@@ -7,7 +7,8 @@ import {
   EventRef
 } from 'obsidian';
 import MomentDateRegex from './moment-date-regex';
-import moment from 'moment';
+import moment, { Duration, min } from 'moment';
+import { Editor, EditorChangeLinkedList } from 'codemirror';
 import { DayPlannerSettingsTab } from './settings-tab';
 import { DayPlannerSettings } from './settings';
 import { DAY_PLANNER_FILENAME } from './constants';
@@ -23,9 +24,9 @@ export default class DayPlanner extends Plugin {
   statusBarText: HTMLSpanElement;
   statusBarProgress: HTMLDivElement;
   statusBarCurrentProgress: HTMLDivElement;
-
   
-   
+  
+  
   onInit() {}
   
   async onload() {
@@ -37,25 +38,25 @@ export default class DayPlanner extends Plugin {
     this.parser = new Parser(this.app.vault);
     
     this.linkToDayPlanBlock();
-    // this.registerEvent(this.app.workspace.on('file-open', this.parseDayPlanner));
     this.registerEvent(this.app.on("codemirror", this.codeMirror));
     
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
     this.parseDayPlanner();
-
+    
     this.registerInterval(
-        window.setInterval(() => this.refreshStatusBar(), 2500)
-    );
-  }
-
-    async refreshStatusBar() {
-       const planSummary = await this.parseDayPlanner();
-       const current = planSummary.current();
-       this.updateProgress(current.current, current.next);
+      window.setInterval(() => this.refreshStatusBar(), 2500)
+      );
     }
-
+    
+    async refreshStatusBar() {
+      const planSummary = await this.parseDayPlanner();
+      const current = planSummary.current();
+      this.updateProgress(current.current, current.next);
+    }
+    
     updateProgress(current: PlanItem, next: PlanItem) {
-      if(!current || !next){
+      if(current.isEnd){
+        this.progressBar(100, '0', current);
         return;
       }
       const nowMoment = moment(new Date());
@@ -63,20 +64,41 @@ export default class DayPlanner extends Plugin {
       const nextMoment = moment(next.time);
       const diff = moment.duration(nextMoment.diff(currentMoment));
       const fromStart = moment.duration(nowMoment.diff(currentMoment));
-      const fromNext = moment.duration(nextMoment.diff(nowMoment));
+      const untilNext = moment.duration(nextMoment.diff(nowMoment));
       let percentageComplete = (fromStart.asMinutes()/diff.asMinutes())*100;
-      console.log(fromStart.asMinutes(), fromNext.asMinutes(), diff.asMinutes(), percentageComplete);
-      this.statusBarCurrentProgress.style.width = `${percentageComplete.toFixed(0)}%`;
-      this.statusBarText.innerText = `${fromNext.asMinutes().toFixed(0)} mins left`;
+      const minsUntilNext = untilNext.asMinutes().toFixed(0);
+      this.progressBar(percentageComplete, minsUntilNext, current);
     }
-  
+    
+    progressBar(percentageComplete: number, minsUntilNext:string, current: PlanItem) {
+      console.log(percentageComplete);
+      if(current.isBreak){
+        this.statusBarCurrentProgress.addClass('green');
+        this.statusBarProgress.style.display = 'block';
+      } else if(current.isEnd) {
+        this.statusBarProgress.style.display = 'none';
+      } else {
+        this.statusBarCurrentProgress.removeClass('green');
+        this.statusBarProgress.style.display = 'block';
+      }
+      this.statusBarCurrentProgress.style.width = `${percentageComplete.toFixed(0)}%`;
+      this.statusBarText.innerText = this.statusText(minsUntilNext, current);
+    }
+    
+    private statusText(minsUntilNext: string, current: PlanItem): string{
+      if(current.isEnd){
+        return 'ALL DONE!'
+      }
+      const minsText = `${minsUntilNext} mins`;
+      return current.isBreak ? `Break for ${minsText}` : `${minsText} left`;
+    }
+    
     async parseDayPlanner():Promise<PlanSummaryData> {
       const fileContent = await this.vault.adapter.read(DAY_PLANNER_FILENAME);
       const planData = await this.parser.parseMarkdown(fileContent);
-      console.log('Current Task', planData.current());
       return planData;
     }
-  
+    
     linkToDayPlanBlock() {
       if(this.statusBarAdded) {
         return;
@@ -87,20 +109,25 @@ export default class DayPlanner extends Plugin {
       let status = this.statusBar.createEl('div', { cls: 'day-planner', 'title': 'View the Day Planner', prepend: true});
       this.statusBarText = status.createEl('span', { cls: ['status-bar-item-segment', 'day-planner-status-bar-text']});
       this.statusBarProgress = status.createEl('div', { cls: ['status-bar-item-segment', 'day-planner-progress-bar']});
+      this.statusBarProgress.style.display = 'none';
       this.statusBarCurrentProgress = this.statusBarProgress.createEl('div', { cls: 'day-planner-progress-value'});
       status.onClickEvent((ev: any) => {
         this.app.workspace.openLinkText('Day Planner', '', false);
       });
-
+      
       this.statusBarAdded = true;
     }
+    
+    updateDayPlannerMarkdown(instance: Editor, changes: EditorChangeLinkedList[]) {
 
-    codeMirror = (cm: any) => {
-      console.log(cm);
     }
-
+    
+    codeMirror = (cm: Editor) => {
+      cm.on('changes', this.updateDayPlannerMarkdown)
+    }
+    
     onunload() {
       console.log("Unloading Day Planner plugin");
     }
-
-}
+    
+  }

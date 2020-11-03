@@ -18,7 +18,11 @@ export class PlanSummaryData {
         let result = null;
         this.items.forEach((item, i) => {
             const next = this.items[i+1];
-            if(item.time < now && (!next || now < next.time)){
+            if(item.isEnd){
+                result = {current: item, next: null};
+                return;
+            }
+            if(item.time < now && (next && now < next.time)){
                 result = {current: item, next: next};
             } 
         });
@@ -37,14 +41,18 @@ export class PlanRenderData {
 export class PlanItem {
     matchIndex: number;
     charIndex: number;
-    completed: boolean;
+    isCompleted: boolean;
+    isBreak: boolean;
+    isEnd: boolean;
     time: Date;
     text: string;
 
-    constructor(matchIndex: number, charIndex: number, completed: boolean, time: Date, text: string){
+    constructor(matchIndex: number, charIndex: number, isCompleted: boolean, isBreak: boolean, isEnd: boolean, time: Date, text: string){
         this.matchIndex = matchIndex;
         this.charIndex = charIndex;
-        this.completed = completed;
+        this.isCompleted = isCompleted;
+        this.isBreak = isBreak;
+        this.isEnd = isEnd;
         this.time = time;
         this.text = text;
     }
@@ -82,16 +90,30 @@ export default class Parser {
     private transform(regexMatches: RegExpExecArray[]): PlanItem[]{
         const results = regexMatches.map((value:RegExpMatchArray, index) => {
             try {
-                const completed = value.groups.completion.trim().toLocaleLowerCase() === 'x';
+                const isCompleted = this.matchValue(value.groups.completion, 'x');
+                const isBreak = this.matchValue(value.groups.break, 'break');
+                const isEnd = this.matchValue(value.groups.end, 'end');
                 const time = new Date();
                 time.setHours(parseInt(value.groups.hours))
                 time.setMinutes(parseInt(value.groups.minutes))
-                return new PlanItem(index, value.index, completed, time, value.groups.text.trim());
+                return new PlanItem(
+                    index, 
+                    value.index, 
+                    isCompleted, 
+                    isBreak,
+                    isEnd,
+                    time, 
+                    value.groups.text?.trim()
+                );
             } catch (error) {
-
+                console.log(error);
             }
         });
         return results;
+    }
+
+    private matchValue(input: any, match: string): boolean {
+        return input?.trim().toLocaleLowerCase() === match;
     }
 
     private renderProgressInEditor(fileContent:string, items:PlanItem[]){
@@ -99,13 +121,13 @@ export default class Parser {
     }
 
     private empty(): PlanSummaryData {
-        const planData = new PlanSummaryData()
+        const planData = new PlanSummaryData([])
         planData.empty= true;
         return planData;
     }
 
     private invalid(): PlanSummaryData {
-        const planData = new PlanSummaryData()
+        const planData = new PlanSummaryData([])
         planData.invalid = true;
         return planData;
     }

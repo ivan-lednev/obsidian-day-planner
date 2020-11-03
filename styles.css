@@ -27,13 +27,13 @@
 
 .day-planner-progress-value.green {
     background-color: #4CAF50;
-    animation: progress-3 3s ease-in-out forwards;
-    -webkit-animation: progress-3 3s ease-in-out forwards;
+    /* animation: progress-3 3s ease-in-out forwards;
+    -webkit-animation: progress-3 3s ease-in-out forwards; */
 }
 .day-planner-progress-value.yellow {
     background-color: #ff9800;
-    animation: progress-2 3s ease-in-out forwards;
-    -webkit-animation: progress-2 3s ease-in-out forwards;
+    /* animation: progress-2 3s ease-in-out forwards;
+    -webkit-animation: progress-2 3s ease-in-out forwards; */
 }
 
 .day-planner-status-bar-text {
