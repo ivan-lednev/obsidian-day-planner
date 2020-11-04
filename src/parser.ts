@@ -1,4 +1,4 @@
-import { TFile, Vault } from 'obsidian';
+import { ItemView, TFile, Vault } from 'obsidian';
 import { PLAN_PARSER_REGEX } from './constants';
 
 
@@ -6,27 +6,33 @@ export class PlanSummaryData {
     empty: boolean;
     invalid: boolean;
     items: PlanItem[];
+    past: PlanItem[];
+    current: PlanItem;
+    next: PlanItem;
     
     constructor(items: PlanItem[]){
         this.empty = items.length < 1;
         this.invalid = false;
         this.items = items;
+        this.past = [];
     }
 
-    current(): {current: PlanItem, next: PlanItem} {
+    calculate(): void {
         const now = new Date();
-        let result = null;
+        now.setSeconds(0);
+        if(this.items.length === 0){
+            this.empty = true;
+            return;
+        }
         this.items.forEach((item, i) => {
             const next = this.items[i+1];
-            if(item.isEnd){
-                result = {current: item, next: null};
-                return;
-            }
             if(item.time < now && (next && now < next.time)){
-                result = {current: item, next: next};
-            } 
+                this.current = item;
+                this.next = item.isEnd ? null : next;
+            } else if(item.time < now){
+                this.past.push(item);
+            }
         });
-        return result;
     }
 }
 
@@ -39,22 +45,34 @@ export class PlanRenderData {
 }
 
 export class PlanItem {
+
     matchIndex: number;
     charIndex: number;
     isCompleted: boolean;
     isBreak: boolean;
     isEnd: boolean;
     time: Date;
+    rawTime: string;
     text: string;
+    raw: string;
 
-    constructor(matchIndex: number, charIndex: number, isCompleted: boolean, isBreak: boolean, isEnd: boolean, time: Date, text: string){
+    constructor(matchIndex: number, charIndex: number, isCompleted: boolean, 
+        isBreak: boolean, isEnd: boolean, time: Date, rawTime:string, text: string, raw: string){
         this.matchIndex = matchIndex;
         this.charIndex = charIndex;
         this.isCompleted = isCompleted;
         this.isBreak = isBreak;
         this.isEnd = isEnd;
         this.time = time;
+        this.rawTime = rawTime;
         this.text = text;
+        this.raw = raw;
+    }
+
+    isPast() {
+        const now = new Date();
+        now.setSeconds(0);
+        return this.time < now;
     }
 }
 
@@ -84,11 +102,12 @@ export default class Parser {
         while(match = PLAN_PARSER_REGEX.exec(input)){
           matches.push(match)
         }
+        console.log(matches);
         return matches;
     }
 
     private transform(regexMatches: RegExpExecArray[]): PlanItem[]{
-        const results = regexMatches.map((value:RegExpMatchArray, index) => {
+        const results = regexMatches.map((value:RegExpExecArray, index) => {
             try {
                 const isCompleted = this.matchValue(value.groups.completion, 'x');
                 const isBreak = this.matchValue(value.groups.break, 'break');
@@ -96,6 +115,7 @@ export default class Parser {
                 const time = new Date();
                 time.setHours(parseInt(value.groups.hours))
                 time.setMinutes(parseInt(value.groups.minutes))
+                time.setSeconds(0);
                 return new PlanItem(
                     index, 
                     value.index, 
@@ -103,7 +123,9 @@ export default class Parser {
                     isBreak,
                     isEnd,
                     time, 
-                    value.groups.text?.trim()
+                    `${value.groups.hours}:${value.groups.minutes}`,
+                    value.groups.text?.trim(),
+                    value[0]
                 );
             } catch (error) {
                 console.log(error);
