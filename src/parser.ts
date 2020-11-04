@@ -102,7 +102,6 @@ export default class Parser {
         while(match = PLAN_PARSER_REGEX.exec(input)){
           matches.push(match)
         }
-        console.log(matches);
         return matches;
     }
 
