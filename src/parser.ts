@@ -84,15 +84,8 @@ export default class Parser {
     }
 
     async parseMarkdown(fileContent: string): Promise<PlanSummaryData> {
-        // if(file.basename !== 'Day Planner'){
-        //     return this.empty();
-        // }
-        // if(file.extension !== 'md'){
-        //     return this.invalid();
-        // }
         const parsed = this.parse(fileContent);
         const transformed = this.transform(parsed);
-        this.renderProgressInEditor(fileContent, transformed);
         return new PlanSummaryData(transformed);
     }
 
@@ -135,10 +128,6 @@ export default class Parser {
 
     private matchValue(input: any, match: string): boolean {
         return input?.trim().toLocaleLowerCase() === match;
-    }
-
-    private renderProgressInEditor(fileContent:string, items:PlanItem[]){
-
     }
 
     private empty(): PlanSummaryData {

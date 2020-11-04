@@ -3,7 +3,6 @@ import {
     PluginSettingTab,
     Setting
 } from 'obsidian';
-import { TimeZone } from './settings';
 import MomentDateRegex from './moment-date-regex';
 import DayPlanner from './main';
   
@@ -19,20 +18,23 @@ import DayPlanner from './main';
       const { containerEl } = this;
   
       containerEl.empty();
-  
-      new Setting(containerEl)
-        .setName('Default location for new notes')
-        .setDesc('Where newly created notes are placed. Plugin settings will override this.')
-        .addDropdown(dropDown => 
-          dropDown
-            .addOption(TimeZone[TimeZone.GMT], "Time zone")
-            .setValue(TimeZone[this.plugin.settings.timeZone] || TimeZone.GMT.toString())
-            .onChange((value:string) => {
-              this.plugin.settings.timeZone = TimeZone[value as keyof typeof TimeZone];
-              this.plugin.saveData(this.plugin.settings);
-              this.display();
-            }));
 
-      
+      new Setting(containerEl)
+        .setName('Day planner notes folder')
+        .setDesc('Day planner notes will appear under this folder.')
+        .addTextArea((text) =>
+            text
+                .setPlaceholder("Example: Day Planners")
+                .setValue(this.plugin.settings.customFolder)
+                .onChange((value) => {
+                    this.plugin.settings.customFolder = value;
+                    this.plugin.saveData(this.plugin.settings);
+              })
+        );
     }
+
+    close() {
+      this.plugin.file.createFolderIfNotExists(this.plugin.settings.customFolder);
+    }
+
   }
