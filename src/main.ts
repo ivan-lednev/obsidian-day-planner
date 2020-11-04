@@ -48,7 +48,7 @@ export default class DayPlanner extends Plugin {
       window.setInterval(async () => await this.refreshStatusBar(), 2000));
 
     this.registerInterval(
-      window.setInterval(async () => this.updateDayPlannerMarkdown(await this.parseDayPlanner()), 1000));
+      window.setInterval(async () => this.updateDayPlannerMarkdown(await this.parseDayPlanner()), 30000));
 
       this.refreshStatusBar();
       this.updateDayPlannerMarkdown(await this.parseDayPlanner());
