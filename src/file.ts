@@ -1,6 +1,6 @@
 import { Vault } from 'obsidian';
 import { DAY_PLANNER_DEFAULT_CONTENT } from './constants';
-import { DayPlannerSettings, Location } from './settings';
+import { DayPlannerSettings } from './settings';
 
 export default class DayPlannerFile {
     vault: Vault;

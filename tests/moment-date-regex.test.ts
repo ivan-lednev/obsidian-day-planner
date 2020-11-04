@@ -14,7 +14,7 @@ describe("Date formatting", () => {
     
     it("No date format formatting using standad format", () => {
         const input = 'Zettels/{{date}}';
-        const expectedOuput = 'Zettels/202010311425';
+        const expectedOuput = 'Zettels/20201031';
         
         assert.equal(momentRegex.replace(input), expectedOuput);
     });

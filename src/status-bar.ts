@@ -1,6 +1,7 @@
+import { stat } from 'fs';
 import { Workspace } from 'obsidian';
 import DayPlannerFile from './file';
-import { PlanItem } from './parser';
+import { PlanItem } from './plan-data';
 import PlannerMarkdown from './planner-md';
 import Progress from './progress';
 import { DayPlannerSettings } from './settings';
@@ -28,17 +29,15 @@ export default class StatusBar {
         const planSummary = await this.plannerMD.parseDayPlanner();
         planSummary.calculate();
         if(!planSummary.empty && !planSummary.invalid){
-            const current = planSummary.current;
-            if(current){
-                this.updateProgress(planSummary.current, planSummary.next);
-            }
+            this.updateProgress(planSummary.current, planSummary.next);
         }
     }
 
     private updateProgress(current: PlanItem, next: PlanItem) {
-        if(current.isEnd || !next){
-          this.progressBar(100, '0', current);
-          return;
+        if(!current || !next || current.isEnd){
+            this.statusBarProgress.style.display = 'none';
+            this.statusBarText.innerText = 'ALL DONE!';
+            return;
         }
         const { percentageComplete, minsUntilNext } = this.progress.getProgress(current, next);
         this.progressBar(percentageComplete, minsUntilNext, current);
@@ -48,8 +47,6 @@ export default class StatusBar {
         if(current.isBreak){
           this.statusBarCurrentProgress.addClass('green');
           this.statusBarProgress.style.display = 'block';
-        } else if(current.isEnd) {
-          this.statusBarProgress.style.display = 'none';
         } else {
           this.statusBarCurrentProgress.removeClass('green');
           this.statusBarProgress.style.display = 'block';
@@ -59,9 +56,6 @@ export default class StatusBar {
       }
       
       private statusText(minsUntilNext: string, current: PlanItem): string{
-        if(current.isEnd){
-          return 'ALL DONE!'
-        }
         minsUntilNext = minsUntilNext === '0' ? '1' : minsUntilNext;
         const minsText = `${minsUntilNext} min${minsUntilNext === '1' ? '' : 's'}`;
         return (current.isBreak ? `Break for ${minsText}` : `${minsText} left`);
