@@ -19,7 +19,7 @@ export class PlanSummaryData {
 
     calculate(): void {
         const now = new Date();
-        now.setSeconds(0);
+        // now.setSeconds(0);
         if(this.items.length === 0){
             this.empty = true;
             return;
@@ -71,7 +71,7 @@ export class PlanItem {
 
     isPast() {
         const now = new Date();
-        now.setSeconds(0);
+        // now.setSeconds(0);
         return this.time < now;
     }
 }
