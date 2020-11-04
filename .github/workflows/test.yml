@@ -1,0 +1,39 @@
+name: CI Test
+
+on:
+  pull_request:
+      branches:
+        - main
+  push:
+    # Sequence of patterns matched against refs/tags
+    branches:
+      - feature/*
+
+env:
+  PLUGIN_NAME: obsidian-day-planner # Change this to the name of your plugin-id folder
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '14.x' # You might need to adjust this value to your own version
+    - name: Build
+      id: build
+      run: | 
+        npm install
+        npm run build --if-present
+        mkdir ${{ env.PLUGIN_NAME }}
+        cp dist/main.js manifest.json ${{ env.PLUGIN_NAME }}
+        zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
+        ls
+        echo "::set-output name=tag_name::$(git tag --sort version:refname | tail -n 1)"
+    - name: Test
+      id: test
+      run: |
+        npm run test
