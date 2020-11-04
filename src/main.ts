@@ -70,7 +70,6 @@ export default class DayPlanner extends Plugin {
 
       let dayPlannerContents = await this.vault.adapter.read(fileName)
       planSummary.calculate();
-      console.log(planSummary);
       if(planSummary.empty){
         return;
       }
