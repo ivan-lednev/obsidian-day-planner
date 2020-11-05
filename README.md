@@ -1,20 +1,98 @@
 # Day Planner
 
-<!-- ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lynchjames/obsidian-day-planner/Release%20Build?logo=github&style=for-the-badge) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/lynchjames/obsidian-day-planner?style=for-the-badge&sort=semver) -->
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lynchjames/obsidian-day-planner/Release%20Build?logo=github&style=for-the-badge) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/lynchjames/obsidian-day-planner?style=for-the-badge&sort=semver)
 
 
 This repository contains a plugin for [Obsidian](https://obsidian.md/) for day planning and managing pomodoro timers in Markdown. 
 
     
 ## Usage
+Once installed, the plugin will create a folder called Day Planners in the root of your vault. A note for today will automatically be created with the file name format `Day Planners/Day Planner-YYYYMMDD.md`.
+
+### Day Planner Note
+
+Within the note, you can create a check list with times and tasks which will be automatically be tracked during the day. Here is an example:
+
+```markdown
+# Day Planner
+- [ ] 09:30 Setup for work
+- [ ] 09:45 Review notes from yesterday
+- [ ] 10:30 Create new notes for #article review
+- [ ] 11:30 BREAK
+- [ ] 12:00 Reading
+- [ ] 12:25 BREAK
+- [ ] 12:30 Reading
+- [ ] 14:00 BREAK
+- [ ] 15:00 Review notes and update daily note [[20201103]]
+- [ ] 15:45 Walk
+- [ ] 16:30 Reading
+- [ ] 17:20 Prep for tomorrow's meetings
+- [ ] 18:00 END
+```
+
+This is also provided as a file in [day-planner-example.md](examples/day-planner-example.md).
+
+The format of the task list items is important as this is what is used to calculate the times of each task and the intervals between tasks. The format used should be:
+
+ `- [ ] HH:mm Task text` 
+ 
+ **24 hour times should be used.** 
+
+ `BREAK` and `END` are keywords that define breaks and the end to the time tracking for the tasks. They are not case sensitive so `break` and `end` can also be used.
+
+ The note will update automatically in the following ways:
+
+ - Tasks in the past will be checked and marked as complete.
+ - The current task will be called out and a progress indicator will be included in the note.
+
+Using the example above, at 14:30 the note would have automatically updated to:
+
+```markdown
+# Day Planner
+- [x] 09:30 Setup for work
+- [x] 09:45 Review notes from yesterday
+- [x] 10:30 Create new notes for #article review
+- [x] 11:30 BREAK
+- [x] 12:00 Reading
+- [x] 12:25 BREAK
+- [x] 12:30 Reading
+---
+**Current Task**
+- [ ] 14:00 BREAK
+
+||14:00||->->->->->->->->->->_ _ _ _ _ _ _ _ ||15:00||
+
+---
+- [ ] 15:00 Review notes and update daily note [[20201103]]
+- [ ] 15:45 Walk
+- [ ] 16:30 Reading
+- [ ] 17:20 Prep for tomorrow's meetings
+- [ ] 18:00 END
+```
+
+This would also be displayed in preview mode:
+
+![Day Planner Note Preview](images/day-planner-note-preview.png)
+
+### Status Bar
+
+The status bar in Obsidian will also show the current progress on the task or break with the time remaining. Clicking on the status bar item will take you to the Day Planner note.
+
+#### Task Status
+
+![Task Status](images/task-status.png)
+
+#### Break Status
+
+![Break Status](images/break-status.png)
+
+#### End Status
+
+![End Status](images/end-status.png)
 
 ## Commands
 
-
-## Configuration
-
-### Timezone
-<<<Details of timezone plugin TBC>>>
+There are no commands for this plugin, it runs in the background and will update as you make changes to today's day planner note.
 
 ## Compatibility
 
@@ -33,10 +111,6 @@ As of version [0.9.7 of Obsidian](https://forum.obsidian.md/t/obsidian-release-v
 Note: On some machines the `.obsidian` folder may be hidden. On MacOS you should be able to press `Command+Shift+Dot` to show the folder in Finder.
 1. Reload Obsidian
 1. If prompted about Safe Mode, you can disable safe mode and enable the plugin.
-
-## Credits
-
-TBC
 
 ## For developers
 Pull requests are both weclcome and appreciated. 😀
