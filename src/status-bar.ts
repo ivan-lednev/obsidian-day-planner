@@ -71,10 +71,13 @@ export default class StatusBar {
         this.statusBarProgress.style.display = 'none';
         this.statusBarCurrentProgress = this.statusBarProgress.createEl('div', { cls: 'day-planner-progress-value'});
         status.onClickEvent(async (ev: any) => {
-          const fileName = this.file.todayPlannerFilePath();
-          this.workspace.openLinkText(fileName, '', false);
+            try {
+                const fileName = this.file.todayPlannerFilePath();
+                this.workspace.openLinkText(fileName, '', false);
+            } catch (error) {
+                console.log(error)
+            }
         });
-        
         this.statusBarAdded = true;
       }
 }

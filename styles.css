@@ -8,7 +8,7 @@
 
 .day-planner-progress-bar {
     margin-top: 2px;
-    background-color: lightgray;
+    background-color: var(--back);
     border-radius: 4px;
     min-width: 150px;
     height: 16px;
@@ -21,70 +21,15 @@
     border-radius: 4px;
     height: 16px;
     display: inline-block;
-    /* animation: progress 3s ease-in-out forwards;
-    -webkit-animation: progress 3s ease-in-out forwards; */
 }
 
 .day-planner-progress-value.green {
     background-color: #4CAF50;
-    /* animation: progress-3 3s ease-in-out forwards;
-    -webkit-animation: progress-3 3s ease-in-out forwards; */
 }
 .day-planner-progress-value.yellow {
     background-color: #ff9800;
-    /* animation: progress-2 3s ease-in-out forwards;
-    -webkit-animation: progress-2 3s ease-in-out forwards; */
 }
 
 .day-planner-status-bar-text {
-}
-
-/* animation */
-    @keyframes progress {
-    from {
-    width: 0;
-    }
-    to {
-    width: 55%;
-    }
-}
-    @-webkit-keyframes progress {
-    from {
-    width: 0;
-    }
-    to {
-    width: 55%;
-    }
-}
-    @keyframes progress-2 {
-    from {
-    width: 0;
-    }
-    to {
-    width: 70%;
-    }
-}
-    @-webkit-keyframes progress-2 {
-    from {
-    width: 0;
-    }
-    to {
-    width: 70%;
-    }
-}
-    @keyframes progress-3 {
-    from {
-    width: 0;
-    }
-    to {
-    width: 90%;
-    }
-}
-    @-webkit-keyframes progress-3 {
-    from {
-    width: 0;
-    }
-    to {
-    width: 90%;
-    }
+    
 }

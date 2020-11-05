@@ -14,20 +14,24 @@ export class PlanSummaryData {
     }
 
     calculate(): void {
-        const now = new Date();
-        if(this.items.length === 0){
-            this.empty = true;
-            return;
-        }
-        this.items.forEach((item, i) => {
-            const next = this.items[i+1];
-            if(item.time < now && (item.isEnd || (next && now < next.time))){
-                this.current = item;
-                this.next = item.isEnd ? null : next;
-            } else if(item.time < now){
-                this.past.push(item);
+        try {
+            const now = new Date();
+            if(this.items.length === 0){
+                this.empty = true;
+                return;
             }
-        });
+            this.items.forEach((item, i) => {
+                const next = this.items[i+1];
+                if(item.time < now && (item.isEnd || (next && now < next.time))){
+                    this.current = item;
+                    this.next = item.isEnd ? null : next;
+                } else if(item.time < now){
+                    this.past.push(item);
+                }
+            });
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
 
@@ -54,10 +58,5 @@ export class PlanItem {
         this.rawTime = rawTime;
         this.text = text;
         this.raw = raw;
-    }
-
-    isPast() {
-        const now = new Date();
-        return this.time < now;
     }
 }

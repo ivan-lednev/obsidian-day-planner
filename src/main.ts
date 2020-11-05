@@ -3,7 +3,7 @@ import {
   Vault, 
 } from 'obsidian';
 import { Editor } from 'codemirror';
-import { DayPlannerSettingsTab } from './settings-tab';
+// import { DayPlannerSettingsTab } from './settings-tab';
 import DayPlannerSettings from './settings';
 import StatusBar from './status-bar';
 import Progress from './progress';
@@ -43,8 +43,12 @@ export default class DayPlanner extends Plugin {
     // this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
     this.registerInterval(
       window.setInterval(async () => {
-        await this.statusBar.refreshStatusBar()
-        await this.plannerMD.updateDayPlannerMarkdown(await this.plannerMD.parseDayPlanner())
+        try {            
+          await this.statusBar.refreshStatusBar()
+          await this.plannerMD.updateDayPlannerMarkdown(await this.plannerMD.parseDayPlanner())
+        } catch (error) {
+            console.log(error)
+        }
       }, 2000));
     }
     

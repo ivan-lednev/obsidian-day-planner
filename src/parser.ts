@@ -16,12 +16,16 @@ export default class Parser {
     }
 
     private parse(input: string): RegExpExecArray[] {
-        const matches = [];
-        let match;
-        while(match = PLAN_PARSER_REGEX.exec(input)){
-          matches.push(match)
+        try {
+            const matches = [];
+            let match;
+            while(match = PLAN_PARSER_REGEX.exec(input)){
+              matches.push(match)
+            }
+            return matches;
+        } catch (error) {
+            console.log(error)
         }
-        return matches;
     }
 
     private transform(regexMatches: RegExpExecArray[]): PlanItem[]{
@@ -54,18 +58,6 @@ export default class Parser {
 
     private matchValue(input: any, match: string): boolean {
         return input?.trim().toLocaleLowerCase() === match;
-    }
-
-    private empty(): PlanSummaryData {
-        const planData = new PlanSummaryData([])
-        planData.empty= true;
-        return planData;
-    }
-
-    private invalid(): PlanSummaryData {
-        const planData = new PlanSummaryData([])
-        planData.invalid = true;
-        return planData;
     }
 
 }

@@ -24,33 +24,53 @@ export default class DayPlannerFile {
     }
 
     async prepareFile() {
-        await this.createFolderIfNotExists(this.settings.customFolder);
-        await this.createFileIfNotExists(this.todayPlannerFilePath());
+        try {            
+            await this.createFolderIfNotExists(this.settings.customFolder);
+            await this.createFileIfNotExists(this.todayPlannerFilePath());
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     async createFolderIfNotExists(path: string){
-        const normalizedPath = this.normalizePath(path);
-        const folderExists = await this.vault.adapter.exists(normalizedPath, false)
-        if(!folderExists) {
-          await this.vault.createFolder(normalizedPath);
+        try {
+            const normalizedPath = this.normalizePath(path);
+            const folderExists = await this.vault.adapter.exists(normalizedPath, false)
+            if(!folderExists) {
+              await this.vault.createFolder(normalizedPath);
+            }
+        } catch (error) {
+            console.log(error)
         }
     }
 
     async createFileIfNotExists(fileName: string) {
-        const normalizedFileName = this.normalizePath(fileName);
-        if (!await this.vault.adapter.exists(normalizedFileName, false)) {
-            await this.vault.create(normalizedFileName, DAY_PLANNER_DEFAULT_CONTENT);
+        try {
+            const normalizedFileName = this.normalizePath(fileName);
+            if (!await this.vault.adapter.exists(normalizedFileName, false)) {
+                await this.vault.create(normalizedFileName, DAY_PLANNER_DEFAULT_CONTENT);
+            }
+        } catch (error) {
+            console.log(error)
         }
     }
 
     async getFileContents(fileName: string){
         this.prepareFile();
-        return await this.vault.adapter.read(fileName);
+        try {
+            return await this.vault.adapter.read(fileName);
+        } catch (error) {
+            console.log(error)
+        }
     }
     
     async updateFile(fileName: string, fileContents: string){
         this.prepareFile();
-        return await this.vault.adapter.write(this.normalizePath(fileName), fileContents);
+        try {
+            return await this.vault.adapter.write(this.normalizePath(fileName), fileContents);
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     private normalizePath(path: string) : string {

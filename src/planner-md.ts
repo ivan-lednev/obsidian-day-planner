@@ -23,26 +23,34 @@ export default class PlannerMarkdown {
     }
 
     async parseDayPlanner():Promise<PlanSummaryData> {
-        const filePath = this.file.todayPlannerFilePath();
-        const fileContent = await this.file.getFileContents(filePath);
-        const planData = await this.parser.parseMarkdown(fileContent);
-        return planData;
+        try {
+            const filePath = this.file.todayPlannerFilePath();
+            const fileContent = await this.file.getFileContents(filePath);
+            const planData = await this.parser.parseMarkdown(fileContent);
+            return planData;
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     async updateDayPlannerMarkdown(planSummary: PlanSummaryData) {
         if((this.dayPlannerLastEdit + 6000) > new Date().getTime()) {
             return;
         }
-        const filePath = this.file.todayPlannerFilePath();
-        let dayPlannerContents = await this.file.getFileContents(filePath);
-        planSummary.calculate();
-        if(planSummary.empty){
-            return;
+        try {
+            const filePath = this.file.todayPlannerFilePath();
+            let dayPlannerContents = await this.file.getFileContents(filePath);
+            planSummary.calculate();
+            if(planSummary.empty){
+                return;
+            }
+            dayPlannerContents = this.current(planSummary, dayPlannerContents);
+            dayPlannerContents = this.past(planSummary.past, dayPlannerContents);
+            dayPlannerContents = this.end(planSummary, dayPlannerContents);
+            this.file.updateFile(filePath, dayPlannerContents);
+        } catch (error) {
+            console.log(error)
         }
-        dayPlannerContents = this.current(planSummary, dayPlannerContents);
-        dayPlannerContents = this.past(planSummary.past, dayPlannerContents);
-        dayPlannerContents = this.end(planSummary, dayPlannerContents);
-        this.file.updateFile(filePath, dayPlannerContents);
     }
 
     end(planSummary: PlanSummaryData, plannerText: string): string{
@@ -80,12 +88,16 @@ export default class PlannerMarkdown {
     }
 
     currentItemText(planSummary:PlanSummaryData): string{
-        const current = planSummary.current;
-        const next = planSummary.next;
-
-        const progressMarkdown = `||${current.rawTime}||${this.progress.progressMarkdown(current, next)}||${next.rawTime}||`;
-        let replacementItem = `---\n**Current Task**\n${current.raw}\n\n${progressMarkdown}\n\n---`;      
-        return replacementItem;
+        try {
+            const current = planSummary.current;
+            const next = planSummary.next;
+    
+            const progressMarkdown = `||${current.rawTime}||${this.progress.progressMarkdown(current, next)}||${next.rawTime}||`;
+            let replacementItem = `---\n**Current Task**\n${current.raw}\n\n${progressMarkdown}\n\n---`;      
+            return replacementItem;
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     checkIsDayPlannerEditing(){
@@ -94,7 +106,6 @@ export default class PlannerMarkdown {
             return;
         }
         const viewState = activeLeaf.view.getState();
-        console.log(viewState, this.file.todayPlannerFilePath());
         if(viewState.file === this.file.todayPlannerFilePath()){
             this.dayPlannerLastEdit = new Date().getTime();
         };
