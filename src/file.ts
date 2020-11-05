@@ -14,7 +14,16 @@ export default class DayPlannerFile {
         this.momentDateRegex = new MomentDateRegex();
     }
 
+
+    hasTodayNote(): boolean {
+        return this.settings.mode === DayPlannerMode.File || 
+        (this.settings.todayPlannerNote && this.settings.todayPlannerNote.date.getDate() === new Date().getDate());
+    }
+
     todayPlannerFilePath(): string {
+        if(this.settings.mode === DayPlannerMode.Command){
+            // return this.settings.todayPlannerNote.
+        }
         const fileName = this.todayPlannerFileName();
         return `${this.settings.customFolder ?? 'Day Planners'}/${fileName}`;
     }
@@ -25,10 +34,8 @@ export default class DayPlannerFile {
 
     async prepareFile() {
         try {            
-            if(this.settings.mode === DayPlannerMode.File){
-                await this.createFolderIfNotExists(this.settings.customFolder);
-                await this.createFileIfNotExists(this.todayPlannerFilePath());
-            }
+            await this.createFolderIfNotExists(this.settings.customFolder);
+            await this.createFileIfNotExists(this.todayPlannerFilePath());
         } catch (error) {
             console.log(error)
         }

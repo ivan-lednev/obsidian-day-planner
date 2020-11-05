@@ -36,7 +36,7 @@ export default class DayPlanner extends Plugin {
       new PlannerMarkdown(this.app.workspace, this.settings, this.file, parser, progress),
       this.file
     );
-    await this.file.prepareFile();
+
     this.statusBar.linkToDayPlanBlock();
     this.registerEvent(this.app.on("codemirror", this.codeMirror));
     
@@ -44,8 +44,13 @@ export default class DayPlanner extends Plugin {
     this.registerInterval(
       window.setInterval(async () => {
         try {            
-          await this.statusBar.refreshStatusBar()
-          await this.plannerMD.updateDayPlannerMarkdown(await this.plannerMD.parseDayPlanner())
+          if(this.file.hasTodayNote()){
+            console.log('Active note found, starting file processing')
+            await this.statusBar.refreshStatusBar()
+            await this.plannerMD.updateDayPlannerMarkdown(await this.plannerMD.parseDayPlanner())
+          } else{
+            console.log('No active note, skipping file processing')
+          }
         } catch (error) {
             console.log(error)
         }
@@ -54,7 +59,12 @@ export default class DayPlanner extends Plugin {
     
     codeMirror = (cm: Editor) => {
       cm.on('changes', async () => {
-        this.plannerMD.checkIsDayPlannerEditing();
+        if(this.file.hasTodayNote()) {
+          console.log('Active note found, starting CodeMirror monitoring')
+          this.plannerMD.checkIsDayPlannerEditing();
+        } else {
+          console.log('No active note, skipping CodeMirror monitoring')
+        }
       });
     }
     
