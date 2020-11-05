@@ -1,7 +1,7 @@
 import { Vault } from 'obsidian';
 import { DAY_PLANNER_DEFAULT_CONTENT, DAY_PLANNER_FILENAME } from './constants';
 import MomentDateRegex from './moment-date-regex';
-import DayPlannerSettings from './settings';
+import DayPlannerSettings, { DayPlannerMode } from './settings';
 
 export default class DayPlannerFile {
     vault: Vault;
@@ -25,8 +25,10 @@ export default class DayPlannerFile {
 
     async prepareFile() {
         try {            
-            await this.createFolderIfNotExists(this.settings.customFolder);
-            await this.createFileIfNotExists(this.todayPlannerFilePath());
+            if(this.settings.mode === DayPlannerMode.File){
+                await this.createFolderIfNotExists(this.settings.customFolder);
+                await this.createFileIfNotExists(this.todayPlannerFilePath());
+            }
         } catch (error) {
             console.log(error)
         }
