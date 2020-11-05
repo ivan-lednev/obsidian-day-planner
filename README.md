@@ -3,8 +3,9 @@
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lynchjames/obsidian-day-planner/Release%20Build?logo=github&style=for-the-badge) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/lynchjames/obsidian-day-planner?style=for-the-badge&sort=semver)
 
 
-This repository contains a plugin for [Obsidian](https://obsidian.md/) for day planning and managing pomodoro timers in Markdown. 
+This repository contains a plugin for [Obsidian](https://obsidian.md/) for day planning and managing pomodoro timers from a task list in a Markdown note. 
 
+> This is an early alpha of version of the plugin and it will be running constantly in the background while Obsidian is open and the plugin is enabled. **Pleaes try the plugin in a test vault first, and, most importantly, make sure you have your notes backed up in cloud storage or Git.**
     
 ## Usage
 Once installed, the plugin will create a folder called Day Planners in the root of your vault. A note for today will automatically be created with the file name format `Day Planners/Day Planner-YYYYMMDD.md`.
@@ -30,7 +31,7 @@ Within the note, you can create a check list with times and tasks which will be 
 - [ ] 18:00 END
 ```
 
-This is also provided as a file in [day-planner-example.md](examples/day-planner-example.md).
+This is also provided as a file in [day-planner-example.md](https://github.com/lynchjames/obsidian-day-planner/blob/main/examples/day-planner-example.md).
 
 The format of the task list items is important as this is what is used to calculate the times of each task and the intervals between tasks. The format used should be:
 
@@ -39,6 +40,8 @@ The format of the task list items is important as this is what is used to calcul
  **24 hour times should be used.** 
 
  `BREAK` and `END` are keywords that define breaks and the end to the time tracking for the tasks. They are not case sensitive so `break` and `end` can also be used.
+
+ `END` is used as an item with a time to give an accurate time interval for the last task, *"Prep for tomorrow's meetings"* at 17:00 in this example.
 
  The note will update automatically in the following ways:
 
@@ -72,7 +75,7 @@ Using the example above, at 14:30 the note would have automatically updated to:
 
 This would also be displayed in preview mode:
 
-![Day Planner Note Preview](images/day-planner-note-preview.png)
+![Day Planner Note Preview](https://raw.githubusercontent.com/lynchjames/obsidian-day-planner/main/images/day-planner-note-preview.png)
 
 ### Status Bar
 
@@ -80,15 +83,21 @@ The status bar in Obsidian will also show the current progress on the task or br
 
 #### Task Status
 
-![Task Status](images/task-status.png)
+The status displayed when there is an active task:
+
+![Task Status](https://raw.githubusercontent.com/lynchjames/obsidian-day-planner/main/images/task-status.png)
 
 #### Break Status
 
-![Break Status](images/break-status.png)
+The status displayed during a break:
+
+![Break Status](https://raw.githubusercontent.com/lynchjames/obsidian-day-planner/main/images/break-status.png)
 
 #### End Status
 
-![End Status](images/end-status.png)
+The status displayed when the end of the tasks is reached:
+
+![End Status](https://raw.githubusercontent.com/lynchjames/obsidian-day-planner/main/images/end-status.png)
 
 ## Commands
 
