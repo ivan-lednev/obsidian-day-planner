@@ -4,7 +4,7 @@ import DayPlannerFile from './file';
 import Parser from './parser';
 import { PlanItem, PlanSummaryData } from './plan-data';
 import Progress from './progress';
-import { DayPlannerSettings } from './settings';
+import DayPlannerSettings from './settings';
 
 export default class PlannerMarkdown {
     workspace: Workspace;
@@ -23,9 +23,8 @@ export default class PlannerMarkdown {
     }
 
     async parseDayPlanner():Promise<PlanSummaryData> {
-        const fileName = this.settings.todayPlannerFileName();
-        await this.file.createFileIfNotExists(fileName);
-        const fileContent = await this.file.getFileContents(fileName);
+        const filePath = this.file.todayPlannerFilePath();
+        const fileContent = await this.file.getFileContents(filePath);
         const planData = await this.parser.parseMarkdown(fileContent);
         return planData;
     }
@@ -34,8 +33,8 @@ export default class PlannerMarkdown {
         if((this.dayPlannerLastEdit + 6000) > new Date().getTime()) {
             return;
         }
-        const fileName = this.settings.todayPlannerFileName();
-        let dayPlannerContents = await this.file.getFileContents(fileName);
+        const filePath = this.file.todayPlannerFilePath();
+        let dayPlannerContents = await this.file.getFileContents(filePath);
         planSummary.calculate();
         if(planSummary.empty){
             return;
@@ -43,7 +42,7 @@ export default class PlannerMarkdown {
         dayPlannerContents = this.current(planSummary, dayPlannerContents);
         dayPlannerContents = this.past(planSummary.past, dayPlannerContents);
         dayPlannerContents = this.end(planSummary, dayPlannerContents);
-        this.file.updateFile(fileName, dayPlannerContents);
+        this.file.updateFile(filePath, dayPlannerContents);
     }
 
     end(planSummary: PlanSummaryData, plannerText: string): string{
@@ -95,7 +94,8 @@ export default class PlannerMarkdown {
             return;
         }
         const viewState = activeLeaf.view.getState();
-        if(viewState.file === this.settings.todayPlannerFileName()){
+        console.log(viewState, this.file.todayPlannerFilePath());
+        if(viewState.file === this.file.todayPlannerFilePath()){
             this.dayPlannerLastEdit = new Date().getTime();
         };
     }

@@ -4,7 +4,7 @@ import {
 } from 'obsidian';
 import { Editor } from 'codemirror';
 import { DayPlannerSettingsTab } from './settings-tab';
-import { DayPlannerSettings } from './settings';
+import DayPlannerSettings from './settings';
 import StatusBar from './status-bar';
 import Progress from './progress';
 import PlannerMarkdown from './planner-md';
@@ -33,14 +33,14 @@ export default class DayPlanner extends Plugin {
       this.addStatusBarItem(), 
       this.app.workspace, 
       progress,
-      new PlannerMarkdown(this.app.workspace, this.settings, this.file, parser, progress)
+      new PlannerMarkdown(this.app.workspace, this.settings, this.file, parser, progress),
+      this.file
     );
-    this.file.createFolderIfNotExists(this.settings.customFolder);
+    await this.file.prepareFile();
     this.statusBar.linkToDayPlanBlock();
     this.registerEvent(this.app.on("codemirror", this.codeMirror));
     
-    this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
-    
+    // this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
     this.registerInterval(
       window.setInterval(async () => {
         await this.statusBar.refreshStatusBar()

@@ -1,10 +1,9 @@
-import { stat } from 'fs';
 import { Workspace } from 'obsidian';
 import DayPlannerFile from './file';
 import { PlanItem } from './plan-data';
 import PlannerMarkdown from './planner-md';
 import Progress from './progress';
-import { DayPlannerSettings } from './settings';
+import DayPlannerSettings from './settings';
 
 export default class StatusBar {
     settings: DayPlannerSettings;
@@ -18,11 +17,12 @@ export default class StatusBar {
     progress: Progress;
     plannerMD: PlannerMarkdown;
     
-    constructor(statusBar:HTMLElement, workspace:Workspace, progress:Progress, plannerMD:PlannerMarkdown) {
+    constructor(statusBar:HTMLElement, workspace:Workspace, progress:Progress, plannerMD:PlannerMarkdown, file:DayPlannerFile) {
         this.statusBar = statusBar;
         this.workspace = workspace;
         this.progress = progress;
         this.plannerMD = plannerMD;
+        this.file = file;
     }
 
     async refreshStatusBar() {
@@ -71,8 +71,7 @@ export default class StatusBar {
         this.statusBarProgress.style.display = 'none';
         this.statusBarCurrentProgress = this.statusBarProgress.createEl('div', { cls: 'day-planner-progress-value'});
         status.onClickEvent(async (ev: any) => {
-          const fileName = this.settings.todayPlannerFileName();
-          await this.file.createFileIfNotExists(fileName);
+          const fileName = this.file.todayPlannerFilePath();
           this.workspace.openLinkText(fileName, '', false);
         });
         

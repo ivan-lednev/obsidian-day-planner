@@ -22,7 +22,7 @@ import DayPlanner from './main';
       new Setting(containerEl)
         .setName('Day planner notes folder')
         .setDesc('Day planner notes will appear under this folder.')
-        .addTextArea((text) =>
+        .addText((text) =>
             text
                 .setPlaceholder("Example: Day Planners")
                 .setValue(this.plugin.settings.customFolder)
@@ -30,11 +30,15 @@ import DayPlanner from './main';
                     this.plugin.settings.customFolder = value;
                     this.plugin.saveData(this.plugin.settings);
               })
+        )
+        .addButton((button) => 
+              button
+                .setButtonText('Create')
+                .setCta()
+                .onClick(() => {
+                  this.plugin.file.prepareFile();
+                })
         );
-    }
-
-    close() {
-      this.plugin.file.createFolderIfNotExists(this.plugin.settings.customFolder);
     }
 
   }
