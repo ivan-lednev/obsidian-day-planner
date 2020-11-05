@@ -1,28 +1,30 @@
+import { now } from 'moment';
 import { Vault } from 'obsidian';
 import { DAY_PLANNER_DEFAULT_CONTENT, DAY_PLANNER_FILENAME } from './constants';
 import MomentDateRegex from './moment-date-regex';
-import DayPlannerSettings, { DayPlannerMode } from './settings';
+import { DayPlannerSettings, DayPlannerMode, NoteForDateQuery } from './settings';
 
 export default class DayPlannerFile {
     vault: Vault;
     settings: DayPlannerSettings;
     momentDateRegex: MomentDateRegex;
+    noteForDateQuery: NoteForDateQuery;
 
     constructor(vault: Vault, settings: DayPlannerSettings){
         this.vault = vault;
         this.settings = settings;
         this.momentDateRegex = new MomentDateRegex();
+        this.noteForDateQuery = new NoteForDateQuery();
     }
 
 
     hasTodayNote(): boolean {
-        return this.settings.mode === DayPlannerMode.File || 
-        (this.settings.todayPlannerNote && this.settings.todayPlannerNote.date.getDate() === new Date().getDate());
+        return this.settings.mode === DayPlannerMode.File || this.noteForDateQuery.exists(this.settings.notesToDates);
     }
 
     todayPlannerFilePath(): string {
         if(this.settings.mode === DayPlannerMode.Command){
-            // return this.settings.todayPlannerNote.
+            return this.noteForDateQuery.active(this.settings.notesToDates).notePath;
         }
         const fileName = this.todayPlannerFileName();
         return `${this.settings.customFolder ?? 'Day Planners'}/${fileName}`;
@@ -33,9 +35,11 @@ export default class DayPlannerFile {
     }
 
     async prepareFile() {
-        try {            
-            await this.createFolderIfNotExists(this.settings.customFolder);
-            await this.createFileIfNotExists(this.todayPlannerFilePath());
+        try {      
+            if(this.settings.mode === DayPlannerMode.File){      
+                await this.createFolderIfNotExists(this.settings.customFolder);
+                await this.createFileIfNotExists(this.todayPlannerFilePath());
+            }
         } catch (error) {
             console.log(error)
         }

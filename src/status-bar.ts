@@ -3,7 +3,7 @@ import DayPlannerFile from './file';
 import { PlanItem } from './plan-data';
 import PlannerMarkdown from './planner-md';
 import Progress from './progress';
-import DayPlannerSettings from './settings';
+import { DayPlannerSettings } from './settings';
 
 export default class StatusBar {
     settings: DayPlannerSettings;
@@ -29,8 +29,15 @@ export default class StatusBar {
         const planSummary = await this.plannerMD.parseDayPlanner();
         planSummary.calculate();
         if(!planSummary.empty && !planSummary.invalid){
+            this.statusBar.style.display = 'block';      
             this.updateProgress(planSummary.current, planSummary.next);
+        } else {
+          this.hide();
         }
+    }
+
+    hide() {
+      this.statusBar.style.display = 'none';
     }
 
     private updateProgress(current: PlanItem, next: PlanItem) {

@@ -1,10 +1,12 @@
-import { Workspace } from 'obsidian';
-import { CURRENT_ITEM_PROGRESS_REGEX, CURRENT_ITEM_REGEX, PLAN_ITEM_REGEX } from './constants';
+import { strict } from 'assert';
+import { MarkdownSourceView, MarkdownView, Workspace } from 'obsidian';
+import { stringify } from 'querystring';
+import { CURRENT_ITEM_PROGRESS_REGEX, CURRENT_ITEM_REGEX, DAY_PLANNER_DEFAULT_CONTENT, PLAN_ITEM_REGEX } from './constants';
 import DayPlannerFile from './file';
 import Parser from './parser';
 import { PlanItem, PlanSummaryData } from './plan-data';
 import Progress from './progress';
-import DayPlannerSettings from './settings';
+import { DayPlannerSettings, NoteForDateQuery} from './settings';
 
 export default class PlannerMarkdown {
     workspace: Workspace;
@@ -13,13 +15,27 @@ export default class PlannerMarkdown {
     file: DayPlannerFile;
     parser: Parser;
     progress: Progress;
-
+    noteForDateQuery: NoteForDateQuery;
+    
     constructor(workspace: Workspace, settings: DayPlannerSettings, file: DayPlannerFile, parser: Parser, progress: Progress){
         this.workspace = workspace;
         this.settings = settings;
         this.file = file;
         this.parser = parser;
         this.progress = progress;
+        this.noteForDateQuery = new NoteForDateQuery();
+    }
+    
+    async insertPlanner() {
+        const filePath = this.file.todayPlannerFilePath();
+        const fileContents = await (await this.file.getFileContents(filePath)).split('\n');
+        console.log('Contents', fileContents);
+        const view = this.workspace.activeLeaf.view as MarkdownView;
+        const currentLine = view.sourceMode.cmEditor.getCursor().line;
+        console.log('Line', currentLine);
+        const insertResult = [...fileContents.slice(0, currentLine), ...DAY_PLANNER_DEFAULT_CONTENT.split('\n'), ...fileContents.slice(currentLine)];
+        console.log('Insert Result', insertResult);
+        this.file.updateFile(filePath, insertResult.join('\n'));
     }
 
     async parseDayPlanner():Promise<PlanSummaryData> {
@@ -32,7 +48,7 @@ export default class PlannerMarkdown {
             console.log(error)
         }
     }
-
+    
     async updateDayPlannerMarkdown(planSummary: PlanSummaryData) {
         if((this.dayPlannerLastEdit + 6000) > new Date().getTime()) {
             return;

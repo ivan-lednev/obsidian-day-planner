@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import DayPlannerSettings, { DayPlannerMode } from '../src/settings';
+import { DayPlannerSettings, DayPlannerMode } from '../src/settings';
 
 const settings = new DayPlannerSettings();
 describe("Day Planner Settings defaults", () => {

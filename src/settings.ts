@@ -1,16 +1,27 @@
-export default class DayPlannerSettings {
+export class DayPlannerSettings {
   customFolder: string = 'Day Planners';
   mode: DayPlannerMode = DayPlannerMode.File;
-  todayPlannerNote: NoteForDate;
+  notesToDates: NoteForDate[] = [];
 }
 
 export class NoteForDate {
   notePath: string;
-  date: Date;
+  date: string;
 
-  constructor(notePath: string, date:Date){
+  constructor(notePath: string, date:string){
     this.notePath = notePath;
     this.date = date;
+  }
+}
+
+export class NoteForDateQuery {
+  exists(source: NoteForDate[]): boolean {
+    return this.active(source) !== undefined;
+  }
+
+  active(source: NoteForDate[]): NoteForDate{
+    const now = new Date().toDateString();
+    return source && source.filter(ntd => ntd.date === now)[0];
   }
 }
   

@@ -19,6 +19,5 @@ export const CURRENT_ITEM_REGEX = /\n*((---\s*)?(\*\*Current Task\*\*)|(\s*---))
 export const CURRENT_ITEM_PROGRESS_REGEX = /((\n*\|{2}\d{2}:\d{2}\|{2}(->)*(_ )*\|{2}\d{2}:\d{2}\|{2}))/gmi;
 
 export const DAY_PLANNER_DEFAULT_CONTENT =
-`# Day Planner
-- [ ]
-`
+`## Day Planner
+- [ ] `
