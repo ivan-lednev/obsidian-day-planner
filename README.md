@@ -128,7 +128,7 @@ You can choose to include a dynamically generated [Mermaid Gantt chart](https://
 
 Tasks and breaks will be displayed in separate sections to help visualise your plan for the day.
 
-![Mermaid Gantt Chart Example](images/mermaid-gantt.png)
+![Mermaid Gantt Chart Example](https://raw.githubusercontent.com/lynchjames/obsidian-day-planner/main/images/mermaid-gantt.png)
 
 ## Commands
 
