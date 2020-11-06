@@ -1,6 +1,7 @@
 import { MarkdownView, Workspace } from 'obsidian';
 import { DAY_PLANNER_DEFAULT_CONTENT } from './constants';
 import DayPlannerFile from './file';
+import PlannerMermaid from './mermaid';
 import Parser from './parser';
 import { PlanItem, PlanSummaryData } from './plan-data';
 import Progress from './progress';
@@ -13,6 +14,7 @@ export default class PlannerMarkdown {
     file: DayPlannerFile;
     parser: Parser;
     progress: Progress;
+    mermaid: PlannerMermaid;
     noteForDateQuery: NoteForDateQuery;
     
     constructor(workspace: Workspace, settings: DayPlannerSettings, file: DayPlannerFile, parser: Parser, progress: Progress){
@@ -21,6 +23,7 @@ export default class PlannerMarkdown {
         this.file = file;
         this.parser = parser;
         this.progress = progress;
+        this.mermaid = new PlannerMermaid(this.progress);
         this.noteForDateQuery = new NoteForDateQuery();
     }
     
@@ -68,7 +71,9 @@ export default class PlannerMarkdown {
                 }
                 return result;
             });
-            const newFileContents = fileContents.slice(0, startLine).concat(results).concat(fileContents.slice(endLine));
+            const mermaidResult = this.mermaid.generate(planSummary).split('\n');
+            console.log(mermaidResult);
+            const newFileContents = fileContents.slice(0, startLine).concat(results).concat(mermaidResult).concat(fileContents.slice(endLine));
             this.file.updateFile(filePath, newFileContents.join('\n'));
         } catch (error) {
             console.log(error);
