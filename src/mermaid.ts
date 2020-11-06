@@ -8,6 +8,7 @@ export default class PlannerMermaid {
     constructor(progress: Progress) {
         this.progress = progress;
     }
+
     generate(planSummary: PlanSummaryData): string {
         const {tasks, breaks} = this.generateEntries(planSummary.items);
         return this.mermaidTemplate(moment(new Date()).format('Do MMMM YYYY'), tasks, breaks);
@@ -19,7 +20,7 @@ export default class PlannerMermaid {
         items.forEach((item, i) => {
             const next = items[i+1];
             const mins = this.minuteInterval(item, next);
-            const text = `    ${item.displayText()}      :${item.rawTime.split(':')[0]}-${item.rawTime.split(':')[1]}${mins}`;
+            const text = `    ${item.displayText()}      :${item.rawTime.replace(':', '-')}${mins}`;
             if(item.isBreak) {
                 breaks.push(text);
             } else {
@@ -29,7 +30,7 @@ export default class PlannerMermaid {
         return {tasks, breaks};
     }
 
-    minuteInterval(item: PlanItem, next: PlanItem): string {
+    private minuteInterval(item: PlanItem, next: PlanItem): string {
         if(next === undefined){
             return '';
         }
