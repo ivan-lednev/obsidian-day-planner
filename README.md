@@ -15,7 +15,7 @@ Once installed, the plugin will create a folder called Day Planners in the root 
 Within the note, you can create a check list with times and tasks which will be automatically be tracked during the day. Here is an example:
 
 ```markdown
-# Day Planner
+## Day Planner
 - [ ] 09:30 Setup for work
 - [ ] 09:45 Review notes from yesterday
 - [ ] 10:30 Create new notes for #article review
@@ -29,6 +29,8 @@ Within the note, you can create a check list with times and tasks which will be 
 - [ ] 16:30 Reading
 - [ ] 17:20 Prep for tomorrow's meetings
 - [ ] 18:00 END
+
+---
 ```
 
 This is also provided as a file in [day-planner-example.md](https://github.com/lynchjames/obsidian-day-planner/blob/main/examples/day-planner-example.md).
@@ -51,7 +53,7 @@ The format of the task list items is important as this is what is used to calcul
 Using the example above, at 14:30 the note would have automatically updated to:
 
 ```markdown
-# Day Planner
+## Day Planner
 - [x] 09:30 Setup for work
 - [x] 09:45 Review notes from yesterday
 - [x] 10:30 Create new notes for #article review
@@ -59,18 +61,19 @@ Using the example above, at 14:30 the note would have automatically updated to:
 - [x] 12:00 Reading
 - [x] 12:25 BREAK
 - [x] 12:30 Reading
----
+
 **Current Task**
 - [ ] 14:00 BREAK
 
-||14:00||->->->->->->->->->->_ _ _ _ _ _ _ _ ||15:00||
+> ||14:00||->->->->->->->->->->_ _ _ _ _ _ _ _ ||15:00||
 
----
 - [ ] 15:00 Review notes and update daily note [[20201103]]
 - [ ] 15:45 Walk
 - [ ] 16:30 Reading
 - [ ] 17:20 Prep for tomorrow's meetings
 - [ ] 18:00 END
+
+---
 ```
 
 This would also be displayed in preview mode:
@@ -99,9 +102,25 @@ The status displayed when the end of the tasks is reached:
 
 ![End Status](https://raw.githubusercontent.com/lynchjames/obsidian-day-planner/main/images/end-status.png)
 
+## Configuration
+
+### Day Planner Mode
+
+There are 2 modes to use the Day Planner plugin:
+
+**File mode**
+
+The plugin automatically generates day planner notes for each day within a Day Planners folder.
+
+**Command mode**
+
+Commands are used to insert a Day Planner for today within any note as well as unlinking the Day Planner for today from its current note.
+
 ## Commands
 
-There are no commands for this plugin, it runs in the background and will update as you make changes to today's day planner note.
+Using the plugin in command mode, 2 commands are available to link and unlink a Day Planner.
+
+![Plugin Commands](images/commands.png)
 
 ## Compatibility
 

@@ -1,6 +1,5 @@
-import { strict } from 'assert';
-import { MarkdownSourceView, MarkdownView, Workspace } from 'obsidian';
-import { CURRENT_ITEM_PROGRESS_REGEX, CURRENT_ITEM_REGEX, DAY_PLANNER_DEFAULT_CONTENT, PLAN_ITEM_REGEX } from './constants';
+import { MarkdownView, Workspace } from 'obsidian';
+import { DAY_PLANNER_DEFAULT_CONTENT } from './constants';
 import DayPlannerFile from './file';
 import Parser from './parser';
 import { PlanItem, PlanSummaryData } from './plan-data';
@@ -81,11 +80,11 @@ export default class PlannerMarkdown {
         let endLine = 0;
         for (let i = 0; i < fileContents.length; i++) {
             const dpc = fileContents[i];
-            if(dpc.contains('## Day Planner')){
+            if(dpc.contains('# Day Planner')) {
                 startLine = i+1;
             }
             if(dpc === '---' && startLine >= 0) {
-                endLine = i;
+                endLine = i-1;
                 break;
             }
         }    
