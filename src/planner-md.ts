@@ -89,7 +89,6 @@ export default class PlannerMarkdown {
             }
         }    
         const dayPlannerContents = fileContents.slice(startLine, endLine);
-        console.log('Start and end', startLine, endLine);
         return {startLine, endLine, dayPlannerContents}
     }
 
