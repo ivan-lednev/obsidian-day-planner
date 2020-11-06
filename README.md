@@ -116,11 +116,13 @@ The plugin automatically generates day planner notes for each day within a Day P
 
 Commands are used to insert a Day Planner for today within any note as well as unlinking the Day Planner for today from its current note.
 
+The Day Planner can be placed anywhere within a note as long as the format provided is used. Only the Day Planner section of the note will be updated as time progresses.
+
 ## Commands
 
 Using the plugin in command mode, 2 commands are available to link and unlink a Day Planner.
 
-![Plugin Commands](images/commands.png)
+![Plugin Commands](https://raw.githubusercontent.com/lynchjames/obsidian-day-planner/main/images/commands.png)
 
 ## Compatibility
 
