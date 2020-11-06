@@ -3,6 +3,7 @@ export class DayPlannerSettings {
   mode: DayPlannerMode = DayPlannerMode.File;
   mermaid: boolean = false;
   notesToDates: NoteForDate[] = [];
+  completePastItems: boolean = true;
 }
 
 export class NoteForDate {
