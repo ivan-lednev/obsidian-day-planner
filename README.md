@@ -35,6 +35,8 @@ Within the note, you can create a check list with times and tasks which will be 
 
 This is also provided as a file in [day-planner-example.md](https://github.com/lynchjames/obsidian-day-planner/blob/main/examples/day-planner-example.md).
 
+The Day Planner heading and `---` rule are used to identify the extent of the Day Planner. A heading must be used but can be `#`, `##`, `###` or `####`.
+
 The format of the task list items is important as this is what is used to calculate the times of each task and the intervals between tasks. The format used should be:
 
  `- [ ] HH:mm Task text` 
