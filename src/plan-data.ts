@@ -26,6 +26,7 @@ export class PlanSummaryData {
                     this.current = item;
                     this.next = item.isEnd ? null : next;
                 } else if(item.time < now){
+                    item.isPast = true;
                     this.past.push(item);
                 }
             });
@@ -40,6 +41,7 @@ export class PlanItem {
     matchIndex: number;
     charIndex: number;
     isCompleted: boolean;
+    isPast: boolean;
     isBreak: boolean;
     isEnd: boolean;
     time: Date;
@@ -58,5 +60,15 @@ export class PlanItem {
         this.rawTime = rawTime;
         this.text = text;
         this.raw = raw;
+    }
+
+    displayText() {
+        if(this.isBreak) {
+            return 'BREAK';
+        }
+        if(this.isEnd) {
+            return 'END';
+        }
+        return this.text;
     }
 }

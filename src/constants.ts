@@ -20,4 +20,5 @@ export const CURRENT_ITEM_PROGRESS_REGEX = /((\n*\|{2}\d{2}:\d{2}\|{2}(->)*(_ )*
 
 export const DAY_PLANNER_DEFAULT_CONTENT =
 `## Day Planner
-- [ ] `
+- [ ] 
+---`

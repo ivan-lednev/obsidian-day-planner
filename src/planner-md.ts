@@ -1,6 +1,5 @@
 import { strict } from 'assert';
 import { MarkdownSourceView, MarkdownView, Workspace } from 'obsidian';
-import { stringify } from 'querystring';
 import { CURRENT_ITEM_PROGRESS_REGEX, CURRENT_ITEM_REGEX, DAY_PLANNER_DEFAULT_CONTENT, PLAN_ITEM_REGEX } from './constants';
 import DayPlannerFile from './file';
 import Parser from './parser';
@@ -29,20 +28,19 @@ export default class PlannerMarkdown {
     async insertPlanner() {
         const filePath = this.file.todayPlannerFilePath();
         const fileContents = await (await this.file.getFileContents(filePath)).split('\n');
-        console.log('Contents', fileContents);
         const view = this.workspace.activeLeaf.view as MarkdownView;
         const currentLine = view.sourceMode.cmEditor.getCursor().line;
-        console.log('Line', currentLine);
         const insertResult = [...fileContents.slice(0, currentLine), ...DAY_PLANNER_DEFAULT_CONTENT.split('\n'), ...fileContents.slice(currentLine)];
-        console.log('Insert Result', insertResult);
         this.file.updateFile(filePath, insertResult.join('\n'));
     }
 
     async parseDayPlanner():Promise<PlanSummaryData> {
         try {
             const filePath = this.file.todayPlannerFilePath();
-            const fileContent = await this.file.getFileContents(filePath);
-            const planData = await this.parser.parseMarkdown(fileContent);
+            const fileContent = await (await this.file.getFileContents(filePath)).split('\n');
+            const {dayPlannerContents} = this.getPlannerSegment(fileContent);
+
+            const planData = await this.parser.parseMarkdown(dayPlannerContents);
             return planData;
         } catch (error) {
             console.log(error)
@@ -55,61 +53,59 @@ export default class PlannerMarkdown {
         }
         try {
             const filePath = this.file.todayPlannerFilePath();
-            let dayPlannerContents = await this.file.getFileContents(filePath);
+            const fileContents = await (await this.file.getFileContents(filePath)).split('\n');
+            const {startLine, endLine} = this.getPlannerSegment(fileContents);
+
             planSummary.calculate();
             if(planSummary.empty){
                 return;
             }
-            dayPlannerContents = this.current(planSummary, dayPlannerContents);
-            dayPlannerContents = this.past(planSummary.past, dayPlannerContents);
-            dayPlannerContents = this.end(planSummary, dayPlannerContents);
-            this.file.updateFile(filePath, dayPlannerContents);
+            const results = planSummary.items.map((item, i) => {
+                let result = '';
+                if(item === planSummary.current){
+                    result = item.isEnd ? this.updateItemCompletion(item, true) : this.currentItemText(planSummary);
+                } else {
+                    result = this.updateItemCompletion(item, item.isPast);
+                }
+                return result;
+            });
+            const newFileContents = fileContents.slice(0, startLine).concat(results).concat(fileContents.slice(endLine));
+            this.file.updateFile(filePath, newFileContents.join('\n'));
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
-    end(planSummary: PlanSummaryData, plannerText: string): string{
-        if(planSummary.current && planSummary.current.isEnd){
-            return this.updateItemCompletion(planSummary.current, plannerText);
-        }
-        return plannerText;
-    }
-  
-    past(pastItems: PlanItem[], plannerText: string): string {
-        if(!pastItems || pastItems.length === 0){
-            return plannerText;
-        }
-        pastItems.forEach(item => {
-            plannerText = this.updateItemCompletion(item, plannerText);
-        });
-        return plannerText;
+    getPlannerSegment(fileContents: string[]): {startLine: number, endLine: number, dayPlannerContents: string[]} {
+        let startLine = -1;
+        let endLine = 0;
+        for (let i = 0; i < fileContents.length; i++) {
+            const dpc = fileContents[i];
+            if(dpc.contains('## Day Planner')){
+                startLine = i+1;
+            }
+            if(dpc === '---' && startLine >= 0) {
+                endLine = i;
+                break;
+            }
+        }    
+        const dayPlannerContents = fileContents.slice(startLine, endLine);
+        console.log('Start and end', startLine, endLine);
+        return {startLine, endLine, dayPlannerContents}
     }
 
-    updateItemCompletion(item: PlanItem, text: string) {
-        const replacementItem = item.raw.replace(PLAN_ITEM_REGEX, 
-        `[x] ${item.rawTime}`);
-        return text.replace(item.raw, replacementItem);
+    updateItemCompletion(item: PlanItem, complete: boolean) {
+        console.log(item);
+        return `- [${complete ? 'x' : ' '}] ${item.rawTime} ${item.displayText()}`;
     }
     
-    current(planSummary: PlanSummaryData, plannerText: string): string {
-        plannerText = plannerText.replace(CURRENT_ITEM_REGEX, '');
-        plannerText = plannerText.replace(CURRENT_ITEM_PROGRESS_REGEX, '');
-        if(!planSummary.current || !planSummary.next) {
-            return plannerText;
-        }
-        const replacementItem = this.currentItemText(planSummary);
-        plannerText = plannerText.replace(planSummary.current.raw, replacementItem);
-        return plannerText;
-    }
-
     currentItemText(planSummary:PlanSummaryData): string{
         try {
             const current = planSummary.current;
             const next = planSummary.next;
     
-            const progressMarkdown = `||${current.rawTime}||${this.progress.progressMarkdown(current, next)}||${next.rawTime}||`;
-            let replacementItem = `---\n**Current Task**\n${current.raw}\n\n${progressMarkdown}\n\n---`;      
+            const progressMarkdown = `> ||${current.rawTime}||${this.progress.progressMarkdown(current, next)}||${next.rawTime}||`;
+            let replacementItem = `\n**Current Task**\n${this.updateItemCompletion(current, false)}\n\n${progressMarkdown}\n`;      
             return replacementItem;
         } catch (error) {
             console.log(error)

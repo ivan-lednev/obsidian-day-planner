@@ -9,8 +9,8 @@ export default class Parser {
         this.vault = vault;
     }
 
-    async parseMarkdown(fileContent: string): Promise<PlanSummaryData> {
-        const parsed = this.parse(fileContent);
+    async parseMarkdown(fileContent: string[]): Promise<PlanSummaryData> {
+        const parsed = this.parse(fileContent.join('\n'));
         const transformed = this.transform(parsed);
         return new PlanSummaryData(transformed);
     }
