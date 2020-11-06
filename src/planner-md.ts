@@ -71,6 +71,7 @@ export default class PlannerMarkdown {
                 }
                 return result;
             });
+
             const mermaidResult = this.settings.mermaid ? this.mermaid.generate(planSummary).split('\n') : [];
             const newFileContents = fileContents.slice(0, startLine).concat(results).concat(mermaidResult).concat(fileContents.slice(endLine));
             this.file.updateFile(filePath, newFileContents.join('\n'));
