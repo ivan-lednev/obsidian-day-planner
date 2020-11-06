@@ -93,7 +93,6 @@ export default class PlannerMarkdown {
     }
 
     updateItemCompletion(item: PlanItem, complete: boolean) {
-        console.log(item);
         return `- [${complete ? 'x' : ' '}] ${item.rawTime} ${item.displayText()}`;
     }
     
