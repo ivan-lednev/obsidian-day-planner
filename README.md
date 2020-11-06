@@ -10,6 +10,8 @@ This repository contains a plugin for [Obsidian](https://obsidian.md/) for day p
 ## Usage
 Once installed, the plugin will create a folder called Day Planners in the root of your vault. A note for today will automatically be created with the file name format `Day Planners/Day Planner-YYYYMMDD.md`.
 
+You can choose to use the [Command Mode](#day-planner-mode) instead to add a Day Planner for the current day to any note.
+
 ### Day Planner Note
 
 Within the note, you can create a check list with times and tasks which will be automatically be tracked during the day. Here is an example:
@@ -119,6 +121,14 @@ The plugin automatically generates day planner notes for each day within a Day P
 Commands are used to insert a Day Planner for today within any note as well as unlinking the Day Planner for today from its current note.
 
 The Day Planner can be placed anywhere within a note as long as the format provided is used. Only the Day Planner section of the note will be updated as time progresses.
+
+### Mermaid Gantt
+
+You can choose to include a dynamically generated [Mermaid Gantt chart](https://mermaid-js.github.io/mermaid/#/gantt) in your Day Planner.
+
+Tasks and breaks will be displayed in separate sections to help visualise your plan for the day.
+
+![Mermaid Gantt Chart Example](images/mermaid-gantt.png)
 
 ## Commands
 

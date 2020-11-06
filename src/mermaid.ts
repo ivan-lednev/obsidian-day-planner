@@ -10,7 +10,7 @@ export default class PlannerMermaid {
     }
     generate(planSummary: PlanSummaryData): string {
         const {tasks, breaks} = this.generateEntries(planSummary.items);
-        return this.mermaidTemplate(moment(new Date()).format('D MMMM YYYY'), tasks, breaks);
+        return this.mermaidTemplate(moment(new Date()).format('Do MMMM YYYY'), tasks, breaks);
     }
 
     private generateEntries(items: PlanItem[]): {tasks: string[], breaks: string[]} {

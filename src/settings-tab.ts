@@ -32,6 +32,17 @@ import DayPlanner from './main';
               this.plugin.settings.mode = DayPlannerMode[value as keyof typeof DayPlannerMode];
               this.plugin.saveData(this.plugin.settings);
             }));
+
+      new Setting(containerEl)
+        .setName('Mermaid Gantt')
+        .setDesc('Include a mermaid gantt chart generated for the day planner')
+        .addToggle(toggle => 
+          toggle
+            .setValue(this.plugin.settings.mermaid || false)
+            .onChange((value:boolean) => {
+              this.plugin.settings.mermaid = value;
+              this.plugin.saveData(this.plugin.settings);
+            }));
     }
 
     private modeDescriptionContent(): DocumentFragment {
