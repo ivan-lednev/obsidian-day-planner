@@ -134,6 +134,10 @@ Tasks and breaks will be displayed in separate sections to help visualise your p
 
 ![Mermaid Gantt Chart Example](https://raw.githubusercontent.com/lynchjames/obsidian-day-planner/main/images/mermaid-gantt.png)
 
+Colors for the gantt chart can be overridden with custom CSS and there is [Mermaid documentation](https://mermaid-js.github.io/mermaid/#/gantt?id=styling) on the classes. A CSS file with examples for the task and breaks sections is provided:
+
+[mermaid-gantt-example.css](examples/mermaid-gantt-example.css)
+
 ## Commands
 
 Using the plugin in command mode, 2 commands are available to link and unlink a Day Planner.
