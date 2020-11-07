@@ -80,7 +80,7 @@ export default class PlannerMarkdown {
         }
     }
 
-    getPlannerSegment(fileContents: string[]): {startLine: number, endLine: number, dayPlannerContents: string[]} {
+    private getPlannerSegment(fileContents: string[]): {startLine: number, endLine: number, dayPlannerContents: string[]} {
         let startLine = -1;
         let endLine = 0;
         for (let i = 0; i < fileContents.length; i++) {
@@ -97,11 +97,20 @@ export default class PlannerMarkdown {
         return {startLine, endLine, dayPlannerContents}
     }
 
-    updateItemCompletion(item: PlanItem, complete: boolean) {
-        return `- [${complete ? 'x' : ' '}] ${item.rawTime} ${item.displayText()}`;
+    private updateItemCompletion(item: PlanItem, complete: boolean) {
+        let check = this.check(complete);
+        //Override to use current (user inputted) state if plugin setting is enabled
+        if(!this.settings.completePastItems) {
+            check = this.check(item.isCompleted);
+        }
+        return `- [${check}] ${item.rawTime} ${item.displayText()}`;
+    }
+
+    private check(check: boolean) {
+        return check ? 'x' : ' ';
     }
     
-    currentItemText(planSummary:PlanSummaryData): string{
+    private currentItemText(planSummary:PlanSummaryData): string{
         try {
             const current = planSummary.current;
             const next = planSummary.next;

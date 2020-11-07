@@ -2,7 +2,7 @@ import typescript from '@rollup/plugin-typescript';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import copy from 'rollup-plugin-copy';
-const TEST_VAULT = 'test-vault/.obsidian/plugins/day-planner';
+const TEST_VAULT = 'test-vault/.obsidian/plugins/obsidian-day-planner';
 
 export default {
   input: 'src/main.ts',

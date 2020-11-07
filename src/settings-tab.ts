@@ -34,11 +34,22 @@ import DayPlanner from './main';
             }));
 
       new Setting(containerEl)
+        .setName('Complete past planner items')
+        .setDesc('Mark checkboxes for tasks and breaks in the past as completed')
+        .addToggle(toggle => 
+          toggle
+            .setValue(this.plugin.settings.completePastItems)
+            .onChange((value:boolean) => {
+              this.plugin.settings.completePastItems = value;
+              this.plugin.saveData(this.plugin.settings);
+            }));
+
+      new Setting(containerEl)
         .setName('Mermaid Gantt')
         .setDesc('Include a mermaid gantt chart generated for the day planner')
         .addToggle(toggle => 
           toggle
-            .setValue(this.plugin.settings.mermaid || false)
+            .setValue(this.plugin.settings.mermaid)
             .onChange((value:boolean) => {
               this.plugin.settings.mermaid = value;
               this.plugin.saveData(this.plugin.settings);
