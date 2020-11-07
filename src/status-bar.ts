@@ -88,3 +88,27 @@ export default class StatusBar {
         this.statusBarAdded = true;
       }
 }
+
+// <div class="day-planner-status-card" style="
+//     position: absolute;
+//     top: -136px;
+//     width: 300px;
+//     background-color: var(--background-secondary-alt);
+//     padding: 8px;
+//     border-radius: 4px;
+// ">
+//     <div>
+// <strong>Current Task</strong><br> 16:05 Reading articles
+// </div><br>
+//     <span>
+//    <strong>Up Next</strong><br> 17:00 BREAK</span><div style="
+//     border-left: 20px solid transparent;
+//     border-right: 20px solid transparent;
+//     width: 20px;
+//     position: absolute;
+//     /* top: -25px; */
+//     /* height: 29px; */
+//     border-top: 20px solid var(--background-secondary-alt);
+// "></div>
+    
+//     </div>

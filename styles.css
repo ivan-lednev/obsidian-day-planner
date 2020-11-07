@@ -35,3 +35,10 @@
 .day-planner-status-bar-text {
     
 }
+
+.arrow-down {
+    width: 0; 
+    height: 0; 
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+  }
