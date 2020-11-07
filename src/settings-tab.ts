@@ -35,7 +35,7 @@ import DayPlanner from './main';
 
       new Setting(containerEl)
         .setName('Complete past planner items')
-        .setDesc('Mark checkboxes for tasks and breaks in the past as completed')
+        .setDesc('The plugin will automatically mark checkboxes for tasks and breaks in the past as complete')
         .addToggle(toggle => 
           toggle
             .setValue(this.plugin.settings.completePastItems)
