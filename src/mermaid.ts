@@ -23,7 +23,7 @@ export default class PlannerMermaid {
 
     generate(planSummary: PlanSummaryData): string {
         const {tasks, breaks} = this.generateEntries(planSummary.items);
-        return this.mermaidTemplate(moment(new Date()).format('Do MMMM YYYY'), tasks, breaks);
+        return this.mermaidTemplate(tasks, breaks);
     }
 
     private generateEntries(items: PlanItem[]): {tasks: string[], breaks: string[]} {
@@ -59,11 +59,10 @@ export default class PlannerMermaid {
         return input;
     }
 
-    private mermaidTemplate(date: string, tasks: string[], breaks: string[]):string {
+    private mermaidTemplate(tasks: string[], breaks: string[]):string {
         return `
 \`\`\`mermaid
 gantt
-    title Day Planner for ${date}
     dateFormat  HH-mm
     axisFormat %H:%M
     section Tasks
