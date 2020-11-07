@@ -1,6 +1,18 @@
 import moment from 'moment';
+import { stringify } from 'querystring';
 import { PlanItem, PlanSummaryData } from './plan-data';
 import Progress from './progress';
+interface Replacement {
+    key: string;
+    replacement: string;
+}
+const mermmaidEscapedCharacters: Replacement[] = [
+    { key: ';', replacement:'#59;' },
+    { key: ':', replacement:'#58;' },
+    { key: '#', replacement:'#35;' },
+    //HACK to re-introduce partially replaced replacements!
+    { key: '#35;59;', replacement:'#59;' },
+];
 
 export default class PlannerMermaid {
     progress: Progress;
@@ -20,7 +32,7 @@ export default class PlannerMermaid {
         items.forEach((item, i) => {
             const next = items[i+1];
             const mins = this.minuteInterval(item, next);
-            const text = `    ${item.displayText()}      :${item.rawTime.replace(':', '-')}${mins}`;
+            const text = `    ${this.escape(item.displayText())}     :${item.rawTime.replace(':', '-')}${mins}`;
             if(item.isBreak) {
                 breaks.push(text);
             } else {
@@ -38,6 +50,13 @@ export default class PlannerMermaid {
         const nextMoment = moment(next.time);
         const untilNext = Math.floor(moment.duration(nextMoment.diff(currentMoment)).asMinutes());
         return ', ' + untilNext + 'mm';
+    }
+
+    private escape(input: string){
+        mermmaidEscapedCharacters.forEach(mec => {  
+            input = input.replace(mec.key, mec.replacement)
+        });
+        return input;
     }
 
     private mermaidTemplate(date: string, tasks: string[], breaks: string[]):string {
