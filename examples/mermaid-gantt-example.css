@@ -1,0 +1,37 @@
+/** Mermaid Gantt **/
+
+/* Tasks */
+.section0 {
+    fill: var(--text-accent) !important;
+}
+
+.sectionTitle0 {
+    fill: var(--text-normal) !important;
+}
+
+.task0 {
+    fill: darkblue !important;
+    stroke: darkblue !important;
+}
+
+.taskText0 {
+    fill: var(--text-normal) !important;
+}
+
+/* Breaks */
+.section1 {
+    fill: darkgreen !important;
+}
+
+.sectionTitle0 {
+    fill: var(--text-normal) !important;
+}
+
+.task1 {
+    fill: green !important;
+    stroke: green !important;
+}
+
+.taskText1 {
+    fill: var(--text-highlight-bg) !important;
+}
