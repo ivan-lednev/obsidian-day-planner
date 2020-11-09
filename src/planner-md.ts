@@ -55,8 +55,9 @@ export default class PlannerMarkdown {
         }
         try {
             const filePath = this.file.todayPlannerFilePath();
-            const fileContents = await (await this.file.getFileContents(filePath)).split('\n');
-            const {startLine, endLine} = this.getPlannerSegment(fileContents);
+            const fileContents = await (await this.file.getFileContents(filePath))
+            const fileContentsArr = fileContents.split('\n');
+            const {startLine, endLine} = this.getPlannerSegment(fileContentsArr);
 
             planSummary.calculate();
             if(planSummary.empty){
@@ -73,8 +74,11 @@ export default class PlannerMarkdown {
             });
 
             const mermaidResult = this.settings.mermaid ? this.mermaid.generate(planSummary).split('\n') : [];
-            const newFileContents = fileContents.slice(0, startLine).concat(mermaidResult).concat(results).concat(fileContents.slice(endLine));
-            this.file.updateFile(filePath, newFileContents.join('\n'));
+            const newFileContentsArr = fileContentsArr.slice(0, startLine).concat(mermaidResult).concat(results).concat(fileContentsArr.slice(endLine));
+            const newFileContents = newFileContentsArr.join('\n')
+            if(fileContents !== newFileContents){
+                this.file.updateFile(filePath, newFileContents);
+            }
         } catch (error) {
             console.log(error);
         }
