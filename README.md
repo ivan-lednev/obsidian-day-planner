@@ -163,7 +163,7 @@ Note: On some machines the `.obsidian` folder may be hidden. On MacOS you should
 1. If prompted about Safe Mode, you can disable safe mode and enable the plugin.
 
 ## For developers
-Pull requests are both weclcome and appreciated. 😀
+Pull requests are both welcome and appreciated. 😀
 
 If you would like to contribute to the development of this plugin, please follow the guidelines provided in [CONTRIBUTING.md](CONTRIBUTING.md).
 
