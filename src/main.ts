@@ -123,7 +123,7 @@ export default class DayPlanner extends Plugin {
     }
     
     codeMirror = (cm: Editor) => {
-      cm.on('changes', async () => {
+      cm.on('change', async () => {
         if(this.file.hasTodayNote()) {
           // console.log('Active note found, starting CodeMirror monitoring')
           this.plannerMD.checkIsDayPlannerEditing();
