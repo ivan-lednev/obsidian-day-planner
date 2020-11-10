@@ -4,6 +4,8 @@ export class DayPlannerSettings {
   mermaid: boolean = false;
   notesToDates: NoteForDate[] = [];
   completePastItems: boolean = true;
+  circularProgress: boolean = false;
+  nowAndNextInStatusBar: boolean = false;
 }
 
 export class NoteForDate {
