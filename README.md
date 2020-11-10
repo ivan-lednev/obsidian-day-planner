@@ -140,15 +140,15 @@ Colors for the gantt chart can be overridden with custom CSS and there is [Merma
 
 ### Status Bar - Circular Progress
 
-You can choose to display progress in the status bar with a circular pie chart progress bar.
+You can choose to display progress in the status bar with a circular pie chart progress bar to save horizontal space.
 
-![Circular Progress Bar](images/circular-progress.png)
+![Circular Progress Bar](https://raw.githubusercontent.com/lynchjames/obsidian-day-planner/main/images/circular-progress.png)
 
 ### Status Bar - Now and Next
 
 You can choose to display the time and start of the text for the current and next task.
 
-![Now and Next](images/now-and-next.png)
+![Now and Next](https://raw.githubusercontent.com/lynchjames/obsidian-day-planner/main/images/now-and-next.png)
 
 ## Commands
 
