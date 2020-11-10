@@ -32,6 +32,7 @@ export default class DayPlanner extends Plugin {
     const parser = new Parser(this.vault);
     this.plannerMD = new PlannerMarkdown(this.app.workspace, this.settings, this.file, parser, progress)
     this.statusBar = new StatusBar(
+      this.settings,
       this.addStatusBarItem(), 
       this.app.workspace, 
       progress,
@@ -39,7 +40,7 @@ export default class DayPlanner extends Plugin {
       this.file
     );
 
-    this.statusBar.linkToDayPlanBlock();
+    this.statusBar.initStatusBar();
     this.registerEvent(this.app.on("codemirror", this.codeMirror));
     
     this.addCommand({
@@ -114,7 +115,7 @@ export default class DayPlanner extends Plugin {
         this.settings.notesToDates.remove(activePlanner);
         await this.saveData(this.settings);
         await this.loadData();
-        this.statusBar.hide();
+        this.statusBar.hide(this.statusBar.statusBar);
         new Notification('Day Planner reset', 
           {silent: true, body: `The Day Planner for today has been dissociated from ${activePlanner.notePath} and can be added to another note`});
       } catch (error) {

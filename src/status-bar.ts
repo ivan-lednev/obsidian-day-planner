@@ -11,13 +11,19 @@ export default class StatusBar {
     statusBar: HTMLElement
     statusBarAdded: boolean;
     statusBarText: HTMLSpanElement;
+    nextText: HTMLSpanElement;
     statusBarProgress: HTMLDivElement;
     statusBarCurrentProgress: HTMLDivElement;
+    circle: HTMLDivElement;
     workspace: Workspace;
     progress: Progress;
     plannerMD: PlannerMarkdown;
+  card: HTMLDivElement;
+  cardCurrent: any;
+  cardNext: any;
     
-    constructor(statusBar:HTMLElement, workspace:Workspace, progress:Progress, plannerMD:PlannerMarkdown, file:DayPlannerFile) {
+    constructor(settings: DayPlannerSettings, statusBar:HTMLElement, workspace:Workspace, progress:Progress, plannerMD:PlannerMarkdown, file:DayPlannerFile) {
+        this.settings = settings;
         this.statusBar = statusBar;
         this.workspace = workspace;
         this.progress = progress;
@@ -25,66 +31,147 @@ export default class StatusBar {
         this.file = file;
     }
 
+    initStatusBar() {
+      if(this.statusBarAdded) {
+        return;
+      }
+      let status = this.statusBar.createEl('div', { cls: 'day-planner', title: 'View the Day Planner', prepend: true});
+      
+      this.setupCard(status);
+      this.statusBarText = status.createEl('span', { cls: ['status-bar-item-segment', 'day-planner-status-bar-text']});
+      
+      this.setupCircularProgressBar(status);
+      this.setupHorizontalProgressBar(status);
+      
+      this.nextText = status.createEl('span', { cls: ['status-bar-item-segment', 'day-planner-status-bar-text']});
+      
+      this.setupStatusBarEvents(status);
+      this.statusBarAdded = true;
+    }
+
+    private setupStatusBarEvents(status: HTMLDivElement) {
+      status.onClickEvent(async (ev: any) => {
+          try {
+              const fileName = this.file.todayPlannerFilePath();
+              this.workspace.openLinkText(fileName, '', false);
+          } catch (error) {
+              console.log(error)
+          }
+      });
+      status.on('mouseenter', '.day-planner', () => {
+        this.show(this.card);
+      });
+
+      status.on('mouseleave', '.day-planner', () => {
+        this.hide(this.card);
+      });
+    }
+
     async refreshStatusBar() {
         const planSummary = await this.plannerMD.parseDayPlanner();
         planSummary.calculate();
         if(!planSummary.empty && !planSummary.invalid){
-            this.statusBar.style.display = 'block';      
             this.updateProgress(planSummary.current, planSummary.next);
         } else {
-          this.hide();
+          this.hide(this.statusBar);
         }
     }
 
-    hide() {
-      this.statusBar.style.display = 'none';
+    hide(el: HTMLElement) {
+      if(el) {
+        el.style.display = 'none';
+      }
+    }
+
+    show(el: HTMLElement) {
+      if(el) {
+        el.style.display = 'block';
+      }
+    }
+
+    hideProgress () {
+      this.hide(this.statusBarProgress);
+      this.hide(this.circle);
+      this.hide(this.nextText);
     }
 
     private updateProgress(current: PlanItem, next: PlanItem) {
         if(!current || !next || current.isEnd){
-            this.statusBarProgress.style.display = 'none';
+            this.hideProgress();
             this.statusBarText.innerText = 'ALL DONE!';
             return;
         }
         const { percentageComplete, minsUntilNext } = this.progress.getProgress(current, next);
-        this.progressBar(percentageComplete, minsUntilNext, current);
-      }
-
-    private progressBar(percentageComplete: number, minsUntilNext:string, current: PlanItem) {
-        if(current.isBreak){
-          this.statusBarCurrentProgress.addClass('green');
-          this.statusBarProgress.style.display = 'block';
+        if(this.settings.circularProgress) {
+          this.hide(this.statusBarProgress);
+          this.progressCircle(percentageComplete, current);
         } else {
-          this.statusBarCurrentProgress.removeClass('green');
-          this.statusBarProgress.style.display = 'block';
+          this.hide(this.circle);
+          this.progressBar(percentageComplete, current);
         }
-        this.statusBarCurrentProgress.style.width = `${percentageComplete}%`;
-        this.statusBarText.innerText = this.statusText(minsUntilNext, current);
+        this.statusText(minsUntilNext, current, next, percentageComplete);
+    }
+
+    private progressBar(percentageComplete: number, current: PlanItem) {
+      if(current.isBreak){
+        this.statusBarCurrentProgress.addClass('green');
+      } else {
+        this.statusBarCurrentProgress.removeClass('green');
       }
+      this.statusBarCurrentProgress.style.width = `${percentageComplete}%`;
+      this.show(this.statusBarProgress);
+    }
       
-      private statusText(minsUntilNext: string, current: PlanItem): string{
-        minsUntilNext = minsUntilNext === '0' ? '1' : minsUntilNext;
-        const minsText = `${minsUntilNext} min${minsUntilNext === '1' ? '' : 's'}`;
-        return (current.isBreak ? `Break for ${minsText}` : `${minsText} left`);
+    private progressCircle(percentageComplete: number, current: PlanItem) {
+      if(current.isBreak){
+        this.circle.addClass('green');
+      } else {
+        this.circle.removeClass('green');
       }
-  
-      linkToDayPlanBlock() {
-        if(this.statusBarAdded) {
-          return;
-        }
-        let status = this.statusBar.createEl('div', { cls: 'day-planner', 'title': 'View the Day Planner', prepend: true});
-        this.statusBarText = status.createEl('span', { cls: ['status-bar-item-segment', 'day-planner-status-bar-text']});
-        this.statusBarProgress = status.createEl('div', { cls: ['status-bar-item-segment', 'day-planner-progress-bar']});
-        this.statusBarProgress.style.display = 'none';
-        this.statusBarCurrentProgress = this.statusBarProgress.createEl('div', { cls: 'day-planner-progress-value'});
-        status.onClickEvent(async (ev: any) => {
-            try {
-                const fileName = this.file.todayPlannerFilePath();
-                this.workspace.openLinkText(fileName, '', false);
-            } catch (error) {
-                console.log(error)
-            }
-        });
-        this.statusBarAdded = true;
+      this.circle.setAttr('data-value', percentageComplete.toFixed(0));
+      this.show(this.circle);
+    }
+    
+    private statusText(minsUntilNext: string, current: PlanItem, next: PlanItem, percentageComplete: number) {
+      minsUntilNext = minsUntilNext === '0' ? '1' : minsUntilNext;
+      const minsText = `${minsUntilNext} min${minsUntilNext === '1' ? '' : 's'}`;
+      if(this.settings.nowAndNextInStatusBar) {
+        this.statusBarText.innerHTML = `<strong>Now</strong> ${current.rawTime} ${this.ellipsis(current.displayText(), 10)}`;
+        this.nextText.innerHTML = `<strong>Next</strong> ${next.rawTime} ${this.ellipsis(next.displayText(), 10)}`;
+        this.show(this.nextText);
+      } else {
+        this.hide(this.nextText);
+        const statusText = (current.isBreak ? `Break for ${minsText}` : `${minsText} left`);
+        this.statusBarText.innerText = statusText;
       }
+      this.cardCurrent.innerHTML = `<strong>Current Task (${percentageComplete.toFixed(0)}% complete)</strong><br> ${current.rawTime} ${current.displayText()}`;
+      this.cardNext.innerHTML = `<strong>Next Task (in ${minsText})</strong><br> ${next.rawTime} ${next.displayText()}`;
+    }
+
+    private ellipsis(input: string, limit: number){
+      if(input.length <= limit) {
+        return input;
+      }
+      return input.substring(0, limit) + '...';
+    }
+
+    private setupHorizontalProgressBar(status: HTMLDivElement ) {
+      this.statusBarProgress = status.createEl('div', { cls: ['status-bar-item-segment', 'day-planner-progress-bar']});
+      this.statusBarProgress.style.display = 'none';
+      this.statusBarCurrentProgress = this.statusBarProgress.createEl('div', { cls: 'day-planner-progress-value'});
+    }
+
+    private setupCircularProgressBar(status: HTMLDivElement){
+      this.circle = status.createEl('div', {cls: ['status-bar-item-segment', 'progress-pie day-planner']});
+    }
+
+    private setupCard(status: HTMLDivElement) {
+      this.card = status.createEl('div', {cls: 'day-planner-status-card'});
+      this.cardCurrent = this.card.createEl('span');
+      this.card.createEl('br');
+      this.card.createEl('br');
+      this.cardNext = this.card.createEl('span');
+      this.card.createEl('div', {cls: 'arrow-down'});
+    }
+
 }
