@@ -54,6 +54,28 @@ import DayPlanner from './main';
               this.plugin.settings.mermaid = value;
               this.plugin.saveData(this.plugin.settings);
             }));
+
+      new Setting(containerEl)
+        .setName('Status Bar - Circular Progress')
+        .setDesc('Display a circular progress bar in the status bar')
+        .addToggle(toggle => 
+          toggle
+            .setValue(this.plugin.settings.circularProgress)
+            .onChange((value:boolean) => {
+              this.plugin.settings.circularProgress = value;
+              this.plugin.saveData(this.plugin.settings);
+            }));
+
+      new Setting(containerEl)
+          .setName('Status Bar - Now and Next')
+          .setDesc('Display now and next tasks in the status bar')
+          .addToggle(toggle => 
+            toggle
+              .setValue(this.plugin.settings.nowAndNextInStatusBar)
+              .onChange((value:boolean) => {
+                this.plugin.settings.nowAndNextInStatusBar = value;
+                this.plugin.saveData(this.plugin.settings);
+              }));
     }
 
     private modeDescriptionContent(): DocumentFragment {

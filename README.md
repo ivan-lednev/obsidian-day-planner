@@ -138,6 +138,18 @@ Colors for the gantt chart can be overridden with custom CSS and there is [Merma
 
 [mermaid-gantt-example.css](examples/mermaid-gantt-example.css)
 
+### Status Bar - Circular Progress
+
+You can choose to display progress in the status bar with a circular pie chart progress bar.
+
+![Circular Progress Bar](images/circular-progress.png)
+
+### Status Bar - Now and Next
+
+You can choose to display the time and start of the text for the current and next task.
+
+![Now and Next](images/now-and-next.png)
+
 ## Commands
 
 Using the plugin in command mode, 2 commands are available to link and unlink a Day Planner.
