@@ -22,7 +22,7 @@ export default class PlannerMermaid {
     }
 
     generate(planSummary: PlanSummaryData): string {
-        const {tasks, breaks} = this.generateEntries(planSummary.items);
+        const {tasks, breaks} = this.generateEntries(planSummary.validItems());
         return this.mermaidTemplate(tasks, breaks);
     }
 

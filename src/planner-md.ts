@@ -67,6 +67,8 @@ export default class PlannerMarkdown {
                 let result = '';
                 if(item === planSummary.current){
                     result = item.isEnd ? this.updateItemCompletion(item, true) : this.currentItemText(planSummary);
+                } else if(item.isUnMatched) {
+                    result = item.raw;  
                 } else {
                     result = this.updateItemCompletion(item, item.isPast);
                 }
@@ -120,7 +122,7 @@ export default class PlannerMarkdown {
             const next = planSummary.next;
     
             const progressMarkdown = `> ||${current.rawTime}||${this.progress.progressMarkdown(current, next)}||${next.rawTime}||`;
-            let replacementItem = `\n**Current Task**\n${this.updateItemCompletion(current, false)}\n\n${progressMarkdown}\n`;      
+            let replacementItem = `\n**Current Task**\n\n${progressMarkdown}\n\n${this.updateItemCompletion(current, false)}`;      
             return replacementItem;
         } catch (error) {
             console.log(error)

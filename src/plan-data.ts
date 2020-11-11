@@ -16,16 +16,17 @@ export class PlanSummaryData {
     calculate(): void {
         try {
             const now = new Date();
-            if(this.items.length === 0){
+            const validItems = this.validItems();
+            if(validItems.length === 0){
                 this.empty = true;
                 return;
             }
-            this.items.forEach((item, i) => {
-                const next = this.items[i+1];
-                if(item.time < now && (item.isEnd || (next && now < next.time))){
+            validItems.forEach((item, i) => {
+                const next = validItems[i+1];
+                if(item.time < now && (item.isEnd || (next && now < next.time))) {
                     this.current = item;
                     this.next = item.isEnd ? null : next;
-                } else if(item.time < now){
+                } else if(item.time < now) {
                     item.isPast = true;
                     this.past.push(item);
                 }
@@ -33,6 +34,10 @@ export class PlanSummaryData {
         } catch (error) {
             console.log(error)
         }
+    }
+
+    validItems(): PlanItem[] {
+        return this.items.filter(item => !item.isUnMatched);
     }
 }
 
@@ -44,18 +49,20 @@ export class PlanItem {
     isPast: boolean;
     isBreak: boolean;
     isEnd: boolean;
+    isUnMatched: boolean;
     time: Date;
     rawTime: string;
     text: string;
     raw: string;
-
+    
     constructor(matchIndex: number, charIndex: number, isCompleted: boolean, 
-        isBreak: boolean, isEnd: boolean, time: Date, rawTime:string, text: string, raw: string){
+        isBreak: boolean, isEnd: boolean, isUnMatched: boolean, time: Date, rawTime:string, text: string, raw: string){
         this.matchIndex = matchIndex;
         this.charIndex = charIndex;
         this.isCompleted = isCompleted;
         this.isBreak = isBreak;
         this.isEnd = isEnd;
+        this.isUnMatched = isUnMatched;
         this.time = time;
         this.rawTime = rawTime;
         this.text = text;
