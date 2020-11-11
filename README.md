@@ -29,6 +29,9 @@ Within the note, you can create a check list with times and tasks which will be 
 - [ ] 15:00 Review notes and update daily note [[20201103]]
 - [ ] 15:45 Walk
 - [ ] 16:30 Reading
+  - [ ] Article 1
+  - [ ] Article 2
+  - Article notes review
 - [ ] 17:20 Prep for tomorrow's meetings
 - [ ] 18:00 END
 
@@ -44,6 +47,8 @@ The format of the task list items is important as this is what is used to calcul
  `- [ ] HH:mm Task text` 
  
  **24 hour times should be used.** 
+
+ Nested checklist items or bullets are now also supported to capture sub-tasks of a timed task. Timed tasks must be at the top level of the checkbox list.
 
  `BREAK` and `END` are keywords that define breaks and the end to the time tracking for the tasks. They are not case sensitive so `break` and `end` can also be used.
 
@@ -74,6 +79,9 @@ Using the example above, at 14:30 the note would have automatically updated to:
 - [ ] 15:00 Review notes and update daily note [[20201103]]
 - [ ] 15:45 Walk
 - [ ] 16:30 Reading
+  - [ ] Article 1
+  - [ ] Article 2
+  - [ ] Article notes review
 - [ ] 17:20 Prep for tomorrow's meetings
 - [ ] 18:00 END
 

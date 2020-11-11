@@ -4,6 +4,9 @@
 - [ ] 10:30 Create new notes for #article review
 - [ ] 11:30 BREAK
 - [ ] 12:00 Reading
+  - [ ] Article 1
+  - [ ] Article 2
+  - [ ] Article notes review
 - [ ] 12:25 BREAK
 - [ ] 12:30 Reading
 - [ ] 14:00 BREAK
