@@ -45,7 +45,7 @@ export default class Parser {
                     isBreak,
                     isEnd,
                     time, 
-                    `${value.groups.hours}:${value.groups.minutes}`,
+                    `${value.groups.hours.padStart(2, '0')}:${value.groups.minutes}`,
                     value.groups.text?.trim(),
                     value[0]
                 );
