@@ -76,6 +76,17 @@ import DayPlanner from './main';
                 this.plugin.settings.nowAndNextInStatusBar = value;
                 this.plugin.saveData(this.plugin.settings);
               }));
+
+      new Setting(containerEl)
+          .setName('Task Notification')
+          .setDesc('Display a notification when a new task is started')
+          .addToggle(toggle => 
+            toggle
+              .setValue(this.plugin.settings.showTaskNotification)
+              .onChange((value:boolean) => {
+                this.plugin.settings.showTaskNotification = value;
+                this.plugin.saveData(this.plugin.settings);
+              }));
     }
 
     private modeDescriptionContent(): DocumentFragment {

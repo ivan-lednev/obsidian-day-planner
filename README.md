@@ -158,6 +158,10 @@ You can choose to display the time and start of the text for the current and nex
 
 ![Now and Next](https://raw.githubusercontent.com/lynchjames/obsidian-day-planner/main/images/now-and-next.png)
 
+### Task Notification
+
+You can choose to have an in-app notification display when a new task starts.
+
 ## Commands
 
 Using the plugin in command mode, 2 commands are available to link and unlink a Day Planner.

@@ -18,9 +18,10 @@ export default class StatusBar {
     workspace: Workspace;
     progress: Progress;
     plannerMD: PlannerMarkdown;
-  card: HTMLDivElement;
-  cardCurrent: any;
-  cardNext: any;
+    card: HTMLDivElement;
+    cardCurrent: any;
+    cardNext: any;
+    currentTime: string;
     
     constructor(settings: DayPlannerSettings, statusBar:HTMLElement, workspace:Workspace, progress:Progress, plannerMD:PlannerMarkdown, file:DayPlannerFile) {
         this.settings = settings;
@@ -144,8 +145,20 @@ export default class StatusBar {
         const statusText = (current.isBreak ? `Break for ${minsText}` : `${minsText} left`);
         this.statusBarText.innerText = statusText;
       }
-      this.cardCurrent.innerHTML = `<strong>Current Task (${percentageComplete.toFixed(0)}% complete)</strong><br> ${current.rawTime} ${current.displayText()}`;
-      this.cardNext.innerHTML = `<strong>Next Task (in ${minsText})</strong><br> ${next.rawTime} ${next.displayText()}`;
+      const currentTaskStatus = `Current Task (${percentageComplete.toFixed(0)}% complete)`;
+      const currentTaskTimeAndText = `${current.rawTime} ${current.displayText()}`;
+      const nextTask = `Next Task (in ${minsText})`;
+      const nextTaskTimeAndText = `${next.rawTime} ${next.displayText()}`;
+      this.cardCurrent.innerHTML = `<strong>${currentTaskStatus}</strong><br> ${currentTaskTimeAndText}`;
+      this.cardNext.innerHTML = `<strong>${nextTask}</strong><br> ${nextTaskTimeAndText}`;
+      this.taskNotification(current, currentTaskTimeAndText, nextTask, nextTaskTimeAndText);
+    }
+
+    private taskNotification(current: PlanItem, currentTaskTimeAndText: string, nextTask: string, nextTaskText: string){
+      if(this.settings.showTaskNotification && this.currentTime !== undefined && this.currentTime !== current.time.toUTCString()){
+        new Notification(`Task started, ${currentTaskTimeAndText}`, {body: `${nextTask}: ${nextTaskText}`, requireInteraction: true});
+      }
+      this.currentTime = current.time.toUTCString();
     }
 
     private ellipsis(input: string, limit: number){
