@@ -45,8 +45,15 @@ export default class DayPlanner extends Plugin {
     
     this.addCommand({
       id: 'app:add-day-planner-to-note',
-      name: 'Add a Day Planner for today to the current note',
-      callback: () => this.modeGuard(async () => await this.insertDayPlannerIntoCurrentNote()),
+      name: 'Add a Day Planner template for today to the current note',
+      callback: () => this.modeGuard(async () => await this.insertDayPlannerIntoCurrentNote(true)),
+      hotkeys: []
+    });
+
+    this.addCommand({
+      id: 'app:link-day-planner-to-note',
+      name: 'Link today\'s Day Planner to the current note',
+      callback: () => this.modeGuard(async () => await this.insertDayPlannerIntoCurrentNote(false)),
       hotkeys: []
     });
 
@@ -83,7 +90,7 @@ export default class DayPlanner extends Plugin {
       }
     }
 
-    async insertDayPlannerIntoCurrentNote(){
+    async insertDayPlannerIntoCurrentNote(insertTemplate: boolean){
       try {
         if(!this.settings.notesToDates){
           this.settings.notesToDates = [];
@@ -103,7 +110,9 @@ export default class DayPlanner extends Plugin {
           this.settings.notesToDates.push(new NoteForDate(filePath, new Date().toDateString()));
           await this.saveData(this.settings);
         }
-        this.plannerMD.insertPlanner();
+        if(insertTemplate) {
+          this.plannerMD.insertPlanner();
+        }
       } catch (error) {
         console.error(error);
       }
