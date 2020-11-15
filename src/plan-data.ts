@@ -1,4 +1,4 @@
-import moment from 'moment';
+const moment = (window as any).moment;
 
 export class PlanSummaryData {
     empty: boolean;

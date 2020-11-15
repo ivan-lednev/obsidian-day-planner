@@ -3,8 +3,7 @@ import Timeline from './timeline.svelte';
 import { planSummary, now, nowPosition } from './timeline-store';
 import { MINUTE_MULTIPLIER, VIEW_TYPE_TIMELINE } from './constants';
 import type { PlanSummaryData } from './plan-data';
-import moment from 'moment';
-
+const moment = (window as any).moment;
 
 export default class TimelineView extends ItemView {
     private timeline:Timeline;

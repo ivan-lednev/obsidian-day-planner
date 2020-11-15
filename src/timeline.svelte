@@ -1,10 +1,10 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
-    import moment from 'moment';
     import { planSummary, now, nowPosition } from './timeline-store';
     import type { PlanItem, PlanSummaryData } from './plan-data';
     import { MINUTE_MULTIPLIER } from './constants';
-    
+    const moment = (window as any).moment;
+
     export let summary: PlanSummaryData;
     export let rootEl: HTMLElement;
     let position: number;

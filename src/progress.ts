@@ -1,5 +1,5 @@
-import moment from 'moment';
 import type { PlanItem } from './plan-data';
+const moment = (window as any).moment;
 
 export default class Progress {
     getProgress(current: PlanItem, next: PlanItem) {

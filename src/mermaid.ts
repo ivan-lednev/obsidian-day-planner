@@ -1,6 +1,7 @@
-import moment from 'moment';
 import type { PlanItem, PlanSummaryData } from './plan-data';
 import type Progress from './progress';
+const moment = (window as any).moment;
+
 interface Replacement {
     key: string;
     replacement: string;
