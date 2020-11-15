@@ -223,11 +223,11 @@ color:#fff;
 
 #now-line .timeline-time {
     position: relative;
-    left: 7px;
+    left: 5px;
     top: 0;
     background-color: darkred;
     color: #fff;
-    padding: 0 5px 2px 4px;
+    padding: 0 4px 2px 4px;
     border-radius: 0 0 4px 4px;
     text-align: center;
 }
@@ -332,8 +332,8 @@ color:#fff;
       </div>
       
       <div id="scroll-controls">
-        <label>Track current time</label>
-        <input type="checkbox" class="toggle" bind:checked={autoScroll}>
+        <label for="auto-scroll">Track current time</label>
+        <input id="auto-scroll" type="checkbox" class="toggle" bind:checked={autoScroll}>
       </div>
   </div>
   {:else}
