@@ -1,7 +1,6 @@
 import moment from 'moment';
-import { stringify } from 'querystring';
-import { PlanItem, PlanSummaryData } from './plan-data';
-import Progress from './progress';
+import type { PlanItem, PlanSummaryData } from './plan-data';
+import type Progress from './progress';
 interface Replacement {
     key: string;
     replacement: string;

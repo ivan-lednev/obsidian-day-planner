@@ -5,7 +5,7 @@ import {
 } from 'obsidian';
 import { DayPlannerMode }from './settings';
 import MomentDateRegex from './moment-date-regex';
-import DayPlanner from './main';
+import type DayPlanner from './main';
   
   export class DayPlannerSettingsTab extends PluginSettingTab {
     momentDateRegex = new MomentDateRegex();

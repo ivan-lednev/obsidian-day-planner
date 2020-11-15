@@ -1,5 +1,4 @@
-import { Vault } from 'obsidian';
-import { pid } from 'process';
+import type { Vault } from 'obsidian';
 import { PLAN_PARSER_REGEX } from './constants';
 import { PlanItem, PlanSummaryData } from './plan-data';
 
