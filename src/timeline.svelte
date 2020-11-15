@@ -78,12 +78,11 @@
   width: 65px;
   height: 100%;
 
-  /* background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAB4AAAAUxBAMAAACbhYYMAAAAElBMVEVMaXEAAAAAAAAAAAAAAAAAAAAlAuGTAAAABXRSTlMAJztVqiZ/eKAAAAhySURBVHja7dNBDcMwEADBnnUEQqEUSiEUQrMUwiQUgsBSKfiRSj5rBsJKG8cLqKpJAAYGDAwYGAwMGBgwMGBgMDBgYMDAYGDAwICBAQODgQEDAwYGDAwGBgwMGBgMDBgYMDBgYDAwYGDAwICBwcCAgQEDg4EBAwMGBgwMBgYMDBgYDAwYGDAwYGAwMGBgwMCAgcHAgIEBA4OBAQMDBgYMDAYGDAwYGDAwGBgwMGBgMDBgYMDAgIHBwICBAQMDBgYDAwYGDAwGBgwMGBgwMBgYMDBgYDAwYGDAwICBwcCAgQEDAwYGAwMGBgwMBgYMDBgYMDAYGDAwYGDAwGBgwMCAgcHAgIEBAwMGBgMDBgYMDBgYDAwYGDAwGBgwMGBgwMBgYMDAgIHBwICBAQMDBgYDAwYGDAwYGAwMGBgwMBgYMDBgYMDAYGDAwICBAQODgQEDAwYGAwMGBgwMGBgWlLcGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwhNg1YEL91GBEbhow48ASDGkSgIEBAwMGBgMDBgYMDBgYDAwYGDAwGBgwMGBgwMBgYMDAgIEBA4OBAQMDBgYDAwYGDAwYGAwMGBgwMGBgMDBgYMDAYGDAwICBAQODgQEDAwYGAwMGBgwMGBgMDBgYMDBgYDAwYGDAwGBgwMCAgQEDg4EBAwMGBgwMBgYMDBgYDAwYGDAwYGAwMGBgwMCAgcHAgIEBA4OBAQMDBgYMDAYGDAwYGAwMGBgwMGBgMDBgYMDAgIHBwICBAQODgQEDAwYGDAwGBgwMGBgwMBgYMDBgYDAwYGDAwICBwcCAgQEDAwYGAwMGBgwMBgYMDBgYMDAYGDAwYGAwMGBgwMCAgcHAgIEBAwMGBgMDBgYMDAYGDAwYGDAwGBgwMGBgwMBgYMDAgIHBwICBAQMDBgYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgP+KjwZQVr41gLKaBGBgwMCAgcHAgIEBAwMGBgMDBgYMDAYGDAwYGDAwGBgwMGBgwMBgYMDAgIHBwICBAQMDBgYDAwYGDAwYGAwMGBgwMBgYMDBgYMDAYGDAwICBwcCAgQEDAwYGAwMGBgwMGBgMDBgYMDAYGDAwYGDAwGBgwMCAgQEDg4EBAwMGBgMDBgYMDBgYDAwYGDAwYGAwMGBgwMBgYMDAgIEBA4OBAQMDBgYDAwYGDAwYGAwMGBgwMGBgMDBgYMDAYGDAwICBAQODgQEDAwYGDAwGBgwMGBgMDBgYMDBgYDAwYGDAwICBwcCAgQEDg4EBAwMGBgwMBgYMDBgYDAwYGDAwYGAwMGBgwMCAgcHAgIEBA4OBAQMDBgYMDAYGDAwYGDAwGBgwMGBgMDBgYMDAgIFhQXlpAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT4hDAybUvxqMaBKAgQEDAwYGAwMGBgwMGBgMDBgYMDAYGDAwYGDAwGBgwMCAgQEDg4EBAwMGBgMDBgYMDBgYDAwYGDAwYGAwMGBgwMBgYMDAgIEBA4OBAQMDBgYDAwYGDAwYGAwMGBgwMGBgMDBgYMDAYGDAwICBAQODgQEDAwYGDAwGBgwMGBgMDBgYMDBgYDAwYGDAwICBwcCAgQEDg4EBAwMGBgwMBgYMDBgYDAwYGDAwYGAwMGBgwMCAgcHAgIEBA4OBAQMDBgYMDAYGDAwYGDAwGBgwMGBgMDBgYMDAgIHBwICBAQMDBgYDAwYGDAwGBgwMGBgwMBgYMDBgYDAwYGDAwICBwcCAgQEDAwYGAwMGBgwMBgYMDBgYMDAYGDAwYGDAwGBgwMCAgcHAgIEBAwMGhgXlrQET6hIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPXErgGUlZsGUFaTAAwMGBgwMBgYMDBgYMDAYGDAwICBwcCAgQEDAwYGAwMGBgwMGBgMDBgYMDAYGDAwYGDAwGBgwMCAgQEDg4EBAwMGBgMDBgYMDBgYDAwYGDAwGBgwMGBgwMBgYMDAgIEBA4OBAQMDBgYDAwYGDAwYGAwMGBgwMGBgMDBgYMDAYGDAwICBAQODgQEDAwYGDAwGBgwMGBgMDBgYMDBgYDAwYGDAwGBgwMCAgQEDg4EBAwMGBgwMBgYMDBgYDAwYGDAwYGAwMGBgwMCAgcHAgIEBA4OBAQMDBgYMDAYGDAwYGDAwGBgwMGBgMDBgYMDAgIHBwICBAQODgQEDAwYGDAwGBgwMGBgwMBgYMDBgYDAwYGDAwICBwcCAgQEDAwYGAwMGBgwMBgYMDBgYMDAs6AcpIQ+YzlN7yAAAAABJRU5ErkJggg==); */
-  /* background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAFECAYAAAAqbm4JAAAAAXNSR0IArs4c6QAAAFBlWElmTU0AKgAAAAgAAgESAAMAAAABAAEAAIdpAAQAAAABAAAAJgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAEqADAAQAAAABAAABRAAAAAD0e3WFAAABWWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS40LjAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyI+CiAgICAgICAgIDx0aWZmOk9yaWVudGF0aW9uPjE8L3RpZmY6T3JpZW50YXRpb24+CiAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgpMwidZAAAAmUlEQVR4Ae3aMQ4AIAgDwPL/Ryv6AxzNkTB2uTA1VJLVawgQIECAAAECBAgQIECAAAECBAgQIEBgLFCdmFasJ2MIECBAgAABAgQIECBAgAABAgQIECBAIC8VKzYCBAgQIECAAAECBAgQIECAAAECBAgQuAIvFasvVsdDgAABAgQIECBAgAABAgQIECBAgAABAgQIECBA4DuBDftnBAP3HpAjAAAAAElFTkSuQmCC); */
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAEsCAYAAADHIkNEAAAAAXNSR0IArs4c6QAAAFBlWElmTU0AKgAAAAgAAgESAAMAAAABAAEAAIdpAAQAAAABAAAAJgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFqADAAQAAAABAAABLAAAAAAuMW7GAAABWWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS40LjAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyI+CiAgICAgICAgIDx0aWZmOk9yaWVudGF0aW9uPjE8L3RpZmY6T3JpZW50YXRpb24+CiAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgpMwidZAAAAsElEQVR4Ae3ZMQoAIAgFUL3/ocsO0GBLFE9wESJ8jj8jYlQrAgQIECBAgAABAgQIECBAgAABAgQIECBAgACBbwWyNutGQuuNIkCAAAECBAgQIECAAAECBAgQIECAAAECBAgQeEbgJBLaLScq2smYEyBAgAABAgQIECBAgAABAgQIECBAgAABAgSuCpxEQqKfqyfzOQECBAgQIECAAAECBAgQIECAAAECBAgQIECgKzABwWUEBHBCyqYAAAAASUVORK5CYII=);
   background-repeat: repeat-y;
   opacity: 80%;
 }
+
 .aside__line {
   position: absolute;
   left: 65px;
@@ -94,10 +93,8 @@
 }
 
 .filled {
-  /* transform: scaleY(0); */
   transform-origin: top center;
   z-index: 1;
-  /* background: #f3f1f3; */
   animation: scaleDown 1s ease-in-out;
   animation-fill-mode: forwards;
 }
@@ -127,11 +124,10 @@
 }
 
 .event_item.past {
-  opacity: 80%;
 }
 
 .event_item:hover{
-    /* background-image: linear-gradient(-222deg, #FF8494, #ffa9b7); */
+    background-color: var(--interactive-accent-hover);
     box-shadow: 0px 0px 52px -18px rgba(0, 0, 0, 0.75);
 }
 
@@ -180,7 +176,7 @@
 }
 
 .ei_Copy,.ei_Title{
-    color:#fff;
+    color:var(--text-on-accent);
 }
 
 .ei_Dot,.ei_Title{
@@ -199,23 +195,17 @@
 }
 
 .dot_active{
-  background-color: darkred;
+  background-color: var(--text-error-hover);
 }
 
 .ei_Title{
   margin-left: 26px;
-  color:#363b41;
 }
 
 .ei_Copy{
   font-size: 15px;
   display: inline-block;
   margin-left: 28px;
-}
-
-.dark{
-  background-image: linear-gradient(-222deg, #646464, #454545);
-  color:#fff;
 }
 
 .header_title,.ei_Title,.ce_title{
@@ -225,7 +215,7 @@ color:#fff;
 #now-line {
     height: 4px;
     background-color: darkred;
-    opacity: 50%;
+    opacity: 80%;
     position: absolute;
     z-index: 3;
     width: 100%;
@@ -233,14 +223,19 @@ color:#fff;
 
 #now-line .timeline-time {
     position: relative;
-    left: 10px;
-    top: 4px;
+    left: 7px;
+    top: 0;
+    background-color: darkred;
+    color: #fff;
+    padding: 0 5px 2px 4px;
+    border-radius: 0 0 4px 4px;
+    text-align: center;
 }
 
 #scroll-controls {
     background-color: var(--background-secondary);
     position: fixed;
-    top: 0;
+    bottom: 0;
     width: 100%;
     z-index: 4;
     padding: 8px 15px;
@@ -251,15 +246,15 @@ color:#fff;
 #scroll-controls label {
   display: block;
   float: left;
-  margin: 10px;
+  margin: 2px 10px;
 }
 
 #scroll-controls .toggle {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  width: 62px;
-  height: 32px;
+  width: 50px;
+  height: 20px;
   display: block;
   float: left;
   position: relative;
@@ -278,17 +273,17 @@ color:#fff;
   display: block;
   position: absolute;
   z-index: 2;
-  width: 28px;
-  height: 28px;
+  width: 17px;
+  height: 17px;
   background: #fff;
   left: 2px;
-  top: 2px;
+  top: 1px;
   border-radius: 50%;
-  font: 10px/28px Helvetica;
+  font: 9px/18px Helvetica;
   text-transform: uppercase;
   font-weight: bold;
-  text-indent: -22px;
-  word-spacing: 37px;
+  text-indent: -20px;
+  word-spacing: 30px;
   color: #fff;
   text-shadow: -1px -1px rgba(0,0,0,0.15);
   white-space: nowrap;
@@ -301,44 +296,48 @@ color:#fff;
 }
 
 #scroll-controls .toggle:checked:before {
-  left: 32px;
+  left: 31px;
+}
+
+.empty-timeline {
+  text-align: center;
+  vertical-align: middle;
+  margin-top: 50%;
 }
 
 </style>
 
-<div id="scroll-controls">
-  <label>Track Current Time</label>
-  <input type="checkbox" class="toggle" bind:checked={autoScroll}>
-</div>
-
-<div id="day-planner-timeline-container" style="height:{1440*MINUTE_MULTIPLIER}px;">
-  {#if summary.validItems().length > 0}
-
-    <div class="aside filled">
-
-        <div class="aside__line filled__line">
-
-            <div class="filled__line__completed" style="height: {nowPosition}px;">
-
-            </div>
-
-        </div>
-
-    </div>
-      
-    <div class="events" style='top: {offset(summary.validItems().first())}px'>
-      {#each summary.validItems() as item, i}
-          <div class="event_item event_item_color{i%10+1} {shortClass(item)} {pastClass(item)}" style="height: {item.durationMins*MINUTE_MULTIPLIER}px;">
-            <div class="event_item_contents">
-              <div class="ei_Dot {item === summary.current ? 'dot_active' : ''}"></div>
-              <div class="ei_Title">{item.rawTime}</div>
-              <div class="ei_Copy">{item.displayText() ?? ''}</div>
-            </div>
+{#if summary.validItems().length > 0}
+  <div id="day-planner-timeline-container" style="height:{1440*MINUTE_MULTIPLIER}px;">
+      <div class="aside filled">
+          <div class="aside__line filled__line">
+              <div class="filled__line__completed" style="height: {nowPosition}px;"></div>
           </div>
-      {/each}
+      </div>
+        
+      <div class="events" style='top: {offset(summary.validItems().first())}px'>
+        {#each summary.validItems() as item, i}
+            <div class="event_item event_item_color{i%10+1} {shortClass(item)} {pastClass(item)}" style="height: {item.durationMins*MINUTE_MULTIPLIER}px;">
+              <div class="event_item_contents">
+                <div class="ei_Dot {item === summary.current ? 'dot_active' : ''}"></div>
+                <div class="ei_Title">{item.rawTime}</div>
+                <div class="ei_Copy">{item.displayText() ?? ''}</div>
+              </div>
+            </div>
+        {/each}
+      </div>
+
+      <div id="now-line" style="top:{position}px">
+          <span class="timeline-time">{moment(currentTime).format('HH:mm')}</span>
+      </div>
+      
+      <div id="scroll-controls">
+        <label>Track current time</label>
+        <input type="checkbox" class="toggle" bind:checked={autoScroll}>
+      </div>
+  </div>
+  {:else}
+    <div class="empty-timeline">
+      No Planner Data
     </div>
-    <div id="now-line" style="top:{position}px">
-        <span class="timeline-time">{moment(currentTime).format('HH:mm')}</span>
-    </div>
-    {/if}
-</div>
+{/if}

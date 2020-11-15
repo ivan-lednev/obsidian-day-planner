@@ -13,6 +13,7 @@ import DayPlannerFile from './file';
 import Parser from './parser';
 import { VIEW_TYPE_TIMELINE } from './constants';
 import TimelineView from './timeline-view';
+import { PlanSummaryData } from './plan-data';
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
@@ -151,6 +152,7 @@ export default class DayPlanner extends Plugin {
         await this.saveData(this.settings);
         await this.loadData();
         this.statusBar.hide(this.statusBar.statusBar);
+        this.timelineView && this.timelineView.update(new PlanSummaryData([]));
         new Notification('Day Planner reset', 
           {silent: true, body: `The Day Planner for today has been dissociated from ${activePlanner.notePath} and can be added to another note`});
       } catch (error) {
