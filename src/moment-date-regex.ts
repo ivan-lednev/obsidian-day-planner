@@ -1,5 +1,5 @@
 import { DEFAULT_DATE_FORMAT, DATE_REGEX } from './constants';
-import * as moment from 'moment';
+import moment from 'moment';
 
 export default class MomentDateRegex {
     replace(input: string): string {

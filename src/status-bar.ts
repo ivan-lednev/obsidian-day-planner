@@ -1,9 +1,9 @@
-import { Workspace } from 'obsidian';
-import DayPlannerFile from './file';
-import { PlanItem } from './plan-data';
-import PlannerMarkdown from './planner-md';
-import Progress from './progress';
-import { DayPlannerSettings } from './settings';
+import type { Workspace } from 'obsidian';
+import type DayPlannerFile from './file';
+import type { PlanItem, PlanSummaryData } from './plan-data';
+import type PlannerMarkdown from './planner-md';
+import type Progress from './progress';
+import type { DayPlannerSettings } from './settings';
 
 export default class StatusBar {
     settings: DayPlannerSettings;
@@ -68,14 +68,13 @@ export default class StatusBar {
       });
     }
 
-    async refreshStatusBar() {
-        const planSummary = await this.plannerMD.parseDayPlanner();
-        planSummary.calculate();
+    async refreshStatusBar(planSummary: PlanSummaryData) {
         if(!planSummary.empty && !planSummary.invalid){
             this.updateProgress(planSummary.current, planSummary.next);
         } else {
           this.hide(this.statusBar);
         }
+        return planSummary;
     }
 
     hide(el: HTMLElement) {

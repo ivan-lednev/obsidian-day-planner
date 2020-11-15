@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export class PlanSummaryData {
     empty: boolean;
     invalid: boolean;
@@ -30,6 +32,10 @@ export class PlanSummaryData {
                     item.isPast = true;
                     this.past.push(item);
                 }
+                if(next){
+                    const untilNext = moment.duration(moment(next.time).diff(moment(item.time))).asMinutes();
+                    item.durationMins = untilNext;
+                }
             });
         } catch (error) {
             console.log(error)
@@ -51,6 +57,7 @@ export class PlanItem {
     isEnd: boolean;
     isUnMatched: boolean;
     time: Date;
+    durationMins: number;
     rawTime: string;
     text: string;
     raw: string;

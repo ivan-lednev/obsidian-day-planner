@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { PlanItem } from './plan-data';
+import type { PlanItem } from './plan-data';
 
 export default class Progress {
     getProgress(current: PlanItem, next: PlanItem) {

@@ -1,5 +1,5 @@
 import { now } from 'moment';
-import { Vault } from 'obsidian';
+import type { Vault } from 'obsidian';
 import { DAY_PLANNER_DEFAULT_CONTENT, DAY_PLANNER_FILENAME } from './constants';
 import MomentDateRegex from './moment-date-regex';
 import { DayPlannerSettings, DayPlannerMode, NoteForDateQuery } from './settings';

@@ -1,8 +1,9 @@
 import {
   Plugin,
-  Vault, 
+  Vault,
+  WorkspaceLeaf, 
 } from 'obsidian';
-import { Editor } from 'codemirror';
+import type { Editor } from 'codemirror';
 import { DayPlannerSettingsTab } from './settings-tab';
 import { DayPlannerSettings, DayPlannerMode, NoteForDate, NoteForDateQuery } from './settings';
 import StatusBar from './status-bar';
@@ -10,6 +11,9 @@ import Progress from './progress';
 import PlannerMarkdown from './planner-md';
 import DayPlannerFile from './file';
 import Parser from './parser';
+import { VIEW_TYPE_TIMELINE } from './constants';
+import TimelineView from './timeline-view';
+import { PlanSummaryData } from './plan-data';
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
@@ -18,9 +22,7 @@ export default class DayPlanner extends Plugin {
   plannerMD: PlannerMarkdown;
   statusBar: StatusBar; 
   notesForDatesQuery: NoteForDateQuery;
-  
-  
-  onInit() {}
+  timelineView: TimelineView;
   
   async onload() {
     console.log("Loading Day Planner plugin");
@@ -64,14 +66,30 @@ export default class DayPlanner extends Plugin {
       hotkeys: []
     });
 
+    this.addCommand({
+      id: 'app:show-day-planner-timeline',
+      name: 'Show the Day Planner Timeline',
+      callback: () => this.initLeaf(),
+      hotkeys: []
+    });
+
+    this.registerView(
+      VIEW_TYPE_TIMELINE,
+      (leaf: WorkspaceLeaf) =>
+        (this.timelineView = new TimelineView(leaf))
+    );
+
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
     this.registerInterval(
       window.setInterval(async () => {
         try {            
           if(this.file.hasTodayNote()){
             // console.log('Active note found, starting file processing')
-            await this.statusBar.refreshStatusBar()
-            await this.plannerMD.updateDayPlannerMarkdown(await this.plannerMD.parseDayPlanner())
+            const planSummary = await this.plannerMD.parseDayPlanner();
+            planSummary.calculate();
+            await this.statusBar.refreshStatusBar(planSummary)
+            await this.plannerMD.updateDayPlannerMarkdown(planSummary)
+            this.timelineView && this.timelineView.update(planSummary);
           } else{
             // console.log('No active note, skipping file processing')
           }
@@ -79,6 +97,15 @@ export default class DayPlanner extends Plugin {
             console.log(error)
         }
       }, 2000));
+    }
+
+    initLeaf() {
+      if (this.app.workspace.getLeavesOfType(VIEW_TYPE_TIMELINE).length > 0) {
+        return;
+      }
+      this.app.workspace.getRightLeaf(true).setViewState({
+        type: VIEW_TYPE_TIMELINE,
+      });
     }
 
     modeGuard(command: () => any): void {
@@ -125,6 +152,7 @@ export default class DayPlanner extends Plugin {
         await this.saveData(this.settings);
         await this.loadData();
         this.statusBar.hide(this.statusBar.statusBar);
+        this.timelineView && this.timelineView.update(new PlanSummaryData([]));
         new Notification('Day Planner reset', 
           {silent: true, body: `The Day Planner for today has been dissociated from ${activePlanner.notePath} and can be added to another note`});
       } catch (error) {
@@ -145,6 +173,9 @@ export default class DayPlanner extends Plugin {
     
     onunload() {
       console.log("Unloading Day Planner plugin");
+      this.app.workspace
+      .getLeavesOfType(VIEW_TYPE_TIMELINE)
+      .forEach((leaf) => leaf.detach());
     }
     
   }
