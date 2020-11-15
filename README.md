@@ -96,7 +96,7 @@ This would also be displayed in preview mode:
 
 The `Show the Day Planner Timeline` command can be used to add a vertical timeline view display the tasks for today's Day Planner with a line showing the current time.
 
-![Day Planner Timeline](/images/day-planner-timeline.png)
+![Day Planner Timeline](https://raw.githubusercontent.com/lynchjames/obsidian-day-planner/main/images/day-planner-timeline.png)
 
 ### Status Bar
 
