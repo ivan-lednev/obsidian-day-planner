@@ -14,4 +14,4 @@ export const DAY_PLANNER_DEFAULT_CONTENT =
 ---`
 
 export const VIEW_TYPE_TIMELINE = 'timeline';
-export const MINUTE_MULTIPLIER = 5;
+export const MINUTE_MULTIPLIER = 4;

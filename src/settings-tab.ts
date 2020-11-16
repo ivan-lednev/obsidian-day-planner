@@ -87,6 +87,19 @@ import type DayPlanner from './main';
                 this.plugin.settings.showTaskNotification = value;
                 this.plugin.saveData(this.plugin.settings);
               }));
+
+      new Setting(containerEl)
+          .setName('Timeline Zoom Level')
+          .setDesc('The zoom level to display the timeline. The larger, the higher the zoom level.')
+          .addSlider(slider => 
+            slider
+              .setLimits(1, 5, 1)
+              .setValue(this.plugin.settings.timelineZoomLevel ?? 4)
+              .setDynamicTooltip()
+              .onChange((value:number) => {
+                this.plugin.settings.timelineZoomLevel = value;
+                this.plugin.saveData(this.plugin.settings);
+              }));
     }
 
     private modeDescriptionContent(): DocumentFragment {

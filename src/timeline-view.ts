@@ -1,15 +1,18 @@
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import Timeline from './timeline.svelte';
-import { planSummary, now, nowPosition } from './timeline-store';
-import { MINUTE_MULTIPLIER, VIEW_TYPE_TIMELINE } from './constants';
+import { planSummary, now, nowPosition, zoomLevel } from './timeline-store';
+import { VIEW_TYPE_TIMELINE } from './constants';
 import type { PlanSummaryData } from './plan-data';
+import type { DayPlannerSettings } from './settings';
 const moment = (window as any).moment;
 
 export default class TimelineView extends ItemView {
     private timeline:Timeline;
+    private settings: DayPlannerSettings;
 
-    constructor(leaf: WorkspaceLeaf){
+    constructor(leaf: WorkspaceLeaf, settings: DayPlannerSettings){
         super(leaf);
+        this.settings = settings;
     }
 
     getViewType(): string {
@@ -25,16 +28,16 @@ export default class TimelineView extends ItemView {
     }
 
     update(summaryData: PlanSummaryData) {
-        console.log('View update');
         planSummary.update(n => n = summaryData);
         const currentTime = new Date();
         now.update(n => n = currentTime);
         const currentPosition = this.positionFromTime(currentTime);
         nowPosition.update(n => n = currentPosition);
+        zoomLevel.update(n => n = this.settings.timelineZoomLevel);
     }
 
     positionFromTime(time: Date) {
-        return moment.duration(moment(time).format('HH:mm')).asMinutes()*MINUTE_MULTIPLIER;
+        return moment.duration(moment(time).format('HH:mm')).asMinutes()*this.settings.timelineZoomLevel;
     }
 
     async onOpen() {

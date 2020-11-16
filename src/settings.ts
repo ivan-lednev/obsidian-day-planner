@@ -6,7 +6,8 @@ export class DayPlannerSettings {
   completePastItems: boolean = true;
   circularProgress: boolean = false;
   nowAndNextInStatusBar: boolean = false;
-  showTaskNotification: boolean = false;
+  showTaskNotification: boolean = false
+  timelineZoomLevel: number = 4;
 }
 
 export class NoteForDate {
