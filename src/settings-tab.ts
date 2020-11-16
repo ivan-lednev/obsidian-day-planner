@@ -120,7 +120,7 @@ import type DayPlanner from './main';
 
     private addDocsLink(descEl: DocumentFragment) {
       const a = document.createElement('a');
-      a.href = 'https://github.com/lynchjames/obsidian-day-plannerhttps://github.com/lynchjames/obsidian-day-planner/blob/main/README.md';
+      a.href = 'https://github.com/lynchjames/obsidian-day-planner/blob/main/README.md';
       a.text = 'plugin README';
       a.target = '_blank';
       descEl.appendChild(a);
