@@ -36,10 +36,29 @@
     onDestroy(unsubPosition);
     onDestroy(unsubCurrentTime);
     onDestroy(unsubSettings);
+    onDestroy(removeScrollListener);
+
+    onMount(() => {
+      addScrollListener();
+    });
+
+    function addScrollListener() {
+      rootEl.addEventListener('scroll', disableAutoScroll);
+    }
+
+    function removeScrollListener() {
+      rootEl.removeEventListener('scroll', disableAutoScroll);
+    }
+
+    function disableAutoScroll(ev:any) {
+      autoScroll = false;
+    }
 
     function scrollToPosition(position: number) {
       if(autoScroll) {
+        removeScrollListener();
         rootEl.scrollTo({ left: 0, top: position, behavior: 'smooth' });
+        setTimeout(addScrollListener, 1000);
       }
     }
 
