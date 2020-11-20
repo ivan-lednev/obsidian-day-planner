@@ -66,7 +66,6 @@
 
 #day-planner-timeline-container {
     position: relative;
-    height: 1440px;
 
     --skobeloff: #006466ff;
     --midnight-green-eagle-green: #065a60ff;
@@ -136,6 +135,7 @@
 
 .events {
   position: relative;
+  padding-bottom: 50px;
 }
 
 .event_item{
@@ -336,14 +336,14 @@ color:#fff;
 </style>
 
 {#if summary.validItems().length > 0}
-  <div id="day-planner-timeline-container" style="height:{1440*timelineZoomLevel}px;">
+  <div id="day-planner-timeline-container"><!-- /style="height:{1440*timelineZoomLevel}px;"> -->
       <div class="aside aside-x{timelineZoomLevel} filled">
           <div class="aside__line filled__line">
               <div class="filled__line__completed" style="height: {nowPosition}px;"></div>
           </div>
       </div>
         
-      <div class="events" style='top: {offset(summary.validItems().first())}px'>
+      <div class="events"> <!-- style='top: {offset(summary.validItems().first())}px'> -->
         {#each summary.validItems() as item, i}
             <div class="event_item event_item_color{i%10+1} {shortClass(item)} {pastClass(item)}" style="height: {item.durationMins*timelineZoomLevel}px;">
               <div class="event_item_contents">
@@ -356,6 +356,7 @@ color:#fff;
       </div>
 
       <div id="now-line" style="top:{position}px">
+
           <span class="timeline-time">{moment(currentTime).format('HH:mm')}</span>
       </div>
       
