@@ -9,11 +9,13 @@
     export let rootEl: HTMLElement;
     let timelineZoomLevel: number;
     let position: number;
+    let timelineMeterPosition: number;
     let currentTime: Date;
     let autoScroll: boolean = true;
 
     const unsubSummary = planSummary.subscribe(val => {
         summary = val;
+        updateTimelineMeterPosition();
     });
 
     const unsubPosition = nowPosition.subscribe(val => {
@@ -55,7 +57,7 @@
     }
 
     function scrollToPosition(position: number) {
-      if(autoScroll) {
+      if(autoScroll && !summary.current?.isEnd) {
         removeScrollListener();
         rootEl.scrollTo({ left: 0, top: position, behavior: 'smooth' });
         setTimeout(addScrollListener, 1000);
@@ -66,9 +68,8 @@
         return moment.duration(moment(time).format('HH:mm')).asMinutes();
     }
 
-    function offset(item: PlanItem) {
-        const minuteOffset = inMins(item.time)*timelineZoomLevel;
-        return minuteOffset;
+    function updateTimelineMeterPosition() {
+      timelineMeterPosition = summary.empty ? 0 : ((summary.validItems().first().time.getMinutes()*timelineZoomLevel)*-1) - 1;
     }
 
     function shortClass(item: PlanItem) {
@@ -356,7 +357,7 @@ color:#fff;
 
 {#if summary.validItems().length > 0}
   <div id="day-planner-timeline-container"><!-- /style="height:{1440*timelineZoomLevel}px;"> -->
-      <div class="aside aside-x{timelineZoomLevel} filled">
+      <div class="aside aside-x{timelineZoomLevel} filled" style="top: {timelineMeterPosition}px;">
           <div class="aside__line filled__line">
               <div class="filled__line__completed" style="height: {nowPosition}px;"></div>
           </div>
@@ -374,7 +375,7 @@ color:#fff;
         {/each}
       </div>
 
-      <div id="now-line" style="top:{position}px">
+      <div id="now-line" style="top:{position}px; display: {summary.current && !summary.current.isEnd ? 'block' : 'none'}">
 
           <span class="timeline-time">{moment(currentTime).format('HH:mm')}</span>
       </div>
