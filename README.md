@@ -7,35 +7,67 @@ This repository contains a plugin for [Obsidian](https://obsidian.md/) for day p
 
 > This is an early alpha of version of the plugin and it will be running constantly in the background while Obsidian is open and the plugin is enabled. **Please try the plugin in a test vault first, and, most importantly, make sure you have your notes backed up in cloud storage or Git.**
     
+## Features
+
+- Generate a day planner for you each day or create a day planner in any note you choose.
+- Status bar updates on progress with information on your current and next tasks. You can click on the status bar to access the note for today's day planner.
+- Mermaid Gantt chart automatically generated from your tasks and included in you day planner note.
+- Timeline view showing your tasks laid out on a vertical timeline.
+
+![Day Planner Demo Image](https://raw.githubusercontent.com/lynchjames/obsidian-day-planner/main/images/day-planner-note-preview.png)
+
 ## Usage
+
 Once installed, the plugin will create a folder called Day Planners in the root of your vault. A note for today will automatically be created with the file name format `Day Planners/Day Planner-YYYYMMDD.md`.
 
 You can choose to use the [Command Mode](#day-planner-mode) instead to add a Day Planner for the current day to any note.
 
 ### Day Planner Note
 
-Within the note, you can create a check list with times and tasks which will be automatically be tracked during the day. Here is an example:
+Within the note, you can create a check list with times and tasks which will be automatically be tracked during the day. You can now include headings and other content between tasks. Here is an example:
 
 ```markdown
 ## Day Planner
+
+This is my plan for the day broken into 3 main sections:
+1. Morning Prep
+2. Reading
+3. Afternoon Review
+
+### Morning Prep
+
+This is where I get ready for work and do my usual prep.
+
 - [ ] 09:30 Setup for work
 - [ ] 09:45 Review notes from yesterday
 - [ ] 10:30 Create new notes for #article review
 - [ ] 11:30 BREAK
+
+### Reading
+
+A section of the day dedicated to reading:
+
+1. Articles.
+2. Book chapters assigned for the day.
+3. Re-reading past notes.
+   
 - [ ] 12:00 Reading
+  - [ ] Article 1
+  - [ ] Article 2
+  - [ ] Article notes review
 - [ ] 12:25 BREAK
 - [ ] 12:30 Reading
 - [ ] 14:00 BREAK
+
+### Afternoon Review
+
+I use this time to review what I have done earlier in the day and complete any tasks to prepare for the next day.
+
 - [ ] 15:00 Review notes and update daily note [[20201103]]
 - [ ] 15:45 Walk
 - [ ] 16:30 Reading
-  - [ ] Article 1
-  - [ ] Article 2
-  - Article notes review
 - [ ] 17:20 Prep for tomorrow's meetings
 - [ ] 18:00 END
-
----
 ```
 
 This is also provided as a file in [day-planner-example.md](https://github.com/lynchjames/obsidian-day-planner/blob/main/examples/day-planner-example.md).
@@ -54,43 +86,53 @@ The format of the task list items is important as this is what is used to calcul
 
  `END` is used as an item with a time to give an accurate time interval for the last task, *"Prep for tomorrow's meetings"* at 17:00 in this example.
 
- The note will update automatically in the following ways:
-
- - Tasks in the past will be checked and marked as complete.
- - The current task will be called out and a progress indicator will be included in the note.
+ The note will update automatically: tasks in the past will be checked and marked as complete.
 
 Using the example above, at 14:30 the note would have automatically updated to:
 
 ```markdown
 ## Day Planner
+
+This is my plan for the day broken into 3 main sections:
+1. Morning Prep
+2. Reading
+3. Afternoon Review
+
+### Morning Prep
+
+This is where I get ready for work and do my usual prep.
+
 - [x] 09:30 Setup for work
 - [x] 09:45 Review notes from yesterday
 - [x] 10:30 Create new notes for #article review
 - [x] 11:30 BREAK
+
+### Reading
+
+A section of the day dedicated to reading:
+
+1. Articles.
+2. Book chapters assigned for the day.
+3. Re-reading past notes.
+   
 - [x] 12:00 Reading
+  - [ ] Article 1
+  - [ ] Article 2
+  - [ ] Article notes review
 - [x] 12:25 BREAK
 - [x] 12:30 Reading
-
-**Current Task**
 - [ ] 14:00 BREAK
 
-> ||14:00||->->->->->->->->->->_ _ _ _ _ _ _ _ ||15:00||
+### Afternoon Review
+
+I use this time to review what I have done earlier in the day and complete any tasks to prepare for the next day.
 
 - [ ] 15:00 Review notes and update daily note [[20201103]]
 - [ ] 15:45 Walk
 - [ ] 16:30 Reading
-  - [ ] Article 1
-  - [ ] Article 2
-  - [ ] Article notes review
 - [ ] 17:20 Prep for tomorrow's meetings
 - [ ] 18:00 END
-
----
 ```
-
-This would also be displayed in preview mode:
-
-![Day Planner Note Preview](https://raw.githubusercontent.com/lynchjames/obsidian-day-planner/main/images/day-planner-note-preview.png)
 
 ### Timeline View
 
@@ -167,6 +209,10 @@ You can choose to display the time and start of the text for the current and nex
 ### Task Notification
 
 You can choose to have an in-app notification display when a new task starts.
+
+### Timeline Zoom Level
+
+This is the zoom level to dispaly the timeline. The higher the number, the more vertical space each task will take up.
 
 ## Commands
 

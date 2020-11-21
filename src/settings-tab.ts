@@ -90,7 +90,7 @@ import type DayPlanner from './main';
 
       new Setting(containerEl)
           .setName('Timeline Zoom Level')
-          .setDesc('The zoom level to display the timeline. The larger, the higher the zoom level.')
+          .setDesc('The zoom level to display the timeline. The higher the number, the more vertical space each task will take up.')
           .addSlider(slider => 
             slider
               .setLimits(1, 5, 1)
