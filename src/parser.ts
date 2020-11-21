@@ -10,31 +10,34 @@ export default class Parser {
     }
 
     async parseMarkdown(fileContent: string[]): Promise<PlanSummaryData> {
-        const parsed = this.parse(fileContent.join('\n'));
+        const parsed = this.parse(fileContent);
         const transformed = this.transform(parsed);
         return new PlanSummaryData(transformed);
     }
 
-    private parse(input: string): RegExpExecArray[] {
+    private parse(input: string[]): {index: number, value: RegExpExecArray}[] {
         try {
-            const matches = [];
+            const matches: {index: number, value: RegExpExecArray}[] = [];
             let match;
-            while(match = PLAN_PARSER_REGEX.exec(input)){
-              matches.push(match)
-            }
+            input.forEach((line, i) => {
+                while(match = PLAN_PARSER_REGEX.exec(line)){
+                    matches.push({index:i, value: match});
+                }
+            });
             return matches;
         } catch (error) {
             console.log(error)
         }
     }
 
-    private transform(regexMatches: RegExpExecArray[]): PlanItem[]{
-        const results = regexMatches.map((value:RegExpExecArray, index) => {
+    private transform(regexMatches: {index: number, value: RegExpExecArray}[]): PlanItem[]{
+        const results = regexMatches.map((match) => {
             try {
-                const isUnmatched = value.groups.unmatched !== undefined;
+                const isUnmatched = match.value.groups.unmatched !== undefined;
+                const value = match.value;
                 if(isUnmatched) {
                     const unMatchedText = value[0];
-                    return new PlanItem(index, value.index, false, false, false, true, undefined, undefined, unMatchedText, unMatchedText)
+                    return new PlanItem(match.index, value.index, false, false, false, true, undefined, undefined, unMatchedText, unMatchedText)
                 }
                 const isCompleted = this.matchValue(value.groups.completion, 'x');
                 const isBreak = this.matchValue(value.groups.break, 'break');
@@ -44,7 +47,7 @@ export default class Parser {
                 time.setMinutes(parseInt(value.groups.minutes))
                 time.setSeconds(0);
                 return new PlanItem(
-                    index, 
+                    match.index, 
                     value.index, 
                     isCompleted, 
                     isBreak,

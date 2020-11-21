@@ -329,7 +329,7 @@ color:#fff;
   font: 9px/18px Helvetica;
   text-transform: uppercase;
   font-weight: bold;
-  text-indent: -20px;
+  text-indent: -24px;
   word-spacing: 30px;
   color: #fff;
   text-shadow: -1px -1px rgba(0,0,0,0.15);

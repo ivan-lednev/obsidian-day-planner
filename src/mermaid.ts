@@ -1,3 +1,4 @@
+import { MERMAID_REGEX } from './constants';
 import type { PlanItem, PlanSummaryData } from './plan-data';
 import type Progress from './progress';
 const moment = (window as any).moment;
@@ -60,8 +61,7 @@ export default class PlannerMermaid {
     }
 
     private mermaidTemplate(tasks: string[], breaks: string[]):string {
-        return `
-\`\`\`mermaid
+        return `\`\`\`mermaid
 gantt
     dateFormat  HH-mm
     axisFormat %H:%M
@@ -69,7 +69,6 @@ gantt
 ${tasks.join('\n')}
     section Breaks
 ${breaks.join('\n')}
-\`\`\`
-`
+\`\`\``
     }
 }
