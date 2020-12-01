@@ -61,10 +61,12 @@ export default class PlannerMermaid {
     }
 
     private mermaidTemplate(tasks: string[], breaks: string[]):string {
+        const now = new Date();
         return `\`\`\`mermaid
 gantt
     dateFormat  HH-mm
     axisFormat %H:%M
+    %% Current Time: ${now.toLocaleTimeString()}
     section Tasks
 ${tasks.join('\n')}
     section Breaks
