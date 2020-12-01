@@ -1,0 +1,43 @@
+.event_item:hover{
+    background-color: var(--interactive-accent-hover);
+}
+
+.event_item_color1 {
+  background-color: blue;
+}
+
+.event_item_color2 {
+  background-color: lightblue;
+}
+
+.event_item_color3 {
+  background-color: darkcyan;
+}
+
+.event_item_color4 {
+  background-color: #f00;
+}
+
+.event_item_color5 {
+  background-color: darkred;
+}
+
+.event_item_color6 {
+  background-color: violet;
+}
+
+.event_item_color7 {
+  background-color: var(--space-cadet);
+}
+
+.event_item_color8 {
+  background-color: var(--dark-purple);
+}
+
+.event_item_color9 {
+  background-color: var(--russian-violet);
+}
+
+.event_item_color10 {
+  background-color: var(--russian-violet-2);
+}
