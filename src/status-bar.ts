@@ -71,6 +71,7 @@ export default class StatusBar {
     async refreshStatusBar(planSummary: PlanSummaryData) {
         if(!planSummary.empty && !planSummary.invalid){
             this.updateProgress(planSummary.current, planSummary.next);
+            this.show(this.statusBar);
         } else {
           this.hide(this.statusBar);
         }
