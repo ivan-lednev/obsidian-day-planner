@@ -73,6 +73,13 @@ export default class DayPlanner extends Plugin {
       hotkeys: []
     });
 
+    this.addCommand({
+      id: 'app:show-day-planner-today-note',
+      name: 'Show today\'s Day Planner',
+      callback: () => this.app.workspace.openLinkText(this.file.todayPlannerFilePath(), '', true),
+      hotkeys: []
+    });
+
     this.registerView(
       VIEW_TYPE_TIMELINE,
       (leaf: WorkspaceLeaf) =>
