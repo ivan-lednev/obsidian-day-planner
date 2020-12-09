@@ -64,10 +64,6 @@
       }
     }
 
-    function inMins(time: Date){
-        return moment.duration(moment(time).format('HH:mm')).asMinutes();
-    }
-
     function updateTimelineMeterPosition() {
       timelineMeterPosition = summary.empty ? 0 : ((summary.validItems().first().time.getMinutes()*timelineZoomLevel)*-1) - 1;
     }
@@ -282,13 +278,13 @@ color:#fff;
 
 #scroll-controls {
     background-color: var(--background-secondary);
-    position: fixed;
+    position: sticky;
     bottom: 0;
     width: 100%;
     z-index: 4;
     padding: 8px 15px;
-    left: 0;
     text-align: center;
+    height: 45px;
 }
 
 #scroll-controls label {
@@ -356,14 +352,14 @@ color:#fff;
 </style>
 
 {#if summary.validItems().length > 0}
-  <div id="day-planner-timeline-container"><!-- /style="height:{1440*timelineZoomLevel}px;"> -->
+  <div id="day-planner-timeline-container">
       <div class="aside aside-x{timelineZoomLevel} filled" style="top: {timelineMeterPosition}px;">
           <div class="aside__line filled__line">
               <div class="filled__line__completed" style="height: {nowPosition}px;"></div>
           </div>
       </div>
         
-      <div class="events"> <!-- style='top: {offset(summary.validItems().first())}px'> -->
+      <div class="events">
         {#each summary.validItems() as item, i}
             <div class="event_item event_item_color{i%10+1} {shortClass(item)} {pastClass(item)}" style="height: {item.durationMins*timelineZoomLevel}px;">
               <div class="event_item_contents">
