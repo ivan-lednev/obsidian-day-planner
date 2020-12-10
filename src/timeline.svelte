@@ -65,7 +65,7 @@
     }
 
     function updateTimelineMeterPosition() {
-      timelineMeterPosition = summary.empty ? 0 : ((summary.validItems().first().time.getMinutes()*timelineZoomLevel)*-1) - 1;
+      timelineMeterPosition = summary.empty ? 0 : ((summary.items.first().time.getMinutes()*timelineZoomLevel)*-1) - 1;
     }
 
     function shortClass(item: PlanItem) {
@@ -351,7 +351,7 @@ color:#fff;
 
 </style>
 
-{#if summary.validItems().length > 0}
+{#if summary.items.length > 0}
   <div id="day-planner-timeline-container">
       <div class="aside aside-x{timelineZoomLevel} filled" style="top: {timelineMeterPosition}px;">
           <div class="aside__line filled__line">
@@ -360,7 +360,7 @@ color:#fff;
       </div>
         
       <div class="events">
-        {#each summary.validItems() as item, i}
+        {#each summary.items as item, i}
             <div class="event_item event_item_color{i%10+1} {shortClass(item)} {pastClass(item)}" style="height: {item.durationMins*timelineZoomLevel}px;">
               <div class="event_item_contents">
                 <div class="ei_Dot {item === summary.current ? 'dot_active' : ''}"></div>

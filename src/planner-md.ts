@@ -62,12 +62,7 @@ export default class PlannerMarkdown {
                 return;
             }
             const results = planSummary.items.map((item, i) => {
-                let result = '';
-                if(item.isUnMatched) {
-                    result = item.raw;  
-                } else {
-                    result = this.updateItemCompletion(item, item.isPast);
-                }
+                const result = this.updateItemCompletion(item, item.isPast);
                 return {index: item.matchIndex, replacement: result};
             });
 

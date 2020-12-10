@@ -18,13 +18,12 @@ export class PlanSummaryData {
     calculate(): void {
         try {
             const now = new Date();
-            const validItems = this.validItems();
-            if(validItems.length === 0){
+            if(this.items.length === 0){
                 this.empty = true;
                 return;
             }
-            validItems.forEach((item, i) => {
-                const next = validItems[i+1];
+            this.items.forEach((item, i) => {
+                const next = this.items[i+1];
                 if(item.time < now && (item.isEnd || (next && now < next.time))) {
                     this.current = item;
                     this.next = item.isEnd ? null : next;
@@ -42,9 +41,6 @@ export class PlanSummaryData {
         }
     }
 
-    validItems(): PlanItem[] {
-        return this.items.filter(item => !item.isUnMatched);
-    }
 }
 
 export class PlanItem {
@@ -55,7 +51,6 @@ export class PlanItem {
     isPast: boolean;
     isBreak: boolean;
     isEnd: boolean;
-    isUnMatched: boolean;
     time: Date;
     durationMins: number;
     rawTime: string;
@@ -63,13 +58,12 @@ export class PlanItem {
     raw: string;
     
     constructor(matchIndex: number, charIndex: number, isCompleted: boolean, 
-        isBreak: boolean, isEnd: boolean, isUnMatched: boolean, time: Date, rawTime:string, text: string, raw: string){
+        isBreak: boolean, isEnd: boolean, time: Date, rawTime:string, text: string, raw: string){
         this.matchIndex = matchIndex;
         this.charIndex = charIndex;
         this.isCompleted = isCompleted;
         this.isBreak = isBreak;
         this.isEnd = isEnd;
-        this.isUnMatched = isUnMatched;
         this.time = time;
         this.rawTime = rawTime;
         this.text = text;
