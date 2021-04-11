@@ -365,7 +365,7 @@ color:#fff;
               <div class="event_item_contents">
                 <div class="ei_Dot {item === summary.current ? 'dot_active' : ''}"></div>
                 <div class="ei_Title">{item.rawTime}</div>
-                <div class="ei_Copy">{item.displayText() ?? ''}</div>
+                <div class="ei_Copy">{item.text ?? ''}</div>
               </div>
             </div>
         {/each}

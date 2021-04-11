@@ -61,7 +61,7 @@ export default class PlannerMarkdown {
             if(planSummary.empty){
                 return;
             }
-            const results = planSummary.items.map((item, i) => {
+            const results = planSummary.items.map((item) => {
                 const result = this.updateItemCompletion(item, item.isPast);
                 return {index: item.matchIndex, replacement: result};
             });
@@ -95,7 +95,7 @@ export default class PlannerMarkdown {
         if(!this.settings.completePastItems) {
             check = this.check(item.isCompleted);
         }
-        return `- [${check}] ${item.rawTime} ${item.displayText()}`;
+        return `- [${check}] ${item.rawTime} ${item.text}`;
     }
 
     private check(check: boolean) {
@@ -110,6 +110,6 @@ export default class PlannerMarkdown {
         const viewState = activeLeaf.view.getState();
         if(viewState.file === this.file.todayPlannerFilePath()){
             this.dayPlannerLastEdit = new Date().getTime();
-        };
+        }
     }
 }

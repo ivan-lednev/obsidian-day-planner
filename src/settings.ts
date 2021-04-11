@@ -8,6 +8,8 @@ export class DayPlannerSettings {
   nowAndNextInStatusBar: boolean = false;
   showTaskNotification: boolean = false
   timelineZoomLevel: number = 4;
+  breakLabel: string = "BREAK";
+  endLabel: string = "END";
 }
 
 export class NoteForDate {
