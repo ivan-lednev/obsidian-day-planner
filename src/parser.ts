@@ -1,12 +1,15 @@
-import type { Vault } from 'obsidian';
-import { PLAN_PARSER_REGEX } from './constants';
-import { PlanItem, PlanSummaryData } from './plan-data';
+import { PLAN_PARSER_REGEX_CREATOR } from './constants';
+import { PlanItem, PlanItemFactory, PlanSummaryData } from './plan-data';
+import type { DayPlannerSettings } from './settings';
 
 export default class Parser {
-    vault: Vault;
 
-    constructor(vault: Vault) {
-        this.vault = vault;
+    private planItemFactory: PlanItemFactory;
+    private PLAN_PARSER_REGEX: RegExp;
+
+    constructor(settings: DayPlannerSettings) {
+        this.planItemFactory = new PlanItemFactory(settings);
+        this.PLAN_PARSER_REGEX = PLAN_PARSER_REGEX_CREATOR(settings.breakLabel, settings.endLabel);
     }
 
     async parseMarkdown(fileContent: string[]): Promise<PlanSummaryData> {
@@ -20,7 +23,7 @@ export default class Parser {
             const matches: {index: number, value: RegExpExecArray}[] = [];
             let match;
             input.forEach((line, i) => {
-                while(match = PLAN_PARSER_REGEX.exec(line)){
+                while(match = this.PLAN_PARSER_REGEX.exec(line)){
                     matches.push({index:i, value: match});
                 }
             });
@@ -35,13 +38,13 @@ export default class Parser {
             try {
                 const value = match.value;
                 const isCompleted = this.matchValue(value.groups.completion, 'x');
-                const isBreak = this.matchValue(value.groups.break, 'break');
-                const isEnd = this.matchValue(value.groups.end, 'end');
+                const isBreak = value.groups.break !== undefined;
+                const isEnd = value.groups.end !== undefined;
                 const time = new Date();
                 time.setHours(parseInt(value.groups.hours))
                 time.setMinutes(parseInt(value.groups.minutes))
                 time.setSeconds(0);
-                return new PlanItem(
+                return this.planItemFactory.getPlanItem(
                     match.index, 
                     value.index, 
                     isCompleted, 

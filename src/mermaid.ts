@@ -1,4 +1,3 @@
-import { MERMAID_REGEX } from './constants';
 import type { PlanItem, PlanSummaryData } from './plan-data';
 import type Progress from './progress';
 const moment = (window as any).moment;
@@ -33,7 +32,7 @@ export default class PlannerMermaid {
         items.forEach((item, i) => {
             const next = items[i+1];
             const mins = this.minuteInterval(item, next);
-            const text = `    ${this.escape(item.displayText())}     :${item.rawTime.replace(':', '-')}${mins}`;
+            const text = `    ${this.escape(item.text)}     :${item.rawTime.replace(':', '-')}${mins}`;
             if(item.isBreak) {
                 breaks.push(text);
             } else {

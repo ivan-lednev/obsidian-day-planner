@@ -137,8 +137,8 @@ export default class StatusBar {
       minsUntilNext = minsUntilNext === '0' ? '1' : minsUntilNext;
       const minsText = `${minsUntilNext} min${minsUntilNext === '1' ? '' : 's'}`;
       if(this.settings.nowAndNextInStatusBar) {
-        this.statusBarText.innerHTML = `<strong>Now</strong> ${current.rawTime} ${this.ellipsis(current.displayText(), 10)}`;
-        this.nextText.innerHTML = `<strong>Next</strong> ${next.rawTime} ${this.ellipsis(next.displayText(), 10)}`;
+        this.statusBarText.innerHTML = `<strong>Now</strong> ${current.rawTime} ${this.ellipsis(current.text, 10)}`;
+        this.nextText.innerHTML = `<strong>Next</strong> ${next.rawTime} ${this.ellipsis(next.text, 10)}`;
         this.show(this.nextText);
       } else {
         this.hide(this.nextText);
@@ -146,9 +146,9 @@ export default class StatusBar {
         this.statusBarText.innerText = statusText;
       }
       const currentTaskStatus = `Current Task (${percentageComplete.toFixed(0)}% complete)`;
-      const currentTaskTimeAndText = `${current.rawTime} ${current.displayText()}`;
+      const currentTaskTimeAndText = `${current.rawTime} ${current.text}`;
       const nextTask = `Next Task (in ${minsText})`;
-      const nextTaskTimeAndText = `${next.rawTime} ${next.displayText()}`;
+      const nextTaskTimeAndText = `${next.rawTime} ${next.text}`;
       this.cardCurrent.innerHTML = `<strong>${currentTaskStatus}</strong><br> ${currentTaskTimeAndText}`;
       this.cardNext.innerHTML = `<strong>${nextTask}</strong><br> ${nextTaskTimeAndText}`;
       this.taskNotification(current, currentTaskTimeAndText, nextTask, nextTaskTimeAndText);
