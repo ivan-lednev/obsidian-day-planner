@@ -24,7 +24,7 @@ export default class TimelineView extends ItemView {
     }
 
     getIcon() {
-        return "calendar-with-checkmark";
+        return this.settings.timelineIcon;
     }
 
     update(summaryData: PlanSummaryData) {
@@ -41,10 +41,6 @@ export default class TimelineView extends ItemView {
     }
 
     async onOpen() {
-        const {
-          workspace: { activeLeaf },
-        } = this.app;
-
         this.timeline = new Timeline({
           target: (this as any).contentEl,
           props: {
@@ -52,6 +48,5 @@ export default class TimelineView extends ItemView {
             rootEl: this.containerEl.children[1]
           },
         });
-      }
-
+    }
 }
