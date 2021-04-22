@@ -93,7 +93,7 @@ export default class PlannerMarkdown {
         let check = this.check(complete);
         //Override to use current (user inputted) state if plugin setting is enabled
         if(!this.settings.completePastItems) {
-            check = this.check(item.isCompleted);
+            check = item.isCompleted ? item.completion : ' ';
         }
         return `- [${check}] ${item.rawTime} ${item.displayText()}`;
     }

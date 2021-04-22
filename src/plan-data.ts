@@ -47,6 +47,7 @@ export class PlanItem {
 
     matchIndex: number;
     charIndex: number;
+    completion: string;
     isCompleted: boolean;
     isPast: boolean;
     isBreak: boolean;
@@ -57,11 +58,12 @@ export class PlanItem {
     text: string;
     raw: string;
     
-    constructor(matchIndex: number, charIndex: number, isCompleted: boolean, 
+    constructor(matchIndex: number, charIndex: number, completion: string, 
         isBreak: boolean, isEnd: boolean, time: Date, rawTime:string, text: string, raw: string){
         this.matchIndex = matchIndex;
         this.charIndex = charIndex;
-        this.isCompleted = isCompleted;
+        this.completion = completion;
+        this.isCompleted = !!completion.trim()
         this.isBreak = isBreak;
         this.isEnd = isEnd;
         this.time = time;
