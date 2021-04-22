@@ -80,6 +80,10 @@
       return item.completion.trim();
     }
 
+    function tagClass(item: PlanItem) {
+      return item.tags?.map(tag => tag.substring(1))?.join(' ');
+    }
+
 </script>
 
 <style>
@@ -365,7 +369,7 @@ color:#fff;
         
       <div class="events">
         {#each summary.items as item, i}
-            <div class="event_item event_item_color{i%10+1} {shortClass(item)} {pastClass(item)}" data-task="{completeClass(item)}" style="height: {item.durationMins*timelineZoomLevel}px;">
+            <div class="event_item event_item_color{i%10+1} {shortClass(item)} {pastClass(item)} {tagClass(item)}" data-task="{completeClass(item)}" style="height: {item.durationMins*timelineZoomLevel}px;">
               <div class="event_item_contents">
                 <div class="ei_Dot {item === summary.current ? 'dot_active' : ''}"></div>
                 <div class="ei_Title">{item.rawTime}</div>

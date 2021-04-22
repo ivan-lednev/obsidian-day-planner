@@ -57,6 +57,7 @@ export class PlanItem {
     rawTime: string;
     text: string;
     raw: string;
+    tags: string[];
     
     constructor(matchIndex: number, charIndex: number, completion: string, 
         isBreak: boolean, isEnd: boolean, time: Date, rawTime:string, text: string, raw: string){
@@ -70,6 +71,8 @@ export class PlanItem {
         this.rawTime = rawTime;
         this.text = text;
         this.raw = raw;
+
+        this.tags = text.match(/(#[a-z0-9][a-z0-9\-_]*)/ig);
     }
 
     displayText() {
