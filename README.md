@@ -176,6 +176,8 @@ The plugin automatically generates day planner notes for each day within a Day P
 
 Commands are used to insert a Day Planner for today within any note as well as unlinking the Day Planner for today from its current note.
 
+>Note: To add the Day Planner to the current note you first need to Link the Day Planner to the current note by running either one of the commands "Day Planner: Link today's Day Planner to the current Note" or "Day Planner: Add a Day Planner template for today to the current note" from the command palette.
+
 The Day Planner can be placed anywhere within a note as long as the format provided is used. Only the Day Planner section of the note will be updated as time progresses.
 
 ### Complete Past Planner Items
