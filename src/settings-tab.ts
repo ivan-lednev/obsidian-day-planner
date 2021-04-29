@@ -100,6 +100,17 @@ import type DayPlanner from './main';
                 this.plugin.settings.timelineZoomLevel = value;
                 this.plugin.saveData(this.plugin.settings);
               }));
+
+      new Setting(containerEl)
+        .setName('Template')
+        .setDesc('This template will be used when creating a new Dayplanner note.')
+        .addTextArea(text => text
+          .setValue(this.plugin.settings.defaultContent)
+          .onChange((value:string) => {
+            this.plugin.settings.defaultContent = value;
+            this.plugin.saveData(this.plugin.settings);
+          })
+        );
     }
 
     private modeDescriptionContent(): DocumentFragment {
