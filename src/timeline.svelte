@@ -252,6 +252,14 @@
   margin-left: 28px;
 }
 
+/* THIS ISN'T WORKING */
+.ei_Copy>:first-child{
+  margin-top:0;
+}
+.ei_Copy>:last-child{
+  margin-bottom: 0;
+}
+
 .header_title,.ei_Title,.ce_title{
 color:#fff;
 }

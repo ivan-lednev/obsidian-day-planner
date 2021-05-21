@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf } from 'obsidian';
+import { ItemView, WorkspaceLeaf, MarkdownRenderer } from 'obsidian';
 import Timeline from './timeline.svelte';
 import { planSummary, now, nowPosition, zoomLevel } from './timeline-store';
 import { VIEW_TYPE_TIMELINE } from './constants';
@@ -34,6 +34,15 @@ export default class TimelineView extends ItemView {
         const currentPosition = summaryData.empty ? 0 : this.positionFromTime(currentTime) - this.positionFromTime(summaryData.items.first().time);
         nowPosition.update(n => n = currentPosition);
         zoomLevel.update(n => n = this.settings.timelineZoomLevel);
+        
+        this.contentEl.querySelectorAll('#day-planner-timeline-container>.events>.event_item>.event_item_contents>.ei_Copy').forEach((element: any, index: number) => {
+            const markdown = summaryData.items[index].text;
+            if (!element.dataset.markdown || element.dataset.markdown != markdown) {
+                element.dataset.markdown = markdown;
+                element.innerHTML = "";
+                MarkdownRenderer.renderMarkdown(markdown, element, summaryData.filePath, this);
+            }
+        });
     }
 
     positionFromTime(time: Date) {

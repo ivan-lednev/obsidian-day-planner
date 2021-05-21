@@ -42,6 +42,7 @@ export default class PlannerMarkdown {
             const fileContent = await (await this.file.getFileContents(filePath)).split('\n');
 
             const planData = await this.parser.parseMarkdown(fileContent);
+            planData.filePath = filePath;
             return planData;
         } catch (error) {
             console.log(error)

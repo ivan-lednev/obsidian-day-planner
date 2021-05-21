@@ -3,6 +3,7 @@ const moment = (window as any).moment;
 export class PlanSummaryData {
     empty: boolean;
     invalid: boolean;
+    filePath: string;
     items: PlanItem[];
     past: PlanItem[];
     current: PlanItem;
