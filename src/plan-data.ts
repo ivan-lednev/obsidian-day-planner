@@ -28,6 +28,10 @@ export class PlanSummaryData {
                 const next = this.items[i+1];
                 if(item.time < now && (item.isEnd || (next && now < next.time))) {
                     this.current = item;
+                    if (item.isEnd) {
+                        item.isPast = true;
+                        this.past.push(item);
+                    }
                     this.next = item.isEnd ? null : next;
                 } else if(item.time < now) {
                     item.isPast = true;
