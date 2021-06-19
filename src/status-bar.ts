@@ -142,7 +142,7 @@ export default class StatusBar {
         this.show(this.nextText);
       } else {
         this.hide(this.nextText);
-        const statusText = (current.isBreak ? `Break for ${minsText}` : `${minsText} left`);
+        const statusText = (current.isBreak ? `${this.settings.breakLabel} for ${minsText}` : `${minsText} left`);
         this.statusBarText.innerText = statusText;
       }
       const currentTaskStatus = `Current Task (${percentageComplete.toFixed(0)}% complete)`;
