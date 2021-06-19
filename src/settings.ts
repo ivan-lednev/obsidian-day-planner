@@ -8,6 +8,7 @@ export class DayPlannerSettings {
   nowAndNextInStatusBar: boolean = false;
   showTaskNotification: boolean = false
   timelineZoomLevel: number = 4;
+  timelineIcon: string = 'calendar-with-checkmark'
   breakLabel: string = "BREAK";
   endLabel: string = "END";
 }

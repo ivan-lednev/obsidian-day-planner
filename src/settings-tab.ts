@@ -6,6 +6,7 @@ import {
 import { DayPlannerMode }from './settings';
 import MomentDateRegex from './moment-date-regex';
 import type DayPlanner from './main';
+import { ICONS } from './constants';
   
   export class DayPlannerSettingsTab extends PluginSettingTab {
     momentDateRegex = new MomentDateRegex();
@@ -101,6 +102,19 @@ import type DayPlanner from './main';
                 this.plugin.saveData(this.plugin.settings);
               }));
 
+      new Setting(containerEl)
+          .setName('Timeline Icon')
+          .setDesc('The icon of the timeline pane. Reopen timeline pane or restart obsidian to see the change.')
+          .addDropdown(dropdown => {
+            ICONS.forEach(icon => dropdown.addOption(icon, icon));
+            return dropdown
+              .setValue(this.plugin.settings.timelineIcon ?? 'calendar-with-checkmark')
+              .onChange((value:string) => {
+                this.plugin.settings.timelineIcon = value;
+                this.plugin.saveData(this.plugin.settings);
+              });
+          });
+      
       new Setting(containerEl)
           .setName('BREAK task label')
           .setDesc('Use this label to mark break between tasks.')
