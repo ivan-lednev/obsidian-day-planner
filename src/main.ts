@@ -142,6 +142,7 @@ export default class DayPlanner extends Plugin {
           return;
         }
         if(!dayPlannerExists){
+          this.settings.notesToDates = [];
           this.settings.notesToDates.push(new NoteForDate(filePath, new Date().toDateString()));
           await this.saveData(this.settings);
         }
