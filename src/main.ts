@@ -1,5 +1,6 @@
 import {
   Plugin,
+  TAbstractFile,
   Vault,
   WorkspaceLeaf, 
 } from 'obsidian';
@@ -43,7 +44,7 @@ export default class DayPlanner extends Plugin {
     );
 
     this.statusBar.initStatusBar();
-    this.registerEvent(this.app.on("codemirror", this.codeMirror));
+    this.registerEvent(this.app.vault.on('modify', this.codeMirror, ''));
     
     this.addCommand({
       id: 'app:add-day-planner-to-note',
@@ -167,15 +168,13 @@ export default class DayPlanner extends Plugin {
       }
     }
     
-    codeMirror = (cm: Editor) => {
-      cm.on('change', async () => {
-        if(this.file.hasTodayNote()) {
-          // console.log('Active note found, starting CodeMirror monitoring')
-          this.plannerMD.checkIsDayPlannerEditing();
-        } else {
-          // console.log('No active note, skipping CodeMirror monitoring')
-        }
-      });
+    codeMirror = (file: TAbstractFile) => {
+      if(this.file.hasTodayNote()) {
+        // console.log('Active note found, starting CodeMirror monitoring')
+        this.plannerMD.checkIsDayPlannerEditing();
+      } else {
+        // console.log('No active note, skipping CodeMirror monitoring')
+      }
     }
     
     onunload() {
