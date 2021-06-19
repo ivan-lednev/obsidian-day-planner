@@ -99,7 +99,7 @@ export default class StatusBar {
     private updateProgress(current: PlanItem, next: PlanItem) {
         if(!current || !next || current.isEnd){
             this.hideProgress();
-            this.statusBarText.innerText = 'ALL DONE!';
+            this.statusBarText.innerText = this.settings.endLabel;
             return;
         }
         const { percentageComplete, minsUntilNext } = this.progress.getProgress(current, next);
