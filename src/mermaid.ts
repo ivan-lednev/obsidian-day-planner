@@ -6,12 +6,11 @@ interface Replacement {
     key: string;
     replacement: string;
 }
-const mermmaidEscapedCharacters: Replacement[] = [
-    { key: ';', replacement:'#59;' },
-    { key: ':', replacement:'#58;' },
-    { key: '#', replacement:'#35;' },
-    //HACK to re-introduce partially replaced replacements!
-    { key: '#35;59;', replacement:'#59;' },
+const mermaidEscapedCharacters: Replacement[] = [
+    //Escape characters are not currently supported for Mermaid Gantt
+    { key: ';', replacement:'' },
+    { key: ':', replacement:'' },
+    { key: '#', replacement:'' },
 ];
 
 export default class PlannerMermaid {
@@ -53,8 +52,9 @@ export default class PlannerMermaid {
     }
 
     private escape(input: string){
-        mermmaidEscapedCharacters.forEach(mec => {  
-            input = input.replace(mec.key, mec.replacement)
+        mermaidEscapedCharacters.forEach(mec => {  
+            const regex = new RegExp(mec.key, 'g');
+            input = input.replace(regex, mec.replacement)
         });
         return input;
     }
