@@ -290,7 +290,7 @@ color:#fff;
 #scroll-controls label {
   display: block;
   float: left;
-  margin: 2px 10px;
+  margin: 2px;
 }
 
 #scroll-controls .toggle {
@@ -377,7 +377,7 @@ color:#fff;
       </div>
       
       <div id="scroll-controls">
-        <label for="auto-scroll">Track current time</label>
+        <label for="auto-scroll">Track time</label>
         <input id="auto-scroll" type="checkbox" class="toggle" bind:checked={autoScroll}>
       </div>
   </div>
