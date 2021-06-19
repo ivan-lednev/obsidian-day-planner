@@ -114,6 +114,28 @@ import { ICONS } from './constants';
                 this.plugin.saveData(this.plugin.settings);
               });
           });
+      
+      new Setting(containerEl)
+          .setName('BREAK task label')
+          .setDesc('Use this label to mark break between tasks.')
+          .addText(component =>
+            component
+              .setValue(this.plugin.settings.breakLabel ?? "BREAK")
+              .onChange((value:string) => {
+                this.plugin.settings.breakLabel = value
+                this.plugin.saveData(this.plugin.settings);
+              }));
+
+      new Setting(containerEl)
+          .setName('END task label')
+          .setDesc('Use this label to mark the end of all tasks.')
+          .addText(component =>
+            component
+              .setValue(this.plugin.settings.endLabel ?? "END")
+              .onChange((value:string) => {
+                this.plugin.settings.endLabel = value
+                this.plugin.saveData(this.plugin.settings);
+              }));
     }
 
     private modeDescriptionContent(): DocumentFragment {

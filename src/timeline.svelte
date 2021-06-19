@@ -361,11 +361,11 @@ color:#fff;
         
       <div class="events">
         {#each summary.items as item, i}
-            <div class="event_item event_item_color{i%10+1} {shortClass(item)} {pastClass(item)}" style="height: {item.durationMins*timelineZoomLevel}px;">
+            <div class="event_item event_item_color{i%10+1} {shortClass(item)} {pastClass(item)}" style="height: {item.durationMins*timelineZoomLevel}px;" data-title="{item.rawTime}">
               <div class="event_item_contents">
                 <div class="ei_Dot {item === summary.current ? 'dot_active' : ''}"></div>
                 <div class="ei_Title">{item.rawTime}</div>
-                <div class="ei_Copy">{item.displayText() ?? ''}</div>
+                <div class="ei_Copy">{item.text ?? ''}</div>
               </div>
             </div>
         {/each}

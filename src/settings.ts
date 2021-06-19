@@ -9,6 +9,8 @@ export class DayPlannerSettings {
   showTaskNotification: boolean = false
   timelineZoomLevel: number = 4;
   timelineIcon: string = 'calendar-with-checkmark'
+  breakLabel: string = "BREAK";
+  endLabel: string = "END";
 }
 
 export class NoteForDate {

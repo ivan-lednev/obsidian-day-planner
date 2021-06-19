@@ -1,3 +1,5 @@
+import type { DayPlannerSettings } from './settings';
+
 const moment = (window as any).moment;
 
 export class PlanSummaryData {
@@ -56,7 +58,7 @@ export class PlanItem {
     rawTime: string;
     text: string;
     raw: string;
-    
+
     constructor(matchIndex: number, charIndex: number, isCompleted: boolean, 
         isBreak: boolean, isEnd: boolean, time: Date, rawTime:string, text: string, raw: string){
         this.matchIndex = matchIndex;
@@ -69,14 +71,27 @@ export class PlanItem {
         this.text = text;
         this.raw = raw;
     }
+}
 
-    displayText() {
-        if(this.isBreak) {
-            return 'BREAK';
+export class PlanItemFactory {
+    private settings: DayPlannerSettings;
+
+    constructor(settings: DayPlannerSettings) {
+        this.settings = settings;
+    }
+
+    getPlanItem(matchIndex: number, charIndex: number, isCompleted: boolean, isBreak: boolean, isEnd: boolean, time: Date, rawTime: string, text: string, raw: string) {
+        const displayText = this.getDisplayText(isBreak, isEnd, text);
+        return new PlanItem(matchIndex, charIndex, isCompleted, isBreak, isEnd, time, rawTime, displayText, raw);
+    }
+
+    getDisplayText(isBreak: boolean, isEnd: boolean, text: string) {
+        if(isBreak) {
+            return this.settings.breakLabel;
         }
-        if(this.isEnd) {
-            return 'END';
+        if(isEnd) {
+            return this.settings.endLabel;
         }
-        return this.text;
+        return text;
     }
 }
