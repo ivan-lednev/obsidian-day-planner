@@ -1,5 +1,6 @@
 import {
   Plugin,
+  TAbstractFile,
   Vault,
   WorkspaceLeaf, 
 } from 'obsidian';
@@ -31,7 +32,7 @@ export default class DayPlanner extends Plugin {
     this.notesForDatesQuery = new NoteForDateQuery();
     this.file = new DayPlannerFile(this.vault, this.settings);
     const progress = new Progress();
-    const parser = new Parser(this.vault);
+    const parser = new Parser(this.settings);
     this.plannerMD = new PlannerMarkdown(this.app.workspace, this.settings, this.file, parser, progress)
     this.statusBar = new StatusBar(
       this.settings,
@@ -43,7 +44,7 @@ export default class DayPlanner extends Plugin {
     );
 
     this.statusBar.initStatusBar();
-    this.registerEvent(this.app.on("codemirror", this.codeMirror));
+    this.registerEvent(this.app.vault.on('modify', this.codeMirror, ''));
     
     this.addCommand({
       id: 'app:add-day-planner-to-note',
@@ -89,7 +90,7 @@ export default class DayPlanner extends Plugin {
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
     this.registerInterval(
       window.setInterval(async () => {
-        try {            
+        try {
           if(this.file.hasTodayNote()){
             // console.log('Active note found, starting file processing')
             const planSummary = await this.plannerMD.parseDayPlanner();
@@ -167,15 +168,13 @@ export default class DayPlanner extends Plugin {
       }
     }
     
-    codeMirror = (cm: Editor) => {
-      cm.on('change', async () => {
-        if(this.file.hasTodayNote()) {
-          // console.log('Active note found, starting CodeMirror monitoring')
-          this.plannerMD.checkIsDayPlannerEditing();
-        } else {
-          // console.log('No active note, skipping CodeMirror monitoring')
-        }
-      });
+    codeMirror = (file: TAbstractFile) => {
+      if(this.file.hasTodayNote()) {
+        // console.log('Active note found, starting CodeMirror monitoring')
+        this.plannerMD.checkIsDayPlannerEditing();
+      } else {
+        // console.log('No active note, skipping CodeMirror monitoring')
+      }
     }
     
     onunload() {

@@ -1,3 +1,5 @@
+import type { DayPlannerSettings } from './settings';
+
 const moment = (window as any).moment;
 
 export class PlanSummaryData {
@@ -26,6 +28,10 @@ export class PlanSummaryData {
                 const next = this.items[i+1];
                 if(item.time < now && (item.isEnd || (next && now < next.time))) {
                     this.current = item;
+                    if (item.isEnd) {
+                        item.isPast = true;
+                        this.past.push(item);
+                    }
                     this.next = item.isEnd ? null : next;
                 } else if(item.time < now) {
                     item.isPast = true;
@@ -74,14 +80,27 @@ export class PlanItem {
 
         this.tags = text.match(/(#[a-z0-9][a-z0-9\-_]*)/ig);
     }
+}
 
-    displayText() {
-        if(this.isBreak) {
-            return 'BREAK';
+export class PlanItemFactory {
+    private settings: DayPlannerSettings;
+
+    constructor(settings: DayPlannerSettings) {
+        this.settings = settings;
+    }
+
+    getPlanItem(matchIndex: number, charIndex: number, isCompleted: boolean, isBreak: boolean, isEnd: boolean, time: Date, rawTime: string, text: string, raw: string) {
+        const displayText = this.getDisplayText(isBreak, isEnd, text);
+        return new PlanItem(matchIndex, charIndex, isCompleted, isBreak, isEnd, time, rawTime, displayText, raw);
+    }
+
+    getDisplayText(isBreak: boolean, isEnd: boolean, text: string) {
+        if(isBreak) {
+            return this.settings.breakLabel;
         }
-        if(this.isEnd) {
-            return 'END';
+        if(isEnd) {
+            return this.settings.endLabel;
         }
-        return this.text;
+        return text;
     }
 }
