@@ -35,6 +35,25 @@ import { ICONS } from './constants';
             }));
 
       new Setting(containerEl)
+        .setName('Inital Content')
+        .setDesc('Set the inital content for new day planner note.')
+        .addTextArea(text => {
+          text
+            .setPlaceholder('Note content')
+            .setValue(this.plugin.settings.initialTemplate)
+            .onChange(async (value) => {
+                try {
+                    this.plugin.settings.initialTemplate = value;
+                    await this.plugin.saveData(this.plugin.settings);
+                } catch (e) {
+                    return false;
+                }
+            });
+          text.inputEl.rows = 8;
+          text.inputEl.cols = 50;
+        });
+
+      new Setting(containerEl)
         .setName('Complete past planner items')
         .setDesc('The plugin will automatically mark checkboxes for tasks and breaks in the past as complete')
         .addToggle(toggle => 
