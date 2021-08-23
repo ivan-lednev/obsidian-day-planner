@@ -90,6 +90,17 @@ import { ICONS } from './constants';
               }));
 
       new Setting(containerEl)
+          .setName('Create Next Day Planner')
+          .setDesc('Create a Day Planner for tomorrow on File mode')
+          .addToggle(toggle => 
+            toggle
+              .setValue(this.plugin.settings.createNextDayPlanner)
+              .onChange((value:boolean) => {
+                this.plugin.settings.createNextDayPlanner = value;
+                this.plugin.saveData(this.plugin.settings);
+              }));
+
+      new Setting(containerEl)
           .setName('Timeline Zoom Level')
           .setDesc('The zoom level to display the timeline. The higher the number, the more vertical space each task will take up.')
           .addSlider(slider => 

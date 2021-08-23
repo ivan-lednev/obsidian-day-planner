@@ -7,6 +7,7 @@ export class DayPlannerSettings {
   circularProgress: boolean = false;
   nowAndNextInStatusBar: boolean = false;
   showTaskNotification: boolean = false
+  createNextDayPlanner: boolean = false;
   timelineZoomLevel: number = 4;
   timelineIcon: string = 'calendar-with-checkmark'
   breakLabel: string = "BREAK";
@@ -28,9 +29,21 @@ export class NoteForDateQuery {
     return this.active(source) !== undefined;
   }
 
+  existsTomorrow(source: NoteForDate[]): boolean {
+    return this.activeTomorrow(source) !== undefined;
+  }
+
   active(source: NoteForDate[]): NoteForDate{
     const now = new Date().toDateString();
     return source && source.filter(ntd => ntd.date === now)[0];
+  }
+
+  activeTomorrow(source: NoteForDate[]): NoteForDate{
+    const tomorrowDate = new Date();
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+
+    const tomorrow= tomorrowDate.toDateString();
+    return source && source.filter(ntd => ntd.date === tomorrow)[0];
   }
 }
   
