@@ -5,6 +5,7 @@ import { expect } from 'chai';
 
 import Parser from '../src/parser';
 import { DayPlannerSettings } from '../src/settings';
+import type {PlanItem} from "../src/plan-data";
 
 describe('parser', () => {
   it('should return parsed items', async () => {
@@ -56,5 +57,28 @@ describe('parser', () => {
     expect(ninthItem.isEnd).to.be.true;
     expect(ninthItem.rawTime).to.eql('14:00');
     expect(ninthItem.text).to.eql('🛑 FINISH');
+  });
+  it('should return parsed items sorted by time', async () => {
+    const orderedFileContents = fs.readFileSync(path.join(__dirname, 'fixtures/test.md')).toString().split('\n');
+    const unOrderedFileContents = fs.readFileSync(path.join(__dirname, 'fixtures/unordered_test.md')).toString().split('\n');
+
+    const settings = new DayPlannerSettings();
+    settings.breakLabel = '☕️ COFFEE BREAK';
+    settings.endLabel = '🛑 FINISH';
+
+    const parser = new Parser(settings);
+    let orderedResults = await parser.parseMarkdown(orderedFileContents);
+    let unOrderedResults = await parser.parseMarkdown(unOrderedFileContents);
+
+    // Remove fields that won't match
+    function removeKeys (item: PlanItem) {
+      delete item['matchIndex'];
+      delete item['time'];
+      return item;
+    }
+
+    orderedResults.items = orderedResults.items.map(removeKeys);
+    unOrderedResults.items = unOrderedResults.items.map(removeKeys);
+    expect(orderedResults).to.eql(unOrderedResults);
   });
 });
