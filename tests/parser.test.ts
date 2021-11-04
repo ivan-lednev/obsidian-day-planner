@@ -20,41 +20,51 @@ describe('parser', () => {
 
     expect(results.empty).to.be.false;
     expect(results.invalid).to.be.false;
-    expect(results.items).to.have.lengthOf(9);
+    expect(results.items).to.have.lengthOf(10);
 
     const firstItem = results.items[0];
     expect(firstItem.isCompleted).to.be.true;
     expect(firstItem.isBreak).to.be.false;
     expect(firstItem.isEnd).to.be.false;
-    expect(firstItem.rawTime).to.eql('08:00');
+    expect(firstItem.rawStartTime).to.eql('08:00');
     expect(firstItem.text).to.eql('morning stuff');
 
     const fourthItem = results.items[3];
     expect(fourthItem.isCompleted).to.be.true;
     expect(fourthItem.isBreak).to.be.true;
     expect(fourthItem.isEnd).to.be.false;
-    expect(fourthItem.rawTime).to.eql('11:00');
+    expect(fourthItem.rawStartTime).to.eql('11:00');
     expect(fourthItem.text).to.eql('☕️ COFFEE BREAK');
 
     const fifthItem = results.items[4];
     expect(fifthItem.isCompleted).to.be.false;
     expect(fifthItem.isBreak).to.be.false;
     expect(fifthItem.isEnd).to.be.false;
-    expect(fifthItem.rawTime).to.eql('11:10');
+    expect(fifthItem.rawStartTime).to.eql('11:10');
+    expect(fifthItem.rawEndTime).to.eql('');
     expect(fifthItem.text).to.eql('reading');
 
-    const seventhItem = results.items[6];
-    expect(seventhItem.isCompleted).to.be.false;
-    expect(seventhItem.isBreak).to.be.true;
-    expect(seventhItem.isEnd).to.be.false;
-    expect(seventhItem.rawTime).to.eql('13:00');
-    expect(seventhItem.text).to.eql('☕️ COFFEE BREAK');
+    const ssixthItem = results.items[5];
+    expect(ssixthItem.isCompleted).to.be.false;
+    expect(ssixthItem.isBreak).to.be.false;
+    expect(ssixthItem.isEnd).to.be.false;
+    expect(ssixthItem.endTime).to.not.be.undefined;
+    expect(ssixthItem.rawStartTime).to.eql('11:30');
+    expect(ssixthItem.rawEndTime).to.eql('11:45');
+    expect(ssixthItem.text).to.eql('Short Jog');
 
-    const ninthItem = results.items[8];
-    expect(ninthItem.isCompleted).to.be.false;
-    expect(ninthItem.isBreak).to.be.false;
-    expect(ninthItem.isEnd).to.be.true;
-    expect(ninthItem.rawTime).to.eql('14:00');
-    expect(ninthItem.text).to.eql('🛑 FINISH');
+    const eigthItem = results.items[7];
+    expect(eigthItem.isCompleted).to.be.false;
+    expect(eigthItem.isBreak).to.be.true;
+    expect(eigthItem.isEnd).to.be.false;
+    expect(eigthItem.rawStartTime).to.eql('13:00');
+    expect(eigthItem.text).to.eql('☕️ COFFEE BREAK');
+
+    const tenthItem = results.items[9];
+    expect(tenthItem.isCompleted).to.be.false;
+    expect(tenthItem.isBreak).to.be.false;
+    expect(tenthItem.isEnd).to.be.true;
+    expect(tenthItem.rawStartTime).to.eql('14:00');
+    expect(tenthItem.text).to.eql('🛑 FINISH');
   });
 });

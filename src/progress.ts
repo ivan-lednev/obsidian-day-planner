@@ -6,8 +6,14 @@ export default class Progress {
         try {
             const now = new Date();
             const nowMoment = moment(now);
-            const currentMoment = moment(current.time);
-            const nextMoment = moment(next.time);
+            const currentMoment = moment(current.startTime);
+            let nextMoment: any;
+            if (current.endTime === undefined) {
+                nextMoment = moment(current.endTime)
+            } else {
+                nextMoment = moment(next.startTime)
+            }
+
             const diff = moment.duration(nextMoment.diff(currentMoment));
             const fromStart = moment.duration(nowMoment.diff(currentMoment));
             const untilNext = moment.duration(nextMoment.diff(nowMoment));

@@ -95,7 +95,13 @@ export default class PlannerMarkdown {
         if(!this.settings.completePastItems) {
             check = this.check(item.isCompleted);
         }
-        return `- [${check}] ${item.rawTime} ${item.text}`;
+
+        let outputTask = `- [${check}] ${item.rawStartTime} `
+        if (item.rawEndTime !== '') {
+            outputTask += `- ${item.rawEndTime} `
+        }
+
+        return  outputTask + `${item.text}`;
     }
 
     private check(check: boolean) {

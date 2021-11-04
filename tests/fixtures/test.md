@@ -5,6 +5,7 @@
 - [x] 10:00 meeting
 - [x] 11:00 ☕️ Coffee Break
 - [ ] 11:10 reading
+- [ ] 11:30 - 11:45 Short Jog
 - [ ] 12:00 writing
 - [ ] 13:00 ☕️ COFFEE BREAK
 - [ ] 13:10 meeting

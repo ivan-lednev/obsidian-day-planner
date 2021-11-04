@@ -26,19 +26,22 @@ export class PlanSummaryData {
             }
             this.items.forEach((item, i) => {
                 const next = this.items[i+1];
-                if(item.time < now && (item.isEnd || (next && now < next.time))) {
+                if(item.startTime < now && (item.isEnd || (next && now < next.startTime))) {
                     this.current = item;
                     if (item.isEnd) {
                         item.isPast = true;
                         this.past.push(item);
                     }
                     this.next = item.isEnd ? null : next;
-                } else if(item.time < now) {
+                } else if(item.startTime < now) {
                     item.isPast = true;
                     this.past.push(item);
                 }
-                if(next){
-                    const untilNext = moment.duration(moment(next.time).diff(moment(item.time))).asMinutes();
+                
+                if (item.endTime !== undefined) {
+                    item.durationMins = moment.duration(moment(item.endTime).diff(moment(item.startTime))).asMinutes()
+                } else if(next){
+                    const untilNext = moment.duration(moment(next.startTime).diff(moment(item.startTime))).asMinutes();
                     item.durationMins = untilNext;
                 }
             });
@@ -57,21 +60,25 @@ export class PlanItem {
     isPast: boolean;
     isBreak: boolean;
     isEnd: boolean;
-    time: Date;
+    startTime: Date;
+    endTime: Date;
     durationMins: number;
-    rawTime: string;
+    rawStartTime: string;
+    rawEndTime: string;
     text: string;
     raw: string;
 
     constructor(matchIndex: number, charIndex: number, isCompleted: boolean, 
-        isBreak: boolean, isEnd: boolean, time: Date, rawTime:string, text: string, raw: string){
+        isBreak: boolean, isEnd: boolean, startTime: Date, endTime: Date, rawStartTime:string, rawEndTime:string, text: string, raw: string){
         this.matchIndex = matchIndex;
         this.charIndex = charIndex;
         this.isCompleted = isCompleted;
         this.isBreak = isBreak;
         this.isEnd = isEnd;
-        this.time = time;
-        this.rawTime = rawTime;
+        this.startTime = startTime;
+        this.endTime = endTime
+        this.rawStartTime = rawStartTime;
+        this.rawEndTime = rawEndTime;
         this.text = text;
         this.raw = raw;
     }
@@ -84,9 +91,9 @@ export class PlanItemFactory {
         this.settings = settings;
     }
 
-    getPlanItem(matchIndex: number, charIndex: number, isCompleted: boolean, isBreak: boolean, isEnd: boolean, time: Date, rawTime: string, text: string, raw: string) {
+    getPlanItem(matchIndex: number, charIndex: number, isCompleted: boolean, isBreak: boolean, isEnd: boolean, startTime: Date, endTime: Date, rawStartTime: string, rawEndTime: string, text: string, raw: string) {
         const displayText = this.getDisplayText(isBreak, isEnd, text);
-        return new PlanItem(matchIndex, charIndex, isCompleted, isBreak, isEnd, time, rawTime, displayText, raw);
+        return new PlanItem(matchIndex, charIndex, isCompleted, isBreak, isEnd, startTime, endTime, rawStartTime, rawEndTime, displayText, raw);
     }
 
     getDisplayText(isBreak: boolean, isEnd: boolean, text: string) {
