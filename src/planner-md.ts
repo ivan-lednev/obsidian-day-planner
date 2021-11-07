@@ -1,11 +1,12 @@
-import type { MarkdownView, Workspace } from 'obsidian';
 import { DAY_PLANNER_DEFAULT_CONTENT, MERMAID_REGEX } from './constants';
-import type DayPlannerFile from './file';
-import PlannerMermaid from './mermaid';
-import type Parser from './parser';
+import { DayPlannerSettings, NoteForDateQuery } from './settings';
+import type { MarkdownView, Workspace } from 'obsidian';
 import type { PlanItem, PlanSummaryData } from './plan-data';
+
+import type DayPlannerFile from './file';
+import type Parser from './parser';
+import PlannerMermaid from './mermaid';
 import type Progress from './progress';
-import { DayPlannerSettings, NoteForDateQuery} from './settings';
 
 export default class PlannerMarkdown {
     workspace: Workspace;
@@ -16,7 +17,7 @@ export default class PlannerMarkdown {
     progress: Progress;
     mermaid: PlannerMermaid;
     noteForDateQuery: NoteForDateQuery;
-    
+
     constructor(workspace: Workspace, settings: DayPlannerSettings, file: DayPlannerFile, parser: Parser, progress: Progress){
         this.workspace = workspace;
         this.settings = settings;
@@ -26,12 +27,12 @@ export default class PlannerMarkdown {
         this.mermaid = new PlannerMermaid(this.progress);
         this.noteForDateQuery = new NoteForDateQuery();
     }
-    
+
     async insertPlanner() {
         const filePath = this.file.todayPlannerFilePath();
         const fileContents = await (await this.file.getFileContents(filePath)).split('\n');
         const view = this.workspace.activeLeaf.view as MarkdownView;
-        const currentLine = view.sourceMode.cmEditor.getCursor().line;
+        const currentLine = view.editor.getCursor().line;
         const insertResult = [...fileContents.slice(0, currentLine), ...DAY_PLANNER_DEFAULT_CONTENT.split('\n'), ...fileContents.slice(currentLine)];
         this.file.updateFile(filePath, insertResult.join('\n'));
     }
@@ -47,7 +48,7 @@ export default class PlannerMarkdown {
             console.log(error)
         }
     }
-    
+
     async updateDayPlannerMarkdown(planSummary: PlanSummaryData) {
         if((this.dayPlannerLastEdit + 6000) > new Date().getTime()) {
             return;
