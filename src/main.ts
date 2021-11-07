@@ -1,43 +1,44 @@
+import { DayPlannerMode, DayPlannerSettings, NoteForDate, NoteForDateQuery } from './settings';
 import {
   Plugin,
   TAbstractFile,
   Vault,
-  WorkspaceLeaf, 
+  WorkspaceLeaf,
 } from 'obsidian';
-import type { Editor } from 'codemirror';
-import { DayPlannerSettingsTab } from './settings-tab';
-import { DayPlannerSettings, DayPlannerMode, NoteForDate, NoteForDateQuery } from './settings';
-import StatusBar from './status-bar';
-import Progress from './progress';
-import PlannerMarkdown from './planner-md';
+
 import DayPlannerFile from './file';
+import { DayPlannerSettingsTab } from './settings-tab';
+import type { Editor } from 'codemirror';
 import Parser from './parser';
-import { VIEW_TYPE_TIMELINE } from './constants';
-import TimelineView from './timeline-view';
 import { PlanSummaryData } from './plan-data';
+import PlannerMarkdown from './planner-md';
+import Progress from './progress';
+import StatusBar from './status-bar';
+import TimelineView from './timeline-view';
+import { VIEW_TYPE_TIMELINE } from './constants';
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
   vault: Vault;
   file: DayPlannerFile;
   plannerMD: PlannerMarkdown;
-  statusBar: StatusBar; 
+  statusBar: StatusBar;
   notesForDatesQuery: NoteForDateQuery;
   timelineView: TimelineView;
-  
+
   async onload() {
     console.log("Loading Day Planner plugin");
     this.vault = this.app.vault;
     this.settings = Object.assign(new DayPlannerSettings(), await this.loadData());
     this.notesForDatesQuery = new NoteForDateQuery();
-    this.file = new DayPlannerFile(this.vault, this.settings);
+    this.file = new DayPlannerFile(this.app, this.vault, this.settings);
     const progress = new Progress();
     const parser = new Parser(this.settings);
     this.plannerMD = new PlannerMarkdown(this.app.workspace, this.settings, this.file, parser, progress)
     this.statusBar = new StatusBar(
       this.settings,
-      this.addStatusBarItem(), 
-      this.app.workspace, 
+      this.addStatusBarItem(),
+      this.app.workspace,
       progress,
       new PlannerMarkdown(this.app.workspace, this.settings, this.file, parser, progress),
       this.file
@@ -45,7 +46,7 @@ export default class DayPlanner extends Plugin {
 
     this.statusBar.initStatusBar();
     this.registerEvent(this.app.vault.on('modify', this.codeMirror, ''));
-    
+
     this.addCommand({
       id: 'app:add-day-planner-to-note',
       name: 'Add a Day Planner template for today to the current note',
@@ -131,12 +132,12 @@ export default class DayPlanner extends Plugin {
           this.settings.notesToDates = [];
           this.saveData(this.settings)
         }
-        
+
         const view = this.app.workspace.activeLeaf.view;
         const filePath = view.getState().file;
         const dayPlannerExists = this.notesForDatesQuery.exists(this.settings.notesToDates);
         const activeDayPlannerPath = this.notesForDatesQuery.active(this.settings.notesToDates)?.notePath;
-        
+
         if(dayPlannerExists && activeDayPlannerPath !== filePath){
           new Notification('Day Planner exists', {silent: true, body: `A Day Planner for today already exists in ${activeDayPlannerPath}`});
           return;
@@ -162,13 +163,13 @@ export default class DayPlanner extends Plugin {
         await this.loadData();
         this.statusBar.hide(this.statusBar.statusBar);
         this.timelineView && this.timelineView.update(new PlanSummaryData([]));
-        new Notification('Day Planner reset', 
+        new Notification('Day Planner reset',
           {silent: true, body: `The Day Planner for today has been dissociated from ${activePlanner.notePath} and can be added to another note`});
       } catch (error) {
         console.error(error);
       }
     }
-    
+
     codeMirror = (file: TAbstractFile) => {
       if(this.file.hasTodayNote()) {
         // console.log('Active note found, starting CodeMirror monitoring')
@@ -177,12 +178,12 @@ export default class DayPlanner extends Plugin {
         // console.log('No active note, skipping CodeMirror monitoring')
       }
     }
-    
+
     onunload() {
       console.log("Unloading Day Planner plugin");
       this.app.workspace
       .getLeavesOfType(VIEW_TYPE_TIMELINE)
       .forEach((leaf) => leaf.detach());
     }
-    
+
   }

@@ -1,5 +1,6 @@
 export class DayPlannerSettings {
   customFolder: string = 'Day Planners';
+  templaterFile: string = '';
   mode: DayPlannerMode = DayPlannerMode.File;
   mermaid: boolean = false;
   notesToDates: NoteForDate[] = [];
@@ -33,7 +34,7 @@ export class NoteForDateQuery {
     return source && source.filter(ntd => ntd.date === now)[0];
   }
 }
-  
+
 export enum DayPlannerMode {
   File,
   Command
