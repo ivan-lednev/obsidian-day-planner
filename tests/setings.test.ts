@@ -12,4 +12,8 @@ describe("Day Planner Settings defaults", () => {
     it("Mode", () => {
         assert.equal(settings.mode, DayPlannerMode.File);
     });
+
+    it("Day Planner Template", () => {
+        assert.equal(settings.noteTemplate,"" )
+    });
 });

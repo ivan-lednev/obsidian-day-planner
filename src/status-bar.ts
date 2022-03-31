@@ -36,7 +36,7 @@ export default class StatusBar {
       if(this.statusBarAdded) {
         return;
       }
-      let status = this.statusBar.createEl('div', { cls: 'day-planner', title: 'View the Day Planner', prepend: true});
+      const status = this.statusBar.createEl('div', { cls: 'day-planner', title: 'View the Day Planner', prepend: true});
       
       this.setupCard(status);
       this.statusBarText = status.createEl('span', { cls: ['status-bar-item-segment', 'day-planner-status-bar-text']});

@@ -1,5 +1,4 @@
-import { now } from 'moment';
-import { Vault, normalizePath } from 'obsidian';
+import { Notice, Vault, normalizePath } from 'obsidian';
 import { DAY_PLANNER_DEFAULT_CONTENT, DAY_PLANNER_FILENAME } from './constants';
 import MomentDateRegex from './moment-date-regex';
 import { DayPlannerSettings, DayPlannerMode, NoteForDateQuery } from './settings';
@@ -34,9 +33,34 @@ export default class DayPlannerFile {
         return this.momentDateRegex.replace(DAY_PLANNER_FILENAME);
     }
 
+    async todayPlannerContents(): Promise<string> {
+        const { metadataCache, vault } = window.app;
+        const templatePath = normalizePath(this.settings.noteTemplate);
+
+        if (templatePath === "/") {
+            return (DAY_PLANNER_DEFAULT_CONTENT);
+        }
+        try {
+            const templateFile = metadataCache.getFirstLinkpathDest(templatePath, "");
+            const contents = await vault.cachedRead(templateFile);
+
+            return contents;
+        } catch (err) {
+            console.error(
+                `Failed to read the day planner template '${templatePath}'`,
+                err
+            );
+            new Notice("Failed to read the day planner template");
+            return (DAY_PLANNER_DEFAULT_CONTENT);
+        }
+
+        return DAY_PLANNER_DEFAULT_CONTENT;
+
+    }
+
     async prepareFile() {
-        try {      
-            if(this.settings.mode === DayPlannerMode.File){      
+        try {
+            if(this.settings.mode === DayPlannerMode.File){
                 await this.createFolderIfNotExists(this.settings.customFolder);
                 await this.createFileIfNotExists(this.todayPlannerFilePath());
             }
@@ -76,7 +100,7 @@ export default class DayPlannerFile {
             console.log(error)
         }
     }
-    
+
     async updateFile(fileName: string, fileContents: string){
         this.prepareFile();
         try {

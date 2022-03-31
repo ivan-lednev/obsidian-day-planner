@@ -7,7 +7,8 @@ import { DayPlannerMode }from './settings';
 import MomentDateRegex from './moment-date-regex';
 import type DayPlanner from './main';
 import { ICONS } from './constants';
-  
+import { FileSuggest, FileSuggestMode } from './file-suggester'
+
   export class DayPlannerSettingsTab extends PluginSettingTab {
     momentDateRegex = new MomentDateRegex();
     plugin: DayPlanner;
@@ -15,16 +16,16 @@ import { ICONS } from './constants';
       super(app, plugin);
       this.plugin = plugin;
   }
-  
+
     display(): void {
       const { containerEl } = this;
-  
+
       containerEl.empty();
 
       new Setting(containerEl)
         .setName('Day Planner Mode')
         .setDesc(this.modeDescriptionContent())
-        .addDropdown(dropDown => 
+        .addDropdown(dropDown =>
           dropDown
             .addOption(DayPlannerMode[DayPlannerMode.File], "File mode")
             .addOption(DayPlannerMode[DayPlannerMode.Command], "Command mode")
@@ -34,10 +35,31 @@ import { ICONS } from './constants';
               this.plugin.saveData(this.plugin.settings);
             }));
 
+        new Setting(containerEl)
+            .setName('Day Planner Template')
+            .addSearch((cb) => {
+                new FileSuggest(
+                    this.app,
+                    cb.inputEl,
+                    this.plugin,
+                    FileSuggestMode.TemplateFiles
+                );
+
+                cb.setPlaceholder("Template")
+                    .setValue(this.plugin.settings.noteTemplate)
+                    .onChange((value:string) => {
+                        this.plugin.settings.noteTemplate = value
+                        this.plugin.saveData(this.plugin.settings);
+                    })
+
+                containerEl.addClass("day-planner-search");
+            })
+            .setDesc('Choose the file to use as a template.');
+
       new Setting(containerEl)
         .setName('Complete past planner items')
         .setDesc('The plugin will automatically mark checkboxes for tasks and breaks in the past as complete')
-        .addToggle(toggle => 
+        .addToggle(toggle =>
           toggle
             .setValue(this.plugin.settings.completePastItems)
             .onChange((value:boolean) => {
@@ -48,7 +70,7 @@ import { ICONS } from './constants';
       new Setting(containerEl)
         .setName('Mermaid Gantt')
         .setDesc('Include a mermaid gantt chart generated for the day planner')
-        .addToggle(toggle => 
+        .addToggle(toggle =>
           toggle
             .setValue(this.plugin.settings.mermaid)
             .onChange((value:boolean) => {
@@ -59,7 +81,7 @@ import { ICONS } from './constants';
       new Setting(containerEl)
         .setName('Status Bar - Circular Progress')
         .setDesc('Display a circular progress bar in the status bar')
-        .addToggle(toggle => 
+        .addToggle(toggle =>
           toggle
             .setValue(this.plugin.settings.circularProgress)
             .onChange((value:boolean) => {
@@ -70,7 +92,7 @@ import { ICONS } from './constants';
       new Setting(containerEl)
           .setName('Status Bar - Now and Next')
           .setDesc('Display now and next tasks in the status bar')
-          .addToggle(toggle => 
+          .addToggle(toggle =>
             toggle
               .setValue(this.plugin.settings.nowAndNextInStatusBar)
               .onChange((value:boolean) => {
@@ -81,7 +103,7 @@ import { ICONS } from './constants';
       new Setting(containerEl)
           .setName('Task Notification')
           .setDesc('Display a notification when a new task is started')
-          .addToggle(toggle => 
+          .addToggle(toggle =>
             toggle
               .setValue(this.plugin.settings.showTaskNotification)
               .onChange((value:boolean) => {
@@ -92,7 +114,7 @@ import { ICONS } from './constants';
       new Setting(containerEl)
           .setName('Timeline Zoom Level')
           .setDesc('The zoom level to display the timeline. The higher the number, the more vertical space each task will take up.')
-          .addSlider(slider => 
+          .addSlider(slider =>
             slider
               .setLimits(1, 5, 1)
               .setValue(this.plugin.settings.timelineZoomLevel ?? 4)
@@ -114,7 +136,7 @@ import { ICONS } from './constants';
                 this.plugin.saveData(this.plugin.settings);
               });
           });
-      
+
       new Setting(containerEl)
           .setName('BREAK task label')
           .setDesc('Use this label to mark break between tasks.')

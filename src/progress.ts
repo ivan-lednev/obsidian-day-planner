@@ -11,7 +11,7 @@ export default class Progress {
             const diff = moment.duration(nextMoment.diff(currentMoment));
             const fromStart = moment.duration(nowMoment.diff(currentMoment));
             const untilNext = moment.duration(nextMoment.diff(nowMoment));
-            let percentageComplete = (fromStart.asMinutes() / diff.asMinutes()) * 100;
+            const percentageComplete = (fromStart.asMinutes() / diff.asMinutes()) * 100;
             const minsUntilNext = untilNext.asMinutes().toFixed(0);
             return { percentageComplete, minsUntilNext };
         } catch (error) {

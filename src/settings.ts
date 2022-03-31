@@ -1,16 +1,17 @@
 export class DayPlannerSettings {
-  customFolder: string = 'Day Planners';
+  customFolder = 'Day Planners';
+  noteTemplate = '';
   mode: DayPlannerMode = DayPlannerMode.File;
-  mermaid: boolean = false;
+  mermaid = false;
   notesToDates: NoteForDate[] = [];
-  completePastItems: boolean = true;
-  circularProgress: boolean = false;
-  nowAndNextInStatusBar: boolean = false;
-  showTaskNotification: boolean = false
-  timelineZoomLevel: number = 4;
-  timelineIcon: string = 'calendar-with-checkmark'
-  breakLabel: string = "BREAK";
-  endLabel: string = "END";
+  completePastItems = true;
+  circularProgress = false;
+  nowAndNextInStatusBar = false;
+  showTaskNotification = false
+  timelineZoomLevel = 4;
+  timelineIcon = 'calendar-with-checkmark'
+  breakLabel = "BREAK";
+  endLabel = "END";
 }
 
 export class NoteForDate {
@@ -33,7 +34,7 @@ export class NoteForDateQuery {
     return source && source.filter(ntd => ntd.date === now)[0];
   }
 }
-  
+
 export enum DayPlannerMode {
   File,
   Command

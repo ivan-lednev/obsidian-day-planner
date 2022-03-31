@@ -57,6 +57,10 @@
     position: absolute;
 }
 
+.day-planner-search {
+    width: calc(100% - 20px);
+}
+
 .progress-pie.day-planner {
     background-color: var(--text-muted);
     float: left;
