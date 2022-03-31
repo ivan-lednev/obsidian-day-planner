@@ -3,13 +3,14 @@
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lynchjames/obsidian-day-planner/Release%20Build?logo=github&style=for-the-badge) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/lynchjames/obsidian-day-planner?style=for-the-badge&sort=semver)
 
 
-This repository contains a plugin for [Obsidian](https://obsidian.md/) for day planning and managing pomodoro timers from a task list in a Markdown note. 
+This repository contains a plugin for [Obsidian](https://obsidian.md/) for day planning and managing pomodoro timers from a task list in a Markdown note. It is a fork of  lynchjames/obsidian-day-planner, and adds the ability to use a template for your daily planner note.
 
 > This is an early alpha of version of the plugin and it will be running constantly in the background while Obsidian is open and the plugin is enabled. **Please try the plugin in a test vault first, and, most importantly, make sure you have your notes backed up in cloud storage or Git.**
     
 ## Features
 
 - Generate a day planner for you each day or create a day planner in any note you choose.
+- Use a template to configure your day planner.
 - Status bar updates on progress with information on your current and next tasks. You can click on the status bar to access the note for today's day planner.
 - Mermaid Gantt chart automatically generated from your tasks and included in you day planner note.
 - Timeline view showing your tasks laid out on a vertical timeline.
@@ -180,6 +181,9 @@ Commands are used to insert a Day Planner for today within any note as well as u
 
 The Day Planner can be placed anywhere within a note as long as the format provided is used. Only the Day Planner section of the note will be updated as time progresses.
 
+### Day Planner Template
+You can choose a note to use as a template for the basis of your daily planner. 
+
 ### Complete Past Planner Items
 
 You can choose whether the plugin will automatically mark planner items in the past as complete or allow you to tick them off yourself.
@@ -244,7 +248,3 @@ Note: On some machines the `.obsidian` folder may be hidden. On MacOS you should
 Pull requests are both welcome and appreciated. 😀
 
 If you would like to contribute to the development of this plugin, please follow the guidelines provided in [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Donating
-
-This plugin is provided free of charge. If you would like to donate something to me, you can via [PayPal](https://paypal.me/lynchjames2020). Thank you!
