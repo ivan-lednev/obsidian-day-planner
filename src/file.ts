@@ -82,10 +82,11 @@ export default class DayPlannerFile {
     }
 
     async createFileIfNotExists(fileName: string) {
+        const content = await this.todayPlannerContents();
         try {
             const normalizedFileName = normalizePath(fileName);
             if (!await this.vault.adapter.exists(normalizedFileName, false)) {
-                await this.vault.create(normalizedFileName, DAY_PLANNER_DEFAULT_CONTENT);
+                await this.vault.create(normalizedFileName, content);
             }
         } catch (error) {
             console.log(error)
