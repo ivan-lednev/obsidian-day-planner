@@ -28,6 +28,7 @@ import { ICONS } from './constants';
           dropDown
             .addOption(DayPlannerMode[DayPlannerMode.File], "File mode")
             .addOption(DayPlannerMode[DayPlannerMode.Command], "Command mode")
+            .addOption(DayPlannerMode[DayPlannerMode.Daily], "Daily mode")
             .setValue(DayPlannerMode[this.plugin.settings.mode] || DayPlannerMode.File.toString())
             .onChange((value:string) => {
               this.plugin.settings.mode = DayPlannerMode[value as keyof typeof DayPlannerMode];
@@ -140,7 +141,7 @@ import { ICONS } from './constants';
 
     private modeDescriptionContent(): DocumentFragment {
       const descEl = document.createDocumentFragment();
-      descEl.appendText('Choose between 2 modes to use the Day Planner plugin:');
+      descEl.appendText('Choose between 3 modes to use the Day Planner plugin:');
       descEl.appendChild(document.createElement('br'));
       descEl.appendChild(document.createElement('strong')).appendText('File mode');
       descEl.appendChild(document.createElement('br'));
@@ -149,6 +150,10 @@ import { ICONS } from './constants';
       descEl.appendChild(document.createElement('strong')).appendText('Command mode');
       descEl.appendChild(document.createElement('br'));
       descEl.appendText('Command used to insert a Day Planner for today within the current note.');
+      descEl.appendChild(document.createElement('br'));
+      descEl.appendChild(document.createElement('strong')).appendText('Daily mode');
+      descEl.appendChild(document.createElement('br'));
+      descEl.appendText('Plugin automatically links to the current daily note. Daily notes plugin must be enabled.');
       descEl.appendChild(document.createElement('br'));
       this.addDocsLink(descEl);
       return descEl;

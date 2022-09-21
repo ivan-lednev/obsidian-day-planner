@@ -39,6 +39,7 @@
     "typescript": "^4.3.4"
   },
   "dependencies": {
-    "svelte": "^3.38.2"
+    "svelte": "^3.38.2",
+    "obsidian-daily-notes-interface": "^0.9.4"
   }
 }

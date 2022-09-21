@@ -36,5 +36,6 @@ export class NoteForDateQuery {
   
 export enum DayPlannerMode {
   File,
-  Command
+  Command,
+  Daily
 }

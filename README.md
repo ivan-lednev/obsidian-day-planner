@@ -180,6 +180,9 @@ Commands are used to insert a Day Planner for today within any note as well as u
 
 The Day Planner can be placed anywhere within a note as long as the format provided is used. Only the Day Planner section of the note will be updated as time progresses.
 
+**Daily mode**
+The plugin automatically looks for the day planner in daily notes. The Daily notes plugin must be enabled.
+
 ### Complete Past Planner Items
 
 You can choose whether the plugin will automatically mark planner items in the past as complete or allow you to tick them off yourself.

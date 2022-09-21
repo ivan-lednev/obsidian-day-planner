@@ -1,8 +1,9 @@
-import { now } from 'moment';
+import moment from 'moment';
 import { Vault, normalizePath } from 'obsidian';
 import { DAY_PLANNER_DEFAULT_CONTENT, DAY_PLANNER_FILENAME } from './constants';
 import MomentDateRegex from './moment-date-regex';
-import { DayPlannerSettings, DayPlannerMode, NoteForDateQuery } from './settings';
+import { DayPlannerSettings, DayPlannerMode, NoteForDateQuery, NoteForDate } from './settings';
+import { appHasDailyNotesPluginLoaded, getAllDailyNotes, getDailyNote } from 'obsidian-daily-notes-interface';
 
 export default class DayPlannerFile {
     vault: Vault;
@@ -19,11 +20,25 @@ export default class DayPlannerFile {
 
 
     hasTodayNote(): boolean {
+        if (this.settings.mode == DayPlannerMode.Daily && appHasDailyNotesPluginLoaded()) {
+            const date = moment();
+            let note = getDailyNote(date, getAllDailyNotes());
+            if (note) {
+                const noteForDate = new NoteForDate(
+                    this.vault.getRoot().path + note.path, 
+                    new Date().toDateString()
+                );
+                this.settings.notesToDates.push(noteForDate);
+                return true;
+            }
+            return false;
+        }
+
         return this.settings.mode === DayPlannerMode.File || this.noteForDateQuery.exists(this.settings.notesToDates);
     }
 
     todayPlannerFilePath(): string {
-        if(this.settings.mode === DayPlannerMode.Command){
+        if(this.settings.mode === DayPlannerMode.Command || this.settings.mode === DayPlannerMode.Daily){
             return this.noteForDateQuery.active(this.settings.notesToDates).notePath;
         }
         const fileName = this.todayPlannerFileName();

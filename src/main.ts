@@ -15,6 +15,7 @@ import Parser from './parser';
 import { VIEW_TYPE_TIMELINE } from './constants';
 import TimelineView from './timeline-view';
 import { PlanSummaryData } from './plan-data';
+import { appHasDailyNotesPluginLoaded } from 'obsidian-daily-notes-interface';
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
@@ -98,14 +99,19 @@ export default class DayPlanner extends Plugin {
             await this.statusBar.refreshStatusBar(planSummary)
             await this.plannerMD.updateDayPlannerMarkdown(planSummary)
             this.timelineView && this.timelineView.update(planSummary);
-          } else{
+          } else if (this.settings.mode == DayPlannerMode.Daily && appHasDailyNotesPluginLoaded()) {
+              // console.log('Clearing status bar & timeline in case daily note was deleted')
+              const planSummary = new PlanSummaryData([]);
+              await this.statusBar.refreshStatusBar(planSummary)
+              this.timelineView && this.timelineView.update(planSummary);
+          } else {
             // console.log('No active note, skipping file processing')
           }
         } catch (error) {
             console.log(error)
         }
       }, 2000));
-    }
+  }
 
     initLeaf() {
       if (this.app.workspace.getLeavesOfType(VIEW_TYPE_TIMELINE).length > 0) {
