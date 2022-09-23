@@ -92,7 +92,7 @@ export default class DayPlanner extends Plugin {
     this.registerInterval(
       window.setInterval(async () => {
         try {
-          if(this.file.hasTodayNote()){
+          if(await this.file.hasTodayNote()){
             // console.log('Active note found, starting file processing')
             const planSummary = await this.plannerMD.parseDayPlanner();
             planSummary.calculate();
