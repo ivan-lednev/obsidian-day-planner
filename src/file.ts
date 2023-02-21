@@ -82,7 +82,7 @@ export default class DayPlannerFile {
     }
 
     async getFileContents(fileName: string){
-        this.prepareFile();
+        await this.prepareFile();
         try {
             return await this.vault.adapter.read(fileName);
         } catch (error) {
@@ -91,7 +91,7 @@ export default class DayPlannerFile {
     }
     
     async updateFile(fileName: string, fileContents: string){
-        this.prepareFile();
+        await this.prepareFile();
         try {
             return await this.vault.adapter.write(normalizePath(fileName), fileContents);
         } catch (error) {
