@@ -15,6 +15,7 @@
 > I've also written a [custom CSS snippet](https://github.com/replete/obsidian-minimal-theme-css-snippets/blob/main/%5Bplugin%5D%20Day%20Planner%20tweaks.css) to suit the minimal theme for this plugin.
 > ### To use this repo in your vault
 >
+> [Unzip the latest release](https://github.com/replete/obsidian-day-planner/releases/download/v0.60/obsidian-day-planner.v0.60.zip) into your plugins folder OR:
 > 1) Clone/fork this repo
 > 2) Run `npm i` or `yarn install` to install project
 > 3) Run `npm run build` or `yarn build`
