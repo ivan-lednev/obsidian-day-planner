@@ -1,7 +1,25 @@
 # Day Planner
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lynchjames/obsidian-day-planner/Release%20Build?logo=github&style=for-the-badge) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/lynchjames/obsidian-day-planner?style=for-the-badge&sort=semver)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/replete/obsidian-day-planner/Release%20Build?logo=github&style=for-the-badge) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/replete/obsidian-day-planner?style=for-the-badge&sort=semver)
 
+
+
+> ## Forked in 2023
+> I like this plugin so I've forked it and merged a few of the [open PRs](https://github.com/lynchjames/obsidian-day-planner/pulls) as the original author has abandoned it. I may or may not make changes to this plugin, but this should be useful.
+> ### Added features
+> - [Daily Mode](https://github.com/lynchjames/obsidian-day-planner/pull/179)
+> - [Break/end CSS classes](https://github.com/lynchjames/obsidian-day-planner/pull/113)
+> - [Sort PlanSummaryData items by time](https://github.com/lynchjames/obsidian-day-planner/pull/163)
+> - [Fix missing await](https://github.com/lynchjames/obsidian-day-planner/pull/135)
+>
+> I've also written a [custom CSS snippet](https://github.com/replete/obsidian-minimal-theme-css-snippets/blob/main/%5Bplugin%5D%20Day%20Planner%20tweaks.css) to suit the minimal theme for this plugin.
+> ### To use this repo in your vault
+>
+> 1) Clone/fork this repo
+> 2) Run `npm i` or `yarn install` to install project
+> 3) Run `npm run build` or `yarn build`
+> 4) Copy `./test-vault/.obsidian/plugins/obsidian-day-planner` folder to `<your vault location>/.obsidian/plugins`
+> 
 
 This repository contains a plugin for [Obsidian](https://obsidian.md/) for day planning and managing pomodoro timers from a task list in a Markdown note. 
 
