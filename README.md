@@ -1,6 +1,6 @@
 # Day Planner
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/replete/obsidian-day-planner/Release%20Build?logo=github&style=for-the-badge) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/replete/obsidian-day-planner?style=for-the-badge&sort=semver)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/replete/obsidian-day-planner?style=for-the-badge)
 
 
 
