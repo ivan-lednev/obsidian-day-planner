@@ -31,7 +31,7 @@ export default class TimelineView extends ItemView {
         planSummary.update(n => n = summaryData);
         const currentTime = new Date();
         now.update(n => n = currentTime);
-        const currentPosition = summaryData.empty ? 0 : this.positionFromTime(currentTime) - this.positionFromTime(summaryData.items.first().time);
+        const currentPosition = summaryData.empty ? 0 : this.positionFromTime(currentTime) - this.positionFromTime(summaryData.items.first().startTime);
         nowPosition.update(n => n = currentPosition);
         zoomLevel.update(n => n = this.settings.timelineZoomLevel);
     }

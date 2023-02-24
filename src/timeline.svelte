@@ -65,7 +65,7 @@
     }
 
     function updateTimelineMeterPosition() {
-      timelineMeterPosition = summary.empty ? 0 : ((summary.items.first().time.getMinutes()*timelineZoomLevel)*-1) - 1;
+      timelineMeterPosition = summary.empty ? 0 : ((summary.items.first().startTime.getMinutes()*timelineZoomLevel)*-1) - 1;
     }
 
     function shortClass(item: PlanItem) {
@@ -81,6 +81,27 @@
     }
     function endClass(item: PlanItem) {
       return item.text === 'END' ? 'end' : '';
+
+    function getClassesForEmptySlot(startDate: Date, endDate: Date) {
+      let classes: string;
+      let durationInMinutes = getTimeDifference(startDate, endDate)
+      const now = new Date();
+
+      if (durationInMinutes < (75/timelineZoomLevel)) {
+        classes += 'short'
+      }
+
+      if (now.getMilliseconds() >= endDate.getMilliseconds()) {
+        classes += ' past'
+      }
+
+      return classes
+    }
+
+    function getTimeDifference(startDate: Date, endDate: Date) {
+      let timeDiff = endDate.getMilliseconds() - startDate.getMilliseconds();
+      
+      return Math.round(((timeDiff % 86400000) % 3600000) / 60000);
     }
 
 </script>
@@ -161,7 +182,7 @@
   padding-bottom: 50px;
 }
 
-.event_item{
+.event_item, .empty_event{
     border-bottom: 2px solid var(--background-primary);
     margin: 0;
     cursor: pointer;
@@ -368,13 +389,23 @@ color:#fff;
         
       <div class="events">
         {#each summary.items as item, i}
+<<<<<<< HEAD
         <div class="event_item event_item_color{i%10+1} {shortClass(item)} {pastClass(item)} {breakClass(item)} {endClass(item)}" style="height: {item.durationMins*timelineZoomLevel}px;" data-title="{item.rawTime}">
+=======
+            <div class="event_item event_item_color{i%10+1} {shortClass(item)} {pastClass(item)}" style="height: {item.durationMins*timelineZoomLevel}px;" data-title="{item.rawStartTime}">
+>>>>>>> 3c12abef4fb3bffb9b026d29812d23c16a754635
               <div class="event_item_contents">
                 <div class="ei_Dot {item === summary.current ? 'dot_active' : ''}"></div>
-                <div class="ei_Title">{item.rawTime}</div>
+                <div class="ei_Title">{item.rawStartTime}</div>
                 <div class="ei_Copy">{item.text ?? ''}</div>
               </div>
             </div>
+
+            {#if item.rawEndTime !== '' && i+1 < summary.items.length}
+            <div class="empty_event {getClassesForEmptySlot(item.endTime, summary.items[i+1].startTime)}" style="height: {getTimeDifference(item.endTime, summary.items[i+1].startTime)*timelineZoomLevel}px;" data-title="empty">
+            </div>
+            {/if}
+            
         {/each}
       </div>
 
