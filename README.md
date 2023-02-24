@@ -11,6 +11,7 @@
 > - [Break/end CSS classes](https://github.com/lynchjames/obsidian-day-planner/pull/113)
 > - [Sort PlanSummaryData items by time](https://github.com/lynchjames/obsidian-day-planner/pull/163)
 > - [Fix missing await](https://github.com/lynchjames/obsidian-day-planner/pull/135)
+> - [Add Ability to Specify Start and End Times for Task](https://github.com/lynchjames/obsidian-day-planner/pull/130)
 >
 > I've also written a [custom CSS snippet](https://github.com/replete/obsidian-minimal-theme-css-snippets/blob/main/%5Bplugin%5D%20Day%20Planner%20tweaks.css) to suit the minimal theme for this plugin.
 > ### To use this repo in your vault

@@ -13,7 +13,7 @@ export class PlanSummaryData {
     constructor(items: PlanItem[]){
         this.empty = items.length < 1;
         this.invalid = false;
-        this.items = items.sort((a, b) => (a.time < b.time ? -1 : 1));
+        this.items = items.sort((a, b) => (a.startTime < b.startTime ? -1 : 1));
         this.past = [];
     }
 

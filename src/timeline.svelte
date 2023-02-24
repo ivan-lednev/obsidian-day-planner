@@ -81,6 +81,7 @@
     }
     function endClass(item: PlanItem) {
       return item.text === 'END' ? 'end' : '';
+    }
 
     function getClassesForEmptySlot(startDate: Date, endDate: Date) {
       let classes: string;
@@ -389,11 +390,7 @@ color:#fff;
         
       <div class="events">
         {#each summary.items as item, i}
-<<<<<<< HEAD
-        <div class="event_item event_item_color{i%10+1} {shortClass(item)} {pastClass(item)} {breakClass(item)} {endClass(item)}" style="height: {item.durationMins*timelineZoomLevel}px;" data-title="{item.rawTime}">
-=======
-            <div class="event_item event_item_color{i%10+1} {shortClass(item)} {pastClass(item)}" style="height: {item.durationMins*timelineZoomLevel}px;" data-title="{item.rawStartTime}">
->>>>>>> 3c12abef4fb3bffb9b026d29812d23c16a754635
+        <div class="event_item event_item_color{i%10+1} {shortClass(item)} {pastClass(item)} {breakClass(item)} {endClass(item)}" style="height: {item.durationMins*timelineZoomLevel}px;" data-title="{item.rawStartTime}">
               <div class="event_item_contents">
                 <div class="ei_Dot {item === summary.current ? 'dot_active' : ''}"></div>
                 <div class="ei_Title">{item.rawStartTime}</div>
