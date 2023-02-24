@@ -22,6 +22,10 @@
 > 3) Run `npm run build` or `yarn build`
 > 4) Copy `./test-vault/.obsidian/plugins/obsidian-day-planner` folder to `<your vault location>/.obsidian/plugins`
 > 
+> ### TODOs
+> - [ ] Update styles with from my CSS snippet (see Issues)
+> - [ ] Fix the track time button (see Issues)
+> - [ ] Add built-in pomodoro timer feature (see Issues)
 
 This repository contains a plugin for [Obsidian](https://obsidian.md/) for day planning and managing pomodoro timers from a task list in a Markdown note. 
 
