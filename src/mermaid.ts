@@ -48,7 +48,7 @@ export default class PlannerMermaid {
         const currentMoment = moment(item.time);
         const nextMoment = moment(next.time);
         const untilNext = Math.floor(moment.duration(nextMoment.diff(currentMoment)).asMinutes());
-        return ', ' + untilNext + 'mm';
+        return ', ' + untilNext + 'm';
     }
 
     private escape(input: string){
