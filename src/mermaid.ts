@@ -43,12 +43,12 @@ export default class PlannerMermaid {
 
     private minuteInterval(item: PlanItem, next: PlanItem): string {
         if(next === undefined){
-            return ', 0mm';
+            return ', 0m';
         }
         const currentMoment = moment(item.time);
         const nextMoment = moment(next.time);
         const untilNext = Math.floor(moment.duration(nextMoment.diff(currentMoment)).asMinutes());
-        return ', ' + untilNext + 'mm';
+        return ', ' + untilNext + 'm';
     }
 
     private escape(input: string){
