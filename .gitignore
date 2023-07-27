@@ -13,3 +13,5 @@ coverage/
 test-vault/
 
 TODO.md
+.idea
+data.json
