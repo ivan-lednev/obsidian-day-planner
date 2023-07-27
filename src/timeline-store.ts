@@ -1,5 +1,5 @@
-import { writable } from 'svelte/store';
-import { PlanSummaryData } from './plan-data';
+import { writable } from "svelte/store";
+import { PlanSummaryData } from "./plan-data";
 
 export const planSummary = writable(new PlanSummaryData([]));
 
