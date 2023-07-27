@@ -48,11 +48,13 @@ export default class TimelineView extends ItemView {
   }
 
   async onOpen() {
+    const contentEl = this.containerEl.children[1];
+
     this.timeline = new Timeline({
-      target: (this as any).contentEl,
+      target: contentEl,
       props: {
         planSummary: planSummary,
-        rootEl: this.containerEl.children[1],
+        rootEl: contentEl,
       },
     });
   }
