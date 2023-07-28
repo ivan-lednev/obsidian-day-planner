@@ -182,12 +182,17 @@
     {/each}
   </div>
   <div class="task-grid">
-    <div class="task-container">
-      <button
-        class="task"
-        style:height="75px"
-        style:transform="translateY(calc(60px * 2.78))">Some task</button
-      >
+    <div class="moving-items-container">
+      <div class="needle" style:transform="translateY(calc(60px * 2.70))"></div>
+      <div class="bullet" style:transform="translateY(calc(60px * 2.70))"></div>
+      <div class="task-container">
+        <button
+          class="task"
+          style:height="75px"
+          style:transform="translateY(calc(60px * 2.78))"
+          >Some task
+        </button>
+      </div>
     </div>
     {#each hours as hour}
       <div class="task-grid-block"></div>
@@ -196,11 +201,32 @@
 </div>
 
 <style>
-  .task-container {
+  .moving-items-container {
     position: absolute;
-    left: 10px;
-    right: 10px;
+    left: 0;
+    right: 0;
+  }
+
+  .needle {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 1px solid var(--color-accent);
+    border-bottom: 1px solid var(--color-accent);
+  }
+
+  .bullet {
+    position: absolute;
+    left: -4px;
+    top: -4px;
+    border-radius: 50%;
+    border: 5px solid var(--color-accent);
+  }
+
+  .task-container {
     display: flex;
+    margin-left: 10px;
+    margin-right: 10px;
     flex-direction: column;
   }
 
