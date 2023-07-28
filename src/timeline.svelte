@@ -109,81 +109,155 @@
 
     return Math.round(((timeDiff % 86400000) % 3600000) / 60000);
   }
+
+  const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
 </script>
 
-{#if summary.items.length > 0}
-  <div id="day-planner-timeline-container">
-    <div
-      class="aside aside-x{timelineZoomLevel} filled"
-      style="top: {timelineMeterPosition}px;"
-    >
-      <div class="aside__line filled__line">
-        <div
-          class="filled__line__completed"
-          style="height: {nowPosition}px;"
-        ></div>
-      </div>
-    </div>
+<!--{#if summary.items.length > 0}-->
+<!--  <div id="day-planner-timeline-container">-->
+<!--    <div class="events">-->
+<!--      {#each summary.items as item, i}-->
+<!--        <div-->
+<!--          class="event_item search-result-file-matches {shortClass(item)} {pastClass(item)} {breakClass(-->
+<!--            item,-->
+<!--          )} {endClass(item)}"-->
+<!--          style="height: {item.durationMins * timelineZoomLevel}px;"-->
+<!--          data-title={item.rawStartTime}-->
+<!--        >-->
+<!--          <div class="event_item_contents">-->
+<!--            <div class="ei_Title">{item.rawStartTime}</div>-->
+<!--            <div class="ei_Copy">{item.text ?? ""}</div>-->
+<!--          </div>-->
+<!--        </div>-->
 
-    <div class="events">
-      {#each summary.items as item, i}
-        <div
-          class="event_item event_item_color{(i % 10) + 1} {shortClass(
-            item,
-          )} {pastClass(item)} {breakClass(item)} {endClass(item)}"
-          style="height: {item.durationMins * timelineZoomLevel}px;"
-          data-title={item.rawStartTime}
-        >
-          <div class="event_item_contents">
-            <div
-              class="ei_Dot {item === summary.current ? 'dot_active' : ''}"
-            ></div>
-            <div class="ei_Title">{item.rawStartTime}</div>
-            <div class="ei_Copy">{item.text ?? ""}</div>
-          </div>
+<!--        {#if item.rawEndTime !== "" && i + 1 < summary.items.length}-->
+<!--          <div-->
+<!--            class="empty_event {getClassesForEmptySlot(-->
+<!--              item.endTime,-->
+<!--              summary.items[i + 1].startTime,-->
+<!--            )}"-->
+<!--            style="height: {getTimeDifference(-->
+<!--              item.endTime,-->
+<!--              summary.items[i + 1].startTime,-->
+<!--            ) * timelineZoomLevel}px;"-->
+<!--            data-title="empty"-->
+<!--          ></div>-->
+<!--        {/if}-->
+<!--      {/each}-->
+<!--    </div>-->
+
+<!--    <div-->
+<!--      id="now-line"-->
+<!--      style="top:{position}px; display: {summary.current &&-->
+<!--      !summary.current.isEnd-->
+<!--        ? 'block'-->
+<!--        : 'none'}"-->
+<!--    >-->
+<!--      <span class="timeline-time">{moment(currentTime).format("HH:mm")}</span>-->
+<!--    </div>-->
+
+<!--    <div id="scroll-controls">-->
+<!--      <label for="auto-scroll">Track time</label>-->
+<!--      <input-->
+<!--        id="auto-scroll"-->
+<!--        type="checkbox"-->
+<!--        class="toggle"-->
+<!--        bind:checked={autoScroll}-->
+<!--      />-->
+<!--    </div>-->
+<!--  </div>-->
+<!--{:else}-->
+<!--  <div class="empty-timeline">No Planner Data</div>-->
+<!--{/if}-->
+
+<div class="time-grid">
+  <div class="hours-container">
+    {#each hours as hour}
+      <div class="hour">
+        <div class="hour-number-container">
+          {hour}
         </div>
-
-        {#if item.rawEndTime !== "" && i + 1 < summary.items.length}
-          <div
-            class="empty_event {getClassesForEmptySlot(
-              item.endTime,
-              summary.items[i + 1].startTime,
-            )}"
-            style="height: {getTimeDifference(
-              item.endTime,
-              summary.items[i + 1].startTime,
-            ) * timelineZoomLevel}px;"
-            data-title="empty"
-          ></div>
-        {/if}
-      {/each}
-    </div>
-
-    <div
-      id="now-line"
-      style="top:{position}px; display: {summary.current &&
-      !summary.current.isEnd
-        ? 'block'
-        : 'none'}"
-    >
-      <span class="timeline-time">{moment(currentTime).format("HH:mm")}</span>
-    </div>
-
-    <div id="scroll-controls">
-      <label for="auto-scroll">Track time</label>
-      <input
-        id="auto-scroll"
-        type="checkbox"
-        class="toggle"
-        bind:checked={autoScroll}
-      />
-    </div>
+        <div class="hour-guide"></div>
+      </div>
+    {/each}
   </div>
-{:else}
-  <div class="empty-timeline">No Planner Data</div>
-{/if}
+  <div class="task-grid">
+    <div class="task-container">
+      <button
+        class="task"
+        style:height="75px"
+        style:transform="translateY(calc(60px * 2.78))">Some task</button
+      >
+    </div>
+    {#each hours as hour}
+      <div class="task-grid-block"></div>
+    {/each}
+  </div>
+</div>
 
 <style>
+  .task-container {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hour {
+    display: flex;
+    height: 60px;
+  }
+
+  .time-grid {
+    display: flex;
+  }
+
+  .hours-container {
+    flex: 0 0 40px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .task-grid {
+    position: relative;
+    flex: 1 0 0;
+  }
+
+  .task-grid-block {
+    height: 60px;
+  }
+
+  .task {
+    transform: translate(40px, calc(60px * 3.7));
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .task-grid-block,
+  .hour-guide {
+    border-bottom: 1px solid var(--background-modifier-border);
+  }
+
+  .task-grid-block {
+    border-left: 1px solid var(--background-modifier-border);
+    flex-grow: 1;
+  }
+
+  .hour-guide {
+    flex: 0 0 10px;
+  }
+
+  .hour-number-container {
+    color: var(--text-faint);
+    align-self: center;
+    transform: translateY(calc(-60px / 2));
+    display: flex;
+    justify-content: center;
+    flex: 0 0 30px;
+  }
+
   #day-planner-timeline-container {
     position: relative;
 
@@ -197,46 +271,6 @@
     --dark-purple: #312244ff;
     --russian-violet: #3e1f47ff;
     --russian-violet-2: #4d194dff;
-  }
-
-  .aside {
-    position: absolute;
-    top: -1px;
-    left: 0;
-    width: 65px;
-    height: 100%;
-
-    background-repeat: repeat-y;
-    opacity: 80%;
-  }
-
-  .aside-x5 {
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAEsCAYAAADHIkNEAAAAAXNSR0IArs4c6QAAAFBlWElmTU0AKgAAAAgAAgESAAMAAAABAAEAAIdpAAQAAAABAAAAJgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFqADAAQAAAABAAABLAAAAAAuMW7GAAABWWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS40LjAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyI+CiAgICAgICAgIDx0aWZmOk9yaWVudGF0aW9uPjE8L3RpZmY6T3JpZW50YXRpb24+CiAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgpMwidZAAAAsElEQVR4Ae3ZMQoAIAgFUL3/ocsO0GBLFE9wESJ8jj8jYlQrAgQIECBAgAABAgQIECBAgAABAgQIECBAgACBbwWyNutGQuuNIkCAAAECBAgQIECAAAECBAgQIECAAAECBAgQeEbgJBLaLScq2smYEyBAgAABAgQIECBAgAABAgQIECBAgAABAgSuCpxEQqKfqyfzOQECBAgQIECAAAECBAgQIECAAAECBAgQIECgKzABwWUEBHBCyqYAAAAASUVORK5CYII=);
-  }
-
-  .aside-x4 {
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAADwCAYAAAAEqZSkAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAeGVYSWZNTQAqAAAACAAEARIAAwAAAAEAAQAAARoABQAAAAEAAAA+ARsABQAAAAEAAABGh2kABAAAAAEAAABOAAAAAAAAAEgAAAABAAAASAAAAAEAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFqADAAQAAAABAAAA8AAAAABUK6+SAAAACXBIWXMAAAsTAAALEwEAmpwYAAACMWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS40LjAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyIKICAgICAgICAgICAgeG1sbnM6ZXhpZj0iaHR0cDovL25zLmFkb2JlLmNvbS9leGlmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICAgICA8ZXhpZjpDb2xvclNwYWNlPjE8L2V4aWY6Q29sb3JTcGFjZT4KICAgICAgICAgPGV4aWY6UGl4ZWxYRGltZW5zaW9uPjIyPC9leGlmOlBpeGVsWERpbWVuc2lvbj4KICAgICAgICAgPGV4aWY6UGl4ZWxZRGltZW5zaW9uPjMwMDwvZXhpZjpQaXhlbFlEaW1lbnNpb24+CiAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgrL2/xqAAAA2klEQVR4Ae3bMQqEMBBA0QT2Bh7G+5d2e5G9wRZruliM6CCBsE8QQghxeOUHaynlvb/zPHUf9TXPuCYlQIAAAQIECBAgQIAAAQIECBAg8N8CLegtNwk+V863i7crB7sza7cev8y0ze/4MX2RAAECBAgQIECAAAECBAgQIECAAIEmkGmbkdyheWbaZnTxmOaZaZvRxJpnJGOfAAECBAgQIECAAAECBAgQIECAwEMCmbZ5aJjRHJm2OaZhnk189590DTPStE+AAAECBAgQIECAAAECBAgQIEBgVoEfgLcJ4JWKwMAAAAAASUVORK5CYII=);
-  }
-
-  .aside-x3 {
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAC0CAYAAACQYNzeAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAeGVYSWZNTQAqAAAACAAEARIAAwAAAAEAAQAAARoABQAAAAEAAAA+ARsABQAAAAEAAABGh2kABAAAAAEAAABOAAAAAAAAAEgAAAABAAAASAAAAAEAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFqADAAQAAAABAAAAtAAAAAD5WFEbAAAACXBIWXMAAAsTAAALEwEAmpwYAAACMWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS40LjAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyIKICAgICAgICAgICAgeG1sbnM6ZXhpZj0iaHR0cDovL25zLmFkb2JlLmNvbS9leGlmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICAgICA8ZXhpZjpDb2xvclNwYWNlPjE8L2V4aWY6Q29sb3JTcGFjZT4KICAgICAgICAgPGV4aWY6UGl4ZWxYRGltZW5zaW9uPjIyPC9leGlmOlBpeGVsWERpbWVuc2lvbj4KICAgICAgICAgPGV4aWY6UGl4ZWxZRGltZW5zaW9uPjMwMDwvZXhpZjpQaXhlbFlEaW1lbnNpb24+CiAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgrL2/xqAAAA6UlEQVRoBe3XQQrCQAwF0Bb0Hr2heB4v14MIOtmli8GmlFHhBQbimA7h7f48TdOjnf+pua16/Z91bUqAAAECBAgQIECAAAECHwQi58Wp1KsyfPpsbLsUX133zF/a0G3PYJq5p358GxSxdaWelWGzBAgQIECAAAECBAgQIDBUIHJenDNqTHiPbZcz1m1vrPmdIyE9f5/7MeE9KKohPW+Ze+E9a+gJECBAgAABAgQIECDwHYHIeXEqNSaM9zaKbZfen537tXO/uT4S0seE8c2a6UdQVEO6MJ4AtQQIECBAgAABAgQIECDwqwJv9lMMWDcoNMAAAAAASUVORK5CYII=);
-  }
-
-  .aside-x2 {
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAB4CAYAAAD2SgIRAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAeGVYSWZNTQAqAAAACAAEARIAAwAAAAEAAQAAARoABQAAAAEAAAA+ARsABQAAAAEAAABGh2kABAAAAAEAAABOAAAAAAAAAEgAAAABAAAASAAAAAEAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFqADAAQAAAABAAAAeAAAAADVvVTBAAAACXBIWXMAAAsTAAALEwEAmpwYAAACMWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS40LjAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyIKICAgICAgICAgICAgeG1sbnM6ZXhpZj0iaHR0cDovL25zLmFkb2JlLmNvbS9leGlmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICAgICA8ZXhpZjpDb2xvclNwYWNlPjE8L2V4aWY6Q29sb3JTcGFjZT4KICAgICAgICAgPGV4aWY6UGl4ZWxYRGltZW5zaW9uPjIyPC9leGlmOlBpeGVsWERpbWVuc2lvbj4KICAgICAgICAgPGV4aWY6UGl4ZWxZRGltZW5zaW9uPjMwMDwvZXhpZjpQaXhlbFlEaW1lbnNpb24+CiAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgrL2/xqAAAAt0lEQVRoBe3YMQqAMAyF4VYUD+Ii7p7JK7t4EkVsnOoSEtql+AuC2GdIPxxCYwhhS3c7V0ytju20S6cIIIAAAggg8EcBGVh658YvZ75uXDqenSV3S14YFkswy5gKZ3keEUAAAQQQQACBnwnI7NZV2vNdqY5eRjqe9Ih59ciTMm2u+YuC50/hgjr6p0Ix6BHz6mlOEkQAAQQQQAABBBwCMrBwtvmCcbbp+G+IIoAAAggggAACCDgFHqn/Cpqy3VM1AAAAAElFTkSuQmCC);
-  }
-
-  .aside-x1 {
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAA8CAYAAABig0prAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAeGVYSWZNTQAqAAAACAAEARIAAwAAAAEAAQAAARoABQAAAAEAAAA+ARsABQAAAAEAAABGh2kABAAAAAEAAABOAAAAAAAAAEgAAAABAAAASAAAAAEAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFqADAAQAAAABAAAAPAAAAAB4zqpIAAAACXBIWXMAAAsTAAALEwEAmpwYAAACMWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS40LjAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyIKICAgICAgICAgICAgeG1sbnM6ZXhpZj0iaHR0cDovL25zLmFkb2JlLmNvbS9leGlmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICAgICA8ZXhpZjpDb2xvclNwYWNlPjE8L2V4aWY6Q29sb3JTcGFjZT4KICAgICAgICAgPGV4aWY6UGl4ZWxYRGltZW5zaW9uPjIyPC9leGlmOlBpeGVsWERpbWVuc2lvbj4KICAgICAgICAgPGV4aWY6UGl4ZWxZRGltZW5zaW9uPjMwMDwvZXhpZjpQaXhlbFlEaW1lbnNpb24+CiAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgrL2/xqAAAArElEQVRYCe2VSwqAMAxEW3WjK3eCHsT7H0bBQ/jp7LqokIQirUyhUMIkJA8y9c65Ndx6jg+tdvW0y05J4CcEsHmtcpZTqc8rR8eLsuQm0cOAeomwGA1Q4GrOrRFTSwIkkCCArWsScUvosiSpc9DxrM5KJ+xxGLY5xIHi3xbbfBuKdvpGhnESqJ8AvGJSjnFI9LDNUSKMNKLCkT7v0/LnffO35Z2T1UiABAol8ACZ6QleECm8BQAAAABJRU5ErkJggg==);
-  }
-
-  .aside__line {
-    position: absolute;
-    left: 65px;
-    transform: translateX(-50%);
-    width: 4px;
-    height: 100%;
-    background: var(--text-accent);
   }
 
   .filled {
@@ -255,13 +289,13 @@
 
   .events {
     position: relative;
-    padding-bottom: 50px;
   }
 
   .event_item,
   .empty_event {
-    border-bottom: 2px solid var(--background-primary);
-    margin: 0;
+    margin: 10px;
+    border: 2px solid var(--background-modifier-border);
+    border-radius: var(--radius-m);
     cursor: pointer;
     padding: 5px 10px 10px 0;
     width: 100%;
@@ -276,8 +310,7 @@
   }
 
   .event_item:hover {
-    background-color: var(--interactive-accent-hover);
-    box-shadow: 0px 0px 52px -18px rgba(0, 0, 0, 0.75);
+    background-color: var(--nav-item-background-hover);
   }
 
   .event_item_color1 {
@@ -341,7 +374,6 @@
     height: 14px;
     margin-top: 5px;
     background-color: var(--text-accent);
-    box-shadow: 0px 0px 52px -18px rgba(0, 0, 0, 0.75);
     z-index: 2;
   }
 
@@ -440,7 +472,6 @@
     color: #fff;
     text-shadow: -1px -1px rgba(0, 0, 0, 0.15);
     white-space: nowrap;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     transition: all cubic-bezier(0.3, 1.5, 0.7, 1) 0.3s;
   }
 
