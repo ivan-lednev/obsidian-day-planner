@@ -92,7 +92,7 @@ export default class DayPlanner extends Plugin {
     this.addCommand({
       id: "app:show-day-planner-timeline",
       name: "Show the Day Planner Timeline",
-      callback: () => this.initLeaf(),
+      callback: async () => await this.initLeaf(),
       hotkeys: [],
     });
 
@@ -119,7 +119,6 @@ export default class DayPlanner extends Plugin {
       window.setInterval(async () => {
         try {
           if (await this.file.hasTodayNote()) {
-            // console.log('Active note found, starting file processing')
             const planSummary = await this.plannerMD.parseDayPlanner();
             planSummary.calculate();
             await this.statusBar.refreshStatusBar(planSummary);
@@ -129,7 +128,6 @@ export default class DayPlanner extends Plugin {
             this.settings.mode == DayPlannerMode.Daily &&
             appHasDailyNotesPluginLoaded()
           ) {
-            // console.log('Clearing status bar & timeline in case daily note was deleted')
             const planSummary = new PlanSummaryData([]);
             await this.statusBar.refreshStatusBar(planSummary);
             this.timelineView && this.timelineView.update(planSummary);
@@ -143,12 +141,13 @@ export default class DayPlanner extends Plugin {
     );
   }
 
-  initLeaf() {
+  async initLeaf() {
     if (this.app.workspace.getLeavesOfType(VIEW_TYPE_TIMELINE).length > 0) {
       return;
     }
-    this.app.workspace.getRightLeaf(true).setViewState({
+    await this.app.workspace.getRightLeaf(false).setViewState({
       type: VIEW_TYPE_TIMELINE,
+      active: true
     });
   }
 
