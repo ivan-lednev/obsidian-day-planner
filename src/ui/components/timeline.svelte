@@ -78,6 +78,8 @@
     font-size: 1.2em;
     color: var(--text-muted);
     flex: 1 0 0;
+    display: flex;
+    justify-content: center;
   }
 
   .setting-item {
