@@ -3,19 +3,12 @@
   import { getYCoords } from "../../timeline-store";
   import { getMinutesSinceMidnight } from "../../time-utils";
 
-  const needleUpdateIntervalMillis = 5 * 1000;
-
-  function getCoordsForNow() {
-    return getYCoords(getMinutesSinceMidnight());
-  }
-
-  let coords = getCoordsForNow();
+  $: coords = $getYCoords(getMinutesSinceMidnight());
 
   onMount(() => {
     const interval = setInterval(() => {
-      coords = getCoordsForNow();
-      console.log(getCoordsForNow())
-    }, needleUpdateIntervalMillis);
+      coords = $getYCoords(getMinutesSinceMidnight());
+    }, 5 * 1000);
 
     return () => clearInterval(interval);
   });

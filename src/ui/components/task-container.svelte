@@ -9,7 +9,7 @@
     <button
       class="task absolute-stretch-x"
       style:height="{durationMinutes * $zoomLevel}px"
-      style:transform="translateY({getYCoords(startMinutes)}px)"
+      style:transform="translateY({$getYCoords(startMinutes)}px)"
     >{text}
     </button>
   {/each}

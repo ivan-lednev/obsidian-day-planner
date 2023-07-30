@@ -55,13 +55,14 @@ export default class TimelineView extends ItemView {
         this.positionFromTime(summaryData.items.first().startTime);
 
     // todo: update in settings, this is absolutely not needed
+    // todo: remove?
     nowPosition.update(() => currentPosition);
   }
 
   positionFromTime(time: Date) {
     return (
       moment.duration(moment(time).format("HH:mm")).asMinutes() *
-      this.settings.timelineZoomLevel
+      Number(this.settings.timelineZoomLevel)
     );
   }
 
@@ -72,7 +73,6 @@ export default class TimelineView extends ItemView {
       target: contentEl,
       props: {
         rootEl: contentEl,
-
       },
     });
   }
