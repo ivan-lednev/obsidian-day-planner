@@ -1,9 +1,10 @@
 <script lang="ts">
   import TimeScale from "./time-scale.svelte";
-  import Pointer from "./pointer.svelte";
+  import Needle from "./needle.svelte";
   import TaskContainer from "./task-container.svelte";
+  import { hourSize } from "./timeline-store";
 
-  const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
+  const allHours = Array.from({ length: 24 }).map((value, index) => index);
   const tasks = [
     { start: 60 * 10 + 30, duration: 50, title: "Polish class" },
     { start: 60 * 12, duration: 30, title: "Lunch" }
@@ -11,14 +12,14 @@
 </script>
 
 <div class="time-grid">
-  <TimeScale {hours} />
+  <TimeScale visibleHours={allHours} />
   <div class="task-grid">
     <div class="moving-items">
-      <Pointer />
+      <Needle />
       <TaskContainer {tasks} />
     </div>
-    {#each hours as hour}
-      <div class="time-grid-block"></div>
+    {#each allHours as hour}
+      <div class="time-grid-block" style:height="{$hourSize}px"></div>
     {/each}
   </div>
 </div>
@@ -40,7 +41,6 @@
   }
 
   .time-grid-block {
-    height: 60px;
     border-bottom: 1px solid var(--background-modifier-border);
     border-left: 1px solid var(--background-modifier-border);
     flex-grow: 1;

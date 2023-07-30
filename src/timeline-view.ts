@@ -58,4 +58,8 @@ export default class TimelineView extends ItemView {
       },
     });
   }
+
+  onunload() {
+    this.timeline.$destroy();
+  }
 }

@@ -1,11 +1,16 @@
 <script lang="ts">
-  export let hours;
+  import { hourSize } from "./timeline-store";
+
+  export let visibleHours;
 </script>
 
 <div class="hours-container">
-  {#each hours as hour}
-    <div class="hour">
-      <div class="hour-number-container">
+  {#each visibleHours as hour}
+    <div class="hour" style:height="{$hourSize}px">
+      <div
+        class="hour-number-container"
+        style:transform="translateY(calc(-{$hourSize}px / 2))"
+      >
         {hour}
       </div>
       <div class="hour-guide"></div>
@@ -22,7 +27,6 @@
 
   .hour {
     display: flex;
-    height: 60px;
   }
 
   .hour-guide {
@@ -33,7 +37,6 @@
   .hour-number-container {
     color: var(--text-faint);
     align-self: center;
-    transform: translateY(calc(-60px / 2));
     display: flex;
     justify-content: center;
     flex: 0 0 30px;
