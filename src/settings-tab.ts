@@ -3,7 +3,7 @@ import { DayPlannerMode } from "./settings";
 import MomentDateRegex from "./moment-date-regex";
 import type DayPlanner from "./main";
 import { ICONS } from "./constants";
-import { startHour } from "./timeline-store";
+import { startHour, zoomLevel } from "./timeline-store";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   momentDateRegex = new MomentDateRegex();
@@ -110,9 +110,11 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           .setLimits(1, 5, 1)
           .setValue(this.plugin.settings.timelineZoomLevel ?? 4)
           .setDynamicTooltip()
-          .onChange((value: number) => {
+          .onChange(async (value: number) => {
+            zoomLevel.update(() => value);
+
             this.plugin.settings.timelineZoomLevel = value;
-            this.plugin.saveData(this.plugin.settings);
+            await this.plugin.saveData(this.plugin.settings);
           }),
       );
 

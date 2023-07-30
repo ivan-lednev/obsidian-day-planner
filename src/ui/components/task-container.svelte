@@ -1,18 +1,16 @@
 <script>
-  import { getCoords } from "../../timeline-store";
-
-  export let tasks;
-
-  const startHour = 8;
+  import { getCoords, zoomLevel } from "../../timeline-store";
+  import { tasks } from "../../timeline-store";
 </script>
 
 <div class="task-container">
-  {#each tasks as { title, start, duration }}
+  {#each $tasks as { text, startMinutes, durationMinutes }}
+    <!-- TODO: is might not be reactive -->
     <button
       class="task"
-      style:height="{duration}px"
-      style:transform="translateY({getCoords(start)}px)"
-      >{title}
+      style:height="{durationMinutes * $zoomLevel}px"
+      style:transform="translateY({getCoords(startMinutes)}px)"
+    >{text}
     </button>
   {/each}
 </div>

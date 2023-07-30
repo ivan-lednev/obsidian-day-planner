@@ -1,7 +1,15 @@
 import { derived, get, writable } from "svelte/store";
 import { PlanSummaryData } from "./plan-data";
 
+interface Task {
+  startMinutes: number;
+  durationMinutes: number;
+  text: string;
+}
+
 export const planSummary = writable(new PlanSummaryData([]));
+
+export const tasks = writable([]);
 
 export const nowPosition = writable(0);
 
@@ -15,5 +23,6 @@ export const startHour = writable(6);
 
 export function getCoords(minutes: number) {
   const currentZoomLevel = get(zoomLevel);
-  return minutes * currentZoomLevel - get(startHour) * 60 * currentZoomLevel;
+  const hiddenHoursSize = get(startHour) * 60 * currentZoomLevel
+  return minutes * currentZoomLevel - hiddenHoursSize;
 }

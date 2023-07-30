@@ -48,7 +48,7 @@ export default class DayPlannerFile {
     );
   }
 
-  todayPlannerFilePath(): string {
+  getTodayPlannerFilePath(): string {
     if (
       this.settings.mode === DayPlannerMode.Command ||
       this.settings.mode === DayPlannerMode.Daily
@@ -67,7 +67,7 @@ export default class DayPlannerFile {
     try {
       if (this.settings.mode === DayPlannerMode.File) {
         await this.createFolderIfNotExists(this.settings.customFolder);
-        await this.createFileIfNotExists(this.todayPlannerFilePath());
+        await this.createFileIfNotExists(this.getTodayPlannerFilePath());
       }
     } catch (error) {
       console.log(error);
@@ -114,6 +114,7 @@ export default class DayPlannerFile {
 
   async updateFile(fileName: string, fileContents: string) {
     await this.prepareFile();
+    // todo: do not use adapter
     try {
       return await this.vault.adapter.write(
         normalizePath(fileName),

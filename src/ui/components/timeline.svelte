@@ -2,12 +2,15 @@
   import TimeScale from "./time-scale.svelte";
   import Needle from "./needle.svelte";
   import TaskContainer from "./task-container.svelte";
-  import { hourSize, startHour } from "../../timeline-store";
+  import { hourSize, planSummary, startHour } from "../../timeline-store";
 
   $: allHours = Array.from({ length: 24 })
     .map((value, index) => index)
     .slice($startHour);
 
+  $: console.log($planSummary);
+
+  // todo: remove
   const tasks = [
     { start: 60 * 10 + 30, duration: 50, title: "Polish class" },
     { start: 60 * 12, duration: 30, title: "Lunch" }
@@ -19,7 +22,7 @@
   <div class="task-grid">
     <div class="moving-items">
       <Needle />
-      <TaskContainer {tasks} />
+      <TaskContainer />
     </div>
     {#each allHours as hour}
       <div class="time-grid-block" style:height="{$hourSize}px"></div>

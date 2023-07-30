@@ -60,6 +60,7 @@ export default class DayPlanner extends Plugin {
     );
 
     this.statusBar.initStatusBar();
+    // todo: trigger on metadataCacheUpdate
     this.registerEvent(this.app.vault.on("modify", this.codeMirror, ""));
 
     this.addCommand({
@@ -101,7 +102,7 @@ export default class DayPlanner extends Plugin {
       name: "Show today's Day Planner",
       callback: () =>
         this.app.workspace.openLinkText(
-          this.file.todayPlannerFilePath(),
+          this.file.getTodayPlannerFilePath(),
           "",
           true,
         ),
@@ -137,7 +138,7 @@ export default class DayPlanner extends Plugin {
         } catch (error) {
           console.log(error);
         }
-      }, 2000),
+      }, 5000),
     );
   }
 

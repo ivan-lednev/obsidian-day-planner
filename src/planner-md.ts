@@ -34,7 +34,7 @@ export default class PlannerMarkdown {
   }
 
   async insertPlanner() {
-    const filePath = this.file.todayPlannerFilePath();
+    const filePath = this.file.getTodayPlannerFilePath();
     const fileContents = await (
       await this.file.getFileContents(filePath)
     ).split("\n");
@@ -50,7 +50,7 @@ export default class PlannerMarkdown {
 
   async parseDayPlanner(): Promise<PlanSummaryData> {
     try {
-      const filePath = this.file.todayPlannerFilePath();
+      const filePath = this.file.getTodayPlannerFilePath();
       const fileContent = await (
         await this.file.getFileContents(filePath)
       ).split("\n");
@@ -67,7 +67,7 @@ export default class PlannerMarkdown {
       return;
     }
     try {
-      const filePath = this.file.todayPlannerFilePath();
+      const filePath = this.file.getTodayPlannerFilePath();
       const fileContents = await await this.file.getFileContents(filePath);
       const fileContentsArr = fileContents.split("\n");
 
@@ -131,12 +131,13 @@ export default class PlannerMarkdown {
   }
 
   checkIsDayPlannerEditing() {
+    // TODO: replace deprecated code
     const activeLeaf = this.workspace.activeLeaf;
     if (!activeLeaf) {
       return;
     }
     const viewState = activeLeaf.view.getState();
-    if (viewState.file === this.file.todayPlannerFilePath()) {
+    if (viewState.file === this.file.getTodayPlannerFilePath()) {
       this.dayPlannerLastEdit = new Date().getTime();
     }
   }

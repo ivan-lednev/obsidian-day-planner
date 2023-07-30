@@ -68,7 +68,7 @@ export default class StatusBar {
   private setupStatusBarEvents(status: HTMLDivElement) {
     status.onClickEvent(async (ev: any) => {
       try {
-        const fileName = this.file.todayPlannerFilePath();
+        const fileName = this.file.getTodayPlannerFilePath();
         this.workspace.openLinkText(fileName, "", false);
       } catch (error) {
         console.log(error);
