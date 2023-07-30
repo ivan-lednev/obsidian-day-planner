@@ -7,10 +7,7 @@
 <div class="hours-container">
   {#each visibleHours as hour}
     <div class="hour" style:height="{$hourSize}px">
-      <div
-        class="hour-number-container"
-        style:transform="translateY(calc(-{$hourSize}px / 2))"
-      >
+      <div class="hour-number-container" style:transform="translateY(-10px)">
         {hour}
       </div>
       <div class="hour-guide"></div>
@@ -33,12 +30,18 @@
 
   .hour-guide {
     flex: 0 0 10px;
+  }
+
+  .hour:not(:first-child) .hour-guide {
     border-top: 1px solid var(--background-modifier-border);
   }
 
   .hour-number-container {
+    /*align-self: flex-start;*/
+    position: sticky;
+    top: 10px;
     color: var(--text-faint);
-    align-self: center;
+    align-self: flex-start;
     display: flex;
     justify-content: center;
     flex: 0 0 30px;

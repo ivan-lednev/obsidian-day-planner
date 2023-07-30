@@ -53,16 +53,18 @@
     </div>
   </div>
 </div>
-<div class="time-grid">
-  <TimeScale {visibleHours} />
-  <div class="task-grid">
-    <div class="absolute-stretch-x">
-      <Needle />
-      <TaskContainer />
+<div class="scroller">
+  <div class="time-grid">
+    <TimeScale {visibleHours} />
+    <div class="task-grid">
+      <div class="absolute-stretch-x">
+        <Needle />
+        <TaskContainer />
+      </div>
+      {#each visibleHours as hour}
+        <div class="time-grid-block" style:height="{$hourSize}px"></div>
+      {/each}
     </div>
-    {#each visibleHours as hour}
-      <div class="time-grid-block" style:height="{$hourSize}px"></div>
-    {/each}
   </div>
 </div>
 
@@ -77,16 +79,20 @@
   }
 
   .controls {
-    margin: var(--size-4-2);
+    padding: var(--size-4-2);
+    padding-bottom: 0;
     display: flex;
     flex-direction: column;
     border-bottom: 1px solid var(--background-modifier-border);
   }
 
-  .time-grid {
-    display: flex;
+  .scroller {
     height: 100%;
     overflow: auto;
+  }
+
+  .time-grid {
+    display: flex;
   }
 
   .task-grid {
@@ -95,9 +101,13 @@
   }
 
   .time-grid-block {
-    border-top: 1px solid var(--background-modifier-border);
     border-left: 1px solid var(--background-modifier-border);
     flex-grow: 1;
     flex-shrink: 0;
+  }
+
+  .time-grid-block:not(:nth-child(2)) {
+    /* TODO: lame workaround */
+    border-top: 1px solid var(--background-modifier-border);
   }
 </style>
