@@ -31,7 +31,7 @@
 
   .hour-guide {
     flex: 0 0 10px;
-    border-bottom: 1px solid var(--background-modifier-border);
+    border-top: 1px solid var(--background-modifier-border);
   }
 
   .hour-number-container {
