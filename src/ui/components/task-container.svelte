@@ -3,11 +3,11 @@
   import { tasks } from "../../timeline-store";
 </script>
 
-<div class="task-container">
+<div class="task-container absolute-stretch-x">
   {#each $tasks as { text, startMinutes, durationMinutes }}
     <!-- TODO: is might not be reactive -->
     <button
-      class="task"
+      class="task absolute-stretch-x"
       style:height="{durationMinutes * $zoomLevel}px"
       style:transform="translateY({getCoords(startMinutes)}px)"
     >{text}

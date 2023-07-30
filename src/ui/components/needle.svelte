@@ -20,15 +20,12 @@
   });
 </script>
 
-<div class="needle" style:transform="translateY({coords}px)">
+<div class="needle absolute-stretch-x" style:transform="translateY({coords}px)">
   <div class="bullet"></div>
 </div>
 
 <style>
   .needle {
-    position: absolute;
-    left: 0;
-    right: 0;
     height: 2px;
     background-color: var(--color-accent);
   }

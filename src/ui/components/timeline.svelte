@@ -20,7 +20,7 @@
 <div class="time-grid">
   <TimeScale visibleHours={allHours} />
   <div class="task-grid">
-    <div class="moving-items">
+    <div class="absolute-stretch-x">
       <Needle />
       <TaskContainer />
     </div>
@@ -31,12 +31,6 @@
 </div>
 
 <style>
-  .moving-items {
-    position: absolute;
-    left: 0;
-    right: 0;
-  }
-
   .time-grid {
     display: flex;
   }
