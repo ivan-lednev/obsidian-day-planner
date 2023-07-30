@@ -2,6 +2,7 @@
   import TimeScale from "./time-scale.svelte";
   import Needle from "./needle.svelte";
   import TaskContainer from "./task-container.svelte";
+  import SettingsButton from "./settings-button.svelte";
   import { hourSize, startHour } from "../../timeline-store";
 
   $: visibleHours = Array.from({ length: 24 })
@@ -9,9 +10,31 @@
     .slice($startHour);
 
   let someSetting = false;
+  let settingsVisible = false;
+
+  function toggleSettings() {
+    settingsVisible = !settingsVisible;
+  }
 </script>
 
 <div class="controls">
+  <SettingsButton isActive={settingsVisible} onClick={toggleSettings} />
+  <div>
+    <div class="setting-item">
+      <div class="setting-item-info">
+        <div class="setting-item-name">Zoom</div>
+      </div>
+      <div class="setting-item-control">
+        <select class="dropdown">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
   <div class="setting-item mod-toggle" style:display="none">
     <div class="setting-item-info">
       <div class="setting-item-name">Collapse results</div>
@@ -44,16 +67,26 @@
 </div>
 
 <style>
+  .setting-item {
+    padding: var(--size-2-3) 0;
+    border: none;
+  }
+
   .setting-item-name {
     font-size: var(--font-ui-small);
   }
 
   .controls {
     margin: var(--size-4-2);
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--background-modifier-border);
   }
 
   .time-grid {
     display: flex;
+    height: 100%;
+    overflow: auto;
   }
 
   .task-grid {
