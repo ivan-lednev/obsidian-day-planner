@@ -98,5 +98,6 @@
     border-top: 1px solid var(--background-modifier-border);
     border-left: 1px solid var(--background-modifier-border);
     flex-grow: 1;
+    flex-shrink: 0;
   }
 </style>

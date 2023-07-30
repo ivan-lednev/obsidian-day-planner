@@ -27,6 +27,8 @@
 
   .hour {
     display: flex;
+    flex-grow: 1;
+    flex-shrink: 0;
   }
 
   .hour-guide {
