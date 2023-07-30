@@ -2,7 +2,7 @@
   import TimeScale from "./time-scale.svelte";
   import Needle from "./needle.svelte";
   import TaskContainer from "./task-container.svelte";
-  import { hourSize } from "./timeline-store";
+  import { hourSize } from "../../timeline-store";
 
   const allHours = Array.from({ length: 24 }).map((value, index) => index);
   const tasks = [

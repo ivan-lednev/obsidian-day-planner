@@ -13,7 +13,7 @@ import PlannerMarkdown from "./planner-md";
 import DayPlannerFile from "./file";
 import Parser from "./parser";
 import { VIEW_TYPE_TIMELINE } from "./constants";
-import TimelineView from "./timeline-view";
+import TimelineView from "./ui/timeline-view";
 import { PlanSummaryData } from "./plan-data";
 import { appHasDailyNotesPluginLoaded } from "obsidian-daily-notes-interface";
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { zoomLevel } from "./timeline-store";
+  import { zoomLevel } from "../../timeline-store";
 
   // todo: clean up, move moment code into module
   function positionFromTime(time: Date) {
