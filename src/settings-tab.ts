@@ -3,7 +3,7 @@ import { DayPlannerMode } from "./settings";
 import MomentDateRegex from "./moment-date-regex";
 import type DayPlanner from "./main";
 import { ICONS } from "./constants";
-import { startHour, zoomLevel } from "./timeline-store";
+import { startHour, timelineDateFormat, zoomLevel } from "./timeline-store";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   momentDateRegex = new MomentDateRegex();
@@ -108,12 +108,12 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       .addSlider((slider) =>
         slider
           .setLimits(1, 5, 1)
-          .setValue(this.plugin.settings.timelineZoomLevel ?? 4)
+          .setValue(Number(this.plugin.settings.timelineZoomLevel) ?? 4)
           .setDynamicTooltip()
           .onChange(async (value: number) => {
-            zoomLevel.update(() => value);
+            zoomLevel.update(() => String(value));
 
-            this.plugin.settings.timelineZoomLevel = value;
+            this.plugin.settings.timelineZoomLevel = String(value);
             await this.plugin.saveData(this.plugin.settings);
           }),
       );
@@ -189,6 +189,39 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             await this.plugin.saveData(this.plugin.settings);
           }),
       );
+    new Setting(containerEl)
+      .setName("Date format in timeline header")
+      .then((component) => {
+        component.setDesc(
+          createFragment((fragment) => {
+            fragment.appendText("Your current syntax looks like this: ");
+            component.addMomentFormat((momentFormat) =>
+              momentFormat
+                .setValue(this.plugin.settings.timelineDateFormat)
+                .setSampleEl(fragment.createSpan())
+                .onChange(async (value: string) => {
+                  timelineDateFormat.set(value);
+
+                  this.plugin.settings.timelineDateFormat = value;
+                  await this.plugin.saveData(this.plugin.settings);
+                }),
+            );
+            fragment.append(
+              createEl("br"),
+              createEl(
+                "a",
+                {
+                  text: "format reference",
+                  href: "https://momentjs.com/docs/#/displaying/format/",
+                },
+                (a) => {
+                  a.setAttr("target", "_blank");
+                },
+              ),
+            );
+          }),
+        );
+      });
   }
 
   private modeDescriptionContent(): DocumentFragment {

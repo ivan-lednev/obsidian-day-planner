@@ -117,6 +117,7 @@ export default class DayPlanner extends Plugin {
 
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
     this.registerInterval(
+      // todo: most of it should not be updated with a timer
       window.setInterval(async () => {
         try {
           if (await this.file.hasTodayNote()) {

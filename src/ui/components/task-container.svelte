@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getCoords, zoomLevel } from "../../timeline-store";
+  import { getYCoords, zoomLevel } from "../../timeline-store";
   import { tasks } from "../../timeline-store";
 </script>
 
@@ -9,7 +9,7 @@
     <button
       class="task absolute-stretch-x"
       style:height="{durationMinutes * $zoomLevel}px"
-      style:transform="translateY({getCoords(startMinutes)}px)"
+      style:transform="translateY({getYCoords(startMinutes)}px)"
     >{text}
     </button>
   {/each}

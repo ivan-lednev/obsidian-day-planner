@@ -47,8 +47,8 @@
     flex-shrink: 0;
   }
 
+  /* TODO: this selector is a lame workaround for task container which is absolutely positioned*/
   .time-grid-block:not(:nth-child(2)) {
-    /* TODO: lame workaround */
     border-top: 1px solid var(--background-modifier-border);
   }
 </style>

@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { getCoords } from "../../timeline-store";
+  import { getYCoords } from "../../timeline-store";
   import { getMinutesSinceMidnight } from "../../time-utils";
 
   const needleUpdateIntervalMillis = 5 * 1000;
 
   function getCoordsForNow() {
-    return getCoords(getMinutesSinceMidnight());
+    return getYCoords(getMinutesSinceMidnight());
   }
 
   let coords = getCoordsForNow();
@@ -14,6 +14,7 @@
   onMount(() => {
     const interval = setInterval(() => {
       coords = getCoordsForNow();
+      console.log(getCoordsForNow())
     }, needleUpdateIntervalMillis);
 
     return () => clearInterval(interval);

@@ -7,11 +7,12 @@ export class DayPlannerSettings {
   circularProgress: boolean = false;
   nowAndNextInStatusBar: boolean = false;
   showTaskNotification: boolean = false;
-  timelineZoomLevel: number = 4;
+  timelineZoomLevel: string = "2";
   timelineIcon: string = "calendar-with-checkmark";
   breakLabel: string = "BREAK";
   endLabel: string = "END";
   startHour: number = 6;
+  timelineDateFormat: string = "LLLL";
 }
 
 export class NoteForDate {

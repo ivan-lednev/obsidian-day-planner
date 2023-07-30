@@ -56,7 +56,6 @@ export default class TimelineView extends ItemView {
 
     // todo: update in settings, this is absolutely not needed
     nowPosition.update(() => currentPosition);
-    zoomLevel.update(() => this.settings.timelineZoomLevel);
   }
 
   positionFromTime(time: Date) {
