@@ -3,10 +3,12 @@ import { DayPlannerMode } from "./settings";
 import MomentDateRegex from "./moment-date-regex";
 import type DayPlanner from "./main";
 import { ICONS } from "./constants";
+import { startHour } from "./timeline-store";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   momentDateRegex = new MomentDateRegex();
   plugin: DayPlanner;
+
   constructor(app: App, plugin: DayPlanner) {
     super(app, plugin);
     this.plugin = plugin;
@@ -152,6 +154,37 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           .onChange((value: string) => {
             this.plugin.settings.endLabel = value;
             this.plugin.saveData(this.plugin.settings);
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Start hour")
+      .setDesc("The planner is going to start at this hour")
+      .addDropdown((component) =>
+        component
+          .addOptions({
+            "0": "0",
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5",
+            "6": "6",
+            "7": "7",
+            "8": "8",
+            "9": "9",
+            "10": "10",
+            "11": "11",
+            "12": "12",
+          })
+          .setValue(String(this.plugin.settings.startHour))
+          .onChange(async (value: string) => {
+            const asNumber = Number(value);
+
+            startHour.update(() => asNumber);
+
+            this.plugin.settings.startHour = asNumber;
+            await this.plugin.saveData(this.plugin.settings);
           }),
       );
   }

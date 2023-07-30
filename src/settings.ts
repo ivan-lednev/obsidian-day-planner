@@ -11,6 +11,7 @@ export class DayPlannerSettings {
   timelineIcon: string = "calendar-with-checkmark";
   breakLabel: string = "BREAK";
   endLabel: string = "END";
+  startHour: number = 6;
 }
 
 export class NoteForDate {

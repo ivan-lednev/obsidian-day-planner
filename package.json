@@ -27,6 +27,7 @@
     "jsdom": "^16.6.0",
     "jsdom-global": "^3.0.2",
     "mocha": "^8.4.0",
+    "moment": "^2.29.4",
     "nyc": "^15.1.0",
     "obsidian": "https://github.com/obsidianmd/obsidian-api/tarball/master",
     "svelte": "^3.38.2",

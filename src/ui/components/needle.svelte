@@ -1,26 +1,24 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { zoomLevel } from "../../timeline-store";
+  import { getCoords, startHour, zoomLevel } from "../../timeline-store";
+  import { getMinutesSinceMidnight } from "../../time-utils";
 
-  // todo: clean up, move moment code into module
-  function positionFromTime(time: Date) {
-    return window.moment
-      .duration(window.moment(time).format("HH:mm"))
-      .asMinutes();
-  }
+  const needleUpdateIntervalMillis = 60 * 1000;
 
-  let nowInMinutes = positionFromTime(window.moment());
+  let nowInMinutes = getMinutesSinceMidnight();
+
+  $: scaledNowInMinutes = getCoords(nowInMinutes);
 
   onMount(() => {
     const interval = setInterval(() => {
-      nowInMinutes = positionFromTime(window.moment());
-    }, 60 * 1000);
+      nowInMinutes = getMinutesSinceMidnight();
+    }, needleUpdateIntervalMillis);
 
     return () => clearInterval(interval);
   });
 </script>
 
-<div class="needle" style:transform="translateY({nowInMinutes * $zoomLevel}px)">
+<div class="needle" style:transform="translateY({scaledNowInMinutes}px)">
   <div class="bullet"></div>
 </div>
 

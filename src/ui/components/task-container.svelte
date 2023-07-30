@@ -1,4 +1,6 @@
 <script>
+  import { getCoords } from "../../timeline-store";
+
   export let tasks;
 
   const startHour = 8;
@@ -9,7 +11,7 @@
     <button
       class="task"
       style:height="{duration}px"
-      style:transform="translateY(calc({start - startHour * 60}px))"
+      style:transform="translateY({getCoords(start)}px)"
       >{title}
     </button>
   {/each}
