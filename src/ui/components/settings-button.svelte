@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   export let isActive;
   export let onClick;
 </script>

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { getCoords, zoomLevel } from "../../timeline-store";
   import { tasks } from "../../timeline-store";
 </script>

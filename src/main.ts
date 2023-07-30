@@ -138,7 +138,7 @@ export default class DayPlanner extends Plugin {
         } catch (error) {
           console.log(error);
         }
-      }, 5000),
+      }, 2000),
     );
   }
 
