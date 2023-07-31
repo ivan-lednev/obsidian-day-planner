@@ -3,7 +3,7 @@ import { DayPlannerMode } from "./settings";
 import MomentDateRegex from "./moment-date-regex";
 import type DayPlanner from "./main";
 import { ICONS } from "./constants";
-import { startHour, timelineDateFormat, zoomLevel } from "./timeline-store";
+import { centerNeedle, startHour, timelineDateFormat, zoomLevel } from "./timeline-store";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   momentDateRegex = new MomentDateRegex();
@@ -222,6 +222,18 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           }),
         );
       });
+
+    new Setting(containerEl)
+      .setName("Center the pointer in the timeline view")
+      .setDesc("Should the pointer continuously get scrolled to the center of the view")
+      .addToggle((component) => {
+        component.setValue(this.plugin.settings.centerNeedle).onChange(async (value) => {
+          centerNeedle.set(value);
+
+          this.plugin.settings.centerNeedle = value;
+          await this.plugin.saveData(this.plugin.settings);
+        })
+      })
   }
 
   private modeDescriptionContent(): DocumentFragment {

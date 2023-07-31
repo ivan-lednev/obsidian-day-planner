@@ -13,6 +13,7 @@ export class DayPlannerSettings {
   endLabel: string = "END";
   startHour: number = 6;
   timelineDateFormat: string = "LLLL";
+  centerNeedle: boolean = true;
 }
 
 export class NoteForDate {

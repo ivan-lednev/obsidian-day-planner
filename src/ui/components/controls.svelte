@@ -18,7 +18,7 @@
   onMount(() => {
     const interval = setInterval(() => {
       date = getFormattedDate();
-    }, 1000);
+    }, 5000);
 
     return () => clearInterval(interval);
   });

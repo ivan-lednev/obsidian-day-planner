@@ -30,13 +30,14 @@ export const startHour = writable(6);
 // todo: no defaults in here
 export const timelineDateFormat = writable("LLLL");
 
-export const getYCoords = derived(
-  [zoomLevel, startHour],
-  ([$zoomLevel, $startHour]) => {
-    return (minutes: number) => {
-      const currentZoomLevel = Number($zoomLevel);
-      const hiddenHoursSize = $startHour * 60 * currentZoomLevel;
-      return minutes * currentZoomLevel - hiddenHoursSize;
-    };
-  },
-);
+export const centerNeedle = writable(true);
+
+const createGetYCoordsFn =
+  ([$zoomLevel, $startHour]: [string, number]) =>
+  (minutes: number) => {
+    const currentZoomLevel = Number($zoomLevel);
+    const hiddenHoursSize = $startHour * 60 * currentZoomLevel;
+    return minutes * currentZoomLevel - hiddenHoursSize;
+  };
+
+export const getYCoords = derived([zoomLevel, startHour], createGetYCoordsFn);

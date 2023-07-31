@@ -5,18 +5,28 @@
   import Controls from "./controls.svelte";
   import { hourSize, startHour } from "../../timeline-store";
 
+  let userHoversOverScroller = false;
+
   $: visibleHours = Array.from({ length: 24 })
     .map((value, index) => index)
     .slice($startHour);
 </script>
 
 <Controls />
-<div class="scroller">
+<div
+  class="scroller"
+  on:mouseenter={() => {
+    userHoversOverScroller = true
+  }}
+  on:mouseleave={() => {
+    userHoversOverScroller = false
+  }}
+>
   <div class="time-grid">
     <TimeScale {visibleHours} />
     <div class="task-grid">
       <div class="absolute-stretch-x">
-        <Needle />
+        <Needle scrollBlockedByUser={userHoversOverScroller} />
         <TaskContainer />
       </div>
       {#each visibleHours as hour}
