@@ -1,5 +1,4 @@
-import { derived, get, writable } from "svelte/store";
-import { PlanSummaryData } from "./plan-data";
+import { derived, writable } from "svelte/store";
 
 // todo: use or delete
 interface Task {
@@ -8,13 +7,7 @@ interface Task {
   text: string;
 }
 
-export const planSummary = writable(new PlanSummaryData([]));
-
 export const tasks = writable([]);
-
-export const nowPosition = writable(0);
-
-export const now = writable(new Date());
 
 // todo: no defaults in here
 export const zoomLevel = writable("2");
@@ -32,12 +25,19 @@ export const timelineDateFormat = writable("LLLL");
 
 export const centerNeedle = writable(true);
 
-const createGetYCoordsFn =
-  ([$zoomLevel, $startHour]: [string, number]) =>
-  (minutes: number) => {
-    const currentZoomLevel = Number($zoomLevel);
-    const hiddenHoursSize = $startHour * 60 * currentZoomLevel;
-    return minutes * currentZoomLevel - hiddenHoursSize;
-  };
+const hiddenHoursSize = derived(
+  [startHour, hourSize],
+  ([$startHour, $hourSize]) => $startHour * $hourSize,
+);
 
-export const getYCoords = derived([zoomLevel, startHour], createGetYCoordsFn);
+export const endOfDayCoords = derived(
+  [hourSize, hiddenHoursSize],
+  ([$hourSize, $hiddenHoursSize]) => 24 * $hourSize - $hiddenHoursSize,
+);
+
+export const getYCoords = derived(
+  [zoomLevel, hiddenHoursSize],
+  ([$zoomLevel, $hiddenHoursSize]) =>
+    (minutes: number) =>
+      minutes * Number($zoomLevel) - $hiddenHoursSize,
+);

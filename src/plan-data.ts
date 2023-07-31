@@ -49,7 +49,11 @@ export class PlanSummaryData {
           const untilNext = moment
             .duration(moment(next.startTime).diff(moment(item.startTime)))
             .asMinutes();
-          item.durationMins = untilNext;
+          const defaultDurationMinutes = 30;
+          item.durationMins =
+            untilNext < defaultDurationMinutes
+              ? untilNext
+              : defaultDurationMinutes;
         }
       });
     } catch (error) {
