@@ -9,29 +9,39 @@
   let el;
   let hovered = false;
 
+  function handleMouseEnter() {
+    hovered = true;
+  }
+
+  function handleMouseLeave() {
+    hovered = false;
+  }
+
+  $: zIndex = hovered ? 2 : 1;
   $: height =
     doesContentOverflow(el) && hovered
       ? computeAutoHeight(el)
       : `${durationMinutes * $zoomLevel}px`;
+
+  $: yCoords = $getYCoords(startMinutes);
+  $: transform = `translateY(${yCoords}px)`;
 </script>
 
 <div
   bind:this={el}
   class="task absolute-stretch-x"
   style:height
-  style:transform="translateY({$getYCoords(startMinutes)}px)"
-  on:mouseenter={() => {
-    hovered = true;
-  }}
-  on:mouseleave={() => {
-    hovered = false;
-  }}
+  style:transform
+  style:z-index={zIndex}
+  on:mouseenter={handleMouseEnter}
+  on:mouseleave={handleMouseLeave}
 >
   {text}
 </div>
 
 <style>
   .task {
+    overflow: hidden;
     padding: 5px;
     border-radius: var(--radius-s);
     font-size: var(--font-ui-medium);
