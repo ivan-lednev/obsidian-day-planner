@@ -1,38 +1,23 @@
 import { derived, writable } from "svelte/store";
 
-// todo: use or delete
-interface Task {
-  startMinutes: number;
-  durationMinutes: number;
-  text: string;
-}
-
 export const tasks = writable([]);
 
-// todo: no defaults in here
-export const zoomLevel = writable("2");
+export const zoomLevel = writable();
 
 export const hourSize = derived(
   zoomLevel,
   ($zoomLevel) => Number($zoomLevel) * 60,
 );
 
-// todo: no defaults in here
-export const startHour = writable(6);
+export const startHour = writable(0);
 
-// todo: no defaults in here
-export const timelineDateFormat = writable("LLLL");
+export const timelineDateFormat = writable();
 
-export const centerNeedle = writable(true);
+export const centerNeedle = writable();
 
 const hiddenHoursSize = derived(
   [startHour, hourSize],
   ([$startHour, $hourSize]) => $startHour * $hourSize,
-);
-
-export const endOfDayCoords = derived(
-  [hourSize, hiddenHoursSize],
-  ([$hourSize, $hiddenHoursSize]) => 24 * $hourSize - $hiddenHoursSize,
 );
 
 export const getYCoords = derived(

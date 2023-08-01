@@ -5,12 +5,11 @@
 
 <div class="task-container absolute-stretch-x">
   {#each $tasks as { text, startMinutes, durationMinutes }}
-    <!-- TODO: is might not be reactive -->
     <button
       class="task absolute-stretch-x"
       style:height="{durationMinutes * $zoomLevel}px"
       style:transform="translateY({$getYCoords(startMinutes)}px)"
-    >{text}
+      >{text}
     </button>
   {/each}
 </div>
@@ -28,5 +27,9 @@
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
+    box-shadow: none;
+    color: aliceblue;
+    background-color: var(--color-accent);
+    border: 1px solid var(--background-modifier-border);
   }
 </style>
