@@ -84,7 +84,7 @@ export default class TimelineView extends ItemView {
     timelineDateFormat.set(this.settings.timelineDateFormat);
   }
 
-  onunload() {
-    this.timeline.$destroy();
+  async onClose() {
+    this.timeline?.$destroy();
   }
 }
