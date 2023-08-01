@@ -60,8 +60,6 @@
           </div>
         </div>
       </div>
-
-      <div>s</div>
     </div>
   {/if}
 </div>
