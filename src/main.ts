@@ -112,7 +112,7 @@ export default class DayPlanner extends Plugin {
     this.registerView(
       VIEW_TYPE_TIMELINE,
       (leaf: WorkspaceLeaf) =>
-        (this.timelineView = new TimelineView(leaf, this.settings)),
+        (this.timelineView = new TimelineView(leaf, this.settings, this)),
     );
 
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));

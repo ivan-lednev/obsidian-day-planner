@@ -11,12 +11,18 @@ import { VIEW_TYPE_TIMELINE } from "../constants";
 import type { PlanSummaryData } from "../plan-data";
 import type { DayPlannerSettings } from "../settings";
 import { getMinutesSinceMidnightTo } from "../time-utils";
+import type DayPlanner from "../main";
 
 export default class TimelineView extends ItemView {
   private timeline: Timeline;
   private settings: DayPlannerSettings;
 
-  constructor(leaf: WorkspaceLeaf, settings: DayPlannerSettings) {
+  // TODO: clean up
+  constructor(
+    leaf: WorkspaceLeaf,
+    settings: DayPlannerSettings,
+    private readonly plugin: DayPlanner,
+  ) {
     super(leaf);
     this.settings = settings;
   }
@@ -58,8 +64,23 @@ export default class TimelineView extends ItemView {
 
   initializeStoresFromSettings() {
     zoomLevel.set(this.settings.timelineZoomLevel);
-    startHour.set(this.settings.startHour);
+    zoomLevel.subscribe(async (value) => {
+      this.plugin.settings.timelineZoomLevel = value;
+      await this.plugin.saveData(this.plugin.settings);
+    });
+
     centerNeedle.set(this.settings.centerNeedle);
+    centerNeedle.subscribe(async (value) => {
+      this.plugin.settings.centerNeedle = value;
+      await this.plugin.saveData(this.plugin.settings);
+    });
+
+    startHour.set(this.settings.startHour);
+    startHour.subscribe(async (value) => {
+      this.plugin.settings.startHour = value;
+      await this.plugin.saveData(this.plugin.settings);
+    });
+
     timelineDateFormat.set(this.settings.timelineDateFormat);
   }
 

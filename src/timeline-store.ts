@@ -2,7 +2,7 @@ import { derived, writable } from "svelte/store";
 
 export const tasks = writable([]);
 
-export const zoomLevel = writable();
+export const zoomLevel = writable("2");
 
 export const hourSize = derived(
   zoomLevel,
@@ -13,7 +13,7 @@ export const startHour = writable(0);
 
 export const timelineDateFormat = writable();
 
-export const centerNeedle = writable();
+export const centerNeedle = writable(true);
 
 const hiddenHoursSize = derived(
   [startHour, hourSize],

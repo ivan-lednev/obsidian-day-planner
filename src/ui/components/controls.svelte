@@ -1,7 +1,7 @@
 <script lang="ts">
   import SettingsButton from "./settings-button.svelte";
   import { onMount } from "svelte";
-  import { timelineDateFormat, zoomLevel } from "../../timeline-store";
+  import { centerNeedle, timelineDateFormat, zoomLevel } from "../../timeline-store";
 
   let settingsVisible = false;
 
@@ -30,37 +30,38 @@
     <SettingsButton isActive={settingsVisible} onClick={toggleSettings} />
   </div>
   {#if settingsVisible}
-    <div>
+    <div class="settings">
       <div class="setting-item">
         <div class="setting-item-info">
           <div class="setting-item-name">Zoom</div>
         </div>
         <div class="setting-item-control">
-          <select
-            bind:value={$zoomLevel}
-            class="dropdown"
-          >
+          <select bind:value={$zoomLevel} class="dropdown">
             {#each ["1", "2", "3", "4"] as level}
               <option value={level}>{level}</option>
             {/each}
           </select>
         </div>
       </div>
-    </div>
 
-    <div class="setting-item mod-toggle" style:display="none">
-      <div class="setting-item-info">
-        <div class="setting-item-name">Collapse results</div>
-        <div class="setting-item-description"></div>
-      </div>
-      <div class="setting-item-control">
-        <div
-          class="checkbox-container mod-small"
-          class:is-enabled={false}
-        >
-          <input type="checkbox" tabindex="0" />
+      <div class="setting-item mod-toggle">
+        <div class="setting-item-info">
+          <div class="setting-item-name">Auto-scroll to now</div>
+        </div>
+        <div class="setting-item-control">
+          <div
+            class="checkbox-container mod-small"
+            class:is-enabled={$centerNeedle}
+            on:click={() => {
+              $centerNeedle = !$centerNeedle
+            }}
+          >
+            <input type="checkbox" tabindex="0" />
+          </div>
         </div>
       </div>
+
+      <div>s</div>
     </div>
   {/if}
 </div>
@@ -74,6 +75,10 @@
     justify-content: center;
   }
 
+  .settings {
+    margin: var(--size-4-1) var(--size-4-4);
+  }
+
   .setting-item {
     padding: var(--size-2-3) 0;
     border: none;
@@ -84,13 +89,13 @@
   }
 
   .controls {
-    padding: var(--size-4-2);
     display: flex;
     flex-direction: column;
     border-bottom: 1px solid var(--background-modifier-border);
   }
 
   .header {
+    margin: var(--size-4-2);
     display: flex;
   }
 </style>
