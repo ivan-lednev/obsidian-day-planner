@@ -37,7 +37,6 @@
   }
 
   .hour-number-container {
-    /* align-self: flex-start; */
     position: sticky;
     top: 10px;
 

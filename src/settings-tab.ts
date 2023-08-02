@@ -3,7 +3,12 @@ import { DayPlannerMode } from "./settings";
 import MomentDateRegex from "./moment-date-regex";
 import type DayPlanner from "./main";
 import { ICONS } from "./constants";
-import { centerNeedle, startHour, timelineDateFormat, zoomLevel } from "./timeline-store";
+import {
+  centerNeedle,
+  startHour,
+  timelineDateFormat,
+  zoomLevel,
+} from "./timeline-store";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   momentDateRegex = new MomentDateRegex();
@@ -225,15 +230,50 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Center the pointer in the timeline view")
-      .setDesc("Should the pointer continuously get scrolled to the center of the view")
+      .setDesc(
+        "Should the pointer continuously get scrolled to the center of the view",
+      )
       .addToggle((component) => {
-        component.setValue(this.plugin.settings.centerNeedle).onChange(async (value) => {
-          centerNeedle.set(value);
+        component
+          .setValue(this.plugin.settings.centerNeedle)
+          .onChange(async (value) => {
+            centerNeedle.set(value);
 
-          this.plugin.settings.centerNeedle = value;
-          await this.plugin.saveData(this.plugin.settings);
-        })
-      })
+            this.plugin.settings.centerNeedle = value;
+            await this.plugin.saveData(this.plugin.settings);
+          });
+      });
+
+    new Setting(containerEl)
+      .setName("Planner heading")
+      .setDesc(
+        `When you create a planner, this text is going to be in the heading.
+When you open a file, the plugin will search for this heading to detect a day plan`,
+      )
+      .addText((component) =>
+        component
+          .setValue(this.plugin.settings.plannerHeading)
+          .onChange(async (value) => {
+            this.plugin.settings.plannerHeading = value;
+            await this.plugin.saveData(this.plugin.settings);
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Planner heading level")
+      .setDesc(
+        "When you create a planner in a file, this level of heading is going to be used",
+      )
+      .addSlider((component) =>
+        component
+          .setLimits(1, 6, 1)
+          .setDynamicTooltip()
+          .setValue(this.plugin.settings.plannerHeadingLevel)
+          .onChange(async (value) => {
+            this.plugin.settings.plannerHeadingLevel = value;
+            await this.plugin.saveData(this.plugin.settings);
+          }),
+      );
   }
 
   private modeDescriptionContent(): DocumentFragment {

@@ -1,3 +1,5 @@
+import { DAY_PLANNER_DEFAULT_CONTENT } from "./constants";
+
 export class DayPlannerSettings {
   customFolder: string = "Day Planners";
   mode: DayPlannerMode = DayPlannerMode.File;
@@ -14,6 +16,8 @@ export class DayPlannerSettings {
   startHour: number = 6;
   timelineDateFormat: string = "LLLL";
   centerNeedle: boolean = true;
+  plannerHeading: string = DAY_PLANNER_DEFAULT_CONTENT;
+  plannerHeadingLevel: number = 1;
 }
 
 export class NoteForDate {

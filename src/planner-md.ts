@@ -35,7 +35,7 @@ export default class PlannerMarkdown {
 
   async insertPlanner() {
     const filePath = this.file.getTodayPlannerFilePath();
-    const fileContents = await (
+    const fileContents = (
       await this.file.getFileContents(filePath)
     ).split("\n");
     const view = this.workspace.activeLeaf.view as MarkdownView;
@@ -51,12 +51,11 @@ export default class PlannerMarkdown {
   async parseDayPlanner(): Promise<PlanSummaryData> {
     try {
       const filePath = this.file.getTodayPlannerFilePath();
-      const fileContent = await (
+      const fileContent = (
         await this.file.getFileContents(filePath)
       ).split("\n");
 
-      const planData = await this.parser.parseMarkdown(fileContent);
-      return planData;
+      return await this.parser.parseMarkdown(fileContent);
     } catch (error) {
       console.log(error);
     }

@@ -20,6 +20,7 @@ export const PLAN_PARSER_REGEX_CREATOR = (
 export const MERMAID_REGEX = /```mermaid\ngantt[\S\s]*?```\s*/gim;
 
 export const DAY_PLANNER_DEFAULT_CONTENT = `## Day Planner
+
 - [ ] `;
 
 export const VIEW_TYPE_TIMELINE = "timeline";
