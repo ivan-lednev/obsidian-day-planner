@@ -41,6 +41,6 @@ export class NoteForDateQuery {
 }
 
 export enum DayPlannerMode {
-  DAILY = 'DAILY',
-  CUSTOM = 'CUSTOM',
+  DAILY = "DAILY",
+  CUSTOM = "CUSTOM",
 }

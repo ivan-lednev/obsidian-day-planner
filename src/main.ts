@@ -89,22 +89,22 @@ export default class DayPlanner extends Plugin {
     this.registerInterval(
       // todo: most of it should not be updated with a timer
       window.setInterval(async () => {
-          if (await this.file.hasTodayNote()) {
-            const planSummary = await this.plannerMD.parseDayPlanner();
-            planSummary.calculate();
-            await this.statusBar.refreshStatusBar(planSummary);
-            await this.plannerMD.updateDayPlannerMarkdown(planSummary);
-            this.timelineView && this.timelineView.update(planSummary);
-          } else if (
-            this.settings.mode == DayPlannerMode.DAILY &&
-            appHasDailyNotesPluginLoaded()
-          ) {
-            const planSummary = new PlanSummaryData([]);
-            await this.statusBar.refreshStatusBar(planSummary);
-            this.timelineView && this.timelineView.update(planSummary);
-          } else {
-            // console.log('No active note, skipping file processing')
-          }
+        if (await this.file.hasTodayNote()) {
+          const planSummary = await this.plannerMD.parseDayPlanner();
+          planSummary.calculate();
+          await this.statusBar.refreshStatusBar(planSummary);
+          await this.plannerMD.updateDayPlannerMarkdown(planSummary);
+          this.timelineView && this.timelineView.update(planSummary);
+        } else if (
+          this.settings.mode == DayPlannerMode.DAILY &&
+          appHasDailyNotesPluginLoaded()
+        ) {
+          const planSummary = new PlanSummaryData([]);
+          await this.statusBar.refreshStatusBar(planSummary);
+          this.timelineView && this.timelineView.update(planSummary);
+        } else {
+          // console.log('No active note, skipping file processing')
+        }
       }, 2000),
     );
   }
@@ -115,7 +115,7 @@ export default class DayPlanner extends Plugin {
     }
     await this.app.workspace.getRightLeaf(false).setViewState({
       type: VIEW_TYPE_TIMELINE,
-      active: true
+      active: true,
     });
   }
 

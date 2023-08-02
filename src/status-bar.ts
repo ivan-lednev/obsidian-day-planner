@@ -67,8 +67,8 @@ export default class StatusBar {
 
   private setupStatusBarEvents(status: HTMLDivElement) {
     status.onClickEvent(async (ev: any) => {
-        const fileName = this.file.getTodayPlannerFilePath();
-        this.workspace.openLinkText(fileName, "", false);
+      const fileName = this.file.getTodayPlannerFilePath();
+      this.workspace.openLinkText(fileName, "", false);
     });
     status.on("mouseenter", ".day-planner", () => {
       this.show(this.card);
