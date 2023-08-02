@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getYCoords, zoomLevel } from "../../store/timeline-store";
-  import { computeAutoHeight, doesContentOverflow } from "../../util";
+  import { computeAutoHeight, doesContentOverflow } from "../../util/height";
 
   export let text;
   export let startMinutes;

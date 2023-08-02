@@ -89,7 +89,6 @@ export default class DayPlanner extends Plugin {
     this.registerInterval(
       // todo: most of it should not be updated with a timer
       window.setInterval(async () => {
-        try {
           if (await this.file.hasTodayNote()) {
             const planSummary = await this.plannerMD.parseDayPlanner();
             planSummary.calculate();
@@ -106,9 +105,6 @@ export default class DayPlanner extends Plugin {
           } else {
             // console.log('No active note, skipping file processing')
           }
-        } catch (error) {
-          console.log(error);
-        }
       }, 2000),
     );
   }

@@ -18,7 +18,6 @@ export class PlanSummaryData {
   }
 
   calculate(): void {
-    try {
       const now = new Date();
       if (this.items.length === 0) {
         this.empty = true;
@@ -56,9 +55,6 @@ export class PlanSummaryData {
               : defaultDurationMinutes;
         }
       });
-    } catch (error) {
-      console.log(error);
-    }
   }
 }
 

@@ -62,7 +62,6 @@ export default class DayPlannerFile {
   }
 
   async createFolderIfNotExists(path: string) {
-    try {
       const normalizedPath = normalizePath(path);
       const folderExists = await this.vault.adapter.exists(
         normalizedPath,
@@ -71,13 +70,9 @@ export default class DayPlannerFile {
       if (!folderExists) {
         await this.vault.createFolder(normalizedPath);
       }
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   async createFileIfNotExists(fileName: string) {
-    try {
       const normalizedFileName = normalizePath(fileName);
       if (!(await this.vault.adapter.exists(normalizedFileName, false))) {
         await this.vault.create(
@@ -85,30 +80,19 @@ export default class DayPlannerFile {
           DAY_PLANNER_DEFAULT_CONTENT,
         );
       }
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   async getFileContents(fileName: string) {
     await this.prepareFile();
-    try {
       return await this.vault.adapter.read(fileName);
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   async updateFile(fileName: string, fileContents: string) {
     await this.prepareFile();
     // todo: do not use adapter
-    try {
       return await this.vault.adapter.write(
         normalizePath(fileName),
         fileContents,
       );
-    } catch (error) {
-      console.log(error);
-    }
   }
 }

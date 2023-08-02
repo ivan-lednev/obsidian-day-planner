@@ -42,20 +42,14 @@ export default class PlannerMarkdown {
       ...DAY_PLANNER_DEFAULT_CONTENT.split("\n"),
       ...fileContents.slice(currentLine),
     ];
-    this.file.updateFile(filePath, insertResult.join("\n"));
+    await this.file.updateFile(filePath, insertResult.join("\n"));
   }
 
   async parseDayPlanner(): Promise<PlanSummaryData> {
-    try {
-      const filePath = this.file.getTodayPlannerFilePath();
-      const fileContent = (await this.file.getFileContents(filePath)).split(
-        "\n",
-      );
+    const filePath = this.file.getTodayPlannerFilePath();
+    const fileContent = (await this.file.getFileContents(filePath)).split("\n");
 
-      return await this.parser.parseMarkdown(fileContent);
-    } catch (error) {
-      console.log(error);
-    }
+    return await this.parser.parseMarkdown(fileContent);
   }
 
   async updateDayPlannerMarkdown(planSummary: PlanSummaryData) {
@@ -63,7 +57,7 @@ export default class PlannerMarkdown {
       return;
     }
     const filePath = this.file.getTodayPlannerFilePath();
-    const fileContents = await await this.file.getFileContents(filePath);
+    const fileContents = await this.file.getFileContents(filePath);
     const fileContentsArr = fileContents.split("\n");
 
     planSummary.calculate();
