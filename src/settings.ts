@@ -3,7 +3,6 @@ import { DAY_PLANNER_DEFAULT_CONTENT } from "./constants";
 export class DayPlannerSettings {
   customFolder: string = "Day Planners";
   mode: DayPlannerMode = DayPlannerMode.DAILY;
-  mermaid: boolean = false;
   notesToDates: NoteForDate[] = [];
   completePastItems: boolean = true;
   circularProgress: boolean = false;

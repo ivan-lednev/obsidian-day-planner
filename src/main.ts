@@ -25,7 +25,6 @@ export default class DayPlanner extends Plugin {
   timelineView: TimelineView;
 
   async onload() {
-    console.log("Loading Day Planner plugin");
     this.vault = this.app.vault;
     this.settings = Object.assign(
       new DayPlannerSettings(),

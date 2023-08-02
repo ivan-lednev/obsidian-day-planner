@@ -17,14 +17,11 @@ export const PLAN_PARSER_REGEX_CREATOR = (
     "gmi",
   );
 
-export const MERMAID_REGEX = /```mermaid\ngantt[\S\s]*?```\s*/gim;
-
 export const DAY_PLANNER_DEFAULT_CONTENT = `## Day Planner
 
 - [ ] `;
 
 export const VIEW_TYPE_TIMELINE = "timeline";
-export const MINUTE_MULTIPLIER = 4;
 
 export const ICONS = [
   "any-key",
