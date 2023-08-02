@@ -5,7 +5,7 @@ import type Parser from "./parser";
 import type { PlanSummaryData } from "./plan/plan-summary-data";
 import type Progress from "./progress";
 import { DayPlannerSettings, NoteForDateQuery } from "./settings";
-import { PlanItem } from "./plan/plan-item";
+import type { PlanItem } from "./plan/plan-item";
 
 export default class PlannerMarkdown {
   workspace: Workspace;
@@ -31,9 +31,10 @@ export default class PlannerMarkdown {
     this.noteForDateQuery = new NoteForDateQuery();
   }
 
+  // todo: remove once we fix 'open planner' command
   async insertPlanner() {
     const filePath = this.file.getTodayPlannerFilePath();
-    const fileContents = (await this.file.getFileContents(filePath)).split(
+    const fileContents = (await this.file.getPlannerContents(filePath)).split(
       "\n",
     );
     const view = this.workspace.activeLeaf.view as MarkdownView;
@@ -48,9 +49,11 @@ export default class PlannerMarkdown {
 
   async parseDayPlanner(): Promise<PlanSummaryData> {
     const filePath = this.file.getTodayPlannerFilePath();
-    const fileContent = (await this.file.getFileContents(filePath)).split("\n");
+    const fileContents = (await this.file.getPlannerContents(filePath)).split(
+      "\n",
+    );
 
-    return await this.parser.parseMarkdown(fileContent);
+    return await this.parser.parseMarkdown(fileContents);
   }
 
   async updateDayPlannerMarkdown(planSummary: PlanSummaryData) {
@@ -58,10 +61,10 @@ export default class PlannerMarkdown {
       return;
     }
     const filePath = this.file.getTodayPlannerFilePath();
-    const fileContents = await this.file.getFileContents(filePath);
+    const fileContents = await this.file.getPlannerContents(filePath);
     const fileContentsArr = fileContents.split("\n");
 
-    planSummary.calculate();
+    planSummary.calculatePlanItemProps();
     if (planSummary.empty) {
       return;
     }

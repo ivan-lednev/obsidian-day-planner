@@ -1,4 +1,4 @@
-import { PlanItem } from "./plan/plan-item";
+import type { PlanItem } from "./plan/plan-item";
 
 const moment = (window as any).moment;
 

@@ -1,4 +1,5 @@
 import type { PlanItem } from "./plan-item";
+import { getDiffInMinutes } from "../util/moment";
 
 const moment = (window as any).moment;
 
@@ -17,7 +18,7 @@ export class PlanSummaryData {
     this.past = [];
   }
 
-  calculate(): void {
+  calculatePlanItemProps(): void {
     const now = new Date();
     if (this.items.length === 0) {
       this.empty = true;
@@ -40,21 +41,28 @@ export class PlanSummaryData {
         this.past.push(item);
       }
 
-      if (item.endTime !== undefined) {
-        item.durationMins = moment
-          .duration(moment(item.endTime).diff(moment(item.startTime)))
-          .asMinutes();
-      } else if (next) {
-        const untilNext = moment
-          .duration(moment(next.startTime).diff(moment(item.startTime)))
-          .asMinutes();
-        const defaultDurationMinutes = 30;
-        item.durationMins =
-          untilNext < defaultDurationMinutes
-            ? untilNext
-            : defaultDurationMinutes;
-      }
+      item.durationMins = getDuration(item, next);
     });
   }
 }
 
+const defaultDurationMinutes = 30;
+
+function getDuration(item: PlanItem, next?: PlanItem) {
+  if (item.endTime) {
+    return getDiffInMinutes(moment(item.startTime), moment(item.endTime));
+  }
+
+  if (next) {
+    const minutesUntilNext = getDiffInMinutes(
+      moment(next.startTime),
+      moment(item.startTime),
+    );
+
+    if (minutesUntilNext < defaultDurationMinutes) {
+      return minutesUntilNext;
+    }
+  }
+
+  return defaultDurationMinutes;
+}

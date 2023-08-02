@@ -2,7 +2,7 @@ import { PLAN_PARSER_REGEX_CREATOR } from "./constants";
 import { PlanSummaryData } from "./plan/plan-summary-data";
 import type { DayPlannerSettings } from "./settings";
 import { PlanItemFactory } from "./plan/plan-item-factory";
-import { PlanItem } from "./plan/plan-item";
+import type { PlanItem } from "./plan/plan-item";
 
 export default class Parser {
   private planItemFactory: PlanItemFactory;

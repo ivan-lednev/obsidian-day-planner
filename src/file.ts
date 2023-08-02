@@ -75,7 +75,7 @@ export default class DayPlannerFile {
     }
   }
 
-  async getFileContents(fileName: string) {
+  async getPlannerContents(fileName: string) {
     await this.prepareFile();
     return await this.vault.adapter.read(fileName);
   }
