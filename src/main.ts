@@ -124,37 +124,6 @@ export default class DayPlanner extends Plugin {
     });
   }
 
-  modeGuard(command: () => any): void {
-    if (this.settings.mode !== DayPlannerMode.Command) {
-      new Notification("Day Planner plugin in File mode", {
-        silent: true,
-        body: "Switch to Command mode in settings to use this command",
-      });
-      return;
-    } else {
-      command();
-    }
-  }
-
-  async unlinkDayPlanner() {
-    try {
-      const activePlanner = this.notesForDatesQuery.active(
-        this.settings.notesToDates,
-      );
-      this.settings.notesToDates.remove(activePlanner);
-      await this.saveData(this.settings);
-      await this.loadData();
-      this.statusBar.hide(this.statusBar.statusBar);
-      this.timelineView && this.timelineView.update(new PlanSummaryData([]));
-      new Notification("Day Planner reset", {
-        silent: true,
-        body: `The Day Planner for today has been dissociated from ${activePlanner.notePath} and can be added to another note`,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   codeMirror = (file: TAbstractFile) => {
     if (this.file.hasTodayNote()) {
       // console.log('Active note found, starting CodeMirror monitoring')

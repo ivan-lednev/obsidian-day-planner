@@ -42,15 +42,11 @@ export default class DayPlannerFile {
       return false;
     }
 
-    return (
-      this.noteForDateQuery.exists(this.settings.notesToDates)
-    );
+    return this.noteForDateQuery.exists(this.settings.notesToDates);
   }
 
   getTodayPlannerFilePath(): string {
-    if (
-      this.settings.mode === DayPlannerMode.DAILY
-    ) {
+    if (this.settings.mode === DayPlannerMode.DAILY) {
       return this.noteForDateQuery.active(this.settings.notesToDates).notePath;
     }
     const fileName = this.todayPlannerFileName();
@@ -62,14 +58,7 @@ export default class DayPlannerFile {
   }
 
   async prepareFile() {
-    try {
-      if (this.settings.mode === DayPlannerMode.File) {
-        await this.createFolderIfNotExists(this.settings.customFolder);
-        await this.createFileIfNotExists(this.getTodayPlannerFilePath());
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    await this.createFileIfNotExists(this.getTodayPlannerFilePath());
   }
 
   async createFolderIfNotExists(path: string) {
