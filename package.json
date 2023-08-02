@@ -34,6 +34,10 @@
     "moment": "^2.29.4",
     "nyc": "^15.1.0",
     "obsidian": "https://github.com/obsidianmd/obsidian-api/tarball/master",
+    "postcss-html": "^1.5.0",
+    "stylelint": "^15.10.2",
+    "stylelint-config-html": "^1.1.0",
+    "stylelint-config-standard": "^34.0.0",
     "svelte": "^3.38.2",
     "svelte-check": "^1.6.0",
     "svelte-preprocess": "^4.10.7",
@@ -43,6 +47,7 @@
   },
   "dependencies": {
     "obsidian-daily-notes-interface": "^0.9.4",
-    "prettier-plugin-svelte": "^3.0.3"
+    "prettier-plugin-svelte": "^3.0.3",
+    "stylelint-config-clean-order": "^5.0.1"
   }
 }

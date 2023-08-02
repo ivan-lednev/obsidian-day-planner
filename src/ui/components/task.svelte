@@ -7,6 +7,7 @@
   export let durationMinutes;
 
   let el;
+
   let hovered = false;
 
   function handleMouseEnter() {
@@ -17,7 +18,7 @@
     hovered = false;
   }
 
-  $: zIndex = hovered ? 2 : 1;
+  $: zIndex = hovered ? 1 : 0;
   $: height =
     doesContentOverflow(el) && hovered
       ? computeAutoHeight(el)
@@ -42,18 +43,22 @@
 <style>
   .task {
     overflow: hidden;
-    padding: 5px;
-    border-radius: var(--radius-s);
-    font-size: var(--font-ui-medium);
     display: flex;
-    justify-content: flex-start;
     align-items: flex-start;
-    box-shadow: none;
+    justify-content: flex-start;
+
+    padding: 5px;
+
+    font-size: var(--font-ui-medium);
     color: aliceblue;
+    text-align: left;
+    white-space: normal;
+
     background-color: var(--color-accent);
     border: 1px solid var(--background-modifier-border);
-    white-space: normal;
-    text-align: left;
+    border-radius: var(--radius-s);
+    box-shadow: none;
+
     transition: height 0.2s ease-in-out;
   }
 </style>

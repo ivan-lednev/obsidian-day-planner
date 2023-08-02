@@ -12,8 +12,8 @@
 <style>
   .task-container {
     display: flex;
-    margin-left: 20px;
-    margin-right: 10px;
     flex-direction: column;
+    margin-right: 10px;
+    margin-left: 20px;
   }
 </style>

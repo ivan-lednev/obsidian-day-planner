@@ -66,11 +66,12 @@
 
 <style>
   .date {
+    display: flex;
+    flex: 1 0 0;
+    justify-content: center;
+
     font-size: 1.2em;
     color: var(--text-muted);
-    flex: 1 0 0;
-    display: flex;
-    justify-content: center;
   }
 
   .settings {
@@ -93,7 +94,7 @@
   }
 
   .header {
-    margin: var(--size-4-2);
     display: flex;
+    margin: var(--size-4-2);
   }
 </style>

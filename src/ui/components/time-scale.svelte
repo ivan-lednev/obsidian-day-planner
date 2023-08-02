@@ -17,8 +17,8 @@
 
 <style>
   .hours-container {
-    flex: 0 0 40px;
     display: flex;
+    flex: 0 0 40px;
     flex-direction: column;
   }
 
@@ -37,13 +37,15 @@
   }
 
   .hour-number-container {
-    /*align-self: flex-start;*/
+    /* align-self: flex-start; */
     position: sticky;
     top: 10px;
-    color: var(--text-faint);
-    align-self: flex-start;
+
     display: flex;
-    justify-content: center;
     flex: 0 0 30px;
+    align-self: flex-start;
+    justify-content: center;
+
+    color: var(--text-faint);
   }
 </style>

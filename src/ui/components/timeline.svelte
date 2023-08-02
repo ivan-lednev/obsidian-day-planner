@@ -7,6 +7,14 @@
 
   let userHoversOverScroller = false;
 
+  function handleMouseEnter() {
+    userHoversOverScroller = true;
+  }
+
+  function handleMouseLeave() {
+    userHoversOverScroller = false;
+  }
+
   $: visibleHours = Array.from({ length: 24 })
     .map((value, index) => index)
     .slice($startHour);
@@ -15,12 +23,8 @@
 <Controls />
 <div
   class="scroller"
-  on:mouseenter={() => {
-    userHoversOverScroller = true
-  }}
-  on:mouseleave={() => {
-    userHoversOverScroller = false
-  }}
+  on:mouseenter={handleMouseEnter}
+  on:mouseleave={handleMouseLeave}
 >
   <div class="time-grid">
     <TimeScale {visibleHours} />
@@ -38,8 +42,8 @@
 
 <style>
   .scroller {
-    height: 100%;
     overflow: auto;
+    height: 100%;
   }
 
   .time-grid {
@@ -52,12 +56,12 @@
   }
 
   .time-grid-block {
-    border-left: 1px solid var(--background-modifier-border);
     flex-grow: 1;
     flex-shrink: 0;
+    border-left: 1px solid var(--background-modifier-border);
   }
 
-  /* TODO: this selector is a lame workaround for task container which is absolutely positioned*/
+  /* TODO: this selector is a lame workaround for task container which is absolutely positioned */
   .time-grid-block:not(:nth-child(2)) {
     border-top: 1px solid var(--background-modifier-border);
   }

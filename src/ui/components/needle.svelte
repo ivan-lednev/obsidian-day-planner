@@ -37,9 +37,10 @@
 
   .bullet {
     position: absolute;
-    left: -4px;
     top: -4px;
-    border-radius: 50%;
+    left: -4px;
+
     border: 5px solid var(--color-accent);
+    border-radius: 50%;
   }
 </style>

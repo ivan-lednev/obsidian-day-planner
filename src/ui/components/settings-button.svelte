@@ -35,7 +35,7 @@
 
 <style>
   .clickable-icon {
-    align-self: center;
     flex-basis: var(--input-height);
+    align-self: center;
   }
 </style>
