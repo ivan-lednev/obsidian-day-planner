@@ -2,9 +2,10 @@ import type { MarkdownView, Workspace } from "obsidian";
 import { DAY_PLANNER_DEFAULT_CONTENT } from "./constants";
 import type DayPlannerFile from "./file";
 import type Parser from "./parser";
-import type { PlanItem, PlanSummaryData } from "./plan-data";
+import type { PlanSummaryData } from "./plan/plan-summary-data";
 import type Progress from "./progress";
 import { DayPlannerSettings, NoteForDateQuery } from "./settings";
+import { PlanItem } from "./plan/plan-item";
 
 export default class PlannerMarkdown {
   workspace: Workspace;

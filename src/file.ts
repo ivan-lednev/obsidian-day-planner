@@ -3,7 +3,6 @@ import { DAY_PLANNER_DEFAULT_CONTENT, DAY_PLANNER_FILENAME } from "./constants";
 import MomentDateRegex from "./moment-date-regex";
 import {
   DayPlannerSettings,
-  DayPlannerMode,
   NoteForDateQuery,
   NoteForDate,
 } from "./settings";
@@ -11,16 +10,16 @@ import {
   appHasDailyNotesPluginLoaded,
   getDailyNoteSettings,
 } from "obsidian-daily-notes-interface";
+import { DayPlannerMode } from "./types";
 
 export default class DayPlannerFile {
-  vault: Vault;
-  settings: DayPlannerSettings;
-  momentDateRegex: MomentDateRegex;
-  noteForDateQuery: NoteForDateQuery;
+  private readonly momentDateRegex: MomentDateRegex;
+  private readonly noteForDateQuery: NoteForDateQuery;
 
-  constructor(vault: Vault, settings: DayPlannerSettings) {
-    this.vault = vault;
-    this.settings = settings;
+  constructor(
+    private readonly vault: Vault,
+    private readonly settings: DayPlannerSettings,
+  ) {
     this.momentDateRegex = new MomentDateRegex();
     this.noteForDateQuery = new NoteForDateQuery();
   }

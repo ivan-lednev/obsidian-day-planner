@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { centerNeedle, getYCoords } from "../../store/timeline-store";
-  import { getMinutesSinceMidnight } from "../../time-utils";
+  import { getMinutesSinceMidnight } from "../../util/moment";
 
   export let scrollBlockedByUser;
 

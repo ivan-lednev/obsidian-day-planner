@@ -1,14 +1,14 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
-import { DayPlannerMode } from "./settings";
-import MomentDateRegex from "./moment-date-regex";
-import type DayPlanner from "./main";
-import { ICONS } from "./constants";
+import MomentDateRegex from "../moment-date-regex";
+import type DayPlanner from "../main";
+import { ICONS } from "../constants";
 import {
   centerNeedle,
   startHour,
   timelineDateFormat,
   zoomLevel,
-} from "./store/timeline-store";
+} from "../store/timeline-store";
+import { DayPlannerMode } from "../types";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   momentDateRegex = new MomentDateRegex();

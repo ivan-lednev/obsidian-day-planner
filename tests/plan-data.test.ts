@@ -1,8 +1,8 @@
 import 'mocha';
 import { expect } from 'chai';
 
-import { PlanItemFactory } from '../src/plan-data';
 import { DayPlannerSettings } from '../src/settings';
+import { PlanItemFactory } from "../src/plan/plan-item-factory";
 
 describe('plan-data', () => {
   describe('PlanItemFactory', () => {

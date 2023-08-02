@@ -1,4 +1,5 @@
 import { DAY_PLANNER_DEFAULT_CONTENT } from "./constants";
+import { DayPlannerMode } from "./types";
 
 export class DayPlannerSettings {
   customFolder: string = "Day Planners";
@@ -40,7 +41,3 @@ export class NoteForDateQuery {
   }
 }
 
-export enum DayPlannerMode {
-  DAILY = "DAILY",
-  CUSTOM = "CUSTOM",
-}

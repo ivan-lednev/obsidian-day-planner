@@ -8,9 +8,9 @@ import {
   zoomLevel,
 } from "../store/timeline-store";
 import { VIEW_TYPE_TIMELINE } from "../constants";
-import type { PlanSummaryData } from "../plan-data";
+import type { PlanSummaryData } from "../plan/plan-summary-data";
 import type { DayPlannerSettings } from "../settings";
-import { getMinutesSinceMidnightTo } from "../time-utils";
+import { getMinutesSinceMidnightTo } from "../util/moment";
 import type DayPlanner from "../main";
 
 export default class TimelineView extends ItemView {

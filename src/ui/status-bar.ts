@@ -1,9 +1,10 @@
 import type { Workspace } from "obsidian";
-import type DayPlannerFile from "./file";
-import type { PlanItem, PlanSummaryData } from "./plan-data";
-import type PlannerMarkdown from "./planner-md";
-import type Progress from "./progress";
-import type { DayPlannerSettings } from "./settings";
+import type DayPlannerFile from "../file";
+import type { PlanSummaryData } from "../plan/plan-summary-data";
+import type PlannerMarkdown from "../planner-md";
+import type Progress from "../progress";
+import type { DayPlannerSettings } from "../settings";
+import type { PlanItem } from "../plan/plan-item";
 
 export default class StatusBar {
   settings: DayPlannerSettings;

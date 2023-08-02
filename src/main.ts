@@ -1,19 +1,19 @@
 import { Plugin, TAbstractFile, Vault, WorkspaceLeaf } from "obsidian";
-import { DayPlannerSettingsTab } from "./settings-tab";
+import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import {
   DayPlannerSettings,
-  DayPlannerMode,
   NoteForDateQuery,
 } from "./settings";
-import StatusBar from "./status-bar";
+import StatusBar from "./ui/status-bar";
 import Progress from "./progress";
 import PlannerMarkdown from "./planner-md";
 import DayPlannerFile from "./file";
 import Parser from "./parser";
 import { VIEW_TYPE_TIMELINE } from "./constants";
 import TimelineView from "./ui/timeline-view";
-import { PlanSummaryData } from "./plan-data";
+import { PlanSummaryData } from "./plan/plan-summary-data";
 import { appHasDailyNotesPluginLoaded } from "obsidian-daily-notes-interface";
+import { DayPlannerMode } from "./types";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
