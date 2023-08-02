@@ -4,7 +4,11 @@
 
 
 
-> ## Forked in 2023
+> > ## Forked in 2023
+> > Yet another fork
+> > 
+> > - Mermaid got removed
+> 
 > I like this plugin so I've forked it and merged a few of the [open PRs](https://github.com/lynchjames/obsidian-day-planner/pulls) as the original author has abandoned it. I may or may not make changes to this plugin, but this should be useful.
 > ### Added features
 > - [Daily Mode](https://github.com/lynchjames/obsidian-day-planner/pull/179)
