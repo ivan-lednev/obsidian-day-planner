@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { tasks } from "../../timeline-store";
+  import { tasks } from "../../store/timeline-store";
   import Task from "./task.svelte";
 </script>
 

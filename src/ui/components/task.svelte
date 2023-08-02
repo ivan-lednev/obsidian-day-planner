@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getYCoords, zoomLevel } from "../../timeline-store";
+  import { getYCoords, zoomLevel } from "../../store/timeline-store";
   import { computeAutoHeight, doesContentOverflow } from "../../util";
 
   export let text;

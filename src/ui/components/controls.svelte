@@ -1,7 +1,7 @@
 <script lang="ts">
   import SettingsButton from "./settings-button.svelte";
   import { onMount } from "svelte";
-  import { centerNeedle, timelineDateFormat, zoomLevel } from "../../timeline-store";
+  import { centerNeedle, timelineDateFormat, zoomLevel } from "../../store/timeline-store";
 
   let settingsVisible = false;
 

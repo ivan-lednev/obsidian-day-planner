@@ -6,7 +6,7 @@ import {
   tasks,
   timelineDateFormat,
   zoomLevel,
-} from "../timeline-store";
+} from "../store/timeline-store";
 import { VIEW_TYPE_TIMELINE } from "../constants";
 import type { PlanSummaryData } from "../plan-data";
 import type { DayPlannerSettings } from "../settings";

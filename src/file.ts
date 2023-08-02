@@ -27,7 +27,7 @@ export default class DayPlannerFile {
 
   async hasTodayNote(): Promise<boolean> {
     if (
-      this.settings.mode == DayPlannerMode.Daily &&
+      this.settings.mode == DayPlannerMode.DAILY &&
       appHasDailyNotesPluginLoaded()
     ) {
       const date = new Date();
@@ -43,15 +43,13 @@ export default class DayPlannerFile {
     }
 
     return (
-      this.settings.mode === DayPlannerMode.File ||
       this.noteForDateQuery.exists(this.settings.notesToDates)
     );
   }
 
   getTodayPlannerFilePath(): string {
     if (
-      this.settings.mode === DayPlannerMode.Command ||
-      this.settings.mode === DayPlannerMode.Daily
+      this.settings.mode === DayPlannerMode.DAILY
     ) {
       return this.noteForDateQuery.active(this.settings.notesToDates).notePath;
     }

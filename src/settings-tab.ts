@@ -8,7 +8,7 @@ import {
   startHour,
   timelineDateFormat,
   zoomLevel,
-} from "./timeline-store";
+} from "./store/timeline-store";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   momentDateRegex = new MomentDateRegex();
@@ -29,17 +29,13 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       .setDesc(this.modeDescriptionContent())
       .addDropdown((dropDown) =>
         dropDown
-          .addOption(DayPlannerMode[DayPlannerMode.File], "File mode")
-          .addOption(DayPlannerMode[DayPlannerMode.Command], "Command mode")
-          .addOption(DayPlannerMode[DayPlannerMode.Daily], "Daily mode")
-          .setValue(
-            DayPlannerMode[this.plugin.settings.mode] ||
-              DayPlannerMode.File.toString(),
-          )
-          .onChange((value: string) => {
+          .addOption(DayPlannerMode[DayPlannerMode.DAILY], "Daily mode")
+          .addOption(DayPlannerMode[DayPlannerMode.CUSTOM], "Custom path")
+          .setValue(DayPlannerMode[this.plugin.settings.mode])
+          .onChange(async (value: string) => {
             this.plugin.settings.mode =
               DayPlannerMode[value as keyof typeof DayPlannerMode];
-            this.plugin.saveData(this.plugin.settings);
+            await this.plugin.saveData(this.plugin.settings);
           }),
       );
 
@@ -51,9 +47,9 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       .addToggle((toggle) =>
         toggle
           .setValue(this.plugin.settings.completePastItems)
-          .onChange((value: boolean) => {
+          .onChange(async (value: boolean) => {
             this.plugin.settings.completePastItems = value;
-            this.plugin.saveData(this.plugin.settings);
+            await this.plugin.saveData(this.plugin.settings);
           }),
       );
 

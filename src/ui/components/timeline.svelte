@@ -3,7 +3,7 @@
   import Needle from "./needle.svelte";
   import TaskContainer from "./task-container.svelte";
   import Controls from "./controls.svelte";
-  import { hourSize, startHour } from "../../timeline-store";
+  import { hourSize, startHour } from "../../store/timeline-store";
 
   let userHoversOverScroller = false;
 

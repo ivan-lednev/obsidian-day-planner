@@ -1,10 +1,8 @@
 import { Plugin, TAbstractFile, Vault, WorkspaceLeaf } from "obsidian";
-import type { Editor } from "codemirror";
 import { DayPlannerSettingsTab } from "./settings-tab";
 import {
   DayPlannerSettings,
   DayPlannerMode,
-  NoteForDate,
   NoteForDateQuery,
 } from "./settings";
 import StatusBar from "./status-bar";
@@ -64,42 +62,15 @@ export default class DayPlanner extends Plugin {
     this.registerEvent(this.app.vault.on("modify", this.codeMirror, ""));
 
     this.addCommand({
-      id: "app:add-day-planner-to-note",
-      name: "Add a Day Planner template for today to the current note",
-      callback: () =>
-        this.modeGuard(
-          async () => await this.insertDayPlannerIntoCurrentNote(true),
-        ),
-      hotkeys: [],
-    });
-
-    this.addCommand({
-      id: "app:link-day-planner-to-note",
-      name: "Link today's Day Planner to the current note",
-      callback: () =>
-        this.modeGuard(
-          async () => await this.insertDayPlannerIntoCurrentNote(false),
-        ),
-      hotkeys: [],
-    });
-
-    this.addCommand({
-      id: "app:unlink-day-planner-from-note",
-      name: "Unlink today's Day Planner from its note",
-      callback: () => this.modeGuard(async () => await this.unlinkDayPlanner()),
-      hotkeys: [],
-    });
-
-    this.addCommand({
-      id: "app:show-day-planner-timeline",
+      id: "show-day-planner-timeline",
       name: "Show the Day Planner Timeline",
       callback: async () => await this.initLeaf(),
       hotkeys: [],
     });
 
     this.addCommand({
-      id: "app:show-day-planner-today-note",
-      name: "Show today's Day Planner",
+      id: "show-day-planner-today-note",
+      name: "Open today's Day Planner",
       callback: () =>
         this.app.workspace.openLinkText(
           this.file.getTodayPlannerFilePath(),
@@ -127,7 +98,7 @@ export default class DayPlanner extends Plugin {
             await this.plannerMD.updateDayPlannerMarkdown(planSummary);
             this.timelineView && this.timelineView.update(planSummary);
           } else if (
-            this.settings.mode == DayPlannerMode.Daily &&
+            this.settings.mode == DayPlannerMode.DAILY &&
             appHasDailyNotesPluginLoaded()
           ) {
             const planSummary = new PlanSummaryData([]);
@@ -162,44 +133,6 @@ export default class DayPlanner extends Plugin {
       return;
     } else {
       command();
-    }
-  }
-
-  async insertDayPlannerIntoCurrentNote(insertTemplate: boolean) {
-    try {
-      if (!this.settings.notesToDates) {
-        this.settings.notesToDates = [];
-        this.saveData(this.settings);
-      }
-
-      const view = this.app.workspace.activeLeaf.view;
-      const filePath = view.getState().file;
-      const dayPlannerExists = this.notesForDatesQuery.exists(
-        this.settings.notesToDates,
-      );
-      const activeDayPlannerPath = this.notesForDatesQuery.active(
-        this.settings.notesToDates,
-      )?.notePath;
-
-      if (dayPlannerExists && activeDayPlannerPath !== filePath) {
-        new Notification("Day Planner exists", {
-          silent: true,
-          body: `A Day Planner for today already exists in ${activeDayPlannerPath}`,
-        });
-        return;
-      }
-      if (!dayPlannerExists) {
-        this.settings.notesToDates = [];
-        this.settings.notesToDates.push(
-          new NoteForDate(filePath, new Date().toDateString()),
-        );
-        await this.saveData(this.settings);
-      }
-      if (insertTemplate) {
-        this.plannerMD.insertPlanner();
-      }
-    } catch (error) {
-      console.error(error);
     }
   }
 
