@@ -1,6 +1,7 @@
 import { timeRegExp } from "../regexp";
+import type { Moment } from "moment/moment";
 
-export function parseTimestamp(asText?: string) {
+export function parseTimestamp(asText?: string): Moment | null {
   if (!asText) {
     return null;
   }

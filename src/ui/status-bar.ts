@@ -192,14 +192,14 @@ export default class StatusBar {
     if (
       this.settings.showTaskNotification &&
       this.currentTime !== undefined &&
-      this.currentTime !== current.startTime.toUTCString()
+      this.currentTime !== current.startTime.toString()
     ) {
       new Notification(`Task started, ${currentTaskTimeAndText}`, {
         body: `${nextTask}: ${nextTaskText}`,
         requireInteraction: true,
       });
     }
-    this.currentTime = current.startTime.toUTCString();
+    this.currentTime = current.startTime.toString();
   }
 
   private ellipsis(input: string, limit: number) {
