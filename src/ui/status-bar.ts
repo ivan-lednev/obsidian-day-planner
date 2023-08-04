@@ -129,11 +129,6 @@ export default class StatusBar {
   }
 
   private progressBar(percentageComplete: number, current: PlanItem) {
-    if (current.isBreak) {
-      this.statusBarCurrentProgress.addClass("green");
-    } else {
-      this.statusBarCurrentProgress.removeClass("green");
-    }
     this.statusBarCurrentProgress.style.width = `${percentageComplete}%`;
     this.show(this.statusBarProgress);
   }

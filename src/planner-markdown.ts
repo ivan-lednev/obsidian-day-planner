@@ -3,7 +3,6 @@ import { DAY_PLANNER_DEFAULT_CONTENT } from "./constants";
 import type DayPlannerFile from "./file";
 import type Parser from "./parser";
 import type { PlanSummaryData } from "./plan/plan-summary-data";
-import type Progress from "./progress";
 import { DayPlannerSettings, NoteForDateQuery } from "./settings";
 import type { PlanItem } from "./plan/plan-item";
 
@@ -13,7 +12,6 @@ export default class PlannerMarkdown {
   settings: DayPlannerSettings;
   file: DayPlannerFile;
   parser: Parser;
-  progress: Progress;
   noteForDateQuery: NoteForDateQuery;
 
   constructor(
@@ -21,13 +19,11 @@ export default class PlannerMarkdown {
     settings: DayPlannerSettings,
     file: DayPlannerFile,
     parser: Parser,
-    progress: Progress,
   ) {
     this.workspace = workspace;
     this.settings = settings;
     this.file = file;
     this.parser = parser;
-    this.progress = progress;
     this.noteForDateQuery = new NoteForDateQuery();
   }
 
@@ -53,7 +49,7 @@ export default class PlannerMarkdown {
       "\n",
     );
 
-    return await this.parser.parseMarkdown(fileContents);
+    return this.parser.parseMarkdown(fileContents);
   }
 
   async updateDayPlannerMarkdown(planSummary: PlanSummaryData) {
