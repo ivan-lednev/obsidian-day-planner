@@ -9,7 +9,7 @@ const durationSeparator = `\\s*-{1,2}\\s*`;
 
 const hours = `\\d{1,2}`;
 const minutes = `\\d{2}`;
-const hourMinuteSeparator = `[:.]`;
+const hourMinuteSeparator = `[:. ]`;
 
 const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))?\\s*([ap]m)?`;
 

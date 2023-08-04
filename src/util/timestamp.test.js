@@ -4,6 +4,7 @@ it.each([
   ["13:00", { hours: 13, minutes: 0 }],
   ["13.00", { hours: 13, minutes: 0 }],
   ["1300", { hours: 13, minutes: 0 }],
+  ["13 00", { hours: 13, minutes: 0 }],
   ["13", { hours: 13, minutes: 0 }],
   ["3", { hours: 3, minutes: 0 }],
   ["0301", { hours: 3, minutes: 1 }],
