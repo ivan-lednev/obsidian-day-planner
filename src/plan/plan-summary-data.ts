@@ -19,7 +19,7 @@ export class PlanSummaryData {
   }
 
   updatePlanItemProps(): void {
-    const now = new Date();
+    const now = moment();
     if (this.items.length === 0) {
       this.empty = true;
       return;
@@ -27,8 +27,8 @@ export class PlanSummaryData {
     this.items.forEach((item, i) => {
       const next = this.items[i + 1];
       if (
-        item.startTime < now &&
-        (item.isEnd || (next && now < next.startTime))
+        item.startTime.isBefore(now) &&
+        (item.isEnd || (next && now.isBefore(next.startTime)))
       ) {
         this.current = item;
         if (item.isEnd) {
@@ -50,7 +50,7 @@ const defaultDurationMinutes = 30;
 
 function getDuration(item: PlanItem, next?: PlanItem) {
   if (item.endTime) {
-    return getDiffInMinutes(moment(item.startTime), moment(item.endTime));
+    return getDiffInMinutes(item.startTime, item.endTime);
   }
 
   if (next) {
