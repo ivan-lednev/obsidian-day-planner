@@ -11,7 +11,8 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:svelte/recommended"
+    "plugin:svelte/recommended",
+    "plugin:jest/recommended"
   ],
   "parserOptions": {
     "sourceType": "module",

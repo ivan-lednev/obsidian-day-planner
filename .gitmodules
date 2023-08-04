@@ -1,0 +1,3 @@
+[submodule "obsidian-metadata-utils"]
+	path = obsidian-metadata-utils
+	url = https://github.com/ivan-lednev/obsidian-metadata-utils.git
