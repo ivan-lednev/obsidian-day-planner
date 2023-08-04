@@ -1,6 +1,5 @@
 export class PlanItem {
   matchIndex: number;
-  charIndex: number;
   isCompleted: boolean;
   isPast: boolean;
   isBreak: boolean;
@@ -15,7 +14,6 @@ export class PlanItem {
 
   constructor(
     matchIndex: number,
-    charIndex: number,
     isCompleted: boolean,
     isBreak: boolean,
     isEnd: boolean,
@@ -27,7 +25,6 @@ export class PlanItem {
     raw: string
   ) {
     this.matchIndex = matchIndex;
-    this.charIndex = charIndex;
     this.isCompleted = isCompleted;
     this.isBreak = isBreak;
     this.isEnd = isEnd;

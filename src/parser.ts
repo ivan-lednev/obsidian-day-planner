@@ -65,7 +65,6 @@ export default class Parser {
 
       return this.planItemFactory.getPlanItem(
         match.index,
-        value.index,
         isCompleted,
         isBreak,
         isEnd,

@@ -11,7 +11,6 @@ export class PlanItemFactory {
 
   getPlanItem(
     matchIndex: number,
-    charIndex: number,
     isCompleted: boolean,
     isBreak: boolean,
     isEnd: boolean,
@@ -25,7 +24,6 @@ export class PlanItemFactory {
     const displayText = this.getDisplayText(isBreak, isEnd, text);
     return new PlanItem(
       matchIndex,
-      charIndex,
       isCompleted,
       isBreak,
       isEnd,
