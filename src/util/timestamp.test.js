@@ -9,7 +9,8 @@ it.each([
   ["0301", { hours: 3, minutes: 1 }],
   ["03", { hours: 3, minutes: 0 }],
   ["3pm", { hours: 15, minutes: 0 }],
+  ["11 pm ", { hours: 23, minutes: 0 }],
   ["0301pm", { hours: 15, minutes: 1 }],
 ])("Parses timestamp %s", (asText, object) => {
-  expect(parseTimestamp(asText)).toMatchObject(object);
+  expect(parseTimestamp(asText).toObject()).toMatchObject(object);
 });
