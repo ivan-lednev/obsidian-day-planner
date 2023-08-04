@@ -2,7 +2,6 @@ import { PLAN_PARSER_REGEX_CREATOR } from "./constants";
 import { PlanSummaryData } from "./plan/plan-summary-data";
 import type { DayPlannerSettings } from "./settings";
 import { PlanItemFactory } from "./plan/plan-item-factory";
-import type { PlanItem } from "./plan/plan-item";
 
 export default class Parser {
   private planItemFactory: PlanItemFactory;
@@ -17,68 +16,55 @@ export default class Parser {
   }
 
   async parseMarkdown(fileContent: string[]): Promise<PlanSummaryData> {
-    const parsed = this.parse(fileContent);
-    const transformed = this.transform(parsed);
-    return new PlanSummaryData(transformed);
+    return new PlanSummaryData(this.parse(fileContent));
   }
 
-  private parse(input: string[]): { index: number; value: RegExpExecArray }[] {
-    const matches: { index: number; value: RegExpExecArray }[] = [];
-    let match;
-    input.forEach((line, i) => {
-      while ((match = this.PLAN_PARSER_REGEX.exec(line))) {
-        matches.push({ index: i, value: match });
-      }
-    });
-    return matches;
-  }
+  private parse(input: string[]) {
+    return input
+      .map((line, index) => ({
+        matchArray: this.PLAN_PARSER_REGEX.exec(line),
+        index,
+      }))
+      .filter(({ matchArray }) => matchArray !== null)
+      .map(
+        ({
+          matchArray: {
+            groups: { completion, hours, minutes, endHours, endMinutes, text },
+          },
+          index,
+        }) => {
+          const isCompleted = completion?.trim().toLocaleLowerCase() === "x";
 
-  private transform(
-    regexMatches: { index: number; value: RegExpExecArray }[],
-  ): PlanItem[] {
-    return regexMatches.map((match) => {
-      const value = match.value;
-      const isCompleted = this.matchValue(value.groups.completion, "x");
-      const isBreak = value.groups.break !== undefined;
-      const isEnd = value.groups.end !== undefined;
-      const startTime = new Date();
-      startTime.setHours(parseInt(value.groups.hours));
-      startTime.setMinutes(parseInt(value.groups.minutes));
-      startTime.setSeconds(0);
+          const startTime = new Date();
+          const startTimeRaw = `${hours.padStart(2, "0")}:${minutes}`;
+          startTime.setHours(parseInt(hours));
+          startTime.setMinutes(parseInt(minutes));
+          startTime.setSeconds(0);
 
-      let endTimeRaw = "";
-      let endTime = new Date();
-      if (
-        value.groups.endHours !== undefined &&
-        value.groups.endMinutes !== undefined
-      ) {
-        endTime.setHours(parseInt(value.groups.endHours));
-        endTime.setMinutes(parseInt(value.groups.endMinutes));
-        endTime.setSeconds(0);
+          let endTime;
+          let endTimeRaw = "";
 
-        endTimeRaw = `${value.groups.endHours.padStart(2, "0")}:${
-          value.groups.endMinutes
-        }`;
-      } else {
-        endTime = undefined;
-      }
+          if (endHours && endMinutes) {
+            endTime = new Date();
+            endTime.setHours(parseInt(endHours));
+            endTime.setMinutes(parseInt(endMinutes));
+            endTime.setSeconds(0);
 
-      return this.planItemFactory.getPlanItem(
-        match.index,
-        isCompleted,
-        isBreak,
-        isEnd,
-        startTime,
-        endTime,
-        `${value.groups.hours.padStart(2, "0")}:${value.groups.minutes}`,
-        endTimeRaw,
-        value.groups.text?.trim(),
-        value[0],
+            endTimeRaw = `${endHours.padStart(2, "0")}:${endMinutes}`;
+          }
+
+          return this.planItemFactory.getPlanItem(
+            index,
+            isCompleted,
+            false,
+            false,
+            startTime,
+            endTime,
+            startTimeRaw,
+            endTimeRaw,
+            text?.trim(),
+          );
+        },
       );
-    });
-  }
-
-  private matchValue(input: any, match: string): boolean {
-    return input?.trim().toLocaleLowerCase() === match;
   }
 }

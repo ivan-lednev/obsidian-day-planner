@@ -91,7 +91,7 @@ export default class DayPlanner extends Plugin {
       window.setInterval(async () => {
         if (await this.file.hasTodayNote()) {
           const planSummary = await this.plannerMD.parseDayPlanner();
-          planSummary.calculatePlanItemProps();
+          planSummary.updatePlanItemProps();
           await this.statusBar.refreshStatusBar(planSummary);
           await this.plannerMD.updateDayPlannerMarkdown(planSummary);
           this.timelineView?.update(planSummary);

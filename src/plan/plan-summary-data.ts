@@ -18,7 +18,7 @@ export class PlanSummaryData {
     this.past = [];
   }
 
-  calculatePlanItemProps(): void {
+  updatePlanItemProps(): void {
     const now = new Date();
     if (this.items.length === 0) {
       this.empty = true;

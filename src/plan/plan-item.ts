@@ -10,7 +10,6 @@ export class PlanItem {
   rawStartTime: string;
   rawEndTime: string;
   text: string;
-  raw: string;
 
   constructor(
     matchIndex: number,
@@ -22,7 +21,6 @@ export class PlanItem {
     rawStartTime: string,
     rawEndTime: string,
     text: string,
-    raw: string
   ) {
     this.matchIndex = matchIndex;
     this.isCompleted = isCompleted;
@@ -33,6 +31,5 @@ export class PlanItem {
     this.rawStartTime = rawStartTime;
     this.rawEndTime = rawEndTime;
     this.text = text;
-    this.raw = raw;
   }
 }

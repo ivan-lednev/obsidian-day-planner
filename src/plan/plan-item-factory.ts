@@ -19,7 +19,6 @@ export class PlanItemFactory {
     rawStartTime: string,
     rawEndTime: string,
     text: string,
-    raw: string
   ) {
     const displayText = this.getDisplayText(isBreak, isEnd, text);
     return new PlanItem(
@@ -32,7 +31,6 @@ export class PlanItemFactory {
       rawStartTime,
       rawEndTime,
       displayText,
-      raw
     );
   }
 
