@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getYCoords, zoomLevel } from "../../store/timeline-store";
   import { computeAutoHeight, doesContentOverflow } from "../../util/height";
+  import { fade } from "svelte/transition";
 
   export let text;
   export let startMinutes;
@@ -31,6 +32,7 @@
 <div
   bind:this={el}
   class="task absolute-stretch-x"
+  transition:fade={{ duration: 100 }}
   style:height
   style:transform
   style:z-index={zIndex}
