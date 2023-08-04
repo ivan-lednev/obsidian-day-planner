@@ -1,29 +1,22 @@
 import type { MarkdownView, Workspace } from "obsidian";
 import { DAY_PLANNER_DEFAULT_CONTENT } from "./constants";
 import type DayPlannerFile from "./file";
-import type Parser from "./parser";
-import type { PlanSummaryData } from "./plan/plan-summary-data";
+import { PlanSummaryData } from "./plan/plan-summary-data";
 import { DayPlannerSettings, NoteForDateQuery } from "./settings";
 import type { PlanItem } from "./plan/plan-item";
+import { parsePlanItems } from "./parser/parser";
+import type { MetadataCache } from "obsidian";
 
 export default class PlannerMarkdown {
-  workspace: Workspace;
   dayPlannerLastEdit: number;
-  settings: DayPlannerSettings;
-  file: DayPlannerFile;
-  parser: Parser;
   noteForDateQuery: NoteForDateQuery;
 
   constructor(
-    workspace: Workspace,
-    settings: DayPlannerSettings,
-    file: DayPlannerFile,
-    parser: Parser,
+    private readonly workspace: Workspace,
+    private readonly metadataCache: MetadataCache,
+    private readonly settings: DayPlannerSettings,
+    private readonly file: DayPlannerFile,
   ) {
-    this.workspace = workspace;
-    this.settings = settings;
-    this.file = file;
-    this.parser = parser;
     this.noteForDateQuery = new NoteForDateQuery();
   }
 
@@ -45,11 +38,14 @@ export default class PlannerMarkdown {
 
   async parseDayPlanner(): Promise<PlanSummaryData> {
     const filePath = this.file.getTodayPlannerFilePath();
-    const fileContents = (await this.file.getPlannerContents(filePath)).split(
-      "\n",
+    const fileContents = await this.file.getPlannerContents(filePath);
+    const metadata = this.metadataCache.getFileCache(
+      this.metadataCache.getFirstLinkpathDest(filePath, ""),
     );
 
-    return this.parser.parseMarkdown(fileContents);
+    return new PlanSummaryData(
+      parsePlanItems(fileContents, metadata, this.settings.plannerHeading),
+    );
   }
 
   async updateDayPlannerMarkdown(planSummary: PlanSummaryData) {

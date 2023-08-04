@@ -8,7 +8,6 @@ import StatusBar from "./ui/status-bar";
 import Progress from "./progress";
 import PlannerMarkdown from "./planner-markdown";
 import DayPlannerFile from "./file";
-import Parser from "./parser";
 import { VIEW_TYPE_TIMELINE } from "./constants";
 import TimelineView from "./ui/timeline-view";
 import { PlanSummaryData } from "./plan/plan-summary-data";
@@ -33,12 +32,11 @@ export default class DayPlanner extends Plugin {
     this.notesForDatesQuery = new NoteForDateQuery();
     this.file = new DayPlannerFile(this.vault, this.settings);
     const progress = new Progress();
-    const parser = new Parser();
     this.plannerMD = new PlannerMarkdown(
       this.app.workspace,
+      this.app.metadataCache,
       this.settings,
       this.file,
-      parser,
     );
     this.statusBar = new StatusBar(
       this.settings,
@@ -47,9 +45,9 @@ export default class DayPlanner extends Plugin {
       progress,
       new PlannerMarkdown(
         this.app.workspace,
+        this.app.metadataCache,
         this.settings,
         this.file,
-        parser,
       ),
       this.file,
     );
