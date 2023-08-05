@@ -25,22 +25,18 @@
   });
 </script>
 
-<div class="needle absolute-stretch-x" style:transform="translateY({coords}px)" bind:this={el}>
-  <div class="bullet"></div>
-</div>
+<div
+  class="needle absolute-stretch-x"
+  style:transform="translateY({coords}px)"
+  bind:this={el}
+></div>
 
 <style>
   .needle {
-    height: 2px;
+    z-index: 2;
+    height: 4px;
     background-color: var(--color-accent);
-  }
-
-  .bullet {
-    position: absolute;
-    top: -4px;
-    left: -4px;
-
-    border: 5px solid var(--color-accent);
-    border-radius: 50%;
+    border-top: 1px solid var(--background-modifier-border);
+    border-bottom: 1px solid var(--background-modifier-border);
   }
 </style>

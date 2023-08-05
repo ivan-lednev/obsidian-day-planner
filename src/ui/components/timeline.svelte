@@ -34,7 +34,12 @@
         <TaskContainer />
       </div>
       {#each visibleHours as hour}
-        <div class="time-grid-block" style:height="{$hourSize}px"></div>
+        <div class="time-grid-block" style:height="{$hourSize}px">
+          <div
+            class="half-hour-separator"
+            style:height="{$hourSize / 2}px"
+          ></div>
+        </div>
       {/each}
     </div>
   </div>
@@ -59,6 +64,10 @@
     flex-grow: 1;
     flex-shrink: 0;
     border-left: 1px solid var(--background-modifier-border);
+  }
+
+  .half-hour-separator {
+    border-bottom: 1px dashed var(--background-modifier-border);
   }
 
   /* TODO: this selector is a lame workaround for task container which is absolutely positioned */
