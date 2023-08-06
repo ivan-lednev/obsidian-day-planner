@@ -4,7 +4,7 @@
 </script>
 
 <div class="task-container absolute-stretch-x">
-  {#each $tasks as taskProps}
+  {#each $tasks as taskProps (taskProps.startMinutes)}
     <Task {...taskProps} />
   {/each}
 </div>
