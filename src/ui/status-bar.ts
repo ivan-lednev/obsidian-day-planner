@@ -5,6 +5,11 @@ import type PlannerMarkdown from "../planner-markdown";
 import type Progress from "../progress";
 import type { DayPlannerSettings } from "../settings";
 import type { PlanItem } from "../plan/plan-item";
+import {
+  getDiffInMinutes,
+  getMinutesSinceMidnight,
+  getMinutesSinceMidnightTo,
+} from "../util/moment";
 
 export default class StatusBar {
   private statusBarText: HTMLSpanElement;
@@ -60,29 +65,49 @@ export default class StatusBar {
 
   async refreshStatusBar(planSummary: PlanSummaryData) {
     if (!planSummary.empty && !planSummary.invalid) {
-      this.updateProgress(planSummary.current, planSummary.next);
+      this.updateProgress(planSummary);
       this.containerEl.show();
     } else {
       this.containerEl.hide();
     }
   }
 
-  hideProgress() {
+  private hideProgress() {
     this.statusBarProgress.hide();
     this.circle.hide();
     this.nextText.hide();
   }
 
-  private updateProgress(current: PlanItem, next: PlanItem) {
-    if (!current || !next || current.isEnd) {
+  private updateProgress(planSummary: PlanSummaryData) {
+    const now = window.moment();
+
+    const currentItemIndex = planSummary.items.findIndex(
+      (item) => item.startTime.isBefore(now) && item.endTime.isAfter(now),
+    );
+    if (currentItemIndex < 0) {
       this.hideProgress();
       this.statusBarText.innerText = this.settings.endLabel;
       return;
     }
-    const { percentageComplete, minsUntilNext } = this.progress.getProgress(
-      current,
-      next,
-    );
+
+    const currentItem = planSummary.items[currentItemIndex];
+    const nextItem = planSummary.items[currentItemIndex + 1];
+
+    const minutesFromStart = getDiffInMinutes(currentItem.startTime, now);
+    const percentageComplete =
+      minutesFromStart / (currentItem.durationMins / 100);
+
+    this.updateStatusBarText(currentItem, nextItem);
+
+    if (nextItem) {
+      this.setStatusText(
+        getDiffInMinutes(now, nextItem.startTime),
+        currentItem,
+        nextItem,
+        percentageComplete,
+      );
+    }
+
     if (this.settings.circularProgress) {
       this.statusBarProgress.hide();
       this.progressCircle(percentageComplete);
@@ -90,7 +115,6 @@ export default class StatusBar {
       this.circle.hide();
       this.progressBar(percentageComplete);
     }
-    this.statusText(minsUntilNext, current, next, percentageComplete);
   }
 
   private progressBar(percentageComplete: number) {
@@ -103,40 +127,60 @@ export default class StatusBar {
     this.circle.show();
   }
 
-  private statusText(
-    minsUntilNext: string,
+  private setStatusText(
+    minsUntilNext: number,
     current: PlanItem,
     next: PlanItem,
     percentageComplete: number,
   ) {
-    minsUntilNext = minsUntilNext === "0" ? "1" : minsUntilNext;
-    const minsText = `${minsUntilNext} min${minsUntilNext === "1" ? "" : "s"}`;
-    if (this.settings.nowAndNextInStatusBar) {
-      this.statusBarText.innerHTML = `<strong>Now</strong> ${
-        current.rawStartTime
-      } ${this.ellipsis(current.text, 10)}`;
-      this.nextText.innerHTML = `<strong>Next</strong> ${
-        next.rawStartTime
-      } ${this.ellipsis(next.text, 10)}`;
-      this.nextText.show();
-    } else {
-      this.nextText.hide();
-      this.statusBarText.innerText = `${minsText} left`;
-    }
-    const currentTaskStatus = `Current Task (${percentageComplete.toFixed(
-      0,
-    )}% complete)`;
+    const minsUntilNextText = minsUntilNext === 0 ? "1" : minsUntilNext;
+    const minsText = `${minsUntilNextText} min${
+      minsUntilNextText === "1" ? "" : "s"
+    }`;
+
+    const percent = percentageComplete.toFixed(0);
+    const currentTaskStatus = `Current Task (${percent}% complete)`;
+
+    // todo: this is out of place
     const currentTaskTimeAndText = `${current.rawStartTime} ${current.text}`;
     const nextTask = `Next Task (in ${minsText})`;
     const nextTaskTimeAndText = `${next.rawStartTime} ${next.text}`;
-    this.cardCurrent.innerHTML = `<strong>${currentTaskStatus}</strong><br> ${currentTaskTimeAndText}`;
-    this.cardNext.innerHTML = `<strong>${nextTask}</strong><br> ${nextTaskTimeAndText}`;
+
+    this.cardCurrent.textContent = `${currentTaskStatus}: ${currentTaskTimeAndText}`;
+    this.cardNext.textContent = `${nextTask}: ${nextTaskTimeAndText}`;
+
+    // todo: this is out of place
     this.taskNotification(
       current,
       currentTaskTimeAndText,
       nextTask,
       nextTaskTimeAndText,
     );
+  }
+
+  private updateStatusBarText(currentItem: PlanItem, nextItem?: PlanItem) {
+    if (this.settings.nowAndNextInStatusBar) {
+      this.statusBarText.textContent = `Now: ${
+        currentItem.rawStartTime
+      } ${this.ellipsis(currentItem.text, 15)}`;
+
+      if (nextItem) {
+        this.nextText.textContent = `Next: ${
+          nextItem.rawStartTime
+        } ${this.ellipsis(nextItem.text, 15)}`;
+
+        this.nextText.show();
+      }
+
+      this.nextText.hide();
+    } else {
+      this.nextText.hide();
+      const minutesLeft = getDiffInMinutes(
+        currentItem.endTime,
+        window.moment(),
+      );
+      this.statusBarText.textContent = `Minutes left: ${minutesLeft}`;
+    }
   }
 
   private taskNotification(
@@ -158,6 +202,7 @@ export default class StatusBar {
     this.currentTime = current.startTime.toString();
   }
 
+  // todo: this doesn't belong to the class
   private ellipsis(input: string, limit: number) {
     if (input.length <= limit) {
       return input;

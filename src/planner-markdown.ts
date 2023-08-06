@@ -56,7 +56,7 @@ export default class PlannerMarkdown {
     const fileContents = await this.file.getPlannerContents(filePath);
     const fileContentsArr = fileContents.split("\n");
 
-    planSummary.updatePlanItemProps();
+    planSummary.calculatePlanItemProps();
     if (planSummary.empty) {
       return;
     }
