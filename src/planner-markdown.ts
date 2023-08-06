@@ -71,16 +71,4 @@ export default class PlannerMarkdown {
   private check(check: boolean) {
     return check ? "x" : " ";
   }
-
-  checkIsDayPlannerEditing() {
-    // TODO: replace deprecated code
-    const activeLeaf = this.workspace.activeLeaf;
-    if (!activeLeaf) {
-      return;
-    }
-    const viewState = activeLeaf.view.getState();
-    if (viewState.file === this.file.getTodayPlannerFilePath()) {
-      this.dayPlannerLastEdit = new Date().getTime();
-    }
-  }
 }

@@ -1,12 +1,13 @@
-import { Plugin, Vault, WorkspaceLeaf } from "obsidian";
+import { MarkdownView, Plugin, Vault, WorkspaceLeaf } from "obsidian";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
-import { DayPlannerSettings, NoteForDateQuery } from "./settings";
+import { DayPlannerSettings } from "./settings";
 import StatusBar from "./ui/status-bar";
 import PlannerMarkdown from "./planner-markdown";
 import DayPlannerFile from "./file";
 import { VIEW_TYPE_TIMELINE } from "./constants";
 import TimelineView from "./ui/timeline-view";
 import { PlanSummaryData } from "./plan/plan-summary-data";
+import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
@@ -51,11 +52,9 @@ export default class DayPlanner extends Plugin {
       id: "show-day-planner-today-note",
       name: "Open today's Day Planner",
       callback: () =>
-        this.app.workspace.openLinkText(
-          this.file.getTodayPlannerFilePath(),
-          "",
-          true,
-        ),
+        this.app.workspace
+          .getLeaf(false)
+          .openFile(getDailyNote(window.moment(), getAllDailyNotes())),
     });
 
     this.addCommand({
@@ -106,7 +105,7 @@ export default class DayPlanner extends Plugin {
   }
 
   private async initLeaf() {
-    this.detachTimelineLeaves()
+    this.detachTimelineLeaves();
     await this.app.workspace.getRightLeaf(false).setViewState({
       type: VIEW_TYPE_TIMELINE,
       active: true,
@@ -120,6 +119,6 @@ export default class DayPlanner extends Plugin {
   }
 
   onunload() {
-    this.detachTimelineLeaves()
+    this.detachTimelineLeaves();
   }
 }
