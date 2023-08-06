@@ -8,8 +8,6 @@ import DayPlannerFile from "./file";
 import { VIEW_TYPE_TIMELINE } from "./constants";
 import TimelineView from "./ui/timeline-view";
 import { PlanSummaryData } from "./plan/plan-summary-data";
-import { appHasDailyNotesPluginLoaded } from "obsidian-daily-notes-interface";
-import { DayPlannerMode } from "./types";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
@@ -18,7 +16,6 @@ export default class DayPlanner extends Plugin {
   plannerMD: PlannerMarkdown;
   statusBar: StatusBar;
   notesForDatesQuery: NoteForDateQuery;
-  timelineView: TimelineView;
 
   async onload() {
     this.vault = this.app.vault;
@@ -49,9 +46,6 @@ export default class DayPlanner extends Plugin {
       this.file,
     );
 
-    // todo: trigger on metadataCacheUpdate
-    this.registerEvent(this.app.vault.on("modify", this.codeMirror, ""));
-
     this.addCommand({
       id: "show-day-planner-timeline",
       name: "Show the Day Planner Timeline",
@@ -78,35 +72,33 @@ export default class DayPlanner extends Plugin {
 
     this.registerView(
       VIEW_TYPE_TIMELINE,
-      // todo: this is a bad idea, use getViewOfType()
-      (leaf: WorkspaceLeaf) =>
-        (this.timelineView = new TimelineView(leaf, this.settings, this)),
+      (leaf: WorkspaceLeaf) => new TimelineView(leaf, this.settings, this),
     );
 
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
 
     this.registerInterval(
-      // todo: most of it should not be updated with a timer
       window.setInterval(async () => {
-        // todo: clean this up
         if (await this.file.hasTodayNote()) {
           const planSummary = await this.plannerMD.parseDayPlanner();
           planSummary.calculatePlanItemProps();
-          await this.statusBar.refreshStatusBar(planSummary);
           await this.plannerMD.updateDayPlannerMarkdown(planSummary);
-          this.timelineView?.update(planSummary);
-        } else if (
-          this.settings.mode == DayPlannerMode.DAILY &&
-          appHasDailyNotesPluginLoaded()
-        ) {
-          const planSummary = new PlanSummaryData([]);
           await this.statusBar.refreshStatusBar(planSummary);
-          this.timelineView && this.timelineView.update(planSummary);
-        } else {
-          // console.log('No active note, skipping file processing')
+
+          this.updateTimelineView(planSummary);
         }
       }, 2000),
     );
+  }
+
+  private updateTimelineView(planSummary: PlanSummaryData) {
+    this.app.workspace
+      .getLeavesOfType(VIEW_TYPE_TIMELINE)
+      .forEach(({ view }) => {
+        if (view instanceof TimelineView) {
+          view.update(planSummary);
+        }
+      });
   }
 
   private createPlannerHeading() {
@@ -118,29 +110,21 @@ export default class DayPlanner extends Plugin {
 `;
   }
 
-  async initLeaf() {
-    if (this.app.workspace.getLeavesOfType(VIEW_TYPE_TIMELINE).length > 0) {
-      return;
-    }
+  private async initLeaf() {
+    this.detachTimelineLeaves()
     await this.app.workspace.getRightLeaf(false).setViewState({
       type: VIEW_TYPE_TIMELINE,
       active: true,
     });
   }
 
-  codeMirror = (file: TAbstractFile) => {
-    if (this.file.hasTodayNote()) {
-      // console.log('Active note found, starting CodeMirror monitoring')
-      this.plannerMD.checkIsDayPlannerEditing();
-    } else {
-      // console.log('No active note, skipping CodeMirror monitoring')
-    }
-  };
-
-  onunload() {
-    console.log("Unloading Day Planner plugin");
+  private detachTimelineLeaves() {
     this.app.workspace
       .getLeavesOfType(VIEW_TYPE_TIMELINE)
       .forEach((leaf) => leaf.detach());
+  }
+
+  onunload() {
+    this.detachTimelineLeaves()
   }
 }

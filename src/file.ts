@@ -26,7 +26,7 @@ export default class DayPlannerFile {
 
   async hasTodayNote(): Promise<boolean> {
     if (
-      this.settings.mode == DayPlannerMode.DAILY &&
+      this.settings.mode === DayPlannerMode.DAILY &&
       appHasDailyNotesPluginLoaded()
     ) {
       const date = new Date();
@@ -82,7 +82,6 @@ export default class DayPlannerFile {
 
   async updateFile(fileName: string, fileContents: string) {
     await this.prepareFile();
-    // todo: do not use adapter
     return await this.vault.adapter.write(
       normalizePath(fileName),
       fileContents,

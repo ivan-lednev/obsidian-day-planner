@@ -5,11 +5,7 @@ import type PlannerMarkdown from "../planner-markdown";
 import type Progress from "../progress";
 import type { DayPlannerSettings } from "../settings";
 import type { PlanItem } from "../plan/plan-item";
-import {
-  getDiffInMinutes,
-  getMinutesSinceMidnight,
-  getMinutesSinceMidnightTo,
-} from "../util/moment";
+import { getDiffInMinutes } from "../util/moment";
 
 export default class StatusBar {
   private statusBarText: HTMLSpanElement;
