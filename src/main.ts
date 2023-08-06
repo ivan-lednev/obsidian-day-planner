@@ -1,9 +1,6 @@
 import { Plugin, TAbstractFile, Vault, WorkspaceLeaf } from "obsidian";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
-import {
-  DayPlannerSettings,
-  NoteForDateQuery,
-} from "./settings";
+import { DayPlannerSettings, NoteForDateQuery } from "./settings";
 import StatusBar from "./ui/status-bar";
 import Progress from "./progress";
 import PlannerMarkdown from "./planner-markdown";
@@ -59,7 +56,6 @@ export default class DayPlanner extends Plugin {
       id: "show-day-planner-timeline",
       name: "Show the Day Planner Timeline",
       callback: async () => await this.initLeaf(),
-      hotkeys: [],
     });
 
     this.addCommand({
@@ -71,11 +67,18 @@ export default class DayPlanner extends Plugin {
           "",
           true,
         ),
-      hotkeys: [],
+    });
+
+    this.addCommand({
+      id: "insert-planner-heading-at-cursor",
+      name: "Insert Planner Heading at Cursor",
+      editorCallback: (editor) =>
+        editor.replaceSelection(this.createPlannerHeading()),
     });
 
     this.registerView(
       VIEW_TYPE_TIMELINE,
+      // todo: this is a bad idea, use getViewOfType()
       (leaf: WorkspaceLeaf) =>
         (this.timelineView = new TimelineView(leaf, this.settings, this)),
     );
@@ -102,6 +105,15 @@ export default class DayPlanner extends Plugin {
         }
       }, 2000),
     );
+  }
+
+  private createPlannerHeading() {
+    const headingTokens = "#".repeat(this.settings.plannerHeadingLevel);
+
+    return `${headingTokens} ${this.settings.plannerHeading}
+
+- 
+`;
   }
 
   async initLeaf() {
