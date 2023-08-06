@@ -53,12 +53,20 @@ export class StatusBar {
   }
 
   async refreshStatusBar(planSummary: PlanSummaryData) {
+    this.containerEl.show();
     if (!planSummary.empty && !planSummary.invalid) {
       this.updateProgress(planSummary);
-      this.containerEl.show();
     } else {
-      this.containerEl.hide();
+      this.setEmpty();
     }
+  }
+
+  setEmpty() {
+    this.setText("No plan for today");
+  }
+
+  setText(text: string) {
+    this.statusBarText.textContent = text;
   }
 
   private hideProgress() {
@@ -203,6 +211,7 @@ export class StatusBar {
     this.statusBarProgress = this.containerEl.createEl("div", {
       cls: ["status-bar-item-segment", "day-planner-progress-bar"],
     });
+    this.statusBarProgress.hide();
     this.statusBarCurrentProgress = this.statusBarProgress.createEl("div", {
       cls: "day-planner-progress-value",
     });

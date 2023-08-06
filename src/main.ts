@@ -1,4 +1,4 @@
-import { Plugin, Vault, WorkspaceLeaf } from "obsidian";
+import { Notice, Plugin, Vault, WorkspaceLeaf } from "obsidian";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { DayPlannerSettings } from "./settings";
 import { VIEW_TYPE_TIMELINE } from "./constants";
@@ -57,19 +57,26 @@ export default class DayPlanner extends Plugin {
 
     this.registerInterval(
       window.setInterval(async () => {
-        if (dailyNoteExists()) {
+        try {
           await this.updateUI();
+        } catch (error) {
+          this.statusBar.setText(`⚠️ Planner update failed (see console)`);
+          console.error(error);
         }
-      }, 2000),
+      }, 5000),
     );
   }
 
   private async updateUI() {
-    const planSummary = await this.getPlanSummary();
+    if (dailyNoteExists()) {
+      const planSummary = await this.getPlanSummary();
 
-    await this.statusBar.refreshStatusBar(planSummary);
+      await this.statusBar.refreshStatusBar(planSummary);
 
-    this.updateTimelineView(planSummary);
+      this.updateTimelineView(planSummary);
+    } else {
+      this.statusBar.setEmpty();
+    }
   }
 
   private async getPlanSummary() {

@@ -22,7 +22,7 @@ export function parsePlanItems(
   const planHeading = headings[planHeadingIndex];
   const nextHeading = headings[planHeadingIndex + 1];
 
-  const listItemsUnderPlan = metadata.listItems.filter((li) => {
+  const listItemsUnderPlan = metadata?.listItems.filter((li) => {
     const isBelowPlan =
       li.position.start.line > planHeading.position.start.line;
 
