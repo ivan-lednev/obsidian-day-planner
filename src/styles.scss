@@ -1,0 +1,97 @@
+@use "../vendor/progress_pie_scss";
+
+.day-planner {
+  position: relative;
+}
+
+.day-planner .status-bar-item-segment:hover {
+  cursor: pointer;
+}
+
+.day-planner-progress-bar {
+  align-self: stretch;
+  display: flex;
+  align-items: stretch;
+  min-width: 100px;
+
+  background-color: var(--text-faint);
+  border-radius: var(--radius-s);
+  overflow: hidden;
+}
+
+.day-planner-progress-value {
+  background-color: var(--color-accent);
+}
+
+.day-planner-progress-value.green, .day-planner .progress-pie.green::before {
+  background-color: #4CAF50;
+}
+
+.day-planner .progress-pie.green {
+  background-image: linear-gradient(to right, transparent 50%, #4CAF50 0)
+}
+
+.day-planner-status-bar-text {
+  float: left;
+  margin-right: 10px;
+}
+
+.day-planner-status-card {
+  position: absolute;
+  top: -140px;
+
+  display: none;
+
+  width: 300px;
+  padding: 8px;
+
+  background-color: var(--background-secondary-alt);
+  border-radius: 4px;
+}
+
+.day-planner-status-card .arrow-down {
+  position: absolute;
+
+  width: 20px;
+
+  border-top: 20px solid var(--background-secondary-alt);
+  border-right: 20px solid transparent;
+  border-left: 20px solid transparent;
+}
+
+.progress-pie.day-planner {
+  float: left;
+  display: none;
+
+  width: 20px;
+  height: 20px;
+  margin: 0.3px 10px 0.3px 0;
+
+  background-color: var(--text-muted);
+}
+
+.progress-pie.day-planner::after {
+  width: 80%;
+  height: 80%;
+}
+
+.progress-pie.day-planner::after {
+  font-size: 8px;
+  font-weight: 900;
+  line-height: 13px;
+  color: transparent;
+
+  background-color: transparent;
+}
+
+[data-type="timeline"] .view-content {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.absolute-stretch-x {
+  position: absolute;
+  right: 0;
+  left: 0;
+}
