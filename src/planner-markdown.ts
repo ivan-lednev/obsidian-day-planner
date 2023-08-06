@@ -1,5 +1,4 @@
 import type { MarkdownView, Workspace } from "obsidian";
-import { DAY_PLANNER_DEFAULT_CONTENT } from "./constants";
 import type DayPlannerFile from "./file";
 import { PlanSummaryData } from "./plan/plan-summary-data";
 import { DayPlannerSettings, NoteForDateQuery } from "./settings";
@@ -18,22 +17,6 @@ export default class PlannerMarkdown {
     private readonly file: DayPlannerFile,
   ) {
     this.noteForDateQuery = new NoteForDateQuery();
-  }
-
-  // todo: remove once we fix 'open planner' command
-  async insertPlanner() {
-    const filePath = this.file.getTodayPlannerFilePath();
-    const fileContents = (await this.file.getPlannerContents(filePath)).split(
-      "\n",
-    );
-    const view = this.workspace.activeLeaf.view as MarkdownView;
-    const currentLine = view.editor.getCursor().line;
-    const insertResult = [
-      ...fileContents.slice(0, currentLine),
-      ...DAY_PLANNER_DEFAULT_CONTENT.split("\n"),
-      ...fileContents.slice(currentLine),
-    ];
-    await this.file.updateFile(filePath, insertResult.join("\n"));
   }
 
   async parseDayPlanner(): Promise<PlanSummaryData> {

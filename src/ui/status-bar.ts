@@ -2,7 +2,6 @@ import type { Workspace } from "obsidian";
 import type DayPlannerFile from "../file";
 import type { PlanSummaryData } from "../plan/plan-summary-data";
 import type PlannerMarkdown from "../planner-markdown";
-import type Progress from "../progress";
 import type { DayPlannerSettings } from "../settings";
 import type { PlanItem } from "../plan/plan-item";
 import { getDiffInMinutes } from "../util/moment";
@@ -22,7 +21,6 @@ export default class StatusBar {
     private readonly settings: DayPlannerSettings,
     private readonly containerEl: HTMLElement,
     private readonly workspace: Workspace,
-    private readonly progress: Progress,
     private readonly plannerMD: PlannerMarkdown,
     private readonly file: DayPlannerFile,
   ) {

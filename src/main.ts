@@ -1,8 +1,7 @@
-import { Plugin, TAbstractFile, Vault, WorkspaceLeaf } from "obsidian";
+import { Plugin, Vault, WorkspaceLeaf } from "obsidian";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { DayPlannerSettings, NoteForDateQuery } from "./settings";
 import StatusBar from "./ui/status-bar";
-import Progress from "./progress";
 import PlannerMarkdown from "./planner-markdown";
 import DayPlannerFile from "./file";
 import { VIEW_TYPE_TIMELINE } from "./constants";
@@ -13,9 +12,8 @@ export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
   vault: Vault;
   file: DayPlannerFile;
-  plannerMD: PlannerMarkdown;
+  plannerMarkdown: PlannerMarkdown;
   statusBar: StatusBar;
-  notesForDatesQuery: NoteForDateQuery;
 
   async onload() {
     this.vault = this.app.vault;
@@ -23,10 +21,8 @@ export default class DayPlanner extends Plugin {
       new DayPlannerSettings(),
       await this.loadData(),
     );
-    this.notesForDatesQuery = new NoteForDateQuery();
     this.file = new DayPlannerFile(this.vault, this.settings);
-    const progress = new Progress();
-    this.plannerMD = new PlannerMarkdown(
+    this.plannerMarkdown = new PlannerMarkdown(
       this.app.workspace,
       this.app.metadataCache,
       this.settings,
@@ -36,7 +32,6 @@ export default class DayPlanner extends Plugin {
       this.settings,
       this.addStatusBarItem(),
       this.app.workspace,
-      progress,
       new PlannerMarkdown(
         this.app.workspace,
         this.app.metadataCache,
@@ -80,9 +75,9 @@ export default class DayPlanner extends Plugin {
     this.registerInterval(
       window.setInterval(async () => {
         if (await this.file.hasTodayNote()) {
-          const planSummary = await this.plannerMD.parseDayPlanner();
+          const planSummary = await this.plannerMarkdown.parseDayPlanner();
           planSummary.calculatePlanItemProps();
-          await this.plannerMD.updateDayPlannerMarkdown(planSummary);
+          await this.plannerMarkdown.updateDayPlannerMarkdown(planSummary);
           await this.statusBar.refreshStatusBar(planSummary);
 
           this.updateTimelineView(planSummary);
