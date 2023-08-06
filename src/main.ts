@@ -52,7 +52,6 @@ export default class DayPlanner extends Plugin {
       this.file,
     );
 
-    this.statusBar.initStatusBar();
     // todo: trigger on metadataCacheUpdate
     this.registerEvent(this.app.vault.on("modify", this.codeMirror, ""));
 

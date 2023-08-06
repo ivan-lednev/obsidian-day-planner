@@ -7,26 +7,18 @@
 }
 
 .day-planner-progress-bar {
-  float: left;
-  display: none;
+  align-self: stretch;
+  display: flex;
+  align-items: stretch;
+  min-width: 100px;
 
-  min-width: 80px;
-  height: 16px;
-  margin-top: 2px;
-
-  background-color: var(--text-muted);
-  border-radius: 4px;
+  background-color: var(--text-faint);
+  border-radius: var(--radius-s);
+  overflow: hidden;
 }
 
 .day-planner-progress-value {
-  display: inline-block;
-
-  height: 16px;
-
-  background-color: var(--interactive-accent);
-  border-radius: 4px;
-
-  transition: 0.3s all linear;
+  background-color: var(--color-accent);
 }
 
 .day-planner-progress-value.green, .day-planner .progress-pie.green::before {

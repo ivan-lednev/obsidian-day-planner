@@ -1,111 +1,76 @@
 import type { Workspace } from "obsidian";
 import type DayPlannerFile from "../file";
 import type { PlanSummaryData } from "../plan/plan-summary-data";
-import type PlannerMarkdown from "../planner-md";
+import type PlannerMarkdown from "../planner-markdown";
 import type Progress from "../progress";
 import type { DayPlannerSettings } from "../settings";
 import type { PlanItem } from "../plan/plan-item";
 
 export default class StatusBar {
-  settings: DayPlannerSettings;
-  file: DayPlannerFile;
-  statusBar: HTMLElement;
-  statusBarAdded: boolean;
-  statusBarText: HTMLSpanElement;
-  nextText: HTMLSpanElement;
-  statusBarProgress: HTMLDivElement;
-  statusBarCurrentProgress: HTMLDivElement;
-  circle: HTMLDivElement;
-  workspace: Workspace;
-  progress: Progress;
-  plannerMD: PlannerMarkdown;
-  card: HTMLDivElement;
-  cardCurrent: any;
-  cardNext: any;
-  currentTime: string;
+  private statusBarText: HTMLSpanElement;
+  private nextText: HTMLSpanElement;
+  private statusBarProgress: HTMLDivElement;
+  private statusBarCurrentProgress: HTMLDivElement;
+  private circle: HTMLDivElement;
+  private card: HTMLDivElement;
+  private cardCurrent: HTMLSpanElement;
+  private cardNext: HTMLSpanElement;
+  private currentTime: string;
 
   constructor(
-    settings: DayPlannerSettings,
-    statusBar: HTMLElement,
-    workspace: Workspace,
-    progress: Progress,
-    plannerMD: PlannerMarkdown,
-    file: DayPlannerFile,
+    private readonly settings: DayPlannerSettings,
+    private readonly containerEl: HTMLElement,
+    private readonly workspace: Workspace,
+    private readonly progress: Progress,
+    private readonly plannerMD: PlannerMarkdown,
+    private readonly file: DayPlannerFile,
   ) {
-    this.settings = settings;
-    this.statusBar = statusBar;
-    this.workspace = workspace;
-    this.progress = progress;
-    this.plannerMD = plannerMD;
-    this.file = file;
-  }
+    // todo: this is redundant
+    this.containerEl.addClass("day-planner");
 
-  initStatusBar() {
-    if (this.statusBarAdded) {
-      return;
-    }
-    let status = this.statusBar.createEl("div", {
-      cls: "day-planner",
-      title: "View the Day Planner",
-      prepend: true,
-    });
-
-    this.setupCard(status);
-    this.statusBarText = status.createEl("span", {
+    this.setupCard();
+    this.statusBarText = this.containerEl.createEl("span", {
       cls: ["status-bar-item-segment", "day-planner-status-bar-text"],
     });
 
-    this.setupCircularProgressBar(status);
-    this.setupHorizontalProgressBar(status);
+    this.setupCircularProgressBar();
+    this.setupHorizontalProgressBar();
 
-    this.nextText = status.createEl("span", {
+    this.nextText = this.containerEl.createEl("span", {
       cls: ["status-bar-item-segment", "day-planner-status-bar-text"],
     });
 
-    this.setupStatusBarEvents(status);
-    this.statusBarAdded = true;
+    this.setupStatusBarEvents();
   }
 
-  private setupStatusBarEvents(status: HTMLDivElement) {
-    status.onClickEvent(async (ev: any) => {
+  private setupStatusBarEvents() {
+    this.containerEl.onClickEvent(async () => {
       const fileName = this.file.getTodayPlannerFilePath();
-      this.workspace.openLinkText(fileName, "", false);
-    });
-    status.on("mouseenter", ".day-planner", () => {
-      this.show(this.card);
+      await this.workspace.openLinkText(fileName, "", false);
     });
 
-    status.on("mouseleave", ".day-planner", () => {
-      this.hide(this.card);
+    this.containerEl.on("mouseenter", ".day-planner", () => {
+      this.card.show();
+    });
+
+    this.containerEl.on("mouseleave", ".day-planner", () => {
+      this.card.hide();
     });
   }
 
   async refreshStatusBar(planSummary: PlanSummaryData) {
     if (!planSummary.empty && !planSummary.invalid) {
       this.updateProgress(planSummary.current, planSummary.next);
-      this.show(this.statusBar);
+      this.containerEl.show();
     } else {
-      this.hide(this.statusBar);
-    }
-    return planSummary;
-  }
-
-  hide(el: HTMLElement) {
-    if (el) {
-      el.style.display = "none";
-    }
-  }
-
-  show(el: HTMLElement) {
-    if (el) {
-      el.style.display = "block";
+      this.containerEl.hide();
     }
   }
 
   hideProgress() {
-    this.hide(this.statusBarProgress);
-    this.hide(this.circle);
-    this.hide(this.nextText);
+    this.statusBarProgress.hide();
+    this.circle.hide();
+    this.nextText.hide();
   }
 
   private updateProgress(current: PlanItem, next: PlanItem) {
@@ -119,28 +84,23 @@ export default class StatusBar {
       next,
     );
     if (this.settings.circularProgress) {
-      this.hide(this.statusBarProgress);
-      this.progressCircle(percentageComplete, current);
+      this.statusBarProgress.hide();
+      this.progressCircle(percentageComplete);
     } else {
-      this.hide(this.circle);
-      this.progressBar(percentageComplete, current);
+      this.circle.hide();
+      this.progressBar(percentageComplete);
     }
     this.statusText(minsUntilNext, current, next, percentageComplete);
   }
 
-  private progressBar(percentageComplete: number, current: PlanItem) {
+  private progressBar(percentageComplete: number) {
     this.statusBarCurrentProgress.style.width = `${percentageComplete}%`;
-    this.show(this.statusBarProgress);
+    this.statusBarProgress.show();
   }
 
-  private progressCircle(percentageComplete: number, current: PlanItem) {
-    if (current.isBreak) {
-      this.circle.addClass("green");
-    } else {
-      this.circle.removeClass("green");
-    }
+  private progressCircle(percentageComplete: number) {
     this.circle.setAttr("data-value", percentageComplete.toFixed(0));
-    this.show(this.circle);
+    this.circle.show();
   }
 
   private statusText(
@@ -151,7 +111,6 @@ export default class StatusBar {
   ) {
     minsUntilNext = minsUntilNext === "0" ? "1" : minsUntilNext;
     const minsText = `${minsUntilNext} min${minsUntilNext === "1" ? "" : "s"}`;
-    // TODO: do I need to add an end time here pjk
     if (this.settings.nowAndNextInStatusBar) {
       this.statusBarText.innerHTML = `<strong>Now</strong> ${
         current.rawStartTime
@@ -159,13 +118,10 @@ export default class StatusBar {
       this.nextText.innerHTML = `<strong>Next</strong> ${
         next.rawStartTime
       } ${this.ellipsis(next.text, 10)}`;
-      this.show(this.nextText);
+      this.nextText.show();
     } else {
-      this.hide(this.nextText);
-      const statusText = current.isBreak
-        ? `${this.settings.breakLabel} for ${minsText}`
-        : `${minsText} left`;
-      this.statusBarText.innerText = statusText;
+      this.nextText.hide();
+      this.statusBarText.innerText = `${minsText} left`;
     }
     const currentTaskStatus = `Current Task (${percentageComplete.toFixed(
       0,
@@ -209,28 +165,33 @@ export default class StatusBar {
     return input.substring(0, limit) + "...";
   }
 
-  private setupHorizontalProgressBar(status: HTMLDivElement) {
-    this.statusBarProgress = status.createEl("div", {
+  private setupHorizontalProgressBar() {
+    this.statusBarProgress = this.containerEl.createEl("div", {
       cls: ["status-bar-item-segment", "day-planner-progress-bar"],
     });
-    this.statusBarProgress.style.display = "none";
     this.statusBarCurrentProgress = this.statusBarProgress.createEl("div", {
       cls: "day-planner-progress-value",
     });
   }
 
-  private setupCircularProgressBar(status: HTMLDivElement) {
-    this.circle = status.createEl("div", {
+  private setupCircularProgressBar() {
+    this.circle = this.containerEl.createEl("div", {
       cls: ["status-bar-item-segment", "progress-pie day-planner"],
     });
   }
 
-  private setupCard(status: HTMLDivElement) {
-    this.card = status.createEl("div", { cls: "day-planner-status-card" });
+  private setupCard() {
+    this.card = this.containerEl.createEl("div", {
+      cls: "day-planner-status-card",
+    });
+
     this.cardCurrent = this.card.createEl("span");
+
     this.card.createEl("br");
     this.card.createEl("br");
+
     this.cardNext = this.card.createEl("span");
+
     this.card.createEl("div", { cls: "arrow-down" });
   }
 }
