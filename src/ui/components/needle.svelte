@@ -33,10 +33,7 @@
 
 <style>
   .needle {
-    z-index: 2;
     height: 4px;
     background-color: var(--color-accent);
-    border-top: 1px solid var(--background-modifier-border);
-    border-bottom: 1px solid var(--background-modifier-border);
   }
 </style>
