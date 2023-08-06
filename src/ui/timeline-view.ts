@@ -17,7 +17,6 @@ export default class TimelineView extends ItemView {
   private timeline: Timeline;
   private settings: DayPlannerSettings;
 
-  // TODO: clean up
   constructor(
     leaf: WorkspaceLeaf,
     settings: DayPlannerSettings,

@@ -1,20 +1,18 @@
-import { MarkdownView, Plugin, Vault, WorkspaceLeaf } from "obsidian";
+import { Plugin, Vault, WorkspaceLeaf } from "obsidian";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { DayPlannerSettings } from "./settings";
-import StatusBar from "./ui/status-bar";
-import PlannerMarkdown from "./planner-markdown";
-import DayPlannerFile from "./file";
 import { VIEW_TYPE_TIMELINE } from "./constants";
 import TimelineView from "./ui/timeline-view";
 import { PlanSummaryData } from "./plan/plan-summary-data";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
+import { parsePlanItems } from "./parser/parser";
+import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
+import { StatusBar } from "./ui/status-bar";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
-  vault: Vault;
-  file: DayPlannerFile;
-  plannerMarkdown: PlannerMarkdown;
-  statusBar: StatusBar;
+  private vault: Vault;
+  private statusBar: StatusBar;
 
   async onload() {
     this.vault = this.app.vault;
@@ -22,24 +20,10 @@ export default class DayPlanner extends Plugin {
       new DayPlannerSettings(),
       await this.loadData(),
     );
-    this.file = new DayPlannerFile(this.vault, this.settings);
-    this.plannerMarkdown = new PlannerMarkdown(
-      this.app.workspace,
-      this.app.metadataCache,
-      this.settings,
-      this.file,
-    );
     this.statusBar = new StatusBar(
       this.settings,
       this.addStatusBarItem(),
       this.app.workspace,
-      new PlannerMarkdown(
-        this.app.workspace,
-        this.app.metadataCache,
-        this.settings,
-        this.file,
-      ),
-      this.file,
     );
 
     this.addCommand({
@@ -51,10 +35,10 @@ export default class DayPlanner extends Plugin {
     this.addCommand({
       id: "show-day-planner-today-note",
       name: "Open today's Day Planner",
-      callback: () =>
+      callback: async () =>
         this.app.workspace
           .getLeaf(false)
-          .openFile(getDailyNote(window.moment(), getAllDailyNotes())),
+          .openFile(await createDailyNoteIfNeeded()),
     });
 
     this.addCommand({
@@ -73,16 +57,33 @@ export default class DayPlanner extends Plugin {
 
     this.registerInterval(
       window.setInterval(async () => {
-        if (await this.file.hasTodayNote()) {
-          const planSummary = await this.plannerMarkdown.parseDayPlanner();
-          planSummary.calculatePlanItemProps();
-          await this.plannerMarkdown.updateDayPlannerMarkdown(planSummary);
-          await this.statusBar.refreshStatusBar(planSummary);
-
-          this.updateTimelineView(planSummary);
+        if (dailyNoteExists()) {
+          await this.updateUI();
         }
       }, 2000),
     );
+  }
+
+  private async updateUI() {
+    const planSummary = await this.getPlanSummary();
+
+    await this.statusBar.refreshStatusBar(planSummary);
+
+    this.updateTimelineView(planSummary);
+  }
+
+  private async getPlanSummary() {
+    const dailyNote = getDailyNote(window.moment(), getAllDailyNotes());
+    const fileContents = await this.app.vault.cachedRead(dailyNote);
+    const metadata = this.app.metadataCache.getFileCache(dailyNote);
+
+    const planSummary = new PlanSummaryData(
+      parsePlanItems(fileContents, metadata, this.settings.plannerHeading),
+    );
+
+    planSummary.calculatePlanItemProps();
+
+    return planSummary;
   }
 
   private updateTimelineView(planSummary: PlanSummaryData) {

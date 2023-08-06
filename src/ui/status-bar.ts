@@ -1,12 +1,10 @@
 import type { Workspace } from "obsidian";
-import type DayPlannerFile from "../file";
 import type { PlanSummaryData } from "../plan/plan-summary-data";
-import type PlannerMarkdown from "../planner-markdown";
 import type { DayPlannerSettings } from "../settings";
 import type { PlanItem } from "../plan/plan-item";
 import { getDiffInMinutes } from "../util/moment";
 
-export default class StatusBar {
+export class StatusBar {
   private statusBarText: HTMLSpanElement;
   private nextText: HTMLSpanElement;
   private statusBarProgress: HTMLDivElement;
@@ -21,8 +19,6 @@ export default class StatusBar {
     private readonly settings: DayPlannerSettings,
     private readonly containerEl: HTMLElement,
     private readonly workspace: Workspace,
-    private readonly plannerMD: PlannerMarkdown,
-    private readonly file: DayPlannerFile,
   ) {
     // todo: this is redundant
     this.containerEl.addClass("day-planner");
@@ -44,8 +40,7 @@ export default class StatusBar {
 
   private setupStatusBarEvents() {
     this.containerEl.onClickEvent(async () => {
-      const fileName = this.file.getTodayPlannerFilePath();
-      await this.workspace.openLinkText(fileName, "", false);
+      // todo: open daily note
     });
 
     this.containerEl.on("mouseenter", ".day-planner", () => {

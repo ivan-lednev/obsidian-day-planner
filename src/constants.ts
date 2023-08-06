@@ -1,11 +1,3 @@
-export const DEFAULT_DATE_FORMAT = "YYYYMMDD";
-export const DATE_REGEX = /(?<target>{{date:?(?<date>[^}]*)}})/g;
-
-export const DAY_PLANNER_FILENAME = "Day Planner-{{date}}.md";
-
-export const DAY_PLANNER_DEFAULT_CONTENT = `## Day Planner
-
-- [ ] `;
 
 export const VIEW_TYPE_TIMELINE = "timeline";
 
