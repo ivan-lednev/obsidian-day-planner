@@ -8,7 +8,7 @@ got abandoned by the author.
 🪲 [Create issues](https://github.com/ivan-lednev/obsidian-day-planner/issues)
 
 🪛 Pull-requests are welcome! If you don't know where to start, feel free to create an issue, and I'll provide some
-guidance.
+guidance. Also, please check out [CONTRIBUTING](./CONTRIBUTING.md).
 
 You can also support the development of this plugin directly:
 
