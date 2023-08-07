@@ -78,7 +78,7 @@ export class StatusBar {
     const now = window.moment();
 
     const currentItemIndex = planItems.findIndex(
-      (item) => item.startTime.isBefore(now) && item.endTime?.isAfter(now),
+      (item) => item.startTime.isBefore(now) && item.endTime.isAfter(now),
     );
     if (currentItemIndex < 0) {
       this.hideProgress();
@@ -91,7 +91,8 @@ export class StatusBar {
     const nextItem = planItems[currentItemIndex + 1];
 
     const minutesFromStart = getDiffInMinutes(currentItem.startTime, now);
-    const percentageComplete = minutesFromStart / (currentItem.durationMinutes / 100);
+    const percentageComplete =
+      minutesFromStart / (currentItem.durationMinutes / 100);
 
     this.updateStatusBarText(currentItem, nextItem);
 

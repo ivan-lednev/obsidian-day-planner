@@ -66,13 +66,17 @@ export function parsePlanItems(
     .map((item, index, items) => {
       const next = items[index + 1];
 
+      const durationMinutes = calculateDefaultDuration(item, next);
+
+      const endTime =
+        item.endTime || item.startTime.clone().add(durationMinutes, "minutes");
+
       return {
         ...item,
+        endTime,
         startMinutes: getMinutesSinceMidnightTo(item.startTime),
-        endMinutes: item.endTime
-          ? getMinutesSinceMidnightTo(item.endTime)
-          : undefined,
-        durationMinutes: calculateDefaultDuration(item, next),
+        endMinutes: getMinutesSinceMidnightTo(endTime),
+        durationMinutes,
       };
     });
 }
