@@ -1,5 +1,7 @@
 # Time Block Planner
 
+## Purpose
+
 This is an ideological successor to [obsidian-day-planner](https://github.com/lynchjames/obsidian-day-planner), which
 got abandoned by the author.
 
@@ -29,11 +31,13 @@ initially forked it, but ended up rewriting almost all of it.
 
 ## Features
 
-TODO
-
 ### Write a plan using a simple human-readable format and see it rendered in a side panel
 
+![image](https://github.com/ivan-lednev/obsidian-day-planner/assets/41428836/92a9e7a6-e71f-4a84-b533-ee24e075be8b)
+
 ### The progress bar is also in place
+
+![image](https://github.com/ivan-lednev/obsidian-day-planner/assets/41428836/0acf9def-6225-4174-9070-4450ae17fa79)
 
 ## Usage
 
