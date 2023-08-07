@@ -79,7 +79,7 @@ export class StatusBar {
     const now = window.moment();
 
     const currentItemIndex = planSummary.items.findIndex(
-      (item) => item.startTime.isBefore(now) && item.endTime.isAfter(now),
+      (item) => item.startTime.isBefore(now) && item.endTime?.isAfter(now),
     );
     if (currentItemIndex < 0) {
       this.hideProgress();
