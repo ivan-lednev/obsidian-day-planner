@@ -1,9 +1,11 @@
 {
   "id": "time-block-planner",
-  "name": "Time Block Planner",
+  "name": "Time Block planner",
   "version": "0.1.0",
-  "description": "Another day planner",
-  "isDesktopOnly": false,
-  "js": "main.js",
-  "css": "style.css"
+  "minAppVersion": "0.16.0",
+  "description": "A day planner with clean UI and readable syntax",
+  "author": "Ivan Lednev",
+  "authorUrl": "https://github.com/ivan-lednev",
+  "fundingUrl": "https://www.buymeacoffee.com/machineelf",
+  "isDesktopOnly": false
 }
