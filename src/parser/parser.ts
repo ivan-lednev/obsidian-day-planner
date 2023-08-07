@@ -3,18 +3,12 @@ import { parseTimestamp } from "../util/timestamp";
 import { timestampRegExp } from "../regexp";
 import { isTopLevelListItem } from "../../obsidian-metadata-utils/src/list";
 import { getTextAtPosition } from "../../obsidian-metadata-utils/src/position";
-import type { PlanItem } from "../plan-item";
 import { getDiffInMinutes, getMinutesSinceMidnightTo } from "../util/moment";
 import { DEFAULT_DURATION_MINUTES } from "../constants";
 
-type PlanItemWithoutDuration = Omit<
-  PlanItem,
-  "durationMinutes" | "startMinutes" | "endMinutes"
->;
-
 export function calculateDefaultDuration(
-  item: PlanItemWithoutDuration,
-  next?: PlanItemWithoutDuration,
+  item: ReturnType<typeof createPlanItem>,
+  next?: ReturnType<typeof createPlanItem>,
 ) {
   if (item.endTime) {
     return getDiffInMinutes(item.startTime, item.endTime);
@@ -67,7 +61,7 @@ export function parsePlanItems(
   const listItemsWithContent = getListItemContent(content, listItemsUnderPlan);
 
   return listItemsWithContent
-    .map((li) => createPlanItemFrom(li.listItemLineContent))
+    .map((li) => createPlanItem(li.listItemLineContent))
     .filter((item) => item !== null)
     .map((item, index, items) => {
       const next = items[index + 1];
@@ -83,7 +77,7 @@ export function parsePlanItems(
     });
 }
 
-function createPlanItemFrom(line: string) {
+function createPlanItem(line: string) {
   const match = timestampRegExp.exec(line);
   if (!match) {
     return null;
