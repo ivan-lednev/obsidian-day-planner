@@ -23,35 +23,6 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
-      .setName("Day Planner Mode")
-      .setDesc(this.modeDescriptionContent())
-      .addDropdown((dropDown) =>
-        dropDown
-          .addOption(DayPlannerMode[DayPlannerMode.DAILY], "Daily mode")
-          .addOption(DayPlannerMode[DayPlannerMode.CUSTOM], "Custom path")
-          .setValue(DayPlannerMode[this.plugin.settings.mode])
-          .onChange(async (value: string) => {
-            this.plugin.settings.mode =
-              DayPlannerMode[value as keyof typeof DayPlannerMode];
-            await this.plugin.saveData(this.plugin.settings);
-          }),
-      );
-
-    new Setting(containerEl)
-      .setName("Complete past planner items")
-      .setDesc(
-        "The plugin will automatically mark checkboxes for tasks and breaks in the past as complete",
-      )
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.completePastItems)
-          .onChange(async (value: boolean) => {
-            this.plugin.settings.completePastItems = value;
-            await this.plugin.saveData(this.plugin.settings);
-          }),
-      );
-
-    new Setting(containerEl)
       .setName("Status Bar - Circular Progress")
       .setDesc("Display a circular progress bar in the status bar")
       .addToggle((toggle) =>
@@ -123,32 +94,8 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName("BREAK task label")
-      .setDesc("Use this label to mark break between tasks.")
-      .addText((component) =>
-        component
-          .setValue(this.plugin.settings.breakLabel ?? "BREAK")
-          .onChange((value: string) => {
-            this.plugin.settings.breakLabel = value;
-            this.plugin.saveData(this.plugin.settings);
-          }),
-      );
-
-    new Setting(containerEl)
-      .setName("END task label")
-      .setDesc("Use this label to mark the end of all tasks.")
-      .addText((component) =>
-        component
-          .setValue(this.plugin.settings.endLabel ?? "END")
-          .onChange((value: string) => {
-            this.plugin.settings.endLabel = value;
-            this.plugin.saveData(this.plugin.settings);
-          }),
-      );
-
-    new Setting(containerEl)
       .setName("Start hour")
-      .setDesc("The planner is going to start at this hour")
+      .setDesc("The planner is going to start at this hour each day")
       .addDropdown((component) =>
         component
           .addOptions({
@@ -176,6 +123,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             await this.plugin.saveData(this.plugin.settings);
           }),
       );
+
     new Setting(containerEl)
       .setName("Date format in timeline header")
       .then((component) => {
