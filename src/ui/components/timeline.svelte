@@ -1,9 +1,10 @@
 <script lang="ts">
-  import TimeScale from "./time-scale.svelte";
+  import Ruler from "./ruler.svelte";
+  import Column from "./column.svelte";
   import Needle from "./needle.svelte";
   import TaskContainer from "./task-container.svelte";
   import Controls from "./controls.svelte";
-  import { hourSize, startHour } from "../../store/timeline-store";
+  import { startHour, tasks, weeklyTasks } from "../../store/timeline-store";
 
   let userHoversOverScroller = false;
 
@@ -26,22 +27,16 @@
   on:mouseenter={handleMouseEnter}
   on:mouseleave={handleMouseLeave}
 >
-  <div class="time-grid">
-    <TimeScale {visibleHours} />
-    <div class="task-grid">
-      <div class="absolute-stretch-x">
-        <Needle scrollBlockedByUser={userHoversOverScroller} />
-        <TaskContainer />
-      </div>
-      {#each visibleHours as hour}
-        <div class="time-grid-block" style:height="{$hourSize}px">
-          <div
-            class="half-hour-separator"
-            style:height="{$hourSize / 2}px"
-          ></div>
-        </div>
-      {/each}
-    </div>
+  <div class="scale-with-days">
+    <Ruler {visibleHours} />
+    {#each $weeklyTasks as tasksForDay}
+      <Column {visibleHours}>
+        {#if tasksForDay.isToday}
+          <Needle scrollBlockedByUser={userHoversOverScroller} />
+        {/if}
+        <TaskContainer tasks={tasksForDay.tasks} />
+      </Column>
+    {/each}
   </div>
 </div>
 
@@ -51,27 +46,7 @@
     height: 100%;
   }
 
-  .time-grid {
+  .scale-with-days {
     display: flex;
-  }
-
-  .task-grid {
-    position: relative;
-    flex: 1 0 0;
-  }
-
-  .time-grid-block {
-    flex-grow: 1;
-    flex-shrink: 0;
-    border-left: 1px solid var(--background-modifier-border);
-  }
-
-  .half-hour-separator {
-    border-bottom: 1px dashed var(--background-modifier-border);
-  }
-
-  /* TODO: this selector is a lame workaround for task container which is absolutely positioned */
-  .time-grid-block:not(:nth-child(2)) {
-    border-top: 1px solid var(--background-modifier-border);
   }
 </style>

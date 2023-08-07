@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { tasks } from "../../store/timeline-store";
   import Task from "./task.svelte";
+
+  export let tasks = [];
 </script>
 
 <div class="task-container absolute-stretch-x">
-  {#each $tasks as taskProps (taskProps.startMinutes)}
+  {#each tasks as taskProps (taskProps.startMinutes)}
     <Task {...taskProps} />
   {/each}
 </div>
