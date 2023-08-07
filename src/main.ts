@@ -56,18 +56,23 @@ export default class DayPlanner extends Plugin {
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
 
     this.registerInterval(
-      window.setInterval(async () => {
-        try {
-          await this.updateUI();
-        } catch (error) {
-          this.statusBar.setText(`⚠️ Planner update failed (see console)`);
-          console.error(error);
-        }
-      }, 5000),
+      window.setInterval(
+        () => this.updateStatusBarOnFailed(this.updateUI),
+        2000,
+      ),
     );
   }
 
-  private async updateUI() {
+  private async updateStatusBarOnFailed(fn: () => Promise<void>) {
+    try {
+      await fn();
+    } catch (error) {
+      this.statusBar.setText(`⚠️ Planner update failed (see console)`);
+      console.error(error);
+    }
+  }
+
+  private updateUI = async () => {
     if (dailyNoteExists()) {
       const planSummary = await this.getPlanSummary();
 
@@ -77,7 +82,7 @@ export default class DayPlanner extends Plugin {
     } else {
       this.statusBar.setEmpty();
     }
-  }
+  };
 
   private async getPlanSummary() {
     const dailyNote = getDailyNote(window.moment(), getAllDailyNotes());
