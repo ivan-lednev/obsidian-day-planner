@@ -1,5 +1,6 @@
-
 export const VIEW_TYPE_TIMELINE = "timeline";
+
+export const DEFAULT_DURATION_MINUTES = 30;
 
 export const ICONS = [
   "any-key",

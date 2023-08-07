@@ -23,12 +23,13 @@
   background-color: var(--color-accent);
 }
 
-.day-planner-progress-value.green, .day-planner .progress-pie.green::before {
-  background-color: #4CAF50;
+.day-planner-progress-value.green,
+.day-planner .progress-pie.green::before {
+  background-color: #4caf50;
 }
 
 .day-planner .progress-pie.green {
-  background-image: linear-gradient(to right, transparent 50%, #4CAF50 0)
+  background-image: linear-gradient(to right, transparent 50%, #4caf50 0);
 }
 
 .day-planner-status-bar-text {

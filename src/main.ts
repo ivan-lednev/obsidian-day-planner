@@ -1,13 +1,13 @@
-import { Notice, Plugin, Vault, WorkspaceLeaf } from "obsidian";
+import { Plugin, Vault, WorkspaceLeaf } from "obsidian";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { DayPlannerSettings } from "./settings";
 import { VIEW_TYPE_TIMELINE } from "./constants";
 import TimelineView from "./ui/timeline-view";
-import { PlanSummaryData } from "./plan/plan-summary-data";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { parsePlanItems } from "./parser/parser";
 import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
 import { StatusBar } from "./ui/status-bar";
+import { tasks } from "./store/timeline-store";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
@@ -63,6 +63,10 @@ export default class DayPlanner extends Plugin {
     );
   }
 
+  onunload() {
+    this.detachTimelineLeaves();
+  }
+
   private async updateStatusBarOnFailed(fn: () => Promise<void>) {
     try {
       await fn();
@@ -74,38 +78,22 @@ export default class DayPlanner extends Plugin {
 
   private updateUI = async () => {
     if (dailyNoteExists()) {
-      const planSummary = await this.getPlanSummary();
+      const planItems = await this.getPlanItems();
 
-      await this.statusBar.refreshStatusBar(planSummary);
+      await this.statusBar.update(planItems);
 
-      this.updateTimelineView(planSummary);
+      tasks.update(() => planItems);
     } else {
       this.statusBar.setEmpty();
     }
   };
 
-  private async getPlanSummary() {
+  private async getPlanItems() {
     const dailyNote = getDailyNote(window.moment(), getAllDailyNotes());
     const fileContents = await this.app.vault.cachedRead(dailyNote);
     const metadata = this.app.metadataCache.getFileCache(dailyNote);
 
-    const planSummary = new PlanSummaryData(
-      parsePlanItems(fileContents, metadata, this.settings.plannerHeading),
-    );
-
-    planSummary.calculatePlanItemProps();
-
-    return planSummary;
-  }
-
-  private updateTimelineView(planSummary: PlanSummaryData) {
-    this.app.workspace
-      .getLeavesOfType(VIEW_TYPE_TIMELINE)
-      .forEach(({ view }) => {
-        if (view instanceof TimelineView) {
-          view.update(planSummary);
-        }
-      });
+    return parsePlanItems(fileContents, metadata, this.settings.plannerHeading);
   }
 
   private createPlannerHeading() {
@@ -129,9 +117,5 @@ export default class DayPlanner extends Plugin {
     this.app.workspace
       .getLeavesOfType(VIEW_TYPE_TIMELINE)
       .forEach((leaf) => leaf.detach());
-  }
-
-  onunload() {
-    this.detachTimelineLeaves();
   }
 }

@@ -32,12 +32,12 @@
 <div
   bind:this={el}
   class="task absolute-stretch-x"
-  transition:fade={{ duration: 100 }}
+  on:mouseenter={handleMouseEnter}
+  on:mouseleave={handleMouseLeave}
   style:height
   style:transform
   style:z-index={zIndex}
-  on:mouseenter={handleMouseEnter}
-  on:mouseleave={handleMouseLeave}
+  transition:fade={{ duration: 100 }}
 >
   {text}
 </div>

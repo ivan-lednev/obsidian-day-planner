@@ -7,7 +7,6 @@ import {
   timelineDateFormat,
   zoomLevel,
 } from "../store/timeline-store";
-import { DayPlannerMode } from "../types";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   plugin: DayPlanner;

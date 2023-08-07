@@ -1,9 +1,35 @@
 import type { CachedMetadata, ListItemCache } from "obsidian";
 import { parseTimestamp } from "../util/timestamp";
-import type { PlanItem } from "../plan/plan-item";
 import { timestampRegExp } from "../regexp";
 import { isTopLevelListItem } from "../../obsidian-metadata-utils/src/list";
 import { getTextAtPosition } from "../../obsidian-metadata-utils/src/position";
+import type { PlanItem } from "../plan-item";
+import { getDiffInMinutes, getMinutesSinceMidnightTo } from "../util/moment";
+import { DEFAULT_DURATION_MINUTES } from "../constants";
+
+type PlanItemWithoutDuration = Omit<
+  PlanItem,
+  "durationMinutes" | "startMinutes" | "endMinutes"
+>;
+
+export function calculateDefaultDuration(
+  item: PlanItemWithoutDuration,
+  next?: PlanItemWithoutDuration,
+) {
+  if (item.endTime) {
+    return getDiffInMinutes(item.startTime, item.endTime);
+  }
+
+  if (next) {
+    const minutesUntilNext = getDiffInMinutes(next.startTime, item.startTime);
+
+    if (minutesUntilNext < DEFAULT_DURATION_MINUTES) {
+      return minutesUntilNext;
+    }
+  }
+
+  return DEFAULT_DURATION_MINUTES;
+}
 
 export function parsePlanItems(
   content: string,
@@ -19,10 +45,15 @@ export function parsePlanItems(
   const planHeadingIndex = headings.findIndex(
     (h) => h.heading === planHeadingContent,
   );
+
+  if (planHeadingIndex < 0) {
+    return [];
+  }
+
   const planHeading = headings[planHeadingIndex];
   const nextHeading = headings[planHeadingIndex + 1];
 
-  const listItemsUnderPlan = metadata?.listItems.filter((li) => {
+  const listItemsUnderPlan = metadata.listItems?.filter((li) => {
     const isBelowPlan =
       li.position.start.line > planHeading.position.start.line;
 
@@ -35,29 +66,35 @@ export function parsePlanItems(
 
   const listItemsWithContent = getListItemContent(content, listItemsUnderPlan);
 
-  return listItemsWithContent.reduce((result, li) => {
-    const planItem = createPlanItemFrom(li.listItemLineContent);
-    if (planItem) {
-      result.push(planItem);
-    }
+  return listItemsWithContent
+    .map((li) => createPlanItemFrom(li.listItemLineContent))
+    .filter((item) => item !== null)
+    .map((item, index, items) => {
+      const next = items[index + 1];
 
-    return result;
-  }, []);
+      return {
+        ...item,
+        startMinutes: getMinutesSinceMidnightTo(item.startTime),
+        endMinutes: item.endTime
+          ? getMinutesSinceMidnightTo(item.endTime)
+          : undefined,
+        durationMinutes: calculateDefaultDuration(item, next),
+      };
+    });
 }
 
-function createPlanItemFrom(line: string): PlanItem {
+function createPlanItemFrom(line: string) {
   const match = timestampRegExp.exec(line);
   if (!match) {
     return null;
   }
 
   const {
-    groups: { completion, start, end, text },
+    groups: { start, end, text },
   } = match;
 
   return {
     matchIndex: -1,
-    isCompleted: completion?.trim().toLocaleLowerCase() === "x",
     startTime: parseTimestamp(start),
     endTime: parseTimestamp(end),
     rawStartTime: start,
@@ -67,7 +104,7 @@ function createPlanItemFrom(line: string): PlanItem {
 }
 
 function groupTopListItemsWithDescendants(listItems: ListItemCache[]) {
-  return listItems.reduce((result, current, i) => {
+  return listItems.reduce((result, current) => {
     if (isTopLevelListItem(current)) {
       result.push({ root: current, descendants: [] });
     } else {

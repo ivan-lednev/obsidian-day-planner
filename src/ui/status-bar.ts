@@ -1,7 +1,6 @@
 import type { Workspace } from "obsidian";
-import type { PlanSummaryData } from "../plan/plan-summary-data";
 import type { DayPlannerSettings } from "../settings";
-import type { PlanItem } from "../plan/plan-item";
+import type { PlanItem } from "../plan-item";
 import { getDiffInMinutes } from "../util/moment";
 
 export class StatusBar {
@@ -38,6 +37,23 @@ export class StatusBar {
     this.setupStatusBarEvents();
   }
 
+  async update(planItems: PlanItem[]) {
+    this.containerEl.show();
+    if (planItems.length > 0) {
+      this.updateProgress(planItems);
+    } else {
+      this.setEmpty();
+    }
+  }
+
+  setEmpty() {
+    this.setText("No plan for today");
+  }
+
+  setText(text: string) {
+    this.statusBarText.textContent = text;
+  }
+
   private setupStatusBarEvents() {
     this.containerEl.onClickEvent(async () => {
       // todo: open daily note
@@ -52,33 +68,16 @@ export class StatusBar {
     });
   }
 
-  async refreshStatusBar(planSummary: PlanSummaryData) {
-    this.containerEl.show();
-    if (!planSummary.empty && !planSummary.invalid) {
-      this.updateProgress(planSummary);
-    } else {
-      this.setEmpty();
-    }
-  }
-
-  setEmpty() {
-    this.setText("No plan for today");
-  }
-
-  setText(text: string) {
-    this.statusBarText.textContent = text;
-  }
-
   private hideProgress() {
     this.statusBarProgress.hide();
     this.circle.hide();
     this.nextText.hide();
   }
 
-  private updateProgress(planSummary: PlanSummaryData) {
+  private updateProgress(planItems: PlanItem[]) {
     const now = window.moment();
 
-    const currentItemIndex = planSummary.items.findIndex(
+    const currentItemIndex = planItems.findIndex(
       (item) => item.startTime.isBefore(now) && item.endTime?.isAfter(now),
     );
     if (currentItemIndex < 0) {
@@ -87,12 +86,12 @@ export class StatusBar {
       return;
     }
 
-    const currentItem = planSummary.items[currentItemIndex];
-    const nextItem = planSummary.items[currentItemIndex + 1];
+    // todo: move calculations out
+    const currentItem = planItems[currentItemIndex];
+    const nextItem = planItems[currentItemIndex + 1];
 
     const minutesFromStart = getDiffInMinutes(currentItem.startTime, now);
-    const percentageComplete =
-      minutesFromStart / (currentItem.durationMins / 100);
+    const percentageComplete = minutesFromStart / (currentItem.durationMinutes / 100);
 
     this.updateStatusBarText(currentItem, nextItem);
 

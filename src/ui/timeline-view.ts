@@ -3,14 +3,11 @@ import Timeline from "./components/timeline.svelte";
 import {
   centerNeedle,
   startHour,
-  tasks,
   timelineDateFormat,
   zoomLevel,
 } from "../store/timeline-store";
 import { VIEW_TYPE_TIMELINE } from "../constants";
-import type { PlanSummaryData } from "../plan/plan-summary-data";
 import type { DayPlannerSettings } from "../settings";
-import { getMinutesSinceMidnightTo } from "../util/moment";
 import type DayPlanner from "../main";
 
 export default class TimelineView extends ItemView {
@@ -36,20 +33,6 @@ export default class TimelineView extends ItemView {
 
   getIcon() {
     return this.settings.timelineIcon;
-  }
-
-  update(summaryData: PlanSummaryData) {
-    tasks.update(() =>
-      summaryData.items.map((task) => {
-        const defaultDurationMinutes = 30;
-
-        return {
-          durationMinutes: task.durationMins || defaultDurationMinutes,
-          startMinutes: getMinutesSinceMidnightTo(task.startTime),
-          text: task.text,
-        };
-      }),
-    );
   }
 
   async onOpen() {
