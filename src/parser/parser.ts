@@ -50,12 +50,10 @@ export function parsePlanItems(
   const listItemsUnderPlan = metadata.listItems?.filter((li) => {
     const isBelowPlan =
       li.position.start.line > planHeading.position.start.line;
+    const isAboveNextHeadingIfItExists =
+      !nextHeading || li.position.start.line < nextHeading.position.start.line;
 
-    if (isBelowPlan && !nextHeading) {
-      return true;
-    }
-
-    return li.position.start.line < nextHeading.position.start.line;
+    return isBelowPlan && isAboveNextHeadingIfItExists;
   });
 
   const listItemsWithContent = getListItemContent(content, listItemsUnderPlan);
@@ -82,7 +80,7 @@ export function parsePlanItems(
 }
 
 function createPlanItem(line: string) {
-  const match = timestampRegExp.exec(line);
+  const match = timestampRegExp.exec(line.trim());
   if (!match) {
     return null;
   }
