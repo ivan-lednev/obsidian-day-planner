@@ -1,46 +1,37 @@
 <script lang="ts">
-  import { getYCoords, zoomLevel } from "../../store/timeline-store";
-  import { computeAutoHeight, doesContentOverflow } from "../../util/height";
+  import { appStore, getYCoords, zoomLevel } from "../../store/timeline-store";
   import { fade } from "svelte/transition";
+  import { Component, MarkdownRenderer } from "obsidian";
+  import { onDestroy, onMount } from "svelte";
 
-  export let text;
-  export let startMinutes;
-  export let durationMinutes;
+  export let text: string;
+  export let startMinutes: number;
+  export let durationMinutes: number;
 
-  let el;
+  const markdownLifecycleManager = new Component();
+  let el: HTMLDivElement;
 
-  let hovered = false;
-
-  function handleMouseEnter() {
-    hovered = true;
-  }
-
-  function handleMouseLeave() {
-    hovered = false;
-  }
-
-  $: zIndex = hovered ? 1 : 0;
-  $: height =
-    doesContentOverflow(el) && hovered
-      ? computeAutoHeight(el)
-      : `${durationMinutes * $zoomLevel}px`;
+  $: height = `${durationMinutes * Number($zoomLevel)}px`;
 
   $: yCoords = $getYCoords(startMinutes);
   $: transform = `translateY(${yCoords}px)`;
+
+  onMount(() => markdownLifecycleManager.load());
+  onDestroy(() => markdownLifecycleManager.onunload());
+
+  $: if (el) {
+    el.empty();
+    MarkdownRenderer.render($appStore, text, el, "", markdownLifecycleManager);
+  }
 </script>
 
 <div
   bind:this={el}
   class="task absolute-stretch-x"
-  on:mouseenter={handleMouseEnter}
-  on:mouseleave={handleMouseLeave}
   style:height
   style:transform
-  style:z-index={zIndex}
   transition:fade={{ duration: 100 }}
->
-  {text}
-</div>
+></div>
 
 <style>
   .task {
@@ -62,5 +53,10 @@
     box-shadow: none;
 
     transition: height 0.2s ease-in-out;
+  }
+
+  .task :global(p) {
+    margin-block-start: 0;
+    margin-block-end: 0;
   }
 </style>
