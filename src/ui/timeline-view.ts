@@ -1,6 +1,7 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import Timeline from "./components/timeline.svelte";
 import {
+  appStore,
   centerNeedle,
   startHour,
   timelineDateFormat,
@@ -36,7 +37,7 @@ export default class TimelineView extends ItemView {
   }
 
   async onOpen() {
-    this.initializeStoresFromSettings();
+    this.initStore();
 
     const contentEl = this.containerEl.children[1];
     this.timeline = new Timeline({
@@ -44,7 +45,8 @@ export default class TimelineView extends ItemView {
     });
   }
 
-  initializeStoresFromSettings() {
+  initStore() {
+    appStore.set(this.app);
     zoomLevel.set(this.settings.timelineZoomLevel);
     zoomLevel.subscribe(async (value) => {
       this.plugin.settings.timelineZoomLevel = value;

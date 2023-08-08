@@ -1,6 +1,10 @@
 import { derived, writable } from "svelte/store";
+import type { App } from "obsidian";
+import type { PlanItem } from "../plan-item";
 
-export const tasks = writable([]);
+export const appStore = writable<App>();
+
+export const tasks = writable<PlanItem[]>([]);
 
 export const zoomLevel = writable("2");
 
