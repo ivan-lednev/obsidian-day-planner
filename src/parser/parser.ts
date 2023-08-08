@@ -45,13 +45,16 @@ export function parsePlanItems(
   }
 
   const planHeading = headings[planHeadingIndex];
-  const nextHeading = headings[planHeadingIndex + 1];
+  const nextHeadingOfSameLevel = headings
+    .slice(planHeadingIndex + 1)
+    .find((heading) => heading.level <= planHeading.level);
 
   const listItemsUnderPlan = metadata.listItems?.filter((li) => {
     const isBelowPlan =
       li.position.start.line > planHeading.position.start.line;
     const isAboveNextHeadingIfItExists =
-      !nextHeading || li.position.start.line < nextHeading.position.start.line;
+      !nextHeadingOfSameLevel ||
+      li.position.start.line < nextHeadingOfSameLevel.position.start.line;
 
     return isBelowPlan && isAboveNextHeadingIfItExists;
   });
