@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { appStore, getYCoords, zoomLevel } from "../../store/timeline-store";
+  import {
+    appStore,
+    getYCoords,
+    hiddenHoursSize,
+    zoomLevel,
+  } from "../../store/timeline-store";
   import { fade } from "svelte/transition";
   import { Component, MarkdownRenderer } from "obsidian";
   import { onDestroy, onMount } from "svelte";
@@ -7,21 +12,44 @@
   export let text: string;
   export let startMinutes: number;
   export let durationMinutes: number;
+  export let pointerYCoords: number;
 
-  const markdownLifecycleManager = new Component();
+  let markdownLifecycleManager = new Component();
   let el: HTMLDivElement;
+  let dragging = false;
+  let pointerOffsetY: number;
 
   $: height = `${durationMinutes * Number($zoomLevel)}px`;
-
-  $: yCoords = $getYCoords(startMinutes);
+  $: yCoords = dragging
+    ? pointerYCoords - pointerOffsetY
+    : $getYCoords(startMinutes);
   $: transform = `translateY(${yCoords}px)`;
 
-  onMount(() => markdownLifecycleManager.load());
-  onDestroy(() => markdownLifecycleManager.onunload());
+  function handleMouseDown(event: MouseEvent) {
+    pointerOffsetY = event.offsetY;
+    dragging = true;
+  }
+
+  function handleMouseup() {
+    dragging = false;
+  }
+
+  onMount(() => {
+    document.addEventListener("mouseup", handleMouseup);
+  });
+
+  onDestroy(() => {
+    markdownLifecycleManager.unload();
+    document.removeEventListener("mouseup", handleMouseup);
+  });
 
   $: if (el) {
+    markdownLifecycleManager.unload();
+    markdownLifecycleManager = new Component();
+
     el.empty();
     MarkdownRenderer.render($appStore, text, el, "", markdownLifecycleManager);
+    markdownLifecycleManager.load();
   }
 </script>
 
@@ -30,6 +58,7 @@
   class="task absolute-stretch-x"
   style:height
   style:transform
+  on:mousedown={handleMouseDown}
   transition:fade={{ duration: 100 }}
 ></div>
 

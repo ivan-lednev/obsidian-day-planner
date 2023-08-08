@@ -3,22 +3,17 @@
 
   export let visibleHours: number[];
 </script>
+
 <div class="task-grid">
-  <div class="absolute-stretch-x">
-    <slot />
-  </div>
+  <slot />
   {#each visibleHours as hour}
     <div class="time-grid-block" style:height="{$hourSize}px">
-      <div
-        class="half-hour-separator"
-        style:height="{$hourSize / 2}px"
-      ></div>
+      <div class="half-hour-separator" style:height="{$hourSize / 2}px"></div>
     </div>
   {/each}
 </div>
 
 <style>
-
   .task-grid {
     position: relative;
     flex: 1 0 0;

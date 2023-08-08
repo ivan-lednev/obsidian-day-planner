@@ -19,7 +19,7 @@ export const timelineDateFormat = writable();
 
 export const centerNeedle = writable(true);
 
-const hiddenHoursSize = derived(
+export const hiddenHoursSize = derived(
   [startHour, hourSize],
   ([$startHour, $hourSize]) => $startHour * $hourSize,
 );
