@@ -1,6 +1,6 @@
 {
   "id": "time-block-planner",
-  "name": "Time Block planner",
+  "name": "Time Block Planner",
   "version": "0.2.0",
   "minAppVersion": "0.16.0",
   "description": "A day planner with clean UI and readable syntax",

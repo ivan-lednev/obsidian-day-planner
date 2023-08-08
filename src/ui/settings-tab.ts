@@ -93,7 +93,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName("Start hour")
+      .setName("Start Hour")
       .setDesc("The planner is going to start at this hour each day")
       .addDropdown((component) =>
         component
@@ -124,7 +124,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Date format in timeline header")
+      .setName("Date Format in Timeline Header")
       .then((component) => {
         component.setDesc(
           createFragment((fragment) => {
@@ -158,7 +158,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName("Center the pointer in the timeline view")
+      .setName("Center the Pointer in the Timeline View")
       .setDesc(
         "Should the pointer continuously get scrolled to the center of the view",
       )
@@ -174,7 +174,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName("Planner heading")
+      .setName("Planner Heading")
       .setDesc(
         `When you create a planner, this text is going to be in the heading.
 When you open a file, the plugin will search for this heading to detect a day plan`,
