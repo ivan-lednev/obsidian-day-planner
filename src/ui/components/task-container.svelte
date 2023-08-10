@@ -4,25 +4,55 @@
 
   export let tasks: PlanItem[] = [];
 
+  const cancelMessage = "Release outside timeline to cancel";
+  const defaultDurationForNewTask = 30;
+
   let pointerYCoords: number;
   let el: HTMLDivElement;
+  let creating = false;
 
   function handleMousemove(event: MouseEvent) {
     pointerYCoords = event.clientY - el.getBoundingClientRect().top;
   }
 
-  function handleMousedown(event: MouseEvent) {}
+  function startCreation() {
+    creating = true;
+  }
+
+  function confirmCreation(event: MouseEvent) {
+    if (creating) {
+      event.stopPropagation();
+
+      creating = false;
+    }
+  }
+
+  function cancelCreation() {
+    creating = false;
+  }
 </script>
+
+<!-- TODO: use store to broadcast this -->
+<svelte:document on:mouseup={cancelCreation} />
 
 <div
   bind:this={el}
   class="task-container absolute-stretch-x"
   on:mousemove={handleMousemove}
-  on:mousedown={handleMousedown}
+  on:mousedown={startCreation}
+  on:mouseup={confirmCreation}
 >
   {#each tasks as taskProps (taskProps.startMinutes)}
     <Task {...taskProps} {pointerYCoords} />
   {/each}
+  {#if creating}
+    <Task
+      isGhost
+      text={cancelMessage}
+      durationMinutes={defaultDurationForNewTask}
+      {pointerYCoords}
+    />
+  {/if}
 </div>
 
 <style>

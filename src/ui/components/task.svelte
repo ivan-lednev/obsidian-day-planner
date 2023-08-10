@@ -5,16 +5,17 @@
   import { getYCoords, zoomLevel } from "../../store/timeline-store";
 
   export let text: string;
-  export let startMinutes: number;
+  export let startMinutes: number | undefined = undefined;
   export let durationMinutes: number;
   export let pointerYCoords: number;
+  export let isGhost = false;
 
   let el: HTMLDivElement;
   let dragging = false;
   let resizing = false;
   let pointerYWithinTask: number;
 
-  $: defaultYCoords = $getYCoords(startMinutes);
+  $: defaultYCoords = startMinutes ? $getYCoords(startMinutes) : pointerYCoords;
 
   $: height = `${
     resizing
@@ -26,6 +27,7 @@
   $: cursor = dragging ? "grabbing" : "grab";
 
   function handleMouseDown(event: MouseEvent) {
+    event.stopPropagation()
     pointerYWithinTask = event.offsetY;
     dragging = true;
   }
@@ -45,6 +47,7 @@
 <div
   bind:this={el}
   class="task absolute-stretch-x"
+  class:is-ghost={isGhost}
   style:height
   style:transform
   style:cursor
@@ -76,6 +79,10 @@
     border: 1px solid var(--color-accent);
     border-radius: var(--radius-s);
     box-shadow: none;
+  }
+
+  .is-ghost {
+    opacity: 60%;
   }
 
   .task:hover {
