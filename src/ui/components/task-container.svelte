@@ -6,14 +6,19 @@
 
   let pointerYCoords: number;
   let el: HTMLDivElement;
+
+  function handleMousemove(event: MouseEvent) {
+    pointerYCoords = event.clientY - el.getBoundingClientRect().top;
+  }
+
+  function handleMousedown(event: MouseEvent) {}
 </script>
 
 <div
   bind:this={el}
   class="task-container absolute-stretch-x"
-  on:mousemove={(event) => {
-    pointerYCoords = event.clientY - el.getBoundingClientRect().top;
-  }}
+  on:mousemove={handleMousemove}
+  on:mousedown={handleMousedown}
 >
   {#each tasks as taskProps (taskProps.startMinutes)}
     <Task {...taskProps} {pointerYCoords} />
