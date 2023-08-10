@@ -6,14 +6,11 @@ import {
 import type { TFile } from "obsidian";
 
 export async function createDailyNoteIfNeeded(): Promise<TFile> {
-  const now = window.moment();
+  return getDailyNoteForToday() || createDailyNote(window.moment());
+}
 
-  const existingNote = getDailyNote(now, getAllDailyNotes());
-  if (existingNote) {
-    return existingNote;
-  }
-
-  return createDailyNote(now);
+export function getDailyNoteForToday() {
+  return getDailyNote(window.moment(), getAllDailyNotes());
 }
 
 export function dailyNoteExists() {

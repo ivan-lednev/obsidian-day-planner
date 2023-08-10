@@ -42,7 +42,7 @@
   on:mousedown={startCreation}
   on:mouseup={confirmCreation}
 >
-  {#each tasks as taskProps (taskProps.startMinutes)}
+  {#each tasks as taskProps (taskProps.text)}
     <Task {...taskProps} {pointerYCoords} />
   {/each}
   {#if creating}

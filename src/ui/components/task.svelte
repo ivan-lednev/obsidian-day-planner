@@ -1,8 +1,15 @@
 <script lang="ts">
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
+  import { SNAP_STEP_MINUTES } from "src/constants";
+  import { updateDurationInDailyNote } from "src/update-plan";
   import { fade } from "svelte/transition";
-  import { getYCoords, zoomLevel } from "../../store/timeline-store";
+  import {
+    getMinutesFromYCoords,
+    getYCoords,
+    tasks,
+    zoomLevel,
+  } from "../../store/timeline-store";
 
   export let text: string;
   export let startMinutes: number | undefined = undefined;
@@ -22,27 +29,82 @@
       ? pointerYCoords - defaultYCoords
       : durationMinutes * Number($zoomLevel)
   }px`;
-  $: yCoords = dragging ? pointerYCoords - pointerYWithinTask : defaultYCoords;
+
+  $: snapStep = Number($zoomLevel) * SNAP_STEP_MINUTES;
+
+  $: taskStartYCoords = pointerYCoords - pointerYWithinTask;
+  $: yCoords = dragging
+    ? taskStartYCoords - (taskStartYCoords % snapStep)
+    : defaultYCoords;
   $: transform = `translateY(${yCoords}px)`;
   $: cursor = dragging ? "grabbing" : "grab";
 
   function handleMouseDown(event: MouseEvent) {
-    event.stopPropagation()
+    event.stopPropagation();
     pointerYWithinTask = event.offsetY;
     dragging = true;
   }
 
-  function handleMouseup() {
+  function handleConfirmEdit(event: MouseEvent) {
+    $tasks = $tasks.map((task) => {
+      // todo: replace with ID
+      if (task.text !== text) {
+        return task;
+      }
+
+      const newStartMinutes = $getMinutesFromYCoords(
+        pointerYCoords - event.offsetY,
+      );
+
+      $updateDurationInDailyNote(task, {
+        newStartMinutes,
+        newDurationMinutes: task.durationMinutes,
+      });
+
+      return {
+        ...task,
+        startMinutes: newStartMinutes,
+      };
+    });
+  }
+
+  function handleConfirmResize(event: MouseEvent) {
+    event.stopPropagation();
+    resizing = false;
+
+    // todo: duplication
+    $tasks = $tasks.map((task) => {
+      // todo: replace with ID
+      if (task.text !== text) {
+        return task;
+      }
+
+      const newDurationMinutes =
+        (pointerYCoords - defaultYCoords) / Number($zoomLevel);
+
+      $updateDurationInDailyNote(task, {
+        newDurationMinutes,
+        newStartMinutes: task.startMinutes,
+      });
+
+      return {
+        ...task,
+        durationMinutes: newDurationMinutes,
+      };
+    });
+  }
+
+  function handleCancel() {
     dragging = resizing = false;
   }
 
-  function handleResize(event: MouseEvent) {
+  function handleResizeStart(event: MouseEvent) {
     event.stopPropagation();
     resizing = true;
   }
 </script>
 
-<svelte:document on:mouseup={handleMouseup} />
+<svelte:body on:mouseup={handleCancel} />
 
 <div
   bind:this={el}
@@ -52,18 +114,20 @@
   style:transform
   style:cursor
   on:mousedown={handleMouseDown}
+  on:mouseup={handleConfirmEdit}
   transition:fade={{ duration: 100 }}
 >
   <RenderedMarkdown {text} />
   <div
     class="resize-handle absolute-stretch-x"
-    on:mousedown={handleResize}
+    on:mousedown={handleResizeStart}
+    on:mouseup={handleConfirmResize}
   ></div>
 </div>
 
 <style>
   .task {
-    overflow: hidden;
+    overflow: visible;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
@@ -79,6 +143,8 @@
     border: 1px solid var(--color-accent);
     border-radius: var(--radius-s);
     box-shadow: none;
+
+    transition: transform 0.05s linear;
   }
 
   .is-ghost {

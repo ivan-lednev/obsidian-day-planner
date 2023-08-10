@@ -30,3 +30,10 @@ export const getYCoords = derived(
     (minutes: number) =>
       minutes * Number($zoomLevel) - $hiddenHoursSize,
 );
+
+export const getMinutesFromYCoords = derived(
+  [zoomLevel, hiddenHoursSize],
+  ([$zoomLevel, $hiddenHoursSize]) =>
+    (yCoords: number) =>
+      (yCoords + $hiddenHoursSize) / Number($zoomLevel),
+);

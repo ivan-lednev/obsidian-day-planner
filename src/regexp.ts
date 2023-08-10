@@ -15,6 +15,6 @@ const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))?\\s*([ap]m)?`;
 
 export const timeRegExp = new RegExp(time);
 export const timestampRegExp = new RegExp(
-  `^${listToken}${checkboxOrNothing}(?<start>${time})(?:${durationSeparator}(?<end>${time}))?(?<text>.+)$`,
+  `^(?<listTokens>${listToken}${checkboxOrNothing})(?<times>(?<start>${time})(?:${durationSeparator}(?<end>${time}))?)(?<text>.+)$`,
   "im",
 );

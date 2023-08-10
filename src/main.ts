@@ -1,21 +1,24 @@
-import { Plugin, Vault, WorkspaceLeaf } from "obsidian";
+import { Plugin, TFile, Vault, WorkspaceLeaf } from "obsidian";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { DayPlannerSettings } from "./settings";
 import { VIEW_TYPE_TIMELINE } from "./constants";
 import TimelineView from "./ui/timeline-view";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { parsePlanItems } from "./parser/parser";
-import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
+import {
+  createDailyNoteIfNeeded,
+  dailyNoteExists,
+  getDailyNoteForToday,
+} from "./util/daily-notes";
 import { StatusBar } from "./ui/status-bar";
 import { tasks } from "./store/timeline-store";
+import { get } from "svelte/store";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
-  private vault: Vault;
   private statusBar: StatusBar;
 
   async onload() {
-    this.vault = this.app.vault;
     this.settings = Object.assign(
       new DayPlannerSettings(),
       await this.loadData(),
@@ -55,10 +58,18 @@ export default class DayPlanner extends Plugin {
 
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
 
+    this.refreshPlanItemsInStore();
+
+    this.app.metadataCache.on("changed", async (file: TFile) => {
+      if (file === getDailyNoteForToday()) {
+        await this.refreshPlanItemsInStore();
+      }
+    });
+
     this.registerInterval(
       window.setInterval(
-        () => this.updateStatusBarOnFailed(this.updateUI),
-        2000,
+        () => this.updateStatusBarOnFailed(this.updateStatusBar),
+        1000,
       ),
     );
   }
@@ -76,13 +87,15 @@ export default class DayPlanner extends Plugin {
     }
   }
 
-  private updateUI = async () => {
+  private async refreshPlanItemsInStore() {
+    const parsedPlanItems = await this.getPlanItems();
+
+    tasks.update(() => parsedPlanItems);
+  }
+
+  private updateStatusBar = async () => {
     if (dailyNoteExists()) {
-      const planItems = await this.getPlanItems();
-
-      await this.statusBar.update(planItems);
-
-      tasks.update(() => planItems);
+      await this.statusBar.update(get(tasks));
     } else {
       this.statusBar.setEmpty();
     }
@@ -90,10 +103,15 @@ export default class DayPlanner extends Plugin {
 
   private async getPlanItems() {
     const dailyNote = getDailyNote(window.moment(), getAllDailyNotes());
+
+    if (!dailyNote) {
+      return [];
+    }
+
     const fileContents = await this.app.vault.cachedRead(dailyNote);
     const metadata = this.app.metadataCache.getFileCache(dailyNote);
 
-    return parsePlanItems(fileContents, metadata, this.settings.plannerHeading);
+    return parsePlanItems(fileContents, metadata, this.settings.plannerHeading, dailyNote.path);
   }
 
   private createPlannerHeading() {

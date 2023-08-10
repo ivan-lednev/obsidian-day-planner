@@ -13,3 +13,11 @@ export function getMinutesSinceMidnightTo(someMoment: Moment) {
 export function getDiffInMinutes(a: Moment, b: Moment) {
   return Math.abs(a.diff(b, "minutes"));
 }
+
+export function minutesToMoment(minutesSinceMidnight: number) {
+  return moment().startOf("day").add(minutesSinceMidnight, "minutes");
+}
+
+export function addMinutes(moment: Moment, minutes: number) {
+  return moment.clone().add(minutes, "minutes");
+}

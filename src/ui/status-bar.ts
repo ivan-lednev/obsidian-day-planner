@@ -80,6 +80,7 @@ export class StatusBar {
     const currentItemIndex = planItems.findIndex(
       (item) => item.startTime.isBefore(now) && item.endTime.isAfter(now),
     );
+    
     if (currentItemIndex < 0) {
       this.hideProgress();
       this.statusBarText.innerText = this.settings.endLabel;

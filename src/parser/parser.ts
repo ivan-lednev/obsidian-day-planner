@@ -5,6 +5,7 @@ import { isTopLevelListItem } from "../../obsidian-metadata-utils/src/list";
 import { getTextAtPosition } from "../../obsidian-metadata-utils/src/position";
 import { getDiffInMinutes, getMinutesSinceMidnightTo } from "../util/moment";
 import { DEFAULT_DURATION_MINUTES } from "../constants";
+import type { PlanItem, PlanItemLocation } from "src/plan-item";
 
 export function calculateDefaultDuration(
   item: ReturnType<typeof createPlanItem>,
@@ -29,7 +30,8 @@ export function parsePlanItems(
   content: string,
   metadata: CachedMetadata,
   planHeadingContent: string,
-) {
+  path: string,
+): PlanItem[] {
   const { headings } = metadata;
 
   if (!headings) {
@@ -62,7 +64,12 @@ export function parsePlanItems(
   const listItemsWithContent = getListItemContent(content, listItemsUnderPlan);
 
   return listItemsWithContent
-    .map((li) => createPlanItem(li.listItemLineContent))
+    .map((li) =>
+      createPlanItem({
+        line: li.listItemLineContent,
+        location: { path, line: li.line },
+      }),
+    )
     .filter((item) => item !== null)
     .map((item, index, items) => {
       const next = items[index + 1];
@@ -82,23 +89,30 @@ export function parsePlanItems(
     });
 }
 
-function createPlanItem(line: string) {
+function createPlanItem({
+  line,
+  location,
+}: {
+  line: string;
+  location: PlanItemLocation;
+}) {
   const match = timestampRegExp.exec(line.trim());
   if (!match) {
     return null;
   }
 
   const {
-    groups: { start, end, text },
+    groups: { listTokens, start, end, text },
   } = match;
 
   return {
-    matchIndex: -1,
+    listTokens,
     startTime: parseTimestamp(start),
     endTime: parseTimestamp(end),
     rawStartTime: start,
     rawEndTime: end,
     text,
+    location,
   };
 }
 
@@ -126,6 +140,7 @@ function getListItemContent(content: string, listItems: ListItemCache[]) {
       };
 
       return {
+        line: root.position.start.line,
         listItemLineContent: getTextAtPosition(content, root.position),
         listItemCompleteContent: getTextAtPosition(
           content,
