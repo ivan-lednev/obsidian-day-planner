@@ -1,17 +1,15 @@
 <script lang="ts">
-  import { appStore, getYCoords, zoomLevel } from "../../store/timeline-store";
+  import RenderedMarkdown from "./rendered-markdown.svelte";
+
   import { fade } from "svelte/transition";
-  import { Component, MarkdownRenderer } from "obsidian";
-  import { onDestroy, onMount } from "svelte";
+  import { getYCoords, zoomLevel } from "../../store/timeline-store";
 
   export let text: string;
   export let startMinutes: number;
   export let durationMinutes: number;
   export let pointerYCoords: number;
 
-  let markdownLifecycleManager = new Component();
   let el: HTMLDivElement;
-  let renderedMarkdown: HTMLDivElement;
   let dragging = false;
   let resizing = false;
   let pointerYWithinTask: number;
@@ -40,27 +38,6 @@
     event.stopPropagation();
     resizing = true;
   }
-
-  onDestroy(() => {
-    markdownLifecycleManager.unload();
-  });
-
-  $: console.log(pointerYCoords);
-
-  $: if (renderedMarkdown) {
-    markdownLifecycleManager.unload();
-    markdownLifecycleManager = new Component();
-
-    renderedMarkdown.empty();
-    MarkdownRenderer.render(
-      $appStore,
-      text,
-      renderedMarkdown,
-      "",
-      markdownLifecycleManager,
-    );
-    markdownLifecycleManager.load();
-  }
 </script>
 
 <svelte:document on:mouseup={handleMouseup} />
@@ -74,7 +51,7 @@
   on:mousedown={handleMouseDown}
   transition:fade={{ duration: 100 }}
 >
-  <div bind:this={renderedMarkdown} class="rendered-markdown"></div>
+  <RenderedMarkdown {text} />
   <div
     class="resize-handle absolute-stretch-x"
     on:mousedown={handleResize}
@@ -103,11 +80,6 @@
 
   .task:hover {
     cursor: grab;
-  }
-
-  .rendered-markdown :global(p) {
-    margin-block-start: 0;
-    margin-block-end: 0;
   }
 
   .resize-handle {
