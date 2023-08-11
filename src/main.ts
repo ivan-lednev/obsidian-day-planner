@@ -58,7 +58,9 @@ export default class DayPlanner extends Plugin {
 
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
 
-    this.refreshPlanItemsInStore();
+    this.app.workspace.onLayoutReady(async () => {
+      await this.refreshPlanItemsInStore();
+    });
 
     this.app.metadataCache.on("changed", async (file: TFile) => {
       if (file === getDailyNoteForToday()) {
@@ -111,7 +113,12 @@ export default class DayPlanner extends Plugin {
     const fileContents = await this.app.vault.cachedRead(dailyNote);
     const metadata = this.app.metadataCache.getFileCache(dailyNote);
 
-    return parsePlanItems(fileContents, metadata, this.settings.plannerHeading, dailyNote.path);
+    return parsePlanItems(
+      fileContents,
+      metadata,
+      this.settings.plannerHeading,
+      dailyNote.path,
+    );
   }
 
   private createPlannerHeading() {
