@@ -5,8 +5,10 @@
   import { updateDurationInDailyNote } from "src/update-plan";
   import { fade } from "svelte/transition";
   import {
+    durationToCoords,
     getMinutesFromYCoords,
     getYCoords,
+    roundToSnapStep,
     tasks,
     zoomLevel,
   } from "../../store/timeline-store";
@@ -14,34 +16,33 @@
   export let text: string;
   export let startMinutes: number | undefined = undefined;
   export let durationMinutes: number;
-  export let pointerYCoords: number;
+  export let pointerYOffset: number;
   export let isGhost = false;
 
   let el: HTMLDivElement;
   let dragging = false;
   let resizing = false;
-  let pointerYWithinTask: number;
+  let pointerYOffsetToTaskStart: number;
 
-  $: defaultYCoords = startMinutes ? $getYCoords(startMinutes) : pointerYCoords;
+  $: initialTaskOffset = startMinutes
+    ? $getYCoords(startMinutes)
+    : pointerYOffset;
 
-  $: height = `${
-    resizing
-      ? pointerYCoords - defaultYCoords
-      : durationMinutes * Number($zoomLevel)
-  }px`;
+  $: scaledDuration = durationMinutes * Number($zoomLevel);
+  $: fromTaskOffsetToPointer = pointerYOffset - initialTaskOffset;
 
-  $: snapStep = Number($zoomLevel) * SNAP_STEP_MINUTES;
+  $: taskHeight = resizing
+    ? $roundToSnapStep(fromTaskOffsetToPointer)
+    : scaledDuration;
 
-  $: taskStartYCoords = pointerYCoords - pointerYWithinTask;
-  $: yCoords = dragging
-    ? taskStartYCoords - (taskStartYCoords % snapStep)
-    : defaultYCoords;
+  $: taskOffset = pointerYOffset - pointerYOffsetToTaskStart;
+  $: yCoords = dragging ? $roundToSnapStep(taskOffset) : initialTaskOffset;
   $: transform = `translateY(${yCoords}px)`;
   $: cursor = dragging ? "grabbing" : "grab";
 
   function handleMouseDown(event: MouseEvent) {
     event.stopPropagation();
-    pointerYWithinTask = event.offsetY;
+    pointerYOffsetToTaskStart = event.offsetY;
     dragging = true;
   }
 
@@ -53,7 +54,7 @@
       }
 
       const newStartMinutes = $getMinutesFromYCoords(
-        pointerYCoords - event.offsetY,
+        pointerYOffset - event.offsetY,
       );
 
       $updateDurationInDailyNote(task, {
@@ -72,15 +73,14 @@
     event.stopPropagation();
     resizing = false;
 
-    // todo: duplication
+    const newDurationMinutes = $durationToCoords(taskHeight);
+
+    // TODO: duplication
     $tasks = $tasks.map((task) => {
       // todo: replace with ID
       if (task.text !== text) {
         return task;
       }
-
-      const newDurationMinutes =
-        (pointerYCoords - defaultYCoords) / Number($zoomLevel);
 
       $updateDurationInDailyNote(task, {
         newDurationMinutes,
@@ -110,7 +110,7 @@
   bind:this={el}
   class="task absolute-stretch-x"
   class:is-ghost={isGhost}
-  style:height
+  style:height="{taskHeight}px"
   style:transform
   style:cursor
   on:mousedown={handleMouseDown}
@@ -144,7 +144,8 @@
     border-radius: var(--radius-s);
     box-shadow: none;
 
-    transition: transform 0.05s linear;
+    transition-property: height, transform;
+    transition: 0.05s linear;
   }
 
   .is-ghost {

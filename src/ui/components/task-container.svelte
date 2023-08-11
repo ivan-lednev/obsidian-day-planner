@@ -7,12 +7,12 @@
   const cancelMessage = "Release outside timeline to cancel";
   const defaultDurationForNewTask = 30;
 
-  let pointerYCoords: number;
+  let pointerYOffset: number;
   let el: HTMLDivElement;
   let creating = false;
 
   function handleMousemove(event: MouseEvent) {
-    pointerYCoords = event.clientY - el.getBoundingClientRect().top;
+    pointerYOffset = event.clientY - el.getBoundingClientRect().top;
   }
 
   function startCreation() {
@@ -43,14 +43,14 @@
   on:mouseup={confirmCreation}
 >
   {#each tasks as taskProps (taskProps.text)}
-    <Task {...taskProps} {pointerYCoords} />
+    <Task {...taskProps} pointerYOffset={pointerYOffset} />
   {/each}
   {#if creating}
     <Task
       isGhost
       text={cancelMessage}
       durationMinutes={defaultDurationForNewTask}
-      {pointerYCoords}
+      pointerYOffset={pointerYOffset}
     />
   {/if}
 </div>

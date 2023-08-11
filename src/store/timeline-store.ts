@@ -1,6 +1,7 @@
 import { derived, writable } from "svelte/store";
 import type { App } from "obsidian";
 import type { PlanItem } from "../plan-item";
+import { SNAP_STEP_MINUTES } from "src/constants";
 
 export const appStore = writable<App>();
 
@@ -36,4 +37,16 @@ export const getMinutesFromYCoords = derived(
   ([$zoomLevel, $hiddenHoursSize]) =>
     (yCoords: number) =>
       (yCoords + $hiddenHoursSize) / Number($zoomLevel),
+);
+
+export const durationToCoords = derived(
+  zoomLevel,
+  ($zoomLevel) => (durationMinutes: number) =>
+    durationMinutes / Number($zoomLevel),
+);
+
+export const roundToSnapStep = derived(
+  zoomLevel,
+  ($zoomLevel) => (coords: number) =>
+    coords - (coords % (SNAP_STEP_MINUTES * Number($zoomLevel))),
 );

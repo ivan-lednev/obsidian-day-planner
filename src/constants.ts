@@ -2,7 +2,7 @@ export const VIEW_TYPE_TIMELINE = "timeline";
 
 export const DEFAULT_DURATION_MINUTES = 30;
 
-export const SNAP_STEP_MINUTES = 5;
+export const SNAP_STEP_MINUTES = 10;
 
 export const ICONS = [
   "any-key",
