@@ -2,6 +2,7 @@ import type { PlanItem } from "src/plan-item";
 import { timeRegExp } from "../regexp";
 import type { Moment } from "moment/moment";
 import { addMinutes, minutesToMoment } from "./moment";
+import type { Timestamp } from "src/store/timeline-store";
 
 export function parseTimestamp(asText?: string): Moment | null {
   if (!asText) {
@@ -34,14 +35,11 @@ export function parseTimestamp(asText?: string): Moment | null {
 
 export function replaceTimestamp(
   planItem: PlanItem,
-  {
-    newStartMinutes,
-    newDurationMinutes,
-  }: { newStartMinutes: number; newDurationMinutes: number },
+  { startMinutes, durationMinutes }: Timestamp,
 ) {
   return `${planItem.listTokens}${createTimestamp(
-    newStartMinutes,
-    newDurationMinutes,
+    startMinutes,
+    durationMinutes,
   )} ${planItem.text}`;
 }
 

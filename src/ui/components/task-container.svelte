@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { PlanItem } from "src/plan-item";
   import Task from "./task.svelte";
+  import { resizeStatus } from "src/store/timeline-store";
 
   export let tasks: PlanItem[] = [];
 
@@ -19,12 +20,12 @@
     creating = true;
   }
 
-  function confirmCreation(event: MouseEvent) {
-    if (creating) {
-      event.stopPropagation();
+  function handleMouseUp(event: MouseEvent) {
+    event.stopPropagation();
 
-      creating = false;
-    }
+    $resizeStatus = "confirmed";
+
+    cancelCreation()
   }
 
   function cancelCreation() {
@@ -40,17 +41,17 @@
   class="task-container absolute-stretch-x"
   on:mousemove={handleMousemove}
   on:mousedown={startCreation}
-  on:mouseup={confirmCreation}
+  on:mouseup={handleMouseUp}
 >
   {#each tasks as taskProps (taskProps.text)}
-    <Task {...taskProps} pointerYOffset={pointerYOffset} />
+    <Task {...taskProps} {pointerYOffset} />
   {/each}
   {#if creating}
     <Task
       isGhost
       text={cancelMessage}
       durationMinutes={defaultDurationForNewTask}
-      pointerYOffset={pointerYOffset}
+      {pointerYOffset}
     />
   {/if}
 </div>

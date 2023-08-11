@@ -1,14 +1,11 @@
 import { TFile } from "obsidian";
 import type { PlanItem } from "./plan-item";
 import { derived } from "svelte/store";
-import { appStore } from "./store/timeline-store";
+import { Timestamp, appStore } from "./store/timeline-store";
 import { replaceTimestamp } from "./util/timestamp";
 
 export const updateDurationInDailyNote = derived(appStore, ($appStore) => {
-  return async (
-    task: PlanItem,
-    startAndDuration: { newStartMinutes: number; newDurationMinutes: number },
-  ) => {
+  return async (task: PlanItem, startAndDuration: Timestamp) => {
     const file = $appStore.vault.getAbstractFileByPath(task.location.path);
 
     if (!(file instanceof TFile)) {

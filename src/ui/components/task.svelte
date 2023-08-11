@@ -1,15 +1,14 @@
 <script lang="ts">
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
-  import { SNAP_STEP_MINUTES } from "src/constants";
-  import { updateDurationInDailyNote } from "src/update-plan";
   import { fade } from "svelte/transition";
   import {
     durationToCoords,
     getMinutesFromYCoords,
     getYCoords,
+    resizeStatus,
     roundToSnapStep,
-    tasks,
+    updateTimestamps,
     zoomLevel,
   } from "../../store/timeline-store";
 
@@ -18,6 +17,8 @@
   export let durationMinutes: number;
   export let pointerYOffset: number;
   export let isGhost = false;
+
+  $: console.log("start minutes changed: ", startMinutes);
 
   let el: HTMLDivElement;
   let dragging = false;
@@ -35,67 +36,62 @@
     ? $roundToSnapStep(fromTaskOffsetToPointer)
     : scaledDuration;
 
-  $: taskOffset = pointerYOffset - pointerYOffsetToTaskStart;
-  $: yCoords = dragging ? $roundToSnapStep(taskOffset) : initialTaskOffset;
-  $: transform = `translateY(${yCoords}px)`;
+  $: taskOffset = dragging
+    ? $roundToSnapStep(pointerYOffset - pointerYOffsetToTaskStart)
+    : initialTaskOffset;
+
+  $: transform = `translateY(${taskOffset}px)`;
   $: cursor = dragging ? "grabbing" : "grab";
 
-  function handleMouseDown(event: MouseEvent) {
+  function handleMoveStart(event: MouseEvent) {
     event.stopPropagation();
     pointerYOffsetToTaskStart = event.offsetY;
     dragging = true;
   }
 
-  function handleConfirmEdit(event: MouseEvent) {
-    $tasks = $tasks.map((task) => {
-      // todo: replace with ID
-      if (task.text !== text) {
-        return task;
-      }
+  async function handleMoveConfirm(event: MouseEvent) {
+    if (!dragging) {
+      return;
+    }
 
-      const newStartMinutes = $getMinutesFromYCoords(
-        pointerYOffset - event.offsetY,
-      );
+    event.stopPropagation();
 
-      $updateDurationInDailyNote(task, {
-        newStartMinutes,
-        newDurationMinutes: task.durationMinutes,
-      });
+    const newStartMinutes = $getMinutesFromYCoords(
+      pointerYOffset - event.offsetY,
+    );
 
-      return {
-        ...task,
-        startMinutes: newStartMinutes,
-      };
+    updateTimestamps(text, {
+      startMinutes: newStartMinutes,
+      durationMinutes,
     });
+
+    dragging = false;
   }
 
-  function handleConfirmResize(event: MouseEvent) {
-    event.stopPropagation();
-    resizing = false;
+  function handleResizeConfirm() {
+    if (!resizing) {
+      return;
+    }
 
     const newDurationMinutes = $durationToCoords(taskHeight);
 
-    // TODO: duplication
-    $tasks = $tasks.map((task) => {
-      // todo: replace with ID
-      if (task.text !== text) {
-        return task;
-      }
+    resizing = false;
 
-      $updateDurationInDailyNote(task, {
-        newDurationMinutes,
-        newStartMinutes: task.startMinutes,
-      });
-
-      return {
-        ...task,
-        durationMinutes: newDurationMinutes,
-      };
+    updateTimestamps(text, {
+      startMinutes,
+      durationMinutes: newDurationMinutes,
     });
   }
 
+  $: if ($resizeStatus === "confirmed") {
+    handleResizeConfirm();
+    $resizeStatus = "idle";
+  }
+
   function handleCancel() {
-    dragging = resizing = false;
+    dragging = false;
+    resizing = false;
+    $resizeStatus = "cancelled";
   }
 
   function handleResizeStart(event: MouseEvent) {
@@ -113,15 +109,14 @@
   style:height="{taskHeight}px"
   style:transform
   style:cursor
-  on:mousedown={handleMouseDown}
-  on:mouseup={handleConfirmEdit}
+  on:mousedown={handleMoveStart}
+  on:mouseup={handleMoveConfirm}
   transition:fade={{ duration: 100 }}
 >
   <RenderedMarkdown {text} />
   <div
     class="resize-handle absolute-stretch-x"
     on:mousedown={handleResizeStart}
-    on:mouseup={handleConfirmResize}
   ></div>
 </div>
 
