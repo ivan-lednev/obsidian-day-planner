@@ -25,7 +25,7 @@
 
     $resizeStatus = "confirmed";
 
-    cancelCreation()
+    cancelCreation();
   }
 
   function cancelCreation() {

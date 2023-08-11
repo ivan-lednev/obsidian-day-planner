@@ -18,8 +18,6 @@
   export let pointerYOffset: number;
   export let isGhost = false;
 
-  $: console.log("start minutes changed: ", startMinutes);
-
   let el: HTMLDivElement;
   let dragging = false;
   let resizing = false;
@@ -54,7 +52,7 @@
       return;
     }
 
-    event.stopPropagation();
+    dragging = false;
 
     const newStartMinutes = $getMinutesFromYCoords(
       pointerYOffset - event.offsetY,
@@ -64,18 +62,23 @@
       startMinutes: newStartMinutes,
       durationMinutes,
     });
-
-    dragging = false;
   }
 
   function handleResizeConfirm() {
+    console.log("resizeConfirm", {
+      dragging,
+      resizing,
+      resizeStatus: $resizeStatus,
+    });
+
     if (!resizing) {
       return;
     }
 
-    const newDurationMinutes = $durationToCoords(taskHeight);
-
+    $resizeStatus = "idle";
     resizing = false;
+
+    const newDurationMinutes = $durationToCoords(taskHeight);
 
     updateTimestamps(text, {
       startMinutes,
@@ -85,18 +88,18 @@
 
   $: if ($resizeStatus === "confirmed") {
     handleResizeConfirm();
-    $resizeStatus = "idle";
   }
 
   function handleCancel() {
     dragging = false;
     resizing = false;
-    $resizeStatus = "cancelled";
+    $resizeStatus = "idle";
   }
 
   function handleResizeStart(event: MouseEvent) {
     event.stopPropagation();
     resizing = true;
+    $resizeStatus = "idle";
   }
 </script>
 
