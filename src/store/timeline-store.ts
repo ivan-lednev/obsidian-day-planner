@@ -14,30 +14,37 @@ export const appStore = writable<App>();
 
 export const tasks = writable<PlanItem[]>([]);
 
-export const updateDurationInDailyNote = derived(appStore, ($appStore) => {
-  return async (task: PlanItem, startAndDuration: Timestamp) => {
-    const file = $appStore.vault.getAbstractFileByPath(task.location.path);
+let app: App;
 
-    if (!(file instanceof TFile)) {
-      throw new Error("Something is wrong");
-    }
-
-    const contents = await $appStore.vault.read(file);
-    // todo: this is inefficient
-    const updated = contents
-      .split("\n")
-      .map((line, i) => {
-        if (i === task.location.line) {
-          return replaceTimestamp(task, startAndDuration);
-        }
-
-        return line;
-      })
-      .join("\n");
-
-    await $appStore.vault.modify(file, updated);
-  };
+appStore.subscribe((current) => {
+  app = current;
 });
+
+export async function updateDurationInDailyNote(
+  task: PlanItem,
+  startAndDuration: Timestamp,
+) {
+  const file = app.vault.getAbstractFileByPath(task.location.path);
+
+  if (!(file instanceof TFile)) {
+    throw new Error("Something is wrong");
+  }
+
+  const contents = await app.vault.read(file);
+  // todo: this is inefficient
+  const updated = contents
+    .split("\n")
+    .map((line, i) => {
+      if (i === task.location.line) {
+        return replaceTimestamp(task, startAndDuration);
+      }
+
+      return line;
+    })
+    .join("\n");
+
+  await app.vault.modify(file, updated);
+}
 
 export const updateTimestamps = async (id: string, timestamp: Timestamp) => {
   tasks.update((previous) => {
@@ -47,7 +54,7 @@ export const updateTimestamps = async (id: string, timestamp: Timestamp) => {
         return task;
       }
 
-      get(updateDurationInDailyNote)(task, timestamp);
+      updateDurationInDailyNote(task, timestamp);
 
       return {
         ...task,
