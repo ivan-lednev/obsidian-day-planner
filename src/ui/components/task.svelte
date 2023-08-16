@@ -1,19 +1,17 @@
 <script lang="ts">
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
+  import { SNAP_STEP_MINUTES } from "src/constants";
+  import { settings } from "src/store/settings";
+  import type { Readable } from "svelte/store";
   import { fade } from "svelte/transition";
   import {
-    sizeToDuration,
-    roundToSnapStep,
-    getTimeFromYOffset,
-    timeToTimelineOffset,
     durationToSize,
+    roundToSnapStep,
+    timeToTimelineOffset,
   } from "../../store/timeline-store";
-  import { settings } from "src/store/settings";
-  import { SNAP_STEP_MINUTES } from "src/constants";
-  import { updateTimestamps } from "src/store/update-timestamp";
   import { useDrag } from "./use-drag";
-  import type { Readable } from "svelte/store";
+  import { useResize } from "./use-resize";
 
   export let text: string;
   export let startMinutes: number | undefined = undefined;
@@ -29,7 +27,12 @@
     handleMoveConfirm,
   } = useDrag({ text, durationMinutes }, pointerYOffset);
 
-  let resizing = false;
+  const {
+    resizing,
+    handleResizeStart,
+    handleResizeCancel,
+    handleResizeConfirm,
+  } = useResize();
 
   $: initialTaskOffset = isGhost
     ? $pointerYOffset
@@ -41,31 +44,16 @@
 
   $: fromTaskOffsetToPointer = $pointerYOffset - initialTaskOffset;
 
-  $: taskHeight = resizing
+  $: taskHeight = $resizing
     ? roundToSnapStep(fromTaskOffsetToPointer) +
       SNAP_STEP_MINUTES * $settings.zoomLevel
     : $durationToSize(durationMinutes);
 
   $: cursor = $dragging ? "grabbing" : "grab";
 
-  async function handleResizeConfirm() {
-    resizing = false;
-
-    const newDurationMinutes = sizeToDuration(taskHeight);
-
-    await updateTimestamps(text, {
-      startMinutes,
-      durationMinutes: newDurationMinutes,
-    });
-  }
-
   function handleCancel() {
     handleMoveCancel();
-    resizing = false;
-  }
-
-  function handleResizeStart() {
-    resizing = true;
+    handleResizeCancel();
   }
 </script>
 
@@ -85,7 +73,8 @@
   <div
     class="resize-handle absolute-stretch-x"
     on:mousedown|stopPropagation={handleResizeStart}
-    on:mouseup|stopPropagation={handleResizeConfirm}
+    on:mouseup|stopPropagation={() =>
+      handleResizeConfirm(text, taskHeight, startMinutes)}
   ></div>
 </div>
 
