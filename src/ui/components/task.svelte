@@ -6,7 +6,6 @@
     durationToCoords,
     getMinutesFromYCoords,
     getYCoords,
-    resizeStatus,
     roundToSnapStep,
     updateTimestamps,
     zoomLevel,
@@ -18,7 +17,6 @@
   export let pointerYOffset: number;
   export let isGhost = false;
 
-  let el: HTMLDivElement;
   let dragging = false;
   let resizing = false;
   let pointerYOffsetToTaskStart: number;
@@ -65,17 +63,6 @@
   }
 
   function handleResizeConfirm() {
-    console.log("resizeConfirm", {
-      dragging,
-      resizing,
-      resizeStatus: $resizeStatus,
-    });
-
-    if (!resizing) {
-      return;
-    }
-
-    $resizeStatus = "idle";
     resizing = false;
 
     const newDurationMinutes = $durationToCoords(taskHeight);
@@ -86,27 +73,20 @@
     });
   }
 
-  $: if ($resizeStatus === "confirmed") {
-    handleResizeConfirm();
-  }
-
   function handleCancel() {
     dragging = false;
     resizing = false;
-    $resizeStatus = "idle";
   }
 
   function handleResizeStart(event: MouseEvent) {
     event.stopPropagation();
     resizing = true;
-    $resizeStatus = "idle";
   }
 </script>
 
 <svelte:body on:mouseup={handleCancel} />
 
 <div
-  bind:this={el}
   class="task absolute-stretch-x"
   class:is-ghost={isGhost}
   style:height="{taskHeight}px"
@@ -120,6 +100,7 @@
   <div
     class="resize-handle absolute-stretch-x"
     on:mousedown={handleResizeStart}
+    on:mouseup={handleResizeConfirm}
   ></div>
 </div>
 

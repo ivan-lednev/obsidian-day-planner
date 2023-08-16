@@ -1,14 +1,10 @@
-import { derived, get, writable } from "svelte/store";
+import { derived,  writable } from "svelte/store";
 import { TFile, type App } from "obsidian";
 import type { PlanItem } from "../plan-item";
 import { SNAP_STEP_MINUTES } from "src/constants";
 import { replaceTimestamp } from "src/util/timestamp";
 
-type ResizeStatus = "confirmed" | "cancelled" | "idle";
-
 export type Timestamp = { durationMinutes: number; startMinutes: number };
-
-export const resizeStatus = writable<ResizeStatus>("idle");
 
 export const appStore = writable<App>();
 

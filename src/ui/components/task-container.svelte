@@ -2,6 +2,7 @@
   import type { PlanItem } from "src/plan-item";
   import Task from "./task.svelte";
   import { resizeStatus } from "src/store/timeline-store";
+  import { useTaskProps } from "../use-task-props";
 
   export let tasks: PlanItem[] = [];
 
@@ -23,8 +24,6 @@
   function handleMouseUp(event: MouseEvent) {
     event.stopPropagation();
 
-    $resizeStatus = "confirmed";
-
     cancelCreation();
   }
 
@@ -44,7 +43,7 @@
   on:mouseup={handleMouseUp}
 >
   {#each tasks as taskProps (taskProps.text)}
-    <Task {...taskProps} {pointerYOffset} />
+    <Task {...{ ...taskProps, ...useTaskProps(taskProps) }} {pointerYOffset} />
   {/each}
   {#if creating}
     <Task
