@@ -21,9 +21,13 @@
   export let pointerYOffset: Readable<number>;
   export let isGhost = false;
 
-  const { dragging, pointerYOffsetToTaskStart, handleMoveStart, handleMoveCancel, handleMoveConfirm } =
-    useDrag({ text, durationMinutes }, pointerYOffset);
-
+  const {
+    dragging,
+    pointerYOffsetToTaskStart,
+    handleMoveStart,
+    handleMoveCancel,
+    handleMoveConfirm,
+  } = useDrag({ text, durationMinutes }, pointerYOffset);
 
   let resizing = false;
 

@@ -31,5 +31,11 @@ export function useDrag(
     });
   }
 
-  return { pointerYOffsetToTaskStart, dragging, handleMoveStart, handleMoveCancel, handleMoveConfirm };
+  return {
+    pointerYOffsetToTaskStart,
+    dragging,
+    handleMoveStart,
+    handleMoveCancel,
+    handleMoveConfirm,
+  };
 }
