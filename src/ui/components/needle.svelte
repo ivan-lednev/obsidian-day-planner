@@ -4,9 +4,9 @@
   import { getMinutesSinceMidnight } from "../../util/moment";
   import { timeToTimelineOffset } from "src/store/timeline-store";
 
-  export let scrollBlockedByUser;
+  export let scrollBlockedByUser = false;
 
-  let el;
+  let el: HTMLDivElement;
 
   $: coords = $timeToTimelineOffset(getMinutesSinceMidnight());
 
