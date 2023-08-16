@@ -12,49 +12,37 @@
   import { settings } from "src/store/settings";
   import { SNAP_STEP_MINUTES } from "src/constants";
   import { updateTimestamps } from "src/store/update-timestamp";
+  import { useDrag } from "./use-drag";
+  import type { Readable } from "svelte/store";
 
   export let text: string;
   export let startMinutes: number | undefined = undefined;
   export let durationMinutes: number;
-  export let pointerYOffset: number;
+  export let pointerYOffset: Readable<number>;
   export let isGhost = false;
 
-  let dragging = false;
+  const { dragging, pointerYOffsetToTaskStart, handleMoveStart, handleMoveCancel, handleMoveConfirm } =
+    useDrag({ text, durationMinutes }, pointerYOffset);
+
+
   let resizing = false;
-  let pointerYOffsetToTaskStart: number;
 
   $: initialTaskOffset = isGhost
-    ? pointerYOffset
+    ? $pointerYOffset
     : $timeToTimelineOffset(startMinutes);
 
-  $: taskOffset = dragging
-    ? roundToSnapStep(pointerYOffset - pointerYOffsetToTaskStart)
+  $: taskOffset = $dragging
+    ? roundToSnapStep($pointerYOffset - $pointerYOffsetToTaskStart)
     : initialTaskOffset;
 
-  $: fromTaskOffsetToPointer = pointerYOffset - initialTaskOffset;
+  $: fromTaskOffsetToPointer = $pointerYOffset - initialTaskOffset;
 
   $: taskHeight = resizing
     ? roundToSnapStep(fromTaskOffsetToPointer) +
       SNAP_STEP_MINUTES * $settings.zoomLevel
     : $durationToSize(durationMinutes);
 
-  $: cursor = dragging ? "grabbing" : "grab";
-
-  function handleMoveStart(event: MouseEvent) {
-    dragging = true;
-    pointerYOffsetToTaskStart = event.offsetY;
-  }
-
-  async function handleMoveConfirm(event: MouseEvent) {
-    dragging = false;
-
-    const newStartMinutes = getTimeFromYOffset(pointerYOffset - event.offsetY);
-
-    await updateTimestamps(text, {
-      startMinutes: newStartMinutes,
-      durationMinutes,
-    });
-  }
+  $: cursor = $dragging ? "grabbing" : "grab";
 
   async function handleResizeConfirm() {
     resizing = false;
@@ -68,7 +56,7 @@
   }
 
   function handleCancel() {
-    dragging = false;
+    handleMoveCancel();
     resizing = false;
   }
 

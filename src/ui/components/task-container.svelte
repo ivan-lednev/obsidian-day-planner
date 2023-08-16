@@ -1,18 +1,21 @@
 <script lang="ts">
   import type { PlanItem } from "src/plan-item";
   import Task from "./task.svelte";
+  import { updateTimestamps } from "src/store/update-timestamp";
+  import { derived, writable } from "svelte/store";
+  import { getTimeFromYOffset } from "src/store/timeline-store";
 
   export let tasks: PlanItem[] = [];
 
   const cancelMessage = "Release outside timeline to cancel";
   const defaultDurationForNewTask = 30;
 
-  let pointerYOffset: number;
+  const pointerYOffset = writable<number>();
   let el: HTMLDivElement;
   let creating = false;
 
   function handleMousemove(event: MouseEvent) {
-    pointerYOffset = event.clientY - el.getBoundingClientRect().top;
+    pointerYOffset.set(event.clientY - el.getBoundingClientRect().top);
   }
 
   function startCreation() {
@@ -26,6 +29,7 @@
   function cancelCreation() {
     creating = false;
   }
+
 </script>
 
 <!-- TODO: use store to broadcast this -->
