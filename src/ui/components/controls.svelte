@@ -10,7 +10,7 @@
   }
 
   function getFormattedDate() {
-    return moment().format($settings.timelineDateFormat);
+    return window.moment().format($settings.timelineDateFormat);
   }
 
   let date = getFormattedDate();
@@ -49,6 +49,7 @@
           <div class="setting-item-name">Auto-scroll to now</div>
         </div>
         <div class="setting-item-control">
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
             class="checkbox-container mod-small"
             class:is-enabled={$settings.centerNeedle}

@@ -7,6 +7,7 @@
     roundToSnapStep,
     getTimeFromYOffset,
     timeToTimelineOffset,
+    durationToSize,
   } from "../../store/timeline-store";
   import { settings } from "src/store/settings";
   import { SNAP_STEP_MINUTES } from "src/constants";
@@ -26,13 +27,12 @@
     ? $timeToTimelineOffset(startMinutes)
     : pointerYOffset;
 
-  $: scaledDuration = durationMinutes * $settings.zoomLevel;
   $: fromTaskOffsetToPointer = pointerYOffset - initialTaskOffset;
 
   $: taskHeight = resizing
     ? roundToSnapStep(fromTaskOffsetToPointer) +
       SNAP_STEP_MINUTES * $settings.zoomLevel
-    : scaledDuration;
+    : $durationToSize(durationMinutes);
 
   $: taskOffset = dragging
     ? roundToSnapStep(pointerYOffset - pointerYOffsetToTaskStart)

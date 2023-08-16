@@ -28,13 +28,23 @@ export const timeToTimelineOffset = derived(
 );
 
 export function roundToSnapStep(coords: number) {
-  return coords - (coords % (SNAP_STEP_MINUTES * get(settings).zoomLevel));
+  const { zoomLevel } = get(settings);
+  return coords - (coords % (SNAP_STEP_MINUTES * zoomLevel));
 }
 
 export function getTimeFromYOffset(yCoords: number) {
-  return (yCoords + get(hiddenHoursSize)) / get(settings).zoomLevel;
+  const { zoomLevel } = get(settings);
+  return (yCoords + get(hiddenHoursSize)) / zoomLevel;
 }
 
 export function sizeToDuration(size: number) {
-  return size / get(settings).zoomLevel;
+  const { zoomLevel } = get(settings);
+  return size / zoomLevel;
 }
+
+export const durationToSize = derived(settings, ($settings) => {
+  return (duration: number) => {
+    const { zoomLevel } = $settings;
+    return duration * zoomLevel;
+  };
+});
