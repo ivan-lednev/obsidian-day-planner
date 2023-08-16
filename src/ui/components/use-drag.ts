@@ -2,10 +2,7 @@ import { getTimeFromYOffset } from "src/store/timeline-store";
 import { updateTimestamps } from "src/store/update-timestamp";
 import { Readable, get, writable } from "svelte/store";
 
-export function useDrag(
-  { text, durationMinutes }: { text: string; durationMinutes: number },
-  pointerYOffset: Readable<number>,
-) {
+export function useDrag() {
   const dragging = writable(false);
   const pointerYOffsetToTaskStart = writable<number>();
 
@@ -18,11 +15,16 @@ export function useDrag(
     dragging.set(false);
   }
 
-  async function handleMoveConfirm(event: MouseEvent) {
+  async function handleMoveConfirm(
+    event: MouseEvent,
+    pointerYOffset: number,
+    text: string,
+    durationMinutes: number,
+  ) {
     dragging.set(false);
 
     const newStartMinutes = getTimeFromYOffset(
-      get(pointerYOffset) - event.offsetY,
+      pointerYOffset - event.offsetY,
     );
 
     await updateTimestamps(text, {

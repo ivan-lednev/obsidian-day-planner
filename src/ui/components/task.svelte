@@ -25,7 +25,7 @@
     handleMoveStart,
     handleMoveCancel,
     handleMoveConfirm,
-  } = useDrag({ text, durationMinutes }, pointerYOffset);
+  } = useDrag();
 
   const {
     resizing,
@@ -66,7 +66,8 @@
   style:transform="translateY({taskOffset}px)"
   style:cursor
   on:mousedown|stopPropagation={handleMoveStart}
-  on:mouseup={handleMoveConfirm}
+  on:mouseup={(event) =>
+    handleMoveConfirm(event, $pointerYOffset, text, durationMinutes)}
   transition:fade={{ duration: 100 }}
 >
   <RenderedMarkdown {text} />
