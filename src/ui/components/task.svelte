@@ -3,12 +3,12 @@
 
   import { fade } from "svelte/transition";
   import {
-    durationToCoords as sizeToDuration,
-    timeToTimelineOffset,
+    sizeToDuration,
     roundToSnapStep,
     zoomLevel,
     updateTimestamps,
     getTimeFromYOffset,
+    timeToTimelineOffset,
   } from "../../store/timeline-store";
   import { SNAP_STEP_MINUTES } from "src/constants";
 

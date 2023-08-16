@@ -60,18 +60,22 @@ export const updateTimestamps = async (id: string, timestamp: Timestamp) => {
   });
 };
 
+export const settingsStore = writable({
+  zoomLevel: 2,
+  startHour: 0,
+  centerNeedle: true,
+  timelineDateFormat: "LLLL",
+});
+
 export const zoomLevel = writable("2");
+export const startHour = writable(0);
+export const centerNeedle = writable(true);
+export const timelineDateFormat = writable();
 
 export const hourSize = derived(
   zoomLevel,
   ($zoomLevel) => Number($zoomLevel) * 60,
 );
-
-export const startHour = writable(0);
-
-export const timelineDateFormat = writable();
-
-export const centerNeedle = writable(true);
 
 export const hiddenHoursSize = derived(
   [startHour, hourSize],
@@ -92,10 +96,9 @@ export const getTimeFromYOffset = derived(
       (yCoords + $hiddenHoursSize) / Number($zoomLevel),
 );
 
-export const durationToCoords = derived(
+export const sizeToDuration = derived(
   zoomLevel,
-  ($zoomLevel) => (durationMinutes: number) =>
-    durationMinutes / Number($zoomLevel),
+  ($zoomLevel) => (size: number) => size / Number($zoomLevel),
 );
 
 export const roundToSnapStep = derived(
