@@ -1,11 +1,15 @@
 <script lang="ts">
-  import type { PlanItem } from "src/plan-item";
+  import { writable } from "svelte/store";
   import Task from "./task.svelte";
-  import { updateTimestamps } from "src/store/update-timestamp";
-  import { derived, writable } from "svelte/store";
-  import { getTimeFromYOffset } from "src/store/timeline-store";
-
-  export let tasks: PlanItem[] = [];
+  import {
+    getTimeFromYOffset,
+    roundToSnapStep,
+    tasks,
+  } from "../../store/timeline-store";
+  import { DEFAULT_DURATION_MINUTES } from "src/constants";
+  import { createPlanItemFromTimeline } from "src/parser/parser";
+  import { insertPlanItem } from "src/update-plan";
+  import { getDailyNoteForToday } from "src/util/daily-notes";
 
   const cancelMessage = "Release outside timeline to cancel";
   const defaultDurationForNewTask = 30;
@@ -22,14 +26,21 @@
     creating = true;
   }
 
-  function handleMouseUp(event: MouseEvent) {
-    cancelCreation();
+  async function handleMouseUp() {
+    if (!creating) {
+      return;
+    }
+
+    creating = false;
+
+    const newPlanItem = createPlanItemFromTimeline($pointerYOffset);
+    $tasks = [...$tasks, newPlanItem];
+    await insertPlanItem(getDailyNoteForToday().path, newPlanItem);
   }
 
   function cancelCreation() {
     creating = false;
   }
-
 </script>
 
 <!-- TODO: use store to broadcast this -->
@@ -42,7 +53,7 @@
   on:mousedown={startCreation}
   on:mouseup={handleMouseUp}
 >
-  {#each tasks as taskProps (taskProps.text)}
+  {#each $tasks as taskProps (taskProps.text)}
     <Task {...taskProps} {pointerYOffset} />
   {/each}
   {#if creating}

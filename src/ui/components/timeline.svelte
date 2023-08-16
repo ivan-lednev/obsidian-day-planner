@@ -6,7 +6,7 @@
   import Controls from "./controls.svelte";
   import { settings } from "src/store/settings";
   import { tasks } from "src/store/timeline-store";
-  
+
   let userHoversOverScroller = false;
 
   function handleMouseEnter() {
@@ -32,7 +32,7 @@
     <Ruler {visibleHours} />
     <Column {visibleHours}>
       <Needle scrollBlockedByUser={userHoversOverScroller} />
-      <TaskContainer tasks={$tasks} />
+      <TaskContainer />
     </Column>
   </div>
 </div>

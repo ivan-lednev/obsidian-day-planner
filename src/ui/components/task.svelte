@@ -35,7 +35,7 @@
   } = useResize();
 
   $: initialTaskOffset = isGhost
-    ? $pointerYOffset
+    ? roundToSnapStep($pointerYOffset)
     : $timeToTimelineOffset(startMinutes);
 
   $: taskOffset = $dragging

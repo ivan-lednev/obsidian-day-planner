@@ -6,7 +6,6 @@ export interface PlanItemLocation {
 }
 
 export interface PlanItem {
-  matchIndex: number;
   startTime: Moment;
   endTime: Moment;
   rawStartTime: string;

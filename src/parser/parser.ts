@@ -3,10 +3,22 @@ import { parseTimestamp } from "../util/timestamp";
 import { timestampRegExp } from "../regexp";
 import { isTopLevelListItem } from "../../obsidian-metadata-utils/src/list";
 import { getTextAtPosition } from "../../obsidian-metadata-utils/src/position";
-import { getDiffInMinutes, getMinutesSinceMidnightTo } from "../util/moment";
+import {
+  getDiffInMinutes,
+  getMinutesSinceMidnightTo,
+  minutesToMoment,
+} from "../util/moment";
 import { DEFAULT_DURATION_MINUTES } from "../constants";
 import type { PlanItem, PlanItemLocation } from "src/plan-item";
+import {
+  appStore,
+  getTimeFromYOffset,
+  roundToSnapStep,
+} from "src/store/timeline-store";
+import { get } from "svelte/store";
+import { getDailyNoteForToday } from "src/util/daily-notes";
 
+// todo: out of place
 export function calculateDefaultDuration(
   item: ReturnType<typeof createPlanItem>,
   next?: ReturnType<typeof createPlanItem>,
@@ -32,34 +44,10 @@ export function parsePlanItems(
   planHeadingContent: string,
   path: string,
 ): PlanItem[] {
-  const { headings } = metadata;
-
-  if (!headings) {
-    return [];
-  }
-
-  const planHeadingIndex = headings.findIndex(
-    (h) => h.heading === planHeadingContent,
+  const listItemsUnderPlan = getListItemsUnderHeading(
+    metadata,
+    planHeadingContent,
   );
-
-  if (planHeadingIndex < 0) {
-    return [];
-  }
-
-  const planHeading = headings[planHeadingIndex];
-  const nextHeadingOfSameLevel = headings
-    .slice(planHeadingIndex + 1)
-    .find((heading) => heading.level <= planHeading.level);
-
-  const listItemsUnderPlan = metadata.listItems?.filter((li) => {
-    const isBelowPlan =
-      li.position.start.line > planHeading.position.start.line;
-    const isAboveNextHeadingIfItExists =
-      !nextHeadingOfSameLevel ||
-      li.position.start.line < nextHeadingOfSameLevel.position.start.line;
-
-    return isBelowPlan && isAboveNextHeadingIfItExists;
-  });
 
   const listItemsWithContent = getListItemContent(content, listItemsUnderPlan);
 
@@ -87,6 +75,38 @@ export function parsePlanItems(
         durationMinutes,
       };
     });
+}
+
+export function getListItemsUnderHeading(
+  metadata: CachedMetadata,
+  heading: string,
+) {
+  const { headings } = metadata;
+
+  if (!headings) {
+    return [];
+  }
+
+  const planHeadingIndex = headings.findIndex((h) => h.heading === heading);
+
+  if (planHeadingIndex < 0) {
+    return [];
+  }
+
+  const planHeading = headings[planHeadingIndex];
+  const nextHeadingOfSameLevel = headings
+    .slice(planHeadingIndex + 1)
+    .find((heading) => heading.level <= planHeading.level);
+
+  return metadata.listItems?.filter((li) => {
+    const isBelowPlan =
+      li.position.start.line > planHeading.position.start.line;
+    const isAboveNextHeadingIfItExists =
+      !nextHeadingOfSameLevel ||
+      li.position.start.line < nextHeadingOfSameLevel.position.start.line;
+
+    return isBelowPlan && isAboveNextHeadingIfItExists;
+  });
 }
 
 function createPlanItem({
@@ -149,4 +169,24 @@ function getListItemContent(content: string, listItems: ListItemCache[]) {
       };
     },
   );
+}
+
+// todo: move
+export function createPlanItemFromTimeline(pointerYOffset: number) {
+  const startMinutes = getTimeFromYOffset(roundToSnapStep(pointerYOffset));
+  const endMinutes = startMinutes + DEFAULT_DURATION_MINUTES;
+
+  return {
+    startMinutes,
+    durationMinutes: DEFAULT_DURATION_MINUTES,
+    endMinutes,
+    text: "New item",
+    startTime: minutesToMoment(startMinutes),
+    endTime: minutesToMoment(endMinutes),
+    // todo: no hardcode
+    listTokens: "- ",
+    location: {
+      path: getDailyNoteForToday().path,
+    },
+  };
 }
