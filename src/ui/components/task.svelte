@@ -23,9 +23,13 @@
   let resizing = false;
   let pointerYOffsetToTaskStart: number;
 
-  $: initialTaskOffset = startMinutes
-    ? $timeToTimelineOffset(startMinutes)
-    : pointerYOffset;
+  $: initialTaskOffset = isGhost
+    ? pointerYOffset
+    : $timeToTimelineOffset(startMinutes);
+
+  $: taskOffset = dragging
+    ? roundToSnapStep(pointerYOffset - pointerYOffsetToTaskStart)
+    : initialTaskOffset;
 
   $: fromTaskOffsetToPointer = pointerYOffset - initialTaskOffset;
 
@@ -34,11 +38,6 @@
       SNAP_STEP_MINUTES * $settings.zoomLevel
     : $durationToSize(durationMinutes);
 
-  $: taskOffset = dragging
-    ? roundToSnapStep(pointerYOffset - pointerYOffsetToTaskStart)
-    : initialTaskOffset;
-
-  $: transform = `translateY(${taskOffset}px)`;
   $: cursor = dragging ? "grabbing" : "grab";
 
   function handleMoveStart(event: MouseEvent) {
@@ -84,7 +83,7 @@
   class="task absolute-stretch-x"
   class:is-ghost={isGhost}
   style:height="{taskHeight}px"
-  style:transform
+  style:transform="translateY({taskOffset}px)"
   style:cursor
   on:mousedown|stopPropagation={handleMoveStart}
   on:mouseup={handleMoveConfirm}
