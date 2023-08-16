@@ -1,13 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { centerNeedle, getYCoords } from "../../store/timeline-store";
+  import { centerNeedle, timeToTimelineOffset } from "../../store/timeline-store";
   import { getMinutesSinceMidnight } from "../../util/moment";
 
   export let scrollBlockedByUser;
 
   let el;
 
-  $: coords = $getYCoords(getMinutesSinceMidnight());
+  $: coords = $timeToTimelineOffset(getMinutesSinceMidnight());
 
   function scrollIntoView() {
     if ($centerNeedle && !scrollBlockedByUser) {
@@ -17,7 +17,7 @@
 
   onMount(() => {
     const interval = setInterval(() => {
-      coords = $getYCoords(getMinutesSinceMidnight());
+      coords = $timeToTimelineOffset(getMinutesSinceMidnight());
       scrollIntoView();
     }, 2000);
 

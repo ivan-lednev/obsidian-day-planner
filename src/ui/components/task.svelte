@@ -4,11 +4,11 @@
   import { fade } from "svelte/transition";
   import {
     durationToCoords as sizeToDuration,
-    getMinutesFromYCoords,
-    getYCoords,
+    timeToTimelineOffset,
     roundToSnapStep,
-    updateTimestamps,
     zoomLevel,
+    updateTimestamps,
+    getTimeFromYOffset,
   } from "../../store/timeline-store";
   import { SNAP_STEP_MINUTES } from "src/constants";
 
@@ -23,7 +23,7 @@
   let pointerYOffsetToTaskStart: number;
 
   $: initialTaskOffset = startMinutes
-    ? $getYCoords(startMinutes)
+    ? $timeToTimelineOffset(startMinutes)
     : pointerYOffset;
 
   $: scaledDuration = durationMinutes * Number($zoomLevel);
@@ -49,9 +49,7 @@
   async function handleMoveConfirm(event: MouseEvent) {
     dragging = false;
 
-    const newStartMinutes = $getMinutesFromYCoords(
-      pointerYOffset - event.offsetY,
-    );
+    const newStartMinutes = $getTimeFromYOffset(pointerYOffset - event.offsetY);
 
     updateTimestamps(text, {
       startMinutes: newStartMinutes,

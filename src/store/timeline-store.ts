@@ -78,14 +78,14 @@ export const hiddenHoursSize = derived(
   ([$startHour, $hourSize]) => $startHour * $hourSize,
 );
 
-export const getYCoords = derived(
+export const timeToTimelineOffset = derived(
   [zoomLevel, hiddenHoursSize],
   ([$zoomLevel, $hiddenHoursSize]) =>
     (minutes: number) =>
       minutes * Number($zoomLevel) - $hiddenHoursSize,
 );
 
-export const getMinutesFromYCoords = derived(
+export const getTimeFromYOffset = derived(
   [zoomLevel, hiddenHoursSize],
   ([$zoomLevel, $hiddenHoursSize]) =>
     (yCoords: number) =>
