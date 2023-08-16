@@ -7,10 +7,10 @@
     roundToSnapStep,
     getTimeFromYOffset,
     timeToTimelineOffset,
-    updateTimestamps,
   } from "../../store/timeline-store";
   import { settings } from "src/store/settings";
   import { SNAP_STEP_MINUTES } from "src/constants";
+  import { updateTimestamps } from "src/store/update-timestamp";
 
   export let text: string;
   export let startMinutes: number | undefined = undefined;
@@ -51,7 +51,7 @@
 
     const newStartMinutes = getTimeFromYOffset(pointerYOffset - event.offsetY);
 
-    updateTimestamps(text, {
+    await updateTimestamps(text, {
       startMinutes: newStartMinutes,
       durationMinutes,
     });
