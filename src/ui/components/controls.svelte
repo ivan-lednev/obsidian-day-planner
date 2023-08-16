@@ -1,8 +1,8 @@
 <script lang="ts">
   import SettingsButton from "./settings-button.svelte";
   import { onMount } from "svelte";
-  import { centerNeedle, timelineDateFormat, zoomLevel } from "../../store/timeline-store";
-
+  import { settings } from "src/store/settings";
+  
   let settingsVisible = false;
 
   function toggleSettings() {
@@ -10,7 +10,7 @@
   }
 
   function getFormattedDate() {
-    return moment().format($timelineDateFormat);
+    return moment().format($settings.timelineDateFormat);
   }
 
   let date = getFormattedDate();
@@ -36,7 +36,7 @@
           <div class="setting-item-name">Zoom</div>
         </div>
         <div class="setting-item-control">
-          <select bind:value={$zoomLevel} class="dropdown">
+          <select bind:value={$settings.zoomLevel} class="dropdown">
             {#each ["1", "2", "3", "4"] as level}
               <option value={level}>{level}</option>
             {/each}
@@ -51,9 +51,9 @@
         <div class="setting-item-control">
           <div
             class="checkbox-container mod-small"
-            class:is-enabled={$centerNeedle}
+            class:is-enabled={$settings.centerNeedle}
             on:click={() => {
-              $centerNeedle = !$centerNeedle
+              $settings.centerNeedle = !$settings.centerNeedle;
             }}
           >
             <input type="checkbox" tabindex="0" />

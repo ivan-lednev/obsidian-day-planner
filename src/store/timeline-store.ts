@@ -3,6 +3,7 @@ import { TFile, type App } from "obsidian";
 import type { PlanItem } from "../plan-item";
 import { SNAP_STEP_MINUTES } from "src/constants";
 import { replaceTimestamp } from "src/util/timestamp";
+import { settings } from "./settings";
 
 export type Timestamp = { durationMinutes: number; startMinutes: number };
 
@@ -60,49 +61,37 @@ export const updateTimestamps = async (id: string, timestamp: Timestamp) => {
   });
 };
 
-export const settingsStore = writable({
-  zoomLevel: 2,
-  startHour: 0,
-  centerNeedle: true,
-  timelineDateFormat: "LLLL",
-});
-
-export const zoomLevel = writable("2");
-export const startHour = writable(0);
-export const centerNeedle = writable(true);
-export const timelineDateFormat = writable();
-
 export const hourSize = derived(
-  zoomLevel,
-  ($zoomLevel) => Number($zoomLevel) * 60,
+  settings,
+  ($settings) => $settings.zoomLevel * 60,
 );
 
 export const hiddenHoursSize = derived(
-  [startHour, hourSize],
-  ([$startHour, $hourSize]) => $startHour * $hourSize,
+  [settings, hourSize],
+  ([$settings, $hourSize]) => $settings.startHour * $hourSize,
 );
 
 export const timeToTimelineOffset = derived(
-  [zoomLevel, hiddenHoursSize],
-  ([$zoomLevel, $hiddenHoursSize]) =>
+  [settings, hiddenHoursSize],
+  ([$settings, $hiddenHoursSize]) =>
     (minutes: number) =>
-      minutes * Number($zoomLevel) - $hiddenHoursSize,
+      minutes * $settings.zoomLevel - $hiddenHoursSize,
 );
 
 export const getTimeFromYOffset = derived(
-  [zoomLevel, hiddenHoursSize],
-  ([$zoomLevel, $hiddenHoursSize]) =>
+  [settings, hiddenHoursSize],
+  ([$settings, $hiddenHoursSize]) =>
     (yCoords: number) =>
-      (yCoords + $hiddenHoursSize) / Number($zoomLevel),
+      (yCoords + $hiddenHoursSize) / $settings.zoomLevel,
 );
 
 export const sizeToDuration = derived(
-  zoomLevel,
-  ($zoomLevel) => (size: number) => size / Number($zoomLevel),
+  settings,
+  ($settings) => (size: number) => size / $settings.zoomLevel,
 );
 
 export const roundToSnapStep = derived(
-  zoomLevel,
-  ($zoomLevel) => (coords: number) =>
-    coords - (coords % (SNAP_STEP_MINUTES * Number($zoomLevel))),
+  settings,
+  ($settings) => (coords: number) =>
+    coords - (coords % (SNAP_STEP_MINUTES * $settings.zoomLevel)),
 );

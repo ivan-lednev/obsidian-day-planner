@@ -2,11 +2,8 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 import Timeline from "./components/timeline.svelte";
 import {
   appStore,
-  centerNeedle,
-  startHour,
-  timelineDateFormat,
-  zoomLevel,
 } from "../store/timeline-store";
+import { settings } from "src/store/settings";
 import { VIEW_TYPE_TIMELINE } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 import type DayPlanner from "../main";
@@ -47,25 +44,18 @@ export default class TimelineView extends ItemView {
 
   initStore() {
     appStore.set(this.app);
-    zoomLevel.set(this.settings.timelineZoomLevel);
-    zoomLevel.subscribe(async (value) => {
-      this.plugin.settings.timelineZoomLevel = value;
+    const { zoomLevel, centerNeedle, startHour, timelineDateFormat } =
+      this.settings;
+    settings.set({
+      zoomLevel,
+      centerNeedle,
+      startHour,
+      timelineDateFormat
+    });
+    settings.subscribe(async (newValue) => {
+      this.plugin.settings = { ...this.plugin.settings, ...newValue };
       await this.plugin.saveData(this.plugin.settings);
     });
-
-    centerNeedle.set(this.settings.centerNeedle);
-    centerNeedle.subscribe(async (value) => {
-      this.plugin.settings.centerNeedle = value;
-      await this.plugin.saveData(this.plugin.settings);
-    });
-
-    startHour.set(this.settings.startHour);
-    startHour.subscribe(async (value) => {
-      this.plugin.settings.startHour = value;
-      await this.plugin.saveData(this.plugin.settings);
-    });
-
-    timelineDateFormat.set(this.settings.timelineDateFormat);
   }
 
   async onClose() {

@@ -5,11 +5,11 @@
   import {
     sizeToDuration,
     roundToSnapStep,
-    zoomLevel,
-    updateTimestamps,
     getTimeFromYOffset,
     timeToTimelineOffset,
+    updateTimestamps,
   } from "../../store/timeline-store";
+  import { settings } from "src/store/settings";
   import { SNAP_STEP_MINUTES } from "src/constants";
 
   export let text: string;
@@ -26,12 +26,12 @@
     ? $timeToTimelineOffset(startMinutes)
     : pointerYOffset;
 
-  $: scaledDuration = durationMinutes * Number($zoomLevel);
+  $: scaledDuration = durationMinutes * $settings.zoomLevel;
   $: fromTaskOffsetToPointer = pointerYOffset - initialTaskOffset;
 
   $: taskHeight = resizing
     ? $roundToSnapStep(fromTaskOffsetToPointer) +
-      SNAP_STEP_MINUTES * Number($zoomLevel)
+      SNAP_STEP_MINUTES * $settings.zoomLevel
     : scaledDuration;
 
   $: taskOffset = dragging

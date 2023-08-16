@@ -4,8 +4,9 @@
   import Needle from "./needle.svelte";
   import TaskContainer from "./task-container.svelte";
   import Controls from "./controls.svelte";
-  import { startHour, tasks } from "../../store/timeline-store";
-
+  import { settings } from "src/store/settings";
+  import { tasks } from "src/store/timeline-store";
+  
   let userHoversOverScroller = false;
 
   function handleMouseEnter() {
@@ -18,7 +19,7 @@
 
   $: visibleHours = Array.from({ length: 24 })
     .map((value, index) => index)
-    .slice($startHour);
+    .slice($settings.startHour);
 </script>
 
 <Controls />

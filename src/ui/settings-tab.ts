@@ -1,12 +1,7 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import type DayPlanner from "../main";
 import { ICONS } from "../constants";
-import {
-  centerNeedle,
-  startHour,
-  timelineDateFormat,
-  zoomLevel,
-} from "../store/timeline-store";
+import { settings } from "src/store/settings";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   plugin: DayPlanner;
@@ -65,12 +60,12 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       .addSlider((slider) =>
         slider
           .setLimits(1, 5, 1)
-          .setValue(Number(this.plugin.settings.timelineZoomLevel) ?? 4)
+          .setValue(Number(this.plugin.settings.zoomLevel) ?? 4)
           .setDynamicTooltip()
           .onChange(async (value: number) => {
-            zoomLevel.update(() => String(value));
+            settings.update((settings) => ({ ...settings, zoomLevel: value }));
 
-            this.plugin.settings.timelineZoomLevel = String(value);
+            this.plugin.settings.zoomLevel = value;
             await this.plugin.saveData(this.plugin.settings);
           }),
       );
@@ -116,7 +111,10 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           .onChange(async (value: string) => {
             const asNumber = Number(value);
 
-            startHour.update(() => asNumber);
+            settings.update((previous) => ({
+              ...previous,
+              startHour: asNumber,
+            }));
 
             this.plugin.settings.startHour = asNumber;
             await this.plugin.saveData(this.plugin.settings);
@@ -134,7 +132,10 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.timelineDateFormat)
                 .setSampleEl(fragment.createSpan())
                 .onChange(async (value: string) => {
-                  timelineDateFormat.set(value);
+                  settings.update((previous) => ({
+                    ...previous,
+                    timelineDateFormat: value,
+                  }));
 
                   this.plugin.settings.timelineDateFormat = value;
                   await this.plugin.saveData(this.plugin.settings);
@@ -166,7 +167,10 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
         component
           .setValue(this.plugin.settings.centerNeedle)
           .onChange(async (value) => {
-            centerNeedle.set(value);
+            settings.update((previous) => ({
+              ...previous,
+              centerNeedle: value,
+            }));
 
             this.plugin.settings.centerNeedle = value;
             await this.plugin.saveData(this.plugin.settings);
