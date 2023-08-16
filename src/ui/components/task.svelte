@@ -3,13 +3,14 @@
 
   import { fade } from "svelte/transition";
   import {
-    durationToCoords,
+    durationToCoords as sizeToDuration,
     getMinutesFromYCoords,
     getYCoords,
     roundToSnapStep,
     updateTimestamps,
     zoomLevel,
   } from "../../store/timeline-store";
+  import { SNAP_STEP_MINUTES } from "src/constants";
 
   export let text: string;
   export let startMinutes: number | undefined = undefined;
@@ -29,7 +30,8 @@
   $: fromTaskOffsetToPointer = pointerYOffset - initialTaskOffset;
 
   $: taskHeight = resizing
-    ? $roundToSnapStep(fromTaskOffsetToPointer)
+    ? $roundToSnapStep(fromTaskOffsetToPointer) +
+      SNAP_STEP_MINUTES * Number($zoomLevel)
     : scaledDuration;
 
   $: taskOffset = dragging
@@ -40,16 +42,11 @@
   $: cursor = dragging ? "grabbing" : "grab";
 
   function handleMoveStart(event: MouseEvent) {
-    event.stopPropagation();
-    pointerYOffsetToTaskStart = event.offsetY;
     dragging = true;
+    pointerYOffsetToTaskStart = event.offsetY;
   }
 
   async function handleMoveConfirm(event: MouseEvent) {
-    if (!dragging) {
-      return;
-    }
-
     dragging = false;
 
     const newStartMinutes = $getMinutesFromYCoords(
@@ -62,12 +59,12 @@
     });
   }
 
-  function handleResizeConfirm() {
+  async function handleResizeConfirm() {
     resizing = false;
 
-    const newDurationMinutes = $durationToCoords(taskHeight);
+    const newDurationMinutes = $sizeToDuration(taskHeight);
 
-    updateTimestamps(text, {
+    await updateTimestamps(text, {
       startMinutes,
       durationMinutes: newDurationMinutes,
     });
@@ -78,8 +75,7 @@
     resizing = false;
   }
 
-  function handleResizeStart(event: MouseEvent) {
-    event.stopPropagation();
+  function handleResizeStart() {
     resizing = true;
   }
 </script>
@@ -92,15 +88,15 @@
   style:height="{taskHeight}px"
   style:transform
   style:cursor
-  on:mousedown={handleMoveStart}
+  on:mousedown|stopPropagation={handleMoveStart}
   on:mouseup={handleMoveConfirm}
   transition:fade={{ duration: 100 }}
 >
   <RenderedMarkdown {text} />
   <div
     class="resize-handle absolute-stretch-x"
-    on:mousedown={handleResizeStart}
-    on:mouseup={handleResizeConfirm}
+    on:mousedown|stopPropagation={handleResizeStart}
+    on:mouseup|stopPropagation={handleResizeConfirm}
   ></div>
 </div>
 
@@ -136,8 +132,8 @@
   }
 
   .resize-handle {
-    bottom: -10px;
-    height: 20px;
+    bottom: -15px;
+    height: 30px;
     cursor: s-resize;
   }
 </style>

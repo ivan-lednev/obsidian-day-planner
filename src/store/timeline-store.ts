@@ -1,4 +1,4 @@
-import { derived,  writable } from "svelte/store";
+import { derived, writable } from "svelte/store";
 import { TFile, type App } from "obsidian";
 import type { PlanItem } from "../plan-item";
 import { SNAP_STEP_MINUTES } from "src/constants";
