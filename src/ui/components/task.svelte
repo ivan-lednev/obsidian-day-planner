@@ -30,12 +30,12 @@
   $: fromTaskOffsetToPointer = pointerYOffset - initialTaskOffset;
 
   $: taskHeight = resizing
-    ? $roundToSnapStep(fromTaskOffsetToPointer) +
+    ? roundToSnapStep(fromTaskOffsetToPointer) +
       SNAP_STEP_MINUTES * $settings.zoomLevel
     : scaledDuration;
 
   $: taskOffset = dragging
-    ? $roundToSnapStep(pointerYOffset - pointerYOffsetToTaskStart)
+    ? roundToSnapStep(pointerYOffset - pointerYOffsetToTaskStart)
     : initialTaskOffset;
 
   $: transform = `translateY(${taskOffset}px)`;
@@ -49,7 +49,7 @@
   async function handleMoveConfirm(event: MouseEvent) {
     dragging = false;
 
-    const newStartMinutes = $getTimeFromYOffset(pointerYOffset - event.offsetY);
+    const newStartMinutes = getTimeFromYOffset(pointerYOffset - event.offsetY);
 
     updateTimestamps(text, {
       startMinutes: newStartMinutes,
@@ -60,7 +60,7 @@
   async function handleResizeConfirm() {
     resizing = false;
 
-    const newDurationMinutes = $sizeToDuration(taskHeight);
+    const newDurationMinutes = sizeToDuration(taskHeight);
 
     await updateTimestamps(text, {
       startMinutes,

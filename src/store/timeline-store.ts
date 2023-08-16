@@ -1,4 +1,4 @@
-import { derived, writable } from "svelte/store";
+import { derived, get, writable } from "svelte/store";
 import { TFile, type App } from "obsidian";
 import type { PlanItem } from "../plan-item";
 import { SNAP_STEP_MINUTES } from "src/constants";
@@ -11,23 +11,17 @@ export const appStore = writable<App>();
 
 export const tasks = writable<PlanItem[]>([]);
 
-let app: App;
-
-appStore.subscribe((current) => {
-  app = current;
-});
-
 export async function updateDurationInDailyNote(
   task: PlanItem,
   startAndDuration: Timestamp,
 ) {
-  const file = app.vault.getAbstractFileByPath(task.location.path);
+  const file = get(appStore).vault.getAbstractFileByPath(task.location.path);
 
   if (!(file instanceof TFile)) {
     throw new Error("Something is wrong");
   }
 
-  const contents = await app.vault.read(file);
+  const contents = await get(appStore).vault.read(file);
   // todo: this is inefficient
   const updated = contents
     .split("\n")
@@ -40,7 +34,7 @@ export async function updateDurationInDailyNote(
     })
     .join("\n");
 
-  await app.vault.modify(file, updated);
+  await get(appStore).vault.modify(file, updated);
 }
 
 export const updateTimestamps = async (id: string, timestamp: Timestamp) => {
@@ -78,20 +72,14 @@ export const timeToTimelineOffset = derived(
       minutes * $settings.zoomLevel - $hiddenHoursSize,
 );
 
-export const getTimeFromYOffset = derived(
-  [settings, hiddenHoursSize],
-  ([$settings, $hiddenHoursSize]) =>
-    (yCoords: number) =>
-      (yCoords + $hiddenHoursSize) / $settings.zoomLevel,
-);
+export function roundToSnapStep(coords: number) {
+  return coords - (coords % (SNAP_STEP_MINUTES * get(settings).zoomLevel));
+}
 
-export const sizeToDuration = derived(
-  settings,
-  ($settings) => (size: number) => size / $settings.zoomLevel,
-);
+export function getTimeFromYOffset(yCoords: number) {
+  return (yCoords + get(hiddenHoursSize)) / get(settings).zoomLevel;
+}
 
-export const roundToSnapStep = derived(
-  settings,
-  ($settings) => (coords: number) =>
-    coords - (coords % (SNAP_STEP_MINUTES * $settings.zoomLevel)),
-);
+export function sizeToDuration(size: number) {
+  return size / get(settings).zoomLevel;
+}
