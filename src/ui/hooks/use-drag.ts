@@ -16,15 +16,14 @@ export function useDrag() {
   }
 
   async function handleMoveConfirm(
-    event: MouseEvent,
-    pointerYOffset: number,
+    offset: number,
     text: string,
     // todo: we don't need duration here
     durationMinutes: number,
   ) {
     dragging.set(false);
 
-    const newStartMinutes = getTimeFromYOffset(pointerYOffset - event.offsetY);
+    const newStartMinutes = getTimeFromYOffset(offset);
 
     await updateTimestamps(text, {
       startMinutes: newStartMinutes,

@@ -5,7 +5,11 @@
   import { settings } from "src/store/settings";
   import type { Readable } from "svelte/store";
   import { fade } from "svelte/transition";
-  import { durationToSize, roundToSnapStep, timeToTimelineOffset } from "../../store/timeline-store";
+  import {
+    durationToSize,
+    roundToSnapStep,
+    timeToTimelineOffset,
+  } from "../../store/timeline-store";
   import { useDrag } from "../hooks/use-drag";
   import { useResize } from "../hooks/use-resize";
 
@@ -61,8 +65,8 @@
   style:transform="translateY({offset}px)"
   style:cursor
   on:mousedown|stopPropagation={handleMoveStart}
-  on:mouseup={(event) =>
-    handleMoveConfirm(event, $pointerYOffset, text, durationMinutes)}
+  on:mouseup={() =>
+    handleMoveConfirm(Math.floor(offset), text, durationMinutes)}
   transition:fade={{ duration: 100 }}
 >
   <RenderedMarkdown {text} />
