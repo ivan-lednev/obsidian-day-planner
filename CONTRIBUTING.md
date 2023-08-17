@@ -3,15 +3,23 @@
 When contributing to this repository, please first discuss the change you wish to make via
 an [issue](https://github.com/ivan-lednev/obsidian-day-planner/issues).
 
+## Development Process
+
+1. Fork the repo: https://github.com/ivan-lednev/obsidian-day-planner
+1. Create a test vault and go to the plugins directory: `cd <your-vault>/.obsidian/plugins`
+1. Clone your fork with submodules. For my fork the command looks like this: `git clone --recurse-submodules https://github.com/ivan-lednev/obsidian-day-planner
+`
+1. Move to the folder: `cd obsidian-day-planner`
+1. Install dependencies: `npm install`
+1. Watch the changes: `npm run dev`
+1. Now when you change anything, reload Obsidian to see the updates
+   - You can use https://github.com/pjeby/hot-reload to make this process faster
+
 ## Pull Request Process
 
-2. Where appropriate, update the README.md with details of changes to the plugin, this includes additions and changes to
-   configuration  
-   settings, plugin commands, useful file locations and additional installation instructions.
-3. If you can, please include tests in your Pull Request, particularly if you are making significant changes or
-   additions to the behaviour of the plugin.
-5. The repository maintainer will be responsible for increasing the version numbers in files and the README.md to the
-   new version that this Pull Request would represent once it has been completed and merged.
+2. Where appropriate, update the README.md with details of changes to the plugin, this includes additions and changes to configuration settings, plugin commands, useful file locations and additional installation instructions.
+3. If you can, please include tests in your Pull Request, particularly if you are making significant changes or additions to the behavior of the plugin.
+4. The repository maintainer will be responsible for increasing the version numbers in files and the README.md to the new version that this Pull Request would represent once it has been completed and merged.
 
 ## Code of Conduct
 
@@ -56,5 +64,4 @@ This Code of Conduct is based on and adapted from the [Contributor Covenant][hom
 available at [http://contributor-covenant.org/version/1/4][version]
 
 [homepage]: http://contributor-covenant.org
-
 [version]: http://contributor-covenant.org/version/1/4/
