@@ -25,18 +25,25 @@ export async function appendToPlan(path: string, planItem: PlanItem) {
 
   let result = replaceTimestamp(planItem, { ...planItem });
 
-  const headingMetadata = getHeadingByText(metadata, plannerHeading);
+  const headingLine = getHeadingByText(metadata, plannerHeading);
 
-  if (!headingMetadata) {
+  let line = editor.lastLine();
+
+  if (!headingLine) {
     result = `${createPlannerHeading()}\n\n${result}`;
+  } else {
+    line = headingLine.position.start.line;
   }
 
   const listItems = getListItemsUnderHeading(metadata, plannerHeading);
-  const lastListItem = listItems[listItems.length - 1];
 
-  const line = lastListItem
-    ? lastListItem.position.start.line
-    : editor.lastLine();
+  if (listItems?.length > 0) {
+    const lastListItem = listItems[listItems.length - 1];
+
+    line = lastListItem.position.start.line;
+  } else if (headingLine) {
+    result = `\n${result}`
+  }
 
   const ch = editor.getLine(line).length;
 

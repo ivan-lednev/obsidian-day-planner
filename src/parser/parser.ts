@@ -3,7 +3,11 @@ import { parseTimestamp } from "../timestamp/timestamp";
 import { timestampRegExp } from "../regexp";
 import { isTopLevelListItem } from "../../obsidian-metadata-utils/src/list";
 import { getTextAtPosition } from "../../obsidian-metadata-utils/src/position";
-import { getDiffInMinutes, getMinutesSinceMidnightTo, minutesToMoment } from "../util/moment";
+import {
+  getDiffInMinutes,
+  getMinutesSinceMidnightTo,
+  minutesToMoment,
+} from "../util/moment";
 import { DEFAULT_DURATION_MINUTES } from "../constants";
 import { getTimeFromYOffset, roundToSnapStep } from "src/store/timeline-store";
 import { getDailyNoteForToday } from "src/util/daily-notes";
@@ -39,6 +43,10 @@ export function parsePlanItems(
     metadata,
     planHeadingContent,
   );
+
+  if (!listItemsUnderPlan) {
+    return [];
+  }
 
   const listItemsWithContent = getListItemContent(content, listItemsUnderPlan);
 
