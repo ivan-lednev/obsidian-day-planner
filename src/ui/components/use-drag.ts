@@ -19,13 +19,12 @@ export function useDrag() {
     event: MouseEvent,
     pointerYOffset: number,
     text: string,
+    // todo: we don't need duration here
     durationMinutes: number,
   ) {
     dragging.set(false);
 
-    const newStartMinutes = getTimeFromYOffset(
-      pointerYOffset - event.offsetY,
-    );
+    const newStartMinutes = getTimeFromYOffset(pointerYOffset - event.offsetY);
 
     await updateTimestamps(text, {
       startMinutes: newStartMinutes,

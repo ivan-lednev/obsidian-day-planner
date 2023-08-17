@@ -34,19 +34,18 @@
     handleResizeConfirm,
   } = useResize();
 
-  $: initialTaskOffset = isGhost
+  $: initialOffset = isGhost
     ? roundToSnapStep($pointerYOffset)
     : $timeToTimelineOffset(startMinutes);
 
-  $: taskOffset = $dragging
+  $: offset = $dragging
     ? roundToSnapStep($pointerYOffset - $pointerYOffsetToTaskStart)
-    : initialTaskOffset;
+    : initialOffset;
 
-  $: fromTaskOffsetToPointer = $pointerYOffset - initialTaskOffset;
+  $: offsetToPointer = $pointerYOffset - initialOffset;
 
-  $: taskHeight = $resizing
-    ? roundToSnapStep(fromTaskOffsetToPointer) +
-      SNAP_STEP_MINUTES * $settings.zoomLevel
+  $: height = $resizing
+    ? roundToSnapStep(offsetToPointer) + SNAP_STEP_MINUTES * $settings.zoomLevel
     : $durationToSize(durationMinutes);
 
   $: cursor = $dragging ? "grabbing" : "grab";
@@ -62,8 +61,8 @@
 <div
   class="task absolute-stretch-x"
   class:is-ghost={isGhost}
-  style:height="{taskHeight}px"
-  style:transform="translateY({taskOffset}px)"
+  style:height="{height}px"
+  style:transform="translateY({offset}px)"
   style:cursor
   on:mousedown|stopPropagation={handleMoveStart}
   on:mouseup={(event) =>
@@ -75,7 +74,7 @@
     class="resize-handle absolute-stretch-x"
     on:mousedown|stopPropagation={handleResizeStart}
     on:mouseup|stopPropagation={() =>
-      handleResizeConfirm(text, taskHeight, startMinutes)}
+      handleResizeConfirm(text, height, startMinutes)}
   ></div>
 </div>
 
