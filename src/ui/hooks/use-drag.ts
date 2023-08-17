@@ -1,6 +1,6 @@
 import { getTimeFromYOffset } from "src/store/timeline-store";
 import { updateTimestamps } from "src/store/update-timestamp";
-import { Readable, get, writable } from "svelte/store";
+import { writable } from "svelte/store";
 
 export function useDrag() {
   const dragging = writable(false);
