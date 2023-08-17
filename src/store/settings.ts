@@ -6,4 +6,6 @@ export const settings = writable({
   startHour: 0,
   centerNeedle: true,
   timelineDateFormat: "LLLL",
+  plannerHeading: "Day planner",
+  plannerHeadingLevel: 1
 });

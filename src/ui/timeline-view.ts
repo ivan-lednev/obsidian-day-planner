@@ -1,8 +1,6 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import Timeline from "./components/timeline.svelte";
-import {
-  appStore,
-} from "../store/timeline-store";
+import { appStore } from "../store/timeline-store";
 import { settings } from "src/store/settings";
 import { VIEW_TYPE_TIMELINE } from "../constants";
 import type { DayPlannerSettings } from "../settings";
@@ -44,14 +42,24 @@ export default class TimelineView extends ItemView {
 
   initStore() {
     appStore.set(this.app);
-    const { zoomLevel, centerNeedle, startHour, timelineDateFormat } =
-      this.settings;
+    const {
+      zoomLevel,
+      centerNeedle,
+      startHour,
+      timelineDateFormat,
+      plannerHeading,
+      plannerHeadingLevel,
+    } = this.settings;
+
     settings.set({
       zoomLevel,
       centerNeedle,
       startHour,
-      timelineDateFormat
+      timelineDateFormat,
+      plannerHeading,
+      plannerHeadingLevel,
     });
+
     settings.subscribe(async (newValue) => {
       this.plugin.settings = { ...this.plugin.settings, ...newValue };
       await this.plugin.saveData(this.plugin.settings);

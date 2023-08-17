@@ -13,6 +13,7 @@ import {
 import { StatusBar } from "./ui/status-bar";
 import { tasks } from "./store/timeline-store";
 import { get } from "svelte/store";
+import { createPlannerHeading } from "./create-plan";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
@@ -48,7 +49,7 @@ export default class DayPlanner extends Plugin {
       id: "insert-planner-heading-at-cursor",
       name: "Insert Planner Heading at Cursor",
       editorCallback: (editor) =>
-        editor.replaceSelection(this.createPlannerHeading()),
+        editor.replaceSelection(createPlannerHeading()),
     });
 
     this.registerView(
@@ -119,15 +120,6 @@ export default class DayPlanner extends Plugin {
       this.settings.plannerHeading,
       dailyNote.path,
     );
-  }
-
-  private createPlannerHeading() {
-    const headingTokens = "#".repeat(this.settings.plannerHeadingLevel);
-
-    return `${headingTokens} ${this.settings.plannerHeading}
-
-- 
-`;
   }
 
   private async initLeaf() {

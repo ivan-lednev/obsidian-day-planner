@@ -187,6 +187,11 @@ When you open a file, the plugin will search for this heading to detect a day pl
         component
           .setValue(this.plugin.settings.plannerHeading)
           .onChange(async (value) => {
+            settings.update((previous) => ({
+              ...previous,
+              plannerHeading: value,
+            }));
+
             this.plugin.settings.plannerHeading = value;
             await this.plugin.saveData(this.plugin.settings);
           }),
@@ -203,6 +208,11 @@ When you open a file, the plugin will search for this heading to detect a day pl
           .setDynamicTooltip()
           .setValue(this.plugin.settings.plannerHeadingLevel)
           .onChange(async (value) => {
+            settings.update((previous) => ({
+              ...previous,
+              plannerHeadingLevel: value,
+            }));
+
             this.plugin.settings.plannerHeadingLevel = value;
             await this.plugin.saveData(this.plugin.settings);
           }),

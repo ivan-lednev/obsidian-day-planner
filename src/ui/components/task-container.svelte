@@ -8,8 +8,9 @@
   } from "../../store/timeline-store";
   import { DEFAULT_DURATION_MINUTES } from "src/constants";
   import { createPlanItemFromTimeline } from "src/parser/parser";
-  import { insertPlanItem } from "src/update-plan";
+  import { appendUnderHeading } from "src/update-plan";
   import { getDailyNoteForToday } from "src/util/daily-notes";
+  import { replaceTimestamp } from "src/util/timestamp";
 
   const cancelMessage = "Release outside timeline to cancel";
   const defaultDurationForNewTask = 30;
@@ -34,8 +35,10 @@
     creating = false;
 
     const newPlanItem = createPlanItemFromTimeline($pointerYOffset);
+
     $tasks = [...$tasks, newPlanItem];
-    await insertPlanItem(getDailyNoteForToday().path, newPlanItem);
+    
+    await appendUnderHeading(getDailyNoteForToday().path, newPlanItem);
   }
 
   function cancelCreation() {

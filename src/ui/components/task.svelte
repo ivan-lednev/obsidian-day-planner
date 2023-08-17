@@ -10,8 +10,8 @@
     roundToSnapStep,
     timeToTimelineOffset,
   } from "../../store/timeline-store";
-  import { useDrag } from "./use-drag";
-  import { useResize } from "./use-resize";
+  import { useDrag } from "../hooks/use-drag";
+  import { useResize } from "../hooks/use-resize";
 
   export let text: string;
   export let startMinutes: number | undefined = undefined;

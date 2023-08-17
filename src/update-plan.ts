@@ -1,11 +1,11 @@
-import { TFile } from "obsidian";
+import { Editor, TFile } from "obsidian";
 import type { PlanItem } from "./plan-item";
 import { derived, get } from "svelte/store";
 import { Timestamp, appStore } from "./store/timeline-store";
 import { replaceTimestamp } from "./util/timestamp";
-import { getListItemsUnderHeading } from "./parser/parser";
-import { getDailyNote } from "obsidian-daily-notes-interface";
-import { getDailyNoteForToday } from "./util/daily-notes";
+import { getHeadingByText, getListItemsUnderHeading } from "./parser/parser";
+import { settings } from "./store/settings";
+import { createPlannerHeading } from "./create-plan";
 
 // todo: no reactivity is needed here
 export const updateDurationInDailyNote = derived(appStore, ($appStore) => {
@@ -33,36 +33,62 @@ export const updateDurationInDailyNote = derived(appStore, ($appStore) => {
   };
 });
 
-// todo: clean up
-export async function insertPlanItem(path: string, planItem: PlanItem) {
+export async function appendUnderHeading(path: string, planItem: PlanItem) {
   const app = get(appStore);
-  const file = app.vault.getAbstractFileByPath(path);
+  const { plannerHeading } = get(settings);
 
-  if (!(file instanceof TFile)) {
-    throw new Error("Something is wrong");
+  const file = await getFileByPath(path);
+  const metadata = app.metadataCache.getFileCache(file);
+  const editor = await openFileInEditor(file);
+
+  let result = replaceTimestamp(planItem, { ...planItem });
+
+  const headingMetadata = getHeadingByText(metadata, plannerHeading);
+
+  if (!headingMetadata) {
+    result = `${createPlannerHeading()}\n\n${result}`;
   }
 
-  const contents = await app.vault.read(file);
+  const listItems = getListItemsUnderHeading(metadata, plannerHeading);
+  const lastListItem = listItems[listItems.length - 1];
 
-  const metadata = this.app.metadataCache.getFileCache(getDailyNoteForToday());
+  const line = lastListItem
+    ? lastListItem.position.start.line
+    : editor.lastLine();
 
-  // todo: do not hardcode
-  const listItems = getListItemsUnderHeading(metadata, "Day planner");
-  const lastLine = listItems[listItems.length - 1].position.start.line + 1;
+  const ch = editor.getLine(line).length;
 
-  const text = replaceTimestamp(planItem, { ...planItem });
+  editor.replaceRange(`\n${result}`, { line, ch });
 
-  const updatedContents = contents.split("\n");
-  updatedContents.splice(lastLine, 0, text);
+  selectText(editor, planItem.text);
+}
 
-  await app.vault.modify(file, updatedContents.join("\n"));
+function selectText(editor: Editor, text: string) {
+  const startOffset = editor.getValue().indexOf(text);
+  const endOffset = startOffset + text.length;
+
+  editor.setSelection(
+    editor.offsetToPos(startOffset),
+    editor.offsetToPos(endOffset),
+  );
+}
+
+async function openFileInEditor(file: TFile) {
+  const app = get(appStore);
 
   const leaf = app.workspace.getLeaf(false);
   await leaf.openFile(file);
-  const editor = app.workspace.activeEditor?.editor;
+  return app.workspace.activeEditor?.editor;
+}
 
-  editor.setSelection(
-    { line: lastLine, ch: text.indexOf(planItem.text) },
-    { line: lastLine, ch: editor.getLine(lastLine).length },
-  );
+async function getFileByPath(path: string) {
+  const app = get(appStore);
+
+  const file = app.vault.getAbstractFileByPath(path);
+
+  if (!(file instanceof TFile)) {
+    throw new Error(`Unable to open file: ${path}`);
+  }
+
+  return file;
 }
