@@ -15,6 +15,10 @@ export const hourSize = derived(
   ($settings) => $settings.zoomLevel * 60,
 );
 
+export const visibleHours = derived(settings, ($settings) =>
+  [...Array(24).keys()].slice($settings.startHour),
+);
+
 export const hiddenHoursSize = derived(
   [settings, hourSize],
   ([$settings, $hourSize]) => $settings.startHour * $hourSize,

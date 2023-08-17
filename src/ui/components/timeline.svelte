@@ -4,7 +4,7 @@
   import Needle from "./needle.svelte";
   import TaskContainer from "./task-container.svelte";
   import Controls from "./controls.svelte";
-  import { settings } from "src/store/settings";
+  import { visibleHours } from "../../store/timeline-store";
 
   let userHoversOverScroller = false;
 
@@ -15,10 +15,6 @@
   function handleMouseLeave() {
     userHoversOverScroller = false;
   }
-
-  $: visibleHours = Array.from({ length: 24 })
-    .map((value, index) => index)
-    .slice($settings.startHour);
 </script>
 
 <Controls />
@@ -28,8 +24,8 @@
   on:mouseleave={handleMouseLeave}
 >
   <div class="scale-with-days">
-    <Ruler {visibleHours} />
-    <Column {visibleHours}>
+    <Ruler visibleHours={$visibleHours} />
+    <Column visibleHours={$visibleHours}>
       <Needle scrollBlockedByUser={userHoversOverScroller} />
       <TaskContainer />
     </Column>
