@@ -1,3 +1,24 @@
+- [Time Block Planner](#time-block-planner)
+  - [Purpose](#purpose)
+  - [Contributing](#contributing)
+  - [About Obsidian Day Planner](#about-obsidian-day-planner)
+    - [What's the difference?](#whats-the-difference)
+  - [Features](#features)
+    - [Write a plan using a simple human-readable format and see it rendered in a side panel](#write-a-plan-using-a-simple-human-readable-format-and-see-it-rendered-in-a-side-panel)
+    - [Observe your progress in the status bar](#observe-your-progress-in-the-status-bar)
+    - [Use drag-and-drop to create and update tasks](#use-drag-and-drop-to-create-and-update-tasks)
+  - [Usage](#usage)
+  - [Configuration](#configuration)
+    - [Status Bar - Circular Progress](#status-bar---circular-progress)
+    - [Status Bar - Now and Next](#status-bar---now-and-next)
+    - [Task Notification](#task-notification)
+    - [Timeline Zoom Level](#timeline-zoom-level)
+  - [Commands](#commands)
+    - [Show the Day Planner Timeline](#show-the-day-planner-timeline)
+    - [Open today's Day Planner](#open-todays-day-planner)
+    - [Insert Planner Heading at Cursor](#insert-planner-heading-at-cursor)
+  - [Acknowledgements](#acknowledgements)
+
 # Time Block Planner
 
 ## Purpose
@@ -35,9 +56,13 @@ initially forked it, but ended up rewriting almost all of it.
 
 ![image](https://github.com/ivan-lednev/obsidian-day-planner/assets/41428836/92a9e7a6-e71f-4a84-b533-ee24e075be8b)
 
-### The progress bar is also in place
+### Observe your progress in the status bar
 
 ![image](https://github.com/ivan-lednev/obsidian-day-planner/assets/41428836/0acf9def-6225-4174-9070-4450ae17fa79)
+
+### Use drag-and-drop to create and update tasks
+
+![](assets/dnd-demo.gif)
 
 ## Usage
 
