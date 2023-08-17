@@ -73,7 +73,7 @@
   <div
     class="resize-handle absolute-stretch-x"
     on:mousedown|stopPropagation={handleResizeStart}
-    on:mouseup|stopPropagation={() =>
+    on:mouseup={() =>
       handleResizeConfirm(text, height, startMinutes)}
   ></div>
 </div>

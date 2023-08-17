@@ -1,6 +1,6 @@
 import { sizeToDuration } from "src/store/timeline-store";
 import { updateTimestamps } from "src/store/update-timestamp";
-import { writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 
 export function useResize() {
   const resizing = writable(false);
@@ -19,6 +19,10 @@ export function useResize() {
     // todo: don't need start minutes here
     startMinutes: number,
   ) {
+    if (!get(resizing)) {
+      return;
+    }
+
     resizing.set(false);
 
     const newDurationMinutes = sizeToDuration(taskHeight);
