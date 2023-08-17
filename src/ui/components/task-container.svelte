@@ -2,41 +2,19 @@
   import { writable } from "svelte/store";
   import Task from "./task.svelte";
   import { tasks } from "../../store/timeline-store";
-  import { createPlanItemFromTimeline } from "src/parser/parser";
-  import { getDailyNoteForToday } from "src/util/daily-notes";
-  import { appendToPlan } from "../../plan";
+  import { useCreate } from "../hooks/use-create";
 
   const cancelMessage = "Release outside timeline to cancel";
   const defaultDurationForNewTask = 30;
 
+  const { creating, startCreation, cancelCreation, confirmCreation } =
+    useCreate();
+
   const pointerYOffset = writable<number>();
   let el: HTMLDivElement;
-  let creating = false;
 
   function handleMousemove(event: MouseEvent) {
     pointerYOffset.set(event.clientY - el.getBoundingClientRect().top);
-  }
-
-  function startCreation() {
-    creating = true;
-  }
-
-  async function handleMouseUp() {
-    if (!creating) {
-      return;
-    }
-
-    creating = false;
-
-    const newPlanItem = createPlanItemFromTimeline($pointerYOffset);
-
-    $tasks = [...$tasks, newPlanItem];
-    
-    await appendToPlan(getDailyNoteForToday().path, newPlanItem);
-  }
-
-  function cancelCreation() {
-    creating = false;
   }
 </script>
 
@@ -48,12 +26,12 @@
   class="task-container absolute-stretch-x"
   on:mousemove={handleMousemove}
   on:mousedown={startCreation}
-  on:mouseup={handleMouseUp}
+  on:mouseup={() => confirmCreation($pointerYOffset)}
 >
   {#each $tasks as taskProps (taskProps.text)}
     <Task {...taskProps} {pointerYOffset} />
   {/each}
-  {#if creating}
+  {#if $creating}
     <Task
       isGhost
       text={cancelMessage}
