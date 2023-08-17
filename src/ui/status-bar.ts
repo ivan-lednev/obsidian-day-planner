@@ -1,7 +1,7 @@
 import type { Workspace } from "obsidian";
 import type { DayPlannerSettings } from "../settings";
-import type { PlanItem } from "../plan-item";
 import { getDiffInMinutes } from "../util/moment";
+import type { PlanItem } from "../types";
 
 export class StatusBar {
   private statusBarText: HTMLSpanElement;
@@ -80,7 +80,7 @@ export class StatusBar {
     const currentItemIndex = planItems.findIndex(
       (item) => item.startTime.isBefore(now) && item.endTime.isAfter(now),
     );
-    
+
     if (currentItemIndex < 0) {
       this.hideProgress();
       this.statusBarText.innerText = this.settings.endLabel;

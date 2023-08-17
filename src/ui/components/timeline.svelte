@@ -5,7 +5,6 @@
   import TaskContainer from "./task-container.svelte";
   import Controls from "./controls.svelte";
   import { settings } from "src/store/settings";
-  import { tasks } from "src/store/timeline-store";
 
   let userHoversOverScroller = false;
 

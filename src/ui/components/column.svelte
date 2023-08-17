@@ -17,14 +17,6 @@
   .task-grid {
     position: relative;
     flex: 1 0 0;
-
-    /* background: repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 10px,
-      var(--background-modifier-border) 10px,
-      var(--background-modifier-border) 20px
-    ); */
   }
 
   .time-grid-block {

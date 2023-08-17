@@ -2,7 +2,7 @@
   import SettingsButton from "./settings-button.svelte";
   import { onMount } from "svelte";
   import { settings } from "src/store/settings";
-  
+
   let settingsVisible = false;
 
   function toggleSettings() {
@@ -27,7 +27,7 @@
 <div class="controls">
   <div class="header">
     <span class="date">{date}</span>
-    <SettingsButton isActive={settingsVisible} onClick={toggleSettings} />
+    <SettingsButton isActive={settingsVisible} on:click={toggleSettings} />
   </div>
   {#if settingsVisible}
     <div class="settings">

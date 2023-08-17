@@ -1,8 +1,8 @@
 import { derived, get, writable } from "svelte/store";
-import type { PlanItem } from "../plan-item";
 import { SNAP_STEP_MINUTES } from "src/constants";
 import { settings } from "./settings";
 import type { App } from "obsidian";
+import type { PlanItem } from "../types";
 
 export type Timestamp = { durationMinutes: number; startMinutes: number };
 

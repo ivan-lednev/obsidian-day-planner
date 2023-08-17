@@ -1,16 +1,10 @@
 <script lang="ts">
   import { writable } from "svelte/store";
   import Task from "./task.svelte";
-  import {
-    getTimeFromYOffset,
-    roundToSnapStep,
-    tasks,
-  } from "../../store/timeline-store";
-  import { DEFAULT_DURATION_MINUTES } from "src/constants";
+  import { tasks } from "../../store/timeline-store";
   import { createPlanItemFromTimeline } from "src/parser/parser";
-  import { appendUnderHeading } from "src/update-plan";
   import { getDailyNoteForToday } from "src/util/daily-notes";
-  import { replaceTimestamp } from "src/util/timestamp";
+  import { appendToPlan } from "../../plan";
 
   const cancelMessage = "Release outside timeline to cancel";
   const defaultDurationForNewTask = 30;
@@ -38,7 +32,7 @@
 
     $tasks = [...$tasks, newPlanItem];
     
-    await appendUnderHeading(getDailyNoteForToday().path, newPlanItem);
+    await appendToPlan(getDailyNoteForToday().path, newPlanItem);
   }
 
   function cancelCreation() {

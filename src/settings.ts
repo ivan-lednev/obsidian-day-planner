@@ -1,15 +1,10 @@
-import { DayPlannerMode } from "./types";
-
 export class DayPlannerSettings {
-  mode: DayPlannerMode = DayPlannerMode.DAILY;
-  completePastItems: boolean = true;
   circularProgress: boolean = false;
   nowAndNextInStatusBar: boolean = false;
   showTaskNotification: boolean = false;
   zoomLevel: number = 2;
   timelineIcon: string = "calendar-with-checkmark";
-  breakLabel: string = "BREAK";
-  endLabel: string = "END";
+  endLabel: string = "All done";
   startHour: number = 6;
   timelineDateFormat: string = "LLLL";
   centerNeedle: boolean = true;

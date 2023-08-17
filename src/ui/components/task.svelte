@@ -5,11 +5,7 @@
   import { settings } from "src/store/settings";
   import type { Readable } from "svelte/store";
   import { fade } from "svelte/transition";
-  import {
-    durationToSize,
-    roundToSnapStep,
-    timeToTimelineOffset,
-  } from "../../store/timeline-store";
+  import { durationToSize, roundToSnapStep, timeToTimelineOffset } from "../../store/timeline-store";
   import { useDrag } from "../hooks/use-drag";
   import { useResize } from "../hooks/use-resize";
 

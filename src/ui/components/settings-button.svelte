@@ -1,13 +1,13 @@
 <script lang="ts">
-  export let isActive;
-  export let onClick;
+  export let isActive = false;
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
   aria-label="Settings"
   class="clickable-icon is-active"
   class:is-active={isActive}
-  on:click={onClick}
+  on:click
 >
   <svg
     class="svg-icon lucide-sliders-horizontal"

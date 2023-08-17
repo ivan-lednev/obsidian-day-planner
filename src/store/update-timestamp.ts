@@ -1,8 +1,8 @@
 import { get } from "svelte/store";
 import { TFile } from "obsidian";
-import type { PlanItem } from "../plan-item";
-import { replaceTimestamp } from "src/util/timestamp";
-import { Timestamp, appStore, tasks } from "./timeline-store";
+import { replaceTimestamp } from "src/timestamp/timestamp";
+import { appStore, tasks, Timestamp } from "./timeline-store";
+import type { PlanItem } from "../types";
 
 export async function updateTimestamps(id: string, timestamp: Timestamp) {
   tasks.update((previous) => {
@@ -12,6 +12,7 @@ export async function updateTimestamps(id: string, timestamp: Timestamp) {
         return task;
       }
 
+      // todo: split effect from mapping
       updateDurationInDailyNote(task, timestamp);
 
       return {

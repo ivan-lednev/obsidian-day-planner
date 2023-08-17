@@ -1,19 +1,19 @@
-import { Plugin, TFile, Vault, WorkspaceLeaf } from "obsidian";
-import { DayPlannerSettingsTab } from "./ui/settings-tab";
-import { DayPlannerSettings } from "./settings";
-import { VIEW_TYPE_TIMELINE } from "./constants";
-import TimelineView from "./ui/timeline-view";
+import { Plugin, TFile, WorkspaceLeaf } from "obsidian";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
+import { get } from "svelte/store";
+import { VIEW_TYPE_TIMELINE } from "./constants";
 import { parsePlanItems } from "./parser/parser";
+import { DayPlannerSettings } from "./settings";
+import { tasks } from "./store/timeline-store";
+import { DayPlannerSettingsTab } from "./ui/settings-tab";
+import { StatusBar } from "./ui/status-bar";
+import TimelineView from "./ui/timeline-view";
 import {
   createDailyNoteIfNeeded,
   dailyNoteExists,
   getDailyNoteForToday,
 } from "./util/daily-notes";
-import { StatusBar } from "./ui/status-bar";
-import { tasks } from "./store/timeline-store";
-import { get } from "svelte/store";
-import { createPlannerHeading } from "./create-plan";
+import { createPlannerHeading } from "./plan";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
