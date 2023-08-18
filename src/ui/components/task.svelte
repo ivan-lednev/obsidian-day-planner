@@ -7,6 +7,7 @@
   import { fade } from "svelte/transition";
   import {
     durationToSize,
+    overlapLookup,
     roundToSnapStep,
     timeToTimelineOffset,
   } from "../../store/timeline-store";
@@ -14,6 +15,7 @@
   import { useResize } from "../hooks/use-resize";
 
   export let text: string;
+  export let id: string;
   export let startMinutes: number | undefined = undefined;
   export let durationMinutes: number;
   export let pointerYOffset: Readable<number>;
@@ -50,6 +52,14 @@
 
   $: cursor = $dragging ? "grabbing" : "grab";
 
+  $: itemPlacing = $overlapLookup.get(id);
+  $: widthPercent = itemPlacing
+    ? (itemPlacing.span / itemPlacing.columns) * 100
+    : 100;
+  $: xOffsetPercent = itemPlacing
+    ? (100 / itemPlacing.columns) * itemPlacing.start
+    : 0;
+
   function handleCancel() {
     handleMoveCancel();
     handleResizeCancel();
@@ -59,27 +69,43 @@
 <svelte:body on:mouseup={handleCancel} />
 
 <div
-  class="task absolute-stretch-x"
-  class:is-ghost={isGhost}
+  class="gap-box absolute-stretch-x"
   style:height="{height}px"
   style:transform="translateY({offset}px)"
   style:cursor
-  on:mousedown|stopPropagation={handleMoveStart}
-  on:mouseup={() =>
-    handleMoveConfirm(Math.floor(offset), text, durationMinutes)}
-  transition:fade={{ duration: 100 }}
+  style:width="{widthPercent}%"
+  style:left="{xOffsetPercent}%"
 >
-  <RenderedMarkdown {text} />
   <div
-    class="resize-handle absolute-stretch-x"
-    on:mousedown|stopPropagation={handleResizeStart}
+    class="task"
+    class:is-ghost={isGhost}
+    on:mousedown|stopPropagation={handleMoveStart}
     on:mouseup={() =>
-      handleResizeConfirm(text, height, startMinutes)}
-  ></div>
+      handleMoveConfirm(Math.floor(offset), text, durationMinutes)}
+    transition:fade={{ duration: 100 }}
+  >
+    <RenderedMarkdown {text} />
+    <div
+      class="resize-handle absolute-stretch-x"
+      on:mousedown|stopPropagation={handleResizeStart}
+      on:mouseup={() => handleResizeConfirm(text, height, startMinutes)}
+    ></div>
+  </div>
 </div>
 
 <style>
+  .gap-box {
+    display: flex;
+    padding-left: 3px;
+    padding-right: 3px;
+
+    transition-property: height, width, transform;
+    transition: 0.05s linear;
+  }
+
   .task {
+    flex: 1 0 0;
+
     overflow: visible;
     display: flex;
     align-items: flex-start;
@@ -95,10 +121,6 @@
     background-color: var(--background-primary);
     border: 1px solid var(--color-accent);
     border-radius: var(--radius-s);
-    box-shadow: none;
-
-    transition-property: height, transform;
-    transition: 0.05s linear;
   }
 
   .is-ghost {

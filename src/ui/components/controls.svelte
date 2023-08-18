@@ -69,10 +69,12 @@
   .date {
     display: flex;
     flex: 1 0 0;
+    align-items: center;
     justify-content: center;
 
-    font-size: 1.2em;
-    color: var(--text-muted);
+    font-size: var(--font-ui-small);
+    color: var(--text-normal);
+    font-weight: var(--font-medium);
   }
 
   .settings {

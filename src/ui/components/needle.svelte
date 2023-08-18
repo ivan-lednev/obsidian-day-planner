@@ -34,7 +34,7 @@
 
 <style>
   .needle {
-    height: 4px;
+    height: 2px;
     background-color: var(--color-accent);
   }
 </style>

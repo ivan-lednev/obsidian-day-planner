@@ -7,7 +7,7 @@
 <div class="hours-container">
   {#each visibleHours as hour}
     <div class="hour" style:height="{$hourSize}px">
-      <div class="hour-number-container" style:transform="translateY(-10px)">
+      <div class="hour-number-container">
         {hour}
       </div>
       <div class="hour-guide"></div>
@@ -39,12 +39,17 @@
   .hour-number-container {
     position: sticky;
     top: 10px;
+    transform: translateY(
+      calc(var(--font-ui-small) * var(--line-height-tight) / -2)
+    );
 
     display: flex;
     flex: 0 0 30px;
     align-self: flex-start;
     justify-content: center;
 
-    color: var(--text-faint);
+    color: var(--text-muted);
+
+    font-size: var(--nav-item-size);
   }
 </style>

@@ -3,12 +3,15 @@ import { SNAP_STEP_MINUTES } from "src/constants";
 import { settings } from "./settings";
 import type { App } from "obsidian";
 import type { PlanItem } from "../types";
+import { computeOverlap } from "src/parser/overlap";
 
 export type Timestamp = { durationMinutes: number; startMinutes: number };
 
 export const appStore = writable<App>();
 
 export const tasks = writable<PlanItem[]>([]);
+
+export const overlapLookup = derived(tasks, ($tasks) => computeOverlap($tasks))
 
 export const hourSize = derived(
   settings,

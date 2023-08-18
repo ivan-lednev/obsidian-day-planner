@@ -73,7 +73,8 @@ export function parsePlanItems(
         endMinutes: getMinutesSinceMidnightTo(endTime),
         durationMinutes,
       };
-    });
+    })
+    .sort((a, b) => a.startMinutes - b.startMinutes);
 }
 
 export function getListItemsUnderHeading(
@@ -130,14 +131,17 @@ function createPlanItem({
     groups: { listTokens, start, end, text },
   } = match;
 
+  const startTime = parseTimestamp(start);
+
   return {
     listTokens,
-    startTime: parseTimestamp(start),
+    startTime,
     endTime: parseTimestamp(end),
     rawStartTime: start,
     rawEndTime: end,
     text,
     location,
+    id: String(Math.random()),
   };
 }
 

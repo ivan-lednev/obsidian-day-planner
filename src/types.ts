@@ -16,4 +16,15 @@ export interface PlanItem {
   startMinutes: number;
   endMinutes: number;
   location?: PlanItemLocation;
+  id: string;
+}
+
+export type TimeBlock = Pick<PlanItem, "startMinutes" | "endMinutes"> & {
+  id: string;
+};
+
+export interface Overlap {
+  columns: number;
+  span: number;
+  start: number;
 }

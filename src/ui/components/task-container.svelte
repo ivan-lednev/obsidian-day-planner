@@ -35,6 +35,7 @@
     <Task
       isGhost
       text={cancelMessage}
+      id={"TODO: fix"}
       durationMinutes={defaultDurationForNewTask}
       {pointerYOffset}
     />
