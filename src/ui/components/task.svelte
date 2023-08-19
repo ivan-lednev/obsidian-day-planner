@@ -9,10 +9,14 @@
     durationToSize,
     overlapLookup,
     roundToSnapStep,
-    timeToTimelineOffset,
+    timeToTimelineOffset
   } from "../../store/timeline-store";
   import { useDrag } from "../hooks/use-drag";
   import { useResize } from "../hooks/use-resize";
+  import { PlanItem } from "../../types";
+  import { onMount } from "svelte";
+  import { getRelationToNow, minutesToMoment } from "../../util/moment";
+  import { time } from "../../store/time";
 
   export let text: string;
   export let id: string;
@@ -26,14 +30,14 @@
     pointerYOffsetToTaskStart,
     handleMoveStart,
     handleMoveCancel,
-    handleMoveConfirm,
+    handleMoveConfirm
   } = useDrag();
 
   const {
     resizing,
     handleResizeStart,
     handleResizeCancel,
-    handleResizeConfirm,
+    handleResizeConfirm
   } = useResize();
 
   $: initialOffset = isGhost
@@ -60,6 +64,8 @@
     ? (100 / itemPlacing.columns) * itemPlacing.start
     : 0;
 
+  $: relationToNow = getRelationToNow($time, startMinutes, durationMinutes);
+
   function handleCancel() {
     handleMoveCancel();
     handleResizeCancel();
@@ -77,7 +83,7 @@
   style:left="{xOffsetPercent}%"
 >
   <div
-    class="task"
+    class="task {relationToNow}"
     class:is-ghost={isGhost}
     on:mousedown|stopPropagation={handleMoveStart}
     on:mouseup={() =>
@@ -93,46 +99,54 @@
 </div>
 
 <style>
-  .gap-box {
-    display: flex;
-    padding-left: 3px;
-    padding-right: 3px;
+    .gap-box {
+        display: flex;
+        padding-left: 3px;
+        padding-right: 3px;
 
-    transition: 0.05s linear;
-  }
+        transition: 0.05s linear;
+    }
 
-  .task {
-    flex: 1 0 0;
+    .task {
+        flex: 1 0 0;
 
-    overflow: visible;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
+        overflow: visible;
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
 
-    padding: 5px;
+        padding: 5px;
 
-    overflow-wrap: anywhere;
-    font-size: var(--font-ui-medium);
-    color: var(--text-muted);
-    text-align: left;
-    white-space: normal;
+        overflow-wrap: anywhere;
+        font-size: var(--font-ui-medium);
+        color: var(--text-muted);
+        text-align: left;
+        white-space: normal;
 
-    background-color: var(--background-primary);
-    border: 1px solid var(--color-accent);
-    border-radius: var(--radius-s);
-  }
+        background-color: var(--background-primary);
+        border: 1px solid var(--text-faint);
+        border-radius: var(--radius-s);
+    }
 
-  .is-ghost {
-    opacity: 60%;
-  }
+    .past {
+        background-color: var(--background-secondary);
+    }
 
-  .task:hover {
-    cursor: grab;
-  }
+    .present {
+        border-color: var(--color-accent);
+    }
 
-  .resize-handle {
-    bottom: -15px;
-    height: 30px;
-    cursor: s-resize;
-  }
+    .is-ghost {
+        opacity: 60%;
+    }
+
+    .task:hover {
+        cursor: grab;
+    }
+
+    .resize-handle {
+        bottom: -15px;
+        height: 30px;
+        cursor: s-resize;
+    }
 </style>

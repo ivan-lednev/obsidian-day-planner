@@ -19,9 +19,9 @@ export interface PlanItem {
   id: string;
 }
 
-export type TimeBlock = Pick<PlanItem, "startMinutes" | "endMinutes"> & {
-  id: string;
-};
+export type RelationToNow = "past" | "present" | "future";
+
+export type TimeBlock = Pick<PlanItem, "startMinutes" | "endMinutes" | "id">;
 
 export interface Overlap {
   columns: number;

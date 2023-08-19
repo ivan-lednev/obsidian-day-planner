@@ -1,4 +1,5 @@
 import type { Moment } from "moment/moment";
+import type { RelationToNow } from "../types";
 
 const moment = window.moment;
 
@@ -20,4 +21,24 @@ export function minutesToMoment(minutesSinceMidnight: number) {
 
 export function addMinutes(moment: Moment, minutes: number) {
   return moment.clone().add(minutes, "minutes");
+}
+
+export function getRelationToNow(
+  now: Moment,
+  startMinutes: number,
+  durationMinutes: number,
+): RelationToNow {
+  const endMinutes = startMinutes + durationMinutes;
+  const start = minutesToMoment(startMinutes);
+  const end = minutesToMoment(endMinutes);
+
+  if (end.isBefore(now)) {
+    return "past";
+  }
+
+  if (start.isAfter(now)) {
+    return "future";
+  }
+
+  return "present";
 }
