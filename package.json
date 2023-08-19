@@ -6,8 +6,11 @@
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "build": "todo: replace rollup --config rollup.config.js",
+    "lint": "prettier --check src && eslint src",
+    "typescript": "tsc --noEmit",
     "test": "cross-env TS_NODE_COMPILER_OPTIONS='{ \"module\": \"commonjs\" }' mocha -r ts-node/register -r ignore-styles -r jsdom-global/register tests/**/*.test.ts",
-    "coverage": "nyc -r lcov -e .ts -x \"*.test.ts\" npm run test"
+    "coverage": "nyc -r lcov -e .ts -x \"*.test.ts\" npm run test",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +29,7 @@
     "esbuild-svelte": "^0.7.4",
     "eslint": "^8.46.0",
     "eslint-plugin-svelte": "^2.32.4",
+    "husky": "^8.0.3",
     "ignore-styles": "^5.0.1",
     "jest-environment-jsdom": "^29.6.2",
     "jsdom": "^16.6.0",

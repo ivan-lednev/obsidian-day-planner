@@ -4,7 +4,6 @@
   import { SNAP_STEP_MINUTES } from "src/constants";
   import { settings } from "src/store/settings";
   import type { Readable } from "svelte/store";
-  import { fade } from "svelte/transition";
   import {
     durationToSize,
     overlapLookup,
@@ -13,9 +12,7 @@
   } from "../../store/timeline-store";
   import { useDrag } from "../hooks/use-drag";
   import { useResize } from "../hooks/use-resize";
-  import { PlanItem } from "../../types";
-  import { onMount } from "svelte";
-  import { getRelationToNow, minutesToMoment } from "../../util/moment";
+  import { getRelationToNow } from "../../util/moment";
   import { time } from "../../store/time";
 
   export let text: string;

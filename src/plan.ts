@@ -42,7 +42,7 @@ export async function appendToPlan(path: string, planItem: PlanItem) {
 
     line = lastListItem.position.start.line;
   } else if (headingLine) {
-    result = `\n${result}`
+    result = `\n${result}`;
   }
 
   const ch = editor.getLine(line).length;

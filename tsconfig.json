@@ -23,9 +23,10 @@
     ]
   },
   "exclude": [
-    "node_modules/*"
+    "node_modules/*",
+    "obsidian-metadata-utils/*"
   ],
   "include": [
-    "**/*.ts"
+    "src/**/*.ts"
   ]
 }

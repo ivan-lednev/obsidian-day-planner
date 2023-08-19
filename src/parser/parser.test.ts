@@ -10,13 +10,13 @@ const defaultPlannerHeading = "Day planner";
 
 it("parses tasks with timestamps from lines", () => {
   expect(
-    parsePlanItems(basic.content, basic.metadata, defaultPlannerHeading),
+    parsePlanItems(basic.content, basic.metadata, defaultPlannerHeading, ""),
   ).toMatchSnapshot();
 });
 
 it("grabs subtasks", () => {
   expect(
-    parsePlanItems(subtasks.content, subtasks.metadata, "Day planner"),
+    parsePlanItems(subtasks.content, subtasks.metadata, "Day planner", ""),
   ).toMatchSnapshot();
 });
 
@@ -26,13 +26,19 @@ it("parses bullet lists without checkboxes", () => {
       withoutTasks.content,
       withoutTasks.metadata,
       defaultPlannerHeading,
+      "",
     ),
   ).toMatchSnapshot();
 });
 
 it("parses end time", () => {
   expect(
-    parsePlanItems(endTime.content, endTime.metadata, defaultPlannerHeading),
+    parsePlanItems(
+      endTime.content,
+      endTime.metadata,
+      defaultPlannerHeading,
+      "",
+    ),
   ).toMatchSnapshot();
 });
 
@@ -42,6 +48,7 @@ it("handles list items above daily plan", () => {
       listItemsAbove.content,
       listItemsAbove.metadata,
       defaultPlannerHeading,
+      "",
     ),
   ).toMatchObject([{ text: "Wake up" }]);
 });
@@ -52,6 +59,7 @@ it("handles tasks under subheadings", () => {
       subheadings.content,
       subheadings.metadata,
       defaultPlannerHeading,
+      "",
     ),
   ).toMatchObject([
     { text: "Wake up" },

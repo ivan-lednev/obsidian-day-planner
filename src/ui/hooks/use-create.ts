@@ -25,8 +25,10 @@ export function useCreate() {
 
     const newPlanItem = createPlanItemFromTimeline(pointerYOffset);
 
+    // @ts-ignore
     tasks.update((previous) => [...previous, newPlanItem]);
 
+    // @ts-ignore
     await appendToPlan(getDailyNoteForToday().path, newPlanItem);
   }
 

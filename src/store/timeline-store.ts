@@ -11,7 +11,7 @@ export const appStore = writable<App>();
 
 export const tasks = writable<PlanItem[]>([]);
 
-export const overlapLookup = derived(tasks, ($tasks) => computeOverlap($tasks))
+export const overlapLookup = derived(tasks, ($tasks) => computeOverlap($tasks));
 
 export const hourSize = derived(
   settings,
