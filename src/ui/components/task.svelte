@@ -111,6 +111,7 @@
 
     padding: 5px;
 
+    overflow-wrap: anywhere;
     font-size: var(--font-ui-medium);
     color: var(--text-muted);
     text-align: left;
