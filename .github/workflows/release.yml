@@ -26,9 +26,12 @@ jobs:
         run: |
           echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Build
         id: build
-        run: npm install
+        run: npm run build
 
       - name: Package
         run: |
