@@ -64,6 +64,10 @@ initially forked it, but ended up rewriting almost all of it.
 
 ![](assets/dnd-demo.gif)
 
+### Overlapping tasks push each other
+
+![](assets/overlap-demo.png)
+
 ## Usage
 
 1. **Either the core 'Daily Notes' or the 'Periodic Notes' plugins should be enabled**
