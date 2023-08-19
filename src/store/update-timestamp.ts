@@ -8,7 +8,7 @@ export async function updateTimestamps(id: string, timestamp: Timestamp) {
   tasks.update((previous) => {
     return previous.map((task) => {
       // todo: replace with ID
-      if (task.text !== id) {
+      if (task.id !== id) {
         return task;
       }
 

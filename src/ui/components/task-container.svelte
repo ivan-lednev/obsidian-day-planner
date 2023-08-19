@@ -28,14 +28,14 @@
   on:mousedown={startCreation}
   on:mouseup={() => confirmCreation($pointerYOffset)}
 >
-  {#each $tasks as taskProps (taskProps.text)}
+  {#each $tasks as taskProps (`${taskProps.startTime} ${taskProps.text}`)}
     <Task {...taskProps} {pointerYOffset} />
   {/each}
   {#if $creating}
     <Task
       isGhost
       text={cancelMessage}
-      id={"TODO: fix"}
+      id=""
       durationMinutes={defaultDurationForNewTask}
       {pointerYOffset}
     />

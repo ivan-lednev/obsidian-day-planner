@@ -81,14 +81,13 @@
     class:is-ghost={isGhost}
     on:mousedown|stopPropagation={handleMoveStart}
     on:mouseup={() =>
-      handleMoveConfirm(Math.floor(offset), text, durationMinutes)}
-    transition:fade={{ duration: 100 }}
+      handleMoveConfirm(Math.floor(offset), id, durationMinutes)}
   >
     <RenderedMarkdown {text} />
     <div
       class="resize-handle absolute-stretch-x"
       on:mousedown|stopPropagation={handleResizeStart}
-      on:mouseup={() => handleResizeConfirm(text, height, startMinutes)}
+      on:mouseup={() => handleResizeConfirm(id, height, startMinutes)}
     ></div>
   </div>
 </div>
@@ -99,7 +98,6 @@
     padding-left: 3px;
     padding-right: 3px;
 
-    transition-property: height, width, transform;
     transition: 0.05s linear;
   }
 

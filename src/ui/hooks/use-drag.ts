@@ -17,7 +17,7 @@ export function useDrag() {
 
   async function handleMoveConfirm(
     offset: number,
-    text: string,
+    id: string,
     // todo: we don't need duration here
     durationMinutes: number,
   ) {
@@ -25,7 +25,7 @@ export function useDrag() {
 
     const newStartMinutes = getTimeFromYOffset(offset);
 
-    await updateTimestamps(text, {
+    await updateTimestamps(id, {
       startMinutes: newStartMinutes,
       durationMinutes,
     });

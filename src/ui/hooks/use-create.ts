@@ -25,7 +25,6 @@ export function useCreate() {
 
     const newPlanItem = createPlanItemFromTimeline(pointerYOffset);
 
-    // todo: add ID
     tasks.update((previous) => [...previous, newPlanItem]);
 
     await appendToPlan(getDailyNoteForToday().path, newPlanItem);

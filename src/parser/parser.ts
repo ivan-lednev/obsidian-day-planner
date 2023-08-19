@@ -186,6 +186,7 @@ export function createPlanItemFromTimeline(pointerYOffset: number) {
   const endMinutes = startMinutes + DEFAULT_DURATION_MINUTES;
 
   return {
+    id: String(Math.random()),
     startMinutes,
     durationMinutes: DEFAULT_DURATION_MINUTES,
     endMinutes,

@@ -14,7 +14,7 @@ export function useResize() {
   }
 
   async function handleResizeConfirm(
-    text: string,
+    id: string,
     taskHeight: number,
     // todo: don't need start minutes here
     startMinutes: number,
@@ -27,7 +27,7 @@ export function useResize() {
 
     const newDurationMinutes = sizeToDuration(taskHeight);
 
-    await updateTimestamps(text, {
+    await updateTimestamps(id, {
       startMinutes,
       durationMinutes: newDurationMinutes,
     });
