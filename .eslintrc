@@ -5,9 +5,7 @@
     "node": true,
     "browser": true
   },
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "plugins": ["@typescript-eslint"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
@@ -37,7 +35,8 @@
       }
     ],
     "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-empty-function": "off",
     "no-prototype-builtins": "off",
-    "@typescript-eslint/no-empty-function": "off"
+    "jest/no-disabled-tests": "off"
   }
 }

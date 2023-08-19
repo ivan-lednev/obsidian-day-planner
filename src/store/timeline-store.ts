@@ -1,9 +1,9 @@
 import { derived, get, writable } from "svelte/store";
-import { SNAP_STEP_MINUTES } from "src/constants";
+import { SNAP_STEP_MINUTES } from "../constants";
 import { settings } from "./settings";
 import type { App } from "obsidian";
 import type { PlanItem } from "../types";
-import { computeOverlap } from "src/parser/overlap";
+import { computeOverlap } from "../parser/overlap";
 
 export type Timestamp = { durationMinutes: number; startMinutes: number };
 

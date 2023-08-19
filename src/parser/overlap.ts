@@ -1,4 +1,4 @@
-import type { Overlap, TimeBlock } from "src/types";
+import type { Overlap, TimeBlock } from "../types";
 import Fraction from "fraction.js";
 import { partition } from "lodash/fp";
 

@@ -1,7 +1,7 @@
-import { createPlanItemFromTimeline } from "src/parser/parser";
-import { appendToPlan } from "src/plan";
-import { tasks } from "src/store/timeline-store";
-import { getDailyNoteForToday } from "src/util/daily-notes";
+import { createPlanItemFromTimeline } from "../../parser/parser";
+import { appendToPlan } from "../../plan";
+import { tasks } from "../../store/timeline-store";
+import { getDailyNoteForToday } from "../../util/daily-notes";
 import { get, writable } from "svelte/store";
 
 export function useCreate() {

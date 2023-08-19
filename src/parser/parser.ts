@@ -9,8 +9,8 @@ import {
   minutesToMoment,
 } from "../util/moment";
 import { DEFAULT_DURATION_MINUTES } from "../constants";
-import { getTimeFromYOffset, roundToSnapStep } from "src/store/timeline-store";
-import { getDailyNoteForToday } from "src/util/daily-notes";
+import { getTimeFromYOffset, roundToSnapStep } from "../store/timeline-store";
+import { getDailyNoteForToday } from "../util/daily-notes";
 import type { PlanItem, PlanItemLocation } from "../types";
 
 // todo: out of place
