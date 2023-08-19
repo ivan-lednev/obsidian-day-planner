@@ -9,7 +9,7 @@
     durationToSize,
     overlapLookup,
     roundToSnapStep,
-    timeToTimelineOffset
+    timeToTimelineOffset,
   } from "../../store/timeline-store";
   import { useDrag } from "../hooks/use-drag";
   import { useResize } from "../hooks/use-resize";
@@ -30,14 +30,14 @@
     pointerYOffsetToTaskStart,
     handleMoveStart,
     handleMoveCancel,
-    handleMoveConfirm
+    handleMoveConfirm,
   } = useDrag();
 
   const {
     resizing,
     handleResizeStart,
     handleResizeCancel,
-    handleResizeConfirm
+    handleResizeConfirm,
   } = useResize();
 
   $: initialOffset = isGhost
@@ -99,54 +99,52 @@
 </div>
 
 <style>
-    .gap-box {
-        display: flex;
-        padding-left: 3px;
-        padding-right: 3px;
+  .gap-box {
+    display: flex;
+    padding-right: 3px;
+    padding-left: 3px;
+    transition: 0.05s linear;
+  }
 
-        transition: 0.05s linear;
-    }
+  .task {
+    overflow: visible;
+    display: flex;
+    flex: 1 0 0;
+    align-items: flex-start;
+    justify-content: flex-start;
 
-    .task {
-        flex: 1 0 0;
+    padding: 5px;
 
-        overflow: visible;
-        display: flex;
-        align-items: flex-start;
-        justify-content: flex-start;
+    font-size: var(--font-ui-medium);
+    color: var(--text-muted);
+    text-align: left;
+    overflow-wrap: anywhere;
+    white-space: normal;
 
-        padding: 5px;
+    background-color: var(--background-primary);
+    border: 1px solid var(--text-faint);
+    border-radius: var(--radius-s);
+  }
 
-        overflow-wrap: anywhere;
-        font-size: var(--font-ui-medium);
-        color: var(--text-muted);
-        text-align: left;
-        white-space: normal;
+  .past {
+    background-color: var(--background-secondary);
+  }
 
-        background-color: var(--background-primary);
-        border: 1px solid var(--text-faint);
-        border-radius: var(--radius-s);
-    }
+  .present {
+    border-color: var(--color-accent);
+  }
 
-    .past {
-        background-color: var(--background-secondary);
-    }
+  .is-ghost {
+    opacity: 0.6;
+  }
 
-    .present {
-        border-color: var(--color-accent);
-    }
+  .task:hover {
+    cursor: grab;
+  }
 
-    .is-ghost {
-        opacity: 60%;
-    }
-
-    .task:hover {
-        cursor: grab;
-    }
-
-    .resize-handle {
-        bottom: -15px;
-        height: 30px;
-        cursor: s-resize;
-    }
+  .resize-handle {
+    cursor: s-resize;
+    bottom: -15px;
+    height: 30px;
+  }
 </style>

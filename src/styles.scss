@@ -9,14 +9,15 @@
 }
 
 .day-planner-progress-bar {
-  align-self: stretch;
+  overflow: hidden;
   display: flex;
   align-items: stretch;
+  align-self: stretch;
+
   min-width: 100px;
 
   background-color: var(--text-faint);
   border-radius: var(--radius-s);
-  overflow: hidden;
 }
 
 .day-planner-progress-value {

@@ -73,8 +73,8 @@
     justify-content: center;
 
     font-size: var(--font-ui-small);
-    color: var(--text-normal);
     font-weight: var(--font-medium);
+    color: var(--text-normal);
   }
 
   .settings {

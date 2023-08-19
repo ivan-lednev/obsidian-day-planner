@@ -46,8 +46,10 @@
   .task-container {
     top: 0;
     bottom: 0;
+
     display: flex;
     flex-direction: column;
+
     margin-right: 10px;
     margin-left: 20px;
   }

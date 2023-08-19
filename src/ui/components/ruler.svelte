@@ -48,8 +48,7 @@
     align-self: flex-start;
     justify-content: center;
 
-    color: var(--text-muted);
-
     font-size: var(--nav-item-size);
+    color: var(--text-muted);
   }
 </style>
