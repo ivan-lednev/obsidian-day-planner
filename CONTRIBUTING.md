@@ -14,6 +14,7 @@ an [issue](https://github.com/ivan-lednev/obsidian-day-planner/issues).
 1. Watch the changes: `npm run dev`
 1. Now when you change anything, reload Obsidian to see the updates
    - You can use https://github.com/pjeby/hot-reload to make this process faster
+1. Once you're ready to commit, make sure your commit message conforms to the conventional commits spec (pre-commit hook is going to fail otherwise)
 
 ## Pull Request Process
 
