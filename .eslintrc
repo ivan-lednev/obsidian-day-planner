@@ -37,6 +37,7 @@
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-empty-function": "off",
     "no-prototype-builtins": "off",
-    "jest/no-disabled-tests": "off"
+    "jest/no-disabled-tests": "off",
+    "svelte/sort-attributes": "warn"
   }
 }

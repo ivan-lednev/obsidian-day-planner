@@ -1,7 +1,11 @@
 <script lang="ts">
-  import SettingsButton from "./settings-button.svelte";
+  import ControlButton from "./control-button.svelte";
+  import SettingsIcon from "./icons/settings.svelte";
+  import GoToFileIcon from "./icons/go-to-file.svelte";
   import { onMount } from "svelte";
   import { settings } from "src/store/settings";
+  import { openFileInEditor } from "../../util/obsidian";
+  import { getDailyNoteForToday } from "../../util/daily-notes";
 
   let settingsVisible = false;
 
@@ -27,7 +31,21 @@
 <div class="controls">
   <div class="header">
     <span class="date">{date}</span>
-    <SettingsButton isActive={settingsVisible} on:click={toggleSettings} />
+    <ControlButton
+      label="Go to source file"
+      on:click={() => {
+        openFileInEditor(getDailyNoteForToday());
+      }}
+    >
+      <GoToFileIcon />
+    </ControlButton>
+    <ControlButton
+      on:click={toggleSettings}
+      label="Settings"
+      isActive={settingsVisible}
+    >
+      <SettingsIcon />
+    </ControlButton>
   </div>
   {#if settingsVisible}
     <div class="settings">
@@ -66,38 +84,38 @@
 </div>
 
 <style>
-    .date {
-        display: flex;
-        flex: 1 0 0;
-        align-items: center;
-        justify-content: center;
+  .date {
+    display: flex;
+    flex: 1 0 0;
+    align-items: center;
+    justify-content: flex-start;
 
-        font-size: var(--font-ui-small);
-        font-weight: var(--font-medium);
-        color: var(--text-normal);
-    }
+    font-size: var(--font-ui-small);
+    font-weight: var(--font-medium);
+    color: var(--text-normal);
+  }
 
-    .settings {
-        margin: var(--size-4-1) var(--size-4-4);
-    }
+  .settings {
+    margin: var(--size-4-1) var(--size-4-4);
+  }
 
-    .setting-item {
-        padding: var(--size-2-3) 0;
-        border: none;
-    }
+  .setting-item {
+    padding: var(--size-2-3) 0;
+    border: none;
+  }
 
-    .setting-item-name {
-        font-size: var(--font-ui-small);
-    }
+  .setting-item-name {
+    font-size: var(--font-ui-small);
+  }
 
-    .controls {
-        display: flex;
-        flex-direction: column;
-        border-bottom: 1px solid var(--background-modifier-border);
-    }
+  .controls {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--background-modifier-border);
+  }
 
-    .header {
-        display: flex;
-        margin: var(--size-4-2);
-    }
+  .header {
+    display: flex;
+    margin: var(--size-4-2);
+  }
 </style>
