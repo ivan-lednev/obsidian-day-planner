@@ -1,13 +1,13 @@
 <script lang="ts">
   import ControlButton from "./control-button.svelte";
   import SettingsIcon from "./icons/settings.svelte";
-  import GoToFileIcon from "./icons/go-to-file.svelte";
   import ArrowLeftIcon from "./icons/arrow-left.svelte";
   import ArrowRightIcon from "./icons/arrow-right.svelte";
   import { settings } from "src/store/settings";
   import { openFileInEditor } from "../../util/obsidian";
-  import { getDailyNoteForToday } from "../../util/daily-notes";
-  import { time } from "../../store/time";
+  import { getAllDailyNotes } from "obsidian-daily-notes-interface";
+  import { Notice } from "obsidian";
+  import { activeDay, getTimelineFile } from "../../store/timeline-store";
 
   let settingsVisible = false;
 
@@ -15,27 +15,71 @@
     settingsVisible = !settingsVisible;
   }
 
-  $: formattedDateTime = $time.format($settings.timelineDateFormat);
+  async function goBack() {
+    const sortedNoteKeys = Object.keys(getAllDailyNotes()).sort();
+    const currentNoteIndex = sortedNoteKeys.findIndex(
+      (key) => key === $activeDay,
+    );
+
+    const previousNoteKey = sortedNoteKeys[currentNoteIndex - 1];
+    const previousNote = getAllDailyNotes()[previousNoteKey];
+
+    if (!previousNote) {
+      new Notice("No more daily notes");
+      return;
+    }
+
+    await openFileInEditor(previousNote);
+
+    $activeDay = previousNoteKey;
+  }
+
+  async function goForward() {
+    const sortedNoteKeys = Object.keys(getAllDailyNotes()).sort();
+    const currentNoteIndex = sortedNoteKeys.findIndex(
+      (key) => key === $activeDay,
+    );
+
+    const nextNoteKey = sortedNoteKeys[currentNoteIndex + 1];
+    const nextNote = getAllDailyNotes()[nextNoteKey];
+
+    if (!nextNote) {
+      new Notice("No more daily notes");
+      return;
+    }
+
+    await openFileInEditor(nextNote);
+
+    $activeDay = nextNoteKey;
+  }
 </script>
 
+<!-- todo: this is big enough to deserve its own component -->
 <div class="controls">
   <div class="header">
-    <span class="date">{formattedDateTime}</span>
-    <ControlButton label="Go to previous daily plan" on:click={() => {}}>
+    <ControlButton
+      --grid-column-start="2"
+      label="Go to previous daily plan"
+      on:click={goBack}
+    >
       <ArrowLeftIcon />
     </ControlButton>
-    <ControlButton label="Go to next daily plan" on:click={() => {}}>
-      <ArrowRightIcon />
-    </ControlButton>
+
     <ControlButton
-      label="Open file for current plan"
+      label="Go to file"
       on:click={() => {
-        openFileInEditor(getDailyNoteForToday());
+        openFileInEditor(getTimelineFile());
       }}
     >
-      <GoToFileIcon />
+      <span class="date">{getAllDailyNotes()[$activeDay].basename}</span>
     </ControlButton>
+
+    <ControlButton label="Go to next daily plan" on:click={goForward}>
+      <ArrowRightIcon />
+    </ControlButton>
+
     <ControlButton
+      --justify-self="flex-end"
       isActive={settingsVisible}
       label="Settings"
       on:click={toggleSettings}
@@ -82,9 +126,8 @@
 <style>
   .date {
     display: flex;
-    flex: 1 0 0;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
 
     font-size: var(--font-ui-small);
     font-weight: var(--font-medium);
@@ -111,7 +154,10 @@
   }
 
   .header {
-    display: flex;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(5, 1fr);
+    justify-content: center;
     margin: var(--size-4-2);
   }
 </style>

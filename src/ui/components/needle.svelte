@@ -1,7 +1,10 @@
 <script lang="ts">
   import { settings } from "src/store/settings";
   import { getMinutesSinceMidnight } from "../../util/moment";
-  import { timeToTimelineOffset } from "src/store/timeline-store";
+  import {
+    activeDayShown,
+    timeToTimelineOffset,
+  } from "src/store/timeline-store";
   import { time } from "../../store/time";
 
   export let scrollBlockedByUser = false;
@@ -10,7 +13,7 @@
   let coords = $timeToTimelineOffset(getMinutesSinceMidnight($time));
 
   function scrollIntoView() {
-    if ($settings.centerNeedle && !scrollBlockedByUser) {
+    if ($settings.centerNeedle && !scrollBlockedByUser && activeDayShown) {
       el?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }

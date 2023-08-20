@@ -14,9 +14,12 @@
   import { useResize } from "../hooks/use-resize";
   import { getRelationToNow } from "../../util/moment";
   import { time } from "../../store/time";
+  import type { Moment } from "moment";
 
   export let text: string;
   export let id: string;
+  export let startTime: Moment;
+  export let endTime: Moment;
   export let startMinutes: number | undefined = undefined;
   export let durationMinutes: number;
   export let pointerYOffset: Readable<number>;
@@ -61,7 +64,10 @@
     ? (100 / itemPlacing.columns) * itemPlacing.start
     : 0;
 
-  $: relationToNow = getRelationToNow($time, startMinutes, durationMinutes);
+  // todo: clean up
+  $: relationToNow = isGhost
+    ? "future"
+    : getRelationToNow($time, startTime, endTime);
 
   function handleCancel() {
     handleMoveCancel();

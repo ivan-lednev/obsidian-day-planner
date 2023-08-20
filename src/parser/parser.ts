@@ -5,11 +5,15 @@ import { isTopLevelListItem } from "../../obsidian-metadata-utils/src/list";
 import { getTextAtPosition } from "../../obsidian-metadata-utils/src/position";
 import {
   getDiffInMinutes,
-  getMinutesSinceMidnightTo,
-  minutesToMoment,
+  getMinutesSinceMidnightOfDayTo,
+  minutesToMomentOfDay,
 } from "../util/moment";
 import { DEFAULT_DURATION_MINUTES } from "../constants";
-import { getTimeFromYOffset, roundToSnapStep } from "../store/timeline-store";
+import {
+  getMomentOfActiveDay,
+  getTimeFromYOffset,
+  roundToSnapStep,
+} from "../store/timeline-store";
 import { getDailyNoteForToday } from "../util/daily-notes";
 import type { PlanItem, PlanItemLocation } from "../types";
 
@@ -69,8 +73,14 @@ export function parsePlanItems(
       return {
         ...item,
         endTime,
-        startMinutes: getMinutesSinceMidnightTo(item.startTime),
-        endMinutes: getMinutesSinceMidnightTo(endTime),
+        startMinutes: getMinutesSinceMidnightOfDayTo(
+          getMomentOfActiveDay(),
+          item.startTime,
+        ),
+        endMinutes: getMinutesSinceMidnightOfDayTo(
+          getMomentOfActiveDay(),
+          endTime,
+        ),
         durationMinutes,
       };
     })
@@ -131,12 +141,14 @@ function createPlanItem({
     groups: { listTokens, start, end, text },
   } = match;
 
-  const startTime = parseTimestamp(start);
+  // todo: parser should not depend on UI state
+  const startTime = parseTimestamp(start, getMomentOfActiveDay());
 
   return {
     listTokens,
     startTime,
-    endTime: parseTimestamp(end),
+    // todo: parser should not depend on UI state
+    endTime: parseTimestamp(end, getMomentOfActiveDay()),
     rawStartTime: start,
     rawEndTime: end,
     text,
@@ -191,8 +203,8 @@ export function createPlanItemFromTimeline(pointerYOffset: number) {
     durationMinutes: DEFAULT_DURATION_MINUTES,
     endMinutes,
     text: "New item",
-    startTime: minutesToMoment(startMinutes),
-    endTime: minutesToMoment(endMinutes),
+    startTime: minutesToMomentOfDay(startMinutes, getMomentOfActiveDay()),
+    endTime: minutesToMomentOfDay(endMinutes, getMomentOfActiveDay()),
     // todo: no hardcode
     listTokens: "- ",
     location: {

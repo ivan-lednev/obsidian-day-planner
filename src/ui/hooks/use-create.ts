@@ -1,7 +1,6 @@
 import { createPlanItemFromTimeline } from "../../parser/parser";
 import { appendToPlan } from "../../plan";
-import { tasks } from "../../store/timeline-store";
-import { getDailyNoteForToday } from "../../util/daily-notes";
+import { getTimelineFile, tasks } from "../../store/timeline-store";
 import { get, writable } from "svelte/store";
 
 export function useCreate() {
@@ -29,7 +28,7 @@ export function useCreate() {
     tasks.update((previous) => [...previous, newPlanItem]);
 
     // @ts-ignore
-    await appendToPlan(getDailyNoteForToday().path, newPlanItem);
+    await appendToPlan(getTimelineFile().path, newPlanItem);
   }
 
   return {

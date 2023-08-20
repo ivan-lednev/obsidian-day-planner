@@ -1,19 +1,15 @@
 import { Plugin, TFile, WorkspaceLeaf } from "obsidian";
-import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { get } from "svelte/store";
 import { VIEW_TYPE_TIMELINE } from "./constants";
-import { parsePlanItems } from "./parser/parser";
 import { DayPlannerSettings } from "./settings";
-import { tasks } from "./store/timeline-store";
+import { appStore, getTimelineFile, tasks } from "./store/timeline-store";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
-import {
-  createDailyNoteIfNeeded,
-  dailyNoteExists,
-  getDailyNoteForToday,
-} from "./util/daily-notes";
+import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
 import { createPlannerHeading } from "./plan";
+import { refreshPlanItemsInStore } from "./util/obsidian";
+import { settings } from "./store/settings";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
@@ -24,6 +20,7 @@ export default class DayPlanner extends Plugin {
       new DayPlannerSettings(),
       await this.loadData(),
     );
+
     this.statusBar = new StatusBar(
       this.settings,
       this.addStatusBarItem(),
@@ -59,13 +56,15 @@ export default class DayPlanner extends Plugin {
 
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
 
+    this.initStore();
+
     this.app.workspace.onLayoutReady(async () => {
-      await this.refreshPlanItemsInStore();
+      await refreshPlanItemsInStore();
     });
 
     this.app.metadataCache.on("changed", async (file: TFile) => {
-      if (file === getDailyNoteForToday()) {
-        await this.refreshPlanItemsInStore();
+      if (file === getTimelineFile()) {
+        await refreshPlanItemsInStore();
       }
     });
 
@@ -75,6 +74,33 @@ export default class DayPlanner extends Plugin {
         1000,
       ),
     );
+  }
+
+  private initStore() {
+    appStore.set(this.app);
+
+    const {
+      zoomLevel,
+      centerNeedle,
+      startHour,
+      timelineDateFormat,
+      plannerHeading,
+      plannerHeadingLevel,
+    } = this.settings;
+
+    settings.set({
+      zoomLevel,
+      centerNeedle,
+      startHour,
+      timelineDateFormat,
+      plannerHeading,
+      plannerHeadingLevel,
+    });
+
+    settings.subscribe(async (newValue) => {
+      this.settings = { ...this.settings, ...newValue };
+      await this.saveData(this.settings);
+    });
   }
 
   onunload() {
@@ -90,12 +116,6 @@ export default class DayPlanner extends Plugin {
     }
   }
 
-  private async refreshPlanItemsInStore() {
-    const parsedPlanItems = await this.getPlanItems();
-
-    tasks.update(() => parsedPlanItems);
-  }
-
   private updateStatusBar = async () => {
     if (dailyNoteExists()) {
       await this.statusBar.update(get(tasks));
@@ -103,24 +123,6 @@ export default class DayPlanner extends Plugin {
       this.statusBar.setEmpty();
     }
   };
-
-  private async getPlanItems() {
-    const dailyNote = getDailyNote(window.moment(), getAllDailyNotes());
-
-    if (!dailyNote) {
-      return [];
-    }
-
-    const fileContents = await this.app.vault.cachedRead(dailyNote);
-    const metadata = this.app.metadataCache.getFileCache(dailyNote);
-
-    return parsePlanItems(
-      fileContents,
-      metadata,
-      this.settings.plannerHeading,
-      dailyNote.path,
-    );
-  }
 
   private async initLeaf() {
     this.detachTimelineLeaves();

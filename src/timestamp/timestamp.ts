@@ -4,7 +4,7 @@ import { addMinutes, minutesToMoment } from "../util/moment";
 import type { Timestamp } from "src/store/timeline-store";
 import type { PlanItem } from "../types";
 
-export function parseTimestamp(asText?: string): Moment | null {
+export function parseTimestamp(asText?: string, day?: Moment): Moment | null {
   if (!asText) {
     return null;
   }
@@ -30,7 +30,12 @@ export function parseTimestamp(asText?: string): Moment | null {
     parsedHours += 12;
   }
 
-  return window.moment({ hours: parsedHours, minutes: parsedMinutes });
+  const timeOfDay = window.moment.duration({
+    hours: parsedHours,
+    minutes: parsedMinutes,
+  });
+
+  return day.clone().startOf("day").add(timeOfDay);
 }
 
 export function replaceTimestamp(

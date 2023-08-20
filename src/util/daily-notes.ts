@@ -2,6 +2,7 @@ import {
   createDailyNote,
   getAllDailyNotes,
   getDailyNote,
+  getDateFromFile,
 } from "obsidian-daily-notes-interface";
 import type { TFile } from "obsidian";
 
@@ -15,4 +16,14 @@ export function getDailyNoteForToday() {
 
 export function dailyNoteExists() {
   return Boolean(getDailyNote(window.moment(), getAllDailyNotes()));
+}
+
+export function getMomentFromUid(uid: string) {
+  const dailyNote = getAllDailyNotes()[uid];
+
+  if (!dailyNote) {
+    throw new Error(`No daily note: ${uid}`);
+  }
+
+  return getDateFromFile(dailyNote, "day");
 }
