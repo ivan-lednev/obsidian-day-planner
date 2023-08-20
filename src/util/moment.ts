@@ -3,8 +3,8 @@ import type { RelationToNow } from "../types";
 
 const moment = window.moment;
 
-export function getMinutesSinceMidnight() {
-  return moment().diff(moment().startOf("day"), "minutes");
+export function getMinutesSinceMidnight(moment: Moment) {
+  return moment.diff(moment.clone().startOf("day"), "minutes");
 }
 
 export function getMinutesSinceMidnightTo(someMoment: Moment) {
