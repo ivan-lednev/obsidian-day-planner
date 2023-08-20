@@ -9,12 +9,15 @@
     "lint": "prettier --check src && eslint src",
     "typescript": "tsc --noEmit",
     "test": "jest",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "commitlint": "commitlint --edit"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@commitlint/cli": "^17.7.1",
+    "@commitlint/config-conventional": "^17.7.0",
     "@jest/globals": "^29.6.2",
     "@tsconfig/svelte": "^1.0.13",
     "@types/moment": "^2.13.0",
