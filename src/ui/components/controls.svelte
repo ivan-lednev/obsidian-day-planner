@@ -2,6 +2,8 @@
   import ControlButton from "./control-button.svelte";
   import SettingsIcon from "./icons/settings.svelte";
   import GoToFileIcon from "./icons/go-to-file.svelte";
+  import ArrowLeftIcon from "./icons/arrow-left.svelte";
+  import ArrowRightIcon from "./icons/arrow-right.svelte";
   import { settings } from "src/store/settings";
   import { openFileInEditor } from "../../util/obsidian";
   import { getDailyNoteForToday } from "../../util/daily-notes";
@@ -19,8 +21,14 @@
 <div class="controls">
   <div class="header">
     <span class="date">{formattedDateTime}</span>
+    <ControlButton label="Go to previous daily plan" on:click={() => {}}>
+      <ArrowLeftIcon />
+    </ControlButton>
+    <ControlButton label="Go to next daily plan" on:click={() => {}}>
+      <ArrowRightIcon />
+    </ControlButton>
     <ControlButton
-      label="Go to source file"
+      label="Open file for current plan"
       on:click={() => {
         openFileInEditor(getDailyNoteForToday());
       }}
