@@ -11,14 +11,26 @@ const defaultPlannerHeading = "Day planner";
 // todo: replace with toMatchObject
 it.skip("parses tasks with timestamps from lines", () => {
   expect(
-    parsePlanItems(basic.content, basic.metadata, defaultPlannerHeading, ""),
+    parsePlanItems(
+      basic.content,
+      basic.metadata,
+      defaultPlannerHeading,
+      "",
+      window.moment(),
+    ),
   ).toMatchSnapshot();
 });
 
 // todo: replace with toMatchObject
 it.skip("grabs subtasks", () => {
   expect(
-    parsePlanItems(subtasks.content, subtasks.metadata, "Day planner", ""),
+    parsePlanItems(
+      subtasks.content,
+      subtasks.metadata,
+      "Day planner",
+      "",
+      window.moment(),
+    ),
   ).toMatchSnapshot();
 });
 
@@ -30,6 +42,7 @@ it.skip("parses bullet lists without checkboxes", () => {
       withoutTasks.metadata,
       defaultPlannerHeading,
       "",
+      window.moment(),
     ),
   ).toMatchSnapshot();
 });
@@ -42,6 +55,7 @@ it.skip("parses end time", () => {
       endTime.metadata,
       defaultPlannerHeading,
       "",
+      window.moment(),
     ),
   ).toMatchSnapshot();
 });
@@ -53,6 +67,7 @@ it("handles list items above daily plan", () => {
       listItemsAbove.metadata,
       defaultPlannerHeading,
       "",
+      window.moment(),
     ),
   ).toMatchObject([{ text: "Wake up" }]);
 });
@@ -64,6 +79,7 @@ it("handles tasks under subheadings", () => {
       subheadings.metadata,
       defaultPlannerHeading,
       "",
+      window.moment(),
     ),
   ).toMatchObject([
     { text: "Wake up" },

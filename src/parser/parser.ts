@@ -3,45 +3,18 @@ import { parseTimestamp } from "../timestamp/timestamp";
 import { timestampRegExp } from "../regexp";
 import { isTopLevelListItem } from "../../obsidian-metadata-utils/src/list";
 import { getTextAtPosition } from "../../obsidian-metadata-utils/src/position";
-import {
-  getDiffInMinutes,
-  getMinutesSinceMidnightOfDayTo,
-  minutesToMomentOfDay,
-} from "../util/moment";
-import { DEFAULT_DURATION_MINUTES } from "../constants";
-import {
-  getMomentOfActiveDay,
-  getTimeFromYOffset,
-  roundToSnapStep,
-} from "../store/timeline-store";
-import { getDailyNoteForToday } from "../util/daily-notes";
+import { getMinutesSinceMidnightOfDayTo } from "../util/moment";
+import { getMomentOfActiveDay } from "../store/timeline-store";
 import type { PlanItem, PlanItemLocation } from "../types";
-
-// todo: out of place
-export function calculateDefaultDuration(
-  item: ReturnType<typeof createPlanItem>,
-  next?: ReturnType<typeof createPlanItem>,
-) {
-  if (item.endTime) {
-    return getDiffInMinutes(item.startTime, item.endTime);
-  }
-
-  if (next) {
-    const minutesUntilNext = getDiffInMinutes(next.startTime, item.startTime);
-
-    if (minutesUntilNext < DEFAULT_DURATION_MINUTES) {
-      return minutesUntilNext;
-    }
-  }
-
-  return DEFAULT_DURATION_MINUTES;
-}
+import { calculateDefaultDuration } from "./calculate-default-duration";
+import type { Moment } from "moment";
 
 export function parsePlanItems(
   content: string,
   metadata: CachedMetadata,
   planHeadingContent: string,
   path: string,
+  day: Moment,
 ): PlanItem[] {
   const listItemsUnderPlan = getListItemsUnderHeading(
     metadata,
@@ -59,6 +32,7 @@ export function parsePlanItems(
       createPlanItem({
         line: li.listItemLineContent,
         location: { path, line: li.line },
+        day,
       }),
     )
     .filter((item) => item !== null)
@@ -87,6 +61,7 @@ export function parsePlanItems(
     .sort((a, b) => a.startMinutes - b.startMinutes);
 }
 
+// todo: this belongs to metadata-utils
 export function getListItemsUnderHeading(
   metadata: CachedMetadata,
   heading: string,
@@ -125,12 +100,14 @@ export function getHeadingByText(metadata: CachedMetadata, text: string) {
   return headings?.find((h) => h.heading === text);
 }
 
-function createPlanItem({
+export function createPlanItem({
   line,
   location,
+  day,
 }: {
   line: string;
   location: PlanItemLocation;
+  day: Moment;
 }) {
   const match = timestampRegExp.exec(line.trim());
   if (!match) {
@@ -142,13 +119,13 @@ function createPlanItem({
   } = match;
 
   // todo: parser should not depend on UI state
-  const startTime = parseTimestamp(start, getMomentOfActiveDay());
+  const startTime = parseTimestamp(start, day);
 
   return {
     listTokens,
     startTime,
     // todo: parser should not depend on UI state
-    endTime: parseTimestamp(end, getMomentOfActiveDay()),
+    endTime: parseTimestamp(end, day),
     rawStartTime: start,
     rawEndTime: end,
     text,
@@ -190,25 +167,4 @@ function getListItemContent(content: string, listItems: ListItemCache[]) {
       };
     },
   );
-}
-
-// todo: move
-export function createPlanItemFromTimeline(pointerYOffset: number) {
-  const startMinutes = getTimeFromYOffset(roundToSnapStep(pointerYOffset));
-  const endMinutes = startMinutes + DEFAULT_DURATION_MINUTES;
-
-  return {
-    id: String(Math.random()),
-    startMinutes,
-    durationMinutes: DEFAULT_DURATION_MINUTES,
-    endMinutes,
-    text: "New item",
-    startTime: minutesToMomentOfDay(startMinutes, getMomentOfActiveDay()),
-    endTime: minutesToMomentOfDay(endMinutes, getMomentOfActiveDay()),
-    // todo: no hardcode
-    listTokens: "- ",
-    location: {
-      path: getDailyNoteForToday().path,
-    },
-  };
 }

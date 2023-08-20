@@ -64,7 +64,6 @@
     ? (100 / itemPlacing.columns) * itemPlacing.start
     : 0;
 
-  // todo: clean up
   $: relationToNow = isGhost
     ? "future"
     : getRelationToNow($time, startTime, endTime);

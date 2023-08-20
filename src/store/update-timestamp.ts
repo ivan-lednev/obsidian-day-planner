@@ -7,7 +7,6 @@ import type { PlanItem } from "../types";
 export async function updateTimestamps(id: string, timestamp: Timestamp) {
   tasks.update((previous) => {
     return previous.map((task) => {
-      // todo: replace with ID
       if (task.id !== id) {
         return task;
       }
@@ -30,6 +29,7 @@ async function updateDurationInDailyNote(
   const file = get(appStore).vault.getAbstractFileByPath(task.location.path);
 
   if (!(file instanceof TFile)) {
+    // todo: we can do better
     throw new Error("Something is wrong");
   }
 

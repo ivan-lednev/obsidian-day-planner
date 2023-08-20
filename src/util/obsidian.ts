@@ -3,6 +3,7 @@ import { appStore, getTimelineFile, tasks } from "../store/timeline-store";
 import { get } from "svelte/store";
 import { parsePlanItems } from "../parser/parser";
 import { settings } from "../store/settings";
+import { getDateFromFile } from "obsidian-daily-notes-interface";
 
 export async function openFileInEditor(file: TFile) {
   const app = get(appStore);
@@ -41,5 +42,19 @@ async function getPlanItemsFromFile(file: TFile) {
   const fileContents = await app.vault.cachedRead(file);
   const metadata = app.metadataCache.getFileCache(file);
 
-  return parsePlanItems(fileContents, metadata, plannerHeading, file.path);
+  const fileDay = getDateFromFile(file, "day");
+
+  if (!fileDay) {
+    throw new Error(
+      `Tried to parse plan in file that is not a daily note: ${file.path}`,
+    );
+  }
+
+  return parsePlanItems(
+    fileContents,
+    metadata,
+    plannerHeading,
+    file.path,
+    fileDay,
+  );
 }
