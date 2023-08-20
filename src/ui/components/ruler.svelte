@@ -6,7 +6,7 @@
 
 <div class="hours-container">
   {#each visibleHours as hour}
-    <div class="hour" style:height="{$hourSize}px">
+    <div style:height="{$hourSize}px" class="hour">
       <div class="hour-number-container">
         {hour}
       </div>

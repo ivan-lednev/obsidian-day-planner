@@ -5,9 +5,9 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
-  aria-label={label}
   class="clickable-icon"
   class:is-active={isActive}
+  aria-label={label}
   on:click
 >
   <slot />

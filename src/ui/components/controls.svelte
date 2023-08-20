@@ -40,9 +40,9 @@
       <GoToFileIcon />
     </ControlButton>
     <ControlButton
-      on:click={toggleSettings}
-      label="Settings"
       isActive={settingsVisible}
+      label="Settings"
+      on:click={toggleSettings}
     >
       <SettingsIcon />
     </ControlButton>
@@ -54,7 +54,7 @@
           <div class="setting-item-name">Zoom</div>
         </div>
         <div class="setting-item-control">
-          <select bind:value={$settings.zoomLevel} class="dropdown">
+          <select class="dropdown" bind:value={$settings.zoomLevel}>
             {#each ["1", "2", "3", "4"] as level}
               <option value={level}>{level}</option>
             {/each}
@@ -75,7 +75,7 @@
               $settings.centerNeedle = !$settings.centerNeedle;
             }}
           >
-            <input type="checkbox" tabindex="0" />
+            <input tabindex="0" type="checkbox" />
           </div>
         </div>
       </div>

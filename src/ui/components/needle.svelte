@@ -23,8 +23,8 @@
 
 <div
   bind:this={el}
-  class="needle absolute-stretch-x"
   style:transform="translateY({coords}px)"
+  class="needle absolute-stretch-x"
 ></div>
 
 <style>

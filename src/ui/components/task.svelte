@@ -72,12 +72,12 @@
 <svelte:body on:mouseup={handleCancel} />
 
 <div
-  class="gap-box absolute-stretch-x"
   style:height="{height}px"
   style:transform="translateY({offset}px)"
   style:cursor
   style:width="{widthPercent}%"
   style:left="{xOffsetPercent}%"
+  class="gap-box absolute-stretch-x"
 >
   <div
     class="task {relationToNow}"

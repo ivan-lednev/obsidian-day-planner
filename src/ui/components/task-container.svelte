@@ -33,11 +33,11 @@
   {/each}
   {#if $creating}
     <Task
-      isGhost
-      text={cancelMessage}
       id=""
       durationMinutes={defaultDurationForNewTask}
+      isGhost
       {pointerYOffset}
+      text={cancelMessage}
     />
   {/if}
 </div>

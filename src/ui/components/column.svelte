@@ -7,8 +7,8 @@
 <div class="task-grid">
   <slot />
   {#each visibleHours as hour}
-    <div class="time-grid-block" style:height="{$hourSize}px">
-      <div class="half-hour-separator" style:height="{$hourSize / 2}px"></div>
+    <div style:height="{$hourSize}px" class="time-grid-block">
+      <div style:height="{$hourSize / 2}px" class="half-hour-separator"></div>
     </div>
   {/each}
 </div>
