@@ -2,10 +2,10 @@
   import ControlButton from "./control-button.svelte";
   import SettingsIcon from "./icons/settings.svelte";
   import GoToFileIcon from "./icons/go-to-file.svelte";
-  import { onMount } from "svelte";
   import { settings } from "src/store/settings";
   import { openFileInEditor } from "../../util/obsidian";
   import { getDailyNoteForToday } from "../../util/daily-notes";
+  import { time } from "../../store/time";
 
   let settingsVisible = false;
 
@@ -13,24 +13,12 @@
     settingsVisible = !settingsVisible;
   }
 
-  function getFormattedDate() {
-    return window.moment().format($settings.timelineDateFormat);
-  }
-
-  let date = getFormattedDate();
-
-  onMount(() => {
-    const interval = setInterval(() => {
-      date = getFormattedDate();
-    }, 5000);
-
-    return () => clearInterval(interval);
-  });
+  $: formattedDateTime = $time.format($settings.timelineDateFormat);
 </script>
 
 <div class="controls">
   <div class="header">
-    <span class="date">{date}</span>
+    <span class="date">{formattedDateTime}</span>
     <ControlButton
       label="Go to source file"
       on:click={() => {
