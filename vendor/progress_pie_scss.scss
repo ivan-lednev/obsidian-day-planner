@@ -38,13 +38,13 @@
 
 @for $i from 0 through 50 {
   .progress-pie[data-value="#{$i}"]:before {
-     transform: rotate(#{$i/100}turn);
+     transform: rotate(#{calc($i / 100)}turn);
   }
 }
 
 @for $i from 51 through 100 {
   .progress-pie[data-value="#{$i}"]:before {
     background-color: #4CC9D8;
-    transform: rotate(#{$i/100 - .5}turn);
+    transform: rotate(#{calc($i / 100 - .5)}turn);
   }
 }
