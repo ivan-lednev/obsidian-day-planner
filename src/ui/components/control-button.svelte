@@ -18,10 +18,11 @@
 
 <style>
   .clickable-icon {
+    grid-column-start: var(--grid-column-start, auto);
     flex-basis: var(--input-height);
     align-self: center;
-    grid-column-start: var(--grid-column-start, auto);
     justify-self: var(--justify-self, auto);
+
     white-space: nowrap;
   }
 </style>

@@ -3,12 +3,17 @@
 
   import { activeDay, getTimelineFile } from "../../store/active-day";
   import { settings } from "../../store/settings";
-  import { getNeighborNotes } from "../../util/daily-notes";
+  import {
+    createDailyNoteIfNeeded,
+    getNeighborNotes,
+  } from "../../util/daily-notes";
   import { openFileInEditor } from "../../util/obsidian";
+
 
   import ControlButton from "./control-button.svelte";
   import ArrowLeftIcon from "./icons/arrow-left.svelte";
   import ArrowRightIcon from "./icons/arrow-right.svelte";
+  import GoToFileIcon from "./icons/go-to-file.svelte";
   import SettingsIcon from "./icons/settings.svelte";
 
   let settingsVisible = false;
@@ -42,13 +47,27 @@
 
     $activeDay = neighbors.nextNoteKey;
   }
+
+  async function goToToday() {
+    const noteForToday = await createDailyNoteIfNeeded();
+
+    await openFileInEditor(noteForToday);
+  }
 </script>
 
 <!-- todo: this is big enough to deserve its own component -->
 <div class="controls">
   <div class="header">
     <ControlButton
-      --grid-column-start="2"
+      --justify-self="flex-start"
+      label="Open today's daily note"
+      on:click={goToToday}
+    >
+      <GoToFileIcon />
+    </ControlButton>
+
+    <ControlButton
+      --justify-self="flex-end"
       disabled={!neighbors.previousNoteKey}
       label="Go to previous daily plan"
       on:click={goBack}
@@ -66,6 +85,7 @@
     </ControlButton>
 
     <ControlButton
+      --justify-self="flex-start"
       disabled={!neighbors.nextNoteKey}
       label="Go to next daily plan"
       on:click={goForward}
@@ -150,9 +170,10 @@
 
   .header {
     display: grid;
-    gap: 10px;
     grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
     justify-content: center;
+
     margin: var(--size-4-2);
   }
 </style>
