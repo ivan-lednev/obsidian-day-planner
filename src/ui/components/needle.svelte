@@ -2,10 +2,10 @@
   import { settings } from "src/store/settings";
   import { getMinutesSinceMidnight } from "../../util/moment";
   import {
-    activeDayShown,
     timeToTimelineOffset,
   } from "src/store/timeline-store";
   import { time } from "../../store/time";
+  import { todayIsShownInTimeline } from "../../store/active-day";
 
   export let scrollBlockedByUser = false;
 
@@ -13,7 +13,7 @@
   let coords = $timeToTimelineOffset(getMinutesSinceMidnight($time));
 
   function scrollIntoView() {
-    if ($settings.centerNeedle && !scrollBlockedByUser && activeDayShown) {
+    if ($settings.centerNeedle && !scrollBlockedByUser && todayIsShownInTimeline) {
       el?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }

@@ -4,7 +4,8 @@
   import Needle from "./needle.svelte";
   import TaskContainer from "./task-container.svelte";
   import Controls from "./controls.svelte";
-  import { activeDayShown, visibleHours } from "../../store/timeline-store";
+  import { visibleHours } from "../../store/timeline-store";
+  import { todayIsShownInTimeline } from "../../store/active-day";
 
   let userHoversOverScroller = false;
 
@@ -26,7 +27,7 @@
   <div class="scale-with-days">
     <Ruler visibleHours={$visibleHours} />
     <Column visibleHours={$visibleHours}>
-      {#if $activeDayShown}
+      {#if $todayIsShownInTimeline}
         <Needle scrollBlockedByUser={userHoversOverScroller} />
       {/if}
       <TaskContainer />

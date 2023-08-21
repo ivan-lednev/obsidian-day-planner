@@ -4,10 +4,10 @@ import { timestampRegExp } from "../regexp";
 import { isTopLevelListItem } from "../../obsidian-metadata-utils/src/list";
 import { getTextAtPosition } from "../../obsidian-metadata-utils/src/position";
 import { getMinutesSinceMidnightOfDayTo } from "../util/moment";
-import { getMomentOfActiveDay } from "../store/timeline-store";
 import type { PlanItem, PlanItemLocation } from "../types";
 import { calculateDefaultDuration } from "./calculate-default-duration";
 import type { Moment } from "moment";
+import { getMomentOfActiveDay } from "../store/active-day";
 
 export function parsePlanItems(
   content: string,

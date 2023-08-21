@@ -1,8 +1,6 @@
 import { appendToPlan } from "../../plan";
 import {
-  getMomentOfActiveDay,
   getTimeFromYOffset,
-  getTimelineFile,
   roundToSnapStep,
   tasks,
 } from "../../store/timeline-store";
@@ -10,6 +8,7 @@ import { get, writable } from "svelte/store";
 import { DEFAULT_DURATION_MINUTES } from "../../constants";
 import { minutesToMomentOfDay } from "../../util/moment";
 import { getDailyNoteForToday } from "../../util/daily-notes";
+import { getMomentOfActiveDay, getTimelineFile } from "../../store/active-day";
 
 export function useCreate() {
   const creating = writable(false);

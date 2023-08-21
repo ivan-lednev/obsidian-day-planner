@@ -6,8 +6,8 @@
   import { settings } from "src/store/settings";
   import { openFileInEditor } from "../../util/obsidian";
   import { getAllDailyNotes } from "obsidian-daily-notes-interface";
-  import { activeDay, getTimelineFile } from "../../store/timeline-store";
   import { getNeighborNotes } from "../../util/daily-notes";
+  import { activeDay, getTimelineFile } from "../../store/active-day";
 
   let settingsVisible = false;
 
