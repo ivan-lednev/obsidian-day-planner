@@ -4,9 +4,11 @@
   - [About Obsidian Day Planner](#about-obsidian-day-planner)
     - [What's the difference?](#whats-the-difference)
   - [Features](#features)
-    - [Write a plan using a simple human-readable format and see it rendered in a side panel](#write-a-plan-using-a-simple-human-readable-format-and-see-it-rendered-in-a-side-panel)
+    - [Write a plan using a human-readable format or drag-and-drop and see it rendered in a side panel](#write-a-plan-using-a-human-readable-format-or-drag-and-drop-and-see-it-rendered-in-a-side-panel)
     - [Observe your progress in the status bar](#observe-your-progress-in-the-status-bar)
+    - [Navigate to plans from past/future notes](#navigate-to-plans-from-pastfuture-notes)
     - [Use drag-and-drop to create and update tasks](#use-drag-and-drop-to-create-and-update-tasks)
+    - [Overlapping tasks push each other](#overlapping-tasks-push-each-other)
   - [Usage](#usage)
   - [Configuration](#configuration)
     - [Status Bar - Circular Progress](#status-bar---circular-progress)
@@ -48,17 +50,22 @@ initially forked it, but ended up rewriting almost all of it.
 - There is only one mode now: daily notes
 - I've removed Mermaid-related functionality to make the scope of the plugin more focused
 - You can specify an end time for a task
-- The plugin 'understands' timestamps in almost any format:
+- The plugin 'understands' timestamps in almost any format
+- There is a lot of other features available (see below)
 
 ## Features
 
-### Write a plan using a simple human-readable format and see it rendered in a side panel
+### Write a plan using a human-readable format or drag-and-drop and see it rendered in a side panel
 
-![image](https://github.com/ivan-lednev/obsidian-day-planner/assets/41428836/92a9e7a6-e71f-4a84-b533-ee24e075be8b)
+![image](./assets/main-demo.png)
 
 ### Observe your progress in the status bar
 
 ![image](https://github.com/ivan-lednev/obsidian-day-planner/assets/41428836/0acf9def-6225-4174-9070-4450ae17fa79)
+
+### Navigate to plans from past/future notes
+
+![](./assets/navigation-demo.png)
 
 ### Use drag-and-drop to create and update tasks
 
