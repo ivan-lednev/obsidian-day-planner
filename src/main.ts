@@ -1,12 +1,22 @@
-import { Plugin, TFile, WorkspaceLeaf } from "obsidian";
+import { FileView, Plugin, TFile, WorkspaceLeaf } from "obsidian";
 import { get } from "svelte/store";
 import { VIEW_TYPE_TIMELINE } from "./constants";
 import { DayPlannerSettings } from "./settings";
-import { appStore, getTimelineFile, tasks } from "./store/timeline-store";
+import {
+  activeDay,
+  appStore,
+  getTimelineFile,
+  tasks,
+} from "./store/timeline-store";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
-import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
+import {
+  createDailyNoteIfNeeded,
+  dailyNoteExists,
+  getDateUidForToday,
+  getDateUidFromFile,
+} from "./util/daily-notes";
 import { createPlannerHeading } from "./plan";
 import { refreshPlanItemsInStore } from "./util/obsidian";
 import { settings } from "./store/settings";
@@ -60,6 +70,24 @@ export default class DayPlanner extends Plugin {
 
     this.app.workspace.onLayoutReady(async () => {
       await refreshPlanItemsInStore();
+    });
+
+    this.app.workspace.on("active-leaf-change", ({ view }) => {
+      if (!(view instanceof FileView)) {
+        return;
+      }
+
+      const newDailyNoteKey = getDateUidFromFile(view.file);
+
+      if (!newDailyNoteKey) {
+        if (get(activeDay) !== getDateUidForToday()) {
+          activeDay.set(getDateUidForToday());
+        }
+
+        return;
+      }
+
+      activeDay.set(newDailyNoteKey);
     });
 
     this.app.metadataCache.on("changed", async (file: TFile) => {

@@ -4,9 +4,13 @@ import { settings } from "./settings";
 import type { App } from "obsidian";
 import type { PlanItem } from "../types";
 import { computeOverlap } from "../parser/overlap";
-import { getAllDailyNotes, getDateUID } from "obsidian-daily-notes-interface";
+import { getAllDailyNotes } from "obsidian-daily-notes-interface";
 import { refreshPlanItemsInStore } from "../util/obsidian";
-import { getDailyNoteForToday, getMomentFromUid } from "../util/daily-notes";
+import {
+  getDailyNoteForToday,
+  getDateUidForToday,
+  getMomentFromUid,
+} from "../util/daily-notes";
 
 export type Timestamp = { durationMinutes: number; startMinutes: number };
 
@@ -16,21 +20,23 @@ export const tasks = writable<PlanItem[]>([]);
 
 export const overlapLookup = derived(tasks, ($tasks) => computeOverlap($tasks));
 
-export const activeDay = writable(getDateUID(window.moment(), "day"));
+export const activeDay = writable(getDateUidForToday());
+
+activeDay.subscribe(async () => {
+  await refreshPlanItemsInStore();
+});
 
 export const activeDayShown = derived(
   activeDay,
   ($activeDay) => getAllDailyNotes()[$activeDay] === getDailyNoteForToday(),
 );
 
+// todo: move
 export function getMomentOfActiveDay() {
   return getMomentFromUid(get(activeDay));
 }
 
-activeDay.subscribe(async () => {
-  await refreshPlanItemsInStore();
-});
-
+// todo: move
 export function getTimelineFile() {
   return getAllDailyNotes()[get(activeDay)];
 }

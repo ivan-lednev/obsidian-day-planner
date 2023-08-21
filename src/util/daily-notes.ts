@@ -3,6 +3,7 @@ import {
   getAllDailyNotes,
   getDailyNote,
   getDateFromFile,
+  getDateUID,
 } from "obsidian-daily-notes-interface";
 import type { TFile } from "obsidian";
 
@@ -39,4 +40,18 @@ export function getNeighborNotes(dailyNoteKey: string) {
   const nextNoteKey = sortedNoteKeys[currentNoteIndex + 1];
 
   return { previousNoteKey, nextNoteKey };
+}
+
+export function getDateUidFromFile(file: TFile) {
+  const date = getDateFromFile(file, "day");
+
+  if (!date) {
+    return null;
+  }
+
+  return getDateUID(date, "day");
+}
+
+export function getDateUidForToday() {
+  return getDateUID(window.moment(), "day");
 }
