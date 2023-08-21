@@ -1,8 +1,10 @@
 <script lang="ts">
   import { writable } from "svelte/store";
-  import Task from "./task.svelte";
+
   import { tasks } from "../../store/timeline-store";
   import { useCreate } from "../hooks/use-create";
+
+  import Task from "./task.svelte";
 
   const cancelMessage = "Release outside timeline to cancel";
   const defaultDurationForNewTask = 30;

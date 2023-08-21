@@ -1,11 +1,13 @@
 <script lang="ts">
-  import Ruler from "./ruler.svelte";
-  import Column from "./column.svelte";
-  import Needle from "./needle.svelte";
-  import TaskContainer from "./task-container.svelte";
-  import Controls from "./controls.svelte";
-  import { visibleHours } from "../../store/timeline-store";
   import { todayIsShownInTimeline } from "../../store/active-day";
+  import { visibleHours } from "../../store/timeline-store";
+
+  import Column from "./column.svelte";
+  import Controls from "./controls.svelte";
+  import Needle from "./needle.svelte";
+  import Ruler from "./ruler.svelte";
+  import TaskContainer from "./task-container.svelte";
+
 
   let userHoversOverScroller = false;
 

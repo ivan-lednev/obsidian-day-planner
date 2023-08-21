@@ -1,13 +1,15 @@
+import type { Moment } from "moment";
 import type { CachedMetadata, ListItemCache } from "obsidian";
-import { parseTimestamp } from "../timestamp/timestamp";
-import { timestampRegExp } from "../regexp";
+
 import { isTopLevelListItem } from "../../obsidian-metadata-utils/src/list";
 import { getTextAtPosition } from "../../obsidian-metadata-utils/src/position";
-import { getMinutesSinceMidnightOfDayTo } from "../util/moment";
-import type { PlanItem, PlanItemLocation } from "../types";
-import { calculateDefaultDuration } from "./calculate-default-duration";
-import type { Moment } from "moment";
+import { timestampRegExp } from "../regexp";
 import { getMomentOfActiveDay } from "../store/active-day";
+import { parseTimestamp } from "../timestamp/timestamp";
+import type { PlanItem, PlanItemLocation } from "../types";
+import { getMinutesSinceMidnightOfDayTo } from "../util/moment";
+
+import { calculateDefaultDuration } from "./calculate-default-duration";
 
 export function parsePlanItems(
   content: string,

@@ -5,21 +5,29 @@
     "node": true,
     "browser": true
   },
-  "plugins": ["@typescript-eslint"],
+  "plugins": [
+    "@typescript-eslint"
+  ],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:svelte/recommended",
-    "plugin:jest/recommended"
+    "plugin:jest/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript"
   ],
   "parserOptions": {
     "sourceType": "module",
-    "extraFileExtensions": [".svelte"]
+    "extraFileExtensions": [
+      ".svelte"
+    ]
   },
   "overrides": [
     {
-      "files": ["*.svelte"],
+      "files": [
+        "*.svelte"
+      ],
       "parser": "svelte-eslint-parser",
       "parserOptions": {
         "parser": "@typescript-eslint/parser"
@@ -38,6 +46,24 @@
     "@typescript-eslint/no-empty-function": "off",
     "no-prototype-builtins": "off",
     "jest/no-disabled-tests": "off",
-    "svelte/sort-attributes": "warn"
+    "svelte/sort-attributes": "warn",
+    "import/order": [
+      "warn",
+      {
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        },
+        "newlines-between": "always"
+      }
+    ],
+    "import/no-unresolved": [
+      "error",
+      {
+        "ignore": [
+          "^obsidian$"
+        ]
+      }
+    ]
   }
 }

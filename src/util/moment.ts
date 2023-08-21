@@ -1,4 +1,5 @@
 import type { Moment } from "moment/moment";
+
 import type { RelationToNow } from "../types";
 
 const moment = window.moment;

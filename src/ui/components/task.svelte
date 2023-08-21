@@ -1,20 +1,22 @@
 <script lang="ts">
-  import RenderedMarkdown from "./rendered-markdown.svelte";
-
-  import { SNAP_STEP_MINUTES } from "src/constants";
-  import { settings } from "src/store/settings";
+  import type { Moment } from "moment";
   import type { Readable } from "svelte/store";
+
+  import { SNAP_STEP_MINUTES } from "../../constants";
+  import { settings } from "../../store/settings";
+  import { time } from "../../store/time";
   import {
     durationToSize,
     overlapLookup,
     roundToSnapStep,
     timeToTimelineOffset,
   } from "../../store/timeline-store";
+  import { getRelationToNow } from "../../util/moment";
   import { useDrag } from "../hooks/use-drag";
   import { useResize } from "../hooks/use-resize";
-  import { getRelationToNow } from "../../util/moment";
-  import { time } from "../../store/time";
-  import type { Moment } from "moment";
+
+  import RenderedMarkdown from "./rendered-markdown.svelte";
+
 
   export let text: string;
   export let id: string;

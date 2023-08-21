@@ -1,10 +1,11 @@
 import { TFile } from "obsidian";
-import { appStore, tasks } from "../store/timeline-store";
-import { get } from "svelte/store";
-import { parsePlanItems } from "../parser/parser";
-import { settings } from "../store/settings";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
+import { get } from "svelte/store";
+
+import { parsePlanItems } from "../parser/parser";
 import { getTimelineFile } from "../store/active-day";
+import { settings } from "../store/settings";
+import { appStore, tasks } from "../store/timeline-store";
 
 export async function openFileInEditor(file: TFile) {
   const app = get(appStore);

@@ -1,13 +1,15 @@
 <script lang="ts">
+  import { getAllDailyNotes } from "obsidian-daily-notes-interface";
+
+  import { activeDay, getTimelineFile } from "../../store/active-day";
+  import { settings } from "../../store/settings";
+  import { getNeighborNotes } from "../../util/daily-notes";
+  import { openFileInEditor } from "../../util/obsidian";
+
   import ControlButton from "./control-button.svelte";
-  import SettingsIcon from "./icons/settings.svelte";
   import ArrowLeftIcon from "./icons/arrow-left.svelte";
   import ArrowRightIcon from "./icons/arrow-right.svelte";
-  import { settings } from "src/store/settings";
-  import { openFileInEditor } from "../../util/obsidian";
-  import { getAllDailyNotes } from "obsidian-daily-notes-interface";
-  import { getNeighborNotes } from "../../util/daily-notes";
-  import { activeDay, getTimelineFile } from "../../store/active-day";
+  import SettingsIcon from "./icons/settings.svelte";
 
   let settingsVisible = false;
 

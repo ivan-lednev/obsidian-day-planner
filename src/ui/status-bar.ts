@@ -1,7 +1,8 @@
 import type { Workspace } from "obsidian";
+
 import type { DayPlannerSettings } from "../settings";
-import { getDiffInMinutes } from "../util/moment";
 import type { PlanItem } from "../types";
+import { getDiffInMinutes } from "../util/moment";
 
 export class StatusBar {
   private statusBarText: HTMLSpanElement;

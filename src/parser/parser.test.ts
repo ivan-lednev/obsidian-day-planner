@@ -1,10 +1,10 @@
-import { parsePlanItems } from "./parser";
 import * as basic from "./fixtures/basic";
-import * as subtasks from "./fixtures/subtasks";
-import * as withoutTasks from "./fixtures/without-tasks";
 import * as endTime from "./fixtures/end-time";
 import * as listItemsAbove from "./fixtures/list-items-above";
 import * as subheadings from "./fixtures/subheadings";
+import * as subtasks from "./fixtures/subtasks";
+import * as withoutTasks from "./fixtures/without-tasks";
+import { parsePlanItems } from "./parser";
 
 const defaultPlannerHeading = "Day planner";
 

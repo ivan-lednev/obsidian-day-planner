@@ -1,11 +1,12 @@
 import { get } from "svelte/store";
+
+import { getHeadingByText, getListItemsUnderHeading } from "./parser/parser";
 import { settings } from "./store/settings";
 import { appStore } from "./store/timeline-store";
-import { getFileByPath, openFileInEditor } from "./util/obsidian";
 import { replaceTimestamp } from "./timestamp/timestamp";
-import { getHeadingByText, getListItemsUnderHeading } from "./parser/parser";
-import { selectText } from "./util/editor";
 import type { PlanItem } from "./types";
+import { selectText } from "./util/editor";
+import { getFileByPath, openFileInEditor } from "./util/obsidian";
 
 export function createPlannerHeading() {
   const { plannerHeading, plannerHeadingLevel } = get(settings);

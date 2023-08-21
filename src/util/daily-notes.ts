@@ -1,3 +1,4 @@
+import type { TFile } from "obsidian";
 import {
   createDailyNote,
   getAllDailyNotes,
@@ -5,7 +6,6 @@ import {
   getDateFromFile,
   getDateUID,
 } from "obsidian-daily-notes-interface";
-import type { TFile } from "obsidian";
 
 export async function createDailyNoteIfNeeded(): Promise<TFile> {
   return getDailyNoteForToday() || createDailyNote(window.moment());

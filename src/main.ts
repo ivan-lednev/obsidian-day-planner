@@ -1,7 +1,11 @@
 import { FileView, Plugin, TFile, WorkspaceLeaf } from "obsidian";
 import { get } from "svelte/store";
+
 import { VIEW_TYPE_TIMELINE } from "./constants";
+import { createPlannerHeading } from "./plan";
 import { DayPlannerSettings } from "./settings";
+import { activeDay, getTimelineFile } from "./store/active-day";
+import { settings } from "./store/settings";
 import { appStore, tasks } from "./store/timeline-store";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
@@ -12,10 +16,7 @@ import {
   getDateUidForToday,
   getDateUidFromFile,
 } from "./util/daily-notes";
-import { createPlannerHeading } from "./plan";
 import { refreshPlanItemsInStore } from "./util/obsidian";
-import { settings } from "./store/settings";
-import { activeDay, getTimelineFile } from "./store/active-day";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;

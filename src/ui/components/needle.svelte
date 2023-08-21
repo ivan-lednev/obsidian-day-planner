@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { settings } from "src/store/settings";
-  import { getMinutesSinceMidnight } from "../../util/moment";
+  import { todayIsShownInTimeline } from "../../store/active-day";
+  import { settings } from "../../store/settings";
+  import { time } from "../../store/time";
   import {
     timeToTimelineOffset,
-  } from "src/store/timeline-store";
-  import { time } from "../../store/time";
-  import { todayIsShownInTimeline } from "../../store/active-day";
+  } from "../../store/timeline-store";
+  import { getMinutesSinceMidnight } from "../../util/moment";
 
   export let scrollBlockedByUser = false;
 

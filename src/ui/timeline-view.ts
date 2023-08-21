@@ -1,8 +1,10 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
-import Timeline from "./components/timeline.svelte";
+
 import { VIEW_TYPE_TIMELINE } from "../constants";
-import type { DayPlannerSettings } from "../settings";
 import type DayPlanner from "../main";
+import type { DayPlannerSettings } from "../settings";
+
+import Timeline from "./components/timeline.svelte";
 
 export default class TimelineView extends ItemView {
   private timeline: Timeline;

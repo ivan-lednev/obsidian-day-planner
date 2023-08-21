@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Component, MarkdownRenderer } from "obsidian";
   import { onDestroy } from "svelte";
+
   import { appStore } from "../../store/timeline-store";
 
   export let text: string;

@@ -1,6 +1,7 @@
-import type { Overlap, TimeBlock } from "../types";
 import Fraction from "fraction.js";
 import { partition } from "lodash/fp";
+
+import type { Overlap, TimeBlock } from "../types";
 
 const EMPTY = "empty";
 const TAKEN = "taken";

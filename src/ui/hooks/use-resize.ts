@@ -1,6 +1,7 @@
-import { sizeToDuration } from "src/store/timeline-store";
-import { updateTimestamps } from "src/store/update-timestamp";
 import { get, writable } from "svelte/store";
+
+import { sizeToDuration } from "../../store/timeline-store";
+import { updateTimestamps } from "../../store/update-timestamp";
 
 export function useResize() {
   const resizing = writable(false);

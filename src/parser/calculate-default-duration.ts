@@ -1,5 +1,6 @@
-import { getDiffInMinutes } from "../util/moment";
 import { DEFAULT_DURATION_MINUTES } from "../constants";
+import { getDiffInMinutes } from "../util/moment";
+
 import type { createPlanItem } from "./parser";
 
 export function calculateDefaultDuration(
