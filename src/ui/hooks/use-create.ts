@@ -1,4 +1,4 @@
-import { get, writable } from "svelte/store";
+import { writable } from "svelte/store";
 
 import { DEFAULT_DURATION_MINUTES } from "../../constants";
 import { appendToPlan } from "../../plan";
@@ -11,24 +11,18 @@ import {
 import { getDailyNoteForToday } from "../../util/daily-notes";
 import { minutesToMomentOfDay } from "../../util/moment";
 
+import { useEdit } from "./use-edit";
+
 export function useCreate() {
   const creating = writable(false);
+  const { startEdit, stopEdit } = useEdit(creating);
 
   function startCreation() {
-    creating.set(true);
+    startEdit();
   }
 
-  function cancelCreation() {
-    creating.set(false);
-  }
-
-  async function confirmCreation(pointerYOffset: number) {
-    // todo: out of place
-    if (!get(creating)) {
-      return;
-    }
-
-    creating.set(false);
+  async function handleCreationConfirm(pointerYOffset: number) {
+    stopEdit();
 
     const newPlanItem = createPlanItemFromTimeline(pointerYOffset);
 
@@ -43,8 +37,7 @@ export function useCreate() {
   return {
     creating,
     startCreation,
-    cancelCreation,
-    confirmCreation,
+    handleCreationConfirm,
   };
 }
 

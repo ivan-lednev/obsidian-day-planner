@@ -7,7 +7,14 @@ import type { PlanItem } from "../types";
 
 import { settings } from "./settings";
 
-export type Timestamp = { durationMinutes: number; startMinutes: number };
+export type Timestamp = {
+  durationMinutes: number;
+  startMinutes: number;
+};
+
+export type EditStatus = "idle" | "confirmed" | "cancelled" | "started";
+
+export const editStatus = writable<EditStatus>("idle");
 
 export const appStore = writable<App>();
 

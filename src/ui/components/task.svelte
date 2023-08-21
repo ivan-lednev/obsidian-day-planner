@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Moment } from "moment";
+  import { onDestroy } from "svelte";
   import type { Readable } from "svelte/store";
 
   import { SNAP_STEP_MINUTES } from "../../constants";
@@ -17,7 +18,6 @@
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
-
   export let text: string;
   export let id: string;
   export let startTime: Moment;
@@ -31,16 +31,12 @@
     dragging,
     pointerYOffsetToTaskStart,
     handleMoveStart,
-    handleMoveCancel,
     handleMoveConfirm,
+    moveConfirmed,
   } = useDrag();
 
-  const {
-    resizing,
-    handleResizeStart,
-    handleResizeCancel,
-    handleResizeConfirm,
-  } = useResize();
+  const { resizing, resizeConfirmed, handleResizeStart, handleResizeConfirm } =
+    useResize();
 
   $: initialOffset = isGhost
     ? roundToSnapStep($pointerYOffset)
@@ -70,13 +66,20 @@
     ? "future"
     : getRelationToNow($time, startTime, endTime);
 
-  function handleCancel() {
-    handleMoveCancel();
-    handleResizeCancel();
+  $: if ($resizeConfirmed) {
+    handleResizeConfirm(id, height, startMinutes);
   }
-</script>
 
-<svelte:body on:mouseup={handleCancel} />
+  const unsubscribe = moveConfirmed.subscribe((newValue) => {
+    if (newValue) {
+      handleMoveConfirm(Math.floor(offset), id, durationMinutes);
+    }
+  });
+
+  onDestroy(() => {
+    unsubscribe();
+  });
+</script>
 
 <div
   style:height="{height}px"
@@ -90,14 +93,11 @@
     class="task {relationToNow}"
     class:is-ghost={isGhost}
     on:mousedown|stopPropagation={handleMoveStart}
-    on:mouseup={() =>
-      handleMoveConfirm(Math.floor(offset), id, durationMinutes)}
   >
     <RenderedMarkdown {text} />
     <div
       class="resize-handle absolute-stretch-x"
       on:mousedown|stopPropagation={handleResizeStart}
-      on:mouseup={() => handleResizeConfirm(id, height, startMinutes)}
     ></div>
   </div>
 </div>
@@ -140,10 +140,6 @@
 
   .is-ghost {
     opacity: 0.6;
-  }
-
-  .task:hover {
-    cursor: grab;
   }
 
   .resize-handle {
