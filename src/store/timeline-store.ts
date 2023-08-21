@@ -14,8 +14,6 @@ export const appStore = writable<App>();
 
 export const tasks = writable<PlanItem[]>([]);
 
-tasks.subscribe(console.log);
-
 export const overlapLookup = derived(tasks, ($tasks) => computeOverlap($tasks));
 
 export const activeDay = writable(getDateUID(window.moment(), "day"));

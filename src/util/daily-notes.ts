@@ -27,3 +27,16 @@ export function getMomentFromUid(uid: string) {
 
   return getDateFromFile(dailyNote, "day");
 }
+
+export function getNeighborNotes(dailyNoteKey: string) {
+  // todo: this might slow us down
+  const sortedNoteKeys = Object.keys(getAllDailyNotes()).sort();
+  const currentNoteIndex = sortedNoteKeys.findIndex(
+    (key) => key === dailyNoteKey,
+  );
+
+  const previousNoteKey = sortedNoteKeys[currentNoteIndex - 1];
+  const nextNoteKey = sortedNoteKeys[currentNoteIndex + 1];
+
+  return { previousNoteKey, nextNoteKey };
+}

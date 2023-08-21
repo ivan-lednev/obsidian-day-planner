@@ -32,6 +32,7 @@ export function useCreate() {
 
     const newPlanItem = createPlanItemFromTimeline(pointerYOffset);
 
+    // todo: clean up item creation
     // @ts-ignore
     tasks.update((previous) => [...previous, newPlanItem]);
 

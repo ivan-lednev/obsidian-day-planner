@@ -6,8 +6,8 @@
   import { settings } from "src/store/settings";
   import { openFileInEditor } from "../../util/obsidian";
   import { getAllDailyNotes } from "obsidian-daily-notes-interface";
-  import { Notice } from "obsidian";
   import { activeDay, getTimelineFile } from "../../store/timeline-store";
+  import { getNeighborNotes } from "../../util/daily-notes";
 
   let settingsVisible = false;
 
@@ -15,42 +15,30 @@
     settingsVisible = !settingsVisible;
   }
 
+  $: neighbors = getNeighborNotes($activeDay);
+
   async function goBack() {
-    const sortedNoteKeys = Object.keys(getAllDailyNotes()).sort();
-    const currentNoteIndex = sortedNoteKeys.findIndex(
-      (key) => key === $activeDay,
-    );
-
-    const previousNoteKey = sortedNoteKeys[currentNoteIndex - 1];
-    const previousNote = getAllDailyNotes()[previousNoteKey];
-
-    if (!previousNote) {
-      new Notice("No more daily notes");
+    if (!neighbors.previousNoteKey) {
       return;
     }
+
+    const previousNote = getAllDailyNotes()[neighbors.previousNoteKey];
 
     await openFileInEditor(previousNote);
 
-    $activeDay = previousNoteKey;
+    $activeDay = neighbors.previousNoteKey;
   }
 
   async function goForward() {
-    const sortedNoteKeys = Object.keys(getAllDailyNotes()).sort();
-    const currentNoteIndex = sortedNoteKeys.findIndex(
-      (key) => key === $activeDay,
-    );
-
-    const nextNoteKey = sortedNoteKeys[currentNoteIndex + 1];
-    const nextNote = getAllDailyNotes()[nextNoteKey];
-
-    if (!nextNote) {
-      new Notice("No more daily notes");
+    if (!neighbors.nextNoteKey) {
       return;
     }
 
+    const nextNote = getAllDailyNotes()[neighbors.nextNoteKey];
+
     await openFileInEditor(nextNote);
 
-    $activeDay = nextNoteKey;
+    $activeDay = neighbors.nextNoteKey;
   }
 </script>
 
@@ -59,6 +47,7 @@
   <div class="header">
     <ControlButton
       --grid-column-start="2"
+      disabled={!neighbors.previousNoteKey}
       label="Go to previous daily plan"
       on:click={goBack}
     >
@@ -74,7 +63,11 @@
       <span class="date">{getAllDailyNotes()[$activeDay].basename}</span>
     </ControlButton>
 
-    <ControlButton label="Go to next daily plan" on:click={goForward}>
+    <ControlButton
+      disabled={!neighbors.nextNoteKey}
+      label="Go to next daily plan"
+      on:click={goForward}
+    >
       <ArrowRightIcon />
     </ControlButton>
 

@@ -1,6 +1,7 @@
 <script lang="ts">
   export let label: string;
   export let isActive = false;
+  export let disabled = false;
   export let classes = "";
 </script>
 
@@ -8,6 +9,7 @@
 <div
   class="clickable-icon {classes}"
   class:is-active={isActive}
+  aria-disabled={disabled}
   aria-label={label}
   on:click
 >
