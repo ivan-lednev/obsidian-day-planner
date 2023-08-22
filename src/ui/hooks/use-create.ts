@@ -11,18 +11,15 @@ import {
 import { getDailyNoteForToday } from "../../util/daily-notes";
 import { minutesToMomentOfDay } from "../../util/moment";
 
-import { useEdit } from "./use-edit";
-
 export function useCreate() {
   const creating = writable(false);
-  const { startEdit, stopEdit } = useEdit(creating);
 
   function startCreation() {
-    startEdit();
+    creating.set(true);
   }
 
   async function handleCreationConfirm(pointerYOffset: number) {
-    stopEdit();
+    creating.set(false);
 
     const newPlanItem = createPlanItemFromTimeline(pointerYOffset);
 

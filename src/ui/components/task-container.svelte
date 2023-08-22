@@ -1,10 +1,10 @@
 <script lang="ts">
   import { writable } from "svelte/store";
 
-  import { editStatus, tasks } from "../../store/timeline-store";
+  import { tasks } from "../../store/timeline-store";
   import { useCreate } from "../hooks/use-create";
 
-  import Task from "./task.svelte";
+  import Task, { confirmUpdate, cancelUpdate } from "./task.svelte";
 
   const cancelMessage = "Release outside timeline to cancel";
   const defaultDurationForNewTask = 30;
@@ -21,17 +21,13 @@
   function handleMouseUp() {
     if ($creating) {
       handleCreationConfirm($pointerYOffset);
-    } else {
-      $editStatus = "confirmed";
     }
+
+    confirmUpdate();
   }
 </script>
 
-<svelte:document
-  on:mouseup={() => {
-    $editStatus = "cancelled";
-  }}
-/>
+<svelte:document on:mouseup={cancelUpdate} />
 
 <div
   bind:this={el}

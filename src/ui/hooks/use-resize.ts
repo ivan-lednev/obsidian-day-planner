@@ -3,14 +3,11 @@ import { writable } from "svelte/store";
 import { sizeToDuration } from "../../store/timeline-store";
 import { updateTimestamps } from "../../store/update-timestamp";
 
-import { useEdit } from "./use-edit";
-
 export function useResize() {
   const resizing = writable(false);
-  const { startEdit, stopEdit, editConfirmed } = useEdit(resizing);
 
   function handleResizeStart() {
-    startEdit();
+    resizing.set(true);
   }
 
   async function handleResizeConfirm(
@@ -19,7 +16,7 @@ export function useResize() {
     // todo: don't need start minutes here
     startMinutes: number,
   ) {
-    stopEdit();
+    resizing.set(false);
 
     const newDurationMinutes = sizeToDuration(taskHeight);
 
@@ -29,10 +26,14 @@ export function useResize() {
     });
   }
 
+  function handleResizeCancel() {
+    resizing.set(false);
+  }
+
   return {
     resizing,
-    resizeConfirmed: editConfirmed,
     handleResizeStart,
     handleResizeConfirm,
+    handleResizeCancel,
   };
 }

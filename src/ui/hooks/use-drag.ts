@@ -3,16 +3,12 @@ import { writable } from "svelte/store";
 import { getTimeFromYOffset } from "../../store/timeline-store";
 import { updateTimestamps } from "../../store/update-timestamp";
 
-import { useEdit } from "./use-edit";
-
 export function useDrag() {
   const dragging = writable(false);
   const pointerYOffsetToTaskStart = writable<number>();
 
-  const { startEdit, stopEdit, editConfirmed } = useEdit(dragging);
-
   function handleMoveStart(event: MouseEvent) {
-    startEdit();
+    dragging.set(true);
 
     pointerYOffsetToTaskStart.set(event.offsetY);
   }
@@ -23,7 +19,7 @@ export function useDrag() {
     // todo: we don't need duration here
     durationMinutes: number,
   ) {
-    stopEdit();
+    dragging.set(false);
 
     const newStartMinutes = getTimeFromYOffset(offset);
 
@@ -33,11 +29,15 @@ export function useDrag() {
     });
   }
 
+  function handleMoveCancel() {
+    dragging.set(false);
+  }
+
   return {
     pointerYOffsetToTaskStart,
     dragging,
-    moveConfirmed: editConfirmed,
     handleMoveStart,
     handleMoveConfirm,
+    handleMoveCancel,
   };
 }

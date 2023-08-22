@@ -1,6 +1,18 @@
+<script context="module" lang="ts">
+  let onConfirmUpdate: () => void;
+  let onCancelUpdate: () => void;
+
+  export function confirmUpdate() {
+    onConfirmUpdate?.();
+  }
+
+  export function cancelUpdate() {
+    onCancelUpdate?.();
+  }
+</script>
+
 <script lang="ts">
   import type { Moment } from "moment";
-  import { onDestroy } from "svelte";
   import type { Readable } from "svelte/store";
 
   import { SNAP_STEP_MINUTES } from "../../constants";
@@ -32,11 +44,15 @@
     pointerYOffsetToTaskStart,
     handleMoveStart,
     handleMoveConfirm,
-    moveConfirmed,
+    handleMoveCancel,
   } = useDrag();
 
-  const { resizing, resizeConfirmed, handleResizeStart, handleResizeConfirm } =
-    useResize();
+  const {
+    resizing,
+    handleResizeCancel,
+    handleResizeStart,
+    handleResizeConfirm,
+  } = useResize();
 
   $: initialOffset = isGhost
     ? roundToSnapStep($pointerYOffset)
@@ -66,19 +82,17 @@
     ? "future"
     : getRelationToNow($time, startTime, endTime);
 
-  $: if ($resizeConfirmed) {
-    handleResizeConfirm(id, height, startMinutes);
-  }
-
-  const unsubscribe = moveConfirmed.subscribe((newValue) => {
-    if (newValue) {
+  $: if ($dragging) {
+    onConfirmUpdate = () =>
       handleMoveConfirm(Math.floor(offset), id, durationMinutes);
-    }
-  });
-
-  onDestroy(() => {
-    unsubscribe();
-  });
+    onCancelUpdate = handleMoveCancel;
+  } else if ($resizing) {
+    onConfirmUpdate = () => handleResizeConfirm(id, height, startMinutes);
+    onCancelUpdate = handleResizeCancel;
+  } else {
+    onConfirmUpdate = null;
+    onCancelUpdate = null;
+  }
 </script>
 
 <div
@@ -92,7 +106,9 @@
   <div
     class="task {relationToNow}"
     class:is-ghost={isGhost}
-    on:mousedown|stopPropagation={handleMoveStart}
+    on:mousedown|stopPropagation={(e) => {
+      handleMoveStart(e);
+    }}
   >
     <RenderedMarkdown {text} />
     <div
