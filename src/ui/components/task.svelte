@@ -1,16 +1,3 @@
-<script context="module" lang="ts">
-  let onConfirmUpdate: () => void;
-  let onCancelUpdate: () => void;
-
-  export function confirmUpdate() {
-    onConfirmUpdate?.();
-  }
-
-  export function cancelUpdate() {
-    onCancelUpdate?.();
-  }
-</script>
-
 <script lang="ts">
   import type { Moment } from "moment";
   import type { Readable } from "svelte/store";
@@ -20,6 +7,8 @@
   import { time } from "../../store/time";
   import {
     durationToSize,
+    editCancellation,
+    editConfirmation,
     overlapLookup,
     roundToSnapStep,
     timeToTimelineOffset,
@@ -27,6 +16,7 @@
   import { getRelationToNow } from "../../util/moment";
   import { useDrag } from "../hooks/use-drag";
   import { useResize } from "../hooks/use-resize";
+  import { watch } from "../hooks/watch";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
@@ -70,6 +60,7 @@
 
   $: cursor = $dragging ? "grabbing" : "grab";
 
+  // todo: hide somewhere
   $: itemPlacing = $overlapLookup.get(id);
   $: widthPercent = itemPlacing
     ? (itemPlacing.span / itemPlacing.columns) * 100
@@ -82,17 +73,20 @@
     ? "future"
     : getRelationToNow($time, startTime, endTime);
 
-  $: if ($dragging) {
-    onConfirmUpdate = () =>
+  watch(editConfirmation, () => {
+    if ($dragging) {
       handleMoveConfirm(Math.floor(offset), id, durationMinutes);
-    onCancelUpdate = handleMoveCancel;
-  } else if ($resizing) {
-    onConfirmUpdate = () => handleResizeConfirm(id, height, startMinutes);
-    onCancelUpdate = handleResizeCancel;
-  } else {
-    onConfirmUpdate = null;
-    onCancelUpdate = null;
-  }
+    }
+
+    if ($resizing) {
+      handleResizeConfirm(id, height, startMinutes);
+    }
+  });
+
+  watch(editCancellation, () => {
+    handleMoveCancel();
+    handleResizeCancel();
+  });
 </script>
 
 <div

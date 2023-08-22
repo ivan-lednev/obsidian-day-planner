@@ -12,9 +12,8 @@ export type Timestamp = {
   startMinutes: number;
 };
 
-export type EditStatus = "idle" | "confirmed" | "cancelled" | "started";
-
-export const editStatus = writable<EditStatus>("idle");
+export const editConfirmation = writable({});
+export const editCancellation = writable({});
 
 export const appStore = writable<App>();
 
