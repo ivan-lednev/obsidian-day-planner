@@ -2,10 +2,8 @@
   import type { Moment } from "moment";
   import type { Readable } from "svelte/store";
 
-  import { SNAP_STEP_MINUTES } from "../../constants";
   import { editCancellation, editConfirmation } from "../../store/edit";
   import { getHorizontalPlacing } from "../../store/horizontal-placing";
-  import { settings } from "../../store/settings";
   import { time } from "../../store/time";
   import {
     durationToSize,
@@ -50,7 +48,7 @@
   $: offsetToPointer = $pointerYOffset - initialOffset;
 
   $: height = $resizing
-    ? roundToSnapStep(offsetToPointer) + SNAP_STEP_MINUTES * $settings.zoomLevel
+    ? roundToSnapStep(offsetToPointer)
     : $durationToSize(durationMinutes);
 
   $: horizontalPlacing = $getHorizontalPlacing(id);
@@ -81,6 +79,8 @@
   <div
     class="task {relationToNow}"
     class:is-ghost={isGhost}
+    class:past={relationToNow === "past"}
+    class:present={relationToNow === "present"}
     on:mousedown|stopPropagation={(e) => {
       startMove(e);
     }}
