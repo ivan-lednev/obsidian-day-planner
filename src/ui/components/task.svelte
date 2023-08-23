@@ -4,11 +4,11 @@
 
   import { SNAP_STEP_MINUTES } from "../../constants";
   import { editCancellation, editConfirmation } from "../../store/edit";
+  import { getHorizontalPlacing } from "../../store/horizontal-placing";
   import { settings } from "../../store/settings";
   import { time } from "../../store/time";
   import {
     durationToSize,
-    overlapLookup,
     roundToSnapStep,
     timeToTimelineOffset,
   } from "../../store/timeline-store";
@@ -30,6 +30,7 @@
 
   const {
     dragging,
+    cursor,
     pointerYOffsetToTaskStart,
     startMove,
     confirmMove,
@@ -52,29 +53,15 @@
     ? roundToSnapStep(offsetToPointer) + SNAP_STEP_MINUTES * $settings.zoomLevel
     : $durationToSize(durationMinutes);
 
-  $: cursor = $dragging ? "grabbing" : "grab";
-
-  // todo: hide somewhere
-  $: itemPlacing = $overlapLookup.get(id);
-  $: widthPercent = itemPlacing
-    ? (itemPlacing.span / itemPlacing.columns) * 100
-    : 100;
-  $: xOffsetPercent = itemPlacing
-    ? (100 / itemPlacing.columns) * itemPlacing.start
-    : 0;
+  $: horizontalPlacing = $getHorizontalPlacing(id);
 
   $: relationToNow = isGhost
     ? "future"
     : getRelationToNow($time, startTime, endTime);
 
   watch(editConfirmation, () => {
-    if ($dragging) {
-      confirmMove(Math.floor(offset), id, durationMinutes);
-    }
-
-    if ($resizing) {
-      confirmResize(id, height, startMinutes);
-    }
+    confirmMove(offset, id, durationMinutes);
+    confirmResize(id, height, startMinutes);
   });
 
   watch(editCancellation, () => {
@@ -86,9 +73,9 @@
 <div
   style:height="{height}px"
   style:transform="translateY({offset}px)"
-  style:cursor
-  style:width="{widthPercent}%"
-  style:left="{xOffsetPercent}%"
+  style:cursor={$cursor}
+  style:width="{horizontalPlacing.widthPercent}%"
+  style:left="{horizontalPlacing.xOffsetPercent}%"
   class="gap-box absolute-stretch-x"
 >
   <div

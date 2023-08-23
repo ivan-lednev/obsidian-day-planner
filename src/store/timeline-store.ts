@@ -2,7 +2,6 @@ import type { App } from "obsidian";
 import { derived, get, writable } from "svelte/store";
 
 import { SNAP_STEP_MINUTES } from "../constants";
-import { computeOverlap } from "../parser/overlap";
 import type { PlanItem } from "../types";
 
 import { settings } from "./settings";
@@ -15,8 +14,6 @@ export type Timestamp = {
 export const appStore = writable<App>();
 
 export const tasks = writable<PlanItem[]>([]);
-
-export const overlapLookup = derived(tasks, ($tasks) => computeOverlap($tasks));
 
 export const hourSize = derived(
   settings,
