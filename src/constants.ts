@@ -1,4 +1,5 @@
 export const VIEW_TYPE_TIMELINE = "timeline";
+export const VIEW_TYPE_WEEKLY = "weekly";
 
 export const DEFAULT_DURATION_MINUTES = 30;
 

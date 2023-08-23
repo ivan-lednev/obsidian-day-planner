@@ -86,7 +86,8 @@
   background-color: transparent;
 }
 
-[data-type="timeline"] .view-content {
+[data-type="timeline"] .view-content,
+[data-type="weekly"] .view-content {
   display: flex;
   flex-direction: column;
   padding: 0;

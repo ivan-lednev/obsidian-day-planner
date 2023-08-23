@@ -22,7 +22,7 @@
 
 <Controls />
 <div
-  class="scroller"
+  class="vertical-scroller"
   on:mouseenter={handleMouseEnter}
   on:mouseleave={handleMouseLeave}
 >
@@ -38,7 +38,7 @@
 </div>
 
 <style>
-  .scroller {
+  .vertical-scroller {
     overflow: auto;
     height: 100%;
   }

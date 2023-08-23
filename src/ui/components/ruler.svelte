@@ -17,9 +17,16 @@
 
 <style>
   .hours-container {
+    position: sticky;
+    z-index: 5;
+    left: 0;
+
     display: flex;
     flex: 0 0 40px;
     flex-direction: column;
+
+    background-color: var(--background-primary);
+    border-right: 1px solid var(--background-modifier-border);
   }
 
   .hour {

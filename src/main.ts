@@ -1,7 +1,7 @@
 import { FileView, Plugin, TFile, WorkspaceLeaf } from "obsidian";
 import { get } from "svelte/store";
 
-import { VIEW_TYPE_TIMELINE } from "./constants";
+import { VIEW_TYPE_TIMELINE, VIEW_TYPE_WEEKLY } from "./constants";
 import { createPlannerHeading } from "./plan";
 import { DayPlannerSettings } from "./settings";
 import { activeDay, getFileShownInTimeline } from "./store/active-day";
@@ -10,6 +10,7 @@ import { appStore, tasks } from "./store/timeline-store";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
+import WeeklyView from "./ui/weekly-view";
 import {
   createDailyNoteIfNeeded,
   dailyNoteExists,
@@ -37,7 +38,13 @@ export default class DayPlanner extends Plugin {
     this.addCommand({
       id: "show-day-planner-timeline",
       name: "Show the Day Planner Timeline",
-      callback: async () => await this.initLeaf(),
+      callback: async () => await this.initTimelineLeaf(),
+    });
+
+    this.addCommand({
+      id: "show-weekly-view",
+      name: "Show the Week Planner",
+      callback: async () => await this.initWeeklyLeaf(),
     });
 
     this.addCommand({
@@ -59,6 +66,11 @@ export default class DayPlanner extends Plugin {
     this.registerView(
       VIEW_TYPE_TIMELINE,
       (leaf: WorkspaceLeaf) => new TimelineView(leaf, this.settings, this),
+    );
+
+    this.registerView(
+      VIEW_TYPE_WEEKLY,
+      (leaf: WorkspaceLeaf) => new WeeklyView(leaf, this),
     );
 
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
@@ -129,7 +141,8 @@ export default class DayPlanner extends Plugin {
   }
 
   onunload() {
-    this.detachTimelineLeaves();
+    this.detachLeavesOfType(VIEW_TYPE_TIMELINE);
+    this.detachLeavesOfType(VIEW_TYPE_WEEKLY);
   }
 
   private async updateStatusBarOnFailed(fn: () => Promise<void>) {
@@ -149,17 +162,23 @@ export default class DayPlanner extends Plugin {
     }
   };
 
-  private async initLeaf() {
-    this.detachTimelineLeaves();
+  private async initWeeklyLeaf() {
+    this.detachLeavesOfType(VIEW_TYPE_WEEKLY);
+    await this.app.workspace.getLeaf(false).setViewState({
+      type: VIEW_TYPE_WEEKLY,
+      active: true,
+    });
+  }
+
+  private async initTimelineLeaf() {
+    this.detachLeavesOfType(VIEW_TYPE_TIMELINE);
     await this.app.workspace.getRightLeaf(false).setViewState({
       type: VIEW_TYPE_TIMELINE,
       active: true,
     });
   }
 
-  private detachTimelineLeaves() {
-    this.app.workspace
-      .getLeavesOfType(VIEW_TYPE_TIMELINE)
-      .forEach((leaf) => leaf.detach());
+  private detachLeavesOfType(type: string) {
+    this.app.workspace.getLeavesOfType(type).forEach((leaf) => leaf.detach());
   }
 }
