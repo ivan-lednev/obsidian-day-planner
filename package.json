@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "build": "node esbuild.config.mjs production",
-    "lint": "prettier --check src && eslint src",
+    "format": "prettier --write src && eslint --fix src && stylelint --fix src/**/*.svelte",
+    "lint": "prettier --check src && eslint src && stylelint --fix src/**/*.svelte",
     "typescript": "tsc --noEmit",
     "test": "jest",
     "prepare": "husky install",
