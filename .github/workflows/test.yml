@@ -7,9 +7,6 @@ on:
 
   workflow_call:
 
-env:
-  PLUGIN_NAME: time-block-planner
-
 jobs:
   build:
     runs-on: ubuntu-latest
