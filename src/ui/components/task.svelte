@@ -3,12 +3,11 @@
   import type { Readable } from "svelte/store";
 
   import { SNAP_STEP_MINUTES } from "../../constants";
+  import { editCancellation, editConfirmation } from "../../store/edit";
   import { settings } from "../../store/settings";
   import { time } from "../../store/time";
   import {
     durationToSize,
-    editCancellation,
-    editConfirmation,
     overlapLookup,
     roundToSnapStep,
     timeToTimelineOffset,

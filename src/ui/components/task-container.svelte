@@ -1,9 +1,8 @@
 <script lang="ts">
   import { writable } from "svelte/store";
 
+  import { editCancellation, editConfirmation } from "../../store/edit";
   import {
-    editCancellation,
-    editConfirmation,
     tasks,
   } from "../../store/timeline-store";
   import { useCreate } from "../hooks/use-create";
@@ -27,11 +26,11 @@
       confirmCreation($pointerYOffset);
     }
 
-    editConfirmation.set({});
+    editConfirmation.trigger();
   }
 </script>
 
-<svelte:document on:mouseup={() => editCancellation.set({})} />
+<svelte:document on:mouseup={editCancellation.trigger} />
 
 <div
   bind:this={el}

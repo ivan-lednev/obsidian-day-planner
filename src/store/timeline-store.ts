@@ -12,9 +12,6 @@ export type Timestamp = {
   startMinutes: number;
 };
 
-export const editConfirmation = writable({});
-export const editCancellation = writable({});
-
 export const appStore = writable<App>();
 
 export const tasks = writable<PlanItem[]>([]);

@@ -1,7 +1,8 @@
 import { onDestroy } from "svelte";
-import type { Writable } from "svelte/store";
 
-export function watch(store: Writable<object>, fn: () => void) {
+import type { Watchable } from "../../store/create-watchable";
+
+export function watch(store: Watchable, fn: () => void) {
   const unsub = store.subscribe(() => fn());
   onDestroy(() => {
     unsub();
