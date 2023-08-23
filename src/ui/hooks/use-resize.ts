@@ -6,11 +6,11 @@ import { updateTimestamps } from "../../store/update-timestamp";
 export function useResize() {
   const resizing = writable(false);
 
-  function handleResizeStart() {
+  function startResize() {
     resizing.set(true);
   }
 
-  async function handleResizeConfirm(
+  async function confirmResize(
     id: string,
     taskHeight: number,
     // todo: don't need start minutes here
@@ -26,14 +26,14 @@ export function useResize() {
     });
   }
 
-  function handleResizeCancel() {
+  function cancelResize() {
     resizing.set(false);
   }
 
   return {
     resizing,
-    handleResizeStart,
-    handleResizeConfirm,
-    handleResizeCancel,
+    startResize,
+    confirmResize,
+    cancelResize,
   };
 }

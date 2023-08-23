@@ -32,17 +32,12 @@
   const {
     dragging,
     pointerYOffsetToTaskStart,
-    handleMoveStart,
-    handleMoveConfirm,
-    handleMoveCancel,
+    startMove,
+    confirmMove,
+    cancelMove,
   } = useDrag();
 
-  const {
-    resizing,
-    handleResizeCancel,
-    handleResizeStart,
-    handleResizeConfirm,
-  } = useResize();
+  const { resizing, cancelResize, startResize, confirmResize } = useResize();
 
   $: initialOffset = isGhost
     ? roundToSnapStep($pointerYOffset)
@@ -75,17 +70,17 @@
 
   watch(editConfirmation, () => {
     if ($dragging) {
-      handleMoveConfirm(Math.floor(offset), id, durationMinutes);
+      confirmMove(Math.floor(offset), id, durationMinutes);
     }
 
     if ($resizing) {
-      handleResizeConfirm(id, height, startMinutes);
+      confirmResize(id, height, startMinutes);
     }
   });
 
   watch(editCancellation, () => {
-    handleMoveCancel();
-    handleResizeCancel();
+    cancelMove();
+    cancelResize();
   });
 </script>
 
@@ -101,13 +96,13 @@
     class="task {relationToNow}"
     class:is-ghost={isGhost}
     on:mousedown|stopPropagation={(e) => {
-      handleMoveStart(e);
+      startMove(e);
     }}
   >
     <RenderedMarkdown {text} />
     <div
       class="resize-handle absolute-stretch-x"
-      on:mousedown|stopPropagation={handleResizeStart}
+      on:mousedown|stopPropagation={startResize}
     ></div>
   </div>
 </div>

@@ -13,7 +13,7 @@
   const cancelMessage = "Release outside timeline to cancel";
   const defaultDurationForNewTask = 30;
 
-  const { creating, startCreation, handleCreationConfirm } = useCreate();
+  const { creating, startCreation, confirmCreation } = useCreate();
 
   const pointerYOffset = writable<number>();
   let el: HTMLDivElement;
@@ -24,7 +24,7 @@
 
   function handleMouseUp() {
     if ($creating) {
-      handleCreationConfirm($pointerYOffset);
+      confirmCreation($pointerYOffset);
     }
 
     editConfirmation.set({});

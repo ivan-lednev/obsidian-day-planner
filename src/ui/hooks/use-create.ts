@@ -18,7 +18,7 @@ export function useCreate() {
     creating.set(true);
   }
 
-  async function handleCreationConfirm(pointerYOffset: number) {
+  async function confirmCreation(pointerYOffset: number) {
     creating.set(false);
 
     const newPlanItem = createPlanItemFromTimeline(pointerYOffset);
@@ -34,7 +34,7 @@ export function useCreate() {
   return {
     creating,
     startCreation,
-    handleCreationConfirm,
+    confirmCreation,
   };
 }
 

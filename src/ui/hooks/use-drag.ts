@@ -7,13 +7,13 @@ export function useDrag() {
   const dragging = writable(false);
   const pointerYOffsetToTaskStart = writable<number>();
 
-  function handleMoveStart(event: MouseEvent) {
+  function startMove(event: MouseEvent) {
     dragging.set(true);
 
     pointerYOffsetToTaskStart.set(event.offsetY);
   }
 
-  async function handleMoveConfirm(
+  async function confirmMove(
     offset: number,
     id: string,
     // todo: we don't need duration here
@@ -29,15 +29,15 @@ export function useDrag() {
     });
   }
 
-  function handleMoveCancel() {
+  function cancelMove() {
     dragging.set(false);
   }
 
   return {
     pointerYOffsetToTaskStart,
     dragging,
-    handleMoveStart,
-    handleMoveConfirm,
-    handleMoveCancel,
+    startMove,
+    confirmMove,
+    cancelMove,
   };
 }
