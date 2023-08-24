@@ -5,7 +5,9 @@ import { get } from "svelte/store";
 import { parsePlanItems } from "../parser/parser";
 import { getFileShownInTimeline } from "../store/active-day";
 import { settings } from "../store/settings";
-import { appStore, tasks } from "../store/timeline-store";
+import { appStore, taskLookup, tasks } from "../store/timeline-store";
+
+import { getNotesForWeek } from "./daily-notes";
 
 export async function openFileInEditor(file: TFile) {
   const app = get(appStore);
@@ -28,9 +30,23 @@ export async function getFileByPath(path: string) {
 }
 
 export async function refreshPlanItemsInStore() {
+  const notesForWeek = getNotesForWeek();
+  const parsedPlanItemsForWeek = Object.fromEntries(
+    await Promise.all(
+      notesForWeek.map(async ({ id, note }) => [
+        id,
+        note ? await getPlanItemsFromFile(note) : [],
+      ]),
+    ),
+  );
+
+  taskLookup.set(parsedPlanItemsForWeek);
+
+  console.log(parsedPlanItemsForWeek);
+
   const parsedPlanItems = await getPlanItemsFromFile(getFileShownInTimeline());
 
-  tasks.update(() => parsedPlanItems);
+  tasks.set(parsedPlanItems);
 }
 
 async function getPlanItemsFromFile(file: TFile) {

@@ -4,7 +4,7 @@
 
   import { editCancellation, editConfirmation } from "../../store/edit";
   import { getHorizontalPlacing } from "../../store/horizontal-placing";
-  import { time } from "../../store/time";
+  import { currentTime } from "../../store/time";
   import {
     durationToSize,
     roundToSnapStep,
@@ -59,7 +59,7 @@
 
   $: relationToNow = isGhost
     ? "future"
-    : getRelationToNow($time, startTime, endTime);
+    : getRelationToNow($currentTime, startTime, endTime);
 
   watch(editConfirmation, () => {
     confirmMove(offset, id, durationMinutes);

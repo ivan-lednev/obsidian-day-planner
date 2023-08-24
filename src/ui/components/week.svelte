@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { todayIsShownInTimeline } from "../../store/active-day";
-  import { visibleHours } from "../../store/timeline-store";
+  import { getDateUID } from "obsidian-daily-notes-interface";
+
+  import { currentTime } from "../../store/time";
+  import { taskLookup, visibleHours } from "../../store/timeline-store";
   import { getDaysOfCurrentWeek } from "../../util/moment";
 
   import Column from "./column.svelte";
@@ -26,14 +28,15 @@
 </div>
 <div class="days">
   <Ruler visibleHours={$visibleHours} />
-  {#each dayHeaders as { dayOfMonth, dayOfWeek }}
+  {#each daysOfCurrentWeek as day}
     <div class="day-column">
       <div class="scale-with-days">
         <Column visibleHours={$visibleHours}>
-          {#if $todayIsShownInTimeline}
+          {#if day.isSame($currentTime, "day")}
             <Needle scrollBlockedByUser={false} />
           {/if}
-          <TaskContainer />
+
+          <TaskContainer tasks={$taskLookup[getDateUID(day, "day")] || []} />
         </Column>
       </div>
     </div>
@@ -55,8 +58,8 @@
 
     background-color: var(--background-primary);
     border: 1px solid var(--background-modifier-border);
-      border-top: none;
-      border-left: none;
+    border-top: none;
+    border-left: none;
   }
 
   .days {

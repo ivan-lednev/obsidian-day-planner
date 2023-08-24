@@ -7,6 +7,8 @@ import {
   getDateUID,
 } from "obsidian-daily-notes-interface";
 
+import { getDaysOfCurrentWeek } from "./moment";
+
 export async function createDailyNoteIfNeeded(): Promise<TFile> {
   return getDailyNoteForToday() || createDailyNote(window.moment());
 }
@@ -54,4 +56,10 @@ export function getDateUidFromFile(file: TFile) {
 
 export function getDateUidForToday() {
   return getDateUID(window.moment(), "day");
+}
+
+export function getNotesForWeek() {
+  return getDaysOfCurrentWeek()
+    .map((moment) => getDateUID(moment, "day"))
+    .map((uid) => ({ id: uid, note: getAllDailyNotes()[uid] }));
 }

@@ -2,10 +2,12 @@
   import { writable } from "svelte/store";
 
   import { editCancellation, editConfirmation } from "../../store/edit";
-  import { tasks } from "../../store/timeline-store";
+  import { PlanItem } from "../../types";
   import { useCreate } from "../hooks/use-create";
 
   import Task from "./task.svelte";
+
+  export let tasks: PlanItem[]
 
   const cancelMessage = "Release outside timeline to cancel";
   const defaultDurationForNewTask = 30;
@@ -37,7 +39,7 @@
   on:mousedown={startCreation}
   on:mouseup|stopPropagation={handleMouseUp}
 >
-  {#each $tasks as taskProps (`${taskProps.startTime} ${taskProps.text}`)}
+  {#each tasks as taskProps (`${taskProps.startTime} ${taskProps.text}`)}
     <Task {...taskProps} {pointerYOffset} />
   {/each}
   {#if $creating}

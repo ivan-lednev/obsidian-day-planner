@@ -1,7 +1,7 @@
 <script lang="ts">
   import { todayIsShownInTimeline } from "../../store/active-day";
   import { settings } from "../../store/settings";
-  import { time } from "../../store/time";
+  import { currentTime } from "../../store/time";
   import {
     timeToTimelineOffset,
   } from "../../store/timeline-store";
@@ -10,7 +10,7 @@
   export let scrollBlockedByUser = false;
 
   let el: HTMLDivElement;
-  let coords = $timeToTimelineOffset(getMinutesSinceMidnight($time));
+  let coords = $timeToTimelineOffset(getMinutesSinceMidnight($currentTime));
 
   function scrollIntoView() {
     if ($settings.centerNeedle && !scrollBlockedByUser && todayIsShownInTimeline) {
@@ -19,7 +19,7 @@
   }
 
   $: {
-    coords = $timeToTimelineOffset(getMinutesSinceMidnight($time));
+    coords = $timeToTimelineOffset(getMinutesSinceMidnight($currentTime));
     scrollIntoView();
   }
 </script>

@@ -15,6 +15,8 @@ export const appStore = writable<App>();
 
 export const tasks = writable<PlanItem[]>([]);
 
+export const taskLookup = writable([]);
+
 export const hourSize = derived(
   settings,
   ($settings) => $settings.zoomLevel * 60,
