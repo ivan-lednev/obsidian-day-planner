@@ -4,7 +4,6 @@ import type { CachedMetadata, ListItemCache } from "obsidian";
 import { isTopLevelListItem } from "../../obsidian-metadata-utils/src/list";
 import { getTextAtPosition } from "../../obsidian-metadata-utils/src/position";
 import { timestampRegExp } from "../regexp";
-import { getMomentOfActiveDay } from "../store/active-day";
 import { parseTimestamp } from "../timestamp/timestamp";
 import type { PlanItem, PlanItemLocation } from "../types";
 import { getMinutesSinceMidnightOfDayTo } from "../util/moment";
@@ -48,14 +47,8 @@ export function parsePlanItems(
       return {
         ...item,
         endTime,
-        startMinutes: getMinutesSinceMidnightOfDayTo(
-          getMomentOfActiveDay(),
-          item.startTime,
-        ),
-        endMinutes: getMinutesSinceMidnightOfDayTo(
-          getMomentOfActiveDay(),
-          endTime,
-        ),
+        startMinutes: getMinutesSinceMidnightOfDayTo(day, item.startTime),
+        endMinutes: getMinutesSinceMidnightOfDayTo(day, endTime),
         durationMinutes,
       };
     })
