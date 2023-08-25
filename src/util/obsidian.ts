@@ -1,5 +1,10 @@
+import type { Moment } from "moment";
 import { TFile } from "obsidian";
-import { getDateFromFile } from "obsidian-daily-notes-interface";
+import {
+  getAllDailyNotes,
+  getDailyNote,
+  getDateFromFile,
+} from "obsidian-daily-notes-interface";
 import { get } from "svelte/store";
 
 import { parsePlanItems } from "../parser/parser";
@@ -15,6 +20,10 @@ export async function openFileInEditor(file: TFile) {
   const leaf = app.workspace.getLeaf(false);
   await leaf.openFile(file);
   return app.workspace.activeEditor?.editor;
+}
+
+export async function openFileForDay(moment: Moment) {
+  return openFileInEditor(getDailyNote(moment, getAllDailyNotes()));
 }
 
 export async function getFileByPath(path: string) {

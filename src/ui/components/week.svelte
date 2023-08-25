@@ -1,13 +1,19 @@
 <script lang="ts">
   import type { Moment } from "moment";
-  import { createDailyNote, getDateUID } from "obsidian-daily-notes-interface";
+  import {
+    createDailyNote,
+    getDateUID,
+  } from "obsidian-daily-notes-interface";
 
   import { currentTime } from "../../store/time";
   import { taskLookup, visibleHours } from "../../store/timeline-store";
   import { getNotesForDays } from "../../util/daily-notes";
   import { getDaysOfCurrentWeek } from "../../util/moment";
+  import { openFileForDay } from "../../util/obsidian";
 
   import Column from "./column.svelte";
+  import ControlButton from "./control-button.svelte";
+  import GoToFileIcon from "./icons/go-to-file.svelte";
   import FilePlus from "./icons/plus-file.svelte";
   import Needle from "./needle.svelte";
   import Ruler from "./ruler.svelte";
@@ -28,7 +34,14 @@
   <div class="corner"></div>
   {#each daysOfCurrentWeek as day}
     <div class="day-header" class:today={day.isSame(window.moment(), "day")}>
-      {day.format("DD, ddd")}
+      <ControlButton
+        --justify-self="flex-start"
+        label="Open note for day"
+        on:click={async () => await openFileForDay(day)}
+      >
+        <GoToFileIcon />
+      </ControlButton>
+      <div class="day-header-date">{day.format("DD, ddd")}</div>
     </div>
   {/each}
 </div>
@@ -61,6 +74,10 @@
 </div>
 
 <style>
+  .day-header-date {
+    justify-self: center;
+  }
+
   .create-container {
     display: flex;
     justify-content: center;
@@ -106,15 +123,15 @@
   }
 
   .day-header {
-    display: flex;
     flex: 1 0 150px;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
 
     /* todo: move to var */
     gap: 5px;
     align-items: center;
 
-    padding: 5px 0;
+    padding: 5px;
 
     background-color: var(--background-primary);
     border-right: 1px solid var(--background-modifier-border);
