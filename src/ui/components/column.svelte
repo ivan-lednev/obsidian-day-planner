@@ -22,7 +22,6 @@
   .time-grid-block {
     flex-grow: 1;
     flex-shrink: 0;
-    border-left: 1px solid var(--background-modifier-border);
   }
 
   .half-hour-separator {

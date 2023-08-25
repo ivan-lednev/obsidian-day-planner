@@ -1,11 +1,17 @@
 <script lang="ts">
-  import { getDateUID } from "obsidian-daily-notes-interface";
+  import {
+    createDailyNote,
+    getAllDailyNotes,
+    getDailyNote,
+    getDateUID,
+  } from "obsidian-daily-notes-interface";
 
   import { currentTime } from "../../store/time";
   import { taskLookup, visibleHours } from "../../store/timeline-store";
   import { getDaysOfCurrentWeek } from "../../util/moment";
 
   import Column from "./column.svelte";
+  import FilePlus from "./icons/plus-file.svelte";
   import Needle from "./needle.svelte";
   import Ruler from "./ruler.svelte";
   import TaskContainer from "./task-container.svelte";
@@ -15,6 +21,9 @@
     dayOfWeek: moment.format("ddd"),
     dayOfMonth: moment.format("DD"),
   }));
+  const dailyNotes = daysOfCurrentWeek.map((day) =>
+    getDailyNote(day, getAllDailyNotes()),
+  );
 </script>
 
 <div class="week-header">
@@ -28,24 +37,40 @@
 </div>
 <div class="days">
   <Ruler visibleHours={$visibleHours} />
-  {#each daysOfCurrentWeek as day}
-    <div class="day-column">
-      <div class="scale-with-days">
-        <Column visibleHours={$visibleHours}>
-          {#if day.isSame($currentTime, "day")}
-            <Needle scrollBlockedByUser={false} />
-          {/if}
-
-          <TaskContainer tasks={$taskLookup[getDateUID(day, "day")] || []} />
-        </Column>
+  {#each daysOfCurrentWeek as day, i}
+    {#if !dailyNotes[i]}
+      <div class="day-column no-note">
+        <div class="create-container">
+          <button
+            on:click={async () => {
+              await createDailyNote(day);
+            }}
+          >
+            <FilePlus />
+            Create file for day
+          </button>
+        </div>
       </div>
-    </div>
+    {:else}
+      <div class="day-column">
+        <div class="scale-with-days">
+          <Column visibleHours={$visibleHours}>
+            {#if day.isSame($currentTime, "day")}
+              <Needle scrollBlockedByUser={false} />
+            {/if}
+
+            <TaskContainer tasks={$taskLookup[getDateUID(day, "day")] || []} />
+          </Column>
+        </div>
+      </div>
+    {/if}
   {/each}
 </div>
 
 <style>
-  :root {
-    --scrollbar-width: 12px;
+  .create-container {
+    display: flex;
+    justify-content: center;
   }
 
   .corner {
@@ -72,6 +97,12 @@
     /* TODO: parameterize that */
     flex: 1 0 150px;
     flex-direction: column;
+    border-right: 1px solid var(--background-modifier-border);
+  }
+
+  .no-note {
+    position: relative;
+    background-color: var(--background-secondary);
   }
 
   .week-header {
@@ -93,8 +124,8 @@
     padding: 5px 0;
 
     background-color: var(--background-primary);
+    border-right: 1px solid var(--background-modifier-border);
     border-bottom: 1px solid var(--background-modifier-border);
-    border-left: 1px solid var(--background-modifier-border);
   }
 
   .day-of-month {
