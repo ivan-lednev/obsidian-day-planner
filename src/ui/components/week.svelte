@@ -14,10 +14,6 @@
   import TaskContainer from "./task-container.svelte";
 
   const daysOfCurrentWeek = getDaysOfCurrentWeek();
-  const dayHeaders = daysOfCurrentWeek.map((moment) => ({
-    dayOfWeek: moment.format("ddd"),
-    dayOfMonth: moment.format("DD"),
-  }));
 
   let dailyNotes = getNotesForDays(daysOfCurrentWeek);
 
@@ -30,10 +26,9 @@
 
 <div class="week-header">
   <div class="corner"></div>
-  {#each dayHeaders as { dayOfMonth, dayOfWeek }}
-    <div class="day-header">
-      <div class="day-of-week">{dayOfWeek}</div>
-      <div class="day-of-month">{dayOfMonth}</div>
+  {#each daysOfCurrentWeek as day}
+    <div class="day-header" class:today={day.isSame(window.moment(), "day")}>
+      {day.format("DD, ddd")}
     </div>
   {/each}
 </div>
@@ -126,13 +121,9 @@
     border-bottom: 1px solid var(--background-modifier-border);
   }
 
-  .day-of-month {
-    padding: 5px 10px;
+  .today {
     color: var(--background-primary);
     background-color: var(--color-accent);
-    border-radius: var(--radius-s);
-
-    /* todo: move to var */
   }
 
   .scale-with-days {
