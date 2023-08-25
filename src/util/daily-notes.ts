@@ -1,3 +1,4 @@
+import type { Moment } from "moment";
 import type { TFile } from "obsidian";
 import {
   createDailyNote,
@@ -62,4 +63,8 @@ export function getNotesForWeek() {
   return getDaysOfCurrentWeek()
     .map((moment) => getDateUID(moment, "day"))
     .map((uid) => ({ id: uid, note: getAllDailyNotes()[uid] }));
+}
+
+export function getNotesForDays(days: Moment[]) {
+  return days.map((day) => getDailyNote(day, getAllDailyNotes()));
 }

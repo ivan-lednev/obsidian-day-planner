@@ -1,13 +1,10 @@
 <script lang="ts">
-  import {
-    createDailyNote,
-    getAllDailyNotes,
-    getDailyNote,
-    getDateUID,
-  } from "obsidian-daily-notes-interface";
+  import type { Moment } from "moment";
+  import { createDailyNote, getDateUID } from "obsidian-daily-notes-interface";
 
   import { currentTime } from "../../store/time";
   import { taskLookup, visibleHours } from "../../store/timeline-store";
+  import { getNotesForDays } from "../../util/daily-notes";
   import { getDaysOfCurrentWeek } from "../../util/moment";
 
   import Column from "./column.svelte";
@@ -21,9 +18,14 @@
     dayOfWeek: moment.format("ddd"),
     dayOfMonth: moment.format("DD"),
   }));
-  const dailyNotes = daysOfCurrentWeek.map((day) =>
-    getDailyNote(day, getAllDailyNotes()),
-  );
+
+  let dailyNotes = getNotesForDays(daysOfCurrentWeek);
+
+  async function handleCreateNote(moment: Moment) {
+    await createDailyNote(moment);
+
+    dailyNotes = getNotesForDays(daysOfCurrentWeek);
+  }
 </script>
 
 <div class="week-header">
@@ -41,11 +43,7 @@
     {#if !dailyNotes[i]}
       <div class="day-column no-note">
         <div class="create-container">
-          <button
-            on:click={async () => {
-              await createDailyNote(day);
-            }}
-          >
+          <button on:click={() => handleCreateNote(day)}>
             <FilePlus />
             Create file for day
           </button>
