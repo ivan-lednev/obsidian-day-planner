@@ -88,6 +88,8 @@
 
 [data-type="timeline"] .view-content,
 [data-type="weekly"] .view-content {
+  --time-ruler-width: 30px;
+
   display: flex;
   flex-direction: column;
   padding: 0;

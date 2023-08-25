@@ -77,7 +77,7 @@
     top: 0;
     left: 0;
 
-    flex: 0 0 40px;
+    flex: 0 0 var(--time-ruler-width);
 
     background-color: var(--background-primary);
     border: 1px solid var(--background-modifier-border);

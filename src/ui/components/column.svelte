@@ -20,16 +20,11 @@
   }
 
   .time-grid-block {
-    flex-grow: 1;
-    flex-shrink: 0;
+    flex: 1 0 0;
+    border-bottom: 1px solid var(--background-modifier-border);
   }
 
   .half-hour-separator {
     border-bottom: 1px dashed var(--background-modifier-border);
-  }
-
-  /* TODO: this selector is a lame workaround for task container which is absolutely positioned */
-  .time-grid-block:not(:nth-child(2)) {
-    border-top: 1px solid var(--background-modifier-border);
   }
 </style>
