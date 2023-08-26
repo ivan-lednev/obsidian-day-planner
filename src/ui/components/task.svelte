@@ -17,6 +17,9 @@
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
+  import TaskCircleIcon from "./icons/circle.svelte";
+  import TaskCompletedIcon from "./icons/check-circle.svelte";
+
   export let text: string;
   export let id: string;
   export let startTime: Moment;
@@ -85,8 +88,12 @@
     on:mousedown|stopPropagation={(e) => {
       startMove(e);
     }}
-    style="background-color: blue;"
   >
+    {#if relationToNow === "past"}
+      <TaskCompletedIcon />
+    {:else}
+      <TaskCircleIcon />
+    {/if}
     <RenderedMarkdown {text} />
     <div
       class="resize-handle absolute-stretch-x"
