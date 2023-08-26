@@ -79,7 +79,9 @@ export default class DayPlanner extends Plugin {
     this.initStore();
 
     this.app.workspace.onLayoutReady(async () => {
-      await refreshPlanItemsInStore();
+      activeDay.subscribe(async () => {
+        await refreshPlanItemsInStore();
+      });
     });
 
     this.app.workspace.on("active-leaf-change", ({ view }) => {
