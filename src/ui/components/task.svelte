@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Moment } from "moment";
   import type { Readable } from "svelte/store";
 
   import { editCancellation, editConfirmation } from "../../store/edit";
@@ -8,8 +7,9 @@
   import {
     durationToSize,
     roundToSnapStep,
-    timeToTimelineOffset,
+    timeToTimelineOffset
   } from "../../store/timeline-store";
+  import type{ PlanItem } from "../../types";
   import { getRelationToNow } from "../../util/moment";
   import { useDrag } from "../hooks/use-drag";
   import { useResize } from "../hooks/use-resize";
@@ -20,12 +20,7 @@
   import TaskCircleIcon from "./icons/circle.svelte";
   import TaskCompletedIcon from "./icons/check-circle.svelte";
 
-  export let text: string;
-  export let id: string;
-  export let startTime: Moment;
-  export let endTime: Moment;
-  export let startMinutes: number | undefined = undefined;
-  export let durationMinutes: number;
+  export let planItem: PlanItem;
   export let pointerYOffset: Readable<number>;
   export let isGhost = false;
   export let isCompleted: boolean;
@@ -36,14 +31,14 @@
     pointerYOffsetToTaskStart,
     startMove,
     confirmMove,
-    cancelMove,
+    cancelMove
   } = useDrag();
 
   const { resizing, cancelResize, startResize, confirmResize } = useResize();
 
   $: initialOffset = isGhost
     ? roundToSnapStep($pointerYOffset)
-    : $timeToTimelineOffset(startMinutes);
+    : $timeToTimelineOffset(planItem.startMinutes);
 
   $: offset = $dragging
     ? roundToSnapStep($pointerYOffset - $pointerYOffsetToTaskStart)
@@ -53,17 +48,17 @@
 
   $: height = $resizing
     ? roundToSnapStep(offsetToPointer)
-    : $durationToSize(durationMinutes);
+    : $durationToSize(planItem.durationMinutes);
 
-  $: horizontalPlacing = $getHorizontalPlacing(id);
+  $: horizontalPlacing = $getHorizontalPlacing(planItem.id);
 
   $: relationToNow = isGhost
     ? "future"
-    : getRelationToNow($currentTime, startTime, endTime);
+    : getRelationToNow($currentTime, planItem.startTime, planItem.endTime);
 
   watch(editConfirmation, () => {
-    confirmMove(offset, id, durationMinutes);
-    confirmResize(id, height, startMinutes);
+    confirmMove(offset, planItem.id, planItem.durationMinutes);
+    confirmResize(planItem.id, height, planItem.startMinutes);
   });
 
   watch(editCancellation, () => {
@@ -95,7 +90,7 @@
     {:else}
       <TaskCircleIcon />
     {/if}
-    <RenderedMarkdown {text} />
+    <RenderedMarkdown text={planItem.text} />
     <div
       class="resize-handle absolute-stretch-x"
       on:mousedown|stopPropagation={startResize}
@@ -104,44 +99,44 @@
 </div>
 
 <style>
-  .gap-box {
-    display: flex;
-    padding-right: 3px;
-    padding-left: 3px;
-    transition: 0.05s linear;
-  }
+    .gap-box {
+        display: flex;
+        padding-right: 3px;
+        padding-left: 3px;
+        transition: 0.05s linear;
+    }
 
-  .task {
-    overflow: visible;
-    display: flex;
-    flex: 1 0 0;
-    align-items: flex-start;
-    justify-content: flex-start;
+    .task {
+        overflow: visible;
+        display: flex;
+        flex: 1 0 0;
+        align-items: flex-start;
+        justify-content: flex-start;
 
-    padding: 5px;
+        padding: 5px;
 
-    font-size: var(--font-ui-medium);
-    color: var(--text-muted);
-    text-align: left;
-    overflow-wrap: anywhere;
-    white-space: normal;
+        font-size: var(--font-ui-medium);
+        color: var(--text-muted);
+        text-align: left;
+        overflow-wrap: anywhere;
+        white-space: normal;
 
-    background-color: var(--background-primary);
-    border: 1px solid var(--text-faint);
-    border-radius: var(--radius-s);
-  }
+        background-color: var(--background-primary);
+        border: 1px solid var(--text-faint);
+        border-radius: var(--radius-s);
+    }
 
-  .past {
-    background-color: var(--background-secondary);
-  }
+    .past {
+        background-color: var(--background-secondary);
+    }
 
-  .present {
-    border-color: var(--color-accent);
-  }
+    .present {
+        border-color: var(--color-accent);
+    }
 
-  .is-ghost {
-    opacity: 0.6;
-  }
+    .is-ghost {
+        opacity: 0.6;
+    }
 
   .is-completed {
     color: var(--text-faint);
@@ -149,9 +144,9 @@
     text-decoration: line-through;
   }
 
-  .resize-handle {
-    cursor: s-resize;
-    bottom: -15px;
-    height: 30px;
-  }
+    .resize-handle {
+        cursor: s-resize;
+        bottom: -15px;
+        height: 30px;
+    }
 </style>

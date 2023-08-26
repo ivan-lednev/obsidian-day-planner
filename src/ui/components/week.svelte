@@ -1,9 +1,6 @@
 <script lang="ts">
   import type { Moment } from "moment";
-  import {
-    createDailyNote,
-    getDateUID,
-  } from "obsidian-daily-notes-interface";
+  import { createDailyNote, getDateUID } from "obsidian-daily-notes-interface";
 
   import { currentTime } from "../../store/time";
   import { taskLookup, visibleHours } from "../../store/timeline-store";
@@ -28,12 +25,16 @@
 
     dailyNotes = getNotesForDays(daysOfCurrentWeek);
   }
+
+  function isToday(moment: Moment) {
+    return moment.isSame(window.moment(), "day");
+  }
 </script>
 
 <div class="week-header">
   <div class="corner"></div>
   {#each daysOfCurrentWeek as day}
-    <div class="day-header" class:today={day.isSame(window.moment(), "day")}>
+    <div class="day-header" class:today={isToday(day)}>
       <ControlButton
         --justify-self="flex-start"
         label="Open note for day"
@@ -41,7 +42,9 @@
       >
         <GoToFileIcon />
       </ControlButton>
-      <div class="day-header-date">{day.format("DD, ddd")}</div>
+      <div class="day-header-date">
+        {day.format("DD, ddd")}
+      </div>
     </div>
   {/each}
 </div>
@@ -65,7 +68,10 @@
               <Needle scrollBlockedByUser={false} />
             {/if}
 
-            <TaskContainer tasks={$taskLookup[getDateUID(day, "day")] || []} />
+            <TaskContainer
+              {day}
+              tasks={$taskLookup[getDateUID(day, "day")] || []}
+            />
           </Column>
         </div>
       </div>
@@ -123,9 +129,9 @@
   }
 
   .day-header {
-    flex: 1 0 150px;
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
+    flex: 1 0 150px;
 
     /* todo: move to var */
     gap: 5px;
@@ -139,7 +145,7 @@
   }
 
   .today {
-    color: var(--background-primary);
+    color: white;
     background-color: var(--color-accent);
   }
 

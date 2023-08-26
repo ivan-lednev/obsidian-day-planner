@@ -5,7 +5,7 @@ import {
   getDailyNote,
   getDateFromFile,
 } from "obsidian-daily-notes-interface";
-import { get } from "svelte/store";
+import { get, writable } from "svelte/store";
 
 import { parsePlanItems } from "../parser/parser";
 import { getFileShownInTimeline } from "../store/active-day";
@@ -44,7 +44,7 @@ export async function refreshPlanItemsInStore() {
     await Promise.all(
       notesForWeek.map(async ({ id, note }) => [
         id,
-        note ? await getPlanItemsFromFile(note) : [],
+        writable(note ? await getPlanItemsFromFile(note) : []),
       ]),
     ),
   );

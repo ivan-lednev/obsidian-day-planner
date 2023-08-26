@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { writable } from "svelte/store";
+  import { Moment } from "moment";
+  import { Writable, writable } from "svelte/store";
 
   import { editCancellation, editConfirmation } from "../../store/edit";
   import { PlanItem } from "../../types";
@@ -7,7 +8,8 @@
 
   import Task from "./task.svelte";
 
-  export let tasks: PlanItem[]
+  export let tasks: Writable<PlanItem[]>;
+  export let day: Moment;
 
   const cancelMessage = "Release outside timeline to cancel";
   const defaultDurationForNewTask = 30;
@@ -23,10 +25,14 @@
 
   function handleMouseUp() {
     if ($creating) {
-      confirmCreation($pointerYOffset);
+      confirmCreation(tasks, day, $pointerYOffset);
     }
 
     editConfirmation.trigger();
+  }
+
+  function getPlanItemKey(planItem: PlanItem) {
+    return `${planItem.startTime} ${planItem.text}`;
   }
 </script>
 
@@ -39,14 +45,13 @@
   on:mousedown={startCreation}
   on:mouseup|stopPropagation={handleMouseUp}
 >
-  {#each tasks as taskProps (`${taskProps.startTime} ${taskProps.text}`)}
-    <Task {...taskProps} {pointerYOffset} />
+  {#each $tasks as planItem (getPlanItemKey(planItem))}
+    <Task {planItem} {pointerYOffset} />
   {/each}
   {#if $creating}
     <Task
-      id=""
-      durationMinutes={defaultDurationForNewTask}
       isGhost
+      planItem={{ durationMinutes: defaultDurationForNewTask, id: "" }}
       {pointerYOffset}
       text={cancelMessage}
     />

@@ -1,17 +1,14 @@
-import { writable } from "svelte/store";
+import type { Moment } from "moment";
+import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
+import { Writable, writable } from "svelte/store";
 
 import { DEFAULT_DURATION_MINUTES } from "../../constants";
 import { appendToPlan } from "../../plan";
 import {
-  getMomentOfActiveDay,
-  getFileShownInTimeline,
-} from "../../store/active-day";
-import {
   getTimeFromYOffset,
   roundToSnapStep,
-  tasks,
 } from "../../store/timeline-store";
-import { getDailyNoteForToday } from "../../util/daily-notes";
+import type { PlanItem } from "../../types";
 import { minutesToMomentOfDay } from "../../util/moment";
 
 export function useCreate() {
@@ -21,17 +18,22 @@ export function useCreate() {
     creating.set(true);
   }
 
-  async function confirmCreation(pointerYOffset: number) {
+  async function confirmCreation(
+    tasks: Writable<PlanItem[]>,
+    day: Moment,
+    pointerYOffset: number,
+  ) {
     creating.set(false);
 
-    const newPlanItem = createPlanItemFromTimeline(pointerYOffset);
+    // TODO: day goes here
+    const newPlanItem = createPlanItemFromTimeline(day, pointerYOffset);
 
     // todo: clean up item creation
     // @ts-ignore
     tasks.update((previous) => [...previous, newPlanItem]);
 
     // @ts-ignore
-    await appendToPlan(getFileShownInTimeline().path, newPlanItem);
+    await appendToPlan(getDailyNote(day, getAllDailyNotes()).path, newPlanItem);
   }
 
   return {
@@ -41,7 +43,7 @@ export function useCreate() {
   };
 }
 
-function createPlanItemFromTimeline(pointerYOffset: number) {
+function createPlanItemFromTimeline(day: Moment, pointerYOffset: number) {
   const startMinutes = getTimeFromYOffset(roundToSnapStep(pointerYOffset));
   const endMinutes = startMinutes + DEFAULT_DURATION_MINUTES;
 
@@ -51,12 +53,12 @@ function createPlanItemFromTimeline(pointerYOffset: number) {
     durationMinutes: DEFAULT_DURATION_MINUTES,
     endMinutes,
     text: "New item",
-    startTime: minutesToMomentOfDay(startMinutes, getMomentOfActiveDay()),
-    endTime: minutesToMomentOfDay(endMinutes, getMomentOfActiveDay()),
+    startTime: minutesToMomentOfDay(startMinutes, day),
+    endTime: minutesToMomentOfDay(endMinutes, day),
     // todo: no hardcode
     listTokens: "- ",
     location: {
-      path: getDailyNoteForToday().path,
+      path: getDailyNote(day, getAllDailyNotes()).path,
     },
   };
 }
