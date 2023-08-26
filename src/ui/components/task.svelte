@@ -60,6 +60,8 @@
     ? "future"
     : getRelationToNow($time, startTime, endTime);
 
+  $: isFinished = relationToNow === "past" ? true : false;
+
   watch(editConfirmation, () => {
     confirmMove(offset, id, durationMinutes);
     confirmResize(id, height, startMinutes);
@@ -85,6 +87,7 @@
     class:is-ghost={isGhost}
     class:past={relationToNow === "past"}
     class:present={relationToNow === "present"}
+    class:is-finished={isFinished}
     on:mousedown|stopPropagation={(e) => {
       startMove(e);
     }}
@@ -140,6 +143,13 @@
 
   .is-ghost {
     opacity: 0.6;
+  }
+
+  .is-finished {
+    color: rgba(223, 222, 222, 0.836);
+    background-color: #7b9c3c;
+    opacity: 0.7;
+    text-decoration: line-through;
   }
 
   .resize-handle {
