@@ -76,6 +76,7 @@
   style:left="{horizontalPlacing.xOffsetPercent}%"
   class="gap-box absolute-stretch-x"
 >
+  <!-- Card component -->
   <div
     class="task {relationToNow}"
     class:is-ghost={isGhost}
@@ -84,6 +85,7 @@
     on:mousedown|stopPropagation={(e) => {
       startMove(e);
     }}
+    style="background-color: blue;"
   >
     <RenderedMarkdown {text} />
     <div
