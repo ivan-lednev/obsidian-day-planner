@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Moment } from "moment";
   import { setContext } from "svelte";
-  import { Writable, writable } from "svelte/store";
+  import { Writable } from "svelte/store";
 
   import { TASKS_FOR_DAY } from "../../constants";
   import { computeOverlap } from "../../parser/overlap";
@@ -26,21 +26,21 @@
     return tasks;
   }
 
-  $: overlapLookup = computeOverlap($tasks);
-
   setContext(TASKS_FOR_DAY, { getTasks });
 
-  const pointerYOffset = writable<number>();
+  $: overlapLookup = computeOverlap($tasks);
+
+  let pointerYOffset = 0;
   let el: HTMLDivElement;
 
   function handleMousemove(event: MouseEvent) {
-    pointerYOffset.set(event.clientY - el.getBoundingClientRect().top);
+    pointerYOffset = event.clientY - el.getBoundingClientRect().top;
   }
 
   function handleMouseUp() {
     if ($creating) {
       // todo: to make this uniform, we may pull tasks from context
-      confirmCreation(tasks, day, $pointerYOffset);
+      confirmCreation(tasks, day, pointerYOffset);
     }
 
     editConfirmation.trigger();

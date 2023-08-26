@@ -1,6 +1,4 @@
 <script lang="ts">
-  import type { Readable } from "svelte/store";
-
   import { editCancellation, editConfirmation } from "../../store/edit";
   import { currentTime } from "../../store/time";
   import {
@@ -20,7 +18,7 @@
   import TaskCompletedIcon from "./icons/check-circle.svelte";
 
   export let planItem: PlanItem;
-  export let pointerYOffset: Readable<number>;
+  export let pointerYOffset: number;
   export let isGhost = false;
   export let widthPercent = 100;
   export let xOffsetPercent = 0;
@@ -38,14 +36,14 @@
   const { resizing, cancelResize, startResize, confirmResize } = useResize();
 
   $: initialOffset = isGhost
-    ? roundToSnapStep($pointerYOffset)
+    ? roundToSnapStep(pointerYOffset)
     : $timeToTimelineOffset(planItem.startMinutes);
 
   $: offset = $dragging
-    ? roundToSnapStep($pointerYOffset - $pointerYOffsetToTaskStart)
+    ? roundToSnapStep(pointerYOffset - $pointerYOffsetToTaskStart)
     : initialOffset;
 
-  $: offsetToPointer = $pointerYOffset - initialOffset;
+  $: offsetToPointer = pointerYOffset - initialOffset;
 
   $: height = $resizing
     ? roundToSnapStep(offsetToPointer)
