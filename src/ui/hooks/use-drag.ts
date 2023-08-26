@@ -1,7 +1,10 @@
+import { getContext } from "svelte";
 import { derived, get, writable } from "svelte/store";
 
+import { TASKS } from "../../constants";
 import { getTimeFromYOffset } from "../../store/timeline-store";
 import { updateTimestamps } from "../../store/update-timestamp";
+import type { TasksContext } from "../../types";
 
 export function useDrag() {
   const dragging = writable(false);
@@ -9,6 +12,8 @@ export function useDrag() {
   const cursor = derived(dragging, ($dragging) =>
     $dragging ? "grabbing" : "grab",
   );
+
+  const { getTasks } = getContext<TasksContext>(TASKS);
 
   function startMove(event: MouseEvent) {
     dragging.set(true);
@@ -30,7 +35,7 @@ export function useDrag() {
 
     const newStartMinutes = getTimeFromYOffset(Math.floor(offset));
 
-    await updateTimestamps(id, {
+    await updateTimestamps(getTasks(), id, {
       startMinutes: newStartMinutes,
       durationMinutes,
     });

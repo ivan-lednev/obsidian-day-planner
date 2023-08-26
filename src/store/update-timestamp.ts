@@ -1,12 +1,16 @@
 import { TFile } from "obsidian";
-import { get } from "svelte/store";
+import { get, Writable } from "svelte/store";
 
 import { replaceTimestamp } from "../timestamp/timestamp";
 import type { PlanItem } from "../types";
 
-import { Timestamp, appStore, tasks } from "./timeline-store";
+import { Timestamp, appStore } from "./timeline-store";
 
-export async function updateTimestamps(id: string, timestamp: Timestamp) {
+export async function updateTimestamps(
+  tasks: Writable<Array<PlanItem>>,
+  id: string,
+  timestamp: Timestamp,
+) {
   tasks.update((previous) => {
     return previous.map((task) => {
       if (task.id !== id) {

@@ -1,4 +1,5 @@
 import type { Moment } from "moment";
+import type { Writable } from "svelte/store";
 
 export interface PlanItemLocation {
   path: string;
@@ -28,4 +29,9 @@ export interface Overlap {
   columns: number;
   span: number;
   start: number;
+}
+
+export interface TasksContext {
+  tasks: Writable<Array<PlanItem>>;
+  getTasks: () => Writable<Array<PlanItem>>;
 }

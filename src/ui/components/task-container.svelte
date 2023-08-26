@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { Moment } from "moment";
+  import type { Moment } from "moment";
+  import { setContext } from "svelte";
   import { Writable, writable } from "svelte/store";
 
+  import { TASKS } from "../../constants";
   import { editCancellation, editConfirmation } from "../../store/edit";
-  import { PlanItem } from "../../types";
+  import type { PlanItem } from "../../types";
   import { useCreate } from "../hooks/use-create";
 
   import Task from "./task.svelte";
@@ -16,15 +18,25 @@
 
   const { creating, startCreation, confirmCreation } = useCreate();
 
+  // this is a hack for the case when plan items get refreshed, and we need to
+  // add them to the context instead of the initial value
+  function getTasks() {
+    return tasks;
+  }
+
+  setContext(TASKS, { getTasks });
+
   const pointerYOffset = writable<number>();
   let el: HTMLDivElement;
 
   function handleMousemove(event: MouseEvent) {
+    // todo: not sure, but there might be some built-in measurement for svelte Components
     pointerYOffset.set(event.clientY - el.getBoundingClientRect().top);
   }
 
   function handleMouseUp() {
     if ($creating) {
+      // todo: to make this uniform, we may pull tasks from context
       confirmCreation(tasks, day, $pointerYOffset);
     }
 

@@ -1,3 +1,5 @@
+export const TASKS = "tasks";
+
 export const VIEW_TYPE_TIMELINE = "timeline";
 export const VIEW_TYPE_WEEKLY = "weekly";
 

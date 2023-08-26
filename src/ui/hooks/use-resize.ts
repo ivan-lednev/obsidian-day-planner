@@ -1,10 +1,15 @@
+import { getContext } from "svelte";
 import { get, writable } from "svelte/store";
 
+import { TASKS } from "../../constants";
 import { sizeToDuration } from "../../store/timeline-store";
 import { updateTimestamps } from "../../store/update-timestamp";
+import type { TasksContext } from "../../types";
 
 export function useResize() {
   const resizing = writable(false);
+
+  const { getTasks } = getContext<TasksContext>(TASKS);
 
   function startResize() {
     resizing.set(true);
@@ -24,7 +29,7 @@ export function useResize() {
 
     const newDurationMinutes = sizeToDuration(taskHeight);
 
-    await updateTimestamps(id, {
+    await updateTimestamps(getTasks(), id, {
       startMinutes,
       durationMinutes: newDurationMinutes,
     });
