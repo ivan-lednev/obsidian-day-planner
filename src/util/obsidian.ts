@@ -1,6 +1,7 @@
 import type { Moment } from "moment";
 import { TFile } from "obsidian";
 import {
+  createDailyNote,
   getAllDailyNotes,
   getDailyNote,
   getDateFromFile,
@@ -23,7 +24,10 @@ export async function openFileInEditor(file: TFile) {
 }
 
 export async function openFileForDay(moment: Moment) {
-  return openFileInEditor(getDailyNote(moment, getAllDailyNotes()));
+  const dailyNote =
+    getDailyNote(moment, getAllDailyNotes()) || (await createDailyNote(moment));
+
+  return openFileInEditor(dailyNote);
 }
 
 export async function getFileByPath(path: string) {

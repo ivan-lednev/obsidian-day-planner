@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Moment } from "moment";
-  import { createDailyNote, getDateUID } from "obsidian-daily-notes-interface";
+  import { getDateUID } from "obsidian-daily-notes-interface";
 
   import { currentTime } from "../../store/time";
   import { taskLookup, visibleHours } from "../../store/timeline-store";
@@ -20,12 +20,6 @@
 
   let dailyNotes = getNotesForDays(daysOfCurrentWeek);
 
-  async function handleCreateNote(moment: Moment) {
-    await createDailyNote(moment);
-
-    dailyNotes = getNotesForDays(daysOfCurrentWeek);
-  }
-
   function isToday(moment: Moment) {
     return moment.isSame(window.moment(), "day");
   }
@@ -33,14 +27,18 @@
 
 <div class="week-header">
   <div class="corner"></div>
-  {#each daysOfCurrentWeek as day}
+  {#each daysOfCurrentWeek as day, i}
     <div class="day-header" class:today={isToday(day)}>
       <ControlButton
         --justify-self="flex-start"
         label="Open note for day"
         on:click={async () => await openFileForDay(day)}
       >
-        <GoToFileIcon />
+        {#if dailyNotes[i]}
+          <GoToFileIcon />
+        {:else}
+          <FilePlus />
+        {/if}
       </ControlButton>
       <div class="day-header-date">
         {day.format("DD, ddd")}
@@ -52,14 +50,11 @@
   <Ruler visibleHours={$visibleHours} />
   {#each daysOfCurrentWeek as day, i}
     {#if !dailyNotes[i]}
-      <div class="day-column no-note">
-        <div class="create-container">
-          <button on:click={() => handleCreateNote(day)}>
-            <FilePlus />
-            Create file for day
-          </button>
-        </div>
-      </div>
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <div
+        class="day-column no-note"
+        on:click={async () => await openFileForDay(day)}
+      ></div>
     {:else}
       <div class="day-column">
         <div class="scale-with-days">
@@ -82,11 +77,6 @@
 <style>
   .day-header-date {
     justify-self: center;
-  }
-
-  .create-container {
-    display: flex;
-    justify-content: center;
   }
 
   .corner {
@@ -117,7 +107,6 @@
   }
 
   .no-note {
-    position: relative;
     background-color: var(--background-secondary);
   }
 
