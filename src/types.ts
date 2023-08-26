@@ -1,6 +1,8 @@
 import type { Moment } from "moment";
 import type { Writable } from "svelte/store";
 
+import type { getHorizontalPlacing } from "./store/horizontal-placing";
+
 export interface PlanItemLocation {
   path: string;
   line: number;
@@ -19,6 +21,10 @@ export interface PlanItem {
   location?: PlanItemLocation;
   id: string;
   isCompleted: boolean;
+}
+
+export interface PlacedPlanItem extends PlanItem {
+  placing: ReturnType<typeof getHorizontalPlacing>;
 }
 
 export type RelationToNow = "past" | "present" | "future";

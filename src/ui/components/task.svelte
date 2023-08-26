@@ -4,9 +4,9 @@
   import {
     durationToSize,
     roundToSnapStep,
-    timeToTimelineOffset
+    timeToTimelineOffset,
   } from "../../store/timeline-store";
-  import type{ PlanItem } from "../../types";
+  import type { PlacedPlanItem } from "../../types";
   import { getRelationToNow } from "../../util/moment";
   import { useDrag } from "../hooks/use-drag";
   import { useResize } from "../hooks/use-resize";
@@ -17,11 +17,10 @@
   import TaskCircleIcon from "./icons/circle.svelte";
   import TaskCompletedIcon from "./icons/check-circle.svelte";
 
+  export let planItem: PlacedPlanItem;
   export let planItem: PlanItem;
   export let pointerYOffset: number;
   export let isGhost = false;
-  export let widthPercent = 100;
-  export let xOffsetPercent = 0;
   export let isCompleted: boolean;
 
   const {
@@ -30,7 +29,7 @@
     pointerYOffsetToTaskStart,
     startMove,
     confirmMove,
-    cancelMove
+    cancelMove,
   } = useDrag();
 
   const { resizing, cancelResize, startResize, confirmResize } = useResize();
@@ -68,8 +67,8 @@
   style:height="{height}px"
   style:transform="translateY({offset}px)"
   style:cursor={$cursor}
-  style:width="{widthPercent}%"
-  style:left="{xOffsetPercent}%"
+  style:width="{planItem.placing.widthPercent}%"
+  style:left="{planItem.placing.xOffsetPercent}%"
   class="gap-box absolute-stretch-x"
 >
   <div
@@ -96,44 +95,44 @@
 </div>
 
 <style>
-    .gap-box {
-        display: flex;
-        padding-right: 3px;
-        padding-left: 3px;
-        transition: 0.05s linear;
-    }
+  .gap-box {
+    display: flex;
+    padding-right: 3px;
+    padding-left: 3px;
+    transition: 0.05s linear;
+  }
 
-    .task {
-        overflow: visible;
-        display: flex;
-        flex: 1 0 0;
-        align-items: flex-start;
-        justify-content: flex-start;
+  .task {
+    overflow: visible;
+    display: flex;
+    flex: 1 0 0;
+    align-items: flex-start;
+    justify-content: flex-start;
 
-        padding: 5px;
+    padding: 5px;
 
-        font-size: var(--font-ui-medium);
-        color: var(--text-muted);
-        text-align: left;
-        overflow-wrap: anywhere;
-        white-space: normal;
+    font-size: var(--font-ui-medium);
+    color: var(--text-muted);
+    text-align: left;
+    overflow-wrap: anywhere;
+    white-space: normal;
 
-        background-color: var(--background-primary);
-        border: 1px solid var(--text-faint);
-        border-radius: var(--radius-s);
-    }
+    background-color: var(--background-primary);
+    border: 1px solid var(--text-faint);
+    border-radius: var(--radius-s);
+  }
 
-    .past {
-        background-color: var(--background-secondary);
-    }
+  .past {
+    background-color: var(--background-secondary);
+  }
 
-    .present {
-        border-color: var(--color-accent);
-    }
+  .present {
+    border-color: var(--color-accent);
+  }
 
-    .is-ghost {
-        opacity: 0.6;
-    }
+  .is-ghost {
+    opacity: 0.6;
+  }
 
   .is-completed {
     color: var(--text-faint);
@@ -141,9 +140,9 @@
     text-decoration: line-through;
   }
 
-    .resize-handle {
-        cursor: s-resize;
-        bottom: -15px;
-        height: 30px;
-    }
+  .resize-handle {
+    cursor: s-resize;
+    bottom: -15px;
+    height: 30px;
+  }
 </style>

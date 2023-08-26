@@ -8,11 +8,14 @@ import {
 } from "obsidian-daily-notes-interface";
 import { get, writable } from "svelte/store";
 
+import { computeOverlap } from "../parser/overlap";
 import { parsePlanItems } from "../parser/parser";
 import { getTimelineFile } from "../store/active-day";
 import { appStore } from "../store/app-store";
+import { getHorizontalPlacing } from "../store/horizontal-placing";
 import { settings } from "../store/settings";
 import { taskLookup, tasks } from "../store/tasks";
+import type { PlanItem } from "../types";
 
 import { getNotesForWeek } from "./daily-notes";
 
@@ -43,21 +46,31 @@ export async function getFileByPath(path: string) {
   return file;
 }
 
+export function addPlacing(planItems: PlanItem[]) {
+  const overlapLookup = computeOverlap(planItems);
+
+  return planItems.map((planItem) => ({
+    ...planItem,
+    placing: getHorizontalPlacing(overlapLookup.get(planItem.id)),
+  }));
+}
+
 export async function refreshPlanItemsInStore() {
   const notesForWeek = getNotesForWeek();
-  const parsedPlanItemsForWeek = Object.fromEntries(
-    await Promise.all(
-      notesForWeek.map(async ({ id, note }) => [
-        id,
-        writable(note ? await getPlanItemsFromFile(note) : []),
-      ]),
-    ),
+
+  const idToPlanItemsStore = await Promise.all(
+    notesForWeek.map(async ({ id, note }) => {
+      const planItems = note ? await getPlanItemsFromFile(note) : [];
+      const planItemsWithPlacing = addPlacing(planItems);
+      return [id, writable(planItemsWithPlacing)];
+    }),
   );
+
+  const parsedPlanItemsForWeek = Object.fromEntries(idToPlanItemsStore);
 
   taskLookup.set(parsedPlanItemsForWeek);
 
-  console.log(parsedPlanItemsForWeek);
-
+  // todo: remove this old code
   const parsedPlanItems = await getPlanItemsFromFile(getTimelineFile());
 
   tasks.set(parsedPlanItems);

@@ -4,15 +4,13 @@
   import { Writable } from "svelte/store";
 
   import { TASKS_FOR_DAY } from "../../constants";
-  import { computeOverlap } from "../../parser/overlap";
   import { editCancellation, editConfirmation } from "../../store/edit";
-  import { getHorizontalPlacing } from "../../store/horizontal-placing";
-  import type { PlanItem } from "../../types";
+  import type { PlacedPlanItem, PlanItem } from "../../types";
   import { useCreate } from "../hooks/use-create";
 
   import Task from "./task.svelte";
 
-  export let tasks: Writable<PlanItem[]>;
+  export let tasks: Writable<PlacedPlanItem[]>;
   export let day: Moment;
 
   const cancelMessage = "Release outside timeline to cancel";
@@ -27,8 +25,6 @@
   }
 
   setContext(TASKS_FOR_DAY, { getTasks });
-
-  $: overlapLookup = computeOverlap($tasks);
 
   let pointerYOffset = 0;
   let el: HTMLDivElement;
@@ -64,7 +60,6 @@
     <Task
       {planItem}
       {pointerYOffset}
-      {...getHorizontalPlacing(overlapLookup.get(planItem.id))}
     />
   {/each}
   {#if $creating}
