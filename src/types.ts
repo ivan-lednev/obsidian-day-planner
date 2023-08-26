@@ -35,3 +35,8 @@ export interface TasksContext {
   tasks: Writable<Array<PlanItem>>;
   getTasks: () => Writable<Array<PlanItem>>;
 }
+
+export type Timestamp = {
+  durationMinutes: number;
+  startMinutes: number;
+};

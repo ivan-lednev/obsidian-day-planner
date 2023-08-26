@@ -1,21 +1,8 @@
-import type { App } from "obsidian";
-import { derived, get, Writable, writable } from "svelte/store";
+import { derived, get } from "svelte/store";
 
 import { SNAP_STEP_MINUTES } from "../constants";
-import type { PlanItem } from "../types";
 
 import { settings } from "./settings";
-
-export type Timestamp = {
-  durationMinutes: number;
-  startMinutes: number;
-};
-
-export const appStore = writable<App>();
-
-export const tasks = writable<PlanItem[]>([]);
-
-export const taskLookup = writable<Record<string, Writable<Array<PlanItem>>>>();
 
 export const hourSize = derived(
   settings,

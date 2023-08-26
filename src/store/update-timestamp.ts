@@ -2,9 +2,9 @@ import { TFile } from "obsidian";
 import { get, Writable } from "svelte/store";
 
 import { replaceTimestamp } from "../timestamp/timestamp";
-import type { PlanItem } from "../types";
+import type { PlanItem, Timestamp } from "../types";
 
-import { Timestamp, appStore } from "./timeline-store";
+import { appStore } from "./app-store";
 
 export async function updateTimestamps(
   tasks: Writable<Array<PlanItem>>,

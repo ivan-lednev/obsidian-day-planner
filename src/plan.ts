@@ -1,8 +1,8 @@
 import { get } from "svelte/store";
 
 import { getHeadingByText, getListItemsUnderHeading } from "./parser/parser";
+import { appStore } from "./store/app-store";
 import { settings } from "./store/settings";
-import { appStore } from "./store/timeline-store";
 import { replaceTimestamp } from "./timestamp/timestamp";
 import type { PlanItem } from "./types";
 import { selectText } from "./util/editor";

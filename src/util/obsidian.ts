@@ -9,9 +9,10 @@ import {
 import { get, writable } from "svelte/store";
 
 import { parsePlanItems } from "../parser/parser";
-import { getFileShownInTimeline } from "../store/active-day";
+import { getTimelineFile } from "../store/active-day";
+import { appStore } from "../store/app-store";
 import { settings } from "../store/settings";
-import { appStore, taskLookup, tasks } from "../store/timeline-store";
+import { taskLookup, tasks } from "../store/tasks";
 
 import { getNotesForWeek } from "./daily-notes";
 
@@ -57,7 +58,7 @@ export async function refreshPlanItemsInStore() {
 
   console.log(parsedPlanItemsForWeek);
 
-  const parsedPlanItems = await getPlanItemsFromFile(getFileShownInTimeline());
+  const parsedPlanItems = await getPlanItemsFromFile(getTimelineFile());
 
   tasks.set(parsedPlanItems);
 }

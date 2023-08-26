@@ -2,7 +2,8 @@
   import { Component, MarkdownRenderer } from "obsidian";
   import { onDestroy } from "svelte";
 
-  import { appStore } from "../../store/timeline-store";
+
+  import { appStore } from "../../store/app-store";
 
   export let text: string;
 

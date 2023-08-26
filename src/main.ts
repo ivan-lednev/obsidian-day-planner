@@ -4,9 +4,10 @@ import { get } from "svelte/store";
 import { VIEW_TYPE_TIMELINE, VIEW_TYPE_WEEKLY } from "./constants";
 import { createPlannerHeading } from "./plan";
 import { DayPlannerSettings } from "./settings";
-import { activeDay, getFileShownInTimeline } from "./store/active-day";
+import { activeDay, getTimelineFile } from "./store/active-day";
+import { appStore } from "./store/app-store";
 import { settings } from "./store/settings";
-import { appStore, tasks } from "./store/timeline-store";
+import { tasks } from "./store/tasks";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
@@ -100,7 +101,7 @@ export default class DayPlanner extends Plugin {
     });
 
     this.app.metadataCache.on("changed", async (file: TFile) => {
-      if (file === getFileShownInTimeline()) {
+      if (file === getTimelineFile()) {
         await refreshPlanItemsInStore();
       }
     });

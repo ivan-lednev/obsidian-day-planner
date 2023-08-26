@@ -2,8 +2,9 @@
   import type { Moment } from "moment";
   import { getDateUID } from "obsidian-daily-notes-interface";
 
+  import { taskLookup } from "../../store/tasks";
   import { currentTime } from "../../store/time";
-  import { taskLookup, visibleHours } from "../../store/timeline-store";
+  import { visibleHours } from "../../store/timeline-store";
   import { getNotesForDays } from "../../util/daily-notes";
   import { getDaysOfCurrentWeek } from "../../util/moment";
   import { openFileForDay } from "../../util/obsidian";

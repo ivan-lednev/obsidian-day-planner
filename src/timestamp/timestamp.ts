@@ -1,8 +1,7 @@
 import type { Moment } from "moment/moment";
-import type { Timestamp } from "src/store/timeline-store";
 
 import { timeRegExp } from "../regexp";
-import type { PlanItem } from "../types";
+import type { PlanItem, Timestamp } from "../types";
 import { addMinutes, minutesToMoment } from "../util/moment";
 
 export function parseTimestamp(asText?: string, day?: Moment): Moment | null {
