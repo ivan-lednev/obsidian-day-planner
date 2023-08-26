@@ -1,10 +1,14 @@
 <script lang="ts">
   import type { Moment } from "moment";
   import { setContext } from "svelte";
-  import { Writable, writable } from "svelte/store";
+  import { derived, Writable, writable } from "svelte/store";
 
   import { TASKS } from "../../constants";
+  import { computeOverlap } from "../../parser/overlap";
   import { editCancellation, editConfirmation } from "../../store/edit";
+  import {
+    getHorizontalPlacing,
+  } from "../../store/horizontal-placing";
   import type { PlanItem } from "../../types";
   import { useCreate } from "../hooks/use-create";
 
@@ -23,6 +27,8 @@
   function getTasks() {
     return tasks;
   }
+
+  const overlapLookup = derived(tasks, computeOverlap);
 
   setContext(TASKS, { getTasks });
 
@@ -58,7 +64,11 @@
   on:mouseup|stopPropagation={handleMouseUp}
 >
   {#each $tasks as planItem (getPlanItemKey(planItem))}
-    <Task {planItem} {pointerYOffset} />
+    {@const { widthPercent, xOffsetPercent } = getHorizontalPlacing(
+      $overlapLookup.get(planItem.id),
+    )}
+
+    <Task {planItem} {pointerYOffset} {widthPercent} {xOffsetPercent} />
   {/each}
   {#if $creating}
     <Task

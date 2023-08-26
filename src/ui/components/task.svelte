@@ -2,7 +2,6 @@
   import type { Readable } from "svelte/store";
 
   import { editCancellation, editConfirmation } from "../../store/edit";
-  import { getHorizontalPlacing } from "../../store/horizontal-placing";
   import { currentTime } from "../../store/time";
   import {
     durationToSize,
@@ -23,6 +22,8 @@
   export let planItem: PlanItem;
   export let pointerYOffset: Readable<number>;
   export let isGhost = false;
+  export let widthPercent = 100;
+  export let xOffsetPercent = 0;
   export let isCompleted: boolean;
 
   const {
@@ -50,8 +51,6 @@
     ? roundToSnapStep(offsetToPointer)
     : $durationToSize(planItem.durationMinutes);
 
-  $: horizontalPlacing = $getHorizontalPlacing(planItem.id);
-
   $: relationToNow = isGhost
     ? "future"
     : getRelationToNow($currentTime, planItem.startTime, planItem.endTime);
@@ -71,8 +70,8 @@
   style:height="{height}px"
   style:transform="translateY({offset}px)"
   style:cursor={$cursor}
-  style:width="{horizontalPlacing.widthPercent}%"
-  style:left="{horizontalPlacing.xOffsetPercent}%"
+  style:width="{widthPercent}%"
+  style:left="{xOffsetPercent}%"
   class="gap-box absolute-stretch-x"
 >
   <div
