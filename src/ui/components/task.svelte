@@ -91,7 +91,7 @@
       startMove(e);
     }}
   >
-    {#if relationToNow === "past"}
+    {#if isFinished}
       <TaskCompletedIcon />
     {:else}
       <TaskCircleIcon />
