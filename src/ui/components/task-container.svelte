@@ -1,14 +1,12 @@
 <script lang="ts">
   import type { Moment } from "moment";
   import { setContext } from "svelte";
-  import { derived, Writable, writable } from "svelte/store";
+  import { Writable, writable } from "svelte/store";
 
-  import { TASKS } from "../../constants";
+  import { TASKS_FOR_DAY } from "../../constants";
   import { computeOverlap } from "../../parser/overlap";
   import { editCancellation, editConfirmation } from "../../store/edit";
-  import {
-    getHorizontalPlacing,
-  } from "../../store/horizontal-placing";
+  import { getHorizontalPlacing } from "../../store/horizontal-placing";
   import type { PlanItem } from "../../types";
   import { useCreate } from "../hooks/use-create";
 
@@ -28,15 +26,14 @@
     return tasks;
   }
 
-  const overlapLookup = derived(tasks, computeOverlap);
+  $: overlapLookup = computeOverlap($tasks);
 
-  setContext(TASKS, { getTasks });
+  setContext(TASKS_FOR_DAY, { getTasks });
 
   const pointerYOffset = writable<number>();
   let el: HTMLDivElement;
 
   function handleMousemove(event: MouseEvent) {
-    // todo: not sure, but there might be some built-in measurement for svelte Components
     pointerYOffset.set(event.clientY - el.getBoundingClientRect().top);
   }
 
@@ -64,11 +61,11 @@
   on:mouseup|stopPropagation={handleMouseUp}
 >
   {#each $tasks as planItem (getPlanItemKey(planItem))}
-    {@const { widthPercent, xOffsetPercent } = getHorizontalPlacing(
-      $overlapLookup.get(planItem.id),
-    )}
-
-    <Task {planItem} {pointerYOffset} {widthPercent} {xOffsetPercent} />
+    <Task
+      {planItem}
+      {pointerYOffset}
+      {...getHorizontalPlacing(overlapLookup.get(planItem.id))}
+    />
   {/each}
   {#if $creating}
     <Task

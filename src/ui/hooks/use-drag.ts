@@ -1,7 +1,7 @@
 import { getContext } from "svelte";
 import { derived, get, writable } from "svelte/store";
 
-import { TASKS } from "../../constants";
+import { TASKS_FOR_DAY } from "../../constants";
 import { getTimeFromYOffset } from "../../store/timeline-store";
 import { updateTimestamps } from "../../store/update-timestamp";
 import type { TasksContext } from "../../types";
@@ -13,7 +13,7 @@ export function useDrag() {
     $dragging ? "grabbing" : "grab",
   );
 
-  const { getTasks } = getContext<TasksContext>(TASKS);
+  const { getTasks } = getContext<TasksContext>(TASKS_FOR_DAY);
 
   function startMove(event: MouseEvent) {
     dragging.set(true);

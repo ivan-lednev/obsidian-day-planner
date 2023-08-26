@@ -1,4 +1,4 @@
-export const TASKS = "tasks";
+export const TASKS_FOR_DAY = "tasks";
 
 export const VIEW_TYPE_TIMELINE = "timeline";
 export const VIEW_TYPE_WEEKLY = "weekly";
