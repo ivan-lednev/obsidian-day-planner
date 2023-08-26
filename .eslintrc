@@ -6,7 +6,8 @@
     "browser": true
   },
   "plugins": [
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "unused-imports"
   ],
   "extends": [
     "eslint:recommended",
@@ -65,6 +66,7 @@
           "^@testing-library/svelte$"
         ]
       }
-    ]
+    ],
+    "unused-imports/no-unused-imports": "error"
   }
 }

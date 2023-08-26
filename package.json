@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "build": "node esbuild.config.mjs production",
-    "format": "prettier --write src && eslint --fix src && stylelint --fix src/**/*.svelte",
+    "format": "prettier --write src && eslint --fix src && stylelint src/**/*.svelte",
     "lint": "prettier --check src && eslint src && stylelint --fix src/**/*.svelte",
     "typescript": "tsc --noEmit",
     "test": "jest src/",
@@ -34,6 +34,7 @@
     "eslint": "^8.46.0",
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-svelte": "^2.32.4",
+    "eslint-plugin-unused-imports": "^3.0.0",
     "husky": "^8.0.3",
     "ignore-styles": "^5.0.1",
     "jest": "^29.6.4",
@@ -68,6 +69,7 @@
     "eslint-plugin-jest": "^27.2.3",
     "fraction.js": "4.1.1",
     "lodash": "^4.17.21",
+    "lucide-svelte": "^0.269.0",
     "obsidian-daily-notes-interface": "^0.9.4",
     "prettier-plugin-svelte": "^3.0.3",
     "stylelint-config-clean-order": "^5.0.1"
