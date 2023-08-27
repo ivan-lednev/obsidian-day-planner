@@ -28,7 +28,6 @@ export function parsePlanItems(
   }
 
   const listItemsWithContent = getListItemContent(content, listItemsUnderPlan);
-
   return listItemsWithContent
     .map((li) =>
       createPlanItem({
@@ -112,17 +111,19 @@ export function createPlanItem({
   day: Moment;
 }) {
   const match = timestampRegExp.exec(line.trim());
+
   if (!match) {
     return null;
   }
 
   const {
-    groups: { listTokens, start, end, text },
+    groups: { listTokens, start, end, text, completion },
   } = match;
 
   // todo: parser should not depend on UI state
   const startTime = parseTimestamp(start, day);
 
+  const isCompleted = completion === "x";
   return {
     listTokens,
     startTime,
@@ -133,6 +134,7 @@ export function createPlanItem({
     text,
     location,
     id: String(Math.random()),
+    isCompleted,
   };
 }
 

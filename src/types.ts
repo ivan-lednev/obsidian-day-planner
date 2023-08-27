@@ -17,6 +17,7 @@ export interface PlanItem {
   endMinutes: number;
   location?: PlanItemLocation;
   id: string;
+  isCompleted: boolean;
 }
 
 export type RelationToNow = "past" | "present" | "future";

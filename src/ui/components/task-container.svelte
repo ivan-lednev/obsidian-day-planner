@@ -2,9 +2,7 @@
   import { writable } from "svelte/store";
 
   import { editCancellation, editConfirmation } from "../../store/edit";
-  import {
-    tasks,
-  } from "../../store/timeline-store";
+  import { tasks } from "../../store/timeline-store";
   import { useCreate } from "../hooks/use-create";
 
   import Task from "./task.svelte";

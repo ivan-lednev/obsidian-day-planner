@@ -17,6 +17,9 @@
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
+  import TaskCircleIcon from "./icons/circle.svelte";
+  import TaskCompletedIcon from "./icons/check-circle.svelte";
+
   export let text: string;
   export let id: string;
   export let startTime: Moment;
@@ -25,6 +28,7 @@
   export let durationMinutes: number;
   export let pointerYOffset: Readable<number>;
   export let isGhost = false;
+  export let isCompleted: boolean;
 
   const {
     dragging,
@@ -81,10 +85,16 @@
     class:is-ghost={isGhost}
     class:past={relationToNow === "past"}
     class:present={relationToNow === "present"}
+    class:is-completed={isCompleted}
     on:mousedown|stopPropagation={(e) => {
       startMove(e);
     }}
   >
+    {#if isCompleted}
+      <TaskCompletedIcon />
+    {:else}
+      <TaskCircleIcon />
+    {/if}
     <RenderedMarkdown {text} />
     <div
       class="resize-handle absolute-stretch-x"
@@ -131,6 +141,12 @@
 
   .is-ghost {
     opacity: 0.6;
+  }
+
+  .is-completed {
+    color: var(--text-faint);
+    background-color: #7b9c3c;
+    text-decoration: line-through;
   }
 
   .resize-handle {
