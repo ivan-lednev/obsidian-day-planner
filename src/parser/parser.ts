@@ -117,13 +117,13 @@ export function createPlanItem({
   }
 
   const {
-    groups: { listTokens, start, end, text },
+    groups: { listTokens, start, end, text, completion },
   } = match;
 
   // todo: parser should not depend on UI state
   const startTime = parseTimestamp(start, day);
 
-  const isCompleted = match.groups.completion === "x";
+  const isCompleted = completion === "x";
   return {
     listTokens,
     startTime,
