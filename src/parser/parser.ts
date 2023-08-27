@@ -123,7 +123,7 @@ export function createPlanItem({
   // todo: parser should not depend on UI state
   const startTime = parseTimestamp(start, day);
 
-  const isCompleted = match.groups.completion === "x" ? true : false;
+  const isCompleted = match.groups.completion === "x";
   return {
     listTokens,
     startTime,
