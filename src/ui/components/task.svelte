@@ -85,7 +85,7 @@
     class:is-ghost={isGhost}
     class:past={relationToNow === "past"}
     class:present={relationToNow === "present"}
-    class:is-finished={isCompleted}
+    class:is-completed={isCompleted}
     on:mousedown|stopPropagation={(e) => {
       startMove(e);
     }}
@@ -143,10 +143,9 @@
     opacity: 0.6;
   }
 
-  .is-finished {
-    color: rgba(223, 222, 222, 0.836);
+  .is-completed {
+    color: var(--text-faint);
     background-color: #7b9c3c;
-    opacity: 0.7;
     text-decoration: line-through;
   }
 
