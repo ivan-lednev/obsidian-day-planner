@@ -23,6 +23,6 @@ export function getMomentOfActiveDay() {
   return getMomentFromUid(get(activeDay));
 }
 
-export function getTimelineFile() {
+export function getFileShownInTimeline() {
   return getAllDailyNotes()[get(activeDay)];
 }

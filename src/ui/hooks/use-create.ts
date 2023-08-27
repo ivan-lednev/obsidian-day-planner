@@ -2,7 +2,10 @@ import { writable } from "svelte/store";
 
 import { DEFAULT_DURATION_MINUTES } from "../../constants";
 import { appendToPlan } from "../../plan";
-import { getMomentOfActiveDay, getTimelineFile } from "../../store/active-day";
+import {
+  getMomentOfActiveDay,
+  getFileShownInTimeline,
+} from "../../store/active-day";
 import {
   getTimeFromYOffset,
   roundToSnapStep,
@@ -28,7 +31,7 @@ export function useCreate() {
     tasks.update((previous) => [...previous, newPlanItem]);
 
     // @ts-ignore
-    await appendToPlan(getTimelineFile().path, newPlanItem);
+    await appendToPlan(getFileShownInTimeline().path, newPlanItem);
   }
 
   return {

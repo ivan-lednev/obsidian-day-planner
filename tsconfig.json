@@ -19,7 +19,8 @@
     "types": [
       "node",
       "svelte",
-      "jest"
+      "jest",
+      "@testing-library/jest-dom"
     ]
   },
   "exclude": [

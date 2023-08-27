@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getAllDailyNotes } from "obsidian-daily-notes-interface";
 
-  import { activeDay, getTimelineFile } from "../../store/active-day";
+  import { activeDay, getFileShownInTimeline } from "../../store/active-day";
   import { settings } from "../../store/settings";
   import {
     createDailyNoteIfNeeded,
@@ -78,7 +78,7 @@
     <ControlButton
       label="Go to file"
       on:click={() => {
-        openFileInEditor(getTimelineFile());
+        openFileInEditor(getFileShownInTimeline());
       }}
     >
       <span class="date">{getAllDailyNotes()[$activeDay].basename}</span>

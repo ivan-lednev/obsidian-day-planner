@@ -8,8 +8,7 @@ import { parsePlanItems } from "./parser";
 
 const defaultPlannerHeading = "Day planner";
 
-// todo: replace with toMatchObject
-it.skip("parses tasks with timestamps from lines", () => {
+it("parses tasks with timestamps from lines", () => {
   expect(
     parsePlanItems(
       basic.content,
@@ -21,8 +20,7 @@ it.skip("parses tasks with timestamps from lines", () => {
   ).toMatchSnapshot();
 });
 
-// todo: replace with toMatchObject
-it.skip("grabs subtasks", () => {
+it("grabs subtasks", () => {
   expect(
     parsePlanItems(
       subtasks.content,
@@ -34,8 +32,7 @@ it.skip("grabs subtasks", () => {
   ).toMatchSnapshot();
 });
 
-// todo: replace with toMatchObject
-it.skip("parses bullet lists without checkboxes", () => {
+it("parses bullet lists without checkboxes", () => {
   expect(
     parsePlanItems(
       withoutTasks.content,
@@ -47,8 +44,7 @@ it.skip("parses bullet lists without checkboxes", () => {
   ).toMatchSnapshot();
 });
 
-// todo: replace with toMatchObject
-it.skip("parses end time", () => {
+it("parses end time", () => {
   expect(
     parsePlanItems(
       endTime.content,

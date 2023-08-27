@@ -3,7 +3,7 @@ import { getDateFromFile } from "obsidian-daily-notes-interface";
 import { get } from "svelte/store";
 
 import { parsePlanItems } from "../parser/parser";
-import { getTimelineFile } from "../store/active-day";
+import { getFileShownInTimeline } from "../store/active-day";
 import { settings } from "../store/settings";
 import { appStore, tasks } from "../store/timeline-store";
 
@@ -28,7 +28,7 @@ export async function getFileByPath(path: string) {
 }
 
 export async function refreshPlanItemsInStore() {
-  const parsedPlanItems = await getPlanItemsFromFile(getTimelineFile());
+  const parsedPlanItems = await getPlanItemsFromFile(getFileShownInTimeline());
 
   tasks.update(() => parsedPlanItems);
 }

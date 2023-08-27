@@ -4,7 +4,7 @@ import { get } from "svelte/store";
 import { VIEW_TYPE_TIMELINE } from "./constants";
 import { createPlannerHeading } from "./plan";
 import { DayPlannerSettings } from "./settings";
-import { activeDay, getTimelineFile } from "./store/active-day";
+import { activeDay, getFileShownInTimeline } from "./store/active-day";
 import { settings } from "./store/settings";
 import { appStore, tasks } from "./store/timeline-store";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
@@ -88,7 +88,7 @@ export default class DayPlanner extends Plugin {
     });
 
     this.app.metadataCache.on("changed", async (file: TFile) => {
-      if (file === getTimelineFile()) {
+      if (file === getFileShownInTimeline()) {
         await refreshPlanItemsInStore();
       }
     });
