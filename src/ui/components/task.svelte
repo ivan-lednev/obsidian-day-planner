@@ -28,6 +28,7 @@
   export let durationMinutes: number;
   export let pointerYOffset: Readable<number>;
   export let isGhost = false;
+  export let isCompleted: boolean;
 
   const {
     dragging,
@@ -60,8 +61,6 @@
     ? "future"
     : getRelationToNow($time, startTime, endTime);
 
-  $: isFinished = relationToNow === "past" ? true : false;
-
   watch(editConfirmation, () => {
     confirmMove(offset, id, durationMinutes);
     confirmResize(id, height, startMinutes);
@@ -86,12 +85,12 @@
     class:is-ghost={isGhost}
     class:past={relationToNow === "past"}
     class:present={relationToNow === "present"}
-    class:is-finished={isFinished}
+    class:is-finished={isCompleted}
     on:mousedown|stopPropagation={(e) => {
       startMove(e);
     }}
   >
-    {#if isFinished}
+    {#if isCompleted}
       <TaskCompletedIcon />
     {:else}
       <TaskCircleIcon />
