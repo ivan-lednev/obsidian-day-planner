@@ -1,9 +1,10 @@
 <script lang="ts">
+  import type { Moment } from "moment";
   import { getDateUID } from "obsidian-daily-notes-interface";
 
   import { planItemsByDateUid } from "../../store/tasks";
   import { visibleHours } from "../../store/timeline-store";
-  import { weekNotes } from "../../store/week-notes";
+  import { DateRange, dateRange } from "../../store/week-notes";
   import { getNotesForDays } from "../../util/daily-notes";
   import { getDaysOfCurrentWeek, isToday } from "../../util/moment";
   import { openFileForDay } from "../../util/obsidian";
@@ -15,18 +16,26 @@
   import Needle from "./needle.svelte";
   import Ruler from "./ruler.svelte";
   import TaskContainer from "./task-container.svelte";
+
+  async function openDailyNote(day: Moment) {
+    await openFileForDay(day);
+    dateRange.update((previous: DateRange) => ({
+      ...previous,
+      dailyNotes: getNotesForDays(getDaysOfCurrentWeek()),
+    }));
+  }
 </script>
 
 <div class="week-header">
   <div class="corner"></div>
-  {#each getDaysOfCurrentWeek() as day, i}
+  {#each $dateRange.dates as day, i}
     <div class="day-header" class:today={isToday(day)}>
       <ControlButton
         --justify-self="flex-start"
         label="Open note for day"
-        on:click={async () => await openFileForDay(day)}
+        on:click={async () => await openDailyNote(day)}
       >
-        {#if $weekNotes[i]}
+        {#if $dateRange.dailyNotes[i]}
           <GoToFileIcon />
         {:else}
           <FilePlus />
@@ -40,15 +49,12 @@
 </div>
 <div class="days">
   <Ruler visibleHours={$visibleHours} />
-  {#each getDaysOfCurrentWeek() as day, i}
-    {#if !$weekNotes[i]}
+  {#each $dateRange.dates as day, i}
+    {#if !$dateRange.dailyNotes[i]}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
         class="day-column no-note"
-        on:click={async () => {
-          await openFileForDay(day);
-          weekNotes.set(getNotesForDays(getDaysOfCurrentWeek()));
-        }}
+        on:click={async () => await openDailyNote(day)}
       ></div>
     {:else}
       <div class="day-column">
