@@ -1,13 +1,16 @@
 <script lang="ts">
   import type { Moment } from "moment";
-  import { getDateUID } from "obsidian-daily-notes-interface";
+  import {
+    getAllDailyNotes,
+    getDailyNote,
+    getDateUID,
+  } from "obsidian-daily-notes-interface";
   import { isNotVoid } from "typed-assert";
 
-  import { DateRange, dateRange } from "../../store/date-range";
   import { planItemsByDateUid } from "../../store/tasks";
   import { visibleHours } from "../../store/timeline-store";
-  import { getNotesForDays } from "../../util/daily-notes";
-  import { getDaysOfCurrentWeek, isToday } from "../../util/moment";
+  import { DateRange, visibleDateRange } from "../../store/visible-date-range";
+  import { isToday } from "../../util/moment";
   import { openFileForDay } from "../../util/obsidian";
 
   import Column from "./column.svelte";
@@ -18,38 +21,33 @@
   import Ruler from "./ruler.svelte";
   import TaskContainer from "./task-container.svelte";
 
-  
-async function openDailyNote(day: Moment) {
+  async function openDailyNote(day: Moment) {
     await openFileForDay(day);
-    dateRange.update((previous: DateRange) => ({
-      ...previous,
-      dailyNotes: getNotesForDays(getDaysOfCurrentWeek()),
-    }));
+
+    visibleDateRange.update((previous: DateRange) => [...previous]);
   }
 
   function getTasksForDay(day: Moment) {
-    const dayUid = getDateUID(day, "day")
+    const dayUid = getDateUID(day, "day");
 
-    console.log(`Accessing plan items by id: ${dayUid}`)
+    const parsedPlanItems = $planItemsByDateUid[dayUid];
 
-    const parsedPlanItems = $planItemsByDateUid[dayUid]
+    isNotVoid(parsedPlanItems);
 
-    isNotVoid(parsedPlanItems)
-
-    return parsedPlanItems
+    return parsedPlanItems;
   }
 </script>
 
 <div class="week-header">
   <div class="corner"></div>
-  {#each $dateRange.dates as day, i}
+  {#each $visibleDateRange as day}
     <div class="day-header" class:today={isToday(day)}>
       <ControlButton
         --justify-self="flex-start"
         label="Open note for day"
         on:click={async () => await openDailyNote(day)}
       >
-        {#if $dateRange.dailyNotes[i]}
+        {#if getDailyNote(day, getAllDailyNotes())}
           <GoToFileIcon />
         {:else}
           <FilePlus />
@@ -63,8 +61,8 @@ async function openDailyNote(day: Moment) {
 </div>
 <div class="days">
   <Ruler visibleHours={$visibleHours} />
-  {#each $dateRange.dates as day, i}
-    {#if !$dateRange.dailyNotes[i]}
+  {#each $visibleDateRange as day}
+    {#if !getDailyNote(day, getAllDailyNotes())}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
         class="day-column no-note"
@@ -78,10 +76,7 @@ async function openDailyNote(day: Moment) {
               <Needle scrollBlockedByUser={false} />
             {/if}
 
-            <TaskContainer
-              {day}
-              tasks={getTasksForDay(day)}
-            />
+            <TaskContainer {day} tasks={getTasksForDay(day)} />
           </Column>
         </div>
       </div>

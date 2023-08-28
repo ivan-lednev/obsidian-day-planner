@@ -14,10 +14,10 @@ import { computeOverlap } from "../parser/overlap";
 import { parsePlanItems } from "../parser/parser";
 import { getTimelineFile } from "../store/active-day";
 import { appStore } from "../store/app-store";
-import { DateRange, dateRange } from "../store/date-range";
 import { getHorizontalPlacing } from "../store/horizontal-placing";
 import { settings } from "../store/settings";
 import { planItemsByDateUid, tasks } from "../store/tasks";
+import { visibleDateRange } from "../store/visible-date-range";
 import type { PlanItem } from "../types";
 
 export async function openFileInEditor(file: TFile) {
@@ -63,14 +63,14 @@ export function addPlacing(planItems: PlanItem[]) {
 export async function refreshPlanItemsInStore() {
   // -- todo: derive this from dateRange?
 
-  const currentDateRange = get(dateRange);
+  const currentDateRange = get(visibleDateRange);
 
   isNotVoid(currentDateRange);
 
   // todo: this API is very confusing
-  const notesForWeek = currentDateRange.dates.map((date, i) => ({
+  const notesForWeek = currentDateRange.map((date) => ({
     id: getDateUID(date, "day"),
-    note: currentDateRange.dailyNotes[i],
+    note: getDailyNote(date, getAllDailyNotes()),
   }));
 
   const idToPlanItemsStore = await Promise.all(
@@ -94,11 +94,11 @@ export async function refreshPlanItemsInStore() {
 
 // todo: delete
 export async function refreshPlanItemsInStoreWithRange(
-  currentDateRange: DateRange,
+  currentDateRange: Moment[],
 ) {
-  const notesForWeek = currentDateRange.dates.map((date, i) => ({
+  const notesForWeek = currentDateRange.map((date) => ({
     id: getDateUID(date, "day"),
-    note: currentDateRange.dailyNotes[i],
+    note: getDailyNote(date, getAllDailyNotes()),
   }));
 
   const idToPlanItemsStore = await Promise.all(

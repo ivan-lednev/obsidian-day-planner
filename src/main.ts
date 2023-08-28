@@ -6,9 +6,9 @@ import { createPlannerHeading } from "./plan";
 import { DayPlannerSettings } from "./settings";
 import { activeDay, getTimelineFile } from "./store/active-day";
 import { appStore } from "./store/app-store";
-import { dateRange } from "./store/date-range";
 import { settings } from "./store/settings";
 import { tasks } from "./store/tasks";
+import { visibleDateRange } from "./store/visible-date-range";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
@@ -18,7 +18,6 @@ import {
   dailyNoteExists,
   getDateUidForToday,
   getDateUidFromFile,
-  getNotesForDays,
 } from "./util/daily-notes";
 import { getDaysOfCurrentWeek } from "./util/moment";
 import { refreshPlanItemsInStore } from "./util/obsidian";
@@ -83,12 +82,9 @@ export default class DayPlanner extends Plugin {
 
     this.app.workspace.onLayoutReady(async () => {
       // todo: this dep is implicit. `dateRange` should be set before parsed plan items
-      dateRange.set({
-        dates: getDaysOfCurrentWeek(),
-        dailyNotes: getNotesForDays(getDaysOfCurrentWeek()),
-      });
+      visibleDateRange.set(getDaysOfCurrentWeek());
 
-      dateRange.subscribe(async () => {
+      visibleDateRange.subscribe(async () => {
         await refreshPlanItemsInStore();
       });
 

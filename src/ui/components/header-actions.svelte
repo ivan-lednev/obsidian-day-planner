@@ -3,8 +3,7 @@
   import { get } from "svelte/store";
   import { isNotVoid } from "typed-assert";
 
-  import { dateRange } from "../../store/date-range";
-  import { getNotesForDays } from "../../util/daily-notes";
+  import { visibleDateRange } from "../../store/visible-date-range";
   import { getDaysOfWeek } from "../../util/moment";
   import {
     refreshPlanItemsInStoreWithRange,
@@ -13,7 +12,7 @@
   import ControlButton from "./control-button.svelte";
 
   async function handleShowPrevious() {
-    const firstDayOfShownWeek = get(dateRange).dates[0];
+    const firstDayOfShownWeek = get(visibleDateRange)[0];
 
     isNotVoid(firstDayOfShownWeek);
 
@@ -21,17 +20,11 @@
       .clone()
       .subtract(1, "week");
     const daysOfPreviousWeek = getDaysOfWeek(firstDayOfPreviousWeek);
-    const notesOfPreviousWeek = getNotesForDays(daysOfPreviousWeek);
-
-    const newRange = {
-      dates: daysOfPreviousWeek,
-      dailyNotes: notesOfPreviousWeek,
-    };
 
     // workaround for store order
-    await refreshPlanItemsInStoreWithRange(newRange);
+    await refreshPlanItemsInStoreWithRange(daysOfPreviousWeek);
 
-    dateRange.set(newRange);
+    visibleDateRange.set(daysOfPreviousWeek);
   }
 </script>
 
