@@ -1,17 +1,13 @@
 <script lang="ts">
   import { ArrowLeftToLine, ArrowRightToLine } from "lucide-svelte";
-  import { get } from "svelte/store";
   import { isNotVoid } from "typed-assert";
 
   import { visibleDateRange } from "../../../store/visible-date-range";
   import { getDaysOfWeek } from "../../../util/moment";
-  import {
-    refreshPlanItemsInStoreWithRange,
-  } from "../../../util/obsidian";
   import ControlButton from "../control-button.svelte";
 
   async function handleShowPrevious() {
-    const firstDayOfShownWeek = get(visibleDateRange)[0];
+    const firstDayOfShownWeek = $visibleDateRange[0];
 
     isNotVoid(firstDayOfShownWeek);
 
@@ -19,9 +15,6 @@
       .clone()
       .subtract(1, "week");
     const daysOfPreviousWeek = getDaysOfWeek(firstDayOfPreviousWeek);
-
-    // workaround for store order
-    await refreshPlanItemsInStoreWithRange(daysOfPreviousWeek);
 
     visibleDateRange.set(daysOfPreviousWeek);
   }

@@ -3,7 +3,6 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 import { VIEW_TYPE_WEEKLY } from "../constants";
 import type DayPlanner from "../main";
 import type { DayPlannerSettings } from "../settings";
-import { refreshPlanItemsInStore } from "../util/obsidian";
 
 import HeaderActions from "./components/week/header-actions.svelte";
 import Week from "./components/week/week.svelte";
@@ -34,8 +33,6 @@ export default class WeeklyView extends ItemView {
   }
 
   async onOpen() {
-    await refreshPlanItemsInStore(); // todo: clean up
-
     const headerEl = this.containerEl.children[0];
     const contentEl = this.containerEl.children[1];
 

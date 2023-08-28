@@ -4,7 +4,7 @@ import { get } from "svelte/store";
 import { VIEW_TYPE_TIMELINE, VIEW_TYPE_WEEKLY } from "./constants";
 import { createPlannerHeading } from "./plan";
 import { DayPlannerSettings } from "./settings";
-import { dayShownInTimeline, getTimelineFile } from "./store/active-day";
+import { dayShownInTimeline } from "./store/active-day";
 import { appStore } from "./store/app-store";
 import { settings } from "./store/settings";
 import { tasks } from "./store/tasks";
@@ -20,7 +20,6 @@ import {
   getDateUidFromFile,
 } from "./util/daily-notes";
 import { getDaysOfCurrentWeek } from "./util/moment";
-import { refreshPlanItemsInStore } from "./util/obsidian";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
@@ -56,10 +55,8 @@ export default class DayPlanner extends Plugin {
     this.app.workspace.onLayoutReady(this.handleLayoutReady);
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
     this.app.metadataCache.on("changed", async (file: TFile) => {
-      // todo: this should work for any visible item
-      if (file === getTimelineFile()) {
-        await refreshPlanItemsInStore();
-      }
+      // todo: be clever about this
+      visibleDateRange.update((prev) => [...prev]);
     });
 
     this.registerInterval(
@@ -148,18 +145,6 @@ export default class DayPlanner extends Plugin {
   private handleLayoutReady = async () => {
     // todo: this dep is implicit. `dateRange` should be set before parsed plan items
     visibleDateRange.set(getDaysOfCurrentWeek());
-
-    this.register(
-      visibleDateRange.subscribe(async () => {
-        await refreshPlanItemsInStore();
-      }),
-    );
-
-    this.register(
-      dayShownInTimeline.subscribe(async () => {
-        await refreshPlanItemsInStore();
-      }),
-    );
   };
 
   onunload() {
