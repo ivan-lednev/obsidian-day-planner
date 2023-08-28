@@ -10,8 +10,8 @@ import {
 
 import { getDaysOfCurrentWeek } from "./moment";
 
-export async function createDailyNoteIfNeeded(): Promise<TFile> {
-  return getDailyNoteForToday() || createDailyNote(window.moment());
+export async function createDailyNoteIfNeeded(moment: Moment): Promise<TFile> {
+  return getDailyNote(moment, getAllDailyNotes()) || createDailyNote(moment);
 }
 
 export function getDailyNoteForToday() {

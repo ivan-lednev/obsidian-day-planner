@@ -4,7 +4,7 @@ import { get } from "svelte/store";
 import { VIEW_TYPE_TIMELINE, VIEW_TYPE_WEEKLY } from "./constants";
 import { createPlannerHeading } from "./plan";
 import { DayPlannerSettings } from "./settings";
-import { activeDay, getTimelineFile } from "./store/active-day";
+import { dayShownInTimeline, getTimelineFile } from "./store/active-day";
 import { appStore } from "./store/app-store";
 import { settings } from "./store/settings";
 import { tasks } from "./store/tasks";
@@ -38,6 +38,57 @@ export default class DayPlanner extends Plugin {
       this.app.workspace,
     );
 
+    this.registerCommands();
+
+    this.registerView(
+      VIEW_TYPE_TIMELINE,
+      (leaf: WorkspaceLeaf) => new TimelineView(leaf, this.settings, this),
+    );
+
+    this.registerView(
+      VIEW_TYPE_WEEKLY,
+      (leaf: WorkspaceLeaf) => new WeeklyView(leaf, this),
+    );
+
+    this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
+    this.initAppAndSettingsStores();
+
+    this.app.workspace.onLayoutReady(this.handleLayoutReady);
+    this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
+    this.app.metadataCache.on("changed", async (file: TFile) => {
+      // todo: this should work for any visible item
+      if (file === getTimelineFile()) {
+        await refreshPlanItemsInStore();
+      }
+    });
+
+    this.registerInterval(
+      window.setInterval(
+        () => this.updateStatusBarOnFailed(this.updateStatusBar),
+        1000,
+      ),
+    );
+  }
+
+  private handleActiveLeafChanged = ({ view }: WorkspaceLeaf) => {
+    if (!(view instanceof FileView)) {
+      return;
+    }
+
+    const newDailyNoteKey = getDateUidFromFile(view.file);
+
+    if (!newDailyNoteKey) {
+      if (get(dayShownInTimeline) !== getDateUidForToday()) {
+        dayShownInTimeline.set(getDateUidForToday());
+      }
+
+      return;
+    }
+
+    dayShownInTimeline.set(newDailyNoteKey);
+  };
+
+  private registerCommands() {
     this.addCommand({
       id: "show-day-planner-timeline",
       name: "Show the Day Planner Timeline",
@@ -56,7 +107,7 @@ export default class DayPlanner extends Plugin {
       callback: async () =>
         this.app.workspace
           .getLeaf(false)
-          .openFile(await createDailyNoteIfNeeded()),
+          .openFile(await createDailyNoteIfNeeded(window.moment())),
     });
 
     this.addCommand({
@@ -65,68 +116,9 @@ export default class DayPlanner extends Plugin {
       editorCallback: (editor) =>
         editor.replaceSelection(createPlannerHeading()),
     });
-
-    this.registerView(
-      VIEW_TYPE_TIMELINE,
-      (leaf: WorkspaceLeaf) => new TimelineView(leaf, this.settings, this),
-    );
-
-    this.registerView(
-      VIEW_TYPE_WEEKLY,
-      (leaf: WorkspaceLeaf) => new WeeklyView(leaf, this),
-    );
-
-    this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
-
-    this.initStore();
-
-    this.app.workspace.onLayoutReady(async () => {
-      // todo: this dep is implicit. `dateRange` should be set before parsed plan items
-      visibleDateRange.set(getDaysOfCurrentWeek());
-
-      visibleDateRange.subscribe(async () => {
-        await refreshPlanItemsInStore();
-      });
-
-      activeDay.subscribe(async () => {
-        await refreshPlanItemsInStore();
-      });
-    });
-
-    this.app.workspace.on("active-leaf-change", ({ view }) => {
-      if (!(view instanceof FileView)) {
-        return;
-      }
-
-      const newDailyNoteKey = getDateUidFromFile(view.file);
-
-      if (!newDailyNoteKey) {
-        if (get(activeDay) !== getDateUidForToday()) {
-          activeDay.set(getDateUidForToday());
-        }
-
-        return;
-      }
-
-      activeDay.set(newDailyNoteKey);
-    });
-
-    this.app.metadataCache.on("changed", async (file: TFile) => {
-      // todo: this should work for any visible item
-      if (file === getTimelineFile()) {
-        await refreshPlanItemsInStore();
-      }
-    });
-
-    this.registerInterval(
-      window.setInterval(
-        () => this.updateStatusBarOnFailed(this.updateStatusBar),
-        1000,
-      ),
-    );
   }
 
-  private initStore() {
+  private initAppAndSettingsStores() {
     appStore.set(this.app);
 
     const {
@@ -152,6 +144,23 @@ export default class DayPlanner extends Plugin {
       await this.saveData(this.settings);
     });
   }
+
+  private handleLayoutReady = async () => {
+    // todo: this dep is implicit. `dateRange` should be set before parsed plan items
+    visibleDateRange.set(getDaysOfCurrentWeek());
+
+    this.register(
+      visibleDateRange.subscribe(async () => {
+        await refreshPlanItemsInStore();
+      }),
+    );
+
+    this.register(
+      dayShownInTimeline.subscribe(async () => {
+        await refreshPlanItemsInStore();
+      }),
+    );
+  };
 
   onunload() {
     this.detachLeavesOfType(VIEW_TYPE_TIMELINE);

@@ -3,13 +3,12 @@
   import { get } from "svelte/store";
   import { isNotVoid } from "typed-assert";
 
-  import { visibleDateRange } from "../../store/visible-date-range";
-  import { getDaysOfWeek } from "../../util/moment";
+  import { visibleDateRange } from "../../../store/visible-date-range";
+  import { getDaysOfWeek } from "../../../util/moment";
   import {
     refreshPlanItemsInStoreWithRange,
-  } from "../../util/obsidian";
-
-  import ControlButton from "./control-button.svelte";
+  } from "../../../util/obsidian";
+  import ControlButton from "../control-button.svelte";
 
   async function handleShowPrevious() {
     const firstDayOfShownWeek = get(visibleDateRange)[0];

@@ -7,23 +7,26 @@
   } from "obsidian-daily-notes-interface";
   import { isNotVoid } from "typed-assert";
 
-  import { planItemsByDateUid } from "../../store/tasks";
-  import { visibleHours } from "../../store/timeline-store";
-  import { DateRange, visibleDateRange } from "../../store/visible-date-range";
-  import { isToday } from "../../util/moment";
-  import { openFileForDay } from "../../util/obsidian";
-
-  import Column from "./column.svelte";
-  import ControlButton from "./control-button.svelte";
-  import GoToFileIcon from "./icons/go-to-file.svelte";
-  import FilePlus from "./icons/plus-file.svelte";
-  import Needle from "./needle.svelte";
-  import Ruler from "./ruler.svelte";
-  import TaskContainer from "./task-container.svelte";
+  import { planItemsByDateUid } from "../../../store/tasks";
+  import { visibleHours } from "../../../store/timeline-store";
+  import {
+    DateRange,
+    visibleDateRange,
+  } from "../../../store/visible-date-range";
+  import { isToday } from "../../../util/moment";
+  import { openFileForDay } from "../../../util/obsidian";
+  import Column from "../column.svelte";
+  import ControlButton from "../control-button.svelte";
+  import GoToFileIcon from "../icons/go-to-file.svelte";
+  import FilePlus from "../icons/plus-file.svelte";
+  import Needle from "../needle.svelte";
+  import Ruler from "../ruler.svelte";
+  import TaskContainer from "../task-container.svelte";
 
   async function openDailyNote(day: Moment) {
     await openFileForDay(day);
 
+    // todo: this is a hack to trigger updates
     visibleDateRange.update((previous: DateRange) => [...previous]);
   }
 
@@ -62,25 +65,17 @@
 <div class="days">
   <Ruler visibleHours={$visibleHours} />
   {#each $visibleDateRange as day}
-    {#if !getDailyNote(day, getAllDailyNotes())}
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div
-        class="day-column no-note"
-        on:click={async () => await openDailyNote(day)}
-      ></div>
-    {:else}
-      <div class="day-column">
-        <div class="scale-with-days">
-          <Column visibleHours={$visibleHours}>
-            {#if isToday(day)}
-              <Needle scrollBlockedByUser={false} />
-            {/if}
+    <div class="day-column">
+      <div class="scale-with-days">
+        <Column visibleHours={$visibleHours}>
+          {#if isToday(day)}
+            <Needle scrollBlockedByUser={false} />
+          {/if}
 
-            <TaskContainer {day} tasks={getTasksForDay(day)} />
-          </Column>
-        </div>
+          <TaskContainer {day} tasks={getTasksForDay(day)} />
+        </Column>
       </div>
-    {/if}
+    </div>
   {/each}
 </div>
 
@@ -114,10 +109,6 @@
 
     background-color: var(--background-secondary);
     border-right: 1px solid var(--background-modifier-border);
-  }
-
-  .no-note {
-    background-color: var(--background-secondary);
   }
 
   .week-header {

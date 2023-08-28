@@ -9,6 +9,7 @@ import {
   roundToSnapStep,
 } from "../../store/timeline-store";
 import type { PlanItem } from "../../types";
+import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 import { minutesToMomentOfDay } from "../../util/moment";
 
 export function useCreate() {
@@ -25,8 +26,7 @@ export function useCreate() {
   ) {
     creating.set(false);
 
-    // TODO: day goes here
-    const newPlanItem = createPlanItemFromTimeline(day, pointerYOffset);
+    const newPlanItem = await createPlanItemFromTimeline(day, pointerYOffset);
 
     // todo: clean up item creation
     // @ts-ignore
@@ -43,9 +43,11 @@ export function useCreate() {
   };
 }
 
-function createPlanItemFromTimeline(day: Moment, pointerYOffset: number) {
+async function createPlanItemFromTimeline(day: Moment, pointerYOffset: number) {
   const startMinutes = getTimeFromYOffset(roundToSnapStep(pointerYOffset));
   const endMinutes = startMinutes + DEFAULT_DURATION_MINUTES;
+
+  const { path } = await createDailyNoteIfNeeded(day);
 
   return {
     id: String(Math.random()),
@@ -58,7 +60,7 @@ function createPlanItemFromTimeline(day: Moment, pointerYOffset: number) {
     // todo: no hardcode
     listTokens: "- ",
     location: {
-      path: getDailyNote(day, getAllDailyNotes()).path,
+      path,
     },
   };
 }

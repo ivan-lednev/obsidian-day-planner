@@ -5,8 +5,8 @@ import type DayPlanner from "../main";
 import type { DayPlannerSettings } from "../settings";
 import { refreshPlanItemsInStore } from "../util/obsidian";
 
-import HeaderActions from "./components/header-actions.svelte";
-import Week from "./components/week.svelte";
+import HeaderActions from "./components/week/header-actions.svelte";
+import Week from "./components/week/week.svelte";
 
 export default class WeeklyView extends ItemView {
   private weekComponent: Week;

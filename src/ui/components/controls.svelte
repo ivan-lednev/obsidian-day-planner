@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getAllDailyNotes } from "obsidian-daily-notes-interface";
 
-  import { activeDay, getFileShownInTimeline } from "../../store/active-day";
+  import { dayShownInTimeline, getTimelineFile } from "../../store/active-day";
   import { settings } from "../../store/settings";
   import {
     createDailyNoteIfNeeded,
@@ -22,7 +22,7 @@
     settingsVisible = !settingsVisible;
   }
 
-  $: neighbors = getNeighborNotes($activeDay);
+  $: neighbors = getNeighborNotes($dayShownInTimeline);
 
   async function goBack() {
     if (!neighbors.previousNoteKey) {
@@ -33,7 +33,7 @@
 
     await openFileInEditor(previousNote);
 
-    $activeDay = neighbors.previousNoteKey;
+    $dayShownInTimeline = neighbors.previousNoteKey;
   }
 
   async function goForward() {
@@ -45,11 +45,11 @@
 
     await openFileInEditor(nextNote);
 
-    $activeDay = neighbors.nextNoteKey;
+    $dayShownInTimeline = neighbors.nextNoteKey;
   }
 
   async function goToToday() {
-    const noteForToday = await createDailyNoteIfNeeded();
+    const noteForToday = await createDailyNoteIfNeeded(window.moment());
 
     await openFileInEditor(noteForToday);
   }
@@ -78,10 +78,10 @@
     <ControlButton
       label="Go to file"
       on:click={() => {
-        openFileInEditor(getFileShownInTimeline());
+        openFileInEditor(getTimelineFile());
       }}
     >
-      <span class="date">{getAllDailyNotes()[$activeDay].basename}</span>
+      <span class="date">{getAllDailyNotes()[$dayShownInTimeline].basename}</span>
     </ControlButton>
 
     <ControlButton

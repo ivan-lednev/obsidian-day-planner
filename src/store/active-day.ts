@@ -3,13 +3,14 @@ import { derived, get, writable } from "svelte/store";
 
 import { getDailyNoteForToday, getDateUidForToday } from "../util/daily-notes";
 
-export const activeDay = writable(getDateUidForToday());
+export const dayShownInTimeline = writable(getDateUidForToday());
 
 export const todayIsShownInTimeline = derived(
-  activeDay,
-  ($activeDay) => getAllDailyNotes()[$activeDay] === getDailyNoteForToday(),
+  dayShownInTimeline,
+  ($dayShownInTimeline) =>
+    getAllDailyNotes()[$dayShownInTimeline] === getDailyNoteForToday(),
 );
 
 export function getTimelineFile() {
-  return getAllDailyNotes()[get(activeDay)];
+  return getAllDailyNotes()[get(dayShownInTimeline)];
 }
