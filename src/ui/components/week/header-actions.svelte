@@ -1,22 +1,26 @@
 <script lang="ts">
   import { ArrowLeftToLine, ArrowRightToLine } from "lucide-svelte";
-  import { isNotVoid } from "typed-assert";
 
   import { visibleDateRange } from "../../../store/visible-date-range";
   import { getDaysOfWeek } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
 
+  $: firstDayOfShownWeek = $visibleDateRange[0];
+
   async function handleShowPrevious() {
-    const firstDayOfShownWeek = $visibleDateRange[0];
-
-    isNotVoid(firstDayOfShownWeek);
-
     const firstDayOfPreviousWeek = firstDayOfShownWeek
       .clone()
       .subtract(1, "week");
     const daysOfPreviousWeek = getDaysOfWeek(firstDayOfPreviousWeek);
 
     visibleDateRange.set(daysOfPreviousWeek);
+  }
+
+  async function handleShowNext() {
+    const firstDayOfNextWeek = firstDayOfShownWeek.clone().add(1, "week");
+    const daysOfNextWeek = getDaysOfWeek(firstDayOfNextWeek);
+
+    visibleDateRange.set(daysOfNextWeek);
   }
 </script>
 
@@ -25,7 +29,7 @@
     <ArrowLeftToLine class="svg-icon" />
   </ControlButton>
 
-  <ControlButton label="Show next week" on:click={() => {}}>
+  <ControlButton label="Show next week" on:click={handleShowNext}>
     <ArrowRightToLine class="svg-icon" />
   </ControlButton>
 </div>
