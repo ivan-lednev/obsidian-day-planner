@@ -3,6 +3,9 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 import { VIEW_TYPE_WEEKLY } from "../constants";
 import type DayPlanner from "../main";
 import type { DayPlannerSettings } from "../settings";
+import { weekNotes } from "../store/week-notes";
+import { getNotesForDays } from "../util/daily-notes";
+import { getDaysOfCurrentWeek } from "../util/moment";
 
 import HeaderActions from "./components/header-actions.svelte";
 import Week from "./components/week.svelte";
@@ -22,11 +25,10 @@ export default class WeeklyView extends ItemView {
   }
 
   getDisplayText(): string {
-    return (
-      window.moment().startOf("isoWeek").format("MMM, DD") +
-      " - " +
-      window.moment().endOf("isoWeek").format("MMM, DD")
-    );
+    const startOfWeek = window.moment().startOf("isoWeek").format("MMM, D");
+    const endOfWeek = window.moment().endOf("isoWeek").format("MMM, D");
+
+    return `${startOfWeek} - ${endOfWeek}`;
   }
 
   getIcon() {
@@ -42,6 +44,10 @@ export default class WeeklyView extends ItemView {
     const customActionsEl = createDiv();
     viewActionsEl.prepend(customActionsEl);
 
+    const daysOfCurrentWeek = getDaysOfCurrentWeek();
+
+    weekNotes.set(getNotesForDays(daysOfCurrentWeek));
+
     this.headerActionsComponent = new HeaderActions({
       target: customActionsEl,
     });
@@ -49,12 +55,6 @@ export default class WeeklyView extends ItemView {
     this.weekComponent = new Week({
       target: contentEl,
     });
-
-    this.addAction(
-      "arrow-right-to-line",
-      "navigate one week forward",
-      () => {},
-    );
   }
 
   async onClose() {

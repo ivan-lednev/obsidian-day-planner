@@ -2,8 +2,8 @@
   import { getDateUID } from "obsidian-daily-notes-interface";
 
   import { planItemsByDateUid } from "../../store/tasks";
-  import { currentTime } from "../../store/time";
   import { visibleHours } from "../../store/timeline-store";
+  import { weekNotes } from "../../store/week-notes";
   import { getNotesForDays } from "../../util/daily-notes";
   import { getDaysOfCurrentWeek, isToday } from "../../util/moment";
   import { openFileForDay } from "../../util/obsidian";
@@ -15,48 +15,46 @@
   import Needle from "./needle.svelte";
   import Ruler from "./ruler.svelte";
   import TaskContainer from "./task-container.svelte";
-
-  const daysOfCurrentWeek = getDaysOfCurrentWeek();
-
-  let dailyNotes = getNotesForDays(daysOfCurrentWeek);
-
 </script>
 
 <div class="week-header">
   <div class="corner"></div>
-  {#each daysOfCurrentWeek as day, i}
+  {#each getDaysOfCurrentWeek() as day, i}
     <div class="day-header" class:today={isToday(day)}>
       <ControlButton
         --justify-self="flex-start"
         label="Open note for day"
         on:click={async () => await openFileForDay(day)}
       >
-        {#if dailyNotes[i]}
+        {#if $weekNotes[i]}
           <GoToFileIcon />
         {:else}
           <FilePlus />
         {/if}
       </ControlButton>
       <div class="day-header-date">
-        {day.format("DD, ddd")}
+        {day.format("MMM D, ddd")}
       </div>
     </div>
   {/each}
 </div>
 <div class="days">
   <Ruler visibleHours={$visibleHours} />
-  {#each daysOfCurrentWeek as day, i}
-    {#if !dailyNotes[i]}
+  {#each getDaysOfCurrentWeek() as day, i}
+    {#if !$weekNotes[i]}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
         class="day-column no-note"
-        on:click={async () => await openFileForDay(day)}
+        on:click={async () => {
+          await openFileForDay(day);
+          weekNotes.set(getNotesForDays(getDaysOfCurrentWeek()));
+        }}
       ></div>
     {:else}
       <div class="day-column">
         <div class="scale-with-days">
           <Column visibleHours={$visibleHours}>
-            {#if day.isSame($currentTime, "day")}
+            {#if isToday(day)}
               <Needle scrollBlockedByUser={false} />
             {/if}
 
