@@ -103,6 +103,7 @@ export default class DayPlanner extends Plugin {
     });
 
     this.app.metadataCache.on("changed", async (file: TFile) => {
+      // todo: this should work for any visible item
       if (file === getTimelineFile()) {
         await refreshPlanItemsInStore();
       }

@@ -6,6 +6,7 @@ import type { DayPlannerSettings } from "../settings";
 import { dateRange } from "../store/week-notes";
 import { getNotesForDays } from "../util/daily-notes";
 import { getDaysOfCurrentWeek } from "../util/moment";
+import { refreshPlanItemsInStore } from "../util/obsidian";
 
 import HeaderActions from "./components/header-actions.svelte";
 import Week from "./components/week.svelte";
@@ -36,6 +37,8 @@ export default class WeeklyView extends ItemView {
   }
 
   async onOpen() {
+    await refreshPlanItemsInStore(); // todo: clean up
+
     const headerEl = this.containerEl.children[0];
     const contentEl = this.containerEl.children[1];
 
