@@ -43,6 +43,6 @@ export interface TasksContext {
 }
 
 export type Timestamp = {
-  durationMinutes: number;
   startMinutes: number;
+  durationMinutes: number;
 };

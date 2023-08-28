@@ -14,7 +14,7 @@ import { getTimelineFile } from "../store/active-day";
 import { appStore } from "../store/app-store";
 import { getHorizontalPlacing } from "../store/horizontal-placing";
 import { settings } from "../store/settings";
-import { taskLookup, tasks } from "../store/tasks";
+import { planItemsByDateUid, tasks } from "../store/tasks";
 import type { PlanItem } from "../types";
 
 import { getNotesForWeek } from "./daily-notes";
@@ -49,10 +49,14 @@ export async function getFileByPath(path: string) {
 export function addPlacing(planItems: PlanItem[]) {
   const overlapLookup = computeOverlap(planItems);
 
-  return planItems.map((planItem) => ({
-    ...planItem,
-    placing: getHorizontalPlacing(overlapLookup.get(planItem.id)),
-  }));
+  return planItems.map((planItem) => {
+    const overlap = overlapLookup.get(planItem.id);
+
+    return {
+      ...planItem,
+      placing: getHorizontalPlacing(overlap),
+    };
+  });
 }
 
 export async function refreshPlanItemsInStore() {
@@ -68,7 +72,7 @@ export async function refreshPlanItemsInStore() {
 
   const parsedPlanItemsForWeek = Object.fromEntries(idToPlanItemsStore);
 
-  taskLookup.set(parsedPlanItemsForWeek);
+  planItemsByDateUid.set(parsedPlanItemsForWeek);
 
   // todo: remove this old code
   const parsedPlanItems = await getPlanItemsFromFile(getTimelineFile());

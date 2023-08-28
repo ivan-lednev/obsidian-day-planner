@@ -3,9 +3,10 @@ import { derived, get } from "svelte/store";
 import { computeOverlap } from "../parser/overlap";
 import type { Overlap } from "../types";
 
-import { taskLookup } from "./tasks";
+import { planItemsByDateUid } from "./tasks";
 
-export const overlapLookup = derived(taskLookup, ($taskLookup) => {
+// todo: delete
+export const overlapLookup = derived(planItemsByDateUid, ($taskLookup) => {
   return computeOverlap(Object.values($taskLookup).map(get).flat());
 });
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Moment } from "moment";
   import { setContext } from "svelte";
-  import { Writable } from "svelte/store";
+  import type { Writable } from "svelte/store";
 
   import { TASKS_FOR_DAY } from "../../constants";
   import { editCancellation, editConfirmation } from "../../store/edit";
@@ -57,10 +57,7 @@
   on:mouseup|stopPropagation={handleMouseUp}
 >
   {#each $tasks as planItem (getPlanItemKey(planItem))}
-    <Task
-      {planItem}
-      {pointerYOffset}
-    />
+    <Task {planItem} {pointerYOffset} />
   {/each}
   {#if $creating}
     <Task

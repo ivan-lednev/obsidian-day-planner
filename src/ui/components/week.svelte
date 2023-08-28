@@ -1,12 +1,11 @@
 <script lang="ts">
-  import type { Moment } from "moment";
   import { getDateUID } from "obsidian-daily-notes-interface";
 
-  import { taskLookup } from "../../store/tasks";
+  import { planItemsByDateUid } from "../../store/tasks";
   import { currentTime } from "../../store/time";
   import { visibleHours } from "../../store/timeline-store";
   import { getNotesForDays } from "../../util/daily-notes";
-  import { getDaysOfCurrentWeek } from "../../util/moment";
+  import { getDaysOfCurrentWeek, isToday } from "../../util/moment";
   import { openFileForDay } from "../../util/obsidian";
 
   import Column from "./column.svelte";
@@ -21,9 +20,6 @@
 
   let dailyNotes = getNotesForDays(daysOfCurrentWeek);
 
-  function isToday(moment: Moment) {
-    return moment.isSame(window.moment(), "day");
-  }
 </script>
 
 <div class="week-header">
@@ -66,7 +62,7 @@
 
             <TaskContainer
               {day}
-              tasks={$taskLookup[getDateUID(day, "day")] || []}
+              tasks={$planItemsByDateUid[getDateUID(day, "day")] || []}
             />
           </Column>
         </div>

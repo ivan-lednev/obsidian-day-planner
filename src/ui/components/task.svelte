@@ -67,8 +67,8 @@
   style:height="{height}px"
   style:transform="translateY({offset}px)"
   style:cursor={$cursor}
-  style:width="{planItem.placing.widthPercent}%"
-  style:left="{planItem.placing.xOffsetPercent}%"
+  style:width="{planItem.placing.widthPercent || 100}%"
+  style:left="{planItem.placing.xOffsetPercent || 0}%"
   class="gap-box absolute-stretch-x"
 >
   <div

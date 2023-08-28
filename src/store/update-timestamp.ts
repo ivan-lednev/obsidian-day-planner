@@ -23,9 +23,14 @@ export async function updateTimestamps(
         // todo: split effect from mapping
         updateDurationInDailyNote(task, timestamp);
 
+        const updatedTime = {
+          ...timestamp,
+          endMinutes: timestamp.startMinutes + timestamp.durationMinutes,
+        };
+
         return {
           ...task,
-          ...timestamp,
+          ...updatedTime,
         };
       }),
       addPlacing,
