@@ -76,8 +76,8 @@ export async function refreshPlanItemsInStore() {
   const idToPlanItemsStore = await Promise.all(
     notesForWeek.map(async ({ id, note }) => {
       const planItems = note ? await getPlanItemsFromFile(note) : [];
-      const planItemsWithPlacing = addPlacing(planItems);
-      return [id, writable(planItemsWithPlacing)];
+
+      return [id, toPlacedWritables(planItems)];
     }),
   );
 
@@ -90,6 +90,11 @@ export async function refreshPlanItemsInStore() {
   const parsedPlanItems = await getPlanItemsFromFile(getTimelineFile());
 
   tasks.set(parsedPlanItems);
+}
+
+export function toPlacedWritables(planItems: PlanItem[]) {
+  const planItemsWithPlacing = addPlacing(planItems);
+  return writable(planItemsWithPlacing);
 }
 
 // todo: delete
@@ -118,7 +123,8 @@ export async function refreshPlanItemsInStoreWithRange(
 
   tasks.set(parsedPlanItems);
 }
-async function getPlanItemsFromFile(file: TFile) {
+
+export async function getPlanItemsFromFile(file: TFile) {
   if (!file) {
     return [];
   }
@@ -131,11 +137,10 @@ async function getPlanItemsFromFile(file: TFile) {
 
   const fileDay = getDateFromFile(file, "day");
 
-  if (!fileDay) {
-    throw new Error(
-      `Tried to parse plan in file that is not a daily note: ${file.path}`,
-    );
-  }
+  isNotVoid(
+    fileDay,
+    `Tried to parse plan in file that is not a daily note: ${file.path}`,
+  );
 
   return parsePlanItems(
     fileContents,

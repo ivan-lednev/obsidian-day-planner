@@ -3,18 +3,16 @@
   import {
     getAllDailyNotes,
     getDailyNote,
-    getDateUID,
   } from "obsidian-daily-notes-interface";
-  import { isNotVoid } from "typed-assert";
 
-  import { planItemsByDateUid } from "../../../store/tasks";
   import { visibleHours } from "../../../store/timeline-store";
-  import {
-    DateRange,
-    visibleDateRange,
-  } from "../../../store/visible-date-range";
+  import { visibleDateRange } from "../../../store/visible-date-range";
   import { isToday } from "../../../util/moment";
-  import { openFileForDay } from "../../../util/obsidian";
+  import {
+    getPlanItemsFromFile,
+    openFileForDay,
+    toPlacedWritables,
+  } from "../../../util/obsidian";
   import Column from "../column.svelte";
   import ControlButton from "../control-button.svelte";
   import GoToFileIcon from "../icons/go-to-file.svelte";
@@ -27,17 +25,7 @@
     await openFileForDay(day);
 
     // todo: this is a hack to trigger updates
-    visibleDateRange.update((previous: DateRange) => [...previous]);
-  }
-
-  function getTasksForDay(day: Moment) {
-    const dayUid = getDateUID(day, "day");
-
-    const parsedPlanItems = $planItemsByDateUid[dayUid];
-
-    isNotVoid(parsedPlanItems);
-
-    return parsedPlanItems;
+    visibleDateRange.update((previous) => [...previous]);
   }
 </script>
 
@@ -72,7 +60,13 @@
             <Needle scrollBlockedByUser={false} />
           {/if}
 
-          <TaskContainer {day} tasks={getTasksForDay(day)} />
+          {#await getPlanItemsFromFile(getDailyNote(day, getAllDailyNotes()))}
+            <pre>...</pre>
+          {:then tasks}
+            <TaskContainer {day} tasks={toPlacedWritables(tasks)} />
+          {:catch error}
+            <pre>Could not render tasks: {error}</pre>
+          {/await}
         </Column>
       </div>
     </div>
