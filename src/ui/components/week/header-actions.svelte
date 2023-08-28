@@ -1,9 +1,16 @@
 <script lang="ts">
-  import { ArrowLeftToLine, ArrowRightToLine , CircleDotIcon } from "lucide-svelte";
-  
+  import {
+    ArrowLeftToLine,
+    ArrowRightToLine,
+    CircleDotIcon,
+  } from "lucide-svelte";
+
   import { visibleDateRange } from "../../../store/visible-date-range";
   import { getDaysOfCurrentWeek, getDaysOfWeek } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
+
+  $: startOfRange = $visibleDateRange[0].format("MMM, D");
+  $: endOfRange = $visibleDateRange.at(-1).format("MMM, D");
 
   $: firstDayOfShownWeek = $visibleDateRange[0];
 
@@ -29,6 +36,9 @@
 </script>
 
 <div class="view-header-nav-buttons">
+  <div class="range">
+    {startOfRange} - {endOfRange}
+  </div>
   <ControlButton label="Show previous week" on:click={handleShowPrevious}>
     <ArrowLeftToLine class="svg-icon" />
   </ControlButton>
@@ -41,3 +51,11 @@
     <ArrowRightToLine class="svg-icon" />
   </ControlButton>
 </div>
+
+<style>
+  .range {
+    flex: 1 0 0;
+    margin-right: 10px;
+    white-space: nowrap;
+  }
+</style>

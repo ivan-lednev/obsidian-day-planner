@@ -15,8 +15,6 @@
   } from "../../../util/obsidian";
   import Column from "../column.svelte";
   import ControlButton from "../control-button.svelte";
-  import GoToFileIcon from "../icons/go-to-file.svelte";
-  import FilePlus from "../icons/plus-file.svelte";
   import Needle from "../needle.svelte";
   import Ruler from "../ruler.svelte";
   import TaskContainer from "../task-container.svelte";
@@ -34,19 +32,11 @@
   {#each $visibleDateRange as day}
     <div class="day-header" class:today={isToday(day)}>
       <ControlButton
-        --justify-self="flex-start"
         label="Open note for day"
         on:click={async () => await openDailyNote(day)}
       >
-        {#if getDailyNote(day, getAllDailyNotes())}
-          <GoToFileIcon />
-        {:else}
-          <FilePlus />
-        {/if}
-      </ControlButton>
-      <div class="day-header-date">
         {day.format("MMM D, ddd")}
-      </div>
+      </ControlButton>
     </div>
   {/each}
 </div>
@@ -74,10 +64,6 @@
 </div>
 
 <style>
-  .day-header-date {
-    justify-self: flex-start;
-  }
-
   .corner {
     position: sticky;
     z-index: 100;
@@ -113,13 +99,7 @@
   }
 
   .day-header {
-    display: grid;
-    grid-template-columns: 1fr 3fr;
     flex: 1 0 150px;
-
-    /* todo: move to var */
-    gap: 5px;
-    align-items: center;
 
     padding: 5px;
 

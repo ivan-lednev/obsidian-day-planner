@@ -22,10 +22,7 @@ export default class WeeklyView extends ItemView {
   }
 
   getDisplayText(): string {
-    const startOfWeek = window.moment().startOf("isoWeek").format("MMM, D");
-    const endOfWeek = window.moment().endOf("isoWeek").format("MMM, D");
-
-    return `${startOfWeek} - ${endOfWeek}`;
+    return "Week Planner";
   }
 
   getIcon() {
