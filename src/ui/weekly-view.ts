@@ -3,9 +3,6 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 import { VIEW_TYPE_WEEKLY } from "../constants";
 import type DayPlanner from "../main";
 import type { DayPlannerSettings } from "../settings";
-import { dateRange } from "../store/week-notes";
-import { getNotesForDays } from "../util/daily-notes";
-import { getDaysOfCurrentWeek } from "../util/moment";
 import { refreshPlanItemsInStore } from "../util/obsidian";
 
 import HeaderActions from "./components/header-actions.svelte";
@@ -46,11 +43,6 @@ export default class WeeklyView extends ItemView {
 
     const customActionsEl = createDiv();
     viewActionsEl.prepend(customActionsEl);
-
-    dateRange.set({
-      dates: getDaysOfCurrentWeek(),
-      dailyNotes: getNotesForDays(getDaysOfCurrentWeek()),
-    });
 
     this.headerActionsComponent = new HeaderActions({
       target: customActionsEl,

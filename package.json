@@ -72,6 +72,7 @@
     "lucide-svelte": "^0.256.0",
     "obsidian-daily-notes-interface": "^0.9.4",
     "prettier-plugin-svelte": "^3.0.3",
-    "stylelint-config-clean-order": "^5.0.1"
+    "stylelint-config-clean-order": "^5.0.1",
+    "typed-assert": "^1.0.9"
   }
 }

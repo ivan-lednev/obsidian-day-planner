@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { Moment } from "moment";
   import { getDateUID } from "obsidian-daily-notes-interface";
+  import { isNotVoid } from "typed-assert";
 
+  import { DateRange, dateRange } from "../../store/date-range";
   import { planItemsByDateUid } from "../../store/tasks";
   import { visibleHours } from "../../store/timeline-store";
-  import { DateRange, dateRange } from "../../store/week-notes";
   import { getNotesForDays } from "../../util/daily-notes";
   import { getDaysOfCurrentWeek, isToday } from "../../util/moment";
   import { openFileForDay } from "../../util/obsidian";
@@ -17,12 +18,25 @@
   import Ruler from "./ruler.svelte";
   import TaskContainer from "./task-container.svelte";
 
-  async function openDailyNote(day: Moment) {
+  
+async function openDailyNote(day: Moment) {
     await openFileForDay(day);
     dateRange.update((previous: DateRange) => ({
       ...previous,
       dailyNotes: getNotesForDays(getDaysOfCurrentWeek()),
     }));
+  }
+
+  function getTasksForDay(day: Moment) {
+    const dayUid = getDateUID(day, "day")
+
+    console.log(`Accessing plan items by id: ${dayUid}`)
+
+    const parsedPlanItems = $planItemsByDateUid[dayUid]
+
+    isNotVoid(parsedPlanItems)
+
+    return parsedPlanItems
   }
 </script>
 
@@ -66,7 +80,7 @@
 
             <TaskContainer
               {day}
-              tasks={$planItemsByDateUid[getDateUID(day, "day")] || []}
+              tasks={getTasksForDay(day)}
             />
           </Column>
         </div>
