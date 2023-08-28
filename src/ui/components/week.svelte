@@ -71,7 +71,7 @@
 
 <style>
   .day-header-date {
-    justify-self: center;
+    justify-self: flex-start;
   }
 
   .corner {
@@ -94,10 +94,10 @@
 
   .day-column {
     display: flex;
-
-    /* TODO: parameterize that */
     flex: 1 0 150px;
     flex-direction: column;
+
+    background-color: var(--background-secondary);
     border-right: 1px solid var(--background-modifier-border);
   }
 
@@ -114,7 +114,7 @@
 
   .day-header {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-columns: 1fr 3fr;
     flex: 1 0 150px;
 
     /* todo: move to var */
