@@ -19,6 +19,7 @@
 
   const { creating, startCreation, confirmCreation } = useCreate();
 
+  // todo: we might not need this anymore
   // this is a hack for the case when plan items get refreshed, and we need to
   // add them to the context instead of the initial value
   function getTasks() {

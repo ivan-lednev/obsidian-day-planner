@@ -45,6 +45,12 @@ export default class DayPlanner extends Plugin {
       (leaf: WorkspaceLeaf) => new WeeklyView(leaf, this),
     );
 
+    this.addRibbonIcon(
+      "calendar-range",
+      "Week plan",
+      async () => await this.initWeeklyLeaf(),
+    );
+
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
     this.initAppAndSettingsStores();
 
@@ -54,6 +60,7 @@ export default class DayPlanner extends Plugin {
       // todo: be clever about figuring out which days we need to update
       // todo: this is just to trigger UI update
       visibleDateRange.update((prev) => [...prev]);
+      visibleDayInTimeline.update((prev) => prev.clone());
     });
 
     this.registerInterval(
