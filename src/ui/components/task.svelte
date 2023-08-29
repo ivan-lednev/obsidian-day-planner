@@ -18,7 +18,6 @@
   import TaskCompletedIcon from "./icons/check-circle.svelte";
 
   export let planItem: PlacedPlanItem;
-  export let planItem: PlanItem;
   export let pointerYOffset: number;
   export let isGhost = false;
   export let isCompleted: boolean;

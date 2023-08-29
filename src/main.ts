@@ -143,7 +143,6 @@ export default class DayPlanner extends Plugin {
   }
 
   private handleLayoutReady = async () => {
-    // todo: this dep is implicit. `dateRange` should be set before parsed plan items
     visibleDateRange.set(getDaysOfCurrentWeek());
   };
 

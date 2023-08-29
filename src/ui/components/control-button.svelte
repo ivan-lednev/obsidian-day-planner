@@ -23,6 +23,7 @@
     align-self: center;
     justify-self: var(--justify-self, auto);
 
+    color: var(--color, var(--icon-color));
     white-space: nowrap;
   }
 </style>

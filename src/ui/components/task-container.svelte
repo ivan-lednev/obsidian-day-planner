@@ -5,6 +5,7 @@
 
   import { TASKS_FOR_DAY } from "../../constants";
   import { editCancellation, editConfirmation } from "../../store/edit";
+  import { getHorizontalPlacing } from "../../store/horizontal-placing";
   import type { PlacedPlanItem, PlanItem } from "../../types";
   import { useCreate } from "../hooks/use-create";
 
@@ -62,7 +63,12 @@
   {#if $creating}
     <Task
       isGhost
-      planItem={{ durationMinutes: defaultDurationForNewTask, id: "" }}
+      planItem={{
+        durationMinutes: defaultDurationForNewTask,
+        text: "New item",
+        id: "",
+        placing: { ...getHorizontalPlacing() },
+      }}
       {pointerYOffset}
       text={cancelMessage}
     />

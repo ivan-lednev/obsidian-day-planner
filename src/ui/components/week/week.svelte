@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Moment } from "moment";
   import {
     getAllDailyNotes,
     getDailyNote,
@@ -18,13 +17,6 @@
   import Needle from "../needle.svelte";
   import Ruler from "../ruler.svelte";
   import TaskContainer from "../task-container.svelte";
-
-  async function openDailyNote(day: Moment) {
-    await openFileForDay(day);
-
-    // todo: this is a hack to trigger updates
-    visibleDateRange.update((previous) => [...previous]);
-  }
 </script>
 
 <div class="week-header">
@@ -32,8 +24,9 @@
   {#each $visibleDateRange as day}
     <div class="day-header" class:today={isToday(day)}>
       <ControlButton
+        --color={isToday(day) ? "white" : "var(--icon-color)"}
         label="Open note for day"
-        on:click={async () => await openDailyNote(day)}
+        on:click={async () => await openFileForDay(day)}
       >
         {day.format("MMM D, ddd")}
       </ControlButton>

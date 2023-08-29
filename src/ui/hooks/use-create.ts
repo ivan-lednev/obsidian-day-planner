@@ -11,6 +11,7 @@ import {
 import type { PlanItem } from "../../types";
 import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 import { minutesToMomentOfDay } from "../../util/moment";
+import { addPlacing } from "../../util/obsidian";
 
 export function useCreate() {
   const creating = writable(false);
@@ -30,10 +31,11 @@ export function useCreate() {
 
     // todo: clean up item creation
     // @ts-ignore
-    tasks.update((previous) => [...previous, newPlanItem]);
+    await appendToPlan(getDailyNote(day, getAllDailyNotes()).path, newPlanItem);
 
     // @ts-ignore
-    await appendToPlan(getDailyNote(day, getAllDailyNotes()).path, newPlanItem);
+    // todo: overlap logic should be hidden
+    tasks.update((previous) => addPlacing([...previous, newPlanItem]));
   }
 
   return {

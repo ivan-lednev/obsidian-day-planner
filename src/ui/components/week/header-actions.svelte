@@ -9,10 +9,9 @@
   import { getDaysOfCurrentWeek, getDaysOfWeek } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
 
-  $: startOfRange = $visibleDateRange[0].format("MMM, D");
-  $: endOfRange = $visibleDateRange.at(-1).format("MMM, D");
-
   $: firstDayOfShownWeek = $visibleDateRange[0];
+  $: startOfRange = firstDayOfShownWeek.format("MMM, D");
+  $: endOfRange = $visibleDateRange.at(-1).format("MMM, D");
 
   function handleShowPrevious() {
     const firstDayOfPreviousWeek = firstDayOfShownWeek
