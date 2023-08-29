@@ -1,14 +1,17 @@
 <script lang="ts">
-  import { getAllDailyNotes } from "obsidian-daily-notes-interface";
+  import type { Moment } from "moment";
+  import {
+    DEFAULT_DAILY_NOTE_FORMAT,
+  } from "obsidian-daily-notes-interface";
 
-  import { dayShownInTimeline, getTimelineFile } from "../../store/active-day";
   import { settings } from "../../store/settings";
   import {
+    visibleDayInTimeline,
+  } from "../../store/visible-day-in-timeline";
+  import {
     createDailyNoteIfNeeded,
-    getNeighborNotes,
   } from "../../util/daily-notes";
   import { openFileInEditor } from "../../util/obsidian";
-
 
   import ControlButton from "./control-button.svelte";
   import ArrowLeftIcon from "./icons/arrow-left.svelte";
@@ -16,36 +19,32 @@
   import GoToFileIcon from "./icons/go-to-file.svelte";
   import SettingsIcon from "./icons/settings.svelte";
 
+  export let day: Moment;
+
   let settingsVisible = false;
 
   function toggleSettings() {
     settingsVisible = !settingsVisible;
   }
 
-  $: neighbors = getNeighborNotes($dayShownInTimeline);
-
   async function goBack() {
-    if (!neighbors.previousNoteKey) {
-      return;
-    }
+    const previousDay = $visibleDayInTimeline.clone().subtract(1, "day");
 
-    const previousNote = getAllDailyNotes()[neighbors.previousNoteKey];
+    const previousNote = await createDailyNoteIfNeeded(previousDay);
 
     await openFileInEditor(previousNote);
 
-    $dayShownInTimeline = neighbors.previousNoteKey;
+    $visibleDayInTimeline = previousDay;
   }
 
   async function goForward() {
-    if (!neighbors.nextNoteKey) {
-      return;
-    }
+    const nextDay = $visibleDayInTimeline.clone().add(1, "day");
 
-    const nextNote = getAllDailyNotes()[neighbors.nextNoteKey];
+    const nextNote = await createDailyNoteIfNeeded(nextDay);
 
     await openFileInEditor(nextNote);
 
-    $dayShownInTimeline = neighbors.nextNoteKey;
+    $visibleDayInTimeline = nextDay;
   }
 
   async function goToToday() {
@@ -68,7 +67,6 @@
 
     <ControlButton
       --justify-self="flex-end"
-      disabled={!neighbors.previousNoteKey}
       label="Go to previous daily plan"
       on:click={goBack}
     >
@@ -77,16 +75,16 @@
 
     <ControlButton
       label="Go to file"
-      on:click={() => {
-        openFileInEditor(getTimelineFile());
+      on:click={async () => {
+        const note = await createDailyNoteIfNeeded(day);
+        await openFileInEditor(note);
       }}
     >
-      <span class="date">{getAllDailyNotes()[$dayShownInTimeline].basename}</span>
+      <span class="date">{day.format(DEFAULT_DAILY_NOTE_FORMAT)}</span>
     </ControlButton>
 
     <ControlButton
       --justify-self="flex-start"
-      disabled={!neighbors.nextNoteKey}
       label="Go to next daily plan"
       on:click={goForward}
     >

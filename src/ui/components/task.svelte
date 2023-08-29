@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { editCancellation, editConfirmation } from "../../store/edit";
-  import { currentTime } from "../../store/time";
+  import { currentTime } from "../../store/current-time";
+  import { editCancellation, editConfirmation } from "../../store/edit-events";
   import {
     durationToSize,
     roundToSnapStep,

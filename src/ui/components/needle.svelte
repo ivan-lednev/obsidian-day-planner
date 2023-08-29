@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { todayIsShownInTimeline } from "../../store/active-day";
+  import { currentTime } from "../../store/current-time";
   import { settings } from "../../store/settings";
-  import { currentTime } from "../../store/time";
-  import {
-    timeToTimelineOffset,
-  } from "../../store/timeline-store";
-  import { getMinutesSinceMidnight } from "../../util/moment";
+  import { timeToTimelineOffset } from "../../store/timeline-store";
+  import { visibleDayInTimeline } from "../../store/visible-day-in-timeline";
+  import { getMinutesSinceMidnight, isToday } from "../../util/moment";
 
   export let scrollBlockedByUser = false;
 
@@ -13,7 +11,11 @@
   let coords = $timeToTimelineOffset(getMinutesSinceMidnight($currentTime));
 
   function scrollIntoView() {
-    if ($settings.centerNeedle && !scrollBlockedByUser && todayIsShownInTimeline) {
+    if (
+      $settings.centerNeedle &&
+      !scrollBlockedByUser &&
+      isToday($visibleDayInTimeline)
+    ) {
       el?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }

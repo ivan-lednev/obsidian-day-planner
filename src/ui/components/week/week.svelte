@@ -43,9 +43,7 @@
             <Needle scrollBlockedByUser={false} />
           {/if}
 
-          {#await getPlanItemsFromFile(getDailyNote(day, getAllDailyNotes()))}
-            <pre>...</pre>
-          {:then tasks}
+          {#await getPlanItemsFromFile(getDailyNote(day, getAllDailyNotes())) then tasks}
             <TaskContainer {day} tasks={toPlacedWritables(tasks)} />
           {:catch error}
             <pre>Could not render tasks: {error}</pre>

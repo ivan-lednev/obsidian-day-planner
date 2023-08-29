@@ -1,4 +1,4 @@
-import { createWatchable } from "./create-watchable";
+import { createWatchable } from "./util/create-watchable";
 
 export const editConfirmation = createWatchable();
 

@@ -1,25 +1,21 @@
 import { FileView, Plugin, TFile, WorkspaceLeaf } from "obsidian";
+import { getDateFromFile } from "obsidian-daily-notes-interface";
 import { get } from "svelte/store";
 
 import { VIEW_TYPE_TIMELINE, VIEW_TYPE_WEEKLY } from "./constants";
 import { createPlannerHeading } from "./plan";
 import { DayPlannerSettings } from "./settings";
-import { dayShownInTimeline } from "./store/active-day";
 import { appStore } from "./store/app-store";
 import { settings } from "./store/settings";
-import { tasks } from "./store/tasks";
+import { tasksForStatusBar } from "./store/tasks-for-status-bar";
 import { visibleDateRange } from "./store/visible-date-range";
+import { visibleDayInTimeline } from "./store/visible-day-in-timeline";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
-import {
-  createDailyNoteIfNeeded,
-  dailyNoteExists,
-  getDateUidForToday,
-  getDateUidFromFile,
-} from "./util/daily-notes";
-import { getDaysOfCurrentWeek } from "./util/moment";
+import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
+import { getDaysOfCurrentWeek, isToday } from "./util/moment";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
@@ -55,7 +51,8 @@ export default class DayPlanner extends Plugin {
     this.app.workspace.onLayoutReady(this.handleLayoutReady);
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
     this.app.metadataCache.on("changed", async (file: TFile) => {
-      // todo: be clever about this
+      // todo: be clever about figuring out which days we need to update
+      // todo: this is just to trigger UI update
       visibleDateRange.update((prev) => [...prev]);
     });
 
@@ -68,21 +65,21 @@ export default class DayPlanner extends Plugin {
   }
 
   private handleActiveLeafChanged = ({ view }: WorkspaceLeaf) => {
-    if (!(view instanceof FileView)) {
+    if (!(view instanceof FileView) || !view.file) {
       return;
     }
 
-    const newDailyNoteKey = getDateUidFromFile(view.file);
+    const newDay = getDateFromFile(view.file, "day");
 
-    if (!newDailyNoteKey) {
-      if (get(dayShownInTimeline) !== getDateUidForToday()) {
-        dayShownInTimeline.set(getDateUidForToday());
+    if (!newDay) {
+      if (isToday(get(visibleDayInTimeline))) {
+        visibleDayInTimeline.set(window.moment());
       }
 
       return;
     }
 
-    dayShownInTimeline.set(newDailyNoteKey);
+    visibleDayInTimeline.set(newDay);
   };
 
   private registerCommands() {
@@ -162,7 +159,7 @@ export default class DayPlanner extends Plugin {
 
   private updateStatusBar = async () => {
     if (dailyNoteExists()) {
-      await this.statusBar.update(get(tasks));
+      await this.statusBar.update(get(tasksForStatusBar));
     } else {
       this.statusBar.setEmpty();
     }

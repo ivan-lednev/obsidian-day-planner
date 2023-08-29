@@ -12,9 +12,10 @@ import { isNotVoid } from "typed-assert";
 import { computeOverlap } from "../parser/overlap";
 import { parsePlanItems } from "../parser/parser";
 import { appStore } from "../store/app-store";
-import { getHorizontalPlacing } from "../store/horizontal-placing";
 import { settings } from "../store/settings";
 import type { PlanItem } from "../types";
+
+import { getHorizontalPlacing } from "./horizontal-placing";
 
 export async function openFileInEditor(file: TFile) {
   const app = get(appStore);

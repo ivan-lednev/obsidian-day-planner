@@ -1,7 +1,7 @@
 import type { Moment } from "moment";
 import type { Writable } from "svelte/store";
 
-import type { getHorizontalPlacing } from "./store/horizontal-placing";
+import type { getHorizontalPlacing } from "./util/horizontal-placing";
 
 export interface PlanItemLocation {
   path: string;

@@ -4,9 +4,9 @@
   import type { Writable } from "svelte/store";
 
   import { TASKS_FOR_DAY } from "../../constants";
-  import { editCancellation, editConfirmation } from "../../store/edit";
-  import { getHorizontalPlacing } from "../../store/horizontal-placing";
+  import { editCancellation, editConfirmation } from "../../store/edit-events";
   import type { PlacedPlanItem, PlanItem } from "../../types";
+  import { getHorizontalPlacing } from "../../util/horizontal-placing";
   import { useCreate } from "../hooks/use-create";
 
   import Task from "./task.svelte";
