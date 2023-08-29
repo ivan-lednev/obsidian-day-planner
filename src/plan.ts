@@ -16,19 +16,19 @@ export function createPlannerHeading() {
   return `${headingTokens} ${plannerHeading}`;
 }
 
+// todo: replace with mdast-util-from-markdown + custom stringify
 export async function appendToPlan(path: string, planItem: PlanItem) {
   const app = get(appStore);
   const { plannerHeading } = get(settings);
 
   const file = await getFileByPath(path);
-  const metadata = app.metadataCache.getFileCache(file);
+  const metadata = app.metadataCache.getFileCache(file) || {};
   const editor = await openFileInEditor(file);
 
+  let line = editor.lastLine();
   let result = replaceTimestamp(planItem, { ...planItem });
 
   const headingLine = getHeadingByText(metadata, plannerHeading);
-
-  let line = editor.lastLine();
 
   if (!headingLine) {
     result = `${createPlannerHeading()}\n\n${result}`;

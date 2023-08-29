@@ -28,10 +28,11 @@ export function useCreate() {
     creating.set(false);
 
     const newPlanItem = await createPlanItemFromTimeline(day, pointerYOffset);
+    const filePath = getDailyNote(day, getAllDailyNotes()).path;
 
     // todo: clean up item creation
     // @ts-ignore
-    await appendToPlan(getDailyNote(day, getAllDailyNotes()).path, newPlanItem);
+    await appendToPlan(filePath, newPlanItem);
 
     // @ts-ignore
     // todo: overlap logic should be hidden

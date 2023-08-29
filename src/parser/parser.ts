@@ -89,7 +89,7 @@ export function getListItemsUnderHeading(
 }
 
 export function getHeadingByText(metadata: CachedMetadata, text: string) {
-  const { headings } = metadata;
+  const { headings = [] } = metadata;
 
   return headings?.find((h) => h.heading === text);
 }
