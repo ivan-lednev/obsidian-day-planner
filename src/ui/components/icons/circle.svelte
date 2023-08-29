@@ -1,15 +1,15 @@
 <svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="16"
-  height="16"
-  viewBox="0 0 24 24"
+  style=" width: var(--icon-s); height: var(--icon-s);margin: 0.1rem 5px 0 0"
+  class="svg-icon lucide lucide-circle"
   fill="none"
+  height="16"
   stroke="currentColor"
-  stroke-width="2"
   stroke-linecap="round"
   stroke-linejoin="round"
-  class="lucide lucide-circle"
-  style="margin: 0.2rem 5px 0 0;"
+  stroke-width="2"
+  viewBox="0 0 24 24"
+  width="16"
+  xmlns="http://www.w3.org/2000/svg"
 >
   <circle cx="12" cy="12" r="10" />
 </svg>

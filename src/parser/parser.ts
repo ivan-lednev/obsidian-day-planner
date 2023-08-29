@@ -113,10 +113,10 @@ export function createPlanItem({
     groups: { listTokens, start, end, text, completion },
   } = match;
 
-  // todo: parser should not depend on UI state
   const startTime = parseTimestamp(start, day);
-
   const isCompleted = completion === "x";
+  const isTask = completion?.length > 0;
+
   return {
     listTokens,
     startTime,
@@ -128,6 +128,7 @@ export function createPlanItem({
     location,
     id: String(Math.random()),
     isCompleted,
+    isTask,
   };
 }
 

@@ -1,5 +1,9 @@
 import { FileView, Plugin, TFile, WorkspaceLeaf } from "obsidian";
-import { getDateFromFile } from "obsidian-daily-notes-interface";
+import {
+  getAllDailyNotes,
+  getDailyNote,
+  getDateFromFile,
+} from "obsidian-daily-notes-interface";
 import { get } from "svelte/store";
 
 import { VIEW_TYPE_TIMELINE, VIEW_TYPE_WEEKLY } from "./constants";
@@ -7,7 +11,6 @@ import { createPlannerHeading } from "./plan";
 import { DayPlannerSettings } from "./settings";
 import { appStore } from "./store/app-store";
 import { settings } from "./store/settings";
-import { tasksForStatusBar } from "./store/tasks-for-status-bar";
 import { visibleDateRange } from "./store/visible-date-range";
 import { visibleDayInTimeline } from "./store/visible-day-in-timeline";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
@@ -16,6 +19,7 @@ import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
 import { getDaysOfCurrentWeek, isToday } from "./util/moment";
+import { getPlanItemsFromFile } from "./util/obsidian";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
@@ -66,7 +70,7 @@ export default class DayPlanner extends Plugin {
     this.registerInterval(
       window.setInterval(
         () => this.updateStatusBarOnFailed(this.updateStatusBar),
-        1000,
+        5000,
       ),
     );
   }
@@ -166,7 +170,9 @@ export default class DayPlanner extends Plugin {
 
   private updateStatusBar = async () => {
     if (dailyNoteExists()) {
-      await this.statusBar.update(get(tasksForStatusBar));
+      const note = getDailyNote(window.moment(), getAllDailyNotes());
+      const planItems = await getPlanItemsFromFile(note);
+      await this.statusBar.update(planItems);
     } else {
       this.statusBar.setEmpty();
     }

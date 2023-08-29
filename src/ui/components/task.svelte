@@ -12,15 +12,13 @@
   import { useResize } from "../hooks/use-resize";
   import { watch } from "../hooks/watch";
 
-  import RenderedMarkdown from "./rendered-markdown.svelte";
-
-  import TaskCircleIcon from "./icons/circle.svelte";
   import TaskCompletedIcon from "./icons/check-circle.svelte";
+  import TaskCircleIcon from "./icons/circle.svelte";
+  import RenderedMarkdown from "./rendered-markdown.svelte";
 
   export let planItem: PlacedPlanItem;
   export let pointerYOffset: number;
   export let isGhost = false;
-  export let isCompleted: boolean;
 
   const {
     dragging,
@@ -72,18 +70,20 @@
 >
   <div
     class="task {relationToNow}"
+    class:is-completed={planItem.isCompleted}
     class:is-ghost={isGhost}
     class:past={relationToNow === "past"}
     class:present={relationToNow === "present"}
-    class:is-completed={isCompleted}
     on:mousedown|stopPropagation={(e) => {
       startMove(e);
     }}
   >
-    {#if isCompleted}
-      <TaskCompletedIcon />
-    {:else}
-      <TaskCircleIcon />
+    {#if planItem.isTask}
+      {#if planItem.isCompleted}
+        <TaskCompletedIcon />
+      {:else}
+        <TaskCircleIcon />
+      {/if}
     {/if}
     <RenderedMarkdown text={planItem.text} />
     <div
@@ -135,7 +135,6 @@
 
   .is-completed {
     color: var(--text-faint);
-    background-color: #7b9c3c;
     text-decoration: line-through;
   }
 

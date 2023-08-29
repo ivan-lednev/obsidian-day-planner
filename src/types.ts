@@ -21,6 +21,7 @@ export interface PlanItem {
   location?: PlanItemLocation;
   id: string;
   isCompleted: boolean;
+  isTask: boolean;
 }
 
 export interface PlacedPlanItem extends PlanItem {
