@@ -23,11 +23,6 @@
 
 # Time Block Planner
 
-## Purpose
-
-This is an ideological successor to [obsidian-day-planner](https://github.com/lynchjames/obsidian-day-planner), which
-got abandoned by the author.
-
 ## Contributing
 
 🪲 [Create issues](https://github.com/ivan-lednev/obsidian-day-planner/issues)
@@ -38,20 +33,6 @@ guidance. Also, please check out [CONTRIBUTING](./CONTRIBUTING.md).
 You can also support the development of this plugin directly:
 
 <a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
-
-## About Obsidian Day Planner
-
-The author of Obsidian Day Planner disappeared a while ago, leaving one of the most popular plugins in a mess. I
-initially forked it, but ended up rewriting almost all of it.
-
-### What's the difference?
-
-- The UI has been rewritten
-- There is only one mode now: daily notes
-- I've removed Mermaid-related functionality to make the scope of the plugin more focused
-- You can specify an end time for a task
-- The plugin 'understands' timestamps in almost any format
-- There is a lot of other features available (see below)
 
 ## Features
 
