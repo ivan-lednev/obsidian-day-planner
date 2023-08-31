@@ -48,13 +48,13 @@ You can also support the development of this plugin directly:
 
 ![](./assets/navigation-demo.png)
 
+### Use the weekly view to plan out the whole week
+
+![2023-08-31_10h16_58](https://github.com/ivan-lednev/obsidian-day-planner/assets/41428836/af402baa-01e7-46fe-9b32-3831e127ee28)
+
 ### Use drag-and-drop to create and update tasks
 
 ![](assets/dnd-demo.gif)
-
-### Overlapping tasks push each other
-
-![](assets/overlap-demo.png)
 
 ## Usage
 
