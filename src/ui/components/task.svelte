@@ -96,8 +96,7 @@
 <style>
   .gap-box {
     display: flex;
-    padding-right: 3px;
-    padding-left: 3px;
+    padding: 0 3px 1px;
     transition: 0.05s linear;
   }
 
