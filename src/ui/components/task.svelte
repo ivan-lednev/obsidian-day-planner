@@ -102,7 +102,7 @@
   }
 
   .task {
-    overflow: visible;
+    overflow: hidden;
     display: flex;
     flex: 1 0 0;
     align-items: flex-start;
