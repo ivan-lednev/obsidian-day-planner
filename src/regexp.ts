@@ -11,7 +11,7 @@ const hours = `\\d{1,2}`;
 const minutes = `\\d{2}`;
 const hourMinuteSeparator = `[:. ]`;
 
-const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))?\\s*([ap]m)?`;
+const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))?\\s*([apAP][mM])?`;
 
 export const timeRegExp = new RegExp(time);
 export const timestampRegExp = new RegExp(
