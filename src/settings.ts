@@ -7,7 +7,7 @@ export class DayPlannerSettings {
   endLabel: string = "All done";
   startHour: number = 6;
   timelineDateFormat: string = "LLLL";
-  centerNeedle: boolean = true;
+  centerNeedle: boolean = false;
   plannerHeading: string = "Day planner";
   plannerHeadingLevel: number = 1;
 }

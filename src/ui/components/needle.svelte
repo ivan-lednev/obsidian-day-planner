@@ -5,7 +5,7 @@
   import { visibleDayInTimeline } from "../../store/visible-day-in-timeline";
   import { getMinutesSinceMidnight, isToday } from "../../util/moment";
 
-  export let scrollBlockedByUser = false;
+  export let autoScrollBlocked = false;
 
   let el: HTMLDivElement;
   let coords = $timeToTimelineOffset(getMinutesSinceMidnight($currentTime));
@@ -13,7 +13,7 @@
   function scrollIntoView() {
     if (
       $settings.centerNeedle &&
-      !scrollBlockedByUser &&
+      !autoScrollBlocked &&
       isToday($visibleDayInTimeline)
     ) {
       el?.scrollIntoView({ behavior: "smooth", block: "center" });

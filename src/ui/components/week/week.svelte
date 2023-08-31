@@ -40,7 +40,7 @@
       <div class="scale-with-days">
         <Column visibleHours={$visibleHours}>
           {#if isToday(day)}
-            <Needle scrollBlockedByUser={false} />
+            <Needle autoScrollBlocked={true} />
           {/if}
 
           {#await getPlanItemsFromFile(getDailyNote(day, getAllDailyNotes())) then tasks}

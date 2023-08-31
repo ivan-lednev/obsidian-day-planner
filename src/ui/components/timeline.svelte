@@ -36,7 +36,7 @@
     <Ruler visibleHours={$visibleHours} />
     <Column visibleHours={$visibleHours}>
       {#if isToday($visibleDayInTimeline)}
-        <Needle scrollBlockedByUser={userHoversOverScroller} />
+        <Needle autoScrollBlocked={userHoversOverScroller} />
       {/if}
       {#await getPlanItemsFromFile(getDailyNote($visibleDayInTimeline, getAllDailyNotes())) then tasks}
         <TaskContainer
