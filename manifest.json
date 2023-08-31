@@ -1,10 +1,10 @@
 {
   "id": "obsidian-day-planner",
-  "name": "Time Block Planner",
+  "name": "Day Planner",
   "version": "0.7.0",
   "minAppVersion": "0.16.0",
   "description": "A day planner with clean UI and readable syntax",
-  "author": "Ivan Lednev",
+  "author": "James Lynch, continued by Ivan Lednev",
   "authorUrl": "https://github.com/ivan-lednev",
   "fundingUrl": "https://www.buymeacoffee.com/machineelf",
   "isDesktopOnly": false
