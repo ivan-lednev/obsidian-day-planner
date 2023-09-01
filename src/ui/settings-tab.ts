@@ -218,6 +218,57 @@ When you open a file, the plugin will search for this heading to detect a day pl
             await this.plugin.saveData(this.plugin.settings);
           }),
       );
+
+    new Setting(containerEl)
+      .setName("Colorful Timeline")
+      .setDesc(
+        "If the planner timeline should be monochrome or color tasks based on time of day",
+      )
+      .addToggle((component) => {
+        component
+          .setValue(this.plugin.settings.timelineColored)
+          .onChange(async (value) => {
+            settings.update((previous) => ({
+              ...previous,
+              timelineColored: value,
+            }));
+
+            this.plugin.settings.timelineColored = value;
+            await this.plugin.saveData(this.plugin.settings);
+          });
+      });
+
+    new Setting(containerEl)
+      .setName("Colorful Timeline - Start Color")
+      .addColorPicker((component) => {
+        component
+          .setValue(this.plugin.settings.timelineStartColor)
+          .onChange(async (value) => {
+            settings.update((previous) => ({
+              ...previous,
+              timelineStartColor: value,
+            }));
+
+            this.plugin.settings.timelineStartColor = value;
+            await this.plugin.saveData(this.plugin.settings);
+          });
+      });
+
+    new Setting(containerEl)
+      .setName("Colorful Timeline - End Color")
+      .addColorPicker((component) => {
+        component
+          .setValue(this.plugin.settings.timelineEndColor)
+          .onChange(async (value) => {
+            settings.update((previous) => ({
+              ...previous,
+              timelineEndColor: value,
+            }));
+
+            this.plugin.settings.timelineEndColor = value;
+            await this.plugin.saveData(this.plugin.settings);
+          });
+      });
   }
 
   private modeDescriptionContent(): DocumentFragment {
