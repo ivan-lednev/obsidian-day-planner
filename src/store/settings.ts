@@ -7,4 +7,7 @@ export const settings = writable({
   timelineDateFormat: "LLLL",
   plannerHeading: "Day planner",
   plannerHeadingLevel: 1,
+  timelineColored: false,
+  timelineStartColor: "#006466",
+  timelineEndColor: "#4d194d",
 });

@@ -1,10 +1,12 @@
 <script lang="ts">
+  import chroma from "chroma-js";
   import { GripVertical } from "lucide-svelte";
   import { MarkdownView } from "obsidian";
 
   import { appStore } from "../../store/app-store";
   import { currentTime } from "../../store/current-time";
   import { editCancellation, editConfirmation } from "../../store/edit-events";
+  import { settings } from "../../store/settings";
   import {
     durationToSize,
     roundToSnapStep,
@@ -33,6 +35,12 @@
   } = useDrag();
 
   const { resizing, cancelResize, startResize, confirmResize } = useResize();
+
+  $: colorScale = chroma.scale([$settings.timelineStartColor, $settings.timelineEndColor]).mode("lab");
+
+  $: backgroundColor = $settings.timelineColored
+    ? colorScale((planItem.startTime.hour() - $settings.startHour )/ (24-$settings.startHour)).hex()
+    : "var(--background-primary)";
 
   $: initialOffset = isGhost
     ? roundToSnapStep(pointerYOffset)
@@ -71,6 +79,7 @@
   class="gap-box absolute-stretch-x"
 >
   <div
+    style:background-color="{backgroundColor}"
     class="task {relationToNow}"
     class:is-ghost={isGhost}
     class:past={relationToNow === "past"}
@@ -144,7 +153,6 @@
     overflow-wrap: anywhere;
     white-space: normal;
 
-    background-color: var(--background-primary);
     border: 1px solid var(--text-faint);
     border-radius: var(--radius-s);
   }
