@@ -50,7 +50,7 @@ You can also support the development of this plugin directly:
 
 ### Write a plan using a human-readable format or drag-and-drop and see it rendered in a side panel
 
-![image](./assets/main-demo-2.png)
+![2023-09-02_12h15_43](https://github.com/ivan-lednev/obsidian-day-planner/assets/41428836/8fadc82c-4844-4152-8235-8c880a1050f6)
 
 ### Observe your progress in the status bar
 
