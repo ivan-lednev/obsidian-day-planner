@@ -14,7 +14,6 @@
   export let tasks: Writable<PlacedPlanItem[]>;
   export let day: Moment;
 
-  const cancelMessage = "Release outside timeline to cancel";
   const defaultDurationForNewTask = 30;
 
   const { creating, startCreation, confirmCreation } = useCreate();
@@ -47,6 +46,16 @@
   function getPlanItemKey(planItem: PlanItem) {
     return `${planItem.startTime} ${planItem.text}`;
   }
+
+  function getDefaultPlacedPlanItem() {
+    // todo: no `as`
+    return {
+      durationMinutes: defaultDurationForNewTask,
+      text: "New item",
+      id: "",
+      placing: { ...getHorizontalPlacing() },
+    } as PlacedPlanItem;
+  }
 </script>
 
 <svelte:document on:mouseup={editCancellation.trigger} />
@@ -62,17 +71,7 @@
     <Task {planItem} {pointerYOffset} />
   {/each}
   {#if $creating}
-    <Task
-      isGhost
-      planItem={{
-        durationMinutes: defaultDurationForNewTask,
-        text: "New item",
-        id: "",
-        placing: { ...getHorizontalPlacing() },
-      }}
-      {pointerYOffset}
-      text={cancelMessage}
-    />
+    <Task isGhost planItem={getDefaultPlacedPlanItem()} {pointerYOffset} />
   {/if}
 </div>
 
