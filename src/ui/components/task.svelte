@@ -72,7 +72,6 @@
 >
   <div
     class="task {relationToNow}"
-    class:is-completed={planItem.isCompleted}
     class:is-ghost={isGhost}
     class:past={relationToNow === "past"}
     class:present={relationToNow === "present"}
@@ -164,11 +163,6 @@
 
   .is-ghost {
     opacity: 0.6;
-  }
-
-  .is-completed {
-    color: var(--text-faint);
-    text-decoration: line-through;
   }
 
   .resize-handle {

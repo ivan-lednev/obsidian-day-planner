@@ -139,13 +139,16 @@ function getDisplayedText(
   const isTask = completion?.length > 0;
 
   const indexOfFirstNewline = completeContent.indexOf("\n");
-
-  if (indexOfFirstNewline < 0) {
-    return text;
-  }
-
   const indexAfterFirstNewline = indexOfFirstNewline + 1;
   const linesAfterFirst = completeContent.substring(indexAfterFirstNewline);
+
+  if (indexOfFirstNewline < 0) {
+    if (isTask) {
+      return `${listTokens}${text}`;
+    }
+
+    return text;
+  }
 
   if (isTask) {
     return `${listTokens}${text}\n${linesAfterFirst}`;

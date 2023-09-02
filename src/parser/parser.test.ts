@@ -21,6 +21,18 @@ it("grabs complete text", () => {
   });
 });
 
+it("preserves checkbox when task has no sub-items", () => {
+  const [{ text }] = parsePlanItems(
+    endTime.content,
+    endTime.metadata,
+    "Day planner",
+    "",
+    window.moment(),
+  );
+
+  expect(text).toMatch(/^- \[ ] /);
+});
+
 it("removes bullets from non-tasks", () => {
   const [{ text }] = parsePlanItems(
     subtasks.content,
