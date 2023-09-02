@@ -13,5 +13,4 @@ module.exports = {
   },
   transformIgnorePatterns: ["/node_modules/(?!@testing-library/svelte)"],
   moduleFileExtensions: ["js", "ts", "svelte"],
-  modulePathIgnorePatterns: ['parser.test.ts']
 };

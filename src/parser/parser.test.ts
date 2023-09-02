@@ -1,4 +1,3 @@
-import * as basic from "./fixtures/basic";
 import * as endTime from "./fixtures/end-time";
 import * as listItemsAbove from "./fixtures/list-items-above";
 import * as subheadings from "./fixtures/subheadings";
@@ -8,52 +7,72 @@ import { parsePlanItems } from "./parser";
 
 const defaultPlannerHeading = "Day planner";
 
-it("parses tasks with timestamps from lines", () => {
-  expect(
-    parsePlanItems(
-      basic.content,
-      basic.metadata,
-      defaultPlannerHeading,
-      "",
-      window.moment(),
-    ),
-  ).toMatchSnapshot();
+it("grabs complete text", () => {
+  const [first] = parsePlanItems(
+    subtasks.content,
+    subtasks.metadata,
+    "Day planner",
+    "",
+    window.moment(),
+  );
+
+  expect(first).toMatchObject({
+    text: expect.stringContaining("1.1"),
+  });
 });
 
-it("grabs subtasks", () => {
-  expect(
-    parsePlanItems(
-      subtasks.content,
-      subtasks.metadata,
-      "Day planner",
-      "",
-      window.moment(),
-    ),
-  ).toMatchSnapshot();
+it("removes bullets from non-tasks", () => {
+  const [{ text }] = parsePlanItems(
+    subtasks.content,
+    subtasks.metadata,
+    "Day planner",
+    "",
+    window.moment(),
+  );
+
+  expect(text).not.toMatch(/^- /);
+});
+
+it("removes indentation for sub-items under non-tasks", () => {
+  const [{ text }] = parsePlanItems(
+    subtasks.content,
+    subtasks.metadata,
+    "Day planner",
+    "",
+    window.moment(),
+  );
+
+  expect(text).not.toMatch(/^\s+- /);
 });
 
 it("parses bullet lists without checkboxes", () => {
-  expect(
-    parsePlanItems(
-      withoutTasks.content,
-      withoutTasks.metadata,
-      defaultPlannerHeading,
-      "",
-      window.moment(),
-    ),
-  ).toMatchSnapshot();
+  const [first, second] = parsePlanItems(
+    withoutTasks.content,
+    withoutTasks.metadata,
+    defaultPlannerHeading,
+    "",
+    window.moment(),
+  );
+
+  expect(first).toMatchObject({
+    text: expect.stringContaining("1"),
+  });
+  expect(second).toMatchObject({
+    text: expect.stringContaining("2"),
+  });
 });
 
 it("parses end time", () => {
-  expect(
-    parsePlanItems(
-      endTime.content,
-      endTime.metadata,
-      defaultPlannerHeading,
-      "",
-      window.moment(),
-    ),
-  ).toMatchSnapshot();
+  const planItems = parsePlanItems(
+    endTime.content,
+    endTime.metadata,
+    defaultPlannerHeading,
+    "",
+    window.moment(),
+  );
+  const first = planItems[0];
+
+  expect(first).toMatchObject({ endMinutes: 680 });
 });
 
 it("handles list items above daily plan", () => {
@@ -65,7 +84,7 @@ it("handles list items above daily plan", () => {
       "",
       window.moment(),
     ),
-  ).toMatchObject([{ text: "Wake up" }]);
+  ).toMatchObject([{ text: expect.stringContaining("Wake up") }]);
 });
 
 it("handles tasks under subheadings", () => {
