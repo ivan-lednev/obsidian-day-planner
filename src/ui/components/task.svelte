@@ -78,7 +78,7 @@
     class:present={relationToNow === "present"}
     on:mousedown={(event) => event.stopPropagation()}
     on:mouseup={async () => {
-      if ($dragging) {
+      if (isGhost || $dragging) {
         return;
       }
 
