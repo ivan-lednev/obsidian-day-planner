@@ -73,6 +73,7 @@
     "obsidian-daily-notes-interface": "^0.9.4",
     "prettier-plugin-svelte": "^3.0.3",
     "stylelint-config-clean-order": "^5.0.1",
+    "ts-dedent": "^2.2.0",
     "typed-assert": "^1.0.9"
   }
 }

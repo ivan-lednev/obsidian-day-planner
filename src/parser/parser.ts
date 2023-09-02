@@ -1,5 +1,6 @@
 import type { Moment } from "moment";
 import type { CachedMetadata, ListItemCache } from "obsidian";
+import { dedent } from "ts-dedent";
 
 import { isTopLevelListItem } from "../../obsidian-metadata-utils/src/list";
 import { getTextAtPosition } from "../../obsidian-metadata-utils/src/position";
@@ -31,6 +32,7 @@ export function parsePlanItems(
     .map((li) =>
       createPlanItem({
         line: li.listItemLineContent,
+        completeContent: li.listItemCompleteContent,
         location: { path, line: li.line },
         day,
       }),
@@ -96,10 +98,12 @@ export function getHeadingByText(metadata: CachedMetadata, text: string) {
 
 export function createPlanItem({
   line,
+  completeContent,
   location,
   day,
 }: {
   line: string;
+  completeContent: string;
   location: PlanItemLocation;
   day: Moment;
 }) {
@@ -110,26 +114,46 @@ export function createPlanItem({
   }
 
   const {
-    groups: { listTokens, start, end, text, completion },
+    groups: { listTokens, start, end, text },
   } = match;
 
   const startTime = parseTimestamp(start, day);
-  const isCompleted = completion === "x";
-  const isTask = completion?.length > 0;
 
   return {
     listTokens,
     startTime,
-    // todo: parser should not depend on UI state
     endTime: parseTimestamp(end, day),
     rawStartTime: start,
     rawEndTime: end,
-    text,
+    text: getDisplayedText(match, completeContent),
+    firstLineText: text,
     location,
     id: String(Math.random()),
-    isCompleted,
-    isTask,
   };
+}
+
+function getDisplayedText(
+  { groups: { text, listTokens, completion } }: RegExpExecArray,
+  completeContent: string,
+) {
+  const isTask = completion?.length > 0;
+
+  const indexOfFirstNewline = completeContent.indexOf("\n");
+
+  if (indexOfFirstNewline < 0) {
+    return text;
+  }
+
+  const indexAfterFirstNewline = indexOfFirstNewline + 1;
+  const linesAfterFirst = completeContent.substring(indexAfterFirstNewline);
+
+  if (isTask) {
+    return `${listTokens}${text}\n${linesAfterFirst}`;
+  }
+
+  const formattedLinesAfterFirst = dedent(linesAfterFirst).trimStart();
+
+  return `${text}\n${formattedLinesAfterFirst}`;
 }
 
 function groupTopListItemsWithDescendants(listItems: ListItemCache[]) {

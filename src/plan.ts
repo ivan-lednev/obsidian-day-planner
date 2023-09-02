@@ -21,7 +21,7 @@ export async function appendToPlan(path: string, planItem: PlanItem) {
   const app = get(appStore);
   const { plannerHeading } = get(settings);
 
-  const file = await getFileByPath(path);
+  const file = getFileByPath(path);
   const metadata = app.metadataCache.getFileCache(file) || {};
   const editor = await openFileInEditor(file);
 
@@ -30,10 +30,10 @@ export async function appendToPlan(path: string, planItem: PlanItem) {
 
   const headingLine = getHeadingByText(metadata, plannerHeading);
 
-  if (!headingLine) {
-    result = `${createPlannerHeading()}\n\n${result}`;
-  } else {
+  if (headingLine) {
     line = headingLine.position.start.line;
+  } else {
+    result = `${createPlannerHeading()}\n\n${result}`;
   }
 
   const listItems = getListItemsUnderHeading(metadata, plannerHeading);
@@ -50,5 +50,5 @@ export async function appendToPlan(path: string, planItem: PlanItem) {
 
   editor.replaceRange(`\n${result}`, { line, ch });
 
-  selectText(editor, planItem.text);
+  selectText(editor, planItem.firstLineText);
 }

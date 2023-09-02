@@ -1,4 +1,8 @@
 <script lang="ts">
+  import { GripVertical } from "lucide-svelte";
+  import { MarkdownView } from "obsidian";
+
+  import { appStore } from "../../store/app-store";
   import { currentTime } from "../../store/current-time";
   import { editCancellation, editConfirmation } from "../../store/edit-events";
   import {
@@ -8,12 +12,11 @@
   } from "../../store/timeline-store";
   import type { PlacedPlanItem } from "../../types";
   import { getRelationToNow } from "../../util/moment";
+  import { getFileByPath, openFileInEditor } from "../../util/obsidian";
   import { useDrag } from "../hooks/use-drag";
   import { useResize } from "../hooks/use-resize";
   import { watch } from "../hooks/watch";
 
-  import TaskCompletedIcon from "./icons/check-circle.svelte";
-  import TaskCircleIcon from "./icons/circle.svelte";
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
   export let planItem: PlacedPlanItem;
@@ -63,7 +66,6 @@
 <div
   style:height="{height}px"
   style:transform="translateY({offset}px)"
-  style:cursor={$cursor}
   style:width="{planItem.placing.widthPercent || 100}%"
   style:left="{planItem.placing.xOffsetPercent || 0}%"
   class="gap-box absolute-stretch-x"
@@ -74,18 +76,32 @@
     class:is-ghost={isGhost}
     class:past={relationToNow === "past"}
     class:present={relationToNow === "present"}
-    on:mousedown|stopPropagation={(e) => {
-      startMove(e);
+    on:mousedown={(event) => event.stopPropagation()}
+    on:mouseup={async () => {
+      if ($dragging) {
+        return;
+      }
+
+      const file = getFileByPath(planItem.location.path);
+
+      const editor = await openFileInEditor(file);
+      $appStore.workspace
+        .getActiveViewOfType(MarkdownView)
+        ?.setEphemeralState({ line: planItem.location.line });
+
+      editor.setCursor({ line: planItem.location.line, ch: 0 });
     }}
   >
-    {#if planItem.isTask}
-      {#if planItem.isCompleted}
-        <TaskCompletedIcon />
-      {:else}
-        <TaskCircleIcon />
-      {/if}
-    {/if}
     <RenderedMarkdown text={planItem.text} />
+    <div
+      style:cursor={$cursor}
+      class="grip"
+      on:mousedown|stopPropagation={(e) => {
+        startMove(e);
+      }}
+    >
+      <GripVertical class="svg-icon" />
+    </div>
     <div
       class="resize-handle absolute-stretch-x"
       on:mousedown|stopPropagation={startResize}
@@ -94,22 +110,36 @@
 </div>
 
 <style>
+  .grip {
+    position: relative;
+    right: -4px;
+
+    grid-column: 2;
+    align-self: flex-start;
+
+    color: var(--text-faint);
+  }
+
+  .grip:hover {
+    color: var(--text-muted);
+  }
+
   .gap-box {
     display: flex;
-    padding: 0 3px 1px;
+    padding: 0 1px 2px;
     transition: 0.05s linear;
   }
 
   .task {
+    position: relative;
+
     overflow: hidden;
     display: flex;
     flex: 1 0 0;
-    align-items: flex-start;
-    justify-content: flex-start;
 
-    padding: 5px;
+    padding: 3px 5px 5px;
 
-    font-size: var(--font-ui-medium);
+    font-size: var(--font-ui-small);
     color: var(--text-muted);
     text-align: left;
     overflow-wrap: anywhere;
@@ -118,6 +148,10 @@
     background-color: var(--background-primary);
     border: 1px solid var(--text-faint);
     border-radius: var(--radius-s);
+  }
+
+  .task:hover {
+    border-color: var(--text-muted);
   }
 
   .past {
@@ -139,7 +173,7 @@
 
   .resize-handle {
     cursor: s-resize;
-    bottom: -15px;
-    height: 30px;
+    bottom: -8px;
+    height: 16px;
   }
 </style>

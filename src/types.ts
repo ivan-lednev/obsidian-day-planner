@@ -15,13 +15,12 @@ export interface PlanItem {
   rawEndTime: string;
   listTokens: string;
   text: string;
+  firstLineText: string;
   durationMinutes: number;
   startMinutes: number;
   endMinutes: number;
   location?: PlanItemLocation;
   id: string;
-  isCompleted: boolean;
-  isTask: boolean;
 }
 
 export interface PlacedPlanItem extends PlanItem {

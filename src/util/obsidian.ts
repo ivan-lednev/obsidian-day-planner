@@ -32,7 +32,7 @@ export async function openFileForDay(moment: Moment) {
   return openFileInEditor(dailyNote);
 }
 
-export async function getFileByPath(path: string) {
+export function getFileByPath(path: string) {
   const app = get(appStore);
 
   const file = app.vault.getAbstractFileByPath(path);

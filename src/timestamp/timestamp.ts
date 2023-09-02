@@ -45,7 +45,7 @@ export function replaceTimestamp(
   return `${planItem.listTokens}${createTimestamp(
     startMinutes,
     durationMinutes,
-  )} ${planItem.text}`;
+  )} ${planItem.firstLineText}`;
 }
 
 function createTimestamp(startMinutes: number, durationMinutes: number) {

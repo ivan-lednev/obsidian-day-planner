@@ -1,6 +1,7 @@
 import { flow, map } from "lodash/fp";
 import { TFile } from "obsidian";
 import { get, Writable } from "svelte/store";
+import { isInstanceOf } from "typed-assert";
 
 import { replaceTimestamp } from "../timestamp/timestamp";
 import type { PlanItem, Timestamp } from "../types";
@@ -38,6 +39,7 @@ export async function updateTimestamps(
   );
 }
 
+// todo: out of place
 async function updateDurationInDailyNote(
   task: PlanItem,
   startAndDuration: Timestamp,
@@ -46,10 +48,7 @@ async function updateDurationInDailyNote(
 
   const file = vault.getAbstractFileByPath(task.location.path);
 
-  if (!(file instanceof TFile)) {
-    // todo: we can do better
-    throw new Error("Something is wrong");
-  }
+  isInstanceOf(file, TFile, `${task.location.path} is not a markdown file`);
 
   const contents = await vault.read(file);
   // todo: this is inefficient

@@ -57,7 +57,7 @@ async function createPlanItemFromTimeline(day: Moment, pointerYOffset: number) {
     startMinutes,
     durationMinutes: DEFAULT_DURATION_MINUTES,
     endMinutes,
-    text: "New item",
+    firstLineText: "New item",
     startTime: minutesToMomentOfDay(startMinutes, day),
     endTime: minutesToMomentOfDay(endMinutes, day),
     // todo: no hardcode
