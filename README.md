@@ -50,7 +50,7 @@ You can also support the development of this plugin directly:
 
 ### Write a plan using a human-readable format or drag-and-drop and see it rendered in a side panel
 
-![image](./assets/main-demo.png)
+![image](./assets/main-demo-2.png)
 
 ### Observe your progress in the status bar
 
