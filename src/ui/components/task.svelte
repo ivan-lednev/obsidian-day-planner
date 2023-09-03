@@ -161,7 +161,7 @@
     display: flex;
     flex: 1 0 0;
 
-    padding: 3px 5px 5px;
+    padding: 4px 6px 6px;
 
     font-size: var(--font-ui-small);
     color: var(--text-normal);
