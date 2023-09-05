@@ -198,6 +198,7 @@ export default class DayPlanner extends Plugin {
       type: VIEW_TYPE_TIMELINE,
       active: true,
     });
+    this.app.workspace.rightSplit.expand();
   }
 
   private detachLeavesOfType(type: string) {
