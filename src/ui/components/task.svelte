@@ -13,6 +13,7 @@
     timeToTimelineOffset,
   } from "../../store/timeline-store";
   import type { PlacedPlanItem } from "../../types";
+  import { getTextColorWithEnoughContrast, IContrastColors } from "../../util/color";
   import { getRelationToNow } from "../../util/moment";
   import { getFileByPath, openFileInEditor } from "../../util/obsidian";
   import { useDrag } from "../hooks/use-drag";
@@ -41,6 +42,15 @@
   $: backgroundColor = $settings.timelineColored
     ? colorScale((planItem.startTime.hour() - $settings.startHour )/ (24-$settings.startHour)).hex()
     : "var(--background-primary)";
+
+  let properContrastColors: IContrastColors;
+  $: properContrastColors = $settings.timelineColored
+    ? getTextColorWithEnoughContrast(backgroundColor)
+    : {
+      normal: "var(--text-normal)",
+      muted: "var(--text-muted)",
+      faint: "var(--text-faint)"
+    };
 
   $: initialOffset = isGhost
     ? roundToSnapStep(pointerYOffset)
@@ -71,7 +81,13 @@
   });
 </script>
 
+<!--  overwrite global theme colors with contrasting text colors, when using colored theme-->
 <div
+  style="
+
+  --text-normal: {properContrastColors.normal};
+  --text-muted: {properContrastColors.muted};
+  --text-faint: {properContrastColors.faint}"
   style:height="{height}px"
   style:transform="translateY({offset}px)"
   style:width="{planItem.placing.widthPercent || 100}%"
@@ -100,7 +116,7 @@
       editor.setCursor({ line: planItem.location.line, ch: 0 });
     }}
   >
-    <RenderedMarkdown text={planItem.text} />
+    <RenderedMarkdown {properContrastColors} text={planItem.text}/>
     <div
       style:cursor={$cursor}
       class="grip"
