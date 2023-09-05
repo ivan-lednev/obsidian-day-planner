@@ -39,12 +39,12 @@
 
   $: colorScale = chroma.scale([$settings.timelineStartColor, $settings.timelineEndColor]).mode("lab");
 
-  $: backgroundColor = $settings.timelineColored
+  $: backgroundColor = $settings.timelineColored && planItem.startTime
     ? colorScale((planItem.startTime.hour() - $settings.startHour )/ (24-$settings.startHour)).hex()
     : "var(--background-primary)";
 
   let properContrastColors: IContrastColors;
-  $: properContrastColors = $settings.timelineColored
+  $: properContrastColors = $settings.timelineColored && planItem.startTime
     ? getTextColorWithEnoughContrast(backgroundColor)
     : {
       normal: "var(--text-normal)",
