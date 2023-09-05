@@ -64,6 +64,11 @@
   }
 
   .rendered-markdown :global(li) {
-    color: var(--text-normal) !important;
+      color: var(--text-normal);
+  }
+
+  .rendered-markdown :global(li.task-list-item[data-task="x"]),
+  .rendered-markdown :global(li.task-list-item[data-task="X"]) {
+    color: var(--text-muted);
   }
 </style>
