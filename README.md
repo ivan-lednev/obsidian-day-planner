@@ -68,6 +68,10 @@ You can also support the development of this plugin directly:
 
 ![](assets/dnd-demo.gif)
 
+### Optional, configurable color-gradient mode
+
+![](assets/colorful_demo.gif)
+
 ## Usage
 
 1. **Either the core 'Daily Notes' or the 'Periodic Notes' plugins should be enabled**
@@ -92,6 +96,9 @@ You can choose to have an in-app notification display when a new task starts.
 ### Timeline Zoom Level
 
 This is the zoom level to display the timeline. The higher the number, the more vertical space each task will take up.
+
+### Colorful Timeline
+You can choose to display the timeline in a gradient across two colors.
 
 ## Commands
 
