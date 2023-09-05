@@ -169,12 +169,12 @@
     overflow-wrap: anywhere;
     white-space: normal;
 
-    border: 1px solid var(--text-faint);
+    border: 1px solid var(--color-base-50);
     border-radius: var(--radius-s);
   }
 
   .task:hover {
-    border-color: var(--text-muted);
+    border-color: var(--color-base-70);
   }
 
   .past {
