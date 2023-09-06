@@ -3,10 +3,7 @@
   import { onDestroy } from "svelte";
 
   import { appStore } from "../../store/app-store";
-  import type { IContrastColors } from "../../util/color";
-
   export let text: string;
-  export let properContrastColors: IContrastColors;
 
   let markdownLifecycleManager = new Component();
   let el: HTMLDivElement;
@@ -30,19 +27,12 @@
   }
 </script>
 
-<div bind:this={el}
-     style="
-
-     --text-normal: {properContrastColors.normal};
-     --text-muted: {properContrastColors.muted};
-     --text-faint: {properContrastColors.faint}
-    "
-     class="rendered-markdown"></div>
+<div bind:this={el} class="rendered-markdown"></div>
 
 <style>
   .rendered-markdown {
     --checkbox-size: var(--font-ui-small);
-
+    color: var(--text-normal);
     flex: 1 0 0;
   }
 
