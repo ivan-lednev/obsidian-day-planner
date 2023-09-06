@@ -1,12 +1,10 @@
 <script lang="ts">
-  import { hourSize } from "../../store/timeline-store";
-
   export let visibleHours: number[];
 </script>
 
 <div class="hours-container">
   {#each visibleHours as hour}
-    <div style:height="{$hourSize}px" class="hour">
+    <div style:height="{120}px" class="hour">
       <div class="hour-number-container">
         {hour}
       </div>
@@ -15,10 +13,6 @@
 </div>
 
 <style>
-  :root {
-    --background-modifier-border: grey;
-  }
-
   .hours-container {
     position: sticky;
     z-index: 5;

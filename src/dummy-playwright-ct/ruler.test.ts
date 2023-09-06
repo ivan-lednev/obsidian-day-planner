@@ -9,5 +9,5 @@ test("should work", async ({ mount }) => {
   });
 
   await expect(component).toContainText("3");
-  await expect(component).toHaveScreenshot();
+  await expect(component).toHaveScreenshot("dummy-screenshot.png");
 });

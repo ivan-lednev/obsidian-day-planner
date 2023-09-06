@@ -52,6 +52,21 @@
     ? "future"
     : getRelationToNow($currentTime, planItem.startTime, planItem.endTime);
 
+  async function handleMouseUp() {
+    if (isGhost || $dragging) {
+      return;
+    }
+
+    const file = getFileByPath(planItem.location.path);
+
+    const editor = await openFileInEditor(file);
+    $appStore.workspace
+      .getActiveViewOfType(MarkdownView)
+      ?.setEphemeralState({ line: planItem.location.line });
+
+    editor.setCursor({ line: planItem.location.line, ch: 0 });
+  }
+
   watch(editConfirmation, () => {
     confirmMove(offset, planItem.id, planItem.durationMinutes);
     confirmResize(planItem.id, height, planItem.startMinutes);
@@ -76,20 +91,7 @@
     class:past={relationToNow === "past"}
     class:present={relationToNow === "present"}
     on:mousedown={(event) => event.stopPropagation()}
-    on:mouseup={async () => {
-      if (isGhost || $dragging) {
-        return;
-      }
-
-      const file = getFileByPath(planItem.location.path);
-
-      const editor = await openFileInEditor(file);
-      $appStore.workspace
-        .getActiveViewOfType(MarkdownView)
-        ?.setEphemeralState({ line: planItem.location.line });
-
-      editor.setCursor({ line: planItem.location.line, ch: 0 });
-    }}
+    on:mouseup={handleMouseUp}
   >
     <RenderedMarkdown text={planItem.text} />
     <div

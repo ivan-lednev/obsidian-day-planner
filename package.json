@@ -11,7 +11,8 @@
     "typescript": "tsc --noEmit",
     "test": "jest src/",
     "prepare": "husky install",
-    "commitlint": "commitlint --edit"
+    "commitlint": "commitlint --edit",
+    "test-ct": "playwright test -c playwright-ct.config.ts"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +21,7 @@
     "@commitlint/cli": "^17.7.1",
     "@commitlint/config-conventional": "^17.7.0",
     "@jest/globals": "^29.6.2",
+    "@playwright/experimental-ct-svelte": "^1.37.1",
     "@testing-library/jest-dom": "^6.1.2",
     "@tsconfig/svelte": "^1.0.13",
     "@types/moment": "^2.13.0",

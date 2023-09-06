@@ -15,3 +15,6 @@ test-vault/
 TODO.md
 .idea
 data.json
+/test-results/
+/playwright-report/
+/playwright/.cache/

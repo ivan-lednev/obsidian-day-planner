@@ -9,8 +9,10 @@ export const hourSize = derived(
   ($settings) => $settings.zoomLevel * 60,
 );
 
+const hoursInDay = [...Array(24).keys()];
+
 export const visibleHours = derived(settings, ($settings) =>
-  [...Array(24).keys()].slice($settings.startHour),
+  hoursInDay.slice($settings.startHour),
 );
 
 // todo: this is out of place

@@ -49,7 +49,7 @@
   }
 
   .rendered-markdown :global(input[type="checkbox"]) {
-      top: 2px;
+    top: 2px;
     margin-inline-end: 4px;
   }
 </style>
