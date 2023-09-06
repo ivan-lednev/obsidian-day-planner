@@ -39,6 +39,15 @@ export async function updateTimestamps(
   );
 }
 
+export function updateStartMinutes(
+  tasks: Writable<Array<PlanItem>>,
+  id: string,
+  startMinutes: number,
+) {
+  // todo
+  return Promise.resolve("dummy");
+}
+
 // todo: out of place
 async function updateDurationInDailyNote(
   task: PlanItem,
