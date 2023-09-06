@@ -44,7 +44,7 @@
     : "var(--background-primary)";
 
   let properContrastColors: IContrastColors;
-  $: properContrastColors = backgroundColor.startsWith("#") && planItem.startTime
+  $: properContrastColors = $settings.timelineColored && planItem.startTime
     ? getTextColorWithEnoughContrast(backgroundColor)
     : {
       normal: "var(--text-normal)",
@@ -83,11 +83,6 @@
 
 <!--  overwrite global theme colors with contrasting text colors, when using colored theme-->
 <div
-  style="
-
-  --text-normal: {properContrastColors.normal};
-  --text-muted: {properContrastColors.muted};
-  --text-faint: {properContrastColors.faint}"
   style:height="{height}px"
   style:transform="translateY({offset}px)"
   style:width="{planItem.placing.widthPercent || 100}%"
@@ -116,7 +111,10 @@
       editor.setCursor({ line: planItem.location.line, ch: 0 });
     }}
   >
-    <RenderedMarkdown {properContrastColors} text={planItem.text}/>
+    <RenderedMarkdown text={planItem.text} 
+                      --text-normal="{properContrastColors.normal}"
+                      --text-muted="{properContrastColors.muted}"
+                      --text-faint="{properContrastColors.faint}"/>
     <div
       style:cursor={$cursor}
       class="grip"
@@ -164,7 +162,6 @@
     padding: 4px 6px 6px;
 
     font-size: var(--font-ui-small);
-    color: var(--text-normal);
     text-align: left;
     overflow-wrap: anywhere;
     white-space: normal;
