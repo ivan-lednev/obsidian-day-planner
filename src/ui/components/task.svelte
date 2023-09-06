@@ -44,7 +44,7 @@
     : "var(--background-primary)";
 
   let properContrastColors: IContrastColors;
-  $: properContrastColors = $settings.timelineColored && planItem.startTime
+  $: properContrastColors = backgroundColor.startsWith("#") && planItem.startTime
     ? getTextColorWithEnoughContrast(backgroundColor)
     : {
       normal: "var(--text-normal)",
