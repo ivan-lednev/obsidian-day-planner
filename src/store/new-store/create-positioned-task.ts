@@ -1,24 +1,36 @@
 import type { Moment } from "moment";
-import { derived, Readable, writable } from "svelte/store";
+import { derived, Readable, Writable, writable } from "svelte/store";
 
 import type { PlanItem } from "../../types";
 import { getRelationToNow } from "../../util/moment";
 
-import type { ReactiveSettingsWithUtils } from "./cool-store";
+import type { ReactiveSettingsWithUtils } from "./use-drag-new";
+import { useDrag } from "./use-drag-new";
 
 interface CreateTaskProps {
   settings: ReactiveSettingsWithUtils;
   currentTime: Readable<Moment>;
+  cursorOffsetY: Readable<number>;
 }
 
-export function createTask(
-  planItem: PlanItem,
-  { settings, currentTime }: CreateTaskProps,
+export function createPositionedTasks(
+  tasks: PlanItem[],
+  props: CreateTaskProps,
 ) {
-  const task = writable(planItem);
+  return writable(tasks.map((t) => createPositionedTask(writable(t), props)));
+}
 
-  // todo: add real one
-  const dragging = writable(false);
+export function createPositionedTask(
+  task: Writable<PlanItem>,
+  { settings, currentTime, cursorOffsetY }: CreateTaskProps,
+) {
+  const { dragging, ...useDragValues } = useDrag({
+    settings,
+    cursorOffsetY,
+    task,
+  });
+
+  // todo: use real one
   const resizing = writable(false);
 
   const initialOffset = derived(
@@ -30,15 +42,15 @@ export function createTask(
   );
 
   const offset = derived(
-    [dragging, initialOffset],
-    ([$dragging, $initialOffset]) => {
+    [dragging, initialOffset, cursorOffsetY],
+    ([$dragging, $initialOffset, $cursorOffsetY]) => {
       // todo: add real impl
-      return $dragging ? 0 : $initialOffset;
+      return $dragging ? $cursorOffsetY : $initialOffset;
     },
   );
 
   // keep the scope to a minimum for now
-  // // todo: startMins, endMins, duration - these are all derived
+  // // todo: startMins, endMins, duration - these are all derived, but they should already be available in tasks, because of overlap
   //
   // const startMinutes = derived(task, ($task) => {
   //   return getMinutesSinceMidnight($task.startTime)
@@ -78,5 +90,6 @@ export function createTask(
     offset,
     height,
     relationToNow,
+    ...useDragValues,
   };
 }

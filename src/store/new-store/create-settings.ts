@@ -2,6 +2,7 @@ import { derived, get, writable } from "svelte/store";
 
 import type { DayPlannerSettings } from "../../settings";
 
+// todo: we need a better name for that
 export function createSettings(pluginSettings: DayPlannerSettings) {
   const settings = writable(pluginSettings);
 
