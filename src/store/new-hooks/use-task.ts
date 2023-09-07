@@ -1,11 +1,12 @@
 import type { Moment } from "moment";
-import { derived, Readable, writable } from "svelte/store";
+import { derived, Readable } from "svelte/store";
 
 import type { PlanItem } from "../../types";
 import { getRelationToNow } from "../../util/moment";
 
 import type { ReactiveSettingsWithUtils } from "./new-use-drag";
 import { useDrag } from "./new-use-drag";
+import { useResize } from "./new-use-resize";
 
 interface CreateTaskProps {
   settings: ReactiveSettingsWithUtils;
@@ -25,8 +26,12 @@ export function useTask(
     onUpdate,
   });
 
-  // todo: use real one
-  const resizing = writable(false);
+  const { resizing, ...useResizeValues } = useResize({
+    settings,
+    task,
+    cursorOffsetY,
+    onUpdate,
+  });
 
   const initialOffset = derived(
     // todo: not sure if this is the cleanest way
@@ -48,10 +53,9 @@ export function useTask(
   });
 
   const height = derived(
-    [resizing, initialHeight],
-    ([$resizing, $initialHeight]) => {
-      // todo: add real impl
-      return $resizing ? 200 : $initialHeight;
+    [resizing, initialHeight, offset, cursorOffsetY],
+    ([$resizing, $initialHeight, $offset, $cursorOffsetY]) => {
+      return $resizing ? $cursorOffsetY - $offset : $initialHeight;
     },
   );
 
@@ -64,5 +68,6 @@ export function useTask(
     height,
     relationToNow,
     ...useDragValues,
+    ...useResizeValues,
   };
 }

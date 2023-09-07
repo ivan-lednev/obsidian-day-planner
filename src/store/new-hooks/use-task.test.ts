@@ -108,19 +108,76 @@ describe("dragging", () => {
 
     startMove();
     cursorOffsetY.set(10);
+    // todo: more assertions here
 
     confirmMove();
 
     expect(get(offset)).toEqual(480);
-    // todo: where is this magic number coming from?
     expect(onUpdateMock).toHaveBeenCalledWith(
-      expect.objectContaining({ startMinutes: 365 }),
+      expect.objectContaining({ startMinutes: 365 }), // todo: where is this magic number coming from?
     );
   });
 
   test.todo("tasks snap to round numbers while dragging");
 });
 
-test.todo("while resizing, height is derived from pointer position");
+describe("Resizing", () => {
+  test("while resizing, height is derived from pointer position", () => {
+    const cursorOffsetY = writable(0);
 
-test.todo("task height snaps to a round number while resizing");
+    const { height, startResize } = useTask(basePlanItem, {
+      settings,
+      currentTime,
+      cursorOffsetY,
+      onUpdate,
+    });
+
+    startResize();
+    cursorOffsetY.set(700);
+
+    expect(get(height)).toEqual(220);
+  });
+
+  test("cancel resize resets task height", () => {
+    const cursorOffsetY = writable(0);
+
+    const { height, startResize, cancelResize } = useTask(basePlanItem, {
+      settings,
+      currentTime,
+      cursorOffsetY,
+      onUpdate,
+    });
+
+    expect(get(height)).toEqual(120);
+
+    startResize();
+    cursorOffsetY.set(700);
+    cancelResize();
+
+    expect(get(height)).toEqual(120);
+  });
+
+  test("when resize ends, task updates and stops reacting to cursor", () => {
+    const cursorOffsetY = writable(0);
+    const mockOnUpdate = jest.fn();
+
+    const { height, startResize, confirmResize } = useTask(basePlanItem, {
+      settings,
+      currentTime,
+      cursorOffsetY,
+      onUpdate: mockOnUpdate,
+    });
+
+    expect(get(height)).toEqual(120);
+
+    startResize();
+    cursorOffsetY.set(700);
+    confirmResize();
+
+    expect(mockOnUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ endMinutes: 710 }),
+    );
+  });
+
+  test.todo("task height snaps to a round number while resizing");
+});
