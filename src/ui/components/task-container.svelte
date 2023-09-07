@@ -75,6 +75,8 @@
 
     editor.setCursor({ line: planItem.location.line, ch: 0 });
   }
+
+  async function asyncNoOp() {}
 </script>
 
 <svelte:document on:mouseup={editCancellation.trigger} />
@@ -97,8 +99,8 @@
   {#if $creating}
     <Task
       isGhost
-      onMouseUp={handleTaskMouseUp}
-      onUpdate={handleUpdate}
+      onMouseUp={asyncNoOp}
+      onUpdate={asyncNoOp}
       planItem={getDefaultPlacedPlanItem()}
       {pointerYOffset}
     />
