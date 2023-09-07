@@ -3,6 +3,7 @@ import { derived, Readable } from "svelte/store";
 
 import type { PlanItem } from "../../types";
 import { getRelationToNow } from "../../util/moment";
+import { roundToSnapStep } from "../timeline-store";
 
 import type { ReactiveSettingsWithUtils } from "./new-use-drag";
 import { useDrag } from "./new-use-drag";
@@ -34,7 +35,8 @@ export function useTask(
     onUpdate,
   });
 
-  const useColorValues = useColor({ settings, task });
+  // todo: lame
+  const useColorValues = useColor({ settings: settings.settings, task });
 
   const initialOffset = derived(
     // todo: not sure if this is the cleanest way
@@ -47,7 +49,12 @@ export function useTask(
   const offset = derived(
     [dragging, initialOffset, cursorOffsetY],
     ([$dragging, $initialOffset, $cursorOffsetY]) => {
-      return $dragging ? $cursorOffsetY : $initialOffset;
+      if ($dragging) {
+        // todo: implicit dep on import?
+        return roundToSnapStep(Math.floor($cursorOffsetY));
+      }
+
+      return $initialOffset;
     },
   );
 
@@ -58,7 +65,14 @@ export function useTask(
   const height = derived(
     [resizing, initialHeight, offset, cursorOffsetY],
     ([$resizing, $initialHeight, $offset, $cursorOffsetY]) => {
-      return $resizing ? $cursorOffsetY - $offset : $initialHeight;
+      if ($resizing) {
+        const fromTaskStartToCursor = $cursorOffsetY - $offset;
+
+        // todo: implicit dep on import?
+        return roundToSnapStep(Math.floor(fromTaskStartToCursor));
+      }
+
+      return $initialHeight;
     },
   );
 

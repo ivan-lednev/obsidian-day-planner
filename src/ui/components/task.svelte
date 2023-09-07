@@ -62,8 +62,6 @@
     style:background-color={$backgroundColor}
     class="task {$relationToNow}"
     class:is-ghost={isGhost}
-    class:past={$relationToNow === "past"}
-    class:present={$relationToNow === "present"}
     on:mousedown={(event) => event.stopPropagation()}
     on:mouseup={async () => {
       // todo: move to hook
