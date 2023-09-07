@@ -13,7 +13,10 @@
     timeToTimelineOffset,
   } from "../../store/timeline-store";
   import type { PlacedPlanItem } from "../../types";
-  import { getTextColorWithEnoughContrast, IContrastColors } from "../../util/color";
+  import {
+    getTextColorWithEnoughContrast,
+    IContrastColors,
+  } from "../../util/color";
   import { getRelationToNow } from "../../util/moment";
   import { getFileByPath, openFileInEditor } from "../../util/obsidian";
   import { useDrag } from "../hooks/use-drag";
@@ -37,20 +40,27 @@
 
   const { resizing, cancelResize, startResize, confirmResize } = useResize();
 
-  $: colorScale = chroma.scale([$settings.timelineStartColor, $settings.timelineEndColor]).mode("lab");
+  $: colorScale = chroma
+    .scale([$settings.timelineStartColor, $settings.timelineEndColor])
+    .mode("lab");
 
-  $: backgroundColor = $settings.timelineColored && planItem.startTime
-    ? colorScale((planItem.startTime.hour() - $settings.startHour )/ (24-$settings.startHour)).hex()
-    : "var(--background-primary)";
+  $: backgroundColor =
+    $settings.timelineColored && planItem.startTime
+      ? colorScale(
+          (planItem.startTime.hour() - $settings.startHour) /
+            (24 - $settings.startHour),
+        ).hex()
+      : "var(--background-primary)";
 
   let properContrastColors: IContrastColors;
-  $: properContrastColors = $settings.timelineColored && planItem.startTime
-    ? getTextColorWithEnoughContrast(backgroundColor)
-    : {
-      normal: "var(--text-normal)",
-      muted: "var(--text-muted)",
-      faint: "var(--text-faint)"
-    };
+  $: properContrastColors =
+    $settings.timelineColored && planItem.startTime
+      ? getTextColorWithEnoughContrast(backgroundColor)
+      : {
+          normal: "var(--text-normal)",
+          muted: "var(--text-muted)",
+          faint: "var(--text-faint)",
+        };
 
   $: initialOffset = isGhost
     ? roundToSnapStep(pointerYOffset)
@@ -90,7 +100,7 @@
   class="gap-box absolute-stretch-x"
 >
   <div
-    style:background-color="{backgroundColor}"
+    style:background-color={backgroundColor}
     class="task {relationToNow}"
     class:is-ghost={isGhost}
     class:past={relationToNow === "past"}
@@ -111,10 +121,12 @@
       editor.setCursor({ line: planItem.location.line, ch: 0 });
     }}
   >
-    <RenderedMarkdown text={planItem.text} 
-                      --text-normal="{properContrastColors.normal}"
-                      --text-muted="{properContrastColors.muted}"
-                      --text-faint="{properContrastColors.faint}"/>
+    <RenderedMarkdown
+      --text-faint={properContrastColors.faint}
+      --text-muted={properContrastColors.muted}
+      --text-normal={properContrastColors.normal}
+      text={planItem.text}
+    />
     <div
       style:cursor={$cursor}
       class="grip"

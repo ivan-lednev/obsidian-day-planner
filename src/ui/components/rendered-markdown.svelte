@@ -32,8 +32,9 @@
 <style>
   .rendered-markdown {
     --checkbox-size: var(--font-ui-small);
-    color: var(--text-normal);
+
     flex: 1 0 0;
+    color: var(--text-normal);
   }
 
   .rendered-markdown :global(p),
