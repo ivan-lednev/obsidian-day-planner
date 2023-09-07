@@ -16,11 +16,19 @@ interface UseTaskProps {
   cursorOffsetY: Readable<number>;
   onUpdate: (planItem: PlanItem) => Promise<void>;
   onMouseUp: (planItem: PlanItem) => Promise<void>;
+  isGhost: boolean;
 }
 
 export function useTask(
   task: PlanItem,
-  { settings, currentTime, cursorOffsetY, onUpdate, onMouseUp }: UseTaskProps,
+  {
+    settings,
+    currentTime,
+    cursorOffsetY,
+    onUpdate,
+    onMouseUp,
+    isGhost,
+  }: UseTaskProps,
 ) {
   const { dragging, ...useDragValues } = useDrag({
     settings,
@@ -50,7 +58,7 @@ export function useTask(
   const offset = derived(
     [dragging, initialOffset, cursorOffsetY, settings.settings],
     ([$dragging, $initialOffset, $cursorOffsetY, $settings]) => {
-      if ($dragging) {
+      if (isGhost || $dragging) {
         // todo: implicit dep on import?
         return snap(Math.floor($cursorOffsetY), $settings.zoomLevel);
       }
@@ -82,7 +90,7 @@ export function useTask(
   });
 
   async function handleMouseUp() {
-    if (get(dragging)) {
+    if (isGhost || get(dragging)) {
       return;
     }
 

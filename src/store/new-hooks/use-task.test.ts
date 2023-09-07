@@ -25,17 +25,23 @@ const basePlanItem = {
   id: "id",
 };
 
-async function asyncNoOp() {}
-
-test("derives task offset from settings and time", () => {
+function getBaseUseTaskProps() {
   const cursorOffsetY = writable(0);
-  const { offset, height, relationToNow } = useTask(basePlanItem, {
+  return {
     settings: settingsWithUtils,
     currentTime,
+    isGhost: false,
     cursorOffsetY,
-    onUpdate: asyncNoOp,
-    onMouseUp: asyncNoOp,
-  });
+    onUpdate: jest.fn(),
+    onMouseUp: jest.fn(),
+  };
+}
+
+test("derives task offset from settings and time", () => {
+  const { offset, height, relationToNow } = useTask(
+    basePlanItem,
+    getBaseUseTaskProps(),
+  );
 
   expect(get(offset)).toEqual(8 * 60);
   expect(get(height)).toEqual(2 * 60);
@@ -43,14 +49,7 @@ test("derives task offset from settings and time", () => {
 });
 
 test("tasks change position and size when zoom level changes", () => {
-  const cursorOffsetY = writable(0);
-  const { offset, height } = useTask(basePlanItem, {
-    settings: settingsWithUtils,
-    currentTime,
-    cursorOffsetY,
-    onUpdate: asyncNoOp,
-    onMouseUp: asyncNoOp,
-  });
+  const { offset, height } = useTask(basePlanItem, getBaseUseTaskProps());
 
   // todo: this is leaking state to other tests
   settingsWithUtils.settings.update((previous) => ({
@@ -62,15 +61,16 @@ test("tasks change position and size when zoom level changes", () => {
   expect(get(height)).toEqual(60);
 });
 
+test.todo(
+  "to-be-created tasks (ghost tasks) follow the cursor and snap to round numbers",
+);
+
 describe("dragging", () => {
   test("while dragging, offset is derived from pointer position", () => {
-    const cursorOffsetY = writable(0);
+    const { cursorOffsetY, ...rest } = getBaseUseTaskProps();
     const { offset, startMove } = useTask(basePlanItem, {
-      settings: settingsWithUtils,
-      currentTime,
       cursorOffsetY,
-      onUpdate: asyncNoOp,
-      onMouseUp: asyncNoOp,
+      ...rest,
     });
 
     startMove();
@@ -80,13 +80,10 @@ describe("dragging", () => {
   });
 
   test("cancel move resets task position", () => {
-    const cursorOffsetY = writable(0);
+    const { cursorOffsetY, ...rest } = getBaseUseTaskProps();
     const { offset, startMove, cancelMove } = useTask(basePlanItem, {
-      settings: settingsWithUtils,
-      currentTime,
       cursorOffsetY,
-      onUpdate: asyncNoOp,
-      onMouseUp: asyncNoOp,
+      ...rest,
     });
 
     startMove();
@@ -100,16 +97,10 @@ describe("dragging", () => {
   });
 
   test("when drag ends, task updates pos and stops reacting to cursor movement", () => {
-    const cursorOffsetY = writable(0);
-    const onUpdateMock = jest.fn();
+    const props = getBaseUseTaskProps();
+    const { cursorOffsetY, onUpdate } = props;
 
-    const { offset, startMove, confirmMove } = useTask(basePlanItem, {
-      settings: settingsWithUtils,
-      currentTime,
-      cursorOffsetY,
-      onUpdate: onUpdateMock,
-      onMouseUp: asyncNoOp,
-    });
+    const { offset, startMove, confirmMove } = useTask(basePlanItem, props);
 
     startMove();
     cursorOffsetY.set(10);
@@ -118,25 +109,22 @@ describe("dragging", () => {
     confirmMove();
 
     expect(get(offset)).toEqual(480);
-    expect(onUpdateMock).toHaveBeenCalledWith(
+    expect(onUpdate).toHaveBeenCalledWith(
       expect.objectContaining({ startMinutes: 365 }), // todo: where is this magic number coming from?
     );
   });
 
   test.todo("tasks snap to round numbers while dragging");
+
+  test.todo("does not react to mouse up when dragging");
 });
 
 describe("Resizing", () => {
   test("while resizing, height is derived from pointer position", () => {
-    const cursorOffsetY = writable(0);
+    const props = getBaseUseTaskProps();
+    const { cursorOffsetY } = props;
 
-    const { height, startResize } = useTask(basePlanItem, {
-      settings: settingsWithUtils,
-      currentTime,
-      cursorOffsetY,
-      onUpdate: asyncNoOp,
-      onMouseUp: asyncNoOp,
-    });
+    const { height, startResize } = useTask(basePlanItem, props);
 
     startResize();
     cursorOffsetY.set(700);
@@ -145,15 +133,10 @@ describe("Resizing", () => {
   });
 
   test("cancel resize resets task height", () => {
-    const cursorOffsetY = writable(0);
+    const props = getBaseUseTaskProps();
+    const { cursorOffsetY } = props;
 
-    const { height, startResize, cancelResize } = useTask(basePlanItem, {
-      settings: settingsWithUtils,
-      currentTime,
-      cursorOffsetY,
-      onUpdate: asyncNoOp,
-      onMouseUp: asyncNoOp,
-    });
+    const { height, startResize, cancelResize } = useTask(basePlanItem, props);
 
     expect(get(height)).toEqual(120);
 
@@ -165,16 +148,10 @@ describe("Resizing", () => {
   });
 
   test("when resize ends, task updates and stops reacting to cursor", () => {
-    const cursorOffsetY = writable(0);
-    const mockOnUpdate = jest.fn();
+    const props = getBaseUseTaskProps();
+    const { cursorOffsetY, onUpdate } = props;
 
-    const { height, startResize, confirmResize } = useTask(basePlanItem, {
-      settings: settingsWithUtils,
-      currentTime,
-      cursorOffsetY,
-      onUpdate: mockOnUpdate,
-      onMouseUp: asyncNoOp,
-    });
+    const { height, startResize, confirmResize } = useTask(basePlanItem, props);
 
     expect(get(height)).toEqual(120);
 
@@ -182,7 +159,7 @@ describe("Resizing", () => {
     cursorOffsetY.set(700);
     confirmResize();
 
-    expect(mockOnUpdate).toHaveBeenCalledWith(
+    expect(onUpdate).toHaveBeenCalledWith(
       expect.objectContaining({ endMinutes: 710 }),
     );
   });
@@ -190,4 +167,4 @@ describe("Resizing", () => {
   test.todo("task height snaps to a round number while resizing");
 });
 
-test.todo("navigates to file on click", () => {});
+test.todo("navigates to file on click");

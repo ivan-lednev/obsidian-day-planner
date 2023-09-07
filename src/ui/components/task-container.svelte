@@ -45,6 +45,10 @@
     // todo: no `as`
     return {
       durationMinutes: defaultDurationForNewTask,
+      startMinutes: 0,
+      endMinutes: defaultDurationForNewTask,
+      startTime: window.moment(),
+      endTime: window.moment(),
       text: "New item",
       id: "",
       placing: { ...getHorizontalPlacing() },

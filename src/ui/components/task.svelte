@@ -35,6 +35,7 @@
     settings: settingsWithUtils,
     cursorOffsetY: pointerYOffset,
     currentTime,
+    isGhost,
     onUpdate,
     onMouseUp,
   });
@@ -64,13 +65,7 @@
     class="task {$relationToNow}"
     class:is-ghost={isGhost}
     on:mousedown={(event) => event.stopPropagation()}
-    on:mouseup={async () => {
-      if (isGhost) {
-        return;
-      }
-
-      await handleMouseUp();
-    }}
+    on:mouseup={handleMouseUp}
   >
     <RenderedMarkdown
       --text-faint={$properContrastColors.faint}
