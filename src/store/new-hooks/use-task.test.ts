@@ -34,6 +34,7 @@ test("derives task offset from settings and time", () => {
     currentTime,
     cursorOffsetY,
     onUpdate: asyncNoOp,
+    onMouseUp: asyncNoOp,
   });
 
   expect(get(offset)).toEqual(8 * 60);
@@ -48,6 +49,7 @@ test("tasks change position and size when zoom level changes", () => {
     currentTime,
     cursorOffsetY,
     onUpdate: asyncNoOp,
+    onMouseUp: asyncNoOp,
   });
 
   // todo: this is leaking state to other tests
@@ -68,6 +70,7 @@ describe("dragging", () => {
       currentTime,
       cursorOffsetY,
       onUpdate: asyncNoOp,
+      onMouseUp: asyncNoOp,
     });
 
     startMove();
@@ -83,6 +86,7 @@ describe("dragging", () => {
       currentTime,
       cursorOffsetY,
       onUpdate: asyncNoOp,
+      onMouseUp: asyncNoOp,
     });
 
     startMove();
@@ -104,6 +108,7 @@ describe("dragging", () => {
       currentTime,
       cursorOffsetY,
       onUpdate: onUpdateMock,
+      onMouseUp: asyncNoOp,
     });
 
     startMove();
@@ -130,6 +135,7 @@ describe("Resizing", () => {
       currentTime,
       cursorOffsetY,
       onUpdate: asyncNoOp,
+      onMouseUp: asyncNoOp,
     });
 
     startResize();
@@ -146,6 +152,7 @@ describe("Resizing", () => {
       currentTime,
       cursorOffsetY,
       onUpdate: asyncNoOp,
+      onMouseUp: asyncNoOp,
     });
 
     expect(get(height)).toEqual(120);
@@ -166,6 +173,7 @@ describe("Resizing", () => {
       currentTime,
       cursorOffsetY,
       onUpdate: mockOnUpdate,
+      onMouseUp: asyncNoOp,
     });
 
     expect(get(height)).toEqual(120);
@@ -181,3 +189,5 @@ describe("Resizing", () => {
 
   test.todo("task height snaps to a round number while resizing");
 });
+
+test.todo("navigates to file on click", () => {});

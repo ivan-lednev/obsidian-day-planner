@@ -33,6 +33,10 @@ export function roundToSnapStep(coords: number) {
   return coords - (coords % (SNAP_STEP_MINUTES * zoomLevel));
 }
 
+export function snap(coords: number, zoomLevel: number) {
+  return coords - (coords % (SNAP_STEP_MINUTES * zoomLevel));
+}
+
 // todo: this is out of place
 export function getTimeFromYOffset(yCoords: number) {
   const { zoomLevel } = get(settings);

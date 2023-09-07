@@ -2,6 +2,7 @@ import { derived, get, Readable, writable } from "svelte/store";
 
 import type { PlanItem } from "../../types";
 import type { settingsWithUtils } from "../settings-with-utils";
+import { snap } from "../timeline-store";
 
 export type ReactiveSettingsWithUtils = typeof settingsWithUtils;
 
@@ -44,10 +45,16 @@ export function useDrag({
     dragging.set(false);
 
     const newStartMinutes = settings.getTimeFromYOffset(
-      Math.floor(get(cursorOffsetY)),
+      // todo: duplication
+      snap(Math.floor(get(cursorOffsetY)), get(settings.settings).zoomLevel),
     );
+    const newEndMinutes = newStartMinutes + task.durationMinutes;
 
-    await onUpdate({ ...task, startMinutes: newStartMinutes });
+    await onUpdate({
+      ...task,
+      startMinutes: newStartMinutes,
+      endMinutes: newEndMinutes,
+    });
   }
 
   return {

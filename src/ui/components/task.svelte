@@ -1,15 +1,12 @@
 <script lang="ts">
   import { GripVertical } from "lucide-svelte";
-  import { MarkdownView } from "obsidian";
   import type { Readable } from "svelte/store";
 
-  import { appStore } from "../../store/app-store";
   import { currentTime } from "../../store/current-time";
   import { editCancellation, editConfirmation } from "../../store/edit-events";
   import { useTask } from "../../store/new-hooks/use-task";
   import { settingsWithUtils } from "../../store/settings-with-utils";
-  import type { PlacedPlanItem } from "../../types";
-  import { getFileByPath, openFileInEditor } from "../../util/obsidian";
+  import type { PlacedPlanItem, PlanItem } from "../../types";
   import { watch } from "../hooks/watch";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
@@ -17,12 +14,13 @@
   export let planItem: PlacedPlanItem;
   export let pointerYOffset: Readable<number>;
   export let isGhost = false;
+  export let onUpdate: (updated: PlanItem) => Promise<void>;
+  export let onMouseUp: (planItem: PlanItem) => Promise<void>;
 
   const {
     height,
     offset,
     relationToNow,
-    dragging,
     cursor,
     startMove,
     confirmMove,
@@ -32,13 +30,16 @@
     confirmResize,
     backgroundColor,
     properContrastColors,
+    handleMouseUp,
   } = useTask(planItem, {
     settings: settingsWithUtils,
     cursorOffsetY: pointerYOffset,
     currentTime,
-    onUpdate: async () => {},
+    onUpdate,
+    onMouseUp,
   });
 
+  // todo: out of place?
   watch(editConfirmation, () => {
     confirmMove();
     confirmResize();
@@ -64,19 +65,11 @@
     class:is-ghost={isGhost}
     on:mousedown={(event) => event.stopPropagation()}
     on:mouseup={async () => {
-      // todo: move to hook
-      if (isGhost || $dragging) {
+      if (isGhost) {
         return;
       }
 
-      const file = getFileByPath(planItem.location.path);
-
-      const editor = await openFileInEditor(file);
-      $appStore.workspace
-        .getActiveViewOfType(MarkdownView)
-        ?.setEphemeralState({ line: planItem.location.line });
-
-      editor.setCursor({ line: planItem.location.line, ch: 0 });
+      await handleMouseUp();
     }}
   >
     <RenderedMarkdown
@@ -136,10 +129,6 @@
 
     border: 1px solid var(--color-base-50);
     border-radius: var(--radius-s);
-  }
-
-  .task:hover {
-    border-color: var(--color-base-70);
   }
 
   .past {

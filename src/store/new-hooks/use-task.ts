@@ -1,9 +1,9 @@
 import type { Moment } from "moment";
-import { derived, Readable } from "svelte/store";
+import { derived, get, Readable } from "svelte/store";
 
 import type { PlanItem } from "../../types";
 import { getRelationToNow } from "../../util/moment";
-import { roundToSnapStep } from "../timeline-store";
+import { roundToSnapStep, snap } from "../timeline-store";
 
 import type { ReactiveSettingsWithUtils } from "./new-use-drag";
 import { useDrag } from "./new-use-drag";
@@ -14,12 +14,13 @@ interface UseTaskProps {
   settings: ReactiveSettingsWithUtils;
   currentTime: Readable<Moment>;
   cursorOffsetY: Readable<number>;
-  onUpdate: (updated: PlanItem) => Promise<void>;
+  onUpdate: (planItem: PlanItem) => Promise<void>;
+  onMouseUp: (planItem: PlanItem) => Promise<void>;
 }
 
 export function useTask(
   task: PlanItem,
-  { settings, currentTime, cursorOffsetY, onUpdate }: UseTaskProps,
+  { settings, currentTime, cursorOffsetY, onUpdate, onMouseUp }: UseTaskProps,
 ) {
   const { dragging, ...useDragValues } = useDrag({
     settings,
@@ -47,11 +48,11 @@ export function useTask(
   );
 
   const offset = derived(
-    [dragging, initialOffset, cursorOffsetY],
-    ([$dragging, $initialOffset, $cursorOffsetY]) => {
+    [dragging, initialOffset, cursorOffsetY, settings.settings],
+    ([$dragging, $initialOffset, $cursorOffsetY, $settings]) => {
       if ($dragging) {
         // todo: implicit dep on import?
-        return roundToSnapStep(Math.floor($cursorOffsetY));
+        return snap(Math.floor($cursorOffsetY), $settings.zoomLevel);
       }
 
       return $initialOffset;
@@ -80,11 +81,20 @@ export function useTask(
     return getRelationToNow($currentTime, task.startTime, task.endTime);
   });
 
+  async function handleMouseUp() {
+    if (get(dragging)) {
+      return;
+    }
+
+    await onMouseUp(task);
+  }
+
   return {
     offset,
     height,
     relationToNow,
     dragging,
+    handleMouseUp,
     ...useDragValues,
     ...useResizeValues,
     ...useColorValues,

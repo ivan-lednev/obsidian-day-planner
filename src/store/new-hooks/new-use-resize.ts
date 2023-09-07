@@ -1,6 +1,7 @@
 import { get, Readable, writable } from "svelte/store";
 
 import type { PlanItem } from "../../types";
+import { snap } from "../timeline-store";
 
 import type { ReactiveSettingsWithUtils } from "./new-use-drag";
 
@@ -30,7 +31,10 @@ export function useResize({
 
     resizing.set(false);
 
-    const newEndMinutes = settings.getTimeFromYOffset(get(cursorOffsetY));
+    const newEndMinutes = settings.getTimeFromYOffset(
+      // todo: duplication
+      snap(Math.floor(get(cursorOffsetY)), get(settings.settings).zoomLevel),
+    );
 
     await onUpdate({
       ...task,
