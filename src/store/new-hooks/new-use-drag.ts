@@ -1,10 +1,9 @@
 import { derived, get, Readable, writable } from "svelte/store";
 
 import type { PlanItem } from "../../types";
+import type { settingsWithUtils } from "../settings-with-utils";
 
-import type { createSettings } from "./create-settings";
-
-export type ReactiveSettingsWithUtils = ReturnType<typeof createSettings>;
+export type ReactiveSettingsWithUtils = typeof settingsWithUtils;
 
 interface UseDragProps {
   settings: ReactiveSettingsWithUtils;

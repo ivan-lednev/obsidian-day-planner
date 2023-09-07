@@ -2,43 +2,46 @@
   import chroma from "chroma-js";
   import { GripVertical } from "lucide-svelte";
   import { MarkdownView } from "obsidian";
+  import type { Readable } from "svelte/store";
 
   import { appStore } from "../../store/app-store";
   import { currentTime } from "../../store/current-time";
   import { editCancellation, editConfirmation } from "../../store/edit-events";
+  import { useTask } from "../../store/new-hooks/use-task";
   import { settings } from "../../store/settings";
-  import {
-    durationToSize,
-    roundToSnapStep,
-    timeToTimelineOffset,
-  } from "../../store/timeline-store";
+  import { settingsWithUtils } from "../../store/settings-with-utils";
   import type { PlacedPlanItem } from "../../types";
   import {
     getTextColorWithEnoughContrast,
     IContrastColors,
   } from "../../util/color";
-  import { getRelationToNow } from "../../util/moment";
   import { getFileByPath, openFileInEditor } from "../../util/obsidian";
-  import { useDrag } from "../hooks/use-drag";
-  import { useResize } from "../hooks/use-resize";
   import { watch } from "../hooks/watch";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
   export let planItem: PlacedPlanItem;
-  export let pointerYOffset: number;
+  export let pointerYOffset: Readable<number>;
   export let isGhost = false;
 
   const {
+    height,
+    offset,
+    relationToNow,
     dragging,
     cursor,
-    pointerYOffsetToTaskStart,
     startMove,
     confirmMove,
     cancelMove,
-  } = useDrag();
-
-  const { resizing, cancelResize, startResize, confirmResize } = useResize();
+    cancelResize,
+    startResize,
+    confirmResize,
+  } = useTask(planItem, {
+    settings: settingsWithUtils,
+    cursorOffsetY: pointerYOffset,
+    currentTime,
+    onUpdate: async () => {},
+  });
 
   $: colorScale = chroma
     .scale([$settings.timelineStartColor, $settings.timelineEndColor])
@@ -62,27 +65,9 @@
           faint: "var(--text-faint)",
         };
 
-  $: initialOffset = isGhost
-    ? roundToSnapStep(pointerYOffset)
-    : $timeToTimelineOffset(planItem.startMinutes);
-
-  $: offset = $dragging
-    ? roundToSnapStep(pointerYOffset - $pointerYOffsetToTaskStart)
-    : initialOffset;
-
-  $: offsetToPointer = pointerYOffset - initialOffset;
-
-  $: height = $resizing
-    ? roundToSnapStep(offsetToPointer)
-    : $durationToSize(planItem.durationMinutes);
-
-  $: relationToNow = isGhost
-    ? "future"
-    : getRelationToNow($currentTime, planItem.startTime, planItem.endTime);
-
   watch(editConfirmation, () => {
-    confirmMove(offset, planItem.id, planItem.durationMinutes);
-    confirmResize(planItem.id, height, planItem.startMinutes);
+    confirmMove();
+    confirmResize();
   });
 
   watch(editCancellation, () => {
@@ -93,8 +78,8 @@
 
 <!--  overwrite global theme colors with contrasting text colors, when using colored theme-->
 <div
-  style:height="{height}px"
-  style:transform="translateY({offset}px)"
+  style:height="{$height}px"
+  style:transform="translateY({$offset}px)"
   style:width="{planItem.placing.widthPercent || 100}%"
   style:left="{planItem.placing.xOffsetPercent || 0}%"
   class="gap-box absolute-stretch-x"
@@ -103,8 +88,8 @@
     style:background-color={backgroundColor}
     class="task {relationToNow}"
     class:is-ghost={isGhost}
-    class:past={relationToNow === "past"}
-    class:present={relationToNow === "present"}
+    class:past={$relationToNow === "past"}
+    class:present={$relationToNow === "present"}
     on:mousedown={(event) => event.stopPropagation()}
     on:mouseup={async () => {
       // todo: move to hook
@@ -131,9 +116,7 @@
     <div
       style:cursor={$cursor}
       class="grip"
-      on:mousedown|stopPropagation={(e) => {
-        startMove(e);
-      }}
+      on:mousedown|stopPropagation={startMove}
     >
       <GripVertical class="svg-icon" />
     </div>

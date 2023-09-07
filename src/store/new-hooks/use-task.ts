@@ -8,7 +8,7 @@ import type { ReactiveSettingsWithUtils } from "./new-use-drag";
 import { useDrag } from "./new-use-drag";
 import { useResize } from "./new-use-resize";
 
-interface CreateTaskProps {
+interface UseTaskProps {
   settings: ReactiveSettingsWithUtils;
   currentTime: Readable<Moment>;
   cursorOffsetY: Readable<number>;
@@ -17,7 +17,7 @@ interface CreateTaskProps {
 
 export function useTask(
   task: PlanItem,
-  { settings, currentTime, cursorOffsetY, onUpdate }: CreateTaskProps,
+  { settings, currentTime, cursorOffsetY, onUpdate }: UseTaskProps,
 ) {
   const { dragging, ...useDragValues } = useDrag({
     settings,
@@ -67,6 +67,7 @@ export function useTask(
     offset,
     height,
     relationToNow,
+    dragging,
     ...useDragValues,
     ...useResizeValues,
   };

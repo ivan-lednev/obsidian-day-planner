@@ -3,7 +3,7 @@ import { derived, get, writable } from "svelte/store";
 import type { DayPlannerSettings } from "../../settings";
 
 // todo: we need a better name for that
-export function createSettings(pluginSettings: DayPlannerSettings) {
+export function useSettings(pluginSettings: DayPlannerSettings) {
   const settings = writable(pluginSettings);
 
   const hourSize = derived(settings, ($settings) => {

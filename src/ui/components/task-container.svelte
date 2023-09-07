@@ -2,6 +2,7 @@
   import type { Moment } from "moment";
   import { setContext } from "svelte";
   import type { Writable } from "svelte/store";
+  import { writable } from "svelte/store";
 
   import { TASKS_FOR_DAY } from "../../constants";
   import { editCancellation, editConfirmation } from "../../store/edit-events";
@@ -27,17 +28,17 @@
 
   setContext(TASKS_FOR_DAY, { getTasks });
 
-  let pointerYOffset = 0;
+  let pointerYOffset = writable(0);
   let el: HTMLDivElement;
 
   function handleMousemove(event: MouseEvent) {
-    pointerYOffset = event.clientY - el.getBoundingClientRect().top;
+    $pointerYOffset = event.clientY - el.getBoundingClientRect().top;
   }
 
   function handleMouseUp() {
     if ($creating) {
       // todo: to make this uniform, we may pull tasks from context
-      confirmCreation(tasks, day, pointerYOffset);
+      confirmCreation(tasks, day, $pointerYOffset);
     }
 
     editConfirmation.trigger();

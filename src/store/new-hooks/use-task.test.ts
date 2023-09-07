@@ -1,10 +1,9 @@
 import moment from "moment";
 import { get, writable } from "svelte/store";
 
-import { SETTINGS_FOR_TESTS } from "../../settings";
 import { currentTime } from "../current-time";
+import { settingsWithUtils } from "../settings-with-utils";
 
-import { createSettings } from "./create-settings";
 import { useTask } from "./use-task";
 
 const basePlanItem = {
@@ -26,14 +25,12 @@ const basePlanItem = {
   id: "id",
 };
 
-const settings = createSettings(SETTINGS_FOR_TESTS);
-
 async function asyncNoOp() {}
 
 test("derives task offset from settings and time", () => {
   const cursorOffsetY = writable(0);
   const { offset, height, relationToNow } = useTask(basePlanItem, {
-    settings,
+    settings: settingsWithUtils,
     currentTime,
     cursorOffsetY,
     onUpdate: asyncNoOp,
@@ -47,14 +44,17 @@ test("derives task offset from settings and time", () => {
 test("tasks change position and size when zoom level changes", () => {
   const cursorOffsetY = writable(0);
   const { offset, height } = useTask(basePlanItem, {
-    settings,
+    settings: settingsWithUtils,
     currentTime,
     cursorOffsetY,
     onUpdate: asyncNoOp,
   });
 
   // todo: this is leaking state to other tests
-  settings.settings.update((previous) => ({ ...previous, zoomLevel: 1 }));
+  settingsWithUtils.settings.update((previous) => ({
+    ...previous,
+    zoomLevel: 1,
+  }));
 
   expect(get(offset)).toEqual(4 * 60);
   expect(get(height)).toEqual(60);
@@ -64,7 +64,7 @@ describe("dragging", () => {
   test("while dragging, offset is derived from pointer position", () => {
     const cursorOffsetY = writable(0);
     const { offset, startMove } = useTask(basePlanItem, {
-      settings,
+      settings: settingsWithUtils,
       currentTime,
       cursorOffsetY,
       onUpdate: asyncNoOp,
@@ -79,7 +79,7 @@ describe("dragging", () => {
   test("cancel move resets task position", () => {
     const cursorOffsetY = writable(0);
     const { offset, startMove, cancelMove } = useTask(basePlanItem, {
-      settings,
+      settings: settingsWithUtils,
       currentTime,
       cursorOffsetY,
       onUpdate: asyncNoOp,
@@ -100,7 +100,7 @@ describe("dragging", () => {
     const onUpdateMock = jest.fn();
 
     const { offset, startMove, confirmMove } = useTask(basePlanItem, {
-      settings,
+      settings: settingsWithUtils,
       currentTime,
       cursorOffsetY,
       onUpdate: onUpdateMock,
@@ -126,7 +126,7 @@ describe("Resizing", () => {
     const cursorOffsetY = writable(0);
 
     const { height, startResize } = useTask(basePlanItem, {
-      settings,
+      settings: settingsWithUtils,
       currentTime,
       cursorOffsetY,
       onUpdate: asyncNoOp,
@@ -142,7 +142,7 @@ describe("Resizing", () => {
     const cursorOffsetY = writable(0);
 
     const { height, startResize, cancelResize } = useTask(basePlanItem, {
-      settings,
+      settings: settingsWithUtils,
       currentTime,
       cursorOffsetY,
       onUpdate: asyncNoOp,
@@ -162,7 +162,7 @@ describe("Resizing", () => {
     const mockOnUpdate = jest.fn();
 
     const { height, startResize, confirmResize } = useTask(basePlanItem, {
-      settings,
+      settings: settingsWithUtils,
       currentTime,
       cursorOffsetY,
       onUpdate: mockOnUpdate,
