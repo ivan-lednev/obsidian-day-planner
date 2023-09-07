@@ -7,6 +7,7 @@ import { getRelationToNow } from "../../util/moment";
 import type { ReactiveSettingsWithUtils } from "./new-use-drag";
 import { useDrag } from "./new-use-drag";
 import { useResize } from "./new-use-resize";
+import { useColor } from "./use-color";
 
 interface UseTaskProps {
   settings: ReactiveSettingsWithUtils;
@@ -32,6 +33,8 @@ export function useTask(
     cursorOffsetY,
     onUpdate,
   });
+
+  const useColorValues = useColor({ settings, task });
 
   const initialOffset = derived(
     // todo: not sure if this is the cleanest way
@@ -70,5 +73,6 @@ export function useTask(
     dragging,
     ...useDragValues,
     ...useResizeValues,
+    ...useColorValues,
   };
 }

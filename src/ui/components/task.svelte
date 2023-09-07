@@ -1,5 +1,4 @@
 <script lang="ts">
-  import chroma from "chroma-js";
   import { GripVertical } from "lucide-svelte";
   import { MarkdownView } from "obsidian";
   import type { Readable } from "svelte/store";
@@ -8,13 +7,8 @@
   import { currentTime } from "../../store/current-time";
   import { editCancellation, editConfirmation } from "../../store/edit-events";
   import { useTask } from "../../store/new-hooks/use-task";
-  import { settings } from "../../store/settings";
   import { settingsWithUtils } from "../../store/settings-with-utils";
   import type { PlacedPlanItem } from "../../types";
-  import {
-    getTextColorWithEnoughContrast,
-    IContrastColors,
-  } from "../../util/color";
   import { getFileByPath, openFileInEditor } from "../../util/obsidian";
   import { watch } from "../hooks/watch";
 
@@ -36,34 +30,14 @@
     cancelResize,
     startResize,
     confirmResize,
+    backgroundColor,
+    properContrastColors,
   } = useTask(planItem, {
     settings: settingsWithUtils,
     cursorOffsetY: pointerYOffset,
     currentTime,
     onUpdate: async () => {},
   });
-
-  $: colorScale = chroma
-    .scale([$settings.timelineStartColor, $settings.timelineEndColor])
-    .mode("lab");
-
-  $: backgroundColor =
-    $settings.timelineColored && planItem.startTime
-      ? colorScale(
-          (planItem.startTime.hour() - $settings.startHour) /
-            (24 - $settings.startHour),
-        ).hex()
-      : "var(--background-primary)";
-
-  let properContrastColors: IContrastColors;
-  $: properContrastColors =
-    $settings.timelineColored && planItem.startTime
-      ? getTextColorWithEnoughContrast(backgroundColor)
-      : {
-          normal: "var(--text-normal)",
-          muted: "var(--text-muted)",
-          faint: "var(--text-faint)",
-        };
 
   watch(editConfirmation, () => {
     confirmMove();
@@ -85,8 +59,8 @@
   class="gap-box absolute-stretch-x"
 >
   <div
-    style:background-color={backgroundColor}
-    class="task {relationToNow}"
+    style:background-color={$backgroundColor}
+    class="task {$relationToNow}"
     class:is-ghost={isGhost}
     class:past={$relationToNow === "past"}
     class:present={$relationToNow === "present"}
@@ -108,9 +82,9 @@
     }}
   >
     <RenderedMarkdown
-      --text-faint={properContrastColors.faint}
-      --text-muted={properContrastColors.muted}
-      --text-normal={properContrastColors.normal}
+      --text-faint={$properContrastColors.faint}
+      --text-muted={$properContrastColors.muted}
+      --text-normal={$properContrastColors.normal}
       text={planItem.text}
     />
     <div
