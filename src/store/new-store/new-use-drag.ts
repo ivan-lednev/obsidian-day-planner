@@ -1,4 +1,4 @@
-import { derived, get, Readable, Writable, writable } from "svelte/store";
+import { derived, get, Readable, writable } from "svelte/store";
 
 import type { PlanItem } from "../../types";
 
@@ -9,10 +9,16 @@ export type ReactiveSettingsWithUtils = ReturnType<typeof createSettings>;
 interface UseDragProps {
   settings: ReactiveSettingsWithUtils;
   cursorOffsetY: Readable<number>;
-  task: Writable<PlanItem>;
+  task: PlanItem;
+  onUpdate: (updated: PlanItem) => Promise<void>;
 }
 
-export function useDrag({ settings, cursorOffsetY, task }: UseDragProps) {
+export function useDrag({
+  settings,
+  cursorOffsetY,
+  task,
+  onUpdate,
+}: UseDragProps) {
   const dragging = writable(false);
   const pointerYOffsetToTaskStart = writable<number>();
 
@@ -42,11 +48,7 @@ export function useDrag({ settings, cursorOffsetY, task }: UseDragProps) {
       Math.floor(get(cursorOffsetY)),
     );
 
-    // todo: all tasks should update here and get new overlap
-    task.update((previous) => ({ ...previous, startMinutes: newStartMinutes }));
-
-    // tasks.update((previous) => addPlacing([...previous, newPlanItem]));
-    // await updateStartMinutes([], id, newStartMinutes);
+    await onUpdate({ ...task, startMinutes: newStartMinutes });
   }
 
   return {
