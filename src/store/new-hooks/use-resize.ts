@@ -3,7 +3,7 @@ import { get, Readable, writable } from "svelte/store";
 import type { PlanItem } from "../../types";
 import { snap } from "../timeline-store";
 
-import type { ReactiveSettingsWithUtils } from "./new-use-drag";
+import type { ReactiveSettingsWithUtils } from "./use-drag";
 
 interface UseResizeProps {
   settings: ReactiveSettingsWithUtils;

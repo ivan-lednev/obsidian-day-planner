@@ -5,9 +5,9 @@ import type { PlanItem } from "../../types";
 import { getRelationToNow } from "../../util/moment";
 import { roundToSnapStep, snap } from "../timeline-store";
 
-import type { ReactiveSettingsWithUtils } from "./new-use-drag";
-import { useDrag } from "./new-use-drag";
-import { useResize } from "./new-use-resize";
+import type { ReactiveSettingsWithUtils } from "./use-drag";
+import { useDrag } from "./use-drag";
+import { useResize } from "./use-resize";
 import { useColor } from "./use-color";
 
 interface UseTaskProps {
