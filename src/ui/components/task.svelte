@@ -107,6 +107,7 @@
     class:present={relationToNow === "present"}
     on:mousedown={(event) => event.stopPropagation()}
     on:mouseup={async () => {
+      // todo: move to hook
       if (isGhost || $dragging) {
         return;
       }

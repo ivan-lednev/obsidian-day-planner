@@ -28,7 +28,7 @@ const basePlanItem = {
 
 const settings = createSettings(SETTINGS_FOR_TESTS);
 
-async function onUpdate() {}
+async function asyncNoOp() {}
 
 test("derives task offset from settings and time", () => {
   const cursorOffsetY = writable(0);
@@ -36,7 +36,7 @@ test("derives task offset from settings and time", () => {
     settings,
     currentTime,
     cursorOffsetY,
-    onUpdate,
+    onUpdate: asyncNoOp,
   });
 
   expect(get(offset)).toEqual(8 * 60);
@@ -50,7 +50,7 @@ test("tasks change position and size when zoom level changes", () => {
     settings,
     currentTime,
     cursorOffsetY,
-    onUpdate,
+    onUpdate: asyncNoOp,
   });
 
   // todo: this is leaking state to other tests
@@ -67,7 +67,7 @@ describe("dragging", () => {
       settings,
       currentTime,
       cursorOffsetY,
-      onUpdate,
+      onUpdate: asyncNoOp,
     });
 
     startMove();
@@ -82,7 +82,7 @@ describe("dragging", () => {
       settings,
       currentTime,
       cursorOffsetY,
-      onUpdate,
+      onUpdate: asyncNoOp,
     });
 
     startMove();
@@ -129,7 +129,7 @@ describe("Resizing", () => {
       settings,
       currentTime,
       cursorOffsetY,
-      onUpdate,
+      onUpdate: asyncNoOp,
     });
 
     startResize();
@@ -145,7 +145,7 @@ describe("Resizing", () => {
       settings,
       currentTime,
       cursorOffsetY,
-      onUpdate,
+      onUpdate: asyncNoOp,
     });
 
     expect(get(height)).toEqual(120);
