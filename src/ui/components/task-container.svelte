@@ -1,15 +1,18 @@
 <script lang="ts">
   import type { Moment } from "moment";
-  import { MarkdownView } from "obsidian";
   import type { Writable } from "svelte/store";
   import { writable } from "svelte/store";
 
-  import { appStore } from "../../global-stores/app-store";
-  import { editCancellation, editConfirmation } from "../../global-stores/edit-events";
+  import {
+    editCancellation,
+    editConfirmation,
+  } from "../../global-stores/edit-events";
   import { updateTimestamps } from "../../global-stores/update-timestamp";
   import type { PlacedPlanItem, PlanItem } from "../../types";
   import { getHorizontalPlacing } from "../../util/horizontal-placing";
-  import { getFileByPath, openFileInEditor } from "../../util/obsidian";
+  import {
+    revealLineInFile,
+  } from "../../util/obsidian";
   import { useCreate } from "../hooks/use-create";
 
   import Task from "./task.svelte";
@@ -57,7 +60,6 @@
     } as PlacedPlanItem;
   }
 
-
   // todo: remove shim
   async function handleUpdate(updated: PlanItem) {
     await updateTimestamps(tasks, updated.id, {
@@ -66,15 +68,8 @@
     });
   }
 
-  async function handleTaskMouseUp(planItem: PlanItem) {
-    const file = getFileByPath(planItem.location.path);
-
-    const editor = await openFileInEditor(file);
-    $appStore.workspace
-      .getActiveViewOfType(MarkdownView)
-      ?.setEphemeralState({ line: planItem.location.line });
-
-    editor.setCursor({ line: planItem.location.line, ch: 0 });
+  async function handleTaskMouseUp({ location: { path, line } }: PlanItem) {
+    await revealLineInFile(path, line);
   }
 
   async function asyncNoOp() {}

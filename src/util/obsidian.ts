@@ -1,5 +1,5 @@
 import type { Moment } from "moment";
-import { TFile } from "obsidian";
+import { MarkdownView, TFile } from "obsidian";
 import {
   createDailyNote,
   getAllDailyNotes,
@@ -42,6 +42,17 @@ export function getFileByPath(path: string) {
   }
 
   return file;
+}
+
+export async function revealLineInFile(path: string, line: number) {
+  const file = getFileByPath(path);
+
+  const editor = await openFileInEditor(file);
+  get(appStore)
+    .workspace.getActiveViewOfType(MarkdownView)
+    ?.setEphemeralState({ line });
+
+  editor.setCursor({ line, ch: 0 });
 }
 
 export function addPlacing(planItems: PlanItem[]) {
