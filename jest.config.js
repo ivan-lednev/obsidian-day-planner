@@ -3,7 +3,8 @@ module.exports = {
   setupFilesAfterEnv: ["<rootDir>/support/jest-setup.ts"],
   testEnvironment: "jsdom",
   transform: {
-    "^.+\\.[tj]s$": "ts-jest",
+    // "^.+\\.[tj]s$": "ts-jest",
+    "^.+\\.[tj]s$": "@swc/jest",
     "^.+\\.svelte$": [
       "./node_modules/svelte-jester/dist/transformer.cjs",
       {
