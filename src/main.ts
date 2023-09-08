@@ -7,12 +7,11 @@ import {
 import { get } from "svelte/store";
 
 import { VIEW_TYPE_TIMELINE, VIEW_TYPE_WEEKLY } from "./constants";
-import { createPlannerHeading } from "./plan";
+import { appStore } from "./global-stores/app-store";
+import { settings } from "./global-stores/settings";
+import { visibleDateRange } from "./global-stores/visible-date-range";
+import { visibleDayInTimeline } from "./global-stores/visible-day-in-timeline";
 import { DayPlannerSettings } from "./settings";
-import { appStore } from "./store/app-store";
-import { settings } from "./store/settings";
-import { visibleDateRange } from "./store/visible-date-range";
-import { visibleDayInTimeline } from "./store/visible-day-in-timeline";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
@@ -20,6 +19,7 @@ import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
 import { getDaysOfCurrentWeek, isToday } from "./util/moment";
 import { getPlanItemsFromFile } from "./util/obsidian";
+import { createPlannerHeading } from "./util/plan";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;

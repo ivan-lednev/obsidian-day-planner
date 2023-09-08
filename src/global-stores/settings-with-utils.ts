@@ -6,7 +6,7 @@ import {
   hourSize,
   sizeToDuration,
   visibleHours,
-} from "./timeline-store";
+} from "./settings-utils";
 
 export const settingsWithUtils = {
   settings,

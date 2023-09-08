@@ -1,14 +1,14 @@
 import type { Moment } from "moment";
 import { derived, get, Readable } from "svelte/store";
 
+import { roundToSnapStep, snap } from "../../global-stores/settings-utils";
 import type { PlanItem } from "../../types";
 import { getRelationToNow } from "../../util/moment";
-import { roundToSnapStep, snap } from "../timeline-store";
 
+import { useColor } from "./use-color";
 import type { ReactiveSettingsWithUtils } from "./use-drag";
 import { useDrag } from "./use-drag";
 import { useResize } from "./use-resize";
-import { useColor } from "./use-color";
 
 interface UseTaskProps {
   settings: ReactiveSettingsWithUtils;
@@ -44,7 +44,7 @@ export function useTask(
     onUpdate,
   });
 
-  // todo: lame
+  // todo: settings.settings is lame
   const useColorValues = useColor({ settings: settings.settings, task });
 
   const initialOffset = derived(
@@ -78,6 +78,7 @@ export function useTask(
         const fromTaskStartToCursor = $cursorOffsetY - $offset;
 
         // todo: implicit dep on import?
+        // todo: snap
         return roundToSnapStep(Math.floor(fromTaskStartToCursor));
       }
 

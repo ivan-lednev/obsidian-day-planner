@@ -5,7 +5,7 @@
     CircleDotIcon,
   } from "lucide-svelte";
 
-  import { visibleDateRange } from "../../../store/visible-date-range";
+  import { visibleDateRange } from "../../../global-stores/visible-date-range";
   import { getDaysOfCurrentWeek, getDaysOfWeek } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
 

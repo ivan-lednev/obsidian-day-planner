@@ -9,10 +9,10 @@ import {
 import { get, writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
-import { computeOverlap } from "../parser/overlap";
+import { appStore } from "../global-stores/app-store";
+import { settings } from "../global-stores/settings";
+import { computeOverlap } from "../overlap/overlap";
 import { parsePlanItems } from "../parser/parser";
-import { appStore } from "../store/app-store";
-import { settings } from "../store/settings";
 import type { PlanItem } from "../types";
 
 import { getHorizontalPlacing } from "./horizontal-placing";

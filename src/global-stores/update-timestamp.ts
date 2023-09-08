@@ -3,7 +3,7 @@ import { TFile } from "obsidian";
 import { get, Writable } from "svelte/store";
 import { isInstanceOf } from "typed-assert";
 
-import { replaceTimestamp } from "../timestamp/timestamp";
+import { replaceTimestamp } from "../parser/timestamp/timestamp";
 import type { PlanItem, Timestamp } from "../types";
 import { addPlacing } from "../util/obsidian";
 
@@ -37,15 +37,6 @@ export async function updateTimestamps(
       addPlacing,
     ),
   );
-}
-
-export function updateStartMinutes(
-  tasks: Writable<Array<PlanItem>>,
-  id: string,
-  startMinutes: number,
-) {
-  // todo
-  return Promise.resolve("dummy");
 }
 
 // todo: out of place

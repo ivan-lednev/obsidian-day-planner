@@ -1,7 +1,7 @@
 import { get, Readable, writable } from "svelte/store";
 
+import { snap } from "../../global-stores/settings-utils";
 import type { PlanItem } from "../../types";
-import { snap } from "../timeline-store";
 
 import type { ReactiveSettingsWithUtils } from "./use-drag";
 

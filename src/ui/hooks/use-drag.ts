@@ -1,8 +1,8 @@
 import { derived, get, Readable, writable } from "svelte/store";
 
+import { snap } from "../../global-stores/settings-utils";
+import type { settingsWithUtils } from "../../global-stores/settings-with-utils";
 import type { PlanItem } from "../../types";
-import type { settingsWithUtils } from "../settings-with-utils";
-import { snap } from "../timeline-store";
 
 export type ReactiveSettingsWithUtils = typeof settingsWithUtils;
 

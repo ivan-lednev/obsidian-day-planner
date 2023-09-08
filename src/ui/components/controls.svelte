@@ -4,10 +4,10 @@
     DEFAULT_DAILY_NOTE_FORMAT,
   } from "obsidian-daily-notes-interface";
 
-  import { settings } from "../../store/settings";
+  import { settings } from "../../global-stores/settings";
   import {
     visibleDayInTimeline,
-  } from "../../store/visible-day-in-timeline";
+  } from "../../global-stores/visible-day-in-timeline";
   import {
     createDailyNoteIfNeeded,
   } from "../../util/daily-notes";

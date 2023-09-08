@@ -1,8 +1,8 @@
 import type { Moment } from "moment/moment";
 
-import { timeRegExp } from "../regexp";
-import type { PlanItem, Timestamp } from "../types";
-import { addMinutes, minutesToMoment } from "../util/moment";
+import { timeRegExp } from "../../regexp";
+import type { PlanItem, Timestamp } from "../../types";
+import { addMinutes, minutesToMoment } from "../../util/moment";
 
 export function parseTimestamp(asText?: string, day?: Moment): Moment | null {
   if (!asText) {

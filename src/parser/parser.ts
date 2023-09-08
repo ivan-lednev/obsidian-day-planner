@@ -5,11 +5,11 @@ import { dedent } from "ts-dedent";
 import { isTopLevelListItem } from "../../obsidian-metadata-utils/src/list";
 import { getTextAtPosition } from "../../obsidian-metadata-utils/src/position";
 import { timestampRegExp } from "../regexp";
-import { parseTimestamp } from "../timestamp/timestamp";
 import type { PlanItem, PlanItemLocation } from "../types";
 import { getMinutesSinceMidnightOfDayTo } from "../util/moment";
 
 import { calculateDefaultDuration } from "./calculate-default-duration";
+import { parseTimestamp } from "./timestamp/timestamp";
 
 export function parsePlanItems(
   content: string,

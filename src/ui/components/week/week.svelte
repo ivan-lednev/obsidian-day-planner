@@ -4,8 +4,8 @@
     getDailyNote,
   } from "obsidian-daily-notes-interface";
 
-  import { visibleHours } from "../../../store/timeline-store";
-  import { visibleDateRange } from "../../../store/visible-date-range";
+  import { visibleHours } from "../../../global-stores/settings-utils";
+  import { visibleDateRange } from "../../../global-stores/visible-date-range";
   import { isToday } from "../../../util/moment";
   import {
     getPlanItemsFromFile,

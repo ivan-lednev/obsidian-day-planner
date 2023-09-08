@@ -2,11 +2,11 @@
   import { GripVertical } from "lucide-svelte";
   import type { Readable } from "svelte/store";
 
-  import { currentTime } from "../../store/current-time";
-  import { editCancellation, editConfirmation } from "../../store/edit-events";
-  import { useTask } from "../../store/new-hooks/use-task";
-  import { settingsWithUtils } from "../../store/settings-with-utils";
+  import { currentTime } from "../../global-stores/current-time";
+  import { editCancellation, editConfirmation } from "../../global-stores/edit-events";
+  import { settingsWithUtils } from "../../global-stores/settings-with-utils";
   import type { PlacedPlanItem, PlanItem } from "../../types";
+  import { useTask } from "../hooks/use-task";
   import { watch } from "../hooks/watch";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
@@ -40,7 +40,7 @@
     onMouseUp,
   });
 
-  // todo: out of place?
+  // todo: no global variables
   watch(editConfirmation, () => {
     confirmMove();
     confirmResize();

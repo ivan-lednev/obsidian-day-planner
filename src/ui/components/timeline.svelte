@@ -4,8 +4,8 @@
     getDailyNote,
   } from "obsidian-daily-notes-interface";
 
-  import { visibleHours } from "../../store/timeline-store";
-  import { visibleDayInTimeline } from "../../store/visible-day-in-timeline";
+  import { visibleHours } from "../../global-stores/settings-utils";
+  import { visibleDayInTimeline } from "../../global-stores/visible-day-in-timeline";
   import { isToday } from "../../util/moment";
   import { getPlanItemsFromFile, toPlacedWritables } from "../../util/obsidian";
 

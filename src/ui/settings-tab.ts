@@ -1,8 +1,8 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 
 import { ICONS } from "../constants";
+import { settings } from "../global-stores/settings";
 import type DayPlanner from "../main";
-import { settings } from "../store/settings";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   plugin: DayPlanner;

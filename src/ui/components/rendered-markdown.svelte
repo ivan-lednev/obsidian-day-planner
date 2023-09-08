@@ -2,7 +2,7 @@
   import { Component, MarkdownRenderer } from "obsidian";
   import { onDestroy } from "svelte";
 
-  import { appStore } from "../../store/app-store";
+  import { appStore } from "../../global-stores/app-store";
   export let text: string;
 
   let markdownLifecycleManager = new Component();

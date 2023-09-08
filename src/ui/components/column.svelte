@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { hourSize } from "../../store/timeline-store";
+  import { hourSize } from "../../global-stores/settings-utils";
 
   export let visibleHours: number[];
 </script>

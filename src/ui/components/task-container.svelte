@@ -4,9 +4,9 @@
   import type { Writable } from "svelte/store";
   import { writable } from "svelte/store";
 
-  import { appStore } from "../../store/app-store";
-  import { editCancellation, editConfirmation } from "../../store/edit-events";
-  import { updateTimestamps } from "../../store/update-timestamp";
+  import { appStore } from "../../global-stores/app-store";
+  import { editCancellation, editConfirmation } from "../../global-stores/edit-events";
+  import { updateTimestamps } from "../../global-stores/update-timestamp";
   import type { PlacedPlanItem, PlanItem } from "../../types";
   import { getHorizontalPlacing } from "../../util/horizontal-placing";
   import { getFileByPath, openFileInEditor } from "../../util/obsidian";
@@ -37,6 +37,8 @@
     editConfirmation.trigger();
   }
 
+  // todo: out of place. These two should be passed from obsidian views downwards
+
   function getPlanItemKey(planItem: PlanItem) {
     return `${planItem.startTime} ${planItem.text}`;
   }
@@ -55,7 +57,7 @@
     } as PlacedPlanItem;
   }
 
-  // todo: out of place
+
   // todo: remove shim
   async function handleUpdate(updated: PlanItem) {
     await updateTimestamps(tasks, updated.id, {
@@ -64,7 +66,6 @@
     });
   }
 
-  // todo: out of place
   async function handleTaskMouseUp(planItem: PlanItem) {
     const file = getFileByPath(planItem.location.path);
 

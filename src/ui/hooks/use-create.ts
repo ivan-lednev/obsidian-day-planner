@@ -3,15 +3,15 @@ import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { Writable, writable } from "svelte/store";
 
 import { DEFAULT_DURATION_MINUTES } from "../../constants";
-import { appendToPlan } from "../../plan";
 import {
   getTimeFromYOffset,
   roundToSnapStep,
-} from "../../store/timeline-store";
+} from "../../global-stores/settings-utils";
 import type { PlanItem } from "../../types";
 import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 import { minutesToMomentOfDay } from "../../util/moment";
 import { addPlacing } from "../../util/obsidian";
+import { appendToPlan } from "../../util/plan";
 
 export function useCreate() {
   const creating = writable(false);
