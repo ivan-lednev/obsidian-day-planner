@@ -21,6 +21,7 @@
   const { creating, startCreation, confirmCreation, cancelCreation } =
     useCreate();
 
+  let shiftPressed = false;
   let pointerYOffset = writable(0);
   let el: HTMLDivElement;
 
@@ -60,7 +61,19 @@
   });
 </script>
 
-<svelte:document on:mouseup={editCancellation.trigger} />
+<svelte:document
+  on:mouseup={editCancellation.trigger}
+  on:keydown={(event) => {
+    if (event.shiftKey) {
+      shiftPressed = true;
+    }
+  }}
+  on:keyup={(event) => {
+    if (!event.shiftKey) {
+      shiftPressed = false;
+    }
+  }}
+/>
 
 <div
   bind:this={el}
@@ -71,6 +84,7 @@
 >
   {#each $tasks as planItem (getPlanItemKey(planItem))}
     <Task
+      copyModifierPressed={shiftPressed}
       onMouseUp={handleTaskMouseUp}
       onUpdate={handleUpdate}
       {planItem}

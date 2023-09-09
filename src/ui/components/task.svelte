@@ -1,9 +1,12 @@
 <script lang="ts">
-  import { GripVertical } from "lucide-svelte";
+  import { GripVertical, Copy } from "lucide-svelte";
   import type { Readable } from "svelte/store";
 
   import { currentTime } from "../../global-stores/current-time";
-  import { editCancellation, editConfirmation } from "../../global-stores/edit-events";
+  import {
+    editCancellation,
+    editConfirmation,
+  } from "../../global-stores/edit-events";
   import { settingsWithUtils } from "../../global-stores/settings-with-utils";
   import type { PlacedPlanItem, PlanItem } from "../../types";
   import { useTask } from "../hooks/use-task";
@@ -11,6 +14,7 @@
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
+  export let copyModifierPressed: boolean;
   export let planItem: PlacedPlanItem;
   export let pointerYOffset: Readable<number>;
   export let onUpdate: (updated: PlanItem) => Promise<void>;
@@ -76,7 +80,11 @@
       class="grip"
       on:mousedown|stopPropagation={startMove}
     >
-      <GripVertical class="svg-icon" />
+      {#if copyModifierPressed}
+        <Copy class="svg-icon" />
+      {:else}
+        <GripVertical class="svg-icon" />
+      {/if}
     </div>
     <div
       class="resize-handle absolute-stretch-x"

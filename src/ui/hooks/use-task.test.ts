@@ -3,9 +3,9 @@ import { get, writable } from "svelte/store";
 
 import { currentTime } from "../../global-stores/current-time";
 import { settingsWithUtils } from "../../global-stores/settings-with-utils";
+import type { PlacedPlanItem } from "../../types";
 
 import { useTask } from "./use-task";
-import type { PlacedPlanItem } from "../../types";
 
 const basePlanItem: PlacedPlanItem = {
   listTokens: "- ",
