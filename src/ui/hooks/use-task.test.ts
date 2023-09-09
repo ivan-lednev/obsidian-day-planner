@@ -5,8 +5,9 @@ import { currentTime } from "../../global-stores/current-time";
 import { settingsWithUtils } from "../../global-stores/settings-with-utils";
 
 import { useTask } from "./use-task";
+import type { PlacedPlanItem } from "../../types";
 
-const basePlanItem = {
+const basePlanItem: PlacedPlanItem = {
   listTokens: "- ",
   startTime: moment("2023-01-01"),
   endTime: moment("2023-01-01"),
@@ -18,6 +19,10 @@ const basePlanItem = {
   rawEndTime: "",
   text: "",
   firstLineText: "",
+  placing: {
+    xOffsetPercent: 0,
+    widthPercent: 100,
+  },
   location: {
     path: "path",
     line: 0,
@@ -30,7 +35,6 @@ function getBaseUseTaskProps() {
   return {
     settings: settingsWithUtils,
     currentTime,
-    isGhost: false,
     cursorOffsetY,
     onUpdate: jest.fn(),
     onMouseUp: jest.fn(),

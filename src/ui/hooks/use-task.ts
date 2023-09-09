@@ -2,7 +2,7 @@ import type { Moment } from "moment";
 import { derived, get, Readable } from "svelte/store";
 
 import { roundToSnapStep, snap } from "../../global-stores/settings-utils";
-import type { PlanItem } from "../../types";
+import type { PlacedPlanItem, PlanItem } from "../../types";
 import { getRelationToNow } from "../../util/moment";
 
 import { useColor } from "./use-color";
@@ -16,19 +16,11 @@ interface UseTaskProps {
   cursorOffsetY: Readable<number>;
   onUpdate: (planItem: PlanItem) => Promise<void>;
   onMouseUp: (planItem: PlanItem) => Promise<void>;
-  isGhost: boolean;
 }
 
 export function useTask(
-  task: PlanItem,
-  {
-    settings,
-    currentTime,
-    cursorOffsetY,
-    onUpdate,
-    onMouseUp,
-    isGhost,
-  }: UseTaskProps,
+  task: PlacedPlanItem,
+  { settings, currentTime, cursorOffsetY, onUpdate, onMouseUp }: UseTaskProps,
 ) {
   const { dragging, ...useDragValues } = useDrag({
     settings,
@@ -58,7 +50,7 @@ export function useTask(
   const offset = derived(
     [dragging, initialOffset, cursorOffsetY, settings.settings],
     ([$dragging, $initialOffset, $cursorOffsetY, $settings]) => {
-      if (isGhost || $dragging) {
+      if (task.isGhost || $dragging) {
         // todo: implicit dep on import?
         return snap(Math.floor($cursorOffsetY), $settings.zoomLevel);
       }
@@ -91,7 +83,7 @@ export function useTask(
   });
 
   async function handleMouseUp() {
-    if (isGhost || get(dragging)) {
+    if (task.isGhost || get(dragging)) {
       return;
     }
 

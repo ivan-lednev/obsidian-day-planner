@@ -9,20 +9,17 @@
   } from "../../global-stores/edit-events";
   import { updateTimestamps } from "../../global-stores/update-timestamp";
   import type { PlacedPlanItem, PlanItem } from "../../types";
-  import { getHorizontalPlacing } from "../../util/horizontal-placing";
-  import {
-    revealLineInFile,
-  } from "../../util/obsidian";
+  import { revealLineInFile } from "../../util/obsidian";
   import { useCreate } from "../hooks/use-create";
+  import { watch } from "../hooks/watch";
 
   import Task from "./task.svelte";
 
   export let tasks: Writable<PlacedPlanItem[]>;
   export let day: Moment;
 
-  const defaultDurationForNewTask = 30;
-
-  const { creating, startCreation, confirmCreation } = useCreate();
+  const { creating, startCreation, confirmCreation, cancelCreation } =
+    useCreate();
 
   let pointerYOffset = writable(0);
   let el: HTMLDivElement;
@@ -33,8 +30,8 @@
 
   function handleMouseUp() {
     if ($creating) {
-      // todo: to make this uniform, we may pull tasks from context
       confirmCreation(tasks, day, $pointerYOffset);
+      return;
     }
 
     editConfirmation.trigger();
@@ -44,20 +41,6 @@
 
   function getPlanItemKey(planItem: PlanItem) {
     return `${planItem.startTime} ${planItem.text}`;
-  }
-
-  function getDefaultPlacedPlanItem() {
-    // todo: no `as`
-    return {
-      durationMinutes: defaultDurationForNewTask,
-      startMinutes: 0,
-      endMinutes: defaultDurationForNewTask,
-      startTime: window.moment(),
-      endTime: window.moment(),
-      text: "New item",
-      id: "",
-      placing: { ...getHorizontalPlacing() },
-    } as PlacedPlanItem;
   }
 
   // todo: remove shim
@@ -72,7 +55,9 @@
     await revealLineInFile(path, line);
   }
 
-  async function asyncNoOp() {}
+  watch(editCancellation, () => {
+    cancelCreation(tasks);
+  });
 </script>
 
 <svelte:document on:mouseup={editCancellation.trigger} />
@@ -81,7 +66,7 @@
   bind:this={el}
   class="task-container absolute-stretch-x"
   on:mousemove={handleMousemove}
-  on:mousedown={startCreation}
+  on:mousedown={() => startCreation(tasks)}
   on:mouseup|stopPropagation={handleMouseUp}
 >
   {#each $tasks as planItem (getPlanItemKey(planItem))}
@@ -92,15 +77,6 @@
       {pointerYOffset}
     />
   {/each}
-  {#if $creating}
-    <Task
-      isGhost
-      onMouseUp={asyncNoOp}
-      onUpdate={asyncNoOp}
-      planItem={getDefaultPlacedPlanItem()}
-      {pointerYOffset}
-    />
-  {/if}
 </div>
 
 <style>

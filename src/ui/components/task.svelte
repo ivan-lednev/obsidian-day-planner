@@ -13,7 +13,6 @@
 
   export let planItem: PlacedPlanItem;
   export let pointerYOffset: Readable<number>;
-  export let isGhost = false;
   export let onUpdate: (updated: PlanItem) => Promise<void>;
   export let onMouseUp: (planItem: PlanItem) => Promise<void>;
 
@@ -35,7 +34,6 @@
     settings: settingsWithUtils,
     cursorOffsetY: pointerYOffset,
     currentTime,
-    isGhost,
     onUpdate,
     onMouseUp,
   });
@@ -63,7 +61,7 @@
   <div
     style:background-color={$backgroundColor}
     class="task {$relationToNow}"
-    class:is-ghost={isGhost}
+    class:is-ghost={planItem.isGhost}
     on:mousedown={(event) => event.stopPropagation()}
     on:mouseup={handleMouseUp}
   >

@@ -25,6 +25,7 @@ export interface PlanItem {
 
 export interface PlacedPlanItem extends PlanItem {
   placing: ReturnType<typeof getHorizontalPlacing>;
+  isGhost?: boolean;
 }
 
 export type RelationToNow = "past" | "present" | "future";
