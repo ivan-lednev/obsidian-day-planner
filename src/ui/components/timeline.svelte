@@ -7,7 +7,7 @@
   import { visibleHours } from "../../global-stores/settings-utils";
   import { visibleDayInTimeline } from "../../global-stores/visible-day-in-timeline";
   import { isToday } from "../../util/moment";
-  import { getPlanItemsFromFile, toPlacedWritables } from "../../util/obsidian";
+  import { addPlacing, getPlanItemsFromFile } from "../../util/obsidian";
 
   import Column from "./column.svelte";
   import Controls from "./controls.svelte";
@@ -41,7 +41,7 @@
       {#await getPlanItemsFromFile(getDailyNote($visibleDayInTimeline, getAllDailyNotes())) then tasks}
         <TaskContainer
           day={$visibleDayInTimeline}
-          tasks={toPlacedWritables(tasks)}
+          tasks={addPlacing(tasks)}
         />
       {:catch error}
         <pre>Could not render tasks: {error}</pre>

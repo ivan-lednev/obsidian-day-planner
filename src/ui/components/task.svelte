@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { noop } from "lodash";
   import { GripVertical, Copy } from "lucide-svelte";
   import type { Readable } from "svelte/store";
 
@@ -10,17 +11,17 @@
   import { settingsWithUtils } from "../../global-stores/settings-with-utils";
   import type { PlacedPlanItem, PlanItem } from "../../types";
   import { useTask } from "../hooks/use-task";
-  import { watch } from "../hooks/watch";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
   export let copyModifierPressed: boolean;
   export let planItem: PlacedPlanItem;
   export let pointerYOffset: Readable<number>;
-  export let onUpdate: (updated: PlanItem) => Promise<void>;
+  export let onUpdate: (planItem: PlanItem) => Promise<void>;
   export let onMouseUp: (planItem: PlanItem) => Promise<void>;
+  export let onCopy: () => void;
 
-  const {
+  $: ({
     height,
     offset,
     relationToNow,
@@ -40,18 +41,21 @@
     currentTime,
     onUpdate,
     onMouseUp,
-  });
+  }));
 
-  // todo: no global variables
-  watch(editConfirmation, () => {
+  $: {
+    $editConfirmation;
+
     confirmMove();
     confirmResize();
-  });
+  }
 
-  watch(editCancellation, () => {
+  $: {
+    $editCancellation;
+
     cancelMove();
     cancelResize();
-  });
+  }
 </script>
 
 <!--  overwrite global theme colors with contrasting text colors, when using colored theme-->
@@ -75,17 +79,25 @@
       --text-normal={$properContrastColors.normal}
       text={planItem.text}
     />
-    <div
-      style:cursor={$cursor}
-      class="grip"
-      on:mousedown|stopPropagation={startMove}
-    >
+    {#if !planItem.isGhost}
       {#if copyModifierPressed}
-        <Copy class="svg-icon" />
+        <div
+          class="grip"
+          on:mousedown|stopPropagation={onCopy}
+          on:mouseup|stopPropagation={noop}
+        >
+          <Copy class="svg-icon" />
+        </div>
       {:else}
-        <GripVertical class="svg-icon" />
+        <div
+          style:cursor={$cursor}
+          class="grip"
+          on:mousedown|stopPropagation={startMove}
+        >
+          <GripVertical class="svg-icon" />
+        </div>
       {/if}
-    </div>
+    {/if}
     <div
       class="resize-handle absolute-stretch-x"
       on:mousedown|stopPropagation={startResize}

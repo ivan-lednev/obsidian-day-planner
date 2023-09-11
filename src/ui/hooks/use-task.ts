@@ -51,7 +51,6 @@ export function useTask(
     [dragging, initialOffset, cursorOffsetY, settings.settings],
     ([$dragging, $initialOffset, $cursorOffsetY, $settings]) => {
       if (task.isGhost || $dragging) {
-        // todo: implicit dep on import?
         return snap(Math.floor($cursorOffsetY), $settings.zoomLevel);
       }
 

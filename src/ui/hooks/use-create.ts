@@ -45,7 +45,9 @@ export function useCreate() {
     }
 
     creating.set(false);
-    tasks.update((prev) => prev.filter((task) => !task.isGhost));
+    tasks.update((prev) => {
+      return prev.filter((task) => !task.isGhost);
+    });
   }
 
   async function confirmCreation(
@@ -53,6 +55,10 @@ export function useCreate() {
     day: Moment,
     pointerYOffset: number,
   ) {
+    if (!get(creating)) {
+      return;
+    }
+
     creating.set(false);
 
     const newPlanItem = await createPlanItemFromTimeline(day, pointerYOffset);

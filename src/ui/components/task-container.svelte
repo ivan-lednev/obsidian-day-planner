@@ -1,25 +1,29 @@
 <script lang="ts">
   import type { Moment } from "moment";
-  import type { Writable } from "svelte/store";
   import { writable } from "svelte/store";
 
-  import {
+import {
     editCancellation,
     editConfirmation,
   } from "../../global-stores/edit-events";
   import { updateTimestamps } from "../../global-stores/update-timestamp";
   import type { PlacedPlanItem, PlanItem } from "../../types";
   import { revealLineInFile } from "../../util/obsidian";
+  import { useCopy } from "../hooks/use-copy";
   import { useCreate } from "../hooks/use-create";
   import { watch } from "../hooks/watch";
 
   import Task from "./task.svelte";
 
-  export let tasks: Writable<PlacedPlanItem[]>;
+
+  export let tasks: PlacedPlanItem[];
   export let day: Moment;
 
-  const { creating, startCreation, confirmCreation, cancelCreation } =
-    useCreate();
+  const tasksStore = writable(tasks);
+
+  const { startCreation, confirmCreation, cancelCreation } = useCreate();
+
+  const { startCopy, confirmCopy } = useCopy();
 
   let shiftPressed = false;
   let pointerYOffset = writable(0);
@@ -29,24 +33,16 @@
     $pointerYOffset = event.clientY - el.getBoundingClientRect().top;
   }
 
-  function handleMouseUp() {
-    if ($creating) {
-      confirmCreation(tasks, day, $pointerYOffset);
-      return;
-    }
-
+  async function handleMouseUp() {
+    await confirmCreation(tasksStore, day, $pointerYOffset);
+    await confirmCopy(tasksStore, $pointerYOffset);
     editConfirmation.trigger();
   }
 
   // todo: out of place. These two should be passed from obsidian views downwards
 
-  function getPlanItemKey(planItem: PlanItem) {
-    return `${planItem.startTime} ${planItem.text}`;
-  }
-
-  // todo: remove shim
-  async function handleUpdate(updated: PlanItem) {
-    await updateTimestamps(tasks, updated.id, {
+  async function updateTask(updated: PlanItem) {
+    await updateTimestamps(tasksStore, updated.id, {
       startMinutes: updated.startMinutes,
       durationMinutes: updated.endMinutes - updated.startMinutes,
     });
@@ -57,7 +53,7 @@
   }
 
   watch(editCancellation, () => {
-    cancelCreation(tasks);
+    cancelCreation(tasksStore);
   });
 </script>
 
@@ -79,14 +75,15 @@
   bind:this={el}
   class="task-container absolute-stretch-x"
   on:mousemove={handleMousemove}
-  on:mousedown={() => startCreation(tasks)}
+  on:mousedown={() => startCreation(tasksStore)}
   on:mouseup|stopPropagation={handleMouseUp}
 >
-  {#each $tasks as planItem (getPlanItemKey(planItem))}
+  {#each $tasksStore as planItem (planItem.id)}
     <Task
       copyModifierPressed={shiftPressed}
+      onCopy={() => startCopy(planItem, tasksStore)}
       onMouseUp={handleTaskMouseUp}
-      onUpdate={handleUpdate}
+      onUpdate={updateTask}
       {planItem}
       {pointerYOffset}
     />

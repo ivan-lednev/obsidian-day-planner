@@ -8,9 +8,9 @@
   import { visibleDateRange } from "../../../global-stores/visible-date-range";
   import { isToday } from "../../../util/moment";
   import {
+    addPlacing,
     getPlanItemsFromFile,
     openFileForDay,
-    toPlacedWritables,
   } from "../../../util/obsidian";
   import Column from "../column.svelte";
   import ControlButton from "../control-button.svelte";
@@ -44,7 +44,7 @@
           {/if}
 
           {#await getPlanItemsFromFile(getDailyNote(day, getAllDailyNotes())) then tasks}
-            <TaskContainer {day} tasks={toPlacedWritables(tasks)} />
+            <TaskContainer {day} tasks={addPlacing(tasks)} />
           {:catch error}
             <pre>Could not render tasks: {error}</pre>
           {/await}
