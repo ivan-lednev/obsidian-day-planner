@@ -55,6 +55,7 @@ export async function revealLineInFile(path: string, line: number) {
   editor.setCursor({ line, ch: 0 });
 }
 
+// todo: rename to calculateOverlap
 export function addPlacing(planItems: PlanItem[]) {
   const overlapLookup = computeOverlap(planItems);
 
@@ -63,6 +64,7 @@ export function addPlacing(planItems: PlanItem[]) {
 
     return {
       ...planItem,
+      // todo: rename to overlap
       placing: getHorizontalPlacing(overlap),
     };
   });

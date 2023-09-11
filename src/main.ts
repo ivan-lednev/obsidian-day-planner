@@ -80,9 +80,13 @@ export default class DayPlanner extends Plugin {
       return;
     }
 
-    const newDay = getDateFromFile(view.file, "day");
+    const dayUserSwitchedTo = getDateFromFile(view.file, "day");
 
-    if (!newDay) {
+    if (dayUserSwitchedTo.isSame(get(visibleDayInTimeline), "day")) {
+      return;
+    }
+
+    if (!dayUserSwitchedTo) {
       if (isToday(get(visibleDayInTimeline))) {
         visibleDayInTimeline.set(window.moment());
       }
@@ -90,7 +94,7 @@ export default class DayPlanner extends Plugin {
       return;
     }
 
-    visibleDayInTimeline.set(newDay);
+    visibleDayInTimeline.set(dayUserSwitchedTo);
   };
 
   private registerCommands() {

@@ -16,7 +16,7 @@ const prod = (process.argv[2] === "production");
 
 const context = await esbuild.context({
   banner: {
-    js: banner,
+    js: banner
   },
   outdir: ".",
   entryPoints: ["src/main.ts", "src/styles.scss"],
@@ -44,10 +44,10 @@ const context = await esbuild.context({
   plugins: [
     sassPlugin(),
     esbuildSvelte({
-      compilerOptions: {css: true},
-      preprocess: sveltePreprocess(),
-    }),
-  ],
+      compilerOptions: { css: true, dev: !prod, enableSourcemap: !prod },
+      preprocess: sveltePreprocess()
+    })
+  ]
 });
 
 if (prod) {

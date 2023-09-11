@@ -58,7 +58,6 @@
   }
 </script>
 
-<!--  overwrite global theme colors with contrasting text colors, when using colored theme-->
 <div
   style:height="{$height}px"
   style:transform="translateY({$offset}px)"
