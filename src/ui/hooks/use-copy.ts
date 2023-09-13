@@ -8,6 +8,7 @@ import {
 import type { PlacedPlanItem } from "../../types";
 import { addPlacing } from "../../util/obsidian";
 import { appendToPlan } from "../../util/plan";
+import { getId } from "../../util/id";
 
 export function useCopy() {
   const copying = writable(false);
@@ -19,7 +20,7 @@ export function useCopy() {
     copying.set(true);
     tasks.update((prev) => [
       ...prev,
-      { ...planItem, isGhost: true, id: String(Math.random()) },
+      { ...planItem, isGhost: true, id: getId() },
     ]);
   }
 

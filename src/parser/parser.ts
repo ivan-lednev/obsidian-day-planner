@@ -10,6 +10,7 @@ import { getMinutesSinceMidnightOfDayTo } from "../util/moment";
 
 import { calculateDefaultDuration } from "./calculate-default-duration";
 import { parseTimestamp } from "./timestamp/timestamp";
+import { getId } from "../util/id";
 
 export function parsePlanItems(
   content: string,
@@ -128,7 +129,7 @@ export function createPlanItem({
     text: getDisplayedText(match, completeContent),
     firstLineText: text,
     location,
-    id: String(Math.random()),
+    id: getId(),
   };
 }
 

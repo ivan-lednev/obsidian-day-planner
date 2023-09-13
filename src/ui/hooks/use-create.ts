@@ -13,6 +13,7 @@ import { getHorizontalPlacing } from "../../util/horizontal-placing";
 import { minutesToMomentOfDay } from "../../util/moment";
 import { addPlacing } from "../../util/obsidian";
 import { appendToPlan } from "../../util/plan";
+import { getId } from "../../util/id";
 
 const DEFAULT_NEW_TASK_DURATION = 30;
 
@@ -89,7 +90,7 @@ async function createPlanItemFromTimeline(day: Moment, pointerYOffset: number) {
   const { path } = await createDailyNoteIfNeeded(day);
 
   return {
-    id: String(Math.random()),
+    id: getId(),
     startMinutes,
     durationMinutes: DEFAULT_DURATION_MINUTES,
     endMinutes,
