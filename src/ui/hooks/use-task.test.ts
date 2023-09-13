@@ -1,34 +1,10 @@
-import moment from "moment";
 import { get, writable } from "svelte/store";
 
 import { currentTime } from "../../global-stores/current-time";
 import { settingsWithUtils } from "../../global-stores/settings-with-utils";
-import type { PlacedPlanItem } from "../../types";
 
+import { basePlanItem } from "./test-utils";
 import { useTask } from "./use-task";
-
-export const basePlanItem: PlacedPlanItem = {
-  listTokens: "- ",
-  startTime: moment("2023-01-01"),
-  endTime: moment("2023-01-01"),
-  startMinutes: 0,
-  endMinutes: 60,
-  // todo: half of the properties should be getters
-  durationMinutes: 60,
-  rawStartTime: "",
-  rawEndTime: "",
-  text: "",
-  firstLineText: "",
-  placing: {
-    xOffsetPercent: 0,
-    widthPercent: 100,
-  },
-  location: {
-    path: "path",
-    line: 0,
-  },
-  id: "id",
-};
 
 function getBaseUseTaskProps() {
   const cursorOffsetY = writable(0);

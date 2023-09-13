@@ -1,37 +1,16 @@
-import type { Moment } from "moment";
 import type { Readable } from "svelte/store";
 import { derived, get, writable } from "svelte/store";
 
 import type { settings } from "../../../global-stores/settings";
 import type { PlacedPlanItem, PlanItem } from "../../../types";
-import { getMinutesSinceMidnight } from "../../../util/moment";
 
 import { transform } from "./transform/transform";
-import type { Edit } from "./types";
-import { EditMode } from "./types";
+import type { Edit, EditMode } from "./types";
 
 interface UseEditProps {
   parsedTasks: PlacedPlanItem[];
   pointerOffsetY: Readable<number>;
   settings: typeof settings;
-}
-
-interface CreateTaskProps {
-  start: Moment;
-  durationMinutes: number;
-}
-
-function createTask({ start, durationMinutes }: CreateTaskProps) {
-  return {
-    start,
-    durationMinutes,
-    get startMinutes() {
-      return getMinutesSinceMidnight(start);
-    },
-    get endMinutes() {
-      return this.startMinutes + durationMinutes;
-    },
-  };
 }
 
 // todo: this is duplicated, but this version is more efficient

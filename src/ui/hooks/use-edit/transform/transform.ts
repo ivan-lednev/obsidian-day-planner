@@ -4,7 +4,6 @@ import type { PlacedPlanItem } from "../../../../types";
 import { toSpliced } from "../../../../util/to-spliced";
 import { Edit, EditMode } from "../types";
 
-
 export function transform(
   baseline: PlacedPlanItem[],
   cursorTime: number,
@@ -47,7 +46,8 @@ function dragAndShiftOthers(
   cursorTime: number,
 ): PlacedPlanItem[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
-  const precedingItems = baseline.slice(0, index);
+  const preceding = baseline.slice(0, index);
+  const following = baseline.slice(index + 1);
 
   const newStartMinutes = cursorTime;
   const newEndMinutes = cursorTime + editTarget.durationMinutes;
@@ -58,25 +58,42 @@ function dragAndShiftOthers(
     endMinutes: newEndMinutes,
   };
 
-  const followingWithCurrent = baseline.slice(index + 1).reduce(
-    (result, current) => {
-      const previous = last(result);
+  const updatedFollowing = following.reduce((result, current) => {
+    const previous = last(result) || updated;
 
-      if (previous.endMinutes > current.startMinutes) {
-        // todo: this is duplicated. Use "shift time" or use getter for endMinutes
+    if (previous.endMinutes > current.startMinutes) {
+      result.push({
+        ...current,
+        startMinutes: previous.endMinutes,
+        endMinutes: previous.endMinutes + current.durationMinutes,
+      });
+    } else {
+      result.push(current);
+    }
+
+    return result;
+  }, []);
+
+  const updatedPreceding = preceding
+    .reverse()
+    .reduce((result, current) => {
+      // todo: this is confusing: it's previous in array, but later in timeline
+      const nextInTimeline = last(result) || updated;
+
+      // todo: this is a mirror of the previous one. We need to join them
+      if (nextInTimeline.startMinutes < current.endMinutes) {
         result.push({
           ...current,
-          startMinutes: previous.endMinutes,
-          endMinutes: previous.endMinutes + current.durationMinutes,
+          startMinutes: nextInTimeline.startMinutes - current.durationMinutes,
+          endMinutes: nextInTimeline.startMinutes,
         });
       } else {
         result.push(current);
       }
 
       return result;
-    },
-    [updated],
-  );
+    }, [])
+    .reverse();
 
-  return [...precedingItems, ...followingWithCurrent];
+  return [...updatedPreceding, updated, ...updatedFollowing];
 }

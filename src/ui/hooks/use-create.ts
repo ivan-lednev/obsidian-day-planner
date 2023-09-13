@@ -10,10 +10,10 @@ import {
 import type { PlacedPlanItem } from "../../types";
 import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 import { getHorizontalPlacing } from "../../util/horizontal-placing";
+import { getId } from "../../util/id";
 import { minutesToMomentOfDay } from "../../util/moment";
 import { addPlacing } from "../../util/obsidian";
 import { appendToPlan } from "../../util/plan";
-import { getId } from "../../util/id";
 
 const DEFAULT_NEW_TASK_DURATION = 30;
 

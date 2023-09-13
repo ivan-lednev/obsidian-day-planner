@@ -6,11 +6,11 @@ import { isTopLevelListItem } from "../../obsidian-metadata-utils/src/list";
 import { getTextAtPosition } from "../../obsidian-metadata-utils/src/position";
 import { timestampRegExp } from "../regexp";
 import type { PlanItem, PlanItemLocation } from "../types";
+import { getId } from "../util/id";
 import { getMinutesSinceMidnightOfDayTo } from "../util/moment";
 
 import { calculateDefaultDuration } from "./calculate-default-duration";
 import { parseTimestamp } from "./timestamp/timestamp";
-import { getId } from "../util/id";
 
 export function parsePlanItems(
   content: string,

@@ -2,11 +2,11 @@ import { get, writable } from "svelte/store";
 
 import { currentTime } from "../../../global-stores/current-time";
 import { settingsWithUtils } from "../../../global-stores/settings-with-utils";
-import { basePlanItem } from "../use-task.test";
+import { timeToMinutes } from "../../../util/moment";
+import { basePlanItem } from "../test-utils";
 
 import { EditMode } from "./types";
 import { useEdit } from "./use-edit";
-import { timeToMinutes } from "../../../util/moment";
 
 const baseTasks = [basePlanItem];
 
@@ -88,7 +88,7 @@ describe("drag many", () => {
         startMinutes: timeToMinutes("01:10"),
         endMinutes: timeToMinutes("02:10"),
         id: "2",
-      }, // todo: can replace with getter
+      },
     ];
 
     const { cursorOffsetY } = getBaseUseTaskProps();
@@ -110,11 +110,75 @@ describe("drag many", () => {
     });
   });
 
-  test.todo(
-    "tasks below stay in initial position once the overlap is reversed",
-  );
+  test("tasks below stay in initial position once the overlap is reversed", () => {
+    const tasks = [
+      basePlanItem,
+      {
+        ...basePlanItem,
+        startMinutes: timeToMinutes("01:10"),
+        endMinutes: timeToMinutes("02:10"),
+        id: "2",
+      },
+    ];
 
-  test.todo("tasks above react to shifting in the same way");
+    const { cursorOffsetY } = getBaseUseTaskProps();
+
+    const { displayedTasks, startEdit } = useEdit({
+      pointerOffsetY: cursorOffsetY,
+      parsedTasks: tasks,
+      settings: settingsWithUtils.settings,
+    });
+
+    startEdit(basePlanItem, EditMode.DRAG_AND_SHIFT_OTHERS);
+    cursorOffsetY.set(timeToMinutes("01:10"));
+    cursorOffsetY.set(timeToMinutes("00:00"));
+
+    const [, next] = get(displayedTasks);
+
+    expect(next).toMatchObject({
+      startMinutes: timeToMinutes("01:10"),
+      endMinutes: timeToMinutes("02:10"),
+    });
+  });
+
+  test("tasks above react to shifting in the same way", () => {
+    const tasks = [
+      {
+        ...basePlanItem,
+        startMinutes: timeToMinutes("01:00"),
+        endMinutes: timeToMinutes("02:00"),
+        id: "1",
+      },
+      {
+        ...basePlanItem,
+        startMinutes: timeToMinutes("02:00"),
+        endMinutes: timeToMinutes("03:00"),
+        id: "2",
+      },
+    ];
+
+    const { cursorOffsetY } = getBaseUseTaskProps();
+
+    const { displayedTasks, startEdit } = useEdit({
+      pointerOffsetY: cursorOffsetY,
+      parsedTasks: tasks,
+      settings: settingsWithUtils.settings,
+    });
+
+    startEdit(tasks[1], EditMode.DRAG_AND_SHIFT_OTHERS);
+    cursorOffsetY.set(timeToMinutes("01:30"));
+
+    const [previous, edited] = get(displayedTasks);
+
+    expect(edited).toMatchObject({
+      startMinutes: timeToMinutes("01:30"),
+      endMinutes: timeToMinutes("02:30"),
+    });
+    expect(previous).toMatchObject({
+      startMinutes: timeToMinutes("00:30"),
+      endMinutes: timeToMinutes("01:30"),
+    });
+  });
 
   test.todo("tasks stop moving once there is not enough time");
 });

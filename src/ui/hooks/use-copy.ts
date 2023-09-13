@@ -6,9 +6,9 @@ import {
   roundToSnapStep,
 } from "../../global-stores/settings-utils";
 import type { PlacedPlanItem } from "../../types";
+import { getId } from "../../util/id";
 import { addPlacing } from "../../util/obsidian";
 import { appendToPlan } from "../../util/plan";
-import { getId } from "../../util/id";
 
 export function useCopy() {
   const copying = writable(false);
