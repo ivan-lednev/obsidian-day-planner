@@ -16,5 +16,3 @@ export class DayPlannerSettings {
   timelineStartColor: HexString = "#006466";
   timelineEndColor: HexString = "#4d194d";
 }
-
-export const SETTINGS_FOR_TESTS = { ...new DayPlannerSettings() };

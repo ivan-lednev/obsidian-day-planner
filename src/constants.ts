@@ -1,13 +1,11 @@
-export const TASKS_FOR_DAY = "tasks";
+export const viewTypeTimeline = "timeline";
+export const viewTypeWeekly = "weekly";
 
-export const VIEW_TYPE_TIMELINE = "timeline";
-export const VIEW_TYPE_WEEKLY = "weekly";
+export const defaultDurationMinutes = 30;
 
-export const DEFAULT_DURATION_MINUTES = 30;
+export const snapStepMinutes = 10;
 
-export const SNAP_STEP_MINUTES = 10;
-
-export const ICONS = [
+export const icons = [
   "any-key",
   "audio-file",
   "blocks",

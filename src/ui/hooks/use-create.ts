@@ -2,7 +2,7 @@ import type { Moment } from "moment";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { get, Writable, writable } from "svelte/store";
 
-import { DEFAULT_DURATION_MINUTES } from "../../constants";
+import { defaultDurationMinutes } from "../../constants";
 import {
   getTimeFromYOffset,
   roundToSnapStep,
@@ -15,14 +15,14 @@ import { minutesToMomentOfDay } from "../../util/moment";
 import { addPlacing } from "../../util/obsidian";
 import { appendToPlan } from "../../util/plan";
 
-const DEFAULT_NEW_TASK_DURATION = 30;
+const defaultNewTaskDuration = 30;
 
 function getDefaultPlacedPlanItem() {
   // todo: no `as`
   return {
-    durationMinutes: DEFAULT_NEW_TASK_DURATION,
+    durationMinutes: defaultNewTaskDuration,
     startMinutes: 0,
-    endMinutes: DEFAULT_NEW_TASK_DURATION,
+    endMinutes: defaultNewTaskDuration,
     startTime: window.moment(),
     endTime: window.moment(),
     text: "New item",
@@ -85,14 +85,14 @@ export function useCreate() {
 async function createPlanItemFromTimeline(day: Moment, pointerYOffset: number) {
   // todo: duplicated snap
   const startMinutes = getTimeFromYOffset(roundToSnapStep(pointerYOffset));
-  const endMinutes = startMinutes + DEFAULT_DURATION_MINUTES;
+  const endMinutes = startMinutes + defaultDurationMinutes;
 
   const { path } = await createDailyNoteIfNeeded(day);
 
   return {
     id: getId(),
     startMinutes,
-    durationMinutes: DEFAULT_DURATION_MINUTES,
+    durationMinutes: defaultDurationMinutes,
     endMinutes,
     firstLineText: "New item",
     startTime: minutesToMomentOfDay(startMinutes, day),

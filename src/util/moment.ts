@@ -5,14 +5,14 @@ import type { RelationToNow } from "../types";
 
 const moment = window.moment;
 
-const DEFAULT_TIMESTAMP_FORMAT = "hh:mm";
+const defaultTimestampFormat = "hh:mm";
 
 export function getMinutesSinceMidnight(moment: Moment) {
   return moment.diff(moment.clone().startOf("day"), "minutes");
 }
 
 export function timeToMinutes(time: string) {
-  const parsed = moment(time, DEFAULT_TIMESTAMP_FORMAT);
+  const parsed = moment(time, defaultTimestampFormat);
 
   return getMinutesSinceMidnight(parsed);
 }

@@ -1,6 +1,6 @@
 import { derived, get } from "svelte/store";
 
-import { SNAP_STEP_MINUTES } from "../constants";
+import { snapStepMinutes } from "../constants";
 
 import { settings } from "./settings";
 
@@ -30,11 +30,11 @@ export const timeToTimelineOffset = derived(
 // todo: this is out of place
 export function roundToSnapStep(coords: number) {
   const { zoomLevel } = get(settings);
-  return coords - (coords % (SNAP_STEP_MINUTES * zoomLevel));
+  return coords - (coords % (snapStepMinutes * zoomLevel));
 }
 
 export function snap(coords: number, zoomLevel: number) {
-  return coords - (coords % (SNAP_STEP_MINUTES * zoomLevel));
+  return coords - (coords % (snapStepMinutes * zoomLevel));
 }
 
 // todo: this is out of place

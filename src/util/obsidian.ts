@@ -6,7 +6,7 @@ import {
   getDailyNote,
   getDateFromFile,
 } from "obsidian-daily-notes-interface";
-import { get, writable } from "svelte/store";
+import { get } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
 import { appStore } from "../global-stores/app-store";
@@ -68,11 +68,6 @@ export function addPlacing(planItems: PlanItem[]) {
       placing: getHorizontalPlacing(overlap),
     };
   });
-}
-
-export function toPlacedWritables(planItems: PlanItem[]) {
-  const planItemsWithPlacing = addPlacing(planItems);
-  return writable(planItemsWithPlacing);
 }
 
 export async function getPlanItemsFromFile(file: TFile) {

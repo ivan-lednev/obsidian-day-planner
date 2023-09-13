@@ -1,6 +1,6 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 
-import { VIEW_TYPE_TIMELINE } from "../constants";
+import { viewTypeTimeline } from "../constants";
 import type DayPlanner from "../main";
 import type { DayPlannerSettings } from "../settings";
 
@@ -20,7 +20,7 @@ export default class TimelineView extends ItemView {
   }
 
   getViewType(): string {
-    return VIEW_TYPE_TIMELINE;
+    return viewTypeTimeline;
   }
 
   getDisplayText(): string {

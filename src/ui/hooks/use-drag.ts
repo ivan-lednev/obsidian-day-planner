@@ -20,7 +20,6 @@ export function useDrag({
   onUpdate,
 }: UseDragProps) {
   const dragging = writable(false);
-  const pointerYOffsetToTaskStart = writable<number>();
 
   const cursor = derived(dragging, ($dragging) =>
     $dragging ? "grabbing" : "grab",
@@ -28,8 +27,6 @@ export function useDrag({
 
   function startMove() {
     dragging.set(true);
-    // todo: this should be more precise: cursoroffset + a bit of task above it
-    pointerYOffsetToTaskStart.set(get(cursorOffsetY));
   }
 
   function cancelMove() {
@@ -58,7 +55,6 @@ export function useDrag({
   }
 
   return {
-    pointerYOffsetToTaskStart,
     cursor,
     dragging,
     startMove,

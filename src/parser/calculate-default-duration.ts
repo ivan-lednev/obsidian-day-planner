@@ -1,4 +1,4 @@
-import { DEFAULT_DURATION_MINUTES } from "../constants";
+import { defaultDurationMinutes } from "../constants";
 import { getDiffInMinutes } from "../util/moment";
 
 import type { createPlanItem } from "./parser";
@@ -14,10 +14,10 @@ export function calculateDefaultDuration(
   if (next) {
     const minutesUntilNext = getDiffInMinutes(next.startTime, item.startTime);
 
-    if (minutesUntilNext < DEFAULT_DURATION_MINUTES) {
+    if (minutesUntilNext < defaultDurationMinutes) {
       return minutesUntilNext;
     }
   }
 
-  return DEFAULT_DURATION_MINUTES;
+  return defaultDurationMinutes;
 }

@@ -62,36 +62,36 @@ function dragAndShiftOthers(
     const previous = last(result) || updated;
 
     if (previous.endMinutes > current.startMinutes) {
-      result.push({
-        ...current,
-        startMinutes: previous.endMinutes,
-        endMinutes: previous.endMinutes + current.durationMinutes,
-      });
-    } else {
-      result.push(current);
+      return [
+        ...result,
+        {
+          ...current,
+          startMinutes: previous.endMinutes,
+          endMinutes: previous.endMinutes + current.durationMinutes,
+        },
+      ];
     }
 
-    return result;
+    return [...result, current];
   }, []);
 
   const updatedPreceding = preceding
     .reverse()
     .reduce((result, current) => {
-      // todo: this is confusing: it's previous in array, but later in timeline
       const nextInTimeline = last(result) || updated;
 
-      // todo: this is a mirror of the previous one. We need to join them
       if (nextInTimeline.startMinutes < current.endMinutes) {
-        result.push({
-          ...current,
-          startMinutes: nextInTimeline.startMinutes - current.durationMinutes,
-          endMinutes: nextInTimeline.startMinutes,
-        });
-      } else {
-        result.push(current);
+        return [
+          ...result,
+          {
+            ...current,
+            startMinutes: nextInTimeline.startMinutes - current.durationMinutes,
+            endMinutes: nextInTimeline.startMinutes,
+          },
+        ];
       }
 
-      return result;
+      return [...result, current];
     }, [])
     .reverse();
 

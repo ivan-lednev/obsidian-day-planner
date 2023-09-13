@@ -67,6 +67,42 @@
         ]
       }
     ],
-    "unused-imports/no-unused-imports": "error"
+    "unused-imports/no-unused-imports": "error",
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "enum",
+        "format": [
+          "StrictPascalCase"
+        ]
+      },
+      {
+        "selector": "enumMember",
+        "format": [
+          "UPPER_CASE"
+        ]
+      },
+      {
+        "selector": "interface",
+        "format": [
+          "StrictPascalCase"
+        ],
+        "custom": {
+          "regex": "^I[A-Z]",
+          "match": false
+        }
+      },
+      // UPPER_CASE is great, but we can't check it automatically only for vars declared once in the lifecycle of a program,
+      // as Google's style guide suggests
+      {
+        "selector": "variable",
+        "modifiers": [
+          "const"
+        ],
+        "format": [
+          "strictCamelCase"
+        ]
+      }
+    ]
   }
 }

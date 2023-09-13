@@ -3,8 +3,8 @@ import { partition } from "lodash/fp";
 
 import type { Overlap, TimeBlock } from "../types";
 
-const EMPTY = "empty";
-const TAKEN = "taken";
+const empty = "empty";
+const taken = "taken";
 
 export function computeOverlap(items: Array<TimeBlock>): Map<string, Overlap> {
   return items.reduce((overlapLookup, item) => {
@@ -68,7 +68,7 @@ function computeOverlapForGroup(
   const columnsForNewGroup = fractionForEachNewItem.d;
   const newItemInherentSpan = fractionForEachNewItem.n;
 
-  const slots = Array(columnsForNewGroup).fill(EMPTY);
+  const slots = Array(columnsForNewGroup).fill(empty);
 
   itemsPlacedPreviously.forEach((item) => {
     const { start, span, columns: previousColumns } = newLookup.get(item.id);
@@ -78,13 +78,13 @@ function computeOverlapForGroup(
     const scaledSpan = scale * span;
     const scaledEnd = scaledStart + scaledSpan;
 
-    slots.fill(TAKEN, scaledStart, scaledEnd);
+    slots.fill(taken, scaledStart, scaledEnd);
   });
 
   itemsToBePlaced.forEach((itemInGroup) => {
-    const firstFreeSlotIndex = slots.findIndex((slot) => slot === EMPTY);
+    const firstFreeSlotIndex = slots.findIndex((slot) => slot === empty);
     const nextTakenSlotIndex = slots.findIndex(
-      (slot, i) => i > firstFreeSlotIndex && slot === TAKEN,
+      (slot, i) => i > firstFreeSlotIndex && slot === taken,
     );
 
     const fromFreeToNextTakenSlot = nextTakenSlotIndex - firstFreeSlotIndex;
@@ -96,7 +96,7 @@ function computeOverlapForGroup(
 
     const fillEnd = firstFreeSlotIndex + span;
 
-    slots.fill(TAKEN, firstFreeSlotIndex, fillEnd);
+    slots.fill(taken, firstFreeSlotIndex, fillEnd);
 
     newLookup.set(itemInGroup.id, {
       start: firstFreeSlotIndex,

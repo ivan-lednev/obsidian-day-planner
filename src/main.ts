@@ -6,7 +6,7 @@ import {
 } from "obsidian-daily-notes-interface";
 import { get } from "svelte/store";
 
-import { VIEW_TYPE_TIMELINE, VIEW_TYPE_WEEKLY } from "./constants";
+import { viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { appStore } from "./global-stores/app-store";
 import { settings } from "./global-stores/settings";
 import { visibleDateRange } from "./global-stores/visible-date-range";
@@ -40,12 +40,12 @@ export default class DayPlanner extends Plugin {
     this.registerCommands();
 
     this.registerView(
-      VIEW_TYPE_TIMELINE,
+      viewTypeTimeline,
       (leaf: WorkspaceLeaf) => new TimelineView(leaf, this.settings, this),
     );
 
     this.registerView(
-      VIEW_TYPE_WEEKLY,
+      viewTypeWeekly,
       (leaf: WorkspaceLeaf) => new WeeklyView(leaf, this),
     );
 
@@ -165,8 +165,8 @@ export default class DayPlanner extends Plugin {
   };
 
   onunload() {
-    this.detachLeavesOfType(VIEW_TYPE_TIMELINE);
-    this.detachLeavesOfType(VIEW_TYPE_WEEKLY);
+    this.detachLeavesOfType(viewTypeTimeline);
+    this.detachLeavesOfType(viewTypeWeekly);
   }
 
   private async updateStatusBarOnFailed(fn: () => Promise<void>) {
@@ -189,17 +189,17 @@ export default class DayPlanner extends Plugin {
   };
 
   private async initWeeklyLeaf() {
-    this.detachLeavesOfType(VIEW_TYPE_WEEKLY);
+    this.detachLeavesOfType(viewTypeWeekly);
     await this.app.workspace.getLeaf(false).setViewState({
-      type: VIEW_TYPE_WEEKLY,
+      type: viewTypeWeekly,
       active: true,
     });
   }
 
   private async initTimelineLeaf() {
-    this.detachLeavesOfType(VIEW_TYPE_TIMELINE);
+    this.detachLeavesOfType(viewTypeTimeline);
     await this.app.workspace.getRightLeaf(false).setViewState({
-      type: VIEW_TYPE_TIMELINE,
+      type: viewTypeTimeline,
       active: true,
     });
     this.app.workspace.rightSplit.expand();

@@ -8,13 +8,13 @@ export interface ContrastColors {
 }
 
 // just using values from the default themes to get good gradients for light and dark colors
-const LightThemeColors: ContrastColors = {
+const lightThemeColors: ContrastColors = {
   normal: "#222222",
   muted: "#5c5c5c",
   faint: "#666666",
 };
 
-const DarkThemeColors: ContrastColors = {
+const darkThemeColors: ContrastColors = {
   normal: "#dadada",
   muted: "#b3b3b3",
   faint: "#ababab",
@@ -23,8 +23,8 @@ const DarkThemeColors: ContrastColors = {
 export function getTextColorWithEnoughContrast(
   backgroundColor: HexString,
 ): ContrastColors {
-  return chroma.contrast(backgroundColor, DarkThemeColors.normal) >
-    chroma.contrast(backgroundColor, LightThemeColors.normal)
-    ? DarkThemeColors
-    : LightThemeColors;
+  return chroma.contrast(backgroundColor, darkThemeColors.normal) >
+    chroma.contrast(backgroundColor, lightThemeColors.normal)
+    ? darkThemeColors
+    : lightThemeColors;
 }

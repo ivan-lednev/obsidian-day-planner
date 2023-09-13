@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 
-import { ICONS } from "../constants";
+import { icons } from "../constants";
 import { settings } from "../global-stores/settings";
 import type DayPlanner from "../main";
 
@@ -77,7 +77,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
         "The icon of the timeline pane. Reopen timeline pane or restart obsidian to see the change.",
       )
       .addDropdown((dropdown) => {
-        ICONS.forEach((icon) => dropdown.addOption(icon, icon));
+        icons.forEach((icon) => dropdown.addOption(icon, icon));
         return dropdown
           .setValue(
             this.plugin.settings.timelineIcon ?? "calendar-with-checkmark",

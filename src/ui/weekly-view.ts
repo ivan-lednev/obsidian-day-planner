@@ -1,6 +1,6 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 
-import { VIEW_TYPE_WEEKLY } from "../constants";
+import { viewTypeWeekly } from "../constants";
 import type DayPlanner from "../main";
 import type { DayPlannerSettings } from "../settings";
 
@@ -18,7 +18,7 @@ export default class WeeklyView extends ItemView {
   }
 
   getViewType(): string {
-    return VIEW_TYPE_WEEKLY;
+    return viewTypeWeekly;
   }
 
   getDisplayText(): string {
