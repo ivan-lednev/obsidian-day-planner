@@ -7,7 +7,7 @@ import type { PlacedPlanItem } from "../../types";
 
 import { useTask } from "./use-task";
 
-const basePlanItem: PlacedPlanItem = {
+export const basePlanItem: PlacedPlanItem = {
   listTokens: "- ",
   startTime: moment("2023-01-01"),
   endTime: moment("2023-01-01"),
