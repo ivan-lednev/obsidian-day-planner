@@ -35,12 +35,12 @@ function createTask({ start, durationMinutes }: CreateTaskProps) {
 }
 
 // todo: this is duplicated, but this version is more efficient
-export function getTimeFromYOffset_NEW(
-  yCoords: number,
+export function offsetYToMinutes_NEW(
+  offsetY: number,
   zoomLevel: number,
   hiddenHoursSize: number,
 ) {
-  return (yCoords + hiddenHoursSize) / zoomLevel;
+  return (offsetY + hiddenHoursSize) / zoomLevel;
 }
 
 export function useEdit({
@@ -58,7 +58,7 @@ export function useEdit({
         return $baselineTasks;
       }
 
-      const cursorMinutes = getTimeFromYOffset_NEW(
+      const cursorMinutes = offsetYToMinutes_NEW(
         $pointerOffsetY,
         $settings.zoomLevel,
         $settings.startHour,

@@ -6,6 +6,7 @@ import { basePlanItem } from "../use-task.test";
 
 import { EditMode } from "./types";
 import { useEdit } from "./use-edit";
+import { timeToMinutes } from "../../../util/moment";
 
 const baseTasks = [basePlanItem];
 
@@ -45,13 +46,13 @@ describe("drag one & common edit mechanics", () => {
     });
 
     startEdit(basePlanItem, EditMode.DRAG);
-    cursorOffsetY.set(200);
+    cursorOffsetY.set(timeToMinutes("09:00"));
 
     const [updatedItem] = get(displayedTasks);
 
     expect(updatedItem).toMatchObject({
-      startMinutes: 200,
-      endMinutes: 260,
+      startMinutes: timeToMinutes("09:00"),
+      endMinutes: timeToMinutes("10:00"),
     });
   });
 
@@ -65,15 +66,15 @@ describe("drag one & common edit mechanics", () => {
     });
 
     startEdit(basePlanItem, EditMode.DRAG);
-    cursorOffsetY.set(200);
+    cursorOffsetY.set(timeToMinutes("09:00"));
     confirmEdit();
-    cursorOffsetY.set(300);
+    cursorOffsetY.set(timeToMinutes("10:00"));
 
     const [updatedItem] = get(displayedTasks);
 
     expect(updatedItem).toMatchObject({
-      startMinutes: 200,
-      endMinutes: 260,
+      startMinutes: timeToMinutes("09:00"),
+      endMinutes: timeToMinutes("10:00"),
     });
   });
 });
@@ -82,7 +83,12 @@ describe("drag many", () => {
   test("tasks below react to shifting selected task once they start overlap", () => {
     const tasks = [
       basePlanItem,
-      { ...basePlanItem, startMinutes: 70, endMinutes: 130, id: "2" },
+      {
+        ...basePlanItem,
+        startMinutes: timeToMinutes("01:10"),
+        endMinutes: timeToMinutes("02:10"),
+        id: "2",
+      }, // todo: can replace with getter
     ];
 
     const { cursorOffsetY } = getBaseUseTaskProps();
@@ -94,13 +100,13 @@ describe("drag many", () => {
     });
 
     startEdit(basePlanItem, EditMode.DRAG_AND_SHIFT_OTHERS);
-    cursorOffsetY.set(200);
+    cursorOffsetY.set(timeToMinutes("01:10"));
 
     const [, next] = get(displayedTasks);
 
     expect(next).toMatchObject({
-      startMinutes: 260,
-      endMinutes: 320,
+      startMinutes: timeToMinutes("02:10"),
+      endMinutes: timeToMinutes("03:10"),
     });
   });
 
