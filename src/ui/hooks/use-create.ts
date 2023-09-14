@@ -69,7 +69,7 @@ export function useCreate() {
     // @ts-expect-error
     tasks.update((previous) => addPlacing([...previous, newPlanItem]));
 
-    // todo: clean up item creation
+    // todo: the hook doesn't need to know about the plan
     // @ts-expect-error
     await appendToPlan(filePath, newPlanItem);
   }

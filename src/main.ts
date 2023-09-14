@@ -19,12 +19,13 @@ import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
 import { getDaysOfCurrentWeek, isToday } from "./util/moment";
 import { ObsidianFacade } from "./util/obsidian-facade";
-import { createPlannerHeading } from "./util/plan";
+import { PlanEditor } from "./util/plan-editor";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
   private statusBar: StatusBar;
   private obsidianFacade: ObsidianFacade;
+  private planEditor: PlanEditor;
 
   async onload() {
     this.settings = Object.assign(
@@ -45,6 +46,12 @@ export default class DayPlanner extends Plugin {
       this.app.vault,
       this.app.metadataCache,
       this.settings,
+    );
+
+    this.planEditor = new PlanEditor(
+      this.settings,
+      this.app.metadataCache,
+      this.obsidianFacade,
     );
 
     this.registerView(
@@ -133,7 +140,7 @@ export default class DayPlanner extends Plugin {
       id: "insert-planner-heading-at-cursor",
       name: "Insert Planner Heading at Cursor",
       editorCallback: (editor) =>
-        editor.replaceSelection(createPlannerHeading()),
+        editor.replaceSelection(this.planEditor.createPlannerHeading()),
     });
   }
 

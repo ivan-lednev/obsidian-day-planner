@@ -9,6 +9,7 @@ import type { PlanItem } from "../types";
 import { selectText } from "./editor";
 import { getFileByPath, openFileInEditor } from "./obsidian";
 
+// todo: delete this once we've replaced the hooks
 export function createPlannerHeading() {
   const { plannerHeading, plannerHeadingLevel } = get(settings);
 
@@ -17,7 +18,7 @@ export function createPlannerHeading() {
   return `${headingTokens} ${plannerHeading}`;
 }
 
-// todo: replace with mdast-util-from-markdown + custom stringify
+// todo: remove this once we've replaced the hooks
 export async function appendToPlan(path: string, planItem: PlanItem) {
   const app = get(appStore);
   const { plannerHeading } = get(settings);
@@ -29,10 +30,10 @@ export async function appendToPlan(path: string, planItem: PlanItem) {
   let line = editor.lastLine();
   let result = replaceTimestamp(planItem, { ...planItem });
 
-  const headingLine = getHeadingByText(metadata, plannerHeading);
+  const cachedHeading = getHeadingByText(metadata, plannerHeading);
 
-  if (headingLine) {
-    line = headingLine.position.start.line;
+  if (cachedHeading) {
+    line = cachedHeading.position.start.line;
   } else {
     result = `${createPlannerHeading()}\n\n${result}`;
   }
@@ -43,7 +44,7 @@ export async function appendToPlan(path: string, planItem: PlanItem) {
     const lastListItem = listItems[listItems.length - 1];
 
     line = lastListItem.position.start.line;
-  } else if (headingLine) {
+  } else if (cachedHeading) {
     result = `\n${result}`;
   }
 

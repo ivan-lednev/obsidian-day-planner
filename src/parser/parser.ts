@@ -91,6 +91,7 @@ export function getListItemsUnderHeading(
   });
 }
 
+// todo: this belongs to metadata-utils
 export function getHeadingByText(metadata: CachedMetadata, text: string) {
   const { headings = [] } = metadata;
 
