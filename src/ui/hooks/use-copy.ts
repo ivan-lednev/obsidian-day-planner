@@ -5,9 +5,9 @@ import {
   getTimeFromYOffset,
   roundToSnapStep,
 } from "../../global-stores/settings-utils";
+import { addPlacing } from "../../overlap/overlap";
 import type { PlacedPlanItem } from "../../types";
 import { getId } from "../../util/id";
-import { addPlacing } from "../../util/obsidian";
 import { appendToPlan } from "../../util/plan";
 
 export function useCopy() {

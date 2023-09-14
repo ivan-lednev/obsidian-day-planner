@@ -61,7 +61,6 @@ export class ObsidianFacade {
     editor.setCursor({ line, ch: 0 });
   }
 
-  // todo: rename to calculateOverlap
   async getPlanItemsFromFile(file: TFile) {
     if (!file) {
       return [];
@@ -88,6 +87,7 @@ export class ObsidianFacade {
     );
   }
 
+  // todo: separate reactivity from obsidian
   async updateTask(tasks: Writable<PlanItem[]>, updated: PlanItem) {
     await updateTimestamps(tasks, updated.id, {
       startMinutes: updated.startMinutes,

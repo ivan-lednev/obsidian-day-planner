@@ -3,9 +3,9 @@ import { TFile } from "obsidian";
 import { get, Writable } from "svelte/store";
 import { isInstanceOf } from "typed-assert";
 
+import { addPlacing } from "../overlap/overlap";
 import { replaceTimestamp } from "../parser/timestamp/timestamp";
 import type { PlanItem, Timestamp } from "../types";
-import { addPlacing } from "../util/obsidian";
 
 import { appStore } from "./app-store";
 

@@ -18,7 +18,6 @@ import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
 import { getDaysOfCurrentWeek, isToday } from "./util/moment";
-import { getPlanItemsFromFile } from "./util/obsidian";
 import { ObsidianFacade } from "./util/obsidian-facade";
 import { createPlannerHeading } from "./util/plan";
 
@@ -192,7 +191,7 @@ export default class DayPlanner extends Plugin {
   private updateStatusBar = async () => {
     if (dailyNoteExists()) {
       const note = getDailyNote(window.moment(), getAllDailyNotes());
-      const planItems = await getPlanItemsFromFile(note);
+      const planItems = await this.obsidianFacade.getPlanItemsFromFile(note);
       await this.statusBar.update(planItems);
     } else {
       this.statusBar.setEmpty();

@@ -1,17 +1,11 @@
 <script lang="ts">
   import type { Moment } from "moment";
-  import {
-    DEFAULT_DAILY_NOTE_FORMAT,
-  } from "obsidian-daily-notes-interface";
+  import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
   import { settings } from "../../global-stores/settings";
-  import {
-    visibleDayInTimeline,
-  } from "../../global-stores/visible-day-in-timeline";
-  import {
-    createDailyNoteIfNeeded,
-  } from "../../util/daily-notes";
-  import { openFileInEditor } from "../../util/obsidian";
+  import { visibleDayInTimeline } from "../../global-stores/visible-day-in-timeline";
+  import { createDailyNoteIfNeeded } from "../../util/daily-notes";
+  import type { ObsidianFacade } from "../../util/obsidian-facade";
 
   import ControlButton from "./control-button.svelte";
   import ArrowLeftIcon from "./icons/arrow-left.svelte";
@@ -20,6 +14,7 @@
   import SettingsIcon from "./icons/settings.svelte";
 
   export let day: Moment;
+  export let obsidianFacade: ObsidianFacade;
 
   let settingsVisible = false;
 
@@ -27,13 +22,15 @@
     settingsVisible = !settingsVisible;
   }
 
+  // todo: hide these in class
+
   async function goBack() {
     const previousDay = $visibleDayInTimeline.clone().subtract(1, "day");
 
     const previousNote = await createDailyNoteIfNeeded(previousDay);
 
     // todo: replace
-    await openFileInEditor(previousNote);
+    await obsidianFacade.openFileInEditor(previousNote);
 
     $visibleDayInTimeline = previousDay;
   }
@@ -43,7 +40,7 @@
 
     const nextNote = await createDailyNoteIfNeeded(nextDay);
 
-    await openFileInEditor(nextNote);
+    await obsidianFacade.openFileInEditor(nextNote);
 
     $visibleDayInTimeline = nextDay;
   }
@@ -51,7 +48,7 @@
   async function goToToday() {
     const noteForToday = await createDailyNoteIfNeeded(window.moment());
 
-    await openFileInEditor(noteForToday);
+    await obsidianFacade.openFileInEditor(noteForToday);
   }
 </script>
 
@@ -78,7 +75,7 @@
       label="Go to file"
       on:click={async () => {
         const note = await createDailyNoteIfNeeded(day);
-        await openFileInEditor(note);
+        await obsidianFacade.openFileInEditor(note);
       }}
     >
       <span class="date">{day.format(DEFAULT_DAILY_NOTE_FORMAT)}</span>

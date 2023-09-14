@@ -6,12 +6,8 @@
 
   import { visibleHours } from "../../../global-stores/settings-utils";
   import { visibleDateRange } from "../../../global-stores/visible-date-range";
+  import { addPlacing } from "../../../overlap/overlap";
   import { isToday } from "../../../util/moment";
-  import {
-    addPlacing,
-    getPlanItemsFromFile,
-    openFileForDay,
-  } from "../../../util/obsidian";
   import type { ObsidianFacade } from "../../../util/obsidian-facade";
   import Column from "../column.svelte";
   import ControlButton from "../control-button.svelte";
@@ -29,7 +25,7 @@
       <ControlButton
         --color={isToday(day) ? "white" : "var(--icon-color)"}
         label="Open note for day"
-        on:click={async () => await openFileForDay(day)}
+        on:click={async () => await obsidianFacade.openFileForDay(day)}
       >
         {day.format("MMM D, ddd")}
       </ControlButton>
@@ -46,7 +42,7 @@
             <Needle autoScrollBlocked={true} />
           {/if}
 
-          {#await getPlanItemsFromFile(getDailyNote(day, getAllDailyNotes())) then tasks}
+          {#await obsidianFacade.getPlanItemsFromFile(getDailyNote(day, getAllDailyNotes())) then tasks}
             <TaskContainer {day} {obsidianFacade} tasks={addPlacing(tasks)} />
           {:catch error}
             <pre>Could not render tasks: {error}</pre>

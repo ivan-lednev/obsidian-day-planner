@@ -6,8 +6,8 @@
 
   import { visibleHours } from "../../global-stores/settings-utils";
   import { visibleDayInTimeline } from "../../global-stores/visible-day-in-timeline";
+  import { addPlacing } from "../../overlap/overlap";
   import { isToday } from "../../util/moment";
-  import { addPlacing } from "../../util/obsidian";
   import type { ObsidianFacade } from "../../util/obsidian-facade";
 
   import Column from "./column.svelte";
@@ -33,7 +33,7 @@
   );
 </script>
 
-<Controls day={$visibleDayInTimeline} />
+<Controls day={$visibleDayInTimeline} {obsidianFacade}/>
 <div
   class="vertical-scroller"
   on:mouseenter={handleMouseEnter}

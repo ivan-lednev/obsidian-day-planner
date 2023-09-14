@@ -1,7 +1,8 @@
 import Fraction from "fraction.js";
 import { partition } from "lodash/fp";
 
-import type { Overlap, TimeBlock } from "../types";
+import type { Overlap, TimeBlock, PlanItem } from "../types";
+import { getHorizontalPlacing } from "../util/horizontal-placing";
 
 const empty = "empty";
 const taken = "taken";
@@ -112,4 +113,17 @@ function overlaps(a: TimeBlock, b: TimeBlock) {
   const [early, late] = a.startMinutes < b.startMinutes ? [a, b] : [b, a];
 
   return early.endMinutes > late.startMinutes;
+}
+
+export function addPlacing(planItems: PlanItem[]) {
+  const overlapLookup = computeOverlap(planItems);
+
+  return planItems.map((planItem) => {
+    const overlap = overlapLookup.get(planItem.id);
+
+    return {
+      ...planItem,
+      placing: getHorizontalPlacing(overlap),
+    };
+  });
 }
