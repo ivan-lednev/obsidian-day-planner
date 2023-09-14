@@ -18,6 +18,7 @@ import type { PlanItem } from "../types";
 import { getHorizontalPlacing } from "./horizontal-placing";
 
 export async function openFileInEditor(file: TFile) {
+  // todo: obsidian helpers should not depend on Svelte code
   const app = get(appStore);
 
   const leaf = app.workspace.getLeaf(false);

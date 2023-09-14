@@ -1,22 +1,20 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 
 import { viewTypeTimeline } from "../constants";
-import type DayPlanner from "../main";
 import type { DayPlannerSettings } from "../settings";
+import type { ObsidianFacade } from "../util/obsidian-facade";
 
 import Timeline from "./components/timeline.svelte";
 
 export default class TimelineView extends ItemView {
   private timeline: Timeline;
-  private settings: DayPlannerSettings;
 
   constructor(
     leaf: WorkspaceLeaf,
-    settings: DayPlannerSettings,
-    private readonly plugin: DayPlanner,
+    private readonly settings: DayPlannerSettings,
+    private readonly obsidianFacade: ObsidianFacade,
   ) {
     super(leaf);
-    this.settings = settings;
   }
 
   getViewType(): string {
@@ -35,6 +33,9 @@ export default class TimelineView extends ItemView {
     const contentEl = this.containerEl.children[1];
     this.timeline = new Timeline({
       target: contentEl,
+      props: {
+        obsidianFacade: this.obsidianFacade,
+      },
     });
   }
 

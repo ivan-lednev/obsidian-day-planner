@@ -19,11 +19,13 @@ import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
 import { getDaysOfCurrentWeek, isToday } from "./util/moment";
 import { getPlanItemsFromFile } from "./util/obsidian";
+import { ObsidianFacade } from "./util/obsidian-facade";
 import { createPlannerHeading } from "./util/plan";
 
 export default class DayPlanner extends Plugin {
   settings: DayPlannerSettings;
   private statusBar: StatusBar;
+  private obsidianFacade: ObsidianFacade;
 
   async onload() {
     this.settings = Object.assign(
@@ -39,14 +41,23 @@ export default class DayPlanner extends Plugin {
 
     this.registerCommands();
 
+    this.obsidianFacade = new ObsidianFacade(
+      this.app.workspace,
+      this.app.vault,
+      this.app.metadataCache,
+      this.settings,
+    );
+
     this.registerView(
       viewTypeTimeline,
-      (leaf: WorkspaceLeaf) => new TimelineView(leaf, this.settings, this),
+      (leaf: WorkspaceLeaf) =>
+        new TimelineView(leaf, this.settings, this.obsidianFacade),
     );
 
     this.registerView(
       viewTypeWeekly,
-      (leaf: WorkspaceLeaf) => new WeeklyView(leaf, this),
+      (leaf: WorkspaceLeaf) =>
+        new WeeklyView(leaf, this.settings, this.obsidianFacade),
     );
 
     this.addRibbonIcon(

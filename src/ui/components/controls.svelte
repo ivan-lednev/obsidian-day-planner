@@ -32,6 +32,7 @@
 
     const previousNote = await createDailyNoteIfNeeded(previousDay);
 
+    // todo: replace
     await openFileInEditor(previousNote);
 
     $visibleDayInTimeline = previousDay;

@@ -12,11 +12,14 @@
     getPlanItemsFromFile,
     openFileForDay,
   } from "../../../util/obsidian";
+  import type { ObsidianFacade } from "../../../util/obsidian-facade";
   import Column from "../column.svelte";
   import ControlButton from "../control-button.svelte";
   import Needle from "../needle.svelte";
   import Ruler from "../ruler.svelte";
   import TaskContainer from "../task-container.svelte";
+
+  export let obsidianFacade: ObsidianFacade;
 </script>
 
 <div class="week-header">
@@ -44,7 +47,7 @@
           {/if}
 
           {#await getPlanItemsFromFile(getDailyNote(day, getAllDailyNotes())) then tasks}
-            <TaskContainer {day} tasks={addPlacing(tasks)} />
+            <TaskContainer {day} {obsidianFacade} tasks={addPlacing(tasks)} />
           {:catch error}
             <pre>Could not render tasks: {error}</pre>
           {/await}

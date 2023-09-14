@@ -1,8 +1,8 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 
 import { viewTypeWeekly } from "../constants";
-import type DayPlanner from "../main";
 import type { DayPlannerSettings } from "../settings";
+import type { ObsidianFacade } from "../util/obsidian-facade";
 
 import HeaderActions from "./components/week/header-actions.svelte";
 import Week from "./components/week/week.svelte";
@@ -10,11 +10,13 @@ import Week from "./components/week/week.svelte";
 export default class WeeklyView extends ItemView {
   private weekComponent: Week;
   private headerActionsComponent: HeaderActions;
-  private settings: DayPlannerSettings;
 
-  constructor(leaf: WorkspaceLeaf, plugin: DayPlanner) {
+  constructor(
+    leaf: WorkspaceLeaf,
+    private readonly settings: DayPlannerSettings,
+    private readonly obsidianFacade: ObsidianFacade,
+  ) {
     super(leaf);
-    this.settings = plugin.settings;
   }
 
   getViewType(): string {
@@ -44,6 +46,9 @@ export default class WeeklyView extends ItemView {
 
     this.weekComponent = new Week({
       target: contentEl,
+      props: {
+        obsidianFacade: this.obsidianFacade,
+      },
     });
   }
 

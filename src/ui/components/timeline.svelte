@@ -7,13 +7,16 @@
   import { visibleHours } from "../../global-stores/settings-utils";
   import { visibleDayInTimeline } from "../../global-stores/visible-day-in-timeline";
   import { isToday } from "../../util/moment";
-  import { addPlacing, getPlanItemsFromFile } from "../../util/obsidian";
+  import { addPlacing } from "../../util/obsidian";
+  import type { ObsidianFacade } from "../../util/obsidian-facade";
 
   import Column from "./column.svelte";
   import Controls from "./controls.svelte";
   import Needle from "./needle.svelte";
   import Ruler from "./ruler.svelte";
   import TaskContainer from "./task-container.svelte";
+
+  export let obsidianFacade: ObsidianFacade;
 
   let userHoversOverScroller = false;
 
@@ -24,6 +27,10 @@
   function handleMouseLeave() {
     userHoversOverScroller = false;
   }
+
+  $: tasksPromise = obsidianFacade.getPlanItemsFromFile(
+    getDailyNote($visibleDayInTimeline, getAllDailyNotes()),
+  );
 </script>
 
 <Controls day={$visibleDayInTimeline} />
@@ -38,9 +45,10 @@
       {#if isToday($visibleDayInTimeline)}
         <Needle autoScrollBlocked={userHoversOverScroller} />
       {/if}
-      {#await getPlanItemsFromFile(getDailyNote($visibleDayInTimeline, getAllDailyNotes())) then tasks}
+      {#await tasksPromise then tasks}
         <TaskContainer
           day={$visibleDayInTimeline}
+          {obsidianFacade}
           tasks={addPlacing(tasks)}
         />
       {:catch error}

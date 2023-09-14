@@ -11,6 +11,7 @@ interface UseEditProps {
   parsedTasks: PlacedPlanItem[];
   pointerOffsetY: Readable<number>;
   settings: typeof settings;
+  onUpdate: (task: PlanItem) => Promise<void>;
 }
 
 // todo: this is duplicated, but this version is more efficient
@@ -26,6 +27,7 @@ export function useEdit({
   parsedTasks,
   pointerOffsetY,
   settings,
+  onUpdate,
 }: UseEditProps) {
   const baselineTasks = writable(parsedTasks);
   const editInProgress = writable<Edit | undefined>();
@@ -52,11 +54,15 @@ export function useEdit({
   }
 
   async function confirmEdit() {
+    const currentTasks = get(displayedTasks);
+
     // todo: this is hard to understand and error-prone (depends on order)
-    baselineTasks.set(get(displayedTasks));
+    baselineTasks.set(currentTasks);
     editInProgress.set(undefined);
 
     // todo: sync with file system
+    // todo: find dirty and update only those in one go
+    await onUpdate(undefined);
   }
 
   function cancelEdit() {

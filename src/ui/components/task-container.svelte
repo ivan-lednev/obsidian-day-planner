@@ -2,27 +2,25 @@
   import type { Moment } from "moment";
   import { writable } from "svelte/store";
 
-import {
+  import {
     editCancellation,
     editConfirmation,
   } from "../../global-stores/edit-events";
   import { updateTimestamps } from "../../global-stores/update-timestamp";
   import type { PlacedPlanItem, PlanItem } from "../../types";
-  import { revealLineInFile } from "../../util/obsidian";
+  import type { ObsidianFacade } from "../../util/obsidian-facade";
   import { useCopy } from "../hooks/use-copy";
   import { useCreate } from "../hooks/use-create";
   import { watch } from "../hooks/watch";
 
   import Task from "./task.svelte";
 
-
   export let tasks: PlacedPlanItem[];
   export let day: Moment;
+  export let obsidianFacade: ObsidianFacade;
 
   const tasksStore = writable(tasks);
-
   const { startCreation, confirmCreation, cancelCreation } = useCreate();
-
   const { startCopy, confirmCopy } = useCopy();
 
   let shiftPressed = false;
@@ -42,6 +40,7 @@ import {
   // todo: out of place. These two should be passed from obsidian views downwards
 
   async function updateTask(updated: PlanItem) {
+    // todo: replace
     await updateTimestamps(tasksStore, updated.id, {
       startMinutes: updated.startMinutes,
       durationMinutes: updated.endMinutes - updated.startMinutes,
@@ -49,7 +48,7 @@ import {
   }
 
   async function handleTaskMouseUp({ location: { path, line } }: PlanItem) {
-    await revealLineInFile(path, line);
+    await obsidianFacade.revealLineInFile(path, line);
   }
 
   watch(editCancellation, () => {
