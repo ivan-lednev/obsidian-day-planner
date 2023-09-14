@@ -100,7 +100,7 @@
           "const"
         ],
         "format": [
-          "strictCamelCase"
+          "camelCase"
         ]
       }
     ]

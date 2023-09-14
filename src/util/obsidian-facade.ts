@@ -7,10 +7,13 @@ import {
   getDailyNote,
   getDateFromFile,
 } from "obsidian-daily-notes-interface";
+import type { Writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
+import { updateTimestamps } from "../global-stores/update-timestamp";
 import { parsePlanItems } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
+import type { PlanItem } from "../types";
 
 export class ObsidianFacade {
   constructor(
@@ -83,5 +86,12 @@ export class ObsidianFacade {
       file.path,
       fileDay,
     );
+  }
+
+  async updateTask(tasks: Writable<PlanItem[]>, updated: PlanItem) {
+    await updateTimestamps(tasks, updated.id, {
+      startMinutes: updated.startMinutes,
+      durationMinutes: updated.endMinutes - updated.startMinutes,
+    });
   }
 }

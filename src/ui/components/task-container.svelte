@@ -6,12 +6,10 @@
     editCancellation,
     editConfirmation,
   } from "../../global-stores/edit-events";
-  import { updateTimestamps } from "../../global-stores/update-timestamp";
-  import type { PlacedPlanItem, PlanItem } from "../../types";
+  import type { PlacedPlanItem } from "../../types";
   import type { ObsidianFacade } from "../../util/obsidian-facade";
   import { useCopy } from "../hooks/use-copy";
   import { useCreate } from "../hooks/use-create";
-  import { watch } from "../hooks/watch";
 
   import Task from "./task.svelte";
 
@@ -19,17 +17,13 @@
   export let day: Moment;
   export let obsidianFacade: ObsidianFacade;
 
+  let shiftPressed = false;
+  let el: HTMLDivElement;
+
   const tasksStore = writable(tasks);
   const { startCreation, confirmCreation, cancelCreation } = useCreate();
   const { startCopy, confirmCopy } = useCopy();
-
-  let shiftPressed = false;
-  let pointerYOffset = writable(0);
-  let el: HTMLDivElement;
-
-  function handleMousemove(event: MouseEvent) {
-    $pointerYOffset = event.clientY - el.getBoundingClientRect().top;
-  }
+  const pointerYOffset = writable(0);
 
   async function handleMouseUp() {
     await confirmCreation(tasksStore, day, $pointerYOffset);
@@ -37,23 +31,11 @@
     editConfirmation.trigger();
   }
 
-  // todo: out of place. These two should be passed from obsidian views downwards
+  $: {
+    $editCancellation;
 
-  async function updateTask(updated: PlanItem) {
-    // todo: replace
-    await updateTimestamps(tasksStore, updated.id, {
-      startMinutes: updated.startMinutes,
-      durationMinutes: updated.endMinutes - updated.startMinutes,
-    });
-  }
-
-  async function handleTaskMouseUp({ location: { path, line } }: PlanItem) {
-    await obsidianFacade.revealLineInFile(path, line);
-  }
-
-  watch(editCancellation, () => {
     cancelCreation(tasksStore);
-  });
+  }
 </script>
 
 <svelte:document
@@ -73,7 +55,12 @@
 <div
   bind:this={el}
   class="task-container absolute-stretch-x"
-  on:mousemove={handleMousemove}
+  on:mousemove={(event) => {
+    const viewportToElOffsetY = el.getBoundingClientRect().top;
+    const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
+
+    pointerYOffset.set(borderTopToPointerOffsetY);
+  }}
   on:mousedown={() => startCreation(tasksStore)}
   on:mouseup|stopPropagation={handleMouseUp}
 >
@@ -81,8 +68,12 @@
     <Task
       copyModifierPressed={shiftPressed}
       onCopy={() => startCopy(planItem, tasksStore)}
-      onMouseUp={handleTaskMouseUp}
-      onUpdate={updateTask}
+      onMouseUp={async ({ location: { path, line } }) => {
+        await obsidianFacade.revealLineInFile(path, line);
+      }}
+      onUpdate={async (task) => {
+        await obsidianFacade.updateTask(tasksStore, task);
+      }}
       {planItem}
       {pointerYOffset}
     />
