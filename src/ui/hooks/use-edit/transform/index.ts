@@ -1,5 +1,5 @@
 import type { PlacedPlanItem } from "../../../../types";
-import { Edit, EditMode } from "../types";
+import { EditOperation, EditMode } from "../types";
 
 import { drag } from "./drag";
 import { dragAndShiftOthers } from "./drag-and-shift-others";
@@ -7,7 +7,7 @@ import { dragAndShiftOthers } from "./drag-and-shift-others";
 export function transform(
   baseline: PlacedPlanItem[],
   cursorTime: number,
-  { taskId, mode }: Edit,
+  { taskId, mode }: EditOperation,
 ) {
   const editTarget = baseline.find((task) => task.id === taskId);
 

@@ -3,6 +3,7 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 import { viewTypeWeekly } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 import type { ObsidianFacade } from "../util/obsidian-facade";
+import type { PlanEditor } from "../util/plan-editor";
 
 import HeaderActions from "./components/week/header-actions.svelte";
 import Week from "./components/week/week.svelte";
@@ -15,6 +16,7 @@ export default class WeeklyView extends ItemView {
     leaf: WorkspaceLeaf,
     private readonly settings: DayPlannerSettings,
     private readonly obsidianFacade: ObsidianFacade,
+    private readonly planEditor: PlanEditor,
   ) {
     super(leaf);
   }
@@ -48,6 +50,7 @@ export default class WeeklyView extends ItemView {
       target: contentEl,
       props: {
         obsidianFacade: this.obsidianFacade,
+        onUpdate: this.planEditor.syncTasksWithFile,
       },
     });
   }

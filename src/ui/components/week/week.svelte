@@ -7,6 +7,7 @@
   import { visibleHours } from "../../../global-stores/settings-utils";
   import { visibleDateRange } from "../../../global-stores/visible-date-range";
   import { addPlacing } from "../../../overlap/overlap";
+  import type { OnUpdateFn } from "../../../types";
   import { isToday } from "../../../util/moment";
   import type { ObsidianFacade } from "../../../util/obsidian-facade";
   import Column from "../column.svelte";
@@ -16,6 +17,7 @@
   import TaskContainer from "../task-container.svelte";
 
   export let obsidianFacade: ObsidianFacade;
+  export let onUpdate: OnUpdateFn;
 </script>
 
 <div class="week-header">
@@ -43,7 +45,12 @@
           {/if}
 
           {#await obsidianFacade.getPlanItemsFromFile(getDailyNote(day, getAllDailyNotes())) then tasks}
-            <TaskContainer {day} {obsidianFacade} tasks={addPlacing(tasks)} />
+            <TaskContainer
+              {day}
+              {obsidianFacade}
+              {onUpdate}
+              tasks={addPlacing(tasks)}
+            />
           {:catch error}
             <pre>Could not render tasks: {error}</pre>
           {/await}

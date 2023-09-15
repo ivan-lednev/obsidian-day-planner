@@ -5,7 +5,7 @@ import type { settings } from "../../../global-stores/settings";
 import type { OnUpdateFn, PlacedPlanItem, PlanItem } from "../../../types";
 
 import { transform } from "./transform";
-import type { Edit, EditMode } from "./types";
+import type { EditOperation, EditMode } from "./types";
 
 interface UseEditProps {
   parsedTasks: PlacedPlanItem[];
@@ -32,12 +32,12 @@ export function useEdit({
   onUpdate,
 }: UseEditProps) {
   const baselineTasks = writable(parsedTasks);
-  const editInProgress = writable<Edit | undefined>();
+  const editOperation = writable<EditOperation | "idle">("idle");
 
   const displayedTasks = derived(
-    [editInProgress, pointerOffsetY, baselineTasks, settings],
-    ([$editInProgress, $pointerOffsetY, $baselineTasks, $settings]) => {
-      if (!$editInProgress) {
+    [editOperation, pointerOffsetY, baselineTasks, settings],
+    ([$editOperation, $pointerOffsetY, $baselineTasks, $settings]) => {
+      if ($editOperation === "idle") {
         return $baselineTasks;
       }
 
@@ -47,25 +47,25 @@ export function useEdit({
         $settings.startHour,
       );
 
-      return transform($baselineTasks, cursorMinutes, $editInProgress);
+      return transform($baselineTasks, cursorMinutes, $editOperation);
     },
   );
 
   function startEdit(planItem: PlanItem, mode: EditMode) {
-    editInProgress.set({ mode, taskId: planItem.id });
+    editOperation.set({ mode, taskId: planItem.id });
   }
 
   async function confirmEdit() {
     const currentTasks = get(displayedTasks);
 
     baselineTasks.set(currentTasks);
-    editInProgress.set(undefined);
+    editOperation.set("idle");
 
     await onUpdate(parsedTasks, currentTasks);
   }
 
   function cancelEdit() {
-    editInProgress.set(undefined);
+    editOperation.set("idle");
   }
 
   return {

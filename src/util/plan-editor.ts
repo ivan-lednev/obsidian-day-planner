@@ -1,4 +1,4 @@
-import { difference } from "lodash/fp";
+import { difference, partition } from "lodash/fp";
 import type { MetadataCache } from "obsidian";
 
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
@@ -17,24 +17,27 @@ export class PlanEditor {
     private readonly obsidianFacade: ObsidianFacade,
   ) {}
 
-  syncWithFile = async (baseline: PlanItem[], updated: PlanItem[]) => {
+  syncTasksWithFile = async (baseline: PlanItem[], updated: PlanItem[]) => {
     const pristine = updated.filter((task) =>
       baseline.find((baselineTask) => isEqualTask(task, baselineTask)),
     );
 
     const dirty = difference(updated, pristine);
+    const [edited] = partition((task) => task.location.line, dirty);
+    const path = updated[0].location.path;
 
-    const promises = dirty.map((task) => {
-      const taskIsInFile = task.location.line !== undefined;
-
-      if (taskIsInFile) {
-        return this.updateTask(task);
-      }
-
-      return this.appendToPlan(task);
+    const firstPromise = this.obsidianFacade.editFile(path, (contents) => {
+      return edited.reduce((result, current) => {
+        return this.updateTaskInFileContents(result, current);
+      }, contents);
     });
 
-    return Promise.all(promises);
+    // todo: fix this too
+    // const promises = dirty.map(async (task) => {
+    //   return this.appendToPlan(task);
+    // });
+
+    return Promise.all([firstPromise]);
   };
 
   createPlannerHeading() {
@@ -46,24 +49,22 @@ export class PlanEditor {
   }
 
   // todo: we might want to update not only duration. Better: syncTaskWithNote
-  async updateTask(task: PlanItem) {
-    await this.obsidianFacade.editFile(task.location.path, (contents) => {
-      return contents
-        .split("\n")
-        .map((line, i) => {
-          // todo: if a task is newly created, it's not going to have a line. We need a clearer way to track this information
-          if (i === task.location?.line) {
-            // todo: this may break if I don't sync duration manually everywhere. Need a getter for endMinutes
-            return replaceTimestamp(task, {
-              startMinutes: task.startMinutes,
-              durationMinutes: task.durationMinutes,
-            });
-          }
+  private updateTaskInFileContents(contents: string, task: PlanItem) {
+    return contents
+      .split("\n")
+      .map((line, index) => {
+        // todo: if a task is newly created, it's not going to have a line. We need a clearer way to track this information
+        if (index === task.location?.line) {
+          // todo: this may break if I don't sync duration manually everywhere. Need a getter for endMinutes
+          return replaceTimestamp(task, {
+            startMinutes: task.startMinutes,
+            durationMinutes: task.durationMinutes,
+          });
+        }
 
-          return line;
-        })
-        .join("\n");
-    });
+        return line;
+      })
+      .join("\n");
   }
 
   // todo: replace with mdast-util-from-markdown + custom stringify

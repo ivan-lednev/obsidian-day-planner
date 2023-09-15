@@ -37,7 +37,7 @@ export default class TimelineView extends ItemView {
       target: contentEl,
       props: {
         obsidianFacade: this.obsidianFacade,
-        onUpdate: this.planEditor.syncWithFile,
+        onUpdate: this.planEditor.syncTasksWithFile,
       },
     });
   }

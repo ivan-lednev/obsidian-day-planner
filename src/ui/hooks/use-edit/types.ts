@@ -11,7 +11,7 @@ export enum EditMode {
   COPY = "COPY",
 }
 
-export interface Edit {
+export interface EditOperation {
   taskId: string;
   mode: EditMode;
 }

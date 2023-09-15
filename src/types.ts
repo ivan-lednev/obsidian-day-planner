@@ -11,7 +11,7 @@ export interface PlanItemLocation {
 export type OnUpdateFn = (
   baseline: PlanItem[],
   updated: PlanItem[],
-) => Promise<void>;
+) => Promise<void | void[]>;
 
 export interface PlanItem {
   startTime: Moment;

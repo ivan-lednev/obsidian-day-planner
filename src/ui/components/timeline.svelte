@@ -1,7 +1,7 @@
 <script lang="ts">
   import {
     getAllDailyNotes,
-    getDailyNote
+    getDailyNote,
   } from "obsidian-daily-notes-interface";
 
   import { visibleHours } from "../../global-stores/settings-utils";
@@ -30,9 +30,8 @@
     userHoversOverScroller = false;
   }
 
-  $: tasksPromise = obsidianFacade.getPlanItemsFromFile(
-    getDailyNote($visibleDayInTimeline, getAllDailyNotes())
-  );
+  $: dailyNote = getDailyNote($visibleDayInTimeline, getAllDailyNotes());
+  $: tasksPromise = obsidianFacade.getPlanItemsFromFile(dailyNote);
 </script>
 
 <Controls day={$visibleDayInTimeline} {obsidianFacade} />
@@ -47,11 +46,12 @@
       {#if isToday($visibleDayInTimeline)}
         <Needle autoScrollBlocked={userHoversOverScroller} />
       {/if}
+      <!-- todo: Move addPlacing() to facade-->
       {#await tasksPromise then tasks}
         <TaskContainer
           day={$visibleDayInTimeline}
           {obsidianFacade}
-          onUpdate={onUpdate}
+          {onUpdate}
           tasks={addPlacing(tasks)}
         />
       {:catch error}
@@ -62,12 +62,12 @@
 </div>
 
 <style>
-    .vertical-scroller {
-        overflow: auto;
-        height: 100%;
-    }
+  .vertical-scroller {
+    overflow: auto;
+    height: 100%;
+  }
 
-    .scale-with-days {
-        display: flex;
-    }
+  .scale-with-days {
+    display: flex;
+  }
 </style>

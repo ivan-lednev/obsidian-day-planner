@@ -68,7 +68,12 @@ export default class DayPlanner extends Plugin {
     this.registerView(
       viewTypeWeekly,
       (leaf: WorkspaceLeaf) =>
-        new WeeklyView(leaf, this.settings, this.obsidianFacade),
+        new WeeklyView(
+          leaf,
+          this.settings,
+          this.obsidianFacade,
+          this.planEditor,
+        ),
     );
 
     this.addRibbonIcon(
