@@ -26,7 +26,7 @@ export function useCopy() {
 
   async function confirmCopy(
     tasks: Writable<PlacedPlanItem[]>,
-    pointerYOffset: number,
+    pointerOffsetY: number,
   ) {
     if (!get(copying)) {
       return;
@@ -36,7 +36,7 @@ export function useCopy() {
 
     const newPlanItem = get(tasks).find((task) => task.isGhost);
 
-    const newStartMinutes = getTimeFromYOffset(roundToSnapStep(pointerYOffset));
+    const newStartMinutes = getTimeFromYOffset(roundToSnapStep(pointerOffsetY));
     const newEndMinutes = newStartMinutes + newPlanItem.durationMinutes;
 
     const withRealTime = {

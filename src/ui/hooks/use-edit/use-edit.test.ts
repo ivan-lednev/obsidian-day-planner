@@ -5,23 +5,30 @@ import { timeToMinutes } from "../../../util/moment";
 import { basePlanItem } from "../test-utils";
 
 import { EditMode } from "./types";
-import { useEdit } from "./use-edit";
+
+import { useEdit } from "./index";
 
 const baseTasks = [basePlanItem];
 
-function getUseEditProps({ tasks } = { tasks: baseTasks }) {
+function createProps({ tasks } = { tasks: baseTasks }) {
   const pointerOffsetY = writable(0);
+
+  function movePointerTo(time: string) {
+    pointerOffsetY.set(timeToMinutes(time));
+  }
+
   return {
     pointerOffsetY,
     parsedTasks: tasks,
     settings: settingsWithUtils.settings,
     onUpdate: () => Promise.resolve(),
+    movePointerTo,
   };
 }
 
 describe("drag one & common edit mechanics", () => {
   test("with no edit in progress, tasks don't change", () => {
-    const props = getUseEditProps();
+    const props = createProps();
     const { pointerOffsetY } = props;
 
     const { displayedTasks } = useEdit(props);
@@ -32,13 +39,12 @@ describe("drag one & common edit mechanics", () => {
   });
 
   test("when drag starts, target task reacts to cursor", () => {
-    const props = getUseEditProps();
-    const { pointerOffsetY } = props;
+    const { movePointerTo, ...props } = createProps();
 
     const { displayedTasks, startEdit } = useEdit(props);
 
     startEdit(basePlanItem, EditMode.DRAG);
-    pointerOffsetY.set(timeToMinutes("09:00"));
+    movePointerTo("09:00");
 
     const [updatedItem] = get(displayedTasks);
 
@@ -49,17 +55,14 @@ describe("drag one & common edit mechanics", () => {
   });
 
   test("after edit confirmation, tasks freeze and stop reacting to cursor", () => {
-    const props = getUseEditProps();
-    const { pointerOffsetY } = props;
+    const { movePointerTo, ...props } = createProps();
 
-    const { displayedTasks, startEdit, confirmEdit } = useEdit(
-      getUseEditProps(),
-    );
+    const { displayedTasks, startEdit, confirmEdit } = useEdit(props);
 
     startEdit(basePlanItem, EditMode.DRAG);
-    pointerOffsetY.set(timeToMinutes("09:00"));
+    movePointerTo("09:00");
     confirmEdit();
-    pointerOffsetY.set(timeToMinutes("10:00"));
+    movePointerTo("10:00");
 
     const [updatedItem] = get(displayedTasks);
 
@@ -82,13 +85,12 @@ describe("drag many", () => {
       },
     ];
 
-    const props = getUseEditProps({ tasks });
-    const { pointerOffsetY } = props;
+    const { movePointerTo, ...props } = createProps({ tasks });
 
     const { displayedTasks, startEdit } = useEdit(props);
 
     startEdit(basePlanItem, EditMode.DRAG_AND_SHIFT_OTHERS);
-    pointerOffsetY.set(timeToMinutes("01:10"));
+    movePointerTo("01:10");
 
     const [, next] = get(displayedTasks);
 
@@ -109,14 +111,13 @@ describe("drag many", () => {
       },
     ];
 
-    const props = getUseEditProps({ tasks });
-    const { pointerOffsetY } = props;
+    const { movePointerTo, ...props } = createProps({ tasks });
 
     const { displayedTasks, startEdit } = useEdit(props);
 
     startEdit(basePlanItem, EditMode.DRAG_AND_SHIFT_OTHERS);
-    pointerOffsetY.set(timeToMinutes("01:10"));
-    pointerOffsetY.set(timeToMinutes("00:00"));
+    movePointerTo("01:10");
+    movePointerTo("00:00");
 
     const [, next] = get(displayedTasks);
 
@@ -142,13 +143,12 @@ describe("drag many", () => {
       },
     ];
 
-    const props = getUseEditProps({ tasks });
-    const { pointerOffsetY } = props;
+    const { movePointerTo, ...props } = createProps({ tasks });
 
     const { displayedTasks, startEdit } = useEdit(props);
 
     startEdit(tasks[1], EditMode.DRAG_AND_SHIFT_OTHERS);
-    pointerOffsetY.set(timeToMinutes("01:30"));
+    movePointerTo("01:30");
 
     const [previous, edited] = get(displayedTasks);
 

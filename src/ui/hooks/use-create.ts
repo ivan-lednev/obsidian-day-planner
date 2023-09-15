@@ -54,7 +54,7 @@ export function useCreate() {
   async function confirmCreation(
     tasks: Writable<PlacedPlanItem[]>,
     day: Moment,
-    pointerYOffset: number,
+    pointerOffsetY: number,
   ) {
     if (!get(creating)) {
       return;
@@ -62,7 +62,7 @@ export function useCreate() {
 
     creating.set(false);
 
-    const newPlanItem = await createPlanItemFromTimeline(day, pointerYOffset);
+    const newPlanItem = await createPlanItemFromTimeline(day, pointerOffsetY);
     const filePath = getDailyNote(day, getAllDailyNotes()).path;
 
     // todo: overlap logic should be hidden
@@ -82,9 +82,9 @@ export function useCreate() {
   };
 }
 
-async function createPlanItemFromTimeline(day: Moment, pointerYOffset: number) {
+async function createPlanItemFromTimeline(day: Moment, pointerOffsetY: number) {
   // todo: duplicated snap
-  const startMinutes = getTimeFromYOffset(roundToSnapStep(pointerYOffset));
+  const startMinutes = getTimeFromYOffset(roundToSnapStep(pointerOffsetY));
   const endMinutes = startMinutes + defaultDurationMinutes;
 
   const { path } = await createDailyNoteIfNeeded(day);

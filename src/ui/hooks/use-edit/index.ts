@@ -4,7 +4,7 @@ import { derived, get, writable } from "svelte/store";
 import type { settings } from "../../../global-stores/settings";
 import type { PlacedPlanItem, PlanItem } from "../../../types";
 
-import { transform } from "./transform/transform";
+import { transform } from "./transform";
 import type { Edit, EditMode } from "./types";
 
 interface UseEditProps {
@@ -18,8 +18,10 @@ interface UseEditProps {
 export function offsetYToMinutes_NEW(
   offsetY: number,
   zoomLevel: number,
-  hiddenHoursSize: number,
+  startHour: number,
 ) {
+  const hiddenHoursSize = startHour * 60 * zoomLevel;
+
   return (offsetY + hiddenHoursSize) / zoomLevel;
 }
 
@@ -45,6 +47,7 @@ export function useEdit({
         $settings.startHour,
       );
 
+      // todo: cursorMinutes should be an integer
       return transform($baselineTasks, cursorMinutes, $editInProgress);
     },
   );
@@ -56,7 +59,6 @@ export function useEdit({
   async function confirmEdit() {
     const currentTasks = get(displayedTasks);
 
-    // todo: this is hard to understand and error-prone (depends on order)
     baselineTasks.set(currentTasks);
     editInProgress.set(undefined);
 

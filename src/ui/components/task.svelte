@@ -16,17 +16,17 @@
 
   export let copyModifierPressed: boolean;
   export let planItem: PlacedPlanItem;
-  export let pointerYOffset: Readable<number>;
+  export let pointerOffsetY: Readable<number>;
   export let onUpdate: (planItem: PlanItem) => Promise<void>;
   export let onMouseUp: (planItem: PlanItem) => Promise<void>;
   export let onCopy: () => void;
+  export let onGripClick: () => void;
 
   $: ({
     height,
     offset,
     relationToNow,
     cursor,
-    startMove,
     confirmMove,
     cancelMove,
     cancelResize,
@@ -37,7 +37,7 @@
     handleMouseUp,
   } = useTask(planItem, {
     settings: settingsWithUtils,
-    cursorOffsetY: pointerYOffset,
+    cursorOffsetY: pointerOffsetY,
     currentTime,
     onUpdate,
     onMouseUp,
@@ -91,7 +91,7 @@
         <div
           style:cursor={$cursor}
           class="grip"
-          on:mousedown|stopPropagation={startMove}
+          on:mousedown|stopPropagation={onGripClick}
         >
           <GripVertical class="svg-icon" />
         </div>

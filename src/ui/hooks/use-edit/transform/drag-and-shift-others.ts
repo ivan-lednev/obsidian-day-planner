@@ -1,46 +1,8 @@
 import { last } from "lodash";
 
 import type { PlacedPlanItem } from "../../../../types";
-import { toSpliced } from "../../../../util/to-spliced";
-import { Edit, EditMode } from "../types";
 
-export function transform(
-  baseline: PlacedPlanItem[],
-  cursorTime: number,
-  { taskId, mode }: Edit,
-) {
-  const editTarget = baseline.find((task) => task.id === taskId);
-
-  switch (mode) {
-    case EditMode.DRAG:
-      return drag(baseline, editTarget, cursorTime);
-    case EditMode.DRAG_AND_SHIFT_OTHERS:
-      return dragAndShiftOthers(baseline, editTarget, cursorTime);
-    default:
-      throw new Error(`Unknown edit mode: ${mode}`);
-  }
-}
-
-function drag(
-  baseline: PlacedPlanItem[],
-  editTarget: PlacedPlanItem,
-  cursorTime: number,
-): PlacedPlanItem[] {
-  const index = baseline.findIndex((task) => task.id === editTarget.id);
-
-  const startMinutes = cursorTime;
-  const endMinutes = cursorTime + editTarget.durationMinutes;
-
-  const updated = {
-    ...editTarget,
-    startMinutes,
-    endMinutes,
-  };
-
-  return toSpliced(baseline, index, updated);
-}
-
-function dragAndShiftOthers(
+export function dragAndShiftOthers(
   baseline: PlacedPlanItem[],
   editTarget: PlacedPlanItem,
   cursorTime: number,
