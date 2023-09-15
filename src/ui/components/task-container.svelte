@@ -8,7 +8,7 @@
   } from "../../global-stores/edit-events";
   import { settings } from "../../global-stores/settings";
   import { snap } from "../../global-stores/settings-utils";
-  import type { PlacedPlanItem } from "../../types";
+  import type { OnUpdateFn, PlacedPlanItem } from "../../types";
   import type { ObsidianFacade } from "../../util/obsidian-facade";
   import { useCopy } from "../hooks/use-copy";
   import { useCreate } from "../hooks/use-create";
@@ -16,11 +16,11 @@
   import { EditMode } from "../hooks/use-edit/types";
 
   import Task from "./task.svelte";
-
   // todo: change to parsedTasks for consistency with useEdit()
   export let tasks: PlacedPlanItem[];
   export let day: Moment;
   export let obsidianFacade: ObsidianFacade;
+  export let onUpdate: OnUpdateFn;
 
   let shiftPressed = false;
   let el: HTMLDivElement;
@@ -35,7 +35,7 @@
     parsedTasks: tasks,
     settings,
     pointerOffsetY: pointerOffsetY,
-    onUpdate: () => Promise.resolve(),
+    onUpdate,
   }));
 
   $: {

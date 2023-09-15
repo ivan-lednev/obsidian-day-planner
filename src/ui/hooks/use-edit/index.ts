@@ -2,7 +2,7 @@ import type { Readable } from "svelte/store";
 import { derived, get, writable } from "svelte/store";
 
 import type { settings } from "../../../global-stores/settings";
-import type { PlacedPlanItem, PlanItem } from "../../../types";
+import type { OnUpdateFn, PlacedPlanItem, PlanItem } from "../../../types";
 
 import { transform } from "./transform";
 import type { Edit, EditMode } from "./types";
@@ -11,7 +11,7 @@ interface UseEditProps {
   parsedTasks: PlacedPlanItem[];
   pointerOffsetY: Readable<number>;
   settings: typeof settings;
-  onUpdate: (task: PlanItem) => Promise<void>;
+  onUpdate: OnUpdateFn;
 }
 
 // todo: this is duplicated, but this version is more efficient
@@ -47,7 +47,6 @@ export function useEdit({
         $settings.startHour,
       );
 
-      // todo: cursorMinutes should be an integer
       return transform($baselineTasks, cursorMinutes, $editInProgress);
     },
   );
@@ -62,9 +61,7 @@ export function useEdit({
     baselineTasks.set(currentTasks);
     editInProgress.set(undefined);
 
-    // todo: sync with file system
-    // todo: find dirty and update only those in one go
-    await onUpdate(undefined);
+    await onUpdate(parsedTasks, currentTasks);
   }
 
   function cancelEdit() {

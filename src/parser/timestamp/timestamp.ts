@@ -56,5 +56,6 @@ function createTimestamp(startMinutes: number, durationMinutes: number) {
 }
 
 function formatTimestamp(moment: Moment) {
+  // todo: this needs to live in plan-editor and be configurable
   return moment.format("HH:mm");
 }

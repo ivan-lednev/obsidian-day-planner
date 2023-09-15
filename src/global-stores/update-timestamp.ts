@@ -9,6 +9,7 @@ import type { PlanItem, Timestamp } from "../types";
 
 import { appStore } from "./app-store";
 
+// todo: delete when class is used everywhere instead of this
 export async function updateTimestamps(
   tasks: Writable<Array<PlanItem>>,
   id: string,
@@ -39,7 +40,6 @@ export async function updateTimestamps(
   );
 }
 
-// todo: out of place
 async function updateDurationInDailyNote(
   task: PlanItem,
   startAndDuration: Timestamp,

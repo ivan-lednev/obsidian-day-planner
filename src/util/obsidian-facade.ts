@@ -8,7 +8,7 @@ import {
   getDateFromFile,
 } from "obsidian-daily-notes-interface";
 import type { Writable } from "svelte/store";
-import { isNotVoid } from "typed-assert";
+import { isInstanceOf, isNotVoid } from "typed-assert";
 
 import { updateTimestamps } from "../global-stores/update-timestamp";
 import { parsePlanItems } from "../parser/parser";
@@ -61,6 +61,18 @@ export class ObsidianFacade {
     editor.setCursor({ line, ch: 0 });
   }
 
+  async editFile(path: string, editFn: (contents: string) => string) {
+    const file = this.vault.getAbstractFileByPath(path);
+
+    isInstanceOf(file, TFile, `${path} is not a markdown file`);
+
+    const contents = await this.vault.read(file);
+    const newContents = editFn(contents);
+
+    await this.vault.modify(file, newContents);
+  }
+
+  // todo: move to plan-editor. it should be a wrapper for plans
   async getPlanItemsFromFile(file: TFile) {
     if (!file) {
       return [];

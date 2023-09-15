@@ -57,7 +57,12 @@ export default class DayPlanner extends Plugin {
     this.registerView(
       viewTypeTimeline,
       (leaf: WorkspaceLeaf) =>
-        new TimelineView(leaf, this.settings, this.obsidianFacade),
+        new TimelineView(
+          leaf,
+          this.settings,
+          this.obsidianFacade,
+          this.planEditor,
+        ),
     );
 
     this.registerView(

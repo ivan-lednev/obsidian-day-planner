@@ -1,12 +1,13 @@
 <script lang="ts">
   import {
     getAllDailyNotes,
-    getDailyNote,
+    getDailyNote
   } from "obsidian-daily-notes-interface";
 
   import { visibleHours } from "../../global-stores/settings-utils";
   import { visibleDayInTimeline } from "../../global-stores/visible-day-in-timeline";
   import { addPlacing } from "../../overlap/overlap";
+  import type { OnUpdateFn } from "../../types";
   import { isToday } from "../../util/moment";
   import type { ObsidianFacade } from "../../util/obsidian-facade";
 
@@ -17,6 +18,7 @@
   import TaskContainer from "./task-container.svelte";
 
   export let obsidianFacade: ObsidianFacade;
+  export let onUpdate: OnUpdateFn;
 
   let userHoversOverScroller = false;
 
@@ -29,11 +31,11 @@
   }
 
   $: tasksPromise = obsidianFacade.getPlanItemsFromFile(
-    getDailyNote($visibleDayInTimeline, getAllDailyNotes()),
+    getDailyNote($visibleDayInTimeline, getAllDailyNotes())
   );
 </script>
 
-<Controls day={$visibleDayInTimeline} {obsidianFacade}/>
+<Controls day={$visibleDayInTimeline} {obsidianFacade} />
 <div
   class="vertical-scroller"
   on:mouseenter={handleMouseEnter}
@@ -49,6 +51,7 @@
         <TaskContainer
           day={$visibleDayInTimeline}
           {obsidianFacade}
+          onUpdate={onUpdate}
           tasks={addPlacing(tasks)}
         />
       {:catch error}
@@ -59,12 +62,12 @@
 </div>
 
 <style>
-  .vertical-scroller {
-    overflow: auto;
-    height: 100%;
-  }
+    .vertical-scroller {
+        overflow: auto;
+        height: 100%;
+    }
 
-  .scale-with-days {
-    display: flex;
-  }
+    .scale-with-days {
+        display: flex;
+    }
 </style>

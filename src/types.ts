@@ -8,6 +8,11 @@ export interface PlanItemLocation {
   line: number;
 }
 
+export type OnUpdateFn = (
+  baseline: PlanItem[],
+  updated: PlanItem[],
+) => Promise<void>;
+
 export interface PlanItem {
   startTime: Moment;
   endTime: Moment;

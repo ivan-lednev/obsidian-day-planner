@@ -3,6 +3,7 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 import { viewTypeTimeline } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 import type { ObsidianFacade } from "../util/obsidian-facade";
+import type { PlanEditor } from "../util/plan-editor";
 
 import Timeline from "./components/timeline.svelte";
 
@@ -13,6 +14,7 @@ export default class TimelineView extends ItemView {
     leaf: WorkspaceLeaf,
     private readonly settings: DayPlannerSettings,
     private readonly obsidianFacade: ObsidianFacade,
+    private readonly planEditor: PlanEditor,
   ) {
     super(leaf);
   }
@@ -35,6 +37,7 @@ export default class TimelineView extends ItemView {
       target: contentEl,
       props: {
         obsidianFacade: this.obsidianFacade,
+        onUpdate: this.planEditor.syncWithFile,
       },
     });
   }
