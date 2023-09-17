@@ -2,11 +2,14 @@ import type { Moment } from "moment";
 import { derived, Readable } from "svelte/store";
 
 import { snap } from "../../global-stores/settings-utils";
-import type { PlacedPlanItem, PlanItem } from "../../types";
+import type {
+  PlacedPlanItem,
+  PlanItem,
+  ReactiveSettingsWithUtils,
+} from "../../types";
 import { getRelationToNow } from "../../util/moment";
 
 import { useColor } from "./use-color";
-import type { ReactiveSettingsWithUtils } from "./use-drag";
 
 interface UseTaskProps {
   settings: ReactiveSettingsWithUtils;

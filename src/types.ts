@@ -1,6 +1,6 @@
 import type { Moment } from "moment";
-import type { Writable } from "svelte/store";
 
+import type { settingsWithUtils } from "./global-stores/settings-with-utils";
 import type { getHorizontalPlacing } from "./util/horizontal-placing";
 
 export interface PlanItemLocation {
@@ -43,12 +43,8 @@ export interface Overlap {
   start: number;
 }
 
-export interface TasksContext {
-  tasks: Writable<Array<PlanItem>>;
-  getTasks: () => Writable<Array<PlanItem>>;
-}
-
 export type Timestamp = {
   startMinutes: number;
   durationMinutes: number;
 };
+export type ReactiveSettingsWithUtils = typeof settingsWithUtils;

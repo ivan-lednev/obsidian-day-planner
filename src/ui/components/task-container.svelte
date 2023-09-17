@@ -11,9 +11,9 @@
   import type { OnUpdateFn, PlacedPlanItem } from "../../types";
   import { getId } from "../../util/id";
   import type { ObsidianFacade } from "../../util/obsidian-facade";
-  import { offsetYToMinutes_NEW, useEdit } from "../hooks/use-edit";
   import { createPlanItem } from "../hooks/use-edit/transform/create";
   import { EditMode } from "../hooks/use-edit/types";
+  import { offsetYToMinutes_NEW, useEdit } from "../hooks/use-edit/use-edit";
 
   import Task from "./task.svelte";
   // todo: change to parsedTasks for consistency with useEdit()

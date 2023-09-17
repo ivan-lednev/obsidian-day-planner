@@ -4,7 +4,7 @@ import { derived, get, writable } from "svelte/store";
 import type { settings } from "../../../global-stores/settings";
 import type { OnUpdateFn, PlacedPlanItem } from "../../../types";
 
-import { transform } from "./transform";
+import { transform } from "./transform/transform";
 import type { EditOperation } from "./types";
 
 interface UseEditProps {

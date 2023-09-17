@@ -5,8 +5,7 @@ import { timeToMinutes } from "../../../util/moment";
 import { basePlanItem } from "../test-utils";
 
 import { EditMode } from "./types";
-
-import { useEdit } from "./index";
+import { useEdit } from "./use-edit";
 
 const baseTasks = [basePlanItem];
 
