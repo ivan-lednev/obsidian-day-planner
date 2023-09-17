@@ -61,11 +61,7 @@
 <!-- todo: this is big enough to deserve its own component -->
 <div class="controls">
   <div class="header">
-    <ControlButton
-      --justify-self="flex-start"
-      label="Open today's daily note"
-      on:click={goToToday}
-    >
+    <ControlButton label="Open today's daily note" on:click={goToToday}>
       <GoToFileIcon />
     </ControlButton>
 
@@ -96,16 +92,10 @@
       <ArrowRightIcon />
     </ControlButton>
 
-    <ControlButton
-      --justify-self="flex-end"
-      isActive={helpVisible}
-      label="Help"
-      on:click={toggleHelp}
-    >
+    <ControlButton isActive={helpVisible} label="Help" on:click={toggleHelp}>
       <HelpCircle class="svg-icon" />
     </ControlButton>
     <ControlButton
-      --justify-self="flex-end"
       isActive={settingsVisible}
       label="Settings"
       on:click={toggleSettings}
@@ -195,9 +185,10 @@
 
   .header {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-    justify-content: center;
+    grid-template-columns: repeat(2, var(--size-4-8)) repeat(3, 1fr) repeat(
+        2,
+        var(--size-4-8)
+      );
 
     margin: var(--size-4-2);
   }
