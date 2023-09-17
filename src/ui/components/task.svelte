@@ -91,8 +91,6 @@
         <div
           style:cursor={$cursor}
           class="grip"
-          aria-label="Shift + drag to copy
-Control + drag to push other tasks"
           on:mousedown|stopPropagation={onGripClick}
         >
           <GripVertical class="svg-icon" />
