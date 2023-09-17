@@ -5,6 +5,7 @@ import { create } from "./create";
 import { drag } from "./drag";
 import { dragAndShiftOthers } from "./drag-and-shift-others";
 import { resize } from "./resize";
+import { resizeAndShiftOthers } from "./resize-and-shift-others";
 
 // todo: better naming. This is more like produceNextFrame
 export function transform(
@@ -21,6 +22,8 @@ export function transform(
       return create(baseline, task, cursorTime);
     case EditMode.RESIZE:
       return resize(baseline, task, cursorTime);
+    case EditMode.RESIZE_AND_SHIFT_OTHERS:
+      return resizeAndShiftOthers(baseline, task, cursorTime);
     default:
       throw new Error(`Unknown edit mode: ${mode}`);
   }

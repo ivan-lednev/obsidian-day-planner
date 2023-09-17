@@ -123,7 +123,13 @@
       onMouseUp={async ({ location: { path, line } }) => {
         await obsidianFacade.revealLineInFile(path, line);
       }}
-      onResizeStart={() => startEdit({ task: planItem, mode: EditMode.RESIZE })}
+      onResizeStart={() => {
+        const mode = controlPressed
+          ? EditMode.RESIZE_AND_SHIFT_OTHERS
+          : EditMode.RESIZE;
+
+        startEdit({ task: planItem, mode });
+      }}
       {planItem}
       {pointerOffsetY}
       shiftOthersModifierPressed={controlPressed}
