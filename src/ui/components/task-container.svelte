@@ -26,8 +26,6 @@
   let controlPressed = false;
   let el: HTMLDivElement;
 
-  // todo: replace with displayedTasks
-  const tasksStore = writable(tasks);
   const pointerOffsetY = writable(0);
 
   $: ({ startEdit, displayedTasks, cancelEdit, confirmEdit } = useEdit({
@@ -125,9 +123,7 @@
       onMouseUp={async ({ location: { path, line } }) => {
         await obsidianFacade.revealLineInFile(path, line);
       }}
-      onUpdate={async (task) => {
-        await obsidianFacade.updateTask(tasksStore, task);
-      }}
+      onResizeStart={() => startEdit({ task: planItem, mode: EditMode.RESIZE })}
       {planItem}
       {pointerOffsetY}
       shiftOthersModifierPressed={controlPressed}

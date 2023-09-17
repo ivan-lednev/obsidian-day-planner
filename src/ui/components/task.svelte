@@ -3,10 +3,6 @@
   import type { Readable } from "svelte/store";
 
   import { currentTime } from "../../global-stores/current-time";
-  import {
-    editCancellation,
-    editConfirmation,
-  } from "../../global-stores/edit-events";
   import { settingsWithUtils } from "../../global-stores/settings-with-utils";
   import type { PlacedPlanItem, PlanItem } from "../../types";
   import { useTask } from "../hooks/use-task";
@@ -17,21 +13,15 @@
   export let shiftOthersModifierPressed: boolean;
   export let planItem: PlacedPlanItem;
   export let pointerOffsetY: Readable<number>;
-  export let onUpdate: (planItem: PlanItem) => Promise<void>;
   export let onMouseUp: (planItem: PlanItem) => Promise<void>;
   export let onCopy: () => void;
   export let onGripClick: () => void;
+  export let onResizeStart: () => void;
 
   $: ({
     height,
     offset,
     relationToNow,
-    cursor,
-    confirmMove,
-    cancelMove,
-    cancelResize,
-    startResize,
-    confirmResize,
     backgroundColor,
     properContrastColors,
     handleMouseUp,
@@ -39,23 +29,8 @@
     settings: settingsWithUtils,
     cursorOffsetY: pointerOffsetY,
     currentTime,
-    onUpdate,
     onMouseUp,
   }));
-
-  $: {
-    $editConfirmation;
-
-    confirmMove();
-    confirmResize();
-  }
-
-  $: {
-    $editCancellation;
-
-    cancelMove();
-    cancelResize();
-  }
 </script>
 
 <div
@@ -80,32 +55,22 @@
     />
     {#if !planItem.isGhost}
       {#if copyModifierPressed}
-        <div
-          class="grip"
-          on:mousedown|stopPropagation={onCopy}
-        >
+        <div class="grip" on:mousedown|stopPropagation={onCopy}>
           <Copy class="svg-icon" />
         </div>
       {:else if shiftOthersModifierPressed}
-        <div
-          class="grip"
-          on:mousedown|stopPropagation={onGripClick}
-        >
+        <div class="grip" on:mousedown|stopPropagation={onGripClick}>
           <Layers class="svg-icon" />
         </div>
       {:else}
-        <div
-          style:cursor={$cursor}
-          class="grip"
-          on:mousedown|stopPropagation={onGripClick}
-        >
+        <div class="grip" on:mousedown|stopPropagation={onGripClick}>
           <GripVertical class="svg-icon" />
         </div>
       {/if}
     {/if}
     <div
-      class="resize-handle absolute-stretch-x"
-      on:mousedown|stopPropagation={startResize}
+      class="resize-handle"
+      on:mousedown|stopPropagation={onResizeStart}
     ></div>
   </div>
 </div>
@@ -163,7 +128,12 @@
 
   .resize-handle {
     cursor: s-resize;
+
+    position: absolute;
+    right: 0;
     bottom: -8px;
+    left: 0;
+
     height: 16px;
   }
 </style>
