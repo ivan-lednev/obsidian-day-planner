@@ -31,6 +31,7 @@ export class ObsidianFacade {
     return this.workspace.activeEditor?.editor;
   }
 
+  // todo: this class should not know about daily notes
   async openFileForDay(moment: Moment) {
     const dailyNote =
       getDailyNote(moment, getAllDailyNotes()) ||
@@ -42,9 +43,7 @@ export class ObsidianFacade {
   getFileByPath(path: string) {
     const file = this.vault.getAbstractFileByPath(path);
 
-    if (!(file instanceof TFile)) {
-      throw new Error(`Unable to open file: ${path}`);
-    }
+    isInstanceOf(file, TFile, `Unable to open file: ${path}`);
 
     return file;
   }
@@ -100,6 +99,7 @@ export class ObsidianFacade {
   }
 
   // todo: separate reactivity from obsidian
+  // todo: reactivity & tasks should not bleed into this class
   async updateTask(tasks: Writable<PlanItem[]>, updated: PlanItem) {
     await updateTimestamps(tasks, updated.id, {
       startMinutes: updated.startMinutes,

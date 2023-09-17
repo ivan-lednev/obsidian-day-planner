@@ -23,6 +23,7 @@
   export let onUpdate: OnUpdateFn;
 
   let shiftPressed = false;
+  let controlPressed = false;
   let el: HTMLDivElement;
 
   // todo: replace with displayedTasks
@@ -52,10 +53,18 @@
     if (event.shiftKey) {
       shiftPressed = true;
     }
+
+    if (event.ctrlKey) {
+      controlPressed = true;
+    }
   }}
   on:keyup={(event) => {
     if (!event.shiftKey) {
       shiftPressed = false;
+    }
+
+    if (!event.ctrlKey) {
+      controlPressed = false;
     }
   }}
 />
@@ -85,7 +94,13 @@
       copyModifierPressed={shiftPressed}
       onCopy={() => startCopy(planItem, tasksStore)}
       onGripClick={() => {
-        startEdit(planItem, EditMode.DRAG_AND_SHIFT_OTHERS);
+        let mode = EditMode.DRAG;
+
+        if (controlPressed) {
+          mode = EditMode.DRAG_AND_SHIFT_OTHERS;
+        }
+
+        startEdit(planItem, mode);
       }}
       onMouseUp={async ({ location: { path, line } }) => {
         await obsidianFacade.revealLineInFile(path, line);
@@ -95,6 +110,7 @@
       }}
       {planItem}
       {pointerOffsetY}
+      shiftOthersModifierPressed={controlPressed}
     />
   {/each}
 </div>

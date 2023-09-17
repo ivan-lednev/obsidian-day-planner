@@ -1,6 +1,6 @@
 <script lang="ts">
   import { noop } from "lodash";
-  import { GripVertical, Copy } from "lucide-svelte";
+  import { GripVertical, Copy, Layers } from "lucide-svelte";
   import type { Readable } from "svelte/store";
 
   import { currentTime } from "../../global-stores/current-time";
@@ -15,6 +15,7 @@
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
   export let copyModifierPressed: boolean;
+  export let shiftOthersModifierPressed: boolean;
   export let planItem: PlacedPlanItem;
   export let pointerOffsetY: Readable<number>;
   export let onUpdate: (planItem: PlanItem) => Promise<void>;
@@ -86,6 +87,14 @@
           on:mouseup|stopPropagation={noop}
         >
           <Copy class="svg-icon" />
+        </div>
+      {:else if shiftOthersModifierPressed}
+        <div
+          class="grip"
+          on:mousedown|stopPropagation={onGripClick}
+          on:mouseup|stopPropagation={noop}
+        >
+          <Layers class="svg-icon" />
         </div>
       {:else}
         <div
