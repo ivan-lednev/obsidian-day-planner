@@ -9,8 +9,8 @@
   import { settings } from "../../global-stores/settings";
   import { snap } from "../../global-stores/settings-utils";
   import type { OnUpdateFn, PlacedPlanItem } from "../../types";
+  import { getId } from "../../util/id";
   import type { ObsidianFacade } from "../../util/obsidian-facade";
-  import { useCopy } from "../hooks/use-copy";
   import { offsetYToMinutes_NEW, useEdit } from "../hooks/use-edit";
   import { createPlanItem } from "../hooks/use-edit/transform/create";
   import { EditMode } from "../hooks/use-edit/types";
@@ -30,7 +30,6 @@
   const tasksStore = writable(tasks);
   const pointerOffsetY = writable(0);
 
-  const { startCopy, confirmCopy } = useCopy();
   $: ({ startEdit, displayedTasks, cancelEdit, confirmEdit } = useEdit({
     parsedTasks: tasks,
     settings,
@@ -93,14 +92,27 @@
   on:mouseup|stopPropagation={async () => {
     editConfirmation.trigger();
 
-    await confirmCopy(tasksStore, $pointerOffsetY);
     await confirmEdit();
   }}
 >
   {#each $displayedTasks as planItem (planItem.id)}
     <Task
       copyModifierPressed={shiftPressed}
-      onCopy={() => startCopy(planItem, tasksStore)}
+      onCopy={() => {
+        // todo: again, a lame way to track which tasks are new
+        const copy = {
+          ...planItem,
+          id: getId(),
+          isGhost: true,
+          // @ts-expect-error
+          location: { ...planItem.location, line: undefined },
+        };
+
+        startEdit({
+          task: copy,
+          mode: EditMode.CREATE,
+        });
+      }}
       onGripClick={() => {
         let mode = EditMode.DRAG;
 

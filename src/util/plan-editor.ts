@@ -39,6 +39,7 @@ export class PlanEditor {
         metadata,
       );
 
+      // todo: use immutable array methods
       const result = [...splitContents];
       result.splice(planEndLine + 1, 0, ...createdList);
       return result.join("\n");

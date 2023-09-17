@@ -10,7 +10,6 @@ export enum EditMode {
   CREATE = "CREATE",
   CREATE_AND_SHIFT_OTHERS = "CREATE_AND_SHIFT_OTHERS",
   CREATE_AND_RESIZE_NEXT = "CREATE_AND_RESIZE_NEXT",
-  COPY = "COPY",
 }
 
 export interface EditOperation {

@@ -41,8 +41,9 @@ export async function createPlanItem(
     text: "New item",
     startTime: minutesToMomentOfDay(startMinutes, day),
     endTime: minutesToMomentOfDay(endMinutes, day),
-    // todo: no hardcode
+    // todo: no hardcode, this should be configurable
     listTokens: "- ",
+    // todo: fix this, do not check for newly created tasks using their location
     // @ts-ignore
     location: {
       path,

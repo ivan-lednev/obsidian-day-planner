@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { noop } from "lodash";
   import { GripVertical, Copy, Layers } from "lucide-svelte";
   import type { Readable } from "svelte/store";
 
@@ -84,7 +83,6 @@
         <div
           class="grip"
           on:mousedown|stopPropagation={onCopy}
-          on:mouseup={noop}
         >
           <Copy class="svg-icon" />
         </div>
@@ -92,7 +90,6 @@
         <div
           class="grip"
           on:mousedown|stopPropagation={onGripClick}
-          on:mouseup={noop}
         >
           <Layers class="svg-icon" />
         </div>
