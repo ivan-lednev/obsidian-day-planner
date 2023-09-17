@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { HelpCircle } from "lucide-svelte";
   import type { Moment } from "moment";
   import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
@@ -17,9 +18,14 @@
   export let obsidianFacade: ObsidianFacade;
 
   let settingsVisible = false;
+  let helpVisible = false;
 
   function toggleSettings() {
     settingsVisible = !settingsVisible;
+  }
+
+  function toggleHelp() {
+    helpVisible = !helpVisible;
   }
 
   // todo: hide these in class
@@ -64,6 +70,7 @@
     </ControlButton>
 
     <ControlButton
+      --grid-column-start="3"
       --justify-self="flex-end"
       label="Go to previous daily plan"
       on:click={goBack}
@@ -91,6 +98,14 @@
 
     <ControlButton
       --justify-self="flex-end"
+      isActive={helpVisible}
+      label="Help"
+      on:click={toggleHelp}
+    >
+      <HelpCircle class="svg-icon" />
+    </ControlButton>
+    <ControlButton
+      --justify-self="flex-end"
       isActive={settingsVisible}
       label="Settings"
       on:click={toggleSettings}
@@ -98,6 +113,14 @@
       <SettingsIcon />
     </ControlButton>
   </div>
+  <!--  TODO: unify formats for text-->
+  {#if helpVisible}
+    <p class="help-item"><strong>Advanced editing:</strong></p>
+    <p class="help-item">Hold <strong>Shift</strong> and drag to copy</p>
+    <p class="help-item">
+      Hold <strong>Control</strong> and drag/resize to push neighboring tasks
+    </p>
+  {/if}
   {#if settingsVisible}
     <div class="settings">
       <div class="setting-item">
@@ -135,6 +158,12 @@
 </div>
 
 <style>
+  .help-item {
+    margin: var(--size-2-3) var(--size-4-4);
+    font-size: var(--font-ui-small);
+    color: var(--text-muted);
+  }
+
   .date {
     display: flex;
     align-items: center;
@@ -166,7 +195,7 @@
 
   .header {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(7, 1fr);
     gap: 10px;
     justify-content: center;
 
