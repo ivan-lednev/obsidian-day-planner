@@ -28,12 +28,13 @@
 
   const pointerOffsetY = writable(0);
 
-  $: ({ startEdit, displayedTasks, cancelEdit, confirmEdit } = useEdit({
-    parsedTasks: tasks,
-    settings,
-    pointerOffsetY: pointerOffsetY,
-    onUpdate,
-  }));
+  $: ({ startEdit, displayedTasks, cancelEdit, isEditInProgress, confirmEdit } =
+    useEdit({
+      parsedTasks: tasks,
+      settings,
+      pointerOffsetY: pointerOffsetY,
+      onUpdate,
+    }));
 
   $: {
     $editCancellation;
@@ -120,9 +121,6 @@
 
         startEdit({ task: planItem, mode });
       }}
-      onMouseUp={async ({ location: { path, line } }) => {
-        await obsidianFacade.revealLineInFile(path, line);
-      }}
       onResizeStart={() => {
         const mode = controlPressed
           ? EditMode.RESIZE_AND_SHIFT_OTHERS
@@ -133,6 +131,14 @@
       {planItem}
       {pointerOffsetY}
       shiftOthersModifierPressed={controlPressed}
+      on:mouseup={async () => {
+        if ($isEditInProgress) {
+          return;
+        }
+
+        const { path, line } = planItem.location;
+        await obsidianFacade.revealLineInFile(path, line);
+      }}
     />
   {/each}
 </div>

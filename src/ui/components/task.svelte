@@ -4,7 +4,7 @@
 
   import { currentTime } from "../../global-stores/current-time";
   import { settingsWithUtils } from "../../global-stores/settings-with-utils";
-  import type { PlacedPlanItem, PlanItem } from "../../types";
+  import type { PlacedPlanItem } from "../../types";
   import { useTask } from "../hooks/use-task";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
@@ -13,7 +13,6 @@
   export let shiftOthersModifierPressed: boolean;
   export let planItem: PlacedPlanItem;
   export let pointerOffsetY: Readable<number>;
-  export let onMouseUp: (planItem: PlanItem) => Promise<void>;
   export let onCopy: () => void;
   export let onGripClick: () => void;
   export let onResizeStart: () => void;
@@ -24,12 +23,10 @@
     relationToNow,
     backgroundColor,
     properContrastColors,
-    handleMouseUp,
   } = useTask(planItem, {
     settings: settingsWithUtils,
     cursorOffsetY: pointerOffsetY,
     currentTime,
-    onMouseUp,
   }));
 </script>
 
@@ -45,7 +42,7 @@
     class="task {$relationToNow}"
     class:is-ghost={planItem.isGhost}
     on:mousedown={(event) => event.stopPropagation()}
-    on:mouseup={handleMouseUp}
+    on:mouseup
   >
     <RenderedMarkdown
       --text-faint={$properContrastColors.faint}

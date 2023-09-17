@@ -51,6 +51,11 @@ export function useEdit({
     },
   );
 
+  const isEditInProgress = derived(
+    editOperation,
+    ($editOperation) => $editOperation !== "idle",
+  );
+
   // todo: pass an object, no need to translate args to objects
   function startEdit(operation: EditOperation) {
     editOperation.set(operation);
@@ -75,5 +80,6 @@ export function useEdit({
     confirmEdit,
     cancelEdit,
     displayedTasks,
+    isEditInProgress,
   };
 }

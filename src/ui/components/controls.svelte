@@ -189,7 +189,6 @@
         2,
         var(--size-4-8)
       );
-
     margin: var(--size-4-2);
   }
 </style>
