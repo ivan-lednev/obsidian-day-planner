@@ -84,7 +84,7 @@
         <div
           class="grip"
           on:mousedown|stopPropagation={onCopy}
-          on:mouseup|stopPropagation={noop}
+          on:mouseup={noop}
         >
           <Copy class="svg-icon" />
         </div>
@@ -92,7 +92,7 @@
         <div
           class="grip"
           on:mousedown|stopPropagation={onGripClick}
-          on:mouseup|stopPropagation={noop}
+          on:mouseup={noop}
         >
           <Layers class="svg-icon" />
         </div>

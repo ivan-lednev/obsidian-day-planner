@@ -48,6 +48,12 @@ export class ObsidianFacade {
     return file;
   }
 
+  getMetadataForPath(path: string) {
+    const file = this.getFileByPath(path);
+
+    return this.metadataCache.getFileCache(file);
+  }
+
   async revealLineInFile(path: string, line: number) {
     const file = this.getFileByPath(path);
 

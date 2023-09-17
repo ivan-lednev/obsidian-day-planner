@@ -48,11 +48,7 @@ export default class DayPlanner extends Plugin {
       this.settings,
     );
 
-    this.planEditor = new PlanEditor(
-      this.settings,
-      this.app.metadataCache,
-      this.obsidianFacade,
-    );
+    this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
 
     this.registerView(
       viewTypeTimeline,

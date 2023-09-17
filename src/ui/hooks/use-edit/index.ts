@@ -59,7 +59,8 @@ export function useEdit({
   async function confirmEdit() {
     const currentTasks = get(displayedTasks);
 
-    baselineTasks.set(currentTasks);
+    // todo: this should be hidden inside creation logic?
+    baselineTasks.set(currentTasks.map((t) => ({ ...t, isGhost: false })));
     editOperation.set("idle");
 
     await onUpdate(parsedTasks, currentTasks);

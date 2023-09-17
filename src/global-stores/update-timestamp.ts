@@ -4,7 +4,7 @@ import { get, Writable } from "svelte/store";
 import { isInstanceOf } from "typed-assert";
 
 import { addPlacing } from "../overlap/overlap";
-import { replaceTimestamp } from "../parser/timestamp/timestamp";
+import { taskLineToString } from "../parser/timestamp/timestamp";
 import type { PlanItem, Timestamp } from "../types";
 
 import { appStore } from "./app-store";
@@ -56,7 +56,7 @@ async function updateDurationInDailyNote(
     .split("\n")
     .map((line, i) => {
       if (i === task.location.line) {
-        return replaceTimestamp(task, startAndDuration);
+        return taskLineToString(task, startAndDuration);
       }
 
       return line;

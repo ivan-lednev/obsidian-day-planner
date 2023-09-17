@@ -3,7 +3,7 @@ import { get } from "svelte/store";
 import { appStore } from "../global-stores/app-store";
 import { settings } from "../global-stores/settings";
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
-import { replaceTimestamp } from "../parser/timestamp/timestamp";
+import { taskLineToString } from "../parser/timestamp/timestamp";
 import type { PlanItem } from "../types";
 
 import { selectText } from "./editor";
@@ -28,7 +28,7 @@ export async function appendToPlan(path: string, planItem: PlanItem) {
   const editor = await openFileInEditor(file);
 
   let line = editor.lastLine();
-  let result = replaceTimestamp(planItem, { ...planItem });
+  let result = taskLineToString(planItem, { ...planItem });
 
   const cachedHeading = getHeadingByText(metadata, plannerHeading);
 

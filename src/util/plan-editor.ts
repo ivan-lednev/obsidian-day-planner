@@ -1,19 +1,17 @@
 import { difference, partition } from "lodash/fp";
-import type { MetadataCache } from "obsidian";
+import type { CachedMetadata } from "obsidian";
 
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
-import { replaceTimestamp } from "../parser/timestamp/timestamp";
+import { taskLineToString } from "../parser/timestamp/timestamp";
 import type { DayPlannerSettings } from "../settings";
 import type { PlanItem } from "../types";
 
-import { selectText } from "./editor";
 import type { ObsidianFacade } from "./obsidian-facade";
 import { isEqualTask } from "./task-utils";
 
 export class PlanEditor {
   constructor(
     private readonly settings: DayPlannerSettings,
-    private readonly metadataCache: MetadataCache,
     private readonly obsidianFacade: ObsidianFacade,
   ) {}
 
@@ -26,22 +24,25 @@ export class PlanEditor {
     const [edited, created] = partition((task) => task.location.line, dirty);
     const path = updated[0].location.path;
 
-    await this.obsidianFacade.editFile(path, (contents) =>
-      edited.reduce(
+    await this.obsidianFacade.editFile(path, (contents) => {
+      const withUpdatedEdited = edited.reduce(
         (result, current) => this.updateTaskInFileContents(result, current),
         contents,
-      ),
-    );
+      );
 
-    if (created.length === 0) {
-      return;
-    }
+      const createdList = created.map((task) =>
+        taskLineToString(task, { ...task }),
+      );
+      const metadata = this.obsidianFacade.getMetadataForPath(path) || {};
+      const [planEndLine, splitContents] = this.getPlanEndLine(
+        withUpdatedEdited.split("\n"),
+        metadata,
+      );
 
-    if (created.length > 1) {
-      throw new Error(`Creating multiple tasks at once is not supported`);
-    }
-
-    await this.appendToPlan(created[0]);
+      const result = [...splitContents];
+      result.splice(planEndLine + 1, 0, ...createdList);
+      return result.join("\n");
+    });
   };
 
   createPlannerHeading() {
@@ -60,7 +61,7 @@ export class PlanEditor {
         // todo: if a task is newly created, it's not going to have a line. We need a clearer way to track this information
         if (index === task.location?.line) {
           // todo: this may break if I don't sync duration manually everywhere. Need a getter for endMinutes
-          return replaceTimestamp(task, {
+          return taskLineToString(task, {
             startMinutes: task.startMinutes,
             durationMinutes: task.durationMinutes,
           });
@@ -71,42 +72,32 @@ export class PlanEditor {
       .join("\n");
   }
 
-  // todo: replace with mdast-util-from-markdown + custom stringify
-  // todo: push obsidian internals into facade
-  async appendToPlan(planItem: PlanItem) {
-    // todo: this needs to live in this class and be configurable
-    let result = replaceTimestamp(planItem, { ...planItem });
+  getPlanEndLine(
+    contents: string[],
+    metadata: CachedMetadata,
+  ): [number, string[]] {
+    const planHeading = getHeadingByText(
+      metadata,
+      this.settings.plannerHeading,
+    );
 
-    const { plannerHeading } = this.settings;
+    const planListItems = getListItemsUnderHeading(
+      metadata,
+      this.settings.plannerHeading,
+    );
 
-    const file = this.obsidianFacade.getFileByPath(planItem.location.path);
-    const metadata = this.metadataCache.getFileCache(file) || {};
+    if (planListItems?.length > 0) {
+      const lastListItem = planListItems[planListItems.length - 1];
 
-    const editor = await this.obsidianFacade.openFileInEditor(file);
-    let line = editor.lastLine();
-
-    const cachedHeading = getHeadingByText(metadata, plannerHeading);
-
-    if (cachedHeading) {
-      line = cachedHeading.position.start.line;
-    } else {
-      result = `${this.createPlannerHeading()}\n\n${result}`;
+      return [lastListItem.position.start.line, contents];
     }
 
-    const listItems = getListItemsUnderHeading(metadata, plannerHeading);
-
-    if (listItems?.length > 0) {
-      const lastListItem = listItems[listItems.length - 1];
-
-      line = lastListItem.position.start.line;
-    } else if (cachedHeading) {
-      result = `\n${result}`;
+    if (planHeading) {
+      return [planHeading.position.start.line, contents];
     }
 
-    const ch = editor.getLine(line).length;
+    const withNewPlan = [...contents, "", this.createPlannerHeading(), ""];
 
-    editor.replaceRange(`\n${result}`, { line, ch });
-
-    selectText(editor, planItem.firstLineText);
+    return [withNewPlan.length, withNewPlan];
   }
 }

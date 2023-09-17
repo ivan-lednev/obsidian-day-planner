@@ -39,7 +39,7 @@ export function parseTimestamp(asText?: string, day?: Moment): Moment | null {
 }
 
 // todo: better: toLine()/toString()
-export function replaceTimestamp(
+export function taskLineToString(
   planItem: PlanItem,
   { startMinutes, durationMinutes }: Timestamp,
 ) {
