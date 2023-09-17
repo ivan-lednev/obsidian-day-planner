@@ -1,7 +1,7 @@
 import type { Readable } from "svelte/store";
 import { derived, get, writable } from "svelte/store";
 
-import type { settings } from "../../../global-stores/settings";
+import type { settings } from "../../../global-store/settings";
 import type { OnUpdateFn, PlacedPlanItem } from "../../../types";
 
 import { transform } from "./transform/transform";
@@ -56,7 +56,6 @@ export function useEdit({
     ($editOperation) => $editOperation !== "idle",
   );
 
-  // todo: pass an object, no need to translate args to objects
   function startEdit(operation: EditOperation) {
     editOperation.set(operation);
   }

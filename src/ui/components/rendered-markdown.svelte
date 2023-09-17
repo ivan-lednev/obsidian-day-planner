@@ -2,7 +2,7 @@
   import { Component, MarkdownRenderer } from "obsidian";
   import { onDestroy } from "svelte";
 
-  import { appStore } from "../../global-stores/app-store";
+  import { appStore } from "../../global-store/app-store";
   export let text: string;
 
   let markdownLifecycleManager = new Component();
@@ -18,6 +18,7 @@
     markdownLifecycleManager = new Component();
 
     el.empty();
+    // todo: once we pass app through context we can delete global store
     MarkdownRenderer.render($appStore, text, el, "", markdownLifecycleManager);
     markdownLifecycleManager.load();
 

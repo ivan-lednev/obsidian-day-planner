@@ -1,7 +1,7 @@
 import type { Moment } from "moment";
 
-import type { settingsWithUtils } from "./global-stores/settings-with-utils";
-import type { getHorizontalPlacing } from "./util/horizontal-placing";
+import type { settingsWithUtils } from "./global-store/settings-with-utils";
+import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 
 export interface PlanItemLocation {
   path: string;

@@ -1,7 +1,7 @@
 import chroma from "chroma-js";
 import { derived } from "svelte/store";
 
-import type { settings } from "../../global-stores/settings";
+import type { settings } from "../../global-store/settings";
 import type { PlanItem } from "../../types";
 import { getTextColorWithEnoughContrast } from "../../util/color";
 

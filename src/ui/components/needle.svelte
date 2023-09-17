@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { currentTime } from "../../global-stores/current-time";
-  import { settings } from "../../global-stores/settings";
-  import { timeToTimelineOffset } from "../../global-stores/settings-utils";
-  import { visibleDayInTimeline } from "../../global-stores/visible-day-in-timeline";
+  import { currentTime } from "../../global-store/current-time";
+  import { settings } from "../../global-store/settings";
+  import { timeToTimelineOffset } from "../../global-store/settings-utils";
+  import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import { getMinutesSinceMidnight, isToday } from "../../util/moment";
 
   export let autoScrollBlocked = false;

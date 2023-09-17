@@ -1,9 +1,8 @@
 <script lang="ts">
   import { GripVertical, Copy, Layers } from "lucide-svelte";
-  import type { Readable } from "svelte/store";
-
-  import { currentTime } from "../../global-stores/current-time";
-  import { settingsWithUtils } from "../../global-stores/settings-with-utils";
+  
+import { currentTime } from "../../global-store/current-time";
+  import { settingsWithUtils } from "../../global-store/settings-with-utils";
   import type { PlacedPlanItem } from "../../types";
   import { useTask } from "../hooks/use-task";
 
@@ -12,7 +11,6 @@
   export let copyModifierPressed: boolean;
   export let shiftOthersModifierPressed: boolean;
   export let planItem: PlacedPlanItem;
-  export let pointerOffsetY: Readable<number>;
   export let onCopy: () => void;
   export let onGripClick: () => void;
   export let onResizeStart: () => void;
@@ -25,7 +23,6 @@
     properContrastColors,
   } = useTask(planItem, {
     settings: settingsWithUtils,
-    cursorOffsetY: pointerOffsetY,
     currentTime,
   }));
 </script>

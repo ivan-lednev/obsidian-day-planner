@@ -4,12 +4,12 @@
     getDailyNote,
   } from "obsidian-daily-notes-interface";
 
-  import { visibleHours } from "../../global-stores/settings-utils";
-  import { visibleDayInTimeline } from "../../global-stores/visible-day-in-timeline";
+  import { visibleHours } from "../../global-store/settings-utils";
+  import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import { addPlacing } from "../../overlap/overlap";
+  import type { ObsidianFacade } from "../../service/obsidian-facade";
   import type { OnUpdateFn } from "../../types";
   import { isToday } from "../../util/moment";
-  import type { ObsidianFacade } from "../../util/obsidian-facade";
 
   import Column from "./column.svelte";
   import Controls from "./controls.svelte";

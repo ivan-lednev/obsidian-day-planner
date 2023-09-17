@@ -5,9 +5,9 @@ import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import { taskLineToString } from "../parser/timestamp/timestamp";
 import type { DayPlannerSettings } from "../settings";
 import type { PlanItem } from "../types";
+import { isEqualTask } from "../util/task-utils";
 
 import type { ObsidianFacade } from "./obsidian-facade";
-import { isEqualTask } from "./task-utils";
 
 export class PlanEditor {
   constructor(
@@ -73,7 +73,7 @@ export class PlanEditor {
       .join("\n");
   }
 
-  getPlanEndLine(
+  private getPlanEndLine(
     contents: string[],
     metadata: CachedMetadata,
   ): [number, string[]] {

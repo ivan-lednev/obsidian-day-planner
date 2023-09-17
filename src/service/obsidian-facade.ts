@@ -37,7 +37,7 @@ export class ObsidianFacade {
     return this.openFileInEditor(dailyNote);
   }
 
-  getFileByPath(path: string) {
+  private getFileByPath(path: string) {
     const file = this.vault.getAbstractFileByPath(path);
 
     isInstanceOf(file, TFile, `Unable to open file: ${path}`);
@@ -82,7 +82,7 @@ export class ObsidianFacade {
 
     const { plannerHeading } = this.settings;
 
-    const fileContents = await this.vault.cachedRead(file);
+    const fileContents = await this.vault.read(file);
     const metadata = this.metadataCache.getFileCache(file);
 
     const fileDay = getDateFromFile(file, "day");

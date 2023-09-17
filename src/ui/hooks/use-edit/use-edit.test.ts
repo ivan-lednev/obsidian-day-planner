@@ -1,6 +1,6 @@
 import { get, writable } from "svelte/store";
 
-import { settingsWithUtils } from "../../../global-stores/settings-with-utils";
+import { settingsWithUtils } from "../../../global-store/settings-with-utils";
 import { timeToMinutes } from "../../../util/moment";
 import { basePlanItem } from "../test-utils";
 

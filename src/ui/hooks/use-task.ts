@@ -1,7 +1,6 @@
 import type { Moment } from "moment";
 import { derived, Readable } from "svelte/store";
 
-import { snap } from "../../global-stores/settings-utils";
 import type { PlacedPlanItem, ReactiveSettingsWithUtils } from "../../types";
 import { getRelationToNow } from "../../util/moment";
 
@@ -10,32 +9,19 @@ import { useColor } from "./use-color";
 interface UseTaskProps {
   settings: ReactiveSettingsWithUtils;
   currentTime: Readable<Moment>;
-  cursorOffsetY: Readable<number>;
 }
 
 export function useTask(
   task: PlacedPlanItem,
-  { settings, currentTime, cursorOffsetY }: UseTaskProps,
+  { settings, currentTime }: UseTaskProps,
 ) {
   // todo: settings.settings is lame
   const useColorValues = useColor({ settings: settings.settings, task });
 
-  const initialOffset = derived(
-    // todo: not sure if this is the cleanest way
+  const offset = derived(
     [settings.settings, settings.hiddenHoursSize],
     ([$settings, $hiddenHoursSize]) => {
       return task.startMinutes * $settings.zoomLevel - $hiddenHoursSize;
-    },
-  );
-
-  const offset = derived(
-    [initialOffset, cursorOffsetY, settings.settings],
-    ([$initialOffset, $cursorOffsetY, $settings]) => {
-      if (task.isGhost) {
-        return snap(Math.floor($cursorOffsetY), $settings.zoomLevel);
-      }
-
-      return $initialOffset;
     },
   );
 

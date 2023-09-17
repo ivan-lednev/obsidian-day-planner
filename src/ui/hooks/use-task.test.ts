@@ -1,7 +1,7 @@
 import { get, writable } from "svelte/store";
 
-import { currentTime } from "../../global-stores/current-time";
-import { settingsWithUtils } from "../../global-stores/settings-with-utils";
+import { currentTime } from "../../global-store/current-time";
+import { settingsWithUtils } from "../../global-store/settings-with-utils";
 
 import { basePlanItem } from "./test-utils";
 import { useTask } from "./use-task";

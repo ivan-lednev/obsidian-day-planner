@@ -27,12 +27,6 @@ export const timeToTimelineOffset = derived(
       minutes * $settings.zoomLevel - $hiddenHoursSize,
 );
 
-// todo: this is out of place
-export function roundToSnapStep(coords: number) {
-  const { zoomLevel } = get(settings);
-  return coords - (coords % (snapStepMinutes * zoomLevel));
-}
-
 export function snap(coords: number, zoomLevel: number) {
   return coords - (coords % (snapStepMinutes * zoomLevel));
 }

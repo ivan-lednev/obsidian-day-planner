@@ -1,9 +1,9 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 
 import { viewTypeTimeline } from "../constants";
+import type { ObsidianFacade } from "../service/obsidian-facade";
+import type { PlanEditor } from "../service/plan-editor";
 import type { DayPlannerSettings } from "../settings";
-import type { ObsidianFacade } from "../util/obsidian-facade";
-import type { PlanEditor } from "../util/plan-editor";
 
 import Timeline from "./components/timeline.svelte";
 

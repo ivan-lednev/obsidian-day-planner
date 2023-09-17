@@ -5,12 +5,12 @@
   import {
     editCancellation,
     editConfirmation,
-  } from "../../global-stores/edit-events";
-  import { settings } from "../../global-stores/settings";
-  import { snap } from "../../global-stores/settings-utils";
+  } from "../../global-store/edit-events";
+  import { settings } from "../../global-store/settings";
+  import { snap } from "../../global-store/settings-utils";
+  import type { ObsidianFacade } from "../../service/obsidian-facade";
   import type { OnUpdateFn, PlacedPlanItem } from "../../types";
   import { getId } from "../../util/id";
-  import type { ObsidianFacade } from "../../util/obsidian-facade";
   import { createPlanItem } from "../hooks/use-edit/transform/create";
   import { EditMode } from "../hooks/use-edit/types";
   import { offsetYToMinutes_NEW, useEdit } from "../hooks/use-edit/use-edit";
@@ -129,7 +129,6 @@
         startEdit({ task: planItem, mode });
       }}
       {planItem}
-      {pointerOffsetY}
       shiftOthersModifierPressed={controlPressed}
       on:mouseup={async () => {
         if ($isEditInProgress) {

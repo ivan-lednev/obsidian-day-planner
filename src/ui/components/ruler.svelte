@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { hourSize } from "../../global-stores/settings-utils";
+  import { hourSize } from "../../global-store/settings-utils";
 
   export let visibleHours: number[];
 </script>

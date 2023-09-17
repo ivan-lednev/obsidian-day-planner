@@ -2,7 +2,8 @@ import Fraction from "fraction.js";
 import { partition } from "lodash/fp";
 
 import type { Overlap, TimeBlock, PlanItem } from "../types";
-import { getHorizontalPlacing } from "../util/horizontal-placing";
+
+import { getHorizontalPlacing } from "./horizontal-placing";
 
 const empty = "empty";
 const taken = "taken";

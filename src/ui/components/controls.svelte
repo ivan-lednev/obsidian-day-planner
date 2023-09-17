@@ -3,10 +3,10 @@
   import type { Moment } from "moment";
   import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
-  import { settings } from "../../global-stores/settings";
-  import { visibleDayInTimeline } from "../../global-stores/visible-day-in-timeline";
+  import { settings } from "../../global-store/settings";
+  import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
+  import type { ObsidianFacade } from "../../service/obsidian-facade";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
-  import type { ObsidianFacade } from "../../util/obsidian-facade";
 
   import ControlButton from "./control-button.svelte";
   import ArrowLeftIcon from "./icons/arrow-left.svelte";
