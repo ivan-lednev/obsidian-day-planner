@@ -45,6 +45,14 @@
 
 <svelte:document
   on:mouseup={editCancellation.trigger}
+  on:mousemove={(event) => {
+    // todo: add debounce after trying to recalculate overlap on every re-render (if it turns out to be slow)
+
+    const viewportToElOffsetY = el.getBoundingClientRect().top;
+    const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
+
+    pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings.zoomLevel));
+  }}
   on:keydown={(event) => {
     if (event.shiftKey) {
       shiftPressed = true;
@@ -68,14 +76,6 @@
 <div
   bind:this={el}
   class="task-container absolute-stretch-x"
-  on:mousemove={(event) => {
-    // todo: add debounce after trying to recalculate overlap on every re-render (if it turns out to be slow)
-
-    const viewportToElOffsetY = el.getBoundingClientRect().top;
-    const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
-
-    pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings.zoomLevel));
-  }}
   on:mousedown={async () => {
     const newTask = await createPlanItem(
       day,
