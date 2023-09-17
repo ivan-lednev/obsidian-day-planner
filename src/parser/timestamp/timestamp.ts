@@ -38,6 +38,7 @@ export function parseTimestamp(asText?: string, day?: Moment): Moment | null {
   return day.clone().startOf("day").add(timeOfDay);
 }
 
+// todo: better: toLine()/toString()
 export function replaceTimestamp(
   planItem: PlanItem,
   { startMinutes, durationMinutes }: Timestamp,

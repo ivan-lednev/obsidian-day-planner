@@ -44,6 +44,7 @@
             <Needle autoScrollBlocked={true} />
           {/if}
 
+          <!--TODO: move to variable, better yet, pull to common component with timeline view-->
           {#await obsidianFacade.getPlanItemsFromFile(getDailyNote(day, getAllDailyNotes())) then tasks}
             <TaskContainer
               {day}

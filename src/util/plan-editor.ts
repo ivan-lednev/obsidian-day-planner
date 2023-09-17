@@ -23,21 +23,25 @@ export class PlanEditor {
     );
 
     const dirty = difference(updated, pristine);
-    const [edited] = partition((task) => task.location.line, dirty);
+    const [edited, created] = partition((task) => task.location.line, dirty);
     const path = updated[0].location.path;
 
-    const firstPromise = this.obsidianFacade.editFile(path, (contents) => {
-      return edited.reduce((result, current) => {
-        return this.updateTaskInFileContents(result, current);
-      }, contents);
-    });
+    await this.obsidianFacade.editFile(path, (contents) =>
+      edited.reduce(
+        (result, current) => this.updateTaskInFileContents(result, current),
+        contents,
+      ),
+    );
 
-    // todo: fix this too
-    // const promises = dirty.map(async (task) => {
-    //   return this.appendToPlan(task);
-    // });
+    if (created.length === 0) {
+      return;
+    }
 
-    return Promise.all([firstPromise]);
+    if (created.length > 1) {
+      throw new Error(`Creating multiple tasks at once is not supported`);
+    }
+
+    await this.appendToPlan(created[0]);
   };
 
   createPlannerHeading() {
@@ -70,15 +74,16 @@ export class PlanEditor {
   // todo: replace with mdast-util-from-markdown + custom stringify
   // todo: push obsidian internals into facade
   async appendToPlan(planItem: PlanItem) {
+    // todo: this needs to live in this class and be configurable
+    let result = replaceTimestamp(planItem, { ...planItem });
+
     const { plannerHeading } = this.settings;
 
     const file = this.obsidianFacade.getFileByPath(planItem.location.path);
-    const editor = await this.obsidianFacade.openFileInEditor(file);
-
     const metadata = this.metadataCache.getFileCache(file) || {};
 
+    const editor = await this.obsidianFacade.openFileInEditor(file);
     let line = editor.lastLine();
-    let result = replaceTimestamp(planItem, { ...planItem });
 
     const cachedHeading = getHeadingByText(metadata, plannerHeading);
 
