@@ -1,3 +1,5 @@
+import type { PlacedPlanItem } from "../../../types";
+
 export enum EditMode {
   DRAG = "DRAG",
   DRAG_AND_SHIFT_OTHERS = "DRAG_AND_SHIFT_OTHERS",
@@ -12,6 +14,6 @@ export enum EditMode {
 }
 
 export interface EditOperation {
-  taskId: string;
+  task: PlacedPlanItem;
   mode: EditMode;
 }

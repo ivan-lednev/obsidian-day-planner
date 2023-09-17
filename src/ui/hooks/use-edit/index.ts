@@ -2,10 +2,10 @@ import type { Readable } from "svelte/store";
 import { derived, get, writable } from "svelte/store";
 
 import type { settings } from "../../../global-stores/settings";
-import type { OnUpdateFn, PlacedPlanItem, PlanItem } from "../../../types";
+import type { OnUpdateFn, PlacedPlanItem } from "../../../types";
 
 import { transform } from "./transform";
-import type { EditOperation, EditMode } from "./types";
+import type { EditOperation } from "./types";
 
 interface UseEditProps {
   parsedTasks: PlacedPlanItem[];
@@ -51,8 +51,9 @@ export function useEdit({
     },
   );
 
-  function startEdit(planItem: PlanItem, mode: EditMode) {
-    editOperation.set({ mode, taskId: planItem.id });
+  // todo: pass an object, no need to translate args to objects
+  function startEdit(operation: EditOperation) {
+    editOperation.set(operation);
   }
 
   async function confirmEdit() {

@@ -43,7 +43,7 @@ describe("drag one & common edit mechanics", () => {
 
     const { displayedTasks, startEdit } = useEdit(props);
 
-    startEdit(basePlanItem, EditMode.DRAG);
+    startEdit({ task: basePlanItem, mode: EditMode.DRAG });
     movePointerTo("09:00");
 
     const [updatedItem] = get(displayedTasks);
@@ -59,7 +59,7 @@ describe("drag one & common edit mechanics", () => {
 
     const { displayedTasks, startEdit, confirmEdit } = useEdit(props);
 
-    startEdit(basePlanItem, EditMode.DRAG);
+    startEdit({ task: basePlanItem, mode: EditMode.DRAG });
     movePointerTo("09:00");
     confirmEdit();
     movePointerTo("10:00");
@@ -89,7 +89,7 @@ describe("drag many", () => {
 
     const { displayedTasks, startEdit } = useEdit(props);
 
-    startEdit(basePlanItem, EditMode.DRAG_AND_SHIFT_OTHERS);
+    startEdit({ task: basePlanItem, mode: EditMode.DRAG_AND_SHIFT_OTHERS });
     movePointerTo("01:10");
 
     const [, next] = get(displayedTasks);
@@ -115,7 +115,7 @@ describe("drag many", () => {
 
     const { displayedTasks, startEdit } = useEdit(props);
 
-    startEdit(basePlanItem, EditMode.DRAG_AND_SHIFT_OTHERS);
+    startEdit({ task: basePlanItem, mode: EditMode.DRAG_AND_SHIFT_OTHERS });
     movePointerTo("01:10");
     movePointerTo("00:00");
 
@@ -147,7 +147,7 @@ describe("drag many", () => {
 
     const { displayedTasks, startEdit } = useEdit(props);
 
-    startEdit(tasks[1], EditMode.DRAG_AND_SHIFT_OTHERS);
+    startEdit({ task: tasks[1], mode: EditMode.DRAG_AND_SHIFT_OTHERS });
     movePointerTo("01:30");
 
     const [previous, edited] = get(displayedTasks);
@@ -165,4 +165,20 @@ describe("drag many", () => {
   test.todo("tasks stop moving once there is not enough time");
 });
 
-describe("drag one with pushing neighbor", () => {});
+describe("create", () => {
+  test.skip("create a task", () => {
+    const { movePointerTo, ...props } = createProps();
+
+    const { displayedTasks, startEdit } = useEdit(props);
+
+    startEdit({ task: basePlanItem, mode: EditMode.DRAG });
+    movePointerTo("09:00");
+
+    const [createdItem] = get(displayedTasks);
+
+    expect(createdItem).toMatchObject({
+      startMinutes: timeToMinutes("09:00"),
+      endMinutes: timeToMinutes("09:30"),
+    });
+  });
+});

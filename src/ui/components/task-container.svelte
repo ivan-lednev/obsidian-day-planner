@@ -11,8 +11,8 @@
   import type { OnUpdateFn, PlacedPlanItem } from "../../types";
   import type { ObsidianFacade } from "../../util/obsidian-facade";
   import { useCopy } from "../hooks/use-copy";
-  import { useCreate } from "../hooks/use-create";
-  import { useEdit } from "../hooks/use-edit";
+  import { offsetYToMinutes_NEW, useEdit } from "../hooks/use-edit";
+  import { createPlanItem } from "../hooks/use-edit/transform/create";
   import { EditMode } from "../hooks/use-edit/types";
 
   import Task from "./task.svelte";
@@ -30,7 +30,6 @@
   const tasksStore = writable(tasks);
   const pointerOffsetY = writable(0);
 
-  const { startCreation, confirmCreation, cancelCreation } = useCreate();
   const { startCopy, confirmCopy } = useCopy();
   $: ({ startEdit, displayedTasks, cancelEdit, confirmEdit } = useEdit({
     parsedTasks: tasks,
@@ -42,7 +41,6 @@
   $: {
     $editCancellation;
 
-    cancelCreation(tasksStore);
     cancelEdit();
   }
 </script>
@@ -80,11 +78,21 @@
 
     pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings.zoomLevel));
   }}
-  on:mousedown={() => startCreation(tasksStore)}
+  on:mousedown={async () => {
+    const newTask = await createPlanItem(
+      day,
+      offsetYToMinutes_NEW(
+        $pointerOffsetY,
+        $settings.zoomLevel,
+        $settings.startHour,
+      ),
+    );
+
+    startEdit({ task: { ...newTask, isGhost: true }, mode: EditMode.CREATE });
+  }}
   on:mouseup|stopPropagation={async () => {
     editConfirmation.trigger();
 
-    await confirmCreation(tasksStore, day, $pointerOffsetY);
     await confirmCopy(tasksStore, $pointerOffsetY);
     await confirmEdit();
   }}
@@ -100,7 +108,7 @@
           mode = EditMode.DRAG_AND_SHIFT_OTHERS;
         }
 
-        startEdit(planItem, mode);
+        startEdit({ task: planItem, mode });
       }}
       onMouseUp={async ({ location: { path, line } }) => {
         await obsidianFacade.revealLineInFile(path, line);
