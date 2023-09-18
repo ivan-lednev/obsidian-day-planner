@@ -3,7 +3,6 @@
   import type { Moment } from "moment";
   import { writable } from "svelte/store";
 
-
   import {
     editCancellation,
     editConfirmation,
@@ -33,7 +32,7 @@
 
   const pointerOffsetY = writable(0);
 
-  $: ({ startEdit, displayedTasks, cancelEdit, isEditInProgress, confirmEdit } =
+  $: ({ startEdit, displayedTasks, cancelEdit, editStatus, confirmEdit } =
     useEdit({
       parsedTasks: tasks,
       settings,
@@ -41,9 +40,19 @@
       onUpdate,
     }));
 
-  $: if ($isEditInProgress) {
+  // todo: clean this up once we add more modes
+  $: if (
+    $editStatus === EditMode.CREATE ||
+    $editStatus === EditMode.DRAG ||
+    $editStatus === EditMode.DRAG_AND_SHIFT_OTHERS
+  ) {
     bodyCursor = "grabbing";
     gripCursor = "grabbing";
+  } else if (
+    $editStatus === EditMode.RESIZE ||
+    $editStatus === EditMode.RESIZE_AND_SHIFT_OTHERS
+  ) {
+    bodyCursor = "row-resize";
   } else {
     bodyCursor = undefined;
     gripCursor = "grab";
@@ -62,7 +71,6 @@
   on:mouseup={editCancellation.trigger}
   on:mousemove={(event) => {
     // todo: add debounce after trying to recalculate overlap on every re-render (if it turns out to be slow)
-
     const viewportToElOffsetY = el.getBoundingClientRect().top;
     const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
 
@@ -109,7 +117,7 @@
     await confirmEdit();
   }}
 >
-  {#if $isEditInProgress && $settings.showHelp}
+  {#if $editStatus && $settings.showHelp}
     <div class="banner">Release outside timeline to cancel edit</div>
   {/if}
   {#each $displayedTasks as planItem (planItem.id)}
@@ -123,7 +131,7 @@
       }}
       {planItem}
       on:mouseup={async () => {
-        if ($isEditInProgress) {
+        if ($editStatus) {
           return;
         }
 

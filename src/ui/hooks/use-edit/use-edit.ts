@@ -32,12 +32,12 @@ export function useEdit({
   onUpdate,
 }: UseEditProps) {
   const baselineTasks = writable(parsedTasks);
-  const editOperation = writable<EditOperation | "idle">("idle");
+  const editOperation = writable<EditOperation | undefined>();
 
   const displayedTasks = derived(
     [editOperation, pointerOffsetY, baselineTasks, settings],
     ([$editOperation, $pointerOffsetY, $baselineTasks, $settings]) => {
-      if ($editOperation === "idle") {
+      if (!$editOperation) {
         return $baselineTasks;
       }
 
@@ -51,9 +51,9 @@ export function useEdit({
     },
   );
 
-  const isEditInProgress = derived(
+  const editStatus = derived(
     editOperation,
-    ($editOperation) => $editOperation !== "idle",
+    ($editOperation) => $editOperation?.mode,
   );
 
   function startEdit(operation: EditOperation) {
@@ -65,13 +65,13 @@ export function useEdit({
 
     // todo: this should be hidden inside creation logic?
     baselineTasks.set(currentTasks.map((t) => ({ ...t, isGhost: false })));
-    editOperation.set("idle");
+    editOperation.set(undefined);
 
     await onUpdate(parsedTasks, currentTasks);
   }
 
   function cancelEdit() {
-    editOperation.set("idle");
+    editOperation.set(undefined);
   }
 
   return {
@@ -79,6 +79,6 @@ export function useEdit({
     confirmEdit,
     cancelEdit,
     displayedTasks,
-    isEditInProgress,
+    editStatus,
   };
 }
