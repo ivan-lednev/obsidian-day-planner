@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { GripVertical, Copy, Layers } from "lucide-svelte";
-
   import { currentTime } from "../../global-store/current-time";
   import { settingsWithUtils } from "../../global-store/settings-with-utils";
   import type { PlacedPlanItem } from "../../types";
@@ -8,11 +6,7 @@
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
-  export let copyModifierPressed: boolean;
-  export let shiftOthersModifierPressed: boolean;
   export let planItem: PlacedPlanItem;
-  export let onCopy: () => void;
-  export let onGripClick: () => void;
   export let onResizeStart: () => void;
 
   $: ({ height, offset, relationToNow, backgroundColor, properContrastColors } =
@@ -43,19 +37,7 @@
       text={planItem.text}
     />
     {#if !planItem.isGhost}
-      {#if copyModifierPressed}
-        <div class="grip" on:mousedown|stopPropagation={onCopy}>
-          <Copy class="svg-icon" />
-        </div>
-      {:else if shiftOthersModifierPressed}
-        <div class="grip" on:mousedown|stopPropagation={onGripClick}>
-          <Layers class="svg-icon" />
-        </div>
-      {:else}
-        <div class="grip" on:mousedown|stopPropagation={onGripClick}>
-          <GripVertical class="svg-icon" />
-        </div>
-      {/if}
+      <slot />
     {/if}
     <hr
       class="workspace-leaf-resize-handle"
@@ -78,20 +60,6 @@
 
     border-bottom-style: solid;
     border-bottom-width: var(--divider-width);
-  }
-
-  .grip {
-    position: relative;
-    right: -4px;
-
-    grid-column: 2;
-    align-self: flex-start;
-
-    color: var(--text-faint);
-  }
-
-  .grip:hover {
-    color: var(--text-muted);
   }
 
   .gap-box {

@@ -16,6 +16,7 @@
   import { offsetYToMinutes_NEW, useEdit } from "../hooks/use-edit/use-edit";
 
   import Task from "./task.svelte";
+  import { Copy, GripVertical, Layers } from "lucide-svelte";
   // todo: change to parsedTasks for consistency with useEdit()
   export let tasks: PlacedPlanItem[];
   export let day: Moment;
@@ -42,6 +43,8 @@
     cancelEdit();
   }
 </script>
+
+<svelte:body style:cursor="grab" />
 
 <svelte:document
   on:mouseup={editCancellation.trigger}
@@ -99,31 +102,6 @@
   {/if}
   {#each $displayedTasks as planItem (planItem.id)}
     <Task
-      copyModifierPressed={shiftPressed}
-      onCopy={() => {
-        // todo: again, a lame way to track which tasks are new
-        const copy = {
-          ...planItem,
-          id: getId(),
-          isGhost: true,
-          // @ts-expect-error
-          location: { ...planItem.location, line: undefined },
-        };
-
-        startEdit({
-          task: copy,
-          mode: EditMode.CREATE,
-        });
-      }}
-      onGripClick={() => {
-        let mode = EditMode.DRAG;
-
-        if (controlPressed) {
-          mode = EditMode.DRAG_AND_SHIFT_OTHERS;
-        }
-
-        startEdit({ task: planItem, mode });
-      }}
       onResizeStart={() => {
         const mode = controlPressed
           ? EditMode.RESIZE_AND_SHIFT_OTHERS
@@ -132,7 +110,6 @@
         startEdit({ task: planItem, mode });
       }}
       {planItem}
-      shiftOthersModifierPressed={controlPressed}
       on:mouseup={async () => {
         if ($isEditInProgress) {
           return;
@@ -141,7 +118,39 @@
         const { path, line } = planItem.location;
         await obsidianFacade.revealLineInFile(path, line);
       }}
-    />
+    >
+      <div
+        class="grip"
+        on:mousedown|stopPropagation={() => {
+          let mode = EditMode.DRAG;
+          let task = planItem;
+
+          if (controlPressed) {
+            mode = EditMode.DRAG_AND_SHIFT_OTHERS;
+          } else if (shiftPressed) {
+            mode = EditMode.CREATE;
+
+            // todo: again, a lame way to track which tasks are new
+            task = {
+              ...planItem,
+              id: getId(),
+              isGhost: true,
+              location: { ...planItem.location, line: undefined },
+            };
+          }
+
+          startEdit({ task, mode });
+        }}
+      >
+        {#if shiftPressed}
+          <Copy class="svg-icon" />
+        {:else if controlPressed}
+          <Layers class="svg-icon" />
+        {:else}
+          <GripVertical class="svg-icon" />
+        {/if}
+      </div>
+    </Task>
   {/each}
 </div>
 
@@ -179,5 +188,19 @@
 
     margin-right: 10px;
     margin-left: 10px;
+  }
+
+  .grip {
+    position: relative;
+    right: -4px;
+
+    grid-column: 2;
+    align-self: flex-start;
+
+    color: var(--text-faint);
+  }
+
+  .grip:hover {
+    color: var(--text-muted);
   }
 </style>
