@@ -1,7 +1,7 @@
 <script lang="ts">
   import { GripVertical, Copy, Layers } from "lucide-svelte";
-  
-import { currentTime } from "../../global-store/current-time";
+
+  import { currentTime } from "../../global-store/current-time";
   import { settingsWithUtils } from "../../global-store/settings-with-utils";
   import type { PlacedPlanItem } from "../../types";
   import { useTask } from "../hooks/use-task";
@@ -15,16 +15,11 @@ import { currentTime } from "../../global-store/current-time";
   export let onGripClick: () => void;
   export let onResizeStart: () => void;
 
-  $: ({
-    height,
-    offset,
-    relationToNow,
-    backgroundColor,
-    properContrastColors,
-  } = useTask(planItem, {
-    settings: settingsWithUtils,
-    currentTime,
-  }));
+  $: ({ height, offset, relationToNow, backgroundColor, properContrastColors } =
+    useTask(planItem, {
+      settings: settingsWithUtils,
+      currentTime,
+    }));
 </script>
 
 <div
@@ -62,14 +57,29 @@ import { currentTime } from "../../global-store/current-time";
         </div>
       {/if}
     {/if}
-    <div
-      class="resize-handle"
+    <hr
+      class="workspace-leaf-resize-handle"
       on:mousedown|stopPropagation={onResizeStart}
-    ></div>
+    />
   </div>
 </div>
 
 <style>
+  .workspace-leaf-resize-handle {
+    cursor: row-resize;
+
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    display: block; /* obsidian hides them sometimes, we don't want that */
+
+    height: calc(var(--divider-width-hover) * 2);
+
+    border-bottom-style: solid;
+    border-bottom-width: var(--divider-width);
+  }
+
   .grip {
     position: relative;
     right: -4px;
@@ -118,16 +128,5 @@ import { currentTime } from "../../global-store/current-time";
 
   .is-ghost {
     opacity: 0.6;
-  }
-
-  .resize-handle {
-    cursor: s-resize;
-
-    position: absolute;
-    right: 0;
-    bottom: -8px;
-    left: 0;
-
-    height: 16px;
   }
 </style>
