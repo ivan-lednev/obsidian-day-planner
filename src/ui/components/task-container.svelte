@@ -63,6 +63,12 @@
 
     cancelEdit();
   }
+
+  function getKey(task: PlacedPlanItem) {
+    return `${task.startMinutes} ${task.endMinutes} ${task.text} ${
+      task.isGhost ?? ""
+    }`;
+  }
 </script>
 
 <svelte:body use:styledCursor={bodyCursor} />
@@ -120,7 +126,7 @@
   {#if $editStatus && $settings.showHelp}
     <div class="banner">Release outside this column to cancel edit</div>
   {/if}
-  {#each $displayedTasks as planItem (planItem.id)}
+  {#each $displayedTasks as planItem (getKey(planItem))}
     <Task
       onResizeStart={() => {
         const mode = controlPressed

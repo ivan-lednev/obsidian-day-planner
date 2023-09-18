@@ -3,6 +3,7 @@
     getAllDailyNotes,
     getDailyNote,
   } from "obsidian-daily-notes-interface";
+  import { derived } from "svelte/store";
 
   import { visibleHours } from "../../global-store/settings-utils";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
@@ -30,8 +31,14 @@
     userHoversOverScroller = false;
   }
 
-  $: dailyNote = getDailyNote($visibleDayInTimeline, getAllDailyNotes());
-  $: tasksPromise = obsidianFacade.getPlanItemsFromFile(dailyNote);
+  const parsedTasks = derived(
+    visibleDayInTimeline,
+    (v, set) => {
+      const note = getDailyNote(v, getAllDailyNotes());
+      obsidianFacade.getPlanItemsFromFile(note).then((v) => set(addPlacing(v)));
+    },
+    [],
+  );
 </script>
 
 <Controls day={$visibleDayInTimeline} {obsidianFacade} />
@@ -46,17 +53,12 @@
       {#if isToday($visibleDayInTimeline)}
         <Needle autoScrollBlocked={userHoversOverScroller} />
       {/if}
-      <!-- todo: Move addPlacing() to facade-->
-      {#await tasksPromise then tasks}
-        <TaskContainer
-          day={$visibleDayInTimeline}
-          {obsidianFacade}
-          {onUpdate}
-          tasks={addPlacing(tasks)}
-        />
-      {:catch error}
-        <pre>Could not render tasks: {error}</pre>
-      {/await}
+      <TaskContainer
+        day={$visibleDayInTimeline}
+        {obsidianFacade}
+        {onUpdate}
+        tasks={$parsedTasks}
+      />
     </Column>
   </div>
 </div>
