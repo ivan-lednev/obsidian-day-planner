@@ -118,7 +118,7 @@
   }}
 >
   {#if $editStatus && $settings.showHelp}
-    <div class="banner">Release outside timeline to cancel edit</div>
+    <div class="banner">Release outside this column to cancel edit</div>
   {/if}
   {#each $displayedTasks as planItem (planItem.id)}
     <Task
