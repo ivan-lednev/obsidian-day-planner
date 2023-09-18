@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { Copy, GripVertical, Layers } from "lucide-svelte";
   import type { Moment } from "moment";
   import { writable } from "svelte/store";
+
 
   import {
     editCancellation,
@@ -11,12 +13,12 @@
   import type { ObsidianFacade } from "../../service/obsidian-facade";
   import type { OnUpdateFn, PlacedPlanItem } from "../../types";
   import { getId } from "../../util/id";
+  import { styledCursor } from "../actions/styled-cursor";
   import { createPlanItem } from "../hooks/use-edit/transform/create";
   import { EditMode } from "../hooks/use-edit/types";
   import { offsetYToMinutes_NEW, useEdit } from "../hooks/use-edit/use-edit";
 
   import Task from "./task.svelte";
-  import { Copy, GripVertical, Layers } from "lucide-svelte";
   // todo: change to parsedTasks for consistency with useEdit()
   export let tasks: PlacedPlanItem[];
   export let day: Moment;
@@ -26,6 +28,8 @@
   let shiftPressed = false;
   let controlPressed = false;
   let el: HTMLDivElement;
+  let bodyCursor: string | undefined = undefined;
+  let gripCursor = "grab";
 
   const pointerOffsetY = writable(0);
 
@@ -37,6 +41,14 @@
       onUpdate,
     }));
 
+  $: if ($isEditInProgress) {
+    bodyCursor = "grabbing";
+    gripCursor = "grabbing";
+  } else {
+    bodyCursor = undefined;
+    gripCursor = "grab";
+  }
+
   $: {
     $editCancellation;
 
@@ -44,7 +56,7 @@
   }
 </script>
 
-<svelte:body style:cursor="grab" />
+<svelte:body use:styledCursor={bodyCursor} />
 
 <svelte:document
   on:mouseup={editCancellation.trigger}
@@ -119,37 +131,40 @@
         await obsidianFacade.revealLineInFile(path, line);
       }}
     >
-      <div
-        class="grip"
-        on:mousedown|stopPropagation={() => {
-          let mode = EditMode.DRAG;
-          let task = planItem;
+      {#if !planItem.isGhost}
+        <div
+          style:cursor={gripCursor}
+          class="grip"
+          on:mousedown|stopPropagation={() => {
+            let mode = EditMode.DRAG;
+            let task = planItem;
 
-          if (controlPressed) {
-            mode = EditMode.DRAG_AND_SHIFT_OTHERS;
-          } else if (shiftPressed) {
-            mode = EditMode.CREATE;
+            if (controlPressed) {
+              mode = EditMode.DRAG_AND_SHIFT_OTHERS;
+            } else if (shiftPressed) {
+              mode = EditMode.CREATE;
 
-            // todo: again, a lame way to track which tasks are new
-            task = {
-              ...planItem,
-              id: getId(),
-              isGhost: true,
-              location: { ...planItem.location, line: undefined },
-            };
-          }
+              // todo: again, a lame way to track which tasks are new
+              task = {
+                ...planItem,
+                id: getId(),
+                isGhost: true,
+                location: { ...planItem.location, line: undefined },
+              };
+            }
 
-          startEdit({ task, mode });
-        }}
-      >
-        {#if shiftPressed}
-          <Copy class="svg-icon" />
-        {:else if controlPressed}
-          <Layers class="svg-icon" />
-        {:else}
-          <GripVertical class="svg-icon" />
-        {/if}
-      </div>
+            startEdit({ task, mode });
+          }}
+        >
+          {#if shiftPressed}
+            <Copy class="svg-icon" />
+          {:else if controlPressed}
+            <Layers class="svg-icon" />
+          {:else}
+            <GripVertical class="svg-icon" />
+          {/if}
+        </div>
+      {/if}
     </Task>
   {/each}
 </div>

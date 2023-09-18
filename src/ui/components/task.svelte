@@ -36,9 +36,7 @@
       --text-normal={$properContrastColors.normal}
       text={planItem.text}
     />
-    {#if !planItem.isGhost}
-      <slot />
-    {/if}
+    <slot />
     <hr
       class="workspace-leaf-resize-handle"
       on:mousedown|stopPropagation={onResizeStart}
@@ -47,7 +45,7 @@
 </div>
 
 <style>
-  .workspace-leaf-resize-handle {
+  :not(#dummy).workspace-leaf-resize-handle {
     cursor: row-resize;
 
     right: 0;
