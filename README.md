@@ -7,19 +7,29 @@
 ## Table of contents
 
 - [Table of contents](#table-of-contents)
-- [Quick demo](#quick-demo)
-- [How to use](#how-to-use)
-- [Basic features (click to see a demo)](#basic-features-click-to-see-a-demo)
-- [Advanced editing (click to see a demo)](#advanced-editing-click-to-see-a-demo)
+- [Quick demos](#quick-demos)
+- [Drag-and-drop editing](#drag-and-drop-editing)
+- [How to use it](#how-to-use-it)
+- [What else you can do](#what-else-you-can-do)
 - [Commands](#commands)
 - [Note on the old plugin version](#note-on-the-old-plugin-version)
 - [Acknowledgements](#acknowledgements)
 
-## Quick demo
+## Quick demos
 
-![2023-09-02_12h15_43](https://github.com/ivan-lednev/obsidian-day-planner/assets/41428836/8fadc82c-4844-4152-8235-8c880a1050f6)
+![](assets/main-demo-2.png)
+![](assets/week.png)
 
-## How to use
+## Drag-and-drop editing
+
+<details>
+<summary>Click to expand</summary>
+
+![](assets/edit.gif)
+
+</details>
+
+## How to use it
 
 1. **Either the core 'Daily Notes' or the 'Periodic Notes' plugins should be enabled**
 1. Install the plugin
@@ -27,58 +37,15 @@
    - Note that the plugin searches for tasks under a preconfigured heading (by default it's `# Day planner`)
 1. Open timeline view to monitor your progress with the command: `Show the day planner timeline`
 
-## Basic features (click to see a demo)
+## What else you can do
 
-<details>
-<summary>Observe your progress in the status bar</summary>
-
-![image](https://github.com/ivan-lednev/obsidian-day-planner/assets/41428836/0acf9def-6225-4174-9070-4450ae17fa79)
-
-</details>
-
-<details>
-<summary>Use the week view for multi-day planning</summary>
-
-![](./assets/week-demo.png)
-
-</details>
-
-<details>
-<summary>Color tasks based on time</summary>
-
-![](./assets/color-demo.png)
-
-</details>
-
-<details>
-<summary>Click on the timeline to create tasks</summary>
-
-![](./assets/dnd-create-demo.gif)
-
-</details>
-
-<details>
-<summary>Drag tasks to re-schedule</summary>
-
-![](./assets/dnd-drag-and-resize-demo.gif)
-
-</details>
-
-## Advanced editing (click to see a demo)
-
-<details>
-<summary>Copy tasks by holding <code>Shift</code> while dragging (<strong>note: right now, only single line tasks are supported</strong>)</summary>
-
-![](./assets/copy-demo.gif)
-
-</details>
-
-<details>
-<summary>Move multiple tasks by holding <code>Control</code> while dragging/resizing</summary>
-
-![](./assets/move-with-others-demo.gif)
-
-</details>
+- Observe your progress in the status bar
+- Use the week view for multi-day planning
+- Color tasks based on time
+- Click on the timeline to create tasks
+- Drag tasks to re-schedule
+- Copy tasks by holding <code>Shift</code> while dragging (<strong>note: right now, only single line tasks are supported</strong>)
+- Move multiple tasks by holding <code>Control</code> while dragging/resizing
 
 ## Commands
 
