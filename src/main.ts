@@ -163,6 +163,7 @@ export default class DayPlanner extends Plugin {
       timelineColored,
       timelineStartColor,
       timelineEndColor,
+      showHelp,
     } = this.settings;
 
     settings.set({
@@ -175,6 +176,7 @@ export default class DayPlanner extends Plugin {
       timelineColored,
       timelineStartColor,
       timelineEndColor,
+      showHelp,
     });
 
     settings.subscribe(async (newValue) => {

@@ -10,6 +10,7 @@ export class DayPlannerSettings {
   startHour: number = 6;
   timelineDateFormat: string = "LLLL";
   centerNeedle: boolean = false;
+  showHelp: boolean = true;
   plannerHeading: string = "Day planner";
   plannerHeadingLevel: number = 1;
   timelineColored: boolean = false;

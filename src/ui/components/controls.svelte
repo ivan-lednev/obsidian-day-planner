@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { range } from "lodash/fp";
   import { HelpCircle } from "lucide-svelte";
   import type { Moment } from "moment";
   import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
@@ -16,6 +17,9 @@
 
   export let day: Moment;
   export let obsidianFacade: ObsidianFacade;
+
+  const startHourOptions = range(0, 13).map(String);
+  const zoomLevelOptions = range(1, 5).map(String);
 
   let settingsVisible = false;
   let helpVisible = false;
@@ -115,11 +119,36 @@
     <div class="settings">
       <div class="setting-item">
         <div class="setting-item-info">
+          <div class="setting-item-name">Start hour</div>
+        </div>
+        <div class="setting-item-control">
+          <select
+            class="dropdown"
+            value={String($settings.startHour)}
+            on:input={(event) => {
+              $settings.startHour = Number(event.currentTarget.value);
+            }}
+          >
+            {#each startHourOptions as hour}
+              <option value={hour}>{hour}</option>
+            {/each}
+          </select>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-item-info">
           <div class="setting-item-name">Zoom</div>
         </div>
         <div class="setting-item-control">
-          <select class="dropdown" bind:value={$settings.zoomLevel}>
-            {#each ["1", "2", "3", "4"] as level}
+          <select
+            class="dropdown"
+            value={String($settings.zoomLevel)}
+            on:input={(event) => {
+              $settings.zoomLevel = Number(event.currentTarget.value);
+            }}
+          >
+            {#each zoomLevelOptions as level}
               <option value={level}>{level}</option>
             {/each}
           </select>
@@ -137,6 +166,24 @@
             class:is-enabled={$settings.centerNeedle}
             on:click={() => {
               $settings.centerNeedle = !$settings.centerNeedle;
+            }}
+          >
+            <input tabindex="0" type="checkbox" />
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-item mod-toggle">
+        <div class="setting-item-info">
+          <div class="setting-item-name">Show help while dragging</div>
+        </div>
+        <div class="setting-item-control">
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <div
+            class="checkbox-container mod-small"
+            class:is-enabled={$settings.showHelp}
+            on:click={() => {
+              $settings.showHelp = !$settings.showHelp;
             }}
           >
             <input tabindex="0" type="checkbox" />

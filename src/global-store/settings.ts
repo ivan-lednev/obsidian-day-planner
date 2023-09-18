@@ -4,6 +4,7 @@ export const settings = writable({
   zoomLevel: 1,
   startHour: 0,
   centerNeedle: true,
+  showHelp: true,
   timelineDateFormat: "LLLL",
   plannerHeading: "Day planner",
   plannerHeadingLevel: 1,

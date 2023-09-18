@@ -94,7 +94,7 @@
     await confirmEdit();
   }}
 >
-  {#if $isEditInProgress}
+  {#if $isEditInProgress && $settings.showHelp}
     <div class="banner">Release outside timeline to cancel edit</div>
   {/if}
   {#each $displayedTasks as planItem (planItem.id)}
