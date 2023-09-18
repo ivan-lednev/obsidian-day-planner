@@ -7,25 +7,32 @@
 ## Table of contents
 
 - [Table of contents](#table-of-contents)
-- [Quick demos](#quick-demos)
-- [Drag-and-drop editing](#drag-and-drop-editing)
+- [What it looks like](#what-it-looks-like)
+- [Drag-and-drop demos](#drag-and-drop-demos)
 - [How to use it](#how-to-use-it)
 - [What else you can do](#what-else-you-can-do)
 - [Commands](#commands)
 - [Note on the old plugin version](#note-on-the-old-plugin-version)
 - [Acknowledgements](#acknowledgements)
 
-## Quick demos
+## What it looks like
 
 ![](assets/main-demo.png)
 ![](assets/week.png)
 
-## Drag-and-drop editing
+## Drag-and-drop demos
 
 <details>
-<summary>Click to expand</summary>
+<summary>Basic editing: create, move, resize (click to expand)</summary>
 
-![](assets/edit.gif)
+![](assets/basic-edit.gif)
+
+</details>
+
+<details>
+<summary>Advanced editing: copy, move/resize with neighbors (click to expand)</summary>
+
+![](assets/advanced-edit.gif)
 
 </details>
 
