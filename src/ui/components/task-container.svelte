@@ -94,6 +94,9 @@
     await confirmEdit();
   }}
 >
+  {#if $isEditInProgress}
+    <div class="banner">Release outside timeline to cancel edit</div>
+  {/if}
   {#each $displayedTasks as planItem (planItem.id)}
     <Task
       copyModifierPressed={shiftPressed}
@@ -143,6 +146,30 @@
 </div>
 
 <style>
+  @keyframes pulse {
+    from {
+      opacity: 0.8;
+    }
+
+    to {
+      opacity: 0.2;
+    }
+  }
+
+  .banner {
+    position: sticky;
+    z-index: 10;
+    top: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: var(--size-4-4);
+
+    animation: pulse 1s infinite alternate;
+  }
+
   .task-container {
     top: 0;
     bottom: 0;
