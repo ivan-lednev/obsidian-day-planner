@@ -17,7 +17,7 @@
 
 ## Quick demos
 
-![](assets/main-demo-2.png)
+![](assets/main-demo.png)
 ![](assets/week.png)
 
 ## Drag-and-drop editing
