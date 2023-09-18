@@ -1,4 +1,4 @@
-import { FileView, Plugin, TFile, WorkspaceLeaf } from "obsidian";
+import { debounce, FileView, Plugin, TFile, WorkspaceLeaf } from "obsidian";
 import {
   getAllDailyNotes,
   getDailyNote,
@@ -84,10 +84,7 @@ export default class DayPlanner extends Plugin {
     this.app.workspace.onLayoutReady(this.handleLayoutReady);
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
     this.app.metadataCache.on("changed", async (file: TFile) => {
-      // todo: be clever about figuring out which days we need to update
-      // todo: this is just to trigger UI update
-      visibleDateRange.update((prev) => [...prev]);
-      visibleDayInTimeline.update((prev) => prev.clone());
+      this.triggerReparse();
     });
 
     this.registerInterval(
@@ -97,6 +94,17 @@ export default class DayPlanner extends Plugin {
       ),
     );
   }
+
+  private triggerReparse = debounce(
+    () => {
+      // todo: be clever about figuring out which days we need to update
+      // todo: this is just to trigger UI update
+      visibleDateRange.update((prev) => [...prev]);
+      visibleDayInTimeline.update((prev) => prev.clone());
+    },
+    4000,
+    true,
+  );
 
   private handleActiveLeafChanged = ({ view }: WorkspaceLeaf) => {
     if (!(view instanceof FileView) || !view.file) {
