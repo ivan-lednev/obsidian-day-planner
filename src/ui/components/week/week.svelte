@@ -3,6 +3,7 @@
     getAllDailyNotes,
     getDailyNote,
   } from "obsidian-daily-notes-interface";
+  import { setContext } from "svelte";
 
   import { visibleHours } from "../../../global-store/settings-utils";
   import { visibleDateRange } from "../../../global-store/visible-date-range";
@@ -18,6 +19,11 @@
 
   export let obsidianFacade: ObsidianFacade;
   export let onUpdate: OnUpdateFn;
+
+  // todo: remove duplication with timeline
+  setContext("obsidian", {
+    app: obsidianFacade.app,
+  });
 </script>
 
 <div class="week-header">

@@ -1,5 +1,12 @@
 <script lang="ts">
   import { range } from "lodash/fp";
+  import {
+    Settings,
+    ArrowLeft,
+    ArrowRight,
+    FileInput,
+    HelpCircle,
+  } from "lucide-svelte";
   import type { Moment } from "moment";
   import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
@@ -9,13 +16,7 @@
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 
   import ControlButton from "./control-button.svelte";
-  import {
-    Settings,
-    ArrowLeft,
-    ArrowRight,
-    FileInput,
-    HelpCircle,
-  } from "lucide-svelte";
+
   export let day: Moment;
   export let obsidianFacade: ObsidianFacade;
 
@@ -63,7 +64,6 @@
   }
 </script>
 
-<!-- todo: this is big enough to deserve its own component -->
 <div class="controls">
   <div class="header">
     <ControlButton label="Open today's daily note" on:click={goToToday}>

@@ -3,6 +3,7 @@
     getAllDailyNotes,
     getDailyNote,
   } from "obsidian-daily-notes-interface";
+  import { setContext } from "svelte";
   import { derived } from "svelte/store";
 
   import { visibleHours } from "../../global-store/settings-utils";
@@ -20,6 +21,10 @@
 
   export let obsidianFacade: ObsidianFacade;
   export let onUpdate: OnUpdateFn;
+
+  setContext("obsidian", {
+    app: obsidianFacade.app,
+  });
 
   let userHoversOverScroller = false;
 

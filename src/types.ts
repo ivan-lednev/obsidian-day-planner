@@ -1,4 +1,5 @@
 import type { Moment } from "moment";
+import type { App } from "obsidian";
 
 import type { settingsWithUtils } from "./global-store/settings-with-utils";
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
@@ -47,4 +48,9 @@ export type Timestamp = {
   startMinutes: number;
   durationMinutes: number;
 };
+
 export type ReactiveSettingsWithUtils = typeof settingsWithUtils;
+
+export interface ObsidianContext {
+  app: App;
+}

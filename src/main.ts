@@ -7,7 +7,6 @@ import {
 import { get } from "svelte/store";
 
 import { viewTypeTimeline, viewTypeWeekly } from "./constants";
-import { appStore } from "./global-store/app-store";
 import { settings } from "./global-store/settings";
 import { visibleDateRange } from "./global-store/visible-date-range";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
@@ -41,12 +40,7 @@ export default class DayPlanner extends Plugin {
 
     this.registerCommands();
 
-    this.obsidianFacade = new ObsidianFacade(
-      this.app.workspace,
-      this.app.vault,
-      this.app.metadataCache,
-      this.settings,
-    );
+    this.obsidianFacade = new ObsidianFacade(this.app, this.settings);
 
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
 
@@ -79,7 +73,7 @@ export default class DayPlanner extends Plugin {
     );
 
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
-    this.initAppAndSettingsStores();
+    this.initSettings();
 
     this.app.workspace.onLayoutReady(this.handleLayoutReady);
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
@@ -150,9 +144,7 @@ export default class DayPlanner extends Plugin {
     });
   }
 
-  private initAppAndSettingsStores() {
-    appStore.set(this.app);
-
+  private initSettings() {
     const {
       zoomLevel,
       centerNeedle,
