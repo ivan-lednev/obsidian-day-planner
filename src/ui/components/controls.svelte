@@ -1,6 +1,5 @@
 <script lang="ts">
   import { range } from "lodash/fp";
-  import { HelpCircle } from "lucide-svelte";
   import type { Moment } from "moment";
   import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
@@ -10,11 +9,13 @@
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 
   import ControlButton from "./control-button.svelte";
-  import ArrowLeftIcon from "./icons/arrow-left.svelte";
-  import ArrowRightIcon from "./icons/arrow-right.svelte";
-  import GoToFileIcon from "./icons/go-to-file.svelte";
-  import SettingsIcon from "./icons/settings.svelte";
-
+  import {
+    Settings,
+    ArrowLeft,
+    ArrowRight,
+    FileInput,
+    HelpCircle,
+  } from "lucide-svelte";
   export let day: Moment;
   export let obsidianFacade: ObsidianFacade;
 
@@ -66,7 +67,7 @@
 <div class="controls">
   <div class="header">
     <ControlButton label="Open today's daily note" on:click={goToToday}>
-      <GoToFileIcon />
+      <FileInput class="svg-icon" />
     </ControlButton>
 
     <ControlButton
@@ -75,7 +76,7 @@
       label="Go to previous daily plan"
       on:click={goBack}
     >
-      <ArrowLeftIcon />
+      <ArrowLeft class="svg-icon" />
     </ControlButton>
 
     <ControlButton
@@ -93,7 +94,7 @@
       label="Go to next daily plan"
       on:click={goForward}
     >
-      <ArrowRightIcon />
+      <ArrowRight class="svg-icon" />
     </ControlButton>
 
     <ControlButton isActive={helpVisible} label="Help" on:click={toggleHelp}>
@@ -104,7 +105,7 @@
       label="Settings"
       on:click={toggleSettings}
     >
-      <SettingsIcon />
+      <Settings class="svg-icon" />
     </ControlButton>
   </div>
   <!--  TODO: unify formats for text-->
