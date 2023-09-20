@@ -120,7 +120,6 @@
       <Settings class="svg-icon" />
     </ControlButton>
   </div>
-  <!--  TODO: unify formats for text-->
   {#if helpVisible}
     <p class="help-item"><strong>Advanced editing:</strong></p>
     <p class="help-item">Hold <strong>Shift</strong> and drag to copy</p>

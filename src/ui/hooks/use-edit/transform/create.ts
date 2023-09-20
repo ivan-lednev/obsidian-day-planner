@@ -12,12 +12,10 @@ export function create(
   cursorTime: number,
 ): PlacedPlanItem[] {
   const startMinutes = cursorTime;
-  const endMinutes = cursorTime + editTarget.durationMinutes;
 
   const updated = {
     ...editTarget,
     startMinutes,
-    endMinutes,
   };
 
   return [...baseline, updated];
@@ -36,12 +34,10 @@ export async function createPlanItem(
     id: getId(),
     startMinutes,
     durationMinutes: defaultDurationMinutes,
-    endMinutes,
     firstLineText: "New item",
     text: "New item",
     startTime: minutesToMomentOfDay(startMinutes, day),
     endTime: minutesToMomentOfDay(endMinutes, day),
-    // todo: no hardcode, this should be configurable
     listTokens: "- ",
     // todo: fix this, do not check for newly created tasks using their location
     // @ts-ignore

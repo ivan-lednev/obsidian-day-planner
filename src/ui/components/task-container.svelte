@@ -13,6 +13,7 @@
   import { snap } from "../../global-store/settings-utils";
   import type { ObsidianContext, PlacedPlanItem } from "../../types";
   import { getId } from "../../util/id";
+  import { getEndMinutes } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
   import { createPlanItem } from "../hooks/use-edit/transform/create";
   import { EditMode } from "../hooks/use-edit/types";
@@ -69,7 +70,7 @@
   }
 
   function getKey(task: PlacedPlanItem) {
-    return `${task.startMinutes} ${task.endMinutes} ${task.text} ${
+    return `${task.startMinutes} ${getEndMinutes(task)} ${task.text} ${
       task.isGhost ?? ""
     }`;
   }

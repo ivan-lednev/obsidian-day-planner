@@ -9,13 +9,11 @@ export function resize(
   // todo: don't pass the index, do this outside
   const index = baseline.findIndex((task) => task.id === editTarget.id);
 
-  const endMinutes = cursorTime;
   const durationMinutes = cursorTime - editTarget.startMinutes;
 
   const updated = {
     ...editTarget,
     durationMinutes,
-    endMinutes,
   };
 
   return toSpliced(baseline, index, updated);

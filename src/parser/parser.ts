@@ -51,7 +51,6 @@ export function parsePlanItems(
         ...item,
         endTime,
         startMinutes: getMinutesSinceMidnightOfDayTo(day, item.startTime),
-        endMinutes: getMinutesSinceMidnightOfDayTo(day, endTime),
         durationMinutes,
       };
     })

@@ -1,6 +1,7 @@
 import { last } from "lodash";
 
 import type { PlacedPlanItem } from "../../../../types";
+import { getEndMinutes } from "../../../../util/task-utils";
 
 export function resizeAndShiftOthers(
   baseline: PlacedPlanItem[],
@@ -11,26 +12,22 @@ export function resizeAndShiftOthers(
   const preceding = baseline.slice(0, index);
   const following = baseline.slice(index + 1);
 
-  const endMinutes = cursorTime;
-  const durationMinutes = endMinutes - editTarget.startMinutes;
+  const durationMinutes = cursorTime - editTarget.startMinutes;
 
   const updated = {
     ...editTarget,
     durationMinutes,
-    endMinutes,
   };
 
-  // todo: this is copy-pasted
   const updatedFollowing = following.reduce((result, current) => {
     const previous = last(result) || updated;
 
-    if (previous.endMinutes > current.startMinutes) {
+    if (getEndMinutes(previous) > current.startMinutes) {
       return [
         ...result,
         {
           ...current,
-          startMinutes: previous.endMinutes,
-          endMinutes: previous.endMinutes + current.durationMinutes,
+          startMinutes: getEndMinutes(previous),
         },
       ];
     }

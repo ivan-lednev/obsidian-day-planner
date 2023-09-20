@@ -3,8 +3,8 @@ import { computeOverlap } from "./overlap";
 test("simple case", () => {
   expect(
     computeOverlap([
-      { id: "1", startMinutes: 1, endMinutes: 3 },
-      { id: "2", startMinutes: 2, endMinutes: 4 },
+      { id: "1", startMinutes: 1, durationMinutes: 2 },
+      { id: "2", startMinutes: 2, durationMinutes: 2 },
     ]),
   ).toEqual(
     new Map([
@@ -17,9 +17,9 @@ test("simple case", () => {
 test("3 tasks overlapping with each other", () => {
   expect(
     computeOverlap([
-      { id: "1", startMinutes: 1, endMinutes: 4 },
-      { id: "2", startMinutes: 2, endMinutes: 4 },
-      { id: "3", startMinutes: 3, endMinutes: 4 },
+      { id: "1", startMinutes: 1, durationMinutes: 3 },
+      { id: "2", startMinutes: 2, durationMinutes: 2 },
+      { id: "3", startMinutes: 3, durationMinutes: 1 },
     ]),
   ).toEqual(
     new Map([
@@ -51,9 +51,9 @@ test("3 tasks overlapping with each other", () => {
 test("3 tasks overlapping with next one, but not with each other", () => {
   expect(
     computeOverlap([
-      { id: "1", startMinutes: 1, endMinutes: 3 },
-      { id: "2", startMinutes: 2, endMinutes: 5 },
-      { id: "3", startMinutes: 4, endMinutes: 6 },
+      { id: "1", startMinutes: 1, durationMinutes: 2 },
+      { id: "2", startMinutes: 2, durationMinutes: 3 },
+      { id: "3", startMinutes: 4, durationMinutes: 2 },
     ]),
   ).toEqual(
     new Map([
@@ -78,9 +78,9 @@ test("3 tasks overlapping with next one, but not with each other", () => {
 test("1st overlaps with 2nd and 3rd, but they don't overlap with each other", () => {
   expect(
     computeOverlap([
-      { id: "1", startMinutes: 1, endMinutes: 6 },
-      { id: "2", startMinutes: 2, endMinutes: 3 },
-      { id: "3", startMinutes: 4, endMinutes: 7 },
+      { id: "1", startMinutes: 1, durationMinutes: 5 },
+      { id: "2", startMinutes: 2, durationMinutes: 1 },
+      { id: "3", startMinutes: 4, durationMinutes: 3 },
     ]),
   ).toEqual(
     new Map([
@@ -113,10 +113,10 @@ test("1st overlaps with 2nd and 3rd, but they don't overlap with each other", ()
 test("2 groups: one with 3 items, other with 2. One item is in both groups (fractions get distributed)", () => {
   expect(
     computeOverlap([
-      { id: "1", startMinutes: 1, endMinutes: 4 },
-      { id: "2", startMinutes: 2, endMinutes: 5 },
-      { id: "3", startMinutes: 3, endMinutes: 8 },
-      { id: "4", startMinutes: 7, endMinutes: 9 },
+      { id: "1", startMinutes: 1, durationMinutes: 3 },
+      { id: "2", startMinutes: 2, durationMinutes: 3 },
+      { id: "3", startMinutes: 3, durationMinutes: 5 },
+      { id: "4", startMinutes: 7, durationMinutes: 2 },
     ]),
   ).toEqual(
     new Map([
@@ -144,10 +144,10 @@ test("2 groups: one with 3 items, other with 2. One item is in both groups (frac
 test("2 groups: one with 3 items, other with 2 with second after first", () => {
   expect(
     computeOverlap([
-      { id: "1", startMinutes: 1, endMinutes: 5 },
-      { id: "2", startMinutes: 1, endMinutes: 3 },
-      { id: "3", startMinutes: 1, endMinutes: 3 },
-      { id: "4", startMinutes: 4, endMinutes: 5 },
+      { id: "1", startMinutes: 1, durationMinutes: 4 },
+      { id: "2", startMinutes: 1, durationMinutes: 2 },
+      { id: "3", startMinutes: 1, durationMinutes: 2 },
+      { id: "4", startMinutes: 4, durationMinutes: 1 },
     ]),
   ).toEqual(
     new Map([
@@ -179,11 +179,11 @@ test("2 groups: one with 3 items, other with 2 with second after first", () => {
 test("combined case", () => {
   expect(
     computeOverlap([
-      { id: "1", startMinutes: 1, endMinutes: 8 },
-      { id: "2", startMinutes: 2, endMinutes: 3 },
-      { id: "3", startMinutes: 4, endMinutes: 8 },
-      { id: "4", startMinutes: 5, endMinutes: 10 },
-      { id: "5", startMinutes: 9, endMinutes: 11 },
+      { id: "1", startMinutes: 1, durationMinutes: 7 },
+      { id: "2", startMinutes: 2, durationMinutes: 1 },
+      { id: "3", startMinutes: 4, durationMinutes: 4 },
+      { id: "4", startMinutes: 5, durationMinutes: 5 },
+      { id: "5", startMinutes: 9, durationMinutes: 2 },
     ]),
   ).toEqual(
     new Map([
@@ -218,12 +218,12 @@ test("combined case", () => {
 test("more complex splitting of available space", () => {
   expect(
     computeOverlap([
-      { id: "1", startMinutes: 1, endMinutes: 6 },
-      { id: "2", startMinutes: 2, endMinutes: 6 },
-      { id: "3", startMinutes: 3, endMinutes: 9 },
-      { id: "4", startMinutes: 7, endMinutes: 9 },
-      { id: "5", startMinutes: 7, endMinutes: 9 },
-      { id: "6", startMinutes: 7, endMinutes: 9 },
+      { id: "1", startMinutes: 1, durationMinutes: 5 },
+      { id: "2", startMinutes: 2, durationMinutes: 4 },
+      { id: "3", startMinutes: 3, durationMinutes: 6 },
+      { id: "4", startMinutes: 7, durationMinutes: 2 },
+      { id: "5", startMinutes: 7, durationMinutes: 2 },
+      { id: "6", startMinutes: 7, durationMinutes: 2 },
     ]),
   ).toEqual(
     new Map([
@@ -250,10 +250,10 @@ test("more complex splitting of available space", () => {
 test("stops at first occupied slot from previous group", () => {
   expect(
     computeOverlap([
-      { id: "1", startMinutes: 1, endMinutes: 4 },
-      { id: "2", startMinutes: 2, endMinutes: 6 },
-      { id: "3", startMinutes: 3, endMinutes: 4 },
-      { id: "4", startMinutes: 5, endMinutes: 6 },
+      { id: "1", startMinutes: 1, durationMinutes: 3 },
+      { id: "2", startMinutes: 2, durationMinutes: 4 },
+      { id: "3", startMinutes: 3, durationMinutes: 1 },
+      { id: "4", startMinutes: 5, durationMinutes: 1 },
     ]),
   ).toEqual(
     new Map([

@@ -1,6 +1,7 @@
 import { last } from "lodash";
 
 import type { PlacedPlanItem } from "../../../../types";
+import { getEndMinutes } from "../../../../util/task-utils";
 
 export function dragAndShiftOthers(
   baseline: PlacedPlanItem[],
@@ -11,25 +12,20 @@ export function dragAndShiftOthers(
   const preceding = baseline.slice(0, index);
   const following = baseline.slice(index + 1);
 
-  const newStartMinutes = cursorTime;
-  const newEndMinutes = cursorTime + editTarget.durationMinutes;
-
   const updated = {
     ...editTarget,
-    startMinutes: newStartMinutes,
-    endMinutes: newEndMinutes,
+    startMinutes: cursorTime,
   };
 
   const updatedFollowing = following.reduce((result, current) => {
     const previous = last(result) || updated;
 
-    if (previous.endMinutes > current.startMinutes) {
+    if (getEndMinutes(previous) > current.startMinutes) {
       return [
         ...result,
         {
           ...current,
-          startMinutes: previous.endMinutes,
-          endMinutes: previous.endMinutes + current.durationMinutes,
+          startMinutes: getEndMinutes(previous),
         },
       ];
     }
@@ -42,13 +38,12 @@ export function dragAndShiftOthers(
     .reduce((result, current) => {
       const nextInTimeline = last(result) || updated;
 
-      if (nextInTimeline.startMinutes < current.endMinutes) {
+      if (nextInTimeline.startMinutes < getEndMinutes(current)) {
         return [
           ...result,
           {
             ...current,
             startMinutes: nextInTimeline.startMinutes - current.durationMinutes,
-            endMinutes: nextInTimeline.startMinutes,
           },
         ];
       }

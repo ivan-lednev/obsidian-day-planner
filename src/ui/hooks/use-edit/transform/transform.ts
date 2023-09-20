@@ -7,7 +7,6 @@ import { dragAndShiftOthers } from "./drag-and-shift-others";
 import { resize } from "./resize";
 import { resizeAndShiftOthers } from "./resize-and-shift-others";
 
-// todo: better naming. This is more like produceNextFrame
 export function transform(
   baseline: PlacedPlanItem[],
   cursorTime: number,

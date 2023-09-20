@@ -16,15 +16,25 @@ export type OnUpdateFn = (
 
 export interface PlanItem {
   startTime: Moment;
+
+  // todo: we might not need this
   endTime: Moment;
+
+  // todo: better:
+  // raw: {
+  //   startTime: string;
+  //   endTime: string;
+  //   bullet: string;
+  //   text: string;
+  // };
   rawStartTime: string;
   rawEndTime: string;
   listTokens: string;
-  text: string;
   firstLineText: string;
+  text: string;
+
   durationMinutes: number;
   startMinutes: number;
-  endMinutes: number;
   location?: PlanItemLocation;
   id: string;
 }
@@ -36,7 +46,10 @@ export interface PlacedPlanItem extends PlanItem {
 
 export type RelationToNow = "past" | "present" | "future";
 
-export type TimeBlock = Pick<PlanItem, "startMinutes" | "endMinutes" | "id">;
+export type TimeBlock = Pick<
+  PlanItem,
+  "startMinutes" | "durationMinutes" | "id"
+>;
 
 export interface Overlap {
   columns: number;
