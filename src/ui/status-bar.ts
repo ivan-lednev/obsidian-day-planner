@@ -3,6 +3,7 @@ import type { Workspace } from "obsidian";
 import type { DayPlannerSettings } from "../settings";
 import type { PlanItem } from "../types";
 import { getDiffInMinutes } from "../util/moment";
+import { getEndTime } from "../util/task-utils";
 
 export class StatusBar {
   private statusBarText: HTMLSpanElement;
@@ -80,11 +81,7 @@ export class StatusBar {
 
     const currentItemIndex = planItems.findIndex(
       (item) =>
-        item.startTime.isBefore(now) &&
-        currentItem.startTime // todo: hide in getter
-          .clone()
-          .add(currentItem.durationMinutes, "minutes")
-          .isAfter(now),
+        item.startTime.isBefore(now) && getEndTime(currentItem).isAfter(now),
     );
 
     if (currentItemIndex < 0) {
@@ -180,10 +177,7 @@ export class StatusBar {
     } else {
       this.nextText.hide();
       const minutesLeft = getDiffInMinutes(
-        // todo: hide this in getter
-        currentItem.startTime
-          .clone()
-          .add(currentItem.durationMinutes, "minutes"),
+        getEndTime(currentItem),
         window.moment(),
       );
       this.statusBarText.textContent = `Minutes left: ${minutesLeft}`;

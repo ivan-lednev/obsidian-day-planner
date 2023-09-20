@@ -3,6 +3,7 @@ import { derived, Readable } from "svelte/store";
 
 import type { PlacedPlanItem, ReactiveSettingsWithUtils } from "../../types";
 import { getRelationToNow } from "../../util/moment";
+import { getEndTime } from "../../util/task-utils";
 
 import { useColor } from "./use-color";
 
@@ -30,13 +31,7 @@ export function useTask(
   });
 
   const relationToNow = derived([currentTime], ([$currentTime]) => {
-    return getRelationToNow(
-      $currentTime,
-      task.startTime,
-      task.startTime // todo: hide in getter
-        .clone()
-        .add(task.durationMinutes, "minutes"),
-    );
+    return getRelationToNow($currentTime, task.startTime, getEndTime(task));
   });
 
   return {

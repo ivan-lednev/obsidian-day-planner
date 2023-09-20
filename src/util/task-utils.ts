@@ -1,3 +1,5 @@
+import type { Moment } from "moment";
+
 import type { PlanItem } from "../types";
 
 export function isEqualTask(a: PlanItem, b: PlanItem) {
@@ -22,4 +24,11 @@ export function getEndMinutes(task: {
   durationMinutes: number;
 }) {
   return task.startMinutes + task.durationMinutes;
+}
+
+export function getEndTime(task: {
+  startTime: Moment;
+  durationMinutes: number;
+}) {
+  return task.startTime.clone().add(task.durationMinutes, "minutes");
 }

@@ -85,7 +85,7 @@ it("parses end time", () => {
   );
   const first = planItems[0];
 
-  expect(first).toMatchObject({ endMinutes: 680 });
+  expect(first).toMatchObject({ durationMinutes: 80 });
 });
 
 it("trims space from text when timestamps end with am/pm", () => {

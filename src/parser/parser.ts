@@ -8,6 +8,7 @@ import { timestampRegExp } from "../regexp";
 import type { PlanItem, PlanItemLocation } from "../types";
 import { getId } from "../util/id";
 import { getMinutesSinceMidnightOfDayTo } from "../util/moment";
+import { getEndTime } from "../util/task-utils";
 
 import { calculateDefaultDuration } from "./calculate-default-duration";
 import { parseTimestamp } from "./timestamp/timestamp";
@@ -44,12 +45,10 @@ export function parsePlanItems(
 
       const durationMinutes = calculateDefaultDuration(item, next);
 
-      const endTime =
-        item.endTime || item.startTime.clone().add(durationMinutes, "minutes");
+      const endTime = item.endTime || getEndTime({ ...item, durationMinutes });
 
       return {
         ...item,
-        // todo: replace with getter
         endTime,
         startMinutes: getMinutesSinceMidnightOfDayTo(day, item.startTime),
         durationMinutes,
