@@ -16,10 +16,6 @@ export type OnUpdateFn = (
 
 export interface PlanItem {
   startTime: Moment;
-
-  // todo: we might not need this
-  endTime: Moment;
-
   // todo: better:
   // raw: {
   //   startTime: string;

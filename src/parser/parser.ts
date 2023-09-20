@@ -49,6 +49,7 @@ export function parsePlanItems(
 
       return {
         ...item,
+        // todo: replace with getter
         endTime,
         startMinutes: getMinutesSinceMidnightOfDayTo(day, item.startTime),
         durationMinutes,

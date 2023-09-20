@@ -49,7 +49,7 @@ describe("drag one & common edit mechanics", () => {
 
     expect(updatedItem).toMatchObject({
       startMinutes: timeToMinutes("09:00"),
-      endMinutes: timeToMinutes("10:00"),
+      durationMinutes: 60,
     });
   });
 
@@ -67,7 +67,7 @@ describe("drag one & common edit mechanics", () => {
 
     expect(updatedItem).toMatchObject({
       startMinutes: timeToMinutes("09:00"),
-      endMinutes: timeToMinutes("10:00"),
+      durationMinutes: 60,
     });
   });
 });
@@ -79,7 +79,7 @@ describe("drag many", () => {
       {
         ...basePlanItem,
         startMinutes: timeToMinutes("01:10"),
-        endMinutes: timeToMinutes("02:10"),
+        durationMinutes: 60,
         id: "2",
       },
     ];
@@ -95,7 +95,7 @@ describe("drag many", () => {
 
     expect(next).toMatchObject({
       startMinutes: timeToMinutes("02:10"),
-      endMinutes: timeToMinutes("03:10"),
+      durationMinutes: 60,
     });
   });
 
@@ -105,7 +105,7 @@ describe("drag many", () => {
       {
         ...basePlanItem,
         startMinutes: timeToMinutes("01:10"),
-        endMinutes: timeToMinutes("02:10"),
+        durationMinutes: 60,
         id: "2",
       },
     ];
@@ -122,7 +122,7 @@ describe("drag many", () => {
 
     expect(next).toMatchObject({
       startMinutes: timeToMinutes("01:10"),
-      endMinutes: timeToMinutes("02:10"),
+      durationMinutes: 60,
     });
   });
 
@@ -131,13 +131,13 @@ describe("drag many", () => {
       {
         ...basePlanItem,
         startMinutes: timeToMinutes("01:00"),
-        endMinutes: timeToMinutes("02:00"),
+        durationMinutes: 60,
         id: "1",
       },
       {
         ...basePlanItem,
         startMinutes: timeToMinutes("02:00"),
-        endMinutes: timeToMinutes("03:00"),
+        durationMinutes: 60,
         id: "2",
       },
     ];
@@ -153,11 +153,11 @@ describe("drag many", () => {
 
     expect(edited).toMatchObject({
       startMinutes: timeToMinutes("01:30"),
-      endMinutes: timeToMinutes("02:30"),
+      durationMinutes: 60,
     });
     expect(previous).toMatchObject({
       startMinutes: timeToMinutes("00:30"),
-      endMinutes: timeToMinutes("01:30"),
+      durationMinutes: 60,
     });
   });
 
@@ -177,7 +177,7 @@ describe("create", () => {
 
     expect(createdItem).toMatchObject({
       startMinutes: timeToMinutes("09:00"),
-      endMinutes: timeToMinutes("09:30"),
+      durationMinutes: 30,
     });
   });
 });

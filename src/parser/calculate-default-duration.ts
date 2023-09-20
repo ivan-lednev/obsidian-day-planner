@@ -4,7 +4,7 @@ import { getDiffInMinutes } from "../util/moment";
 import type { createPlanItem } from "./parser";
 
 export function calculateDefaultDuration(
-  item: ReturnType<typeof createPlanItem>,
+  item: ReturnType<typeof createPlanItem>, // todo: this should be a new type
   next?: ReturnType<typeof createPlanItem>,
 ) {
   if (item.endTime) {

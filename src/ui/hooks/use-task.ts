@@ -30,7 +30,13 @@ export function useTask(
   });
 
   const relationToNow = derived([currentTime], ([$currentTime]) => {
-    return getRelationToNow($currentTime, task.startTime, task.endTime);
+    return getRelationToNow(
+      $currentTime,
+      task.startTime,
+      task.startTime // todo: hide in getter
+        .clone()
+        .add(task.durationMinutes, "minutes"),
+    );
   });
 
   return {

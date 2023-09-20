@@ -79,7 +79,12 @@ export class StatusBar {
     const now = window.moment();
 
     const currentItemIndex = planItems.findIndex(
-      (item) => item.startTime.isBefore(now) && item.endTime.isAfter(now),
+      (item) =>
+        item.startTime.isBefore(now) &&
+        currentItem.startTime // todo: hide in getter
+          .clone()
+          .add(currentItem.durationMinutes, "minutes")
+          .isAfter(now),
     );
 
     if (currentItemIndex < 0) {
@@ -175,7 +180,10 @@ export class StatusBar {
     } else {
       this.nextText.hide();
       const minutesLeft = getDiffInMinutes(
-        currentItem.endTime,
+        // todo: hide this in getter
+        currentItem.startTime
+          .clone()
+          .add(currentItem.durationMinutes, "minutes"),
         window.moment(),
       );
       this.statusBarText.textContent = `Minutes left: ${minutesLeft}`;

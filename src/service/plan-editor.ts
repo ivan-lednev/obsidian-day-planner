@@ -62,7 +62,6 @@ export class PlanEditor {
       .map((line, index) => {
         // todo: if a task is newly created, it's not going to have a line. We need a clearer way to track this information
         if (index === task.location?.line) {
-          // todo: this may break if I don't sync duration manually everywhere. Need a getter for endMinutes
           return this.taskLineToString(task, {
             startMinutes: task.startMinutes,
             durationMinutes: task.durationMinutes,
