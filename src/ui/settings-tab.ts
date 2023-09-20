@@ -123,6 +123,40 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
+      .setName("Default timestamp format")
+      .then((component) => {
+        component.setDesc(
+          createFragment((fragment) => {
+            fragment.appendText(
+              "When you create or edit tasks with drag-and-drop, the plugin use this format. Your current syntax looks like this: ",
+            );
+            component.addMomentFormat((momentFormat) =>
+              momentFormat
+                .setValue(this.plugin.settings.timestampFormat)
+                .setSampleEl(fragment.createSpan())
+                .onChange(async (value: string) => {
+                  this.plugin.settings.timestampFormat = value.trim();
+                  await this.plugin.saveData(this.plugin.settings);
+                }),
+            );
+            fragment.append(
+              createEl("br"),
+              createEl(
+                "a",
+                {
+                  text: "format reference",
+                  href: "https://momentjs.com/docs/#/displaying/format/",
+                },
+                (a) => {
+                  a.setAttr("target", "_blank");
+                },
+              ),
+            );
+          }),
+        );
+      });
+
+    new Setting(containerEl)
       .setName("Date Format in Timeline Header")
       .then((component) => {
         component.setDesc(
@@ -269,47 +303,5 @@ When you open a file, the plugin will search for this heading to detect a day pl
             await this.plugin.saveData(this.plugin.settings);
           });
       });
-  }
-
-  private modeDescriptionContent(): DocumentFragment {
-    const descEl = document.createDocumentFragment();
-    descEl.appendText("Choose between 3 modes to use the Day Planner plugin:");
-    descEl.appendChild(document.createElement("br"));
-    descEl
-      .appendChild(document.createElement("strong"))
-      .appendText("File mode");
-    descEl.appendChild(document.createElement("br"));
-    descEl.appendText(
-      "Plugin automatically generates day planner notes for each day within a Day Planners folder.",
-    );
-    descEl.appendChild(document.createElement("br"));
-    descEl
-      .appendChild(document.createElement("strong"))
-      .appendText("Command mode");
-    descEl.appendChild(document.createElement("br"));
-    descEl.appendText(
-      "Command used to insert a Day Planner for today within the current note.",
-    );
-    descEl.appendChild(document.createElement("br"));
-    descEl
-      .appendChild(document.createElement("strong"))
-      .appendText("Daily mode");
-    descEl.appendChild(document.createElement("br"));
-    descEl.appendText(
-      "Plugin automatically links to the current daily note. Daily notes plugin must be enabled.",
-    );
-    descEl.appendChild(document.createElement("br"));
-    this.addDocsLink(descEl);
-    return descEl;
-  }
-
-  private addDocsLink(descEl: DocumentFragment) {
-    const a = document.createElement("a");
-    a.href =
-      "https://github.com/lynchjames/obsidian-day-planner/blob/main/README.md";
-    a.text = "plugin README";
-    a.target = "_blank";
-    descEl.appendChild(a);
-    descEl.appendChild(document.createElement("br"));
   }
 }

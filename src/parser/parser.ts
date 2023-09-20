@@ -128,7 +128,7 @@ export function createPlanItem({
     rawStartTime: start,
     rawEndTime: end,
     text: getDisplayedText(match, completeContent),
-    firstLineText: text,
+    firstLineText: text.trim(),
     location,
     id: getId(),
   };

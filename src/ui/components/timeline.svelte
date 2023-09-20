@@ -36,8 +36,11 @@
     userHoversOverScroller = false;
   }
 
+  // todo: push this down into taskcontainer/useEdit()
+  // todo: use the same method in week
   const parsedTasks = derived(
     visibleDayInTimeline,
+    // todo: rename variables
     (v, set) => {
       const note = getDailyNote(v, getAllDailyNotes());
       obsidianFacade.getPlanItemsFromFile(note).then((v) => set(addPlacing(v)));

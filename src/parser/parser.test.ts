@@ -1,3 +1,4 @@
+import * as amPm from "./fixtures/am-pm";
 import * as endTime from "./fixtures/end-time";
 import * as listItemsAbove from "./fixtures/list-items-above";
 import * as subheadings from "./fixtures/subheadings";
@@ -85,6 +86,19 @@ it("parses end time", () => {
   const first = planItems[0];
 
   expect(first).toMatchObject({ endMinutes: 680 });
+});
+
+it("trims space from text when timestamps end with am/pm", () => {
+  const planItems = parsePlanItems(
+    amPm.content,
+    amPm.metadata,
+    defaultPlannerHeading,
+    "",
+    window.moment(),
+  );
+  const first = planItems[0];
+
+  expect(first).toMatchObject({ firstLineText: "Wake up" });
 });
 
 it("handles list items above daily plan", () => {

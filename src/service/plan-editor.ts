@@ -1,10 +1,11 @@
 import { difference, partition } from "lodash/fp";
+import type { Moment } from "moment";
 import type { CachedMetadata } from "obsidian";
 
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
-import { taskLineToString } from "../parser/timestamp/timestamp";
 import type { DayPlannerSettings } from "../settings";
-import type { PlanItem } from "../types";
+import type { PlanItem, Timestamp } from "../types";
+import { addMinutes, minutesToMoment } from "../util/moment";
 import { isEqualTask } from "../util/task-utils";
 
 import type { ObsidianFacade } from "./obsidian-facade";
@@ -31,7 +32,7 @@ export class PlanEditor {
       );
 
       const createdList = created.map((task) =>
-        taskLineToString(task, { ...task }),
+        this.taskLineToString(task, { ...task }),
       );
       const metadata = this.obsidianFacade.getMetadataForPath(path) || {};
       const [planEndLine, splitContents] = this.getPlanEndLine(
@@ -62,7 +63,7 @@ export class PlanEditor {
         // todo: if a task is newly created, it's not going to have a line. We need a clearer way to track this information
         if (index === task.location?.line) {
           // todo: this may break if I don't sync duration manually everywhere. Need a getter for endMinutes
-          return taskLineToString(task, {
+          return this.taskLineToString(task, {
             startMinutes: task.startMinutes,
             durationMinutes: task.durationMinutes,
           });
@@ -100,5 +101,26 @@ export class PlanEditor {
     const withNewPlan = [...contents, "", this.createPlannerHeading(), ""];
 
     return [withNewPlan.length, withNewPlan];
+  }
+
+  private taskLineToString(
+    planItem: PlanItem,
+    { startMinutes, durationMinutes }: Timestamp,
+  ) {
+    return `${planItem.listTokens}${this.createTimestamp(
+      startMinutes,
+      durationMinutes,
+    )} ${planItem.firstLineText}`;
+  }
+
+  private createTimestamp(startMinutes: number, durationMinutes: number) {
+    const start = minutesToMoment(startMinutes);
+    const end = addMinutes(start, durationMinutes);
+
+    return `${this.formatTimestamp(start)} - ${this.formatTimestamp(end)}`;
+  }
+
+  private formatTimestamp(moment: Moment) {
+    return moment.format(this.settings.timestampFormat);
   }
 }

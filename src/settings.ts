@@ -16,4 +16,5 @@ export class DayPlannerSettings {
   timelineColored: boolean = false;
   timelineStartColor: HexString = "#006466";
   timelineEndColor: HexString = "#4d194d";
+  timestampFormat: string = "HH:mm";
 }

@@ -1,8 +1,6 @@
 import type { Moment } from "moment/moment";
 
 import { timeRegExp } from "../../regexp";
-import type { PlanItem, Timestamp } from "../../types";
-import { addMinutes, minutesToMoment } from "../../util/moment";
 
 export function parseTimestamp(asText?: string, day?: Moment): Moment | null {
   if (!asText) {
@@ -25,7 +23,6 @@ export function parseTimestamp(asText?: string, day?: Moment): Moment | null {
 
   const parsedMinutes = parseInt(minutes) || 0;
 
-  // todo: what about 12?
   if (ampm?.toLowerCase() === "pm" && parsedHours < 12) {
     parsedHours += 12;
   }
@@ -36,27 +33,4 @@ export function parseTimestamp(asText?: string, day?: Moment): Moment | null {
   });
 
   return day.clone().startOf("day").add(timeOfDay);
-}
-
-// todo: better: toLine()/toString()
-export function taskLineToString(
-  planItem: PlanItem,
-  { startMinutes, durationMinutes }: Timestamp,
-) {
-  return `${planItem.listTokens}${createTimestamp(
-    startMinutes,
-    durationMinutes,
-  )} ${planItem.firstLineText}`;
-}
-
-function createTimestamp(startMinutes: number, durationMinutes: number) {
-  const start = minutesToMoment(startMinutes);
-  const end = addMinutes(start, durationMinutes);
-
-  return `${formatTimestamp(start)} - ${formatTimestamp(end)}`;
-}
-
-function formatTimestamp(moment: Moment) {
-  // todo: this needs to live in plan-editor and be configurable
-  return moment.format("HH:mm");
 }
