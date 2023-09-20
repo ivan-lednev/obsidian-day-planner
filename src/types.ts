@@ -21,7 +21,8 @@ export interface PlanItem {
   //   startTime: string;
   //   endTime: string;
   //   bullet: string;
-  //   text: string;
+  //   textWithSubItems: string;
+  //   firstLineText: string
   // };
   rawStartTime: string;
   rawEndTime: string;

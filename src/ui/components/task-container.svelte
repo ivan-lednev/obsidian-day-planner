@@ -81,7 +81,6 @@
 <svelte:document
   on:mouseup={editCancellation.trigger}
   on:mousemove={(event) => {
-    // todo: add debounce after trying to recalculate overlap on every re-render (if it turns out to be slow)
     const viewportToElOffsetY = el.getBoundingClientRect().top;
     const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
 

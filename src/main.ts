@@ -35,7 +35,7 @@ export default class DayPlanner extends Plugin {
     this.statusBar = new StatusBar(
       this.settings,
       this.addStatusBarItem(),
-      this.app.workspace,
+      async () => await this.initTimelineLeaf(),
     );
 
     this.registerCommands();
@@ -68,8 +68,9 @@ export default class DayPlanner extends Plugin {
 
     this.addRibbonIcon(
       "calendar-range",
-      "Week plan",
-      async () => await this.initWeeklyLeaf(),
+      "Timeline",
+      // todo: add button to open week plan to timeline
+      this.initTimelineLeaf,
     );
 
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
@@ -213,14 +214,14 @@ export default class DayPlanner extends Plugin {
     });
   }
 
-  private async initTimelineLeaf() {
+  private initTimelineLeaf = async () => {
     this.detachLeavesOfType(viewTypeTimeline);
     await this.app.workspace.getRightLeaf(false).setViewState({
       type: viewTypeTimeline,
       active: true,
     });
     this.app.workspace.rightSplit.expand();
-  }
+  };
 
   private detachLeavesOfType(type: string) {
     this.app.workspace.getLeavesOfType(type).forEach((leaf) => leaf.detach());

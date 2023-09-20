@@ -1,9 +1,8 @@
-import type { Workspace } from "obsidian";
-
 import type { DayPlannerSettings } from "../settings";
 import type { PlanItem } from "../types";
 import { getDiffInMinutes } from "../util/moment";
 import { getEndTime } from "../util/task-utils";
+import { ellipsis } from "../util/ellipsis";
 
 export class StatusBar {
   private statusBarText: HTMLSpanElement;
@@ -19,7 +18,7 @@ export class StatusBar {
   constructor(
     private readonly settings: DayPlannerSettings,
     private readonly containerEl: HTMLElement,
-    private readonly workspace: Workspace,
+    private readonly onClick: () => Promise<void>,
   ) {
     // todo: this is redundant
     this.containerEl.addClass("day-planner");
@@ -58,7 +57,7 @@ export class StatusBar {
 
   private setupStatusBarEvents() {
     this.containerEl.onClickEvent(async () => {
-      // todo: open daily note
+      await this.onClick();
     });
 
     this.containerEl.on("mouseenter", ".day-planner", () => {
@@ -80,8 +79,7 @@ export class StatusBar {
     const now = window.moment();
 
     const currentItemIndex = planItems.findIndex(
-      (item) =>
-        item.startTime.isBefore(now) && getEndTime(currentItem).isAfter(now),
+      (item) => item.startTime.isBefore(now) && getEndTime(item).isAfter(now),
     );
 
     if (currentItemIndex < 0) {
@@ -163,12 +161,13 @@ export class StatusBar {
     if (this.settings.nowAndNextInStatusBar) {
       this.statusBarText.textContent = `Now: ${
         currentItem.rawStartTime
-      } ${this.ellipsis(currentItem.text, 15)}`;
+      } ${ellipsis(currentItem.text, 15)}`;
 
       if (nextItem) {
-        this.nextText.textContent = `Next: ${
-          nextItem.rawStartTime
-        } ${this.ellipsis(nextItem.text, 15)}`;
+        this.nextText.textContent = `Next: ${nextItem.rawStartTime} ${ellipsis(
+          nextItem.text,
+          15,
+        )}`;
 
         this.nextText.show();
       }
@@ -201,14 +200,6 @@ export class StatusBar {
       });
     }
     this.currentTime = current.startTime.toString();
-  }
-
-  // todo: this doesn't belong to the class
-  private ellipsis(input: string, limit: number) {
-    if (input.length <= limit) {
-      return input;
-    }
-    return input.substring(0, limit) + "...";
   }
 
   private setupHorizontalProgressBar() {
