@@ -35,7 +35,7 @@ export default class DayPlanner extends Plugin {
     this.statusBar = new StatusBar(
       this.settings,
       this.addStatusBarItem(),
-      async () => await this.initTimelineLeaf(),
+      this.initTimelineLeaf,
     );
 
     this.registerCommands();
@@ -52,6 +52,7 @@ export default class DayPlanner extends Plugin {
           this.settings,
           this.obsidianFacade,
           this.planEditor,
+          this.initWeeklyLeaf,
         ),
     );
 
@@ -66,12 +67,7 @@ export default class DayPlanner extends Plugin {
         ),
     );
 
-    this.addRibbonIcon(
-      "calendar-range",
-      "Timeline",
-      // todo: add button to open week plan to timeline
-      this.initTimelineLeaf,
-    );
+    this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
 
     this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
     this.initSettings();
@@ -125,7 +121,7 @@ export default class DayPlanner extends Plugin {
     this.addCommand({
       id: "show-weekly-view",
       name: "Show the Week Planner",
-      callback: async () => await this.initWeeklyLeaf(),
+      callback: this.initWeeklyLeaf,
     });
 
     this.addCommand({
@@ -146,6 +142,8 @@ export default class DayPlanner extends Plugin {
   }
 
   private initSettings() {
+    // todo: remove duplication. Now, every time we add an option, we have to update it in 3 places
+    //  although with TypeScript this is quite easy
     const {
       zoomLevel,
       centerNeedle,
@@ -182,9 +180,9 @@ export default class DayPlanner extends Plugin {
     visibleDateRange.set(getDaysOfCurrentWeek());
   };
 
-  onunload() {
-    this.detachLeavesOfType(viewTypeTimeline);
-    this.detachLeavesOfType(viewTypeWeekly);
+  async onunload() {
+    await this.detachLeavesOfType(viewTypeTimeline);
+    await this.detachLeavesOfType(viewTypeWeekly);
   }
 
   private async updateStatusBarOnFailed(fn: () => Promise<void>) {
@@ -206,16 +204,16 @@ export default class DayPlanner extends Plugin {
     }
   };
 
-  private async initWeeklyLeaf() {
-    this.detachLeavesOfType(viewTypeWeekly);
+  initWeeklyLeaf = async () => {
+    await this.detachLeavesOfType(viewTypeWeekly);
     await this.app.workspace.getLeaf(false).setViewState({
       type: viewTypeWeekly,
       active: true,
     });
-  }
+  };
 
-  private initTimelineLeaf = async () => {
-    this.detachLeavesOfType(viewTypeTimeline);
+  initTimelineLeaf = async () => {
+    await this.detachLeavesOfType(viewTypeTimeline);
     await this.app.workspace.getRightLeaf(false).setViewState({
       type: viewTypeTimeline,
       active: true,
@@ -223,7 +221,12 @@ export default class DayPlanner extends Plugin {
     this.app.workspace.rightSplit.expand();
   };
 
-  private detachLeavesOfType(type: string) {
-    this.app.workspace.getLeavesOfType(type).forEach((leaf) => leaf.detach());
+  private async detachLeavesOfType(type: string) {
+    // Although detatch() is synchronous, without wrapping into a promise, weird things happen:
+    // - when re-initializing the weekly view, it gets deleted every other time instead of getting re-created
+    // - or the tabs get hidden
+    return Promise.all(
+      this.app.workspace.getLeavesOfType(type).map((leaf) => leaf.detach()),
+    );
   }
 }

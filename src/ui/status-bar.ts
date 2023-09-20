@@ -1,8 +1,8 @@
 import type { DayPlannerSettings } from "../settings";
 import type { PlanItem } from "../types";
+import { ellipsis } from "../util/ellipsis";
 import { getDiffInMinutes } from "../util/moment";
 import { getEndTime } from "../util/task-utils";
-import { ellipsis } from "../util/ellipsis";
 
 export class StatusBar {
   private statusBarText: HTMLSpanElement;

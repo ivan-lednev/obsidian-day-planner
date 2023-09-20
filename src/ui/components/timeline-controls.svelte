@@ -6,6 +6,7 @@
     ArrowRight,
     FileInput,
     HelpCircle,
+    Table2,
   } from "lucide-svelte";
   import type { Moment } from "moment";
   import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
@@ -23,7 +24,8 @@
 
   export let day: Moment;
 
-  const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
+  const { obsidianFacade, initWeeklyView } =
+    getContext<ObsidianContext>(obsidianContext);
 
   const startHourOptions = range(0, 13).map(String);
   const zoomLevelOptions = range(1, 5).map(String);
@@ -80,6 +82,10 @@
   <div class="header">
     <ControlButton label="Open today's daily note" on:click={goToToday}>
       <FileInput class="svg-icon" />
+    </ControlButton>
+
+    <ControlButton label="Open week planner" on:click={initWeeklyView}>
+      <Table2 class="svg-icon" />
     </ControlButton>
 
     <ControlButton

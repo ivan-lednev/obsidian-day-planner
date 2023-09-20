@@ -64,4 +64,5 @@ export type ReactiveSettingsWithUtils = typeof settingsWithUtils;
 export interface ObsidianContext {
   obsidianFacade: ObsidianFacade;
   onUpdate: OnUpdateFn;
+  initWeeklyView: () => Promise<void>;
 }

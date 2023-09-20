@@ -15,6 +15,7 @@ export default class TimelineView extends ItemView {
     private readonly settings: DayPlannerSettings,
     private readonly obsidianFacade: ObsidianFacade,
     private readonly planEditor: PlanEditor,
+    private readonly initWeeklyView: () => Promise<void>,
   ) {
     super(leaf);
   }
@@ -41,6 +42,7 @@ export default class TimelineView extends ItemView {
           {
             obsidianFacade: this.obsidianFacade,
             onUpdate: this.planEditor.syncTasksWithFile,
+            initWeeklyView: this.initWeeklyView,
           },
         ],
       ]),

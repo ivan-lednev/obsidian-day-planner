@@ -4,10 +4,10 @@
   import { isToday } from "../../util/moment";
 
   import Column from "./column.svelte";
-  import Controls from "./controls.svelte";
   import Needle from "./needle.svelte";
   import Ruler from "./ruler.svelte";
   import TaskContainer from "./task-container.svelte";
+  import TimelineControls from "./timeline-controls.svelte";
 
   let userHoversOverScroller = false;
 
@@ -20,7 +20,7 @@
   }
 </script>
 
-<Controls day={$visibleDayInTimeline} />
+<TimelineControls day={$visibleDayInTimeline} />
 <div
   class="vertical-scroller"
   on:mouseenter={handleMouseEnter}
