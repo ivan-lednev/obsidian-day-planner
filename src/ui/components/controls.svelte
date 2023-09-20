@@ -120,7 +120,7 @@
   {#if settingsVisible}
     <div class="settings">
       <SettingItem>
-        <span slot="name">Start hour</span>
+        <svelte:fragment slot="name">Start hour</svelte:fragment>
         <select
           slot="control"
           class="dropdown"
@@ -136,7 +136,7 @@
       </SettingItem>
 
       <SettingItem>
-        <span slot="name">Zoom</span>
+        <svelte:fragment slot="name">Zoom</svelte:fragment>
         <select
           slot="control"
           class="dropdown"
@@ -152,7 +152,7 @@
       </SettingItem>
 
       <SettingItem>
-        <span slot="name">Auto-scroll to now</span>
+        <svelte:fragment slot="name">Auto-scroll to now</svelte:fragment>
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
           slot="control"
@@ -167,7 +167,7 @@
       </SettingItem>
 
       <SettingItem>
-        <span slot="name">Show help while dragging</span>
+        <svelte:fragment slot="name">Show help while dragging</svelte:fragment>
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
           slot="control"
