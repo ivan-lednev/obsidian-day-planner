@@ -12,7 +12,6 @@
 
   const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
 
-  // todo: this should be hidden in an action
   onDestroy(() => {
     markdownLifecycleManager.unload();
   });
@@ -22,7 +21,6 @@
     markdownLifecycleManager = new Component();
 
     el.empty();
-    // todo: once we pass app through context we can delete global store
     MarkdownRenderer.render(
       obsidianFacade.app,
       text,

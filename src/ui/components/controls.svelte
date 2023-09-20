@@ -18,6 +18,7 @@
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 
   import ControlButton from "./control-button.svelte";
+  import SettingItem from "./obsidian/setting-item.svelte";
 
   export let day: Moment;
 
@@ -37,14 +38,11 @@
     helpVisible = !helpVisible;
   }
 
-  // todo: hide these in class
-
   async function goBack() {
     const previousDay = $visibleDayInTimeline.clone().subtract(1, "day");
 
     const previousNote = await createDailyNoteIfNeeded(previousDay);
 
-    // todo: replace
     await obsidianFacade.openFileInEditor(previousNote);
 
     $visibleDayInTimeline = previousDay;
@@ -121,79 +119,67 @@
   {/if}
   {#if settingsVisible}
     <div class="settings">
-      <div class="setting-item">
-        <div class="setting-item-info">
-          <div class="setting-item-name">Start hour</div>
-        </div>
-        <div class="setting-item-control">
-          <select
-            class="dropdown"
-            value={String($settings.startHour)}
-            on:input={(event) => {
-              $settings.startHour = Number(event.currentTarget.value);
-            }}
-          >
-            {#each startHourOptions as hour}
-              <option value={hour}>{hour}</option>
-            {/each}
-          </select>
-        </div>
-      </div>
+      <SettingItem>
+        <span slot="name">Start hour</span>
+        <select
+          slot="control"
+          class="dropdown"
+          value={String($settings.startHour)}
+          on:input={(event) => {
+            $settings.startHour = Number(event.currentTarget.value);
+          }}
+        >
+          {#each startHourOptions as hour}
+            <option value={hour}>{hour}</option>
+          {/each}
+        </select>
+      </SettingItem>
 
-      <div class="setting-item">
-        <div class="setting-item-info">
-          <div class="setting-item-name">Zoom</div>
-        </div>
-        <div class="setting-item-control">
-          <select
-            class="dropdown"
-            value={String($settings.zoomLevel)}
-            on:input={(event) => {
-              $settings.zoomLevel = Number(event.currentTarget.value);
-            }}
-          >
-            {#each zoomLevelOptions as level}
-              <option value={level}>{level}</option>
-            {/each}
-          </select>
-        </div>
-      </div>
+      <SettingItem>
+        <span slot="name">Zoom</span>
+        <select
+          slot="control"
+          class="dropdown"
+          value={String($settings.zoomLevel)}
+          on:input={(event) => {
+            $settings.zoomLevel = Number(event.currentTarget.value);
+          }}
+        >
+          {#each zoomLevelOptions as level}
+            <option value={level}>{level}</option>
+          {/each}
+        </select>
+      </SettingItem>
 
-      <div class="setting-item mod-toggle">
-        <div class="setting-item-info">
-          <div class="setting-item-name">Auto-scroll to now</div>
+      <SettingItem>
+        <span slot="name">Auto-scroll to now</span>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div
+          slot="control"
+          class="checkbox-container mod-small"
+          class:is-enabled={$settings.centerNeedle}
+          on:click={() => {
+            $settings.centerNeedle = !$settings.centerNeedle;
+          }}
+        >
+          <input tabindex="0" type="checkbox" />
         </div>
-        <div class="setting-item-control">
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <div
-            class="checkbox-container mod-small"
-            class:is-enabled={$settings.centerNeedle}
-            on:click={() => {
-              $settings.centerNeedle = !$settings.centerNeedle;
-            }}
-          >
-            <input tabindex="0" type="checkbox" />
-          </div>
-        </div>
-      </div>
+      </SettingItem>
 
-      <div class="setting-item mod-toggle">
-        <div class="setting-item-info">
-          <div class="setting-item-name">Show help while dragging</div>
+      <SettingItem>
+        <span slot="name">Show help while dragging</span>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div
+          slot="control"
+          class="checkbox-container mod-small"
+          class:is-enabled={$settings.showHelp}
+          on:click={() => {
+            $settings.showHelp = !$settings.showHelp;
+          }}
+        >
+          <input tabindex="0" type="checkbox" />
         </div>
-        <div class="setting-item-control">
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <div
-            class="checkbox-container mod-small"
-            class:is-enabled={$settings.showHelp}
-            on:click={() => {
-              $settings.showHelp = !$settings.showHelp;
-            }}
-          >
-            <input tabindex="0" type="checkbox" />
-          </div>
-        </div>
-      </div>
+      </SettingItem>
     </div>
   {/if}
 </div>
@@ -217,15 +203,6 @@
 
   .settings {
     margin: var(--size-4-1) var(--size-4-4);
-  }
-
-  .setting-item {
-    padding: var(--size-2-3) 0;
-    border: none;
-  }
-
-  .setting-item-name {
-    font-size: var(--font-ui-small);
   }
 
   .controls {
