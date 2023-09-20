@@ -20,6 +20,7 @@ import { setContext } from "svelte";
 
   setContext<ObsidianContext>("obsidian", {
     obsidianFacade,
+    onUpdate
   });
 </script>
 
@@ -46,7 +47,7 @@ import { setContext } from "svelte";
           {#if isToday(day)}
             <Needle autoScrollBlocked={true} />
           {/if}
-          <TaskContainer day={writable(day)} {onUpdate} />
+          <TaskContainer day={writable(day)} />
         </Column>
       </div>
     </div>

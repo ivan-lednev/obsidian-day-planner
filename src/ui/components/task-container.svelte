@@ -12,7 +12,6 @@
   import { snap } from "../../global-store/settings-utils";
   import type {
     ObsidianContext,
-    OnUpdateFn,
     PlacedPlanItem,
   } from "../../types";
   import { getId } from "../../util/id";
@@ -26,9 +25,8 @@
 
   // todo: change to parsedTasks for consistency with useEdit()
   export let day: Readable<Moment>;
-  export let onUpdate: OnUpdateFn;
 
-  const { obsidianFacade } = getContext<ObsidianContext>("obsidian");
+  const { obsidianFacade, onUpdate } = getContext<ObsidianContext>("obsidian");
 
   let shiftPressed = false;
   let controlPressed = false;
@@ -38,8 +36,6 @@
 
   const pointerOffsetY = writable(0);
 
-  // todo: push this down into taskcontainer/useEdit()
-  // todo: use the same method in week
   const parsedTasks = createParsedTasks({ day, obsidianFacade });
 
   $: ({ startEdit, displayedTasks, cancelEdit, editStatus, confirmEdit } =

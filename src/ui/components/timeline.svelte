@@ -1,9 +1,7 @@
 <script lang="ts">
-  
+  import { setContext } from "svelte";
 
-import { setContext } from "svelte";
-  
-import { visibleHours } from "../../global-store/settings-utils";
+  import { visibleHours } from "../../global-store/settings-utils";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import type { ObsidianFacade } from "../../service/obsidian-facade";
   import type { ObsidianContext, OnUpdateFn } from "../../types";
@@ -21,6 +19,7 @@ import { visibleHours } from "../../global-store/settings-utils";
   // todo: push this outside
   setContext<ObsidianContext>("obsidian", {
     obsidianFacade,
+    onUpdate,
   });
 
   let userHoversOverScroller = false;
@@ -46,7 +45,7 @@ import { visibleHours } from "../../global-store/settings-utils";
       {#if isToday($visibleDayInTimeline)}
         <Needle autoScrollBlocked={userHoversOverScroller} />
       {/if}
-      <TaskContainer day={visibleDayInTimeline} {onUpdate} />
+      <TaskContainer day={visibleDayInTimeline} />
     </Column>
   </div>
 </div>
