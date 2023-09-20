@@ -1,15 +1,13 @@
 <script lang="ts">
-  import {
-    getAllDailyNotes,
-    getDailyNote,
-  } from "obsidian-daily-notes-interface";
-  import { setContext } from "svelte";
+  
+
+import { setContext } from "svelte";
+  import { writable } from "svelte/store";
 
   import { visibleHours } from "../../../global-store/settings-utils";
   import { visibleDateRange } from "../../../global-store/visible-date-range";
-  import { addPlacing } from "../../../overlap/overlap";
   import type { ObsidianFacade } from "../../../service/obsidian-facade";
-  import type { OnUpdateFn } from "../../../types";
+  import type { ObsidianContext, OnUpdateFn } from "../../../types";
   import { isToday } from "../../../util/moment";
   import Column from "../column.svelte";
   import ControlButton from "../control-button.svelte";
@@ -20,9 +18,8 @@
   export let obsidianFacade: ObsidianFacade;
   export let onUpdate: OnUpdateFn;
 
-  // todo: remove duplication with timeline
-  setContext("obsidian", {
-    app: obsidianFacade.app,
+  setContext<ObsidianContext>("obsidian", {
+    obsidianFacade,
   });
 </script>
 
@@ -49,18 +46,7 @@
           {#if isToday(day)}
             <Needle autoScrollBlocked={true} />
           {/if}
-
-          <!--TODO: move to variable, better yet, pull to common component with timeline view-->
-          {#await obsidianFacade.getPlanItemsFromFile(getDailyNote(day, getAllDailyNotes())) then tasks}
-            <TaskContainer
-              {day}
-              {obsidianFacade}
-              {onUpdate}
-              tasks={addPlacing(tasks)}
-            />
-          {:catch error}
-            <pre>Could not render tasks: {error}</pre>
-          {/await}
+          <TaskContainer day={writable(day)} {onUpdate} />
         </Column>
       </div>
     </div>

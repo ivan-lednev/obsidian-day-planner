@@ -1,16 +1,12 @@
 <script lang="ts">
-  import {
-    getAllDailyNotes,
-    getDailyNote,
-  } from "obsidian-daily-notes-interface";
-  import { setContext } from "svelte";
-  import { derived } from "svelte/store";
+  
 
-  import { visibleHours } from "../../global-store/settings-utils";
+import { setContext } from "svelte";
+  
+import { visibleHours } from "../../global-store/settings-utils";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
-  import { addPlacing } from "../../overlap/overlap";
   import type { ObsidianFacade } from "../../service/obsidian-facade";
-  import type { OnUpdateFn } from "../../types";
+  import type { ObsidianContext, OnUpdateFn } from "../../types";
   import { isToday } from "../../util/moment";
 
   import Column from "./column.svelte";
@@ -22,8 +18,9 @@
   export let obsidianFacade: ObsidianFacade;
   export let onUpdate: OnUpdateFn;
 
-  setContext("obsidian", {
-    app: obsidianFacade.app,
+  // todo: push this outside
+  setContext<ObsidianContext>("obsidian", {
+    obsidianFacade,
   });
 
   let userHoversOverScroller = false;
@@ -35,18 +32,6 @@
   function handleMouseLeave() {
     userHoversOverScroller = false;
   }
-
-  // todo: push this down into taskcontainer/useEdit()
-  // todo: use the same method in week
-  const parsedTasks = derived(
-    visibleDayInTimeline,
-    // todo: rename variables
-    (v, set) => {
-      const note = getDailyNote(v, getAllDailyNotes());
-      obsidianFacade.getPlanItemsFromFile(note).then((v) => set(addPlacing(v)));
-    },
-    [],
-  );
 </script>
 
 <Controls day={$visibleDayInTimeline} {obsidianFacade} />
@@ -61,12 +46,7 @@
       {#if isToday($visibleDayInTimeline)}
         <Needle autoScrollBlocked={userHoversOverScroller} />
       {/if}
-      <TaskContainer
-        day={$visibleDayInTimeline}
-        {obsidianFacade}
-        {onUpdate}
-        tasks={$parsedTasks}
-      />
+      <TaskContainer day={visibleDayInTimeline} {onUpdate} />
     </Column>
   </div>
 </div>

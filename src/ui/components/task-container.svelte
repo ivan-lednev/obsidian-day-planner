@@ -1,7 +1,8 @@
 <script lang="ts">
   import { Copy, GripVertical, Layers } from "lucide-svelte";
   import type { Moment } from "moment";
-  import { writable } from "svelte/store";
+  import { getContext } from "svelte";
+  import { Readable, writable } from "svelte/store";
 
   import {
     editCancellation,
@@ -9,20 +10,25 @@
   } from "../../global-store/edit-events";
   import { settings } from "../../global-store/settings";
   import { snap } from "../../global-store/settings-utils";
-  import type { ObsidianFacade } from "../../service/obsidian-facade";
-  import type { OnUpdateFn, PlacedPlanItem } from "../../types";
+  import type {
+    ObsidianContext,
+    OnUpdateFn,
+    PlacedPlanItem,
+  } from "../../types";
   import { getId } from "../../util/id";
   import { styledCursor } from "../actions/styled-cursor";
   import { createPlanItem } from "../hooks/use-edit/transform/create";
   import { EditMode } from "../hooks/use-edit/types";
   import { offsetYToMinutes_NEW, useEdit } from "../hooks/use-edit/use-edit";
+  import { createParsedTasks } from "../stores/parsed-tasks";
 
   import Task from "./task.svelte";
+
   // todo: change to parsedTasks for consistency with useEdit()
-  export let tasks: PlacedPlanItem[];
-  export let day: Moment;
-  export let obsidianFacade: ObsidianFacade;
+  export let day: Readable<Moment>;
   export let onUpdate: OnUpdateFn;
+
+  const { obsidianFacade } = getContext<ObsidianContext>("obsidian");
 
   let shiftPressed = false;
   let controlPressed = false;
@@ -32,9 +38,13 @@
 
   const pointerOffsetY = writable(0);
 
+  // todo: push this down into taskcontainer/useEdit()
+  // todo: use the same method in week
+  const parsedTasks = createParsedTasks({ day, obsidianFacade });
+
   $: ({ startEdit, displayedTasks, cancelEdit, editStatus, confirmEdit } =
     useEdit({
-      parsedTasks: tasks,
+      parsedTasks: $parsedTasks,
       settings,
       pointerOffsetY: pointerOffsetY,
       onUpdate,
@@ -107,7 +117,7 @@
   class="task-container absolute-stretch-x"
   on:mousedown={async () => {
     const newTask = await createPlanItem(
-      day,
+      $day,
       offsetYToMinutes_NEW(
         $pointerOffsetY,
         $settings.zoomLevel,

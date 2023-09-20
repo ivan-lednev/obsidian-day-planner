@@ -1,8 +1,8 @@
 import type { Moment } from "moment";
-import type { App } from "obsidian";
 
 import type { settingsWithUtils } from "./global-store/settings-with-utils";
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
+import type { ObsidianFacade } from "./service/obsidian-facade";
 
 export interface PlanItemLocation {
   path: string;
@@ -52,5 +52,5 @@ export type Timestamp = {
 export type ReactiveSettingsWithUtils = typeof settingsWithUtils;
 
 export interface ObsidianContext {
-  app: App;
+  obsidianFacade: ObsidianFacade;
 }

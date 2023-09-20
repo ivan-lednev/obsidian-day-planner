@@ -9,7 +9,7 @@
   let markdownLifecycleManager = new Component();
   let el: HTMLDivElement;
 
-  const { app } = getContext<ObsidianContext>("obsidian");
+  const { obsidianFacade } = getContext<ObsidianContext>("obsidian");
 
   // todo: this should be hidden in an action
   onDestroy(() => {
@@ -22,7 +22,13 @@
 
     el.empty();
     // todo: once we pass app through context we can delete global store
-    MarkdownRenderer.render(app, text, el, "", markdownLifecycleManager);
+    MarkdownRenderer.render(
+      obsidianFacade.app,
+      text,
+      el,
+      "",
+      markdownLifecycleManager,
+    );
     markdownLifecycleManager.load();
 
     el.querySelectorAll(`input[type="checkbox"]`)?.forEach((checkbox) =>
