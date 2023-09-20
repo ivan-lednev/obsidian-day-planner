@@ -18,6 +18,7 @@
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 
   import ControlButton from "./control-button.svelte";
+  import Dropdown from "./obsidian/dropdown.svelte";
   import SettingItem from "./obsidian/setting-item.svelte";
 
   export let day: Moment;
@@ -63,6 +64,10 @@
 
     await obsidianFacade.openFileInEditor(noteForToday);
   }
+
+  // function handleZoomLevelInput(event: InputEvent) {
+  //   $settings.zoomLevel = Number(event.currentTarget.value);
+  // }
 </script>
 
 <div class="controls">
@@ -121,34 +126,26 @@
     <div class="settings">
       <SettingItem>
         <svelte:fragment slot="name">Start hour</svelte:fragment>
-        <select
+        <Dropdown
           slot="control"
-          class="dropdown"
-          value={String($settings.startHour)}
-          on:input={(event) => {
+          onInput={(event) => {
             $settings.startHour = Number(event.currentTarget.value);
           }}
-        >
-          {#each startHourOptions as hour}
-            <option value={hour}>{hour}</option>
-          {/each}
-        </select>
+          value={String($settings.startHour)}
+          values={startHourOptions}
+        />
       </SettingItem>
 
       <SettingItem>
         <svelte:fragment slot="name">Zoom</svelte:fragment>
-        <select
+        <Dropdown
           slot="control"
-          class="dropdown"
-          value={String($settings.zoomLevel)}
-          on:input={(event) => {
+          onInput={(event) => {
             $settings.zoomLevel = Number(event.currentTarget.value);
           }}
-        >
-          {#each zoomLevelOptions as level}
-            <option value={level}>{level}</option>
-          {/each}
-        </select>
+          value={String($settings.zoomLevel)}
+          values={zoomLevelOptions}
+        />
       </SettingItem>
 
       <SettingItem>
