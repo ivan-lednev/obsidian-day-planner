@@ -65,9 +65,15 @@
     await obsidianFacade.openFileInEditor(noteForToday);
   }
 
-  // function handleZoomLevelInput(event: InputEvent) {
-  //   $settings.zoomLevel = Number(event.currentTarget.value);
-  // }
+  function handleStartHourInput(event: Event) {
+    // @ts-expect-error
+    $settings.startHour = Number(event.currentTarget.value);
+  }
+
+  function handleZoomLevelInput(event: Event) {
+    // @ts-expect-error
+    $settings.zoomLevel = Number(event.currentTarget.value);
+  }
 </script>
 
 <div class="controls">
@@ -128,11 +134,9 @@
         <svelte:fragment slot="name">Start hour</svelte:fragment>
         <Dropdown
           slot="control"
-          onInput={(event) => {
-            $settings.startHour = Number(event.currentTarget.value);
-          }}
           value={String($settings.startHour)}
           values={startHourOptions}
+          on:input={handleStartHourInput}
         />
       </SettingItem>
 
@@ -140,11 +144,9 @@
         <svelte:fragment slot="name">Zoom</svelte:fragment>
         <Dropdown
           slot="control"
-          onInput={(event) => {
-            $settings.zoomLevel = Number(event.currentTarget.value);
-          }}
           value={String($settings.zoomLevel)}
           values={zoomLevelOptions}
+          on:input={handleZoomLevelInput}
         />
       </SettingItem>
 
