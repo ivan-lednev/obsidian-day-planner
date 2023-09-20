@@ -1,13 +1,11 @@
 <script lang="ts">
-  
-
-import { setContext } from "svelte";
+  import { getContext } from "svelte";
   import { writable } from "svelte/store";
 
+  import { obsidianContext } from "../../../constants";
   import { visibleHours } from "../../../global-store/settings-utils";
   import { visibleDateRange } from "../../../global-store/visible-date-range";
-  import type { ObsidianFacade } from "../../../service/obsidian-facade";
-  import type { ObsidianContext, OnUpdateFn } from "../../../types";
+  import type { ObsidianContext } from "../../../types";
   import { isToday } from "../../../util/moment";
   import Column from "../column.svelte";
   import ControlButton from "../control-button.svelte";
@@ -15,13 +13,7 @@ import { setContext } from "svelte";
   import Ruler from "../ruler.svelte";
   import TaskContainer from "../task-container.svelte";
 
-  export let obsidianFacade: ObsidianFacade;
-  export let onUpdate: OnUpdateFn;
-
-  setContext<ObsidianContext>("obsidian", {
-    obsidianFacade,
-    onUpdate
-  });
+  const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
 </script>
 
 <div class="week-header">

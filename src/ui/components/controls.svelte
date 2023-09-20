@@ -9,16 +9,19 @@
   } from "lucide-svelte";
   import type { Moment } from "moment";
   import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
+  import { getContext } from "svelte";
 
+  import { obsidianContext } from "../../constants";
   import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
-  import type { ObsidianFacade } from "../../service/obsidian-facade";
+  import type { ObsidianContext } from "../../types";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 
   import ControlButton from "./control-button.svelte";
 
   export let day: Moment;
-  export let obsidianFacade: ObsidianFacade;
+
+  const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
 
   const startHourOptions = range(0, 13).map(String);
   const zoomLevelOptions = range(1, 5).map(String);

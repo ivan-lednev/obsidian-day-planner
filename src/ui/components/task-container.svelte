@@ -4,16 +4,14 @@
   import { getContext } from "svelte";
   import { Readable, writable } from "svelte/store";
 
+  import { obsidianContext } from "../../constants";
   import {
     editCancellation,
     editConfirmation,
   } from "../../global-store/edit-events";
   import { settings } from "../../global-store/settings";
   import { snap } from "../../global-store/settings-utils";
-  import type {
-    ObsidianContext,
-    PlacedPlanItem,
-  } from "../../types";
+  import type { ObsidianContext, PlacedPlanItem } from "../../types";
   import { getId } from "../../util/id";
   import { styledCursor } from "../actions/styled-cursor";
   import { createPlanItem } from "../hooks/use-edit/transform/create";
@@ -23,10 +21,10 @@
 
   import Task from "./task.svelte";
 
-  // todo: change to parsedTasks for consistency with useEdit()
   export let day: Readable<Moment>;
 
-  const { obsidianFacade, onUpdate } = getContext<ObsidianContext>("obsidian");
+  const { obsidianFacade, onUpdate } =
+    getContext<ObsidianContext>(obsidianContext);
 
   let shiftPressed = false;
   let controlPressed = false;

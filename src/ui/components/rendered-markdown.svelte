@@ -2,6 +2,7 @@
   import { Component, MarkdownRenderer } from "obsidian";
   import { getContext, onDestroy } from "svelte";
 
+  import { obsidianContext } from "../../constants";
   import type { ObsidianContext } from "../../types";
 
   export let text: string;
@@ -9,7 +10,7 @@
   let markdownLifecycleManager = new Component();
   let el: HTMLDivElement;
 
-  const { obsidianFacade } = getContext<ObsidianContext>("obsidian");
+  const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
 
   // todo: this should be hidden in an action
   onDestroy(() => {

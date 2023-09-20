@@ -1,10 +1,6 @@
 <script lang="ts">
-  import { setContext } from "svelte";
-
   import { visibleHours } from "../../global-store/settings-utils";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
-  import type { ObsidianFacade } from "../../service/obsidian-facade";
-  import type { ObsidianContext, OnUpdateFn } from "../../types";
   import { isToday } from "../../util/moment";
 
   import Column from "./column.svelte";
@@ -12,15 +8,6 @@
   import Needle from "./needle.svelte";
   import Ruler from "./ruler.svelte";
   import TaskContainer from "./task-container.svelte";
-
-  export let obsidianFacade: ObsidianFacade;
-  export let onUpdate: OnUpdateFn;
-
-  // todo: push this outside
-  setContext<ObsidianContext>("obsidian", {
-    obsidianFacade,
-    onUpdate,
-  });
 
   let userHoversOverScroller = false;
 
@@ -33,7 +20,7 @@
   }
 </script>
 
-<Controls day={$visibleDayInTimeline} {obsidianFacade} />
+<Controls day={$visibleDayInTimeline} />
 <div
   class="vertical-scroller"
   on:mouseenter={handleMouseEnter}

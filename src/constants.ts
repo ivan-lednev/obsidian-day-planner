@@ -1,5 +1,6 @@
 export const viewTypeTimeline = "timeline";
 export const viewTypeWeekly = "weekly";
+export const obsidianContext = "obsidian";
 
 export const defaultDurationMinutes = 30;
 

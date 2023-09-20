@@ -1,6 +1,6 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 
-import { viewTypeTimeline } from "../constants";
+import { obsidianContext, viewTypeTimeline } from "../constants";
 import type { ObsidianFacade } from "../service/obsidian-facade";
 import type { PlanEditor } from "../service/plan-editor";
 import type { DayPlannerSettings } from "../settings";
@@ -35,10 +35,15 @@ export default class TimelineView extends ItemView {
     const contentEl = this.containerEl.children[1];
     this.timeline = new Timeline({
       target: contentEl,
-      props: {
-        obsidianFacade: this.obsidianFacade,
-        onUpdate: this.planEditor.syncTasksWithFile,
-      },
+      context: new Map([
+        [
+          obsidianContext,
+          {
+            obsidianFacade: this.obsidianFacade,
+            onUpdate: this.planEditor.syncTasksWithFile,
+          },
+        ],
+      ]),
     });
   }
 

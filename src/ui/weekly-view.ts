@@ -1,6 +1,6 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 
-import { viewTypeWeekly } from "../constants";
+import { obsidianContext, viewTypeWeekly } from "../constants";
 import type { ObsidianFacade } from "../service/obsidian-facade";
 import type { PlanEditor } from "../service/plan-editor";
 import type { DayPlannerSettings } from "../settings";
@@ -48,10 +48,15 @@ export default class WeeklyView extends ItemView {
 
     this.weekComponent = new Week({
       target: contentEl,
-      props: {
-        obsidianFacade: this.obsidianFacade,
-        onUpdate: this.planEditor.syncTasksWithFile,
-      },
+      context: new Map([
+        [
+          obsidianContext,
+          {
+            obsidianFacade: this.obsidianFacade,
+            onUpdate: this.planEditor.syncTasksWithFile,
+          },
+        ],
+      ]),
     });
   }
 
