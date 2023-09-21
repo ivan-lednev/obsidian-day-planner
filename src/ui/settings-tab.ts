@@ -13,6 +13,10 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
     super(plugin.app, plugin);
   }
 
+  private update(patch: Partial<DayPlannerSettings>) {
+    this.settingsStore.update((previous) => ({ ...previous, ...patch }));
+  }
+
   display(): void {
     const { containerEl } = this;
 
@@ -25,10 +29,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
         toggle
           .setValue(this.plugin.settings().circularProgress)
           .onChange((value: boolean) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              circularProgress: value,
-            }));
+            this.update({ circularProgress: value });
           }),
       );
 
@@ -38,11 +39,10 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       .addToggle((toggle) =>
         toggle
           .setValue(this.plugin.settings().nowAndNextInStatusBar)
-          .onChange(async (value: boolean) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
+          .onChange((value: boolean) => {
+            this.update({
               nowAndNextInStatusBar: value,
-            }));
+            });
           }),
       );
 
@@ -52,11 +52,8 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       .addToggle((toggle) =>
         toggle
           .setValue(this.plugin.settings().showTaskNotification)
-          .onChange(async (value: boolean) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              showTaskNotification: value,
-            }));
+          .onChange((value: boolean) => {
+            this.update({ showTaskNotification: value });
           }),
       );
 
@@ -71,10 +68,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           .setValue(Number(this.plugin.settings().zoomLevel) ?? 4)
           .setDynamicTooltip()
           .onChange((value: number) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              zoomLevel: value,
-            }));
+            this.update({ zoomLevel: value });
           }),
       );
 
@@ -90,10 +84,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             this.plugin.settings().timelineIcon ?? "calendar-with-checkmark",
           )
           .onChange((value: string) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              timelineIcon: value,
-            }));
+            this.update({ timelineIcon: value });
           });
       });
 
@@ -118,13 +109,10 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             "12": "12",
           })
           .setValue(String(this.plugin.settings().startHour))
-          .onChange(async (value: string) => {
+          .onChange((value: string) => {
             const asNumber = Number(value);
 
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              startHour: asNumber,
-            }));
+            this.update({ startHour: asNumber });
           }),
       );
 
@@ -141,10 +129,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
                 .setValue(this.plugin.settings().timestampFormat)
                 .setSampleEl(fragment.createSpan())
                 .onChange((value: string) => {
-                  this.settingsStore.update((previous) => ({
-                    ...previous,
-                    timestampFormat: value.trim(),
-                  }));
+                  this.update({ timestampFormat: value.trim() });
                 }),
             );
             fragment.append(
@@ -175,10 +160,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
                 .setValue(this.plugin.settings().timelineDateFormat)
                 .setSampleEl(fragment.createSpan())
                 .onChange((value: string) => {
-                  this.settingsStore.update((previous) => ({
-                    ...previous,
-                    timelineDateFormat: value,
-                  }));
+                  this.update({ timelineDateFormat: value });
                 }),
             );
             fragment.append(
@@ -207,10 +189,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
         component
           .setValue(this.plugin.settings().centerNeedle)
           .onChange((value) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              centerNeedle: value,
-            }));
+            this.update({ centerNeedle: value });
           });
       });
 
@@ -224,10 +203,7 @@ When you open a file, the plugin will search for this heading to detect a day pl
         component
           .setValue(this.plugin.settings().plannerHeading)
           .onChange((value) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              plannerHeading: value,
-            }));
+            this.update({ plannerHeading: value });
           }),
       );
 
@@ -242,10 +218,7 @@ When you open a file, the plugin will search for this heading to detect a day pl
           .setDynamicTooltip()
           .setValue(this.plugin.settings().plannerHeadingLevel)
           .onChange((value) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              plannerHeadingLevel: value,
-            }));
+            this.update({ plannerHeadingLevel: value });
           }),
       );
 
@@ -258,10 +231,7 @@ When you open a file, the plugin will search for this heading to detect a day pl
         component
           .setValue(this.plugin.settings().timelineColored)
           .onChange((value) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              timelineColored: value,
-            }));
+            this.update({ timelineColored: value });
           });
       });
 
@@ -271,10 +241,7 @@ When you open a file, the plugin will search for this heading to detect a day pl
         component
           .setValue(this.plugin.settings().timelineStartColor)
           .onChange((value) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              timelineStartColor: value,
-            }));
+            this.update({ timelineStartColor: value });
           });
       });
 
@@ -284,10 +251,7 @@ When you open a file, the plugin will search for this heading to detect a day pl
         component
           .setValue(this.plugin.settings().timelineEndColor)
           .onChange((value) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              timelineEndColor: value,
-            }));
+            this.update({ timelineEndColor: value });
           });
       });
   }
