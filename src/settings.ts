@@ -1,20 +1,39 @@
 import type { HexString } from "obsidian";
 
-export class DayPlannerSettings {
-  circularProgress: boolean = false;
-  nowAndNextInStatusBar: boolean = false;
-  showTaskNotification: boolean = false;
-  zoomLevel: number = 2;
-  timelineIcon: string = "calendar-with-checkmark";
-  endLabel: string = "All done";
-  startHour: number = 6;
-  timelineDateFormat: string = "LLLL";
-  centerNeedle: boolean = false;
-  showHelp: boolean = true;
-  plannerHeading: string = "Day planner";
-  plannerHeadingLevel: number = 1;
-  timelineColored: boolean = false;
-  timelineStartColor: HexString = "#006466";
-  timelineEndColor: HexString = "#4d194d";
-  timestampFormat: string = "HH:mm";
+export interface DayPlannerSettings {
+  circularProgress: boolean;
+  nowAndNextInStatusBar: boolean;
+  showTaskNotification: boolean;
+  zoomLevel: number;
+  timelineIcon: string;
+  endLabel: string;
+  startHour: number;
+  timelineDateFormat: string;
+  centerNeedle: boolean;
+  showHelp: boolean;
+  plannerHeading: string;
+  plannerHeadingLevel: number;
+  timelineColored: boolean;
+  timelineStartColor: HexString;
+  timelineEndColor: HexString;
+  timestampFormat: string;
 }
+
+export const defaultSettings = {
+  circularProgress: false,
+  nowAndNextInStatusBar: false,
+  showTaskNotification: false,
+  zoomLevel: 2,
+  timelineIcon: "calendar-with-checkmark",
+  endLabel: "All done",
+  startHour: 6,
+  timelineDateFormat: "LLLL",
+  centerNeedle: false,
+  showHelp: true,
+  plannerHeading: "Day planner",
+  plannerHeadingLevel: 1,
+  timelineColored: false,
+  timelineStartColor: "#006466",
+  timelineEndColor: "#4d194d",
+  timestampFormat: "HH:mm",
+};

@@ -16,7 +16,7 @@ export class StatusBar {
   private currentTime: string;
 
   constructor(
-    private readonly settings: DayPlannerSettings,
+    private readonly settings: () => DayPlannerSettings,
     private readonly containerEl: HTMLElement,
     private readonly onClick: () => Promise<void>,
   ) {
@@ -84,10 +84,11 @@ export class StatusBar {
 
     if (currentItemIndex < 0) {
       this.hideProgress();
-      this.statusBarText.innerText = this.settings.endLabel;
+      this.statusBarText.innerText = this.settings().endLabel;
       return;
     }
 
+    console.log({ planItems });
     // todo: move calculations out
     const currentItem = planItems[currentItemIndex];
     const nextItem = planItems[currentItemIndex + 1];
@@ -107,7 +108,7 @@ export class StatusBar {
       );
     }
 
-    if (this.settings.circularProgress) {
+    if (this.settings().circularProgress) {
       this.statusBarProgress.hide();
       this.progressCircle(percentageComplete);
     } else {
@@ -158,29 +159,21 @@ export class StatusBar {
   }
 
   private updateStatusBarText(currentItem: PlanItem, nextItem?: PlanItem) {
-    if (this.settings.nowAndNextInStatusBar) {
-      this.statusBarText.textContent = `Now: ${
-        currentItem.rawStartTime
-      } ${ellipsis(currentItem.text, 15)}`;
+    const minutesLeft = getDiffInMinutes(
+      getEndTime(currentItem),
+      window.moment(),
+    );
+    const timeLeft = window.moment
+      .utc(window.moment.duration(minutesLeft, "minutes").asMilliseconds())
+      .format("HH:mm");
 
-      if (nextItem) {
-        this.nextText.textContent = `Next: ${nextItem.rawStartTime} ${ellipsis(
-          nextItem.text,
-          15,
-        )}`;
+    this.statusBarText.textContent = `-${timeLeft}`;
 
-        this.nextText.show();
-      }
-
-      this.nextText.hide();
-    } else {
-      this.nextText.hide();
-      const minutesLeft = getDiffInMinutes(
-        getEndTime(currentItem),
-        window.moment(),
-      );
-      this.statusBarText.textContent = `Minutes left: ${minutesLeft}`;
-    }
+    this.nextText.hide();
+    const trimmedNow = ellipsis(currentItem.text, 15);
+    const trimmedNext = nextItem ? ellipsis(nextItem.text, 15) : "";
+    this.statusBarText.textContent =
+      `▶ ${trimmedNow} (-${timeLeft})` + (" ▶▶ " + trimmedNext || "");
   }
 
   private taskNotification(
@@ -190,7 +183,7 @@ export class StatusBar {
     nextTaskText: string,
   ) {
     if (
-      this.settings.showTaskNotification &&
+      this.settings().showTaskNotification &&
       this.currentTime !== undefined &&
       this.currentTime !== current.startTime.toString()
     ) {

@@ -56,7 +56,6 @@
 
     height: calc(var(--divider-width-hover) * 2);
 
-    border-bottom-style: solid;
     border-bottom-width: var(--divider-width);
   }
 

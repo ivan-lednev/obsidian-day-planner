@@ -12,7 +12,7 @@ export default class TimelineView extends ItemView {
 
   constructor(
     leaf: WorkspaceLeaf,
-    private readonly settings: DayPlannerSettings,
+    private readonly settings: () => DayPlannerSettings,
     private readonly obsidianFacade: ObsidianFacade,
     private readonly planEditor: PlanEditor,
     private readonly initWeeklyView: () => Promise<void>,
@@ -29,7 +29,7 @@ export default class TimelineView extends ItemView {
   }
 
   getIcon() {
-    return this.settings.timelineIcon;
+    return this.settings().timelineIcon;
   }
 
   async onOpen() {

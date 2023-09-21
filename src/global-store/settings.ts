@@ -1,14 +1,5 @@
 import { writable } from "svelte/store";
+import type { DayPlannerSettings } from "../settings";
+import { defaultSettings } from "../settings";
 
-export const settings = writable({
-  zoomLevel: 1,
-  startHour: 0,
-  centerNeedle: true,
-  showHelp: true,
-  timelineDateFormat: "LLLL",
-  plannerHeading: "Day planner",
-  plannerHeadingLevel: 1,
-  timelineColored: false,
-  timelineStartColor: "#006466",
-  timelineEndColor: "#4d194d",
-});
+export const settings = writable<DayPlannerSettings>(defaultSettings);

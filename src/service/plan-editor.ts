@@ -12,7 +12,7 @@ import type { ObsidianFacade } from "./obsidian-facade";
 
 export class PlanEditor {
   constructor(
-    private readonly settings: DayPlannerSettings,
+    private readonly settings: () => DayPlannerSettings,
     private readonly obsidianFacade: ObsidianFacade,
   ) {}
 
@@ -47,7 +47,7 @@ export class PlanEditor {
   };
 
   createPlannerHeading() {
-    const { plannerHeading, plannerHeadingLevel } = this.settings;
+    const { plannerHeading, plannerHeadingLevel } = this.settings();
 
     const headingTokens = "#".repeat(plannerHeadingLevel);
 
@@ -78,12 +78,12 @@ export class PlanEditor {
   ): [number, string[]] {
     const planHeading = getHeadingByText(
       metadata,
-      this.settings.plannerHeading,
+      this.settings().plannerHeading,
     );
 
     const planListItems = getListItemsUnderHeading(
       metadata,
-      this.settings.plannerHeading,
+      this.settings().plannerHeading,
     );
 
     if (planListItems?.length > 0) {
@@ -119,6 +119,6 @@ export class PlanEditor {
   }
 
   private formatTimestamp(moment: Moment) {
-    return moment.format(this.settings.timestampFormat);
+    return moment.format(this.settings().timestampFormat);
   }
 }

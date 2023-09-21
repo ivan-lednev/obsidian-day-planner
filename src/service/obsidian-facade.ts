@@ -15,7 +15,7 @@ import type { DayPlannerSettings } from "../settings";
 export class ObsidianFacade {
   constructor(
     readonly app: App,
-    private readonly settings: DayPlannerSettings,
+    private readonly settings: () => DayPlannerSettings,
   ) {}
 
   async openFileInEditor(file: TFile) {
@@ -78,7 +78,7 @@ export class ObsidianFacade {
       return [];
     }
 
-    const { plannerHeading } = this.settings;
+    const { plannerHeading } = this.settings();
 
     const fileContents = await this.app.vault.read(file);
     const metadata = this.app.metadataCache.getFileCache(file);

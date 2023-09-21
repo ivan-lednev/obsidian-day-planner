@@ -4,7 +4,8 @@ import {
   getDailyNote,
   getDateFromFile,
 } from "obsidian-daily-notes-interface";
-import { get } from "svelte/store";
+import { get, Writable } from "svelte/store";
+import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 
 import { viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { settings } from "./global-store/settings";
@@ -12,25 +13,26 @@ import { visibleDateRange } from "./global-store/visible-date-range";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
-import { DayPlannerSettings } from "./settings";
+import { DayPlannerSettings, defaultSettings } from "./settings";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
 import { getDaysOfCurrentWeek, isToday } from "./util/moment";
+import type { SvelteComponentDev } from "svelte/internal";
 
 export default class DayPlanner extends Plugin {
-  settings: DayPlannerSettings;
+  settings: () => DayPlannerSettings;
+  private settingsStore: Writable<DayPlannerSettings>;
   private statusBar: StatusBar;
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
+  private statusBarWidget: SvelteComponentDev;
 
   async onload() {
-    this.settings = Object.assign(
-      new DayPlannerSettings(),
-      await this.loadData(),
-    );
+    this.settingsStore = await this.initSettingsStore();
+    this.settings = () => get(this.settingsStore);
 
     this.statusBar = new StatusBar(
       this.settings,
@@ -69,8 +71,7 @@ export default class DayPlanner extends Plugin {
 
     this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
 
-    this.addSettingTab(new DayPlannerSettingsTab(this.app, this));
-    this.initSettings();
+    this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
 
     this.app.workspace.onLayoutReady(this.handleLayoutReady);
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
@@ -87,6 +88,11 @@ export default class DayPlanner extends Plugin {
         5000,
       ),
     );
+
+    const statusBarItemEl = this.addStatusBarItem();
+    this.statusBarWidget = new StatusBarWidget({
+      target: statusBarItemEl,
+    });
   }
 
   private handleActiveLeafChanged = ({ view }: WorkspaceLeaf) => {
@@ -141,39 +147,16 @@ export default class DayPlanner extends Plugin {
     });
   }
 
-  private initSettings() {
-    // todo: remove duplication. Now, every time we add an option, we have to update it in 3 places
-    //  although with TypeScript this is quite easy
-    const {
-      zoomLevel,
-      centerNeedle,
-      startHour,
-      timelineDateFormat,
-      plannerHeading,
-      plannerHeadingLevel,
-      timelineColored,
-      timelineStartColor,
-      timelineEndColor,
-      showHelp,
-    } = this.settings;
+  private async initSettingsStore() {
+    settings.set({ ...defaultSettings, ...(await this.loadData()) });
 
-    settings.set({
-      zoomLevel,
-      centerNeedle,
-      startHour,
-      timelineDateFormat,
-      plannerHeading,
-      plannerHeadingLevel,
-      timelineColored,
-      timelineStartColor,
-      timelineEndColor,
-      showHelp,
-    });
+    this.register(
+      settings.subscribe(async (newValue) => {
+        await this.saveData(newValue);
+      }),
+    );
 
-    settings.subscribe(async (newValue) => {
-      this.settings = { ...this.settings, ...newValue };
-      await this.saveData(this.settings);
-    });
+    return settings;
   }
 
   private handleLayoutReady = async () => {

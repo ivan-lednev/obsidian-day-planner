@@ -8,6 +8,11 @@
   cursor: pointer;
 }
 
+.status-bar-item.plugin-obsidian-day-planner {
+  display: flex;
+  gap: var(--size-2-2);
+}
+
 .day-planner-progress-bar {
   overflow: hidden;
   display: flex;
