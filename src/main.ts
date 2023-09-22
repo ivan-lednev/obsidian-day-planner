@@ -4,8 +4,8 @@ import {
   getDailyNote,
   getDateFromFile,
 } from "obsidian-daily-notes-interface";
+import type { SvelteComponentDev } from "svelte/internal";
 import { get, Writable } from "svelte/store";
-import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 
 import { viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { settings } from "./global-store/settings";
@@ -14,13 +14,13 @@ import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
+import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
 import { getDaysOfCurrentWeek, isToday } from "./util/moment";
-import type { SvelteComponentDev } from "svelte/internal";
 
 export default class DayPlanner extends Plugin {
   settings: () => DayPlannerSettings;

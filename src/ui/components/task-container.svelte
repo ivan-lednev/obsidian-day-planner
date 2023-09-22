@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Copy, GripVertical, Layers } from "lucide-svelte";
+  import { GripVertical } from "lucide-svelte";
   import type { Moment } from "moment";
   import { getContext } from "svelte";
   import { Readable, writable } from "svelte/store";
@@ -154,6 +154,7 @@
           style:cursor={gripCursor}
           class="grip"
           on:mousedown|stopPropagation={() => {
+            // todo: this can be moved to hook
             let mode = EditMode.DRAG;
             let task = planItem;
 
@@ -174,13 +175,7 @@
             startEdit({ task, mode });
           }}
         >
-          {#if shiftPressed}
-            <Copy class="svg-icon" />
-          {:else if controlPressed}
-            <Layers class="svg-icon" />
-          {:else}
-            <GripVertical class="svg-icon" />
-          {/if}
+          <GripVertical class="svg-icon" />
         </div>
       {/if}
     </Task>

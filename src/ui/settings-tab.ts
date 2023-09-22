@@ -1,9 +1,9 @@
 import { PluginSettingTab, Setting } from "obsidian";
+import type { Writable } from "svelte/store";
 
 import { icons } from "../constants";
 import type DayPlanner from "../main";
 import type { DayPlannerSettings } from "../settings";
-import type { Writable } from "svelte/store";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   constructor(
