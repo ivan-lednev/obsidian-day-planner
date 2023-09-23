@@ -17,7 +17,7 @@
 </script>
 
 <div
-  style:height="{$height}px"
+  style:height="{($height + $offset >= 1080) ? 1080-$offset : $height}px"
   style:transform="translateY({$offset}px)"
   style:width="{planItem.placing.widthPercent || 100}%"
   style:left="{planItem.placing.xOffsetPercent || 0}%"
