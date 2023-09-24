@@ -16,7 +16,7 @@ an [issue](https://github.com/ivan-lednev/obsidian-day-planner/issues).
    - You can use https://github.com/pjeby/hot-reload to make this process faster
 1. We don't want the repo to turn into a mess, so...
     1. Before committing, format your code with `npm run format`. If you don't, the PR pipeline is going to mark the PR as failed once the maintainer triggers the PR workflow
-    1. Once you're ready to commit, make sure your commit message conforms to the conventional commits spec (pre-commit hook is going to fail otherwise)
+    1. Once you're ready to commit, make sure your commit message conforms to the [conventional commits spec](https://www.conventionalcommits.org/en/v1.0.0/) (pre-commit hook is going to fail otherwise)
 
 ## Pull Request Process
 
