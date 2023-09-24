@@ -14,7 +14,6 @@ import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
-import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
@@ -89,10 +88,10 @@ export default class DayPlanner extends Plugin {
       ),
     );
 
-    const statusBarItemEl = this.addStatusBarItem();
-    this.statusBarWidget = new StatusBarWidget({
-      target: statusBarItemEl,
-    });
+    // const statusBarItemEl = this.addStatusBarItem();
+    // this.statusBarWidget = new StatusBarWidget({
+    //   target: statusBarItemEl,
+    // });
   }
 
   private handleActiveLeafChanged = ({ view }: WorkspaceLeaf) => {

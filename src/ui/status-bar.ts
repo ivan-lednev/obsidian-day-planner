@@ -170,10 +170,11 @@ export class StatusBar {
     this.statusBarText.textContent = `-${timeLeft}`;
 
     this.nextText.hide();
-    const trimmedNow = ellipsis(currentItem.text, 15);
-    const trimmedNext = nextItem ? ellipsis(nextItem.text, 15) : "";
+    const trimmedNow = ellipsis(currentItem.firstLineText, 15);
+    const trimmedNext = nextItem ? ellipsis(nextItem.firstLineText, 15) : "";
     this.statusBarText.textContent =
-      `▶ ${trimmedNow} (-${timeLeft})` + (" ▶▶ " + trimmedNext || "");
+      `▶ ${trimmedNow} (-${timeLeft})` +
+      (trimmedNext.length > 0 ? " ▶▶ " + trimmedNext : "");
   }
 
   private taskNotification(
