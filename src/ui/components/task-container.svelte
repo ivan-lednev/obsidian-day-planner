@@ -49,6 +49,25 @@
 
     cancelEdit();
   }
+
+  async function handleMouseDown() {
+    const newTask = await createPlanItem(
+      $day,
+      offsetYToMinutes_NEW(
+        $pointerOffsetY,
+        $settings.zoomLevel,
+        $settings.startHour,
+      ),
+    );
+
+    startEdit({ task: { ...newTask, isGhost: true }, mode: EditMode.CREATE });
+  }
+
+  async function handleMouseUp() {
+    editConfirmation.trigger();
+
+    await confirmEdit();
+  }
 </script>
 
 <svelte:body use:styledCursor={bodyCursor} />
@@ -66,23 +85,8 @@
 <div
   bind:this={el}
   class="task-container absolute-stretch-x"
-  on:mousedown={async () => {
-    const newTask = await createPlanItem(
-      $day,
-      offsetYToMinutes_NEW(
-        $pointerOffsetY,
-        $settings.zoomLevel,
-        $settings.startHour,
-      ),
-    );
-
-    startEdit({ task: { ...newTask, isGhost: true }, mode: EditMode.CREATE });
-  }}
-  on:mouseup|stopPropagation={async () => {
-    editConfirmation.trigger();
-
-    await confirmEdit();
-  }}
+  on:mousedown={handleMouseDown}
+  on:mouseup|stopPropagation={handleMouseUp}
 >
   {#if $editStatus && $settings.showHelp}
     <div class="banner">Release outside this column to cancel edit</div>
