@@ -11,10 +11,11 @@
   } from "../../global-store/edit-events";
   import { settings } from "../../global-store/settings";
   import { snap } from "../../global-store/settings-utils";
-  import type { ObsidianContext, PlacedPlanItem } from "../../types";
+  import type { ObsidianContext } from "../../types";
   import { getId } from "../../util/id";
-  import { getEndMinutes } from "../../util/task-utils";
+  import { getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
+  import { cursorForMode } from "../hooks/use-edit/cursor";
   import { createPlanItem } from "../hooks/use-edit/transform/create";
   import { EditMode } from "../hooks/use-edit/types";
   import { offsetYToMinutes_NEW, useEdit } from "../hooks/use-edit/use-edit";
@@ -30,8 +31,6 @@
   let shiftPressed = false;
   let controlPressed = false;
   let el: HTMLDivElement;
-  let bodyCursor: string | undefined = undefined;
-  let gripCursor = "grab";
 
   const pointerOffsetY = writable(0);
 
@@ -45,34 +44,12 @@
       onUpdate,
     }));
 
-  // todo: clean this up once we add more modes
-  $: if (
-    $editStatus === EditMode.CREATE ||
-    $editStatus === EditMode.DRAG ||
-    $editStatus === EditMode.DRAG_AND_SHIFT_OTHERS
-  ) {
-    bodyCursor = "grabbing";
-    gripCursor = "grabbing";
-  } else if (
-    $editStatus === EditMode.RESIZE ||
-    $editStatus === EditMode.RESIZE_AND_SHIFT_OTHERS
-  ) {
-    bodyCursor = "row-resize";
-  } else {
-    bodyCursor = undefined;
-    gripCursor = "grab";
-  }
+  $: ({ bodyCursor, gripCursor } = cursorForMode($editStatus));
 
   $: {
     $editCancellation;
 
     cancelEdit();
-  }
-
-  function getKey(task: PlacedPlanItem) {
-    return `${task.startMinutes} ${getEndMinutes(task)} ${task.text} ${
-      task.isGhost ?? ""
-    }`;
   }
 </script>
 
@@ -130,7 +107,7 @@
   {#if $editStatus && $settings.showHelp}
     <div class="banner">Release outside this column to cancel edit</div>
   {/if}
-  {#each $displayedTasks as planItem (getKey(planItem))}
+  {#each $displayedTasks as planItem (getRenderKey(planItem))}
     <Task
       onResizeStart={() => {
         const mode = controlPressed

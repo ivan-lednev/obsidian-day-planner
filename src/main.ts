@@ -4,6 +4,7 @@ import {
   getDailyNote,
   getDateFromFile,
 } from "obsidian-daily-notes-interface";
+import { getAPI } from "obsidian-dataview";
 import type { SvelteComponentDev } from "svelte/internal";
 import { get, Writable } from "svelte/store";
 
@@ -11,6 +12,7 @@ import { viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { settings } from "./global-store/settings";
 import { visibleDateRange } from "./global-store/visible-date-range";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
+import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
@@ -28,6 +30,7 @@ export default class DayPlanner extends Plugin {
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
   private statusBarWidget: SvelteComponentDev;
+  private dataviewFacade: DataviewFacade;
 
   async onload() {
     this.settingsStore = await this.initSettingsStore();
@@ -42,8 +45,8 @@ export default class DayPlanner extends Plugin {
     this.registerCommands();
 
     this.obsidianFacade = new ObsidianFacade(this.app, this.settings);
-
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
+    this.dataviewFacade = new DataviewFacade(getAPI(this.app));
 
     this.registerView(
       viewTypeTimeline,
@@ -79,6 +82,11 @@ export default class DayPlanner extends Plugin {
       // todo: this is just to trigger UI update
       visibleDateRange.update((prev) => [...prev]);
       visibleDayInTimeline.update((prev) => prev.clone());
+    });
+    // @ts-ignore
+    this.app.metadataCache.on("dataview:metadata-change", () => {
+      // todo: remove copy-paste
+      console.log(this.dataviewFacade.main());
     });
 
     this.registerInterval(
