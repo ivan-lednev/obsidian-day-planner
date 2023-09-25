@@ -1,6 +1,6 @@
 import { get, writable } from "svelte/store";
 
-import { settingsWithUtils } from "../../../global-store/settings-with-utils";
+import { defaultSettingsForTests } from "../../../settings";
 import { timeToMinutes } from "../../../util/moment";
 import { basePlanItem } from "../test-utils";
 
@@ -19,7 +19,7 @@ function createProps({ tasks } = { tasks: baseTasks }) {
   return {
     pointerOffsetY,
     parsedTasks: tasks,
-    settings: settingsWithUtils.settings,
+    settings: writable(defaultSettingsForTests),
     onUpdate: () => Promise.resolve(),
     movePointerTo,
   };

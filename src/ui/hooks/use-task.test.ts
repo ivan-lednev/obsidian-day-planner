@@ -2,6 +2,7 @@ import { get, writable } from "svelte/store";
 
 import { currentTime } from "../../global-store/current-time";
 import { settingsWithUtils } from "../../global-store/settings-with-utils";
+import { timeToMinutes } from "../../util/moment";
 
 import { basePlanItem } from "./test-utils";
 import { useTask } from "./use-task";
@@ -20,12 +21,12 @@ function getBaseUseTaskProps() {
 // todo: use non-default zoom & start hours
 test("derives task offset from settings and time", () => {
   const { offset, height, relationToNow } = useTask(
-    basePlanItem,
+    { ...basePlanItem, startMinutes: timeToMinutes("13:00") },
     getBaseUseTaskProps(),
   );
 
-  expect(get(offset)).toEqual(0);
-  expect(get(height)).toEqual(60);
+  expect(get(offset)).toEqual(840);
+  expect(get(height)).toEqual(120);
   expect(get(relationToNow)).toEqual("past");
 });
 

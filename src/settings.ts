@@ -37,3 +37,9 @@ export const defaultSettings = {
   timelineEndColor: "#4d194d",
   timestampFormat: "HH:mm",
 };
+
+export const defaultSettingsForTests = {
+  ...defaultSettings,
+  startHour: 0,
+  zoomLevel: 1,
+};
