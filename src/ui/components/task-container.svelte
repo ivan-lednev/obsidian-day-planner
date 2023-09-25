@@ -11,7 +11,7 @@
   } from "../../global-store/edit-events";
   import { settings } from "../../global-store/settings";
   import { snap } from "../../global-store/settings-utils";
-  import type { ObsidianContext } from "../../types";
+  import type { ObsidianContext, PlacedPlanItem, PlanItem } from "../../types";
   import { getId } from "../../util/id";
   import { getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
@@ -68,6 +68,45 @@
 
     await confirmEdit();
   }
+
+  function handleResizeStart(event: MouseEvent, task: PlacedPlanItem) {
+    const mode = event.ctrlKey
+      ? EditMode.RESIZE_AND_SHIFT_OTHERS
+      : EditMode.RESIZE;
+
+    startEdit({ task, mode });
+  }
+
+  async function handleTaskMouseUp(task: PlanItem) {
+    if ($editStatus) {
+      return;
+    }
+
+    const { path, line } = task.location;
+    await obsidianFacade.revealLineInFile(path, line);
+  }
+
+  async function handleGripMouseDown(event: MouseEvent, planItem: PlacedPlanItem) {
+    // todo: this can be moved to hook
+    let mode = EditMode.DRAG;
+    let task = planItem;
+
+    if (event.ctrlKey) {
+      mode = EditMode.DRAG_AND_SHIFT_OTHERS;
+    } else if (event.shiftKey) {
+      mode = EditMode.CREATE;
+
+      // todo: again, a lame way to track which tasks are new
+      task = {
+        ...planItem,
+        id: getId(),
+        isGhost: true,
+        location: { ...planItem.location, line: undefined },
+      };
+    }
+
+    startEdit({ task, mode });
+  }
 </script>
 
 <svelte:body use:styledCursor={bodyCursor} />
@@ -93,48 +132,16 @@
   {/if}
   {#each $displayedTasks as planItem (getRenderKey(planItem))}
     <Task
-      onResizeStart={(event) => {
-        const mode = event.ctrlKey
-          ? EditMode.RESIZE_AND_SHIFT_OTHERS
-          : EditMode.RESIZE;
-
-        startEdit({ task: planItem, mode });
-      }}
+      onResizeStart={(event) => handleResizeStart(event, planItem)}
       {planItem}
-      on:mouseup={async () => {
-        if ($editStatus) {
-          return;
-        }
-
-        const { path, line } = planItem.location;
-        await obsidianFacade.revealLineInFile(path, line);
-      }}
+      on:mouseup={() => handleTaskMouseUp(planItem)}
     >
       {#if !planItem.isGhost}
         <div
           style:cursor={gripCursor}
           class="grip"
-          on:mousedown|stopPropagation={(event) => {
-            // todo: this can be moved to hook
-            let mode = EditMode.DRAG;
-            let task = planItem;
-
-            if (event.ctrlKey) {
-              mode = EditMode.DRAG_AND_SHIFT_OTHERS;
-            } else if (event.shiftKey) {
-              mode = EditMode.CREATE;
-
-              // todo: again, a lame way to track which tasks are new
-              task = {
-                ...planItem,
-                id: getId(),
-                isGhost: true,
-                location: { ...planItem.location, line: undefined },
-              };
-            }
-
-            startEdit({ task, mode });
-          }}
+          on:mousedown|stopPropagation={(event) =>
+            handleGripMouseDown(event, planItem)}
         >
           <GripVertical class="svg-icon" />
         </div>
