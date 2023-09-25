@@ -7,7 +7,7 @@
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
   export let planItem: PlacedPlanItem;
-  export let onResizeStart: () => void;
+  export let onResizeStart: (event: MouseEvent) => void;
 
   $: ({ height, offset, relationToNow, backgroundColor, properContrastColors } =
     useTask(planItem, {

@@ -28,8 +28,6 @@
   const { obsidianFacade, onUpdate } =
     getContext<ObsidianContext>(obsidianContext);
 
-  let shiftPressed = false;
-  let controlPressed = false;
   let el: HTMLDivElement;
 
   const pointerOffsetY = writable(0);
@@ -63,24 +61,6 @@
 
     pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings.zoomLevel));
   }}
-  on:keydown={(event) => {
-    if (event.shiftKey) {
-      shiftPressed = true;
-    }
-
-    if (event.ctrlKey) {
-      controlPressed = true;
-    }
-  }}
-  on:keyup={(event) => {
-    if (!event.shiftKey) {
-      shiftPressed = false;
-    }
-
-    if (!event.ctrlKey) {
-      controlPressed = false;
-    }
-  }}
 />
 
 <div
@@ -109,8 +89,8 @@
   {/if}
   {#each $displayedTasks as planItem (getRenderKey(planItem))}
     <Task
-      onResizeStart={() => {
-        const mode = controlPressed
+      onResizeStart={(event) => {
+        const mode = event.ctrlKey
           ? EditMode.RESIZE_AND_SHIFT_OTHERS
           : EditMode.RESIZE;
 
@@ -130,14 +110,14 @@
         <div
           style:cursor={gripCursor}
           class="grip"
-          on:mousedown|stopPropagation={() => {
+          on:mousedown|stopPropagation={(event) => {
             // todo: this can be moved to hook
             let mode = EditMode.DRAG;
             let task = planItem;
 
-            if (controlPressed) {
+            if (event.ctrlKey) {
               mode = EditMode.DRAG_AND_SHIFT_OTHERS;
-            } else if (shiftPressed) {
+            } else if (event.shiftKey) {
               mode = EditMode.CREATE;
 
               // todo: again, a lame way to track which tasks are new
