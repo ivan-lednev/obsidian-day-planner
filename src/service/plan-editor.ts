@@ -86,7 +86,12 @@ export class PlanEditor {
     return `${headingTokens} ${plannerHeading}`;
   }
 
-  autoCompleteTasks = async (planItems: PlanItem[]) => {
+  autoCompleteTasks = async (
+    planItems: PlanItem[],
+    autoIncomplete: boolean = false,
+  ) => {
+    const filePath = planItems[0].location.path;
+
     const now = window.moment();
 
     const lastPastTaskIndex = planItems.findLastIndex((item) =>
@@ -94,28 +99,48 @@ export class PlanEditor {
     );
 
     const pastTasks = planItems.slice(0, lastPastTaskIndex + 1);
+    const followingTasks = planItems.slice(lastPastTaskIndex + 1);
 
-    const uncompletedTasks = pastTasks.filter(
-      (task) => task.listTokens == "- [ ] ",
+    const tasksToComplete = this.replaceListTokens(
+      pastTasks,
+      "- [ ] ",
+      "- [x] ",
     );
 
-    if (uncompletedTasks.length > 0) {
-      uncompletedTasks.forEach((task) => {
-        task.listTokens = "- [x] ";
-      });
-
-      const path = uncompletedTasks[0].location.path;
-
-      if (path) {
-        await this.obsidianFacade.editFile(path, (contents) => {
-          return uncompletedTasks.reduce(
-            (result, current) => this.updateTaskInFileContents(result, current),
-            contents,
-          );
-        });
-      }
+    if (autoIncomplete) {
+      const tasksToIncomplete = this.replaceListTokens(
+        followingTasks,
+        "- [x] ",
+        "- [ ] ",
+      );
+      await this.updateTasks(filePath, [
+        ...tasksToComplete,
+        ...tasksToIncomplete,
+      ]);
+    } else {
+      await this.updateTasks(filePath, tasksToComplete);
     }
   };
+
+  private replaceListTokens(planItems: PlanItem[], from: string, to: string) {
+    return planItems
+      .filter((task) => task.listTokens == from)
+      .map((task) => {
+        task.listTokens = to;
+        return task;
+      });
+  }
+
+  private async updateTasks(path: string, itemsToBeUpdated: PlanItem[]) {
+    if (itemsToBeUpdated.length > 0) {
+      await this.obsidianFacade.editFile(path, (contents) => {
+        return itemsToBeUpdated.reduce(
+          (result, current) => this.updateTaskInFileContents(result, current),
+          contents,
+        );
+      });
+    }
+  }
 
   private updateTaskInFileContents(contents: string, task: PlanItem) {
     return contents

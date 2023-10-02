@@ -210,6 +210,7 @@ export default class DayPlanner extends Plugin {
 
       await this.planEditor.autoCompleteTasks(
         getTasksForDay(today, dataviewTasks),
+        this.settings().autoIncomplete,
       );
     }
   }

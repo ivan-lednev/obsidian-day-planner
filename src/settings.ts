@@ -23,6 +23,7 @@ export interface DayPlannerSettings {
   extendDurationUntilNext: boolean;
   defaultDurationMinutes: number;
   autoComplete: boolean;
+  autoIncomplete: boolean;
 }
 
 export const defaultSettings = {
@@ -47,6 +48,7 @@ export const defaultSettings = {
   extendDurationUntilNext: false,
   defaultDurationMinutes: 30,
   autoComplete: false,
+  autoIncomplete: false,
 };
 
 export const defaultSettingsForTests = {

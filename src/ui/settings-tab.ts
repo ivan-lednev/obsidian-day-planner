@@ -287,8 +287,10 @@ When you open a file, the plugin will search for this heading to detect a day pl
           });
       });
 
+    this.containerEl.createEl("h3", { text: "Auto Complete Tasks" });
+
     new Setting(containerEl)
-      .setName("Auto-Complete Past Tasks")
+      .setName("Enable Automatically Mark Past Tasks Complete")
       .addToggle((toggle) =>
         toggle
           .setValue(this.plugin.settings().autoComplete)
@@ -296,6 +298,17 @@ When you open a file, the plugin will search for this heading to detect a day pl
             this.update({ autoComplete: value });
           }),
       )
-      .setDesc(`Only complete task list.`);
+      .setDesc(`Only apply to task list.`);
+
+    new Setting(containerEl)
+      .setName("Enable Automatically Mark Pending Tasks Incomplete")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings().autoIncomplete)
+          .onChange((value: boolean) => {
+            this.update({ autoIncomplete: value });
+          }),
+      )
+      .setDesc(`Only apply to task list.`);
   }
 }

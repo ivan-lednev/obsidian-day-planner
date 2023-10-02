@@ -1,8 +1,7 @@
-import moment from "moment";
+import moment, { Moment } from "moment";
 import { App } from "obsidian";
 
 import { defaultSettingsForTests } from "../settings";
-import { PlanItem } from "../types";
 
 import { ObsidianFacade } from "./obsidian-facade";
 import { PlanEditor } from "./plan-editor";
@@ -13,16 +12,19 @@ const appMock = <jest.Mock<App>>App;
 
 describe("PlanEditor", () => {
   describe("autoCompletePastTasks", () => {
-    let obsidianFacadeMock;
+    let obsidianFacadeMock: ObsidianFacade;
     let planEditor: PlanEditor;
 
-    beforeEach(() => {
-      obsidianFacadeMock = new ObsidianFacade(
-        appMock,
-        () => defaultSettingsForTests,
-      );
+    const pastItem = getFakePlanItem("1", 1, moment().subtract(30, "m"));
+    const currentItem = getFakePlanItem("2", 2, moment().subtract(15, "m"));
+    const futureItem = getFakePlanItem("3", 3, moment().add(30, "m"));
 
-      jest.spyOn(obsidianFacadeMock, "editFile").mockImplementation(() => {});
+    beforeEach(() => {
+      obsidianFacadeMock = new ObsidianFacade(appMock);
+
+      jest
+        .spyOn(obsidianFacadeMock, "editFile")
+        .mockImplementation((path, cb) => Promise.resolve());
 
       planEditor = new PlanEditor(
         () => defaultSettingsForTests,
@@ -30,51 +32,102 @@ describe("PlanEditor", () => {
       );
     });
 
-    it("should complete past tasks given past tasks exist", () => {
-      const pastTasks = [fakePastPlanItem];
+    describe("auto-complete", () => {
+      it("should complete past tasks given past tasks exist", () => {
+        const pastItems = [pastItem];
 
-      planEditor.autoCompleteTasks(pastTasks);
+        planEditor.autoCompleteTasks(pastItems);
 
-      expect(obsidianFacadeMock.editFile).toHaveBeenCalled();
+        expect(obsidianFacadeMock.editFile).toHaveBeenCalled();
+      });
+
+      it("should NOT complete any tasks given first task is current task", () => {
+        const planItems = [currentItem];
+
+        planEditor.autoCompleteTasks(planItems);
+
+        expect(obsidianFacadeMock.editFile).not.toHaveBeenCalled();
+      });
+
+      it("should NOT complete any tasks given only future tasks exist", () => {
+        const planItems = [futureItem];
+
+        planEditor.autoCompleteTasks(planItems);
+
+        expect(obsidianFacadeMock.editFile).not.toHaveBeenCalled();
+      });
+
+      it("should NOT complete items given past item is not task list", () => {
+        const planItems = [{ ...pastItem, listToken: "- " }];
+
+        planEditor.autoCompleteTasks(planItems);
+
+        expect(obsidianFacadeMock.editFile).not.toHaveBeenCalled();
+      });
     });
 
-    it("should NOT complete any tasks given first task is current task", () => {
-      const pastTasks = [{ ...fakePastPlanItem, startTime: moment() }];
+    describe("auto-incomplete", () => {
+      it("should incomplete future tasks given autoIncomplete is true", () => {
+        const planItems = [{ ...futureItem, listTokens: "- [x] " }];
 
-      planEditor.autoCompleteTasks(pastTasks);
+        planEditor.autoCompleteTasks(planItems, true);
 
-      expect(obsidianFacadeMock.editFile).not.toHaveBeenCalled();
+        expect(obsidianFacadeMock.editFile).toHaveBeenCalled();
+      });
+
+      it("should NOT incomplete future tasks given autoIncomplete is false", () => {
+        const planItems = [{ ...futureItem, listTokens: "- [x] " }];
+
+        planEditor.autoCompleteTasks(planItems);
+
+        expect(obsidianFacadeMock.editFile).not.toHaveBeenCalled();
+      });
+
+      it("should NOT incomplete future tasks given task is incomplete", () => {
+        const planItems = [futureItem];
+
+        planEditor.autoCompleteTasks(planItems, true);
+
+        expect(obsidianFacadeMock.editFile).not.toHaveBeenCalled();
+      });
     });
 
     it("should NOT complete any tasks given only future tasks exist", () => {
-      const pastTasks = [
-        { ...fakePastPlanItem, startTime: moment().add(30, "m") },
-      ];
+      const pastItems = [{ ...pastItem, startTime: moment().add(30, "m") }];
 
-      planEditor.autoCompleteTasks(pastTasks);
+      planEditor.autoCompleteTasks(pastItems);
 
       expect(obsidianFacadeMock.editFile).not.toHaveBeenCalled();
     });
 
     it("should NOT complete items given past item is not task list", () => {
-      const pastTasks = [{ ...fakePastPlanItem, listToken: "- " }];
+      const pastItems = [{ ...pastItem, listToken: "- " }];
 
-      planEditor.autoCompleteTasks(pastTasks);
+      planEditor.autoCompleteTasks(pastItems);
 
       expect(obsidianFacadeMock.editFile).not.toHaveBeenCalled();
     });
-  });
 
-  const fakePastPlanItem: PlanItem = {
-    startTime: moment().subtract(45, "m"),
-    rawStartTime: "",
-    rawEndTime: "",
-    listTokens: "- [ ] ",
-    firstLineText: "",
-    text: "",
-    durationMinutes: 30,
-    startMinutes: 30,
-    location: { path: "/tmp", line: 0 },
-    id: "",
-  };
+    function getFakePlanItem(id: string, line: number, startTime: Moment) {
+      return {
+        startTime: startTime,
+        rawStartTime: "",
+        rawEndTime: "",
+        listTokens: "- [ ] ",
+        firstLineText: "",
+        text: "",
+        durationMinutes: 30,
+        startMinutes: 30,
+        location: {
+          path: "/tmp",
+          line: line,
+          position: {
+            start: { line: line, col: 0, offset: 0 },
+            end: { line: line, col: 0, offset: 0 },
+          },
+        },
+        id: id,
+      };
+    }
+  });
 });
