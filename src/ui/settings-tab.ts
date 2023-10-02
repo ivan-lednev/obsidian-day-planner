@@ -286,5 +286,16 @@ When you open a file, the plugin will search for this heading to detect a day pl
             this.update({ timelineEndColor: value });
           });
       });
+
+    new Setting(containerEl)
+      .setName("Auto-Complete Past Tasks")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings().autoComplete)
+          .onChange((value: boolean) => {
+            this.update({ autoComplete: value });
+          }),
+      )
+      .setDesc(`Only complete task list.`);
   }
 }

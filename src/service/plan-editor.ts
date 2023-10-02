@@ -6,7 +6,7 @@ import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
 import type { PlanItem, Timestamp } from "../types";
 import { addMinutes, minutesToMoment } from "../util/moment";
-import { isEqualTask } from "../util/task-utils";
+import { isEqualTask, getEndTime } from "../util/task-utils";
 
 import type { ObsidianFacade } from "./obsidian-facade";
 
@@ -85,6 +85,37 @@ export class PlanEditor {
 
     return `${headingTokens} ${plannerHeading}`;
   }
+
+  autoCompleteTasks = async (planItems: PlanItem[]) => {
+    const now = window.moment();
+
+    const lastPastTaskIndex = planItems.findLastIndex((item) =>
+      getEndTime(item).isBefore(now),
+    );
+
+    const pastTasks = planItems.slice(0, lastPastTaskIndex + 1);
+
+    const uncompletedTasks = pastTasks.filter(
+      (task) => task.listTokens == "- [ ] ",
+    );
+
+    if (uncompletedTasks.length > 0) {
+      uncompletedTasks.forEach((task) => {
+        task.listTokens = "- [x] ";
+      });
+
+      const path = uncompletedTasks[0].location.path;
+
+      if (path) {
+        await this.obsidianFacade.editFile(path, (contents) => {
+          return uncompletedTasks.reduce(
+            (result, current) => this.updateTaskInFileContents(result, current),
+            contents,
+          );
+        });
+      }
+    }
+  };
 
   private updateTaskInFileContents(contents: string, task: PlanItem) {
     return contents

@@ -55,6 +55,7 @@ export default class DayPlanner extends Plugin {
     );
 
     this.register(this.dataviewTasks.subscribe(this.updateStatusBar));
+    this.register(this.dataviewTasks.subscribe(this.autoCompleteTasks));
 
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
   }
@@ -202,6 +203,16 @@ export default class DayPlanner extends Plugin {
       getTasksForDay(today, dataviewTasks, { ...this.settings() }),
     );
   };
+
+  private async autoCompleteTasks(dataviewTasks: DataArray<STask>) {
+    if (this.settings().autoComplete) {
+      const today = window.moment();
+
+      await this.planEditor.autoCompleteTasks(
+        getTasksForDay(today, dataviewTasks),
+      );
+    }
+  }
 
   initWeeklyLeaf = async () => {
     await this.detachLeavesOfType(viewTypeWeekly);

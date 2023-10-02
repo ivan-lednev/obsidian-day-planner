@@ -22,6 +22,7 @@ export interface DayPlannerSettings {
   showDataviewMigrationWarning: boolean;
   extendDurationUntilNext: boolean;
   defaultDurationMinutes: number;
+  autoComplete: boolean;
 }
 
 export const defaultSettings = {
@@ -45,6 +46,7 @@ export const defaultSettings = {
   showDataviewMigrationWarning: true,
   extendDurationUntilNext: false,
   defaultDurationMinutes: 30,
+  autoComplete: false,
 };
 
 export const defaultSettingsForTests = {
