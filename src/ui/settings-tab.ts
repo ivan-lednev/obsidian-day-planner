@@ -13,49 +13,43 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
     super(plugin.app, plugin);
   }
 
-  private update(patch: Partial<DayPlannerSettings>) {
-    this.settingsStore.update((previous) => ({ ...previous, ...patch }));
-  }
-
   display(): void {
     const { containerEl } = this;
 
     containerEl.empty();
 
+    this.setSectionTitle("General Settings");
+
     new Setting(containerEl)
-      .setName("Status Bar - Circular Progress")
-      .setDesc("Display a circular progress bar in the status bar")
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings().circularProgress)
-          .onChange((value: boolean) => {
-            this.update({ circularProgress: value });
+      .setName("Planner Heading")
+      .setDesc(
+        `When you create a planner, this text is going to be in the heading.
+When you open a file, the plugin will search for this heading to detect a day plan`,
+      )
+      .addText((component) =>
+        component
+          .setValue(this.plugin.settings().plannerHeading)
+          .onChange((value) => {
+            this.update({ plannerHeading: value });
           }),
       );
 
     new Setting(containerEl)
-      .setName("Status Bar - Now and Next")
-      .setDesc("Display now and next tasks in the status bar")
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings().nowAndNextInStatusBar)
-          .onChange((value: boolean) => {
-            this.update({
-              nowAndNextInStatusBar: value,
-            });
+      .setName("Planner heading level")
+      .setDesc(
+        "When you create a planner in a file, this level of heading is going to be used",
+      )
+      .addSlider((component) =>
+        component
+          .setLimits(1, 6, 1)
+          .setDynamicTooltip()
+          .setValue(this.plugin.settings().plannerHeadingLevel)
+          .onChange((value) => {
+            this.update({ plannerHeadingLevel: value });
           }),
       );
 
-    new Setting(containerEl)
-      .setName("Task Notification")
-      .setDesc("Display a notification when a new task is started")
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings().showTaskNotification)
-          .onChange((value: boolean) => {
-            this.update({ showTaskNotification: value });
-          }),
-      );
+    this.setSectionTitle("Timeline View");
 
     new Setting(containerEl)
       .setName("Timeline Zoom Level")
@@ -287,28 +281,81 @@ When you open a file, the plugin will search for this heading to detect a day pl
           });
       });
 
-    this.containerEl.createEl("h3", { text: "Auto Complete Tasks" });
+    this.setSectionTitle("Staus Bar");
+
+    new Setting(containerEl)
+      .setName("Status Bar - Circular Progress")
+      .setDesc("Display a circular progress bar in the status bar")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings().circularProgress)
+          .onChange((value: boolean) => {
+            this.update({ circularProgress: value });
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Status Bar - Now and Next")
+      .setDesc("Display now and next tasks in the status bar")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings().nowAndNextInStatusBar)
+          .onChange((value: boolean) => {
+            this.update({
+              nowAndNextInStatusBar: value,
+            });
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Task Notification")
+      .setDesc("Display a notification when a new task is started")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings().showTaskNotification)
+          .onChange((value: boolean) => {
+            this.update({ showTaskNotification: value });
+          }),
+      );
+
+    this.setSectionTitle("Auto Complete Tasks");
+
+    let taskAutoIncompletionEnabled = this.plugin.settings().autoComplete;
 
     new Setting(containerEl)
       .setName("Enable Automatically Mark Past Tasks Complete")
+      .setDesc(`Only apply to task list.`)
       .addToggle((toggle) =>
         toggle
           .setValue(this.plugin.settings().autoComplete)
           .onChange((value: boolean) => {
             this.update({ autoComplete: value });
+            taskAutoIncompletionEnabled = value;
+            this.display();
           }),
-      )
-      .setDesc(`Only apply to task list.`);
+      );
 
-    new Setting(containerEl)
+    const taskAutoIncompletionOption = new Setting(containerEl)
       .setName("Enable Automatically Mark Pending Tasks Incomplete")
-      .addToggle((toggle) =>
+      .setDesc(`Only apply to task list.`)
+      .setDisabled(!taskAutoIncompletionEnabled);
+
+    if (taskAutoIncompletionEnabled) {
+      taskAutoIncompletionOption.addToggle((toggle) =>
         toggle
           .setValue(this.plugin.settings().autoIncomplete)
           .onChange((value: boolean) => {
             this.update({ autoIncomplete: value });
           }),
-      )
-      .setDesc(`Only apply to task list.`);
+      );
+    }
+  }
+
+  private update(patch: Partial<DayPlannerSettings>) {
+    this.settingsStore.update((previous) => ({ ...previous, ...patch }));
+  }
+
+  private setSectionTitle(title: string) {
+    this.containerEl.createEl("h3", { text: title });
   }
 }
