@@ -11,7 +11,7 @@ jest.mock("obsidian");
 const appMock = <jest.Mock<App>>App;
 
 describe("PlanEditor", () => {
-  describe("autoCompletePastTasks", () => {
+  describe("autoCompleteTasks", () => {
     let obsidianFacadeMock: ObsidianFacade;
     let planEditor: PlanEditor;
 
@@ -32,7 +32,7 @@ describe("PlanEditor", () => {
       );
     });
 
-    describe("auto-complete", () => {
+    describe("Auto Complete Past Tasks", () => {
       it("should complete past tasks given past tasks exist", () => {
         const pastItems = [pastItem];
 
@@ -66,8 +66,8 @@ describe("PlanEditor", () => {
       });
     });
 
-    describe("auto-incomplete", () => {
-      it("should incomplete future tasks given autoIncomplete is true", () => {
+    describe("Auto Incomplete Pending Tasks", () => {
+      it("should incomplete pending tasks given autoIncomplete is true", () => {
         const planItems = [{ ...futureItem, listTokens: "- [x] " }];
 
         planEditor.autoCompleteTasks(planItems, true);
@@ -75,7 +75,7 @@ describe("PlanEditor", () => {
         expect(obsidianFacadeMock.editFile).toHaveBeenCalled();
       });
 
-      it("should NOT incomplete future tasks given autoIncomplete is false", () => {
+      it("should NOT incomplete pending tasks given autoIncomplete is false", () => {
         const planItems = [{ ...futureItem, listTokens: "- [x] " }];
 
         planEditor.autoCompleteTasks(planItems);
@@ -83,7 +83,7 @@ describe("PlanEditor", () => {
         expect(obsidianFacadeMock.editFile).not.toHaveBeenCalled();
       });
 
-      it("should NOT incomplete future tasks given task is incomplete", () => {
+      it("should NOT incomplete pending tasks given pending task is incomplete", () => {
         const planItems = [futureItem];
 
         planEditor.autoCompleteTasks(planItems, true);
