@@ -5,7 +5,6 @@ import {
   getDateFromFile,
 } from "obsidian-daily-notes-interface";
 import { getAPI } from "obsidian-dataview";
-import type { SvelteComponentDev } from "svelte/internal";
 import { get, writable, Writable } from "svelte/store";
 
 import { viewTypeTimeline, viewTypeWeekly } from "./constants";
@@ -31,14 +30,13 @@ export default class DayPlanner extends Plugin {
   private statusBar: StatusBar;
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
-  private statusBarWidget: SvelteComponentDev;
   private dataviewFacade: DataviewFacade;
-  private dataviewTasks: Writable<PlacedPlanItem[]>;
+  private timelineTasks: Writable<PlacedPlanItem[]>;
 
   async onload() {
     this.settingsStore = await this.initSettingsStore();
     this.settings = () => get(this.settingsStore);
-    this.dataviewTasks = writable([]);
+    this.timelineTasks = writable([]);
 
     this.statusBar = new StatusBar(
       this.settings,
@@ -62,7 +60,7 @@ export default class DayPlanner extends Plugin {
           this.obsidianFacade,
           this.planEditor,
           this.initWeeklyLeaf,
-          this.dataviewTasks,
+          this.timelineTasks,
         ),
     );
 
@@ -83,11 +81,29 @@ export default class DayPlanner extends Plugin {
 
     this.app.workspace.onLayoutReady(this.handleLayoutReady);
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
-    this.app.metadataCache.on("changed", async (file: TFile) => {
+    this.app.metadataCache.on("changed", async (changedFile: TFile) => {
       // todo: be clever about figuring out which days we need to update
       // todo: this is just to trigger UI update
       visibleDateRange.update((prev) => [...prev]);
-      visibleDayInTimeline.update((prev) => prev.clone());
+
+      if (this.settings().dataviewModeEnabled) {
+        return;
+      }
+
+      const noteForDayInTimeline = getDailyNote(
+        get(visibleDayInTimeline),
+        getAllDailyNotes(),
+      );
+
+      // todo: because of this, the tasks are going to become stale. We need to re-parse, when the active day changes
+      if (noteForDayInTimeline.path !== changedFile.path) {
+        return;
+      }
+
+      const parsedTasks =
+        await this.obsidianFacade.getPlanItemsFromFile(noteForDayInTimeline);
+
+      this.timelineTasks.set(addPlacing(parsedTasks));
     });
 
     // @ts-expect-error
@@ -96,8 +112,9 @@ export default class DayPlanner extends Plugin {
       const newTasks = [
         ...this.dataviewFacade.getTasksFor(get(visibleDayInTimeline)),
       ];
+      const withPlacing = newTasks.length > 0 ? addPlacing(newTasks) : [];
 
-      this.dataviewTasks.set(newTasks.length > 0 ? addPlacing(newTasks) : []);
+      this.timelineTasks.set(withPlacing);
     });
 
     this.registerInterval(
@@ -106,11 +123,6 @@ export default class DayPlanner extends Plugin {
         5000,
       ),
     );
-
-    // const statusBarItemEl = this.addStatusBarItem();
-    // this.statusBarWidget = new StatusBarWidget({
-    //   target: statusBarItemEl,
-    // });
   }
 
   private handleActiveLeafChanged = ({ view }: WorkspaceLeaf) => {

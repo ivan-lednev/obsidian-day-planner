@@ -24,19 +24,16 @@
 
   export let day: Readable<Moment>;
 
-  const { obsidianFacade, onUpdate, dataviewTasks } =
+  const { obsidianFacade, onUpdate, timelineTasks } =
     getContext<ObsidianContext>(obsidianContext);
 
   let el: HTMLDivElement;
 
   const pointerOffsetY = writable(0);
 
-  // const parsedTasks = createParsedTasks({ day, obsidianFacade });
-  const parsedTasks = dataviewTasks;
-
   $: ({ startEdit, displayedTasks, cancelEdit, editStatus, confirmEdit } =
     useEdit({
-      parsedTasks: $parsedTasks,
+      parsedTasks: $timelineTasks,
       settings,
       pointerOffsetY: pointerOffsetY,
       onUpdate,

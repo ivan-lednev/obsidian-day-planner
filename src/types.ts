@@ -73,5 +73,5 @@ export interface ObsidianContext {
   obsidianFacade: ObsidianFacade;
   onUpdate: OnUpdateFn;
   initWeeklyView: () => Promise<void>;
-  dataviewTasks: Writable<PlacedPlanItem[]>;
+  timelineTasks: Writable<PlacedPlanItem[]>;
 }

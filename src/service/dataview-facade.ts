@@ -1,16 +1,32 @@
 import { Moment } from "moment";
-import { DataviewApi, STask } from "obsidian-dataview";
+import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
+import { DataviewApi, STask, DateTime } from "obsidian-dataview";
 
 import { createPlanItem } from "../parser/parser";
+import { timeRegExp } from "../regexp";
 import { PlanItem } from "../types";
 import { getId } from "../util/id";
 import { getDiffInMinutes, getMinutesSinceMidnight } from "../util/moment";
 
-function sTaskToPlanItem(sTask: STask): PlanItem {
+type Node = { text: string; children: Node[]; scheduled?: DateTime };
+
+function sTaskToString(node: Node, indentation = "") {
+  let result = `- ${node.text}\n`;
+
+  for (const child of node.children) {
+    if (!child.scheduled && !timeRegExp.test(child.text)) {
+      result += indentation + sTaskToString(child, `\t${indentation}`);
+    }
+  }
+
+  return result;
+}
+
+function sTaskToPlanItem(sTask: STask, day: Moment): PlanItem {
   const { startTime, endTime, firstLineText, text } = createPlanItem({
     line: `- ${sTask.text}`,
-    completeContent: `- ${sTask.text}`,
-    day: window.moment(sTask.scheduled.toMillis()),
+    completeContent: sTaskToString(sTask),
+    day,
     location: {
       path: sTask.path,
       line: sTask.line,
@@ -38,13 +54,25 @@ export class DataviewFacade {
   constructor(private readonly dataview: () => DataviewApi) {}
 
   getTasksFor(day: Moment): PlanItem[] {
+    // todo: what if it doesn't exist?
+    const noteForDay = getDailyNote(day, getAllDailyNotes());
+
     return this.dataview()
       .pages()
-      .file.tasks.where(
-        (task: STask) =>
-          task.scheduled &&
-          window.moment(task.scheduled.toMillis()).isSame(day, "day"),
-      )
-      .map(sTaskToPlanItem);
+      .file.tasks.where((task: STask) => {
+        if (task.path === noteForDay.path) {
+          return true;
+        }
+
+        if (!task.scheduled) {
+          return false;
+        }
+
+        const scheduledMoment = window.moment(task.scheduled.toMillis());
+
+        return scheduledMoment.isSame(day, "day");
+      })
+      .filter((sTask: STask) => timeRegExp.test(sTask.text))
+      .map((sTask: STask) => sTaskToPlanItem(sTask, day));
   }
 }
