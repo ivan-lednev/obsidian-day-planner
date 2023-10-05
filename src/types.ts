@@ -24,16 +24,23 @@ export interface PlanItem {
   //   textWithSubItems: string;
   //   firstLineText: string
   // };
-  rawStartTime: string;
-  rawEndTime: string;
+
   listTokens: string;
   firstLineText: string;
   text: string;
-
   durationMinutes: number;
   startMinutes: number;
   location?: PlanItemLocation;
   id: string;
+
+  /**
+   * @deprecated derive it from startTime instead
+   */
+  rawStartTime: string;
+  /**
+   * @deprecated derive it from startTime and duration instead
+   */
+  rawEndTime: string;
 }
 
 export interface PlacedPlanItem extends PlanItem {
