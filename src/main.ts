@@ -61,6 +61,7 @@ export default class DayPlanner extends Plugin {
           this.obsidianFacade,
           this.planEditor,
           this.initWeeklyLeaf,
+          this.dataviewTasks,
         ),
     );
 

@@ -1,4 +1,5 @@
 import type { Moment } from "moment";
+import { Writable } from "svelte/store";
 
 import type { settingsWithUtils } from "./global-store/settings-with-utils";
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
@@ -72,4 +73,5 @@ export interface ObsidianContext {
   obsidianFacade: ObsidianFacade;
   onUpdate: OnUpdateFn;
   initWeeklyView: () => Promise<void>;
+  dataviewTasks: Writable<PlanItem[]>;
 }
