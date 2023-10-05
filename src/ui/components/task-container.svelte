@@ -19,13 +19,16 @@
   import { createPlanItem } from "../hooks/use-edit/transform/create";
   import { EditMode } from "../hooks/use-edit/types";
   import { offsetYToMinutes_NEW, useEdit } from "../hooks/use-edit/use-edit";
+  import { useTasksForDay } from "../hooks/use-tasks-for-day";
 
   import Task from "./task.svelte";
 
   export let day: Readable<Moment>;
 
-  const { obsidianFacade, onUpdate, timelineTasks } =
+  const { obsidianFacade, onUpdate, dataviewFacade, metadataCache } =
     getContext<ObsidianContext>(obsidianContext);
+
+  const tasks = useTasksForDay({ day, dataviewFacade, metadataCache });
 
   let el: HTMLDivElement;
 
@@ -33,7 +36,7 @@
 
   $: ({ startEdit, displayedTasks, cancelEdit, editStatus, confirmEdit } =
     useEdit({
-      parsedTasks: $timelineTasks,
+      parsedTasks: $tasks,
       settings,
       pointerOffsetY: pointerOffsetY,
       onUpdate,
@@ -83,7 +86,10 @@
     await obsidianFacade.revealLineInFile(path, line);
   }
 
-  async function handleGripMouseDown(event: MouseEvent, planItem: PlacedPlanItem) {
+  async function handleGripMouseDown(
+    event: MouseEvent,
+    planItem: PlacedPlanItem,
+  ) {
     // todo: this can be moved to hook
     let mode = EditMode.DRAG;
     let task = planItem;

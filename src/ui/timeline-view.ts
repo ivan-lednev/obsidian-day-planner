@@ -1,11 +1,10 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
-import { Readable } from "svelte/store";
+import { ItemView, MetadataCache, WorkspaceLeaf } from "obsidian";
 
 import { obsidianContext, viewTypeTimeline } from "../constants";
+import { DataviewFacade } from "../service/dataview-facade";
 import type { ObsidianFacade } from "../service/obsidian-facade";
 import type { PlanEditor } from "../service/plan-editor";
 import type { DayPlannerSettings } from "../settings";
-import { PlacedPlanItem } from "../types";
 
 import Timeline from "./components/timeline.svelte";
 
@@ -18,7 +17,8 @@ export default class TimelineView extends ItemView {
     private readonly obsidianFacade: ObsidianFacade,
     private readonly planEditor: PlanEditor,
     private readonly initWeeklyView: () => Promise<void>,
-    private readonly timelineTasks: Readable<PlacedPlanItem[]>,
+    private readonly dataviewFacade: DataviewFacade,
+    private readonly metadataCache: MetadataCache,
   ) {
     super(leaf);
   }
@@ -44,9 +44,10 @@ export default class TimelineView extends ItemView {
           obsidianContext,
           {
             obsidianFacade: this.obsidianFacade,
+            dataviewFacade: this.dataviewFacade,
+            metadataCache: this.metadataCache,
             onUpdate: this.planEditor.syncTasksWithFile,
             initWeeklyView: this.initWeeklyView,
-            timelineTasks: this.timelineTasks,
           },
         ],
       ]),

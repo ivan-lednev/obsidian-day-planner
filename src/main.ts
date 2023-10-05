@@ -5,18 +5,16 @@ import {
   getDateFromFile,
 } from "obsidian-daily-notes-interface";
 import { getAPI } from "obsidian-dataview";
-import { get, writable, Writable } from "svelte/store";
+import { get, Writable } from "svelte/store";
 
 import { viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { settings } from "./global-store/settings";
 import { visibleDateRange } from "./global-store/visible-date-range";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
-import { addPlacing } from "./overlap/overlap";
 import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
-import { PlacedPlanItem } from "./types";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
@@ -31,12 +29,10 @@ export default class DayPlanner extends Plugin {
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
   private dataviewFacade: DataviewFacade;
-  private timelineTasks: Writable<PlacedPlanItem[]>;
 
   async onload() {
     this.settingsStore = await this.initSettingsStore();
     this.settings = () => get(this.settingsStore);
-    this.timelineTasks = writable([]);
 
     this.statusBar = new StatusBar(
       this.settings,
@@ -60,7 +56,8 @@ export default class DayPlanner extends Plugin {
           this.obsidianFacade,
           this.planEditor,
           this.initWeeklyLeaf,
-          this.timelineTasks,
+          this.dataviewFacade,
+          this.app.metadataCache,
         ),
     );
 
@@ -84,37 +81,25 @@ export default class DayPlanner extends Plugin {
     this.app.metadataCache.on("changed", async (changedFile: TFile) => {
       // todo: be clever about figuring out which days we need to update
       // todo: this is just to trigger UI update
-      visibleDateRange.update((prev) => [...prev]);
-
-      if (this.settings().dataviewModeEnabled) {
-        return;
-      }
-
-      const noteForDayInTimeline = getDailyNote(
-        get(visibleDayInTimeline),
-        getAllDailyNotes(),
-      );
-
-      // todo: because of this, the tasks are going to become stale. We need to re-parse, when the active day changes
-      if (noteForDayInTimeline.path !== changedFile.path) {
-        return;
-      }
-
-      const parsedTasks =
-        await this.obsidianFacade.getPlanItemsFromFile(noteForDayInTimeline);
-
-      this.timelineTasks.set(addPlacing(parsedTasks));
-    });
-
-    // @ts-expect-error
-    this.app.metadataCache.on("dataview:metadata-change", () => {
-      // Note that we need to unwrap the proxy, otherwise things break
-      const newTasks = [
-        ...this.dataviewFacade.getTasksFor(get(visibleDayInTimeline)),
-      ];
-      const withPlacing = newTasks.length > 0 ? addPlacing(newTasks) : [];
-
-      this.timelineTasks.set(withPlacing);
+      // visibleDateRange.update((prev) => [...prev]);
+      //
+      // if (this.settings().dataviewModeEnabled) {
+      //   return;
+      // }
+      //
+      // const noteForDayInTimeline = getDailyNote(
+      //   get(visibleDayInTimeline),
+      //   getAllDailyNotes(),
+      // );
+      //
+      // // todo: because of this, the tasks are going to become stale. We need to re-parse, when the active day changes
+      // if (noteForDayInTimeline.path !== changedFile.path) {
+      //   return;
+      // }
+      //
+      // const parsedTasks =
+      //   await this.obsidianFacade.getPlanItemsFromFile(noteForDayInTimeline);
+      //
     });
 
     this.registerInterval(

@@ -2,7 +2,7 @@
   import { currentTime } from "../../global-store/current-time";
   import { settingsWithUtils } from "../../global-store/settings-with-utils";
   import type { PlacedPlanItem } from "../../types";
-  import { useTask } from "../hooks/use-task";
+  import { useTaskVisuals } from "../hooks/use-task-visuals";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
@@ -10,7 +10,7 @@
   export let onResizeStart: (event: MouseEvent) => void;
 
   $: ({ height, offset, relationToNow, backgroundColor, properContrastColors } =
-    useTask(planItem, {
+    useTaskVisuals(planItem, {
       settings: settingsWithUtils,
       currentTime,
     }));

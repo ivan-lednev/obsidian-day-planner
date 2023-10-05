@@ -5,7 +5,7 @@ import { settingsWithUtils } from "../../global-store/settings-with-utils";
 import { timeToMinutes } from "../../util/moment";
 
 import { basePlanItem } from "./test-utils";
-import { useTask } from "./use-task";
+import { useTaskVisuals } from "./use-task-visuals";
 
 function getBaseUseTaskProps() {
   const cursorOffsetY = writable(0);
@@ -20,7 +20,7 @@ function getBaseUseTaskProps() {
 
 // todo: use non-default zoom & start hours
 test("derives task offset from settings and time", () => {
-  const { offset, height, relationToNow } = useTask(
+  const { offset, height, relationToNow } = useTaskVisuals(
     { ...basePlanItem, startMinutes: timeToMinutes("13:00") },
     getBaseUseTaskProps(),
   );
@@ -31,7 +31,10 @@ test("derives task offset from settings and time", () => {
 });
 
 test.skip("tasks change position and size when zoom level changes", () => {
-  const { offset, height } = useTask(basePlanItem, getBaseUseTaskProps());
+  const { offset, height } = useTaskVisuals(
+    basePlanItem,
+    getBaseUseTaskProps(),
+  );
 
   // todo: this is leaking state to other tests, need to copy settings
   settingsWithUtils.settings.update((previous) => ({

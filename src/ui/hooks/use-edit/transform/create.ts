@@ -40,7 +40,7 @@ export async function createPlanItem(
     endTime: minutesToMomentOfDay(endMinutes, day),
     listTokens: "- [ ] ",
     // todo: fix this, do not check for newly created tasks using their location
-    // @ts-ignore
+    // @ts-expect-error
     location: {
       path,
     },

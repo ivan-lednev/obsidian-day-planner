@@ -1,8 +1,9 @@
 import type { Moment } from "moment";
-import { Writable } from "svelte/store";
+import { MetadataCache } from "obsidian";
 
 import type { settingsWithUtils } from "./global-store/settings-with-utils";
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
+import { DataviewFacade } from "./service/dataview-facade";
 import type { ObsidianFacade } from "./service/obsidian-facade";
 
 export interface PlanItemLocation {
@@ -17,15 +18,6 @@ export type OnUpdateFn = (
 
 export interface PlanItem {
   startTime: Moment;
-  // todo: better:
-  // raw: {
-  //   startTime: string;
-  //   endTime: string;
-  //   bullet: string;
-  //   textWithSubItems: string;
-  //   firstLineText: string
-  // };
-
   listTokens: string;
   firstLineText: string;
   text: string;
@@ -33,7 +25,6 @@ export interface PlanItem {
   startMinutes: number;
   location?: PlanItemLocation;
   id: string;
-
   /**
    * @deprecated derive it from startTime instead
    */
@@ -71,7 +62,8 @@ export type ReactiveSettingsWithUtils = typeof settingsWithUtils;
 
 export interface ObsidianContext {
   obsidianFacade: ObsidianFacade;
+  dataviewFacade: DataviewFacade;
+  metadataCache: MetadataCache;
   onUpdate: OnUpdateFn;
   initWeeklyView: () => Promise<void>;
-  timelineTasks: Writable<PlacedPlanItem[]>;
 }

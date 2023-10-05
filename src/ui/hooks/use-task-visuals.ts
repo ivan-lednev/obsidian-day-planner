@@ -12,7 +12,7 @@ interface UseTaskProps {
   currentTime: Readable<Moment>;
 }
 
-export function useTask(
+export function useTaskVisuals(
   task: PlacedPlanItem,
   { settings, currentTime }: UseTaskProps,
 ) {

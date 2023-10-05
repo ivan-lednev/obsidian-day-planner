@@ -40,7 +40,10 @@ function sTaskToPlanItem(sTask: STask, day: Moment): PlanItem {
     listTokens: `${sTask.symbol} `,
     firstLineText,
     text,
-    durationMinutes: getDiffInMinutes(endTime, startTime),
+    durationMinutes: getDiffInMinutes(
+      endTime || startTime.clone().add(30, "minutes"),
+      startTime,
+    ),
     startMinutes: getMinutesSinceMidnight(startTime),
     location: {
       path: sTask.path,
@@ -60,6 +63,10 @@ export class DataviewFacade {
     return this.dataview()
       .pages()
       .file.tasks.where((task: STask) => {
+        if (!timeRegExp.test(task.text)) {
+          return false;
+        }
+
         if (task.path === noteForDay.path) {
           return true;
         }
@@ -72,7 +79,6 @@ export class DataviewFacade {
 
         return scheduledMoment.isSame(day, "day");
       })
-      .filter((sTask: STask) => timeRegExp.test(sTask.text))
       .map((sTask: STask) => sTaskToPlanItem(sTask, day));
   }
 }
