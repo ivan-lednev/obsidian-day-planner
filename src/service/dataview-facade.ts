@@ -7,7 +7,7 @@ import { getId } from "../util/id";
 import { getDiffInMinutes, getMinutesSinceMidnight } from "../util/moment";
 
 function sTaskToPlanItem(sTask: STask): PlanItem {
-  const { startTime, endTime } = createPlanItem({
+  const { startTime, endTime, firstLineText, text } = createPlanItem({
     line: `- ${sTask.text}`,
     completeContent: `- ${sTask.text}`,
     day: window.moment(sTask.scheduled.toMillis()),
@@ -22,8 +22,8 @@ function sTaskToPlanItem(sTask: STask): PlanItem {
     rawStartTime: "-",
     rawEndTime: "-",
     listTokens: `${sTask.symbol} `,
-    firstLineText: sTask.text,
-    text: sTask.text,
+    firstLineText,
+    text,
     durationMinutes: getDiffInMinutes(endTime, startTime),
     startMinutes: getMinutesSinceMidnight(startTime),
     location: {

@@ -12,11 +12,12 @@ import { viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { settings } from "./global-store/settings";
 import { visibleDateRange } from "./global-store/visible-date-range";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
+import { addPlacing } from "./overlap/overlap";
 import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
-import { PlanItem } from "./types";
+import { PlacedPlanItem } from "./types";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
@@ -32,7 +33,7 @@ export default class DayPlanner extends Plugin {
   private planEditor: PlanEditor;
   private statusBarWidget: SvelteComponentDev;
   private dataviewFacade: DataviewFacade;
-  private dataviewTasks: Writable<PlanItem[]>;
+  private dataviewTasks: Writable<PlacedPlanItem[]>;
 
   async onload() {
     this.settingsStore = await this.initSettingsStore();
@@ -91,9 +92,12 @@ export default class DayPlanner extends Plugin {
 
     // @ts-expect-error
     this.app.metadataCache.on("dataview:metadata-change", () => {
-      this.dataviewTasks.set([
+      // Note that we need to unwrap the proxy, otherwise things break
+      const newTasks = [
         ...this.dataviewFacade.getTasksFor(get(visibleDayInTimeline)),
-      ]);
+      ];
+
+      this.dataviewTasks.set(newTasks.length > 0 ? addPlacing(newTasks) : []);
     });
 
     this.registerInterval(

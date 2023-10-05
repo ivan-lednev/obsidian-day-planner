@@ -19,20 +19,20 @@
   import { createPlanItem } from "../hooks/use-edit/transform/create";
   import { EditMode } from "../hooks/use-edit/types";
   import { offsetYToMinutes_NEW, useEdit } from "../hooks/use-edit/use-edit";
-  import { createParsedTasks } from "../stores/parsed-tasks";
 
   import Task from "./task.svelte";
 
   export let day: Readable<Moment>;
 
-  const { obsidianFacade, onUpdate } =
+  const { obsidianFacade, onUpdate, dataviewTasks } =
     getContext<ObsidianContext>(obsidianContext);
 
   let el: HTMLDivElement;
 
   const pointerOffsetY = writable(0);
 
-  const parsedTasks = createParsedTasks({ day, obsidianFacade });
+  // const parsedTasks = createParsedTasks({ day, obsidianFacade });
+  const parsedTasks = dataviewTasks;
 
   $: ({ startEdit, displayedTasks, cancelEdit, editStatus, confirmEdit } =
     useEdit({
