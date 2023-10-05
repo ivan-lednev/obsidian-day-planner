@@ -6,7 +6,7 @@ import {
 } from "obsidian-daily-notes-interface";
 import { getAPI } from "obsidian-dataview";
 import type { SvelteComponentDev } from "svelte/internal";
-import { get, Writable } from "svelte/store";
+import { get, writable, Writable } from "svelte/store";
 
 import { viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { settings } from "./global-store/settings";
@@ -16,6 +16,7 @@ import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
+import { PlanItem } from "./types";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
@@ -31,10 +32,12 @@ export default class DayPlanner extends Plugin {
   private planEditor: PlanEditor;
   private statusBarWidget: SvelteComponentDev;
   private dataviewFacade: DataviewFacade;
+  private dataviewTasks: Writable<PlanItem[]>;
 
   async onload() {
     this.settingsStore = await this.initSettingsStore();
     this.settings = () => get(this.settingsStore);
+    this.dataviewTasks = writable([]);
 
     this.statusBar = new StatusBar(
       this.settings,
@@ -46,7 +49,8 @@ export default class DayPlanner extends Plugin {
 
     this.obsidianFacade = new ObsidianFacade(this.app, this.settings);
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
-    this.dataviewFacade = new DataviewFacade(getAPI(this.app));
+    // todo: it's unclear why it's sometimes undefined. Perhaps it has to do with the load order
+    this.dataviewFacade = new DataviewFacade(() => getAPI(this.app));
 
     this.registerView(
       viewTypeTimeline,
@@ -83,10 +87,12 @@ export default class DayPlanner extends Plugin {
       visibleDateRange.update((prev) => [...prev]);
       visibleDayInTimeline.update((prev) => prev.clone());
     });
-    // @ts-ignore
+
+    // @ts-expect-error
     this.app.metadataCache.on("dataview:metadata-change", () => {
-      // todo: remove copy-paste
-      console.log(this.dataviewFacade.main());
+      this.dataviewTasks.set([
+        ...this.dataviewFacade.getTasksFor(get(visibleDayInTimeline)),
+      ]);
     });
 
     this.registerInterval(
