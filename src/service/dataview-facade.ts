@@ -17,9 +17,7 @@ interface Node {
 }
 
 function sTaskLineToString(node: Node) {
-  const status = node.status ? `[${node.status}] ` : " ";
-
-  return `${node.symbol} ${status} ${node.text}\n`;
+  return `${node.symbol} [${node.status}] ${node.text}\n`;
 }
 
 function sTaskToString(node: Node, indentation = "") {
@@ -79,7 +77,7 @@ export class DataviewFacade {
           return false;
         }
 
-        if (task.path === noteForDay.path) {
+        if (task.path === noteForDay?.path) {
           return true;
         }
 

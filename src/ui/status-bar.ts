@@ -88,7 +88,6 @@ export class StatusBar {
       return;
     }
 
-    console.log({ planItems });
     // todo: move calculations out
     const currentItem = planItems[currentItemIndex];
     const nextItem = planItems[currentItemIndex + 1];

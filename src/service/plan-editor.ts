@@ -71,10 +71,12 @@ export class PlanEditor {
       .map((line, index) => {
         // todo: if a task is newly created, it's not going to have a line. We need a clearer way to track this information
         if (index === task.location?.line) {
-          return this.taskLineToString(task, {
+          const taskAsString = this.taskLineToString(task, {
             startMinutes: task.startMinutes,
             durationMinutes: task.durationMinutes,
           });
+
+          return line.replace(/^(\s*).+/, `$1${taskAsString}`);
         }
 
         return line;
