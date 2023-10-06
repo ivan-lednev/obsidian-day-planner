@@ -117,7 +117,7 @@ export default class DayPlanner extends Plugin {
 
     const dayUserSwitchedTo = getDateFromFile(view.file, "day");
 
-    if (dayUserSwitchedTo.isSame(get(visibleDayInTimeline), "day")) {
+    if (dayUserSwitchedTo?.isSame(get(visibleDayInTimeline), "day")) {
       return;
     }
 

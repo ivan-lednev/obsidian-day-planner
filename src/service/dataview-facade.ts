@@ -21,11 +21,11 @@ function sTaskLineToString(node: Node) {
 }
 
 function sTaskToString(node: Node, indentation = "") {
-  let result = sTaskLineToString(node);
+  let result = `${indentation}${sTaskLineToString(node)}`;
 
   for (const child of node.children) {
     if (!child.scheduled && !timeRegExp.test(child.text)) {
-      result += indentation + sTaskToString(child, `\t${indentation}`);
+      result += sTaskToString(child, `\t${indentation}`);
     }
   }
 

@@ -1,6 +1,5 @@
 import { Moment } from "moment";
 import { MetadataCache, TFile } from "obsidian";
-import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { onDestroy } from "svelte";
 import { get, Readable, writable } from "svelte/store";
 
@@ -28,10 +27,12 @@ export function useTasksForDay({
   }
 
   async function handleChanged(operation: string, changedFile: TFile) {
-    const noteForDay = getDailyNote(get(day), getAllDailyNotes());
+    const taskPaths = get(tasks).map((task) => task.location.path);
+    const relatedFileChanged = taskPaths.some(
+      (path) => path === changedFile.path,
+    );
 
-    // todo: we should filter for paths of any task present in timeline
-    if (noteForDay.path === changedFile.path) {
+    if (relatedFileChanged) {
       tasks.set(getPlacedTasksFor(get(day)));
     }
   }
