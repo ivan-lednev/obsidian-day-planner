@@ -1,6 +1,7 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
+import { ItemView, MetadataCache, WorkspaceLeaf } from "obsidian";
 
 import { obsidianContext, viewTypeWeekly } from "../constants";
+import { DataviewFacade } from "../service/dataview-facade";
 import type { ObsidianFacade } from "../service/obsidian-facade";
 import type { PlanEditor } from "../service/plan-editor";
 import type { DayPlannerSettings } from "../settings";
@@ -17,6 +18,8 @@ export default class WeeklyView extends ItemView {
     private readonly settings: () => DayPlannerSettings,
     private readonly obsidianFacade: ObsidianFacade,
     private readonly planEditor: PlanEditor,
+    private readonly dataviewFacade: DataviewFacade,
+    private readonly metadataCache: MetadataCache,
   ) {
     super(leaf);
   }
@@ -53,6 +56,8 @@ export default class WeeklyView extends ItemView {
           obsidianContext,
           {
             obsidianFacade: this.obsidianFacade,
+            dataviewFacade: this.dataviewFacade,
+            metadataCache: this.metadataCache,
             onUpdate: this.planEditor.syncTasksWithFile,
           },
         ],

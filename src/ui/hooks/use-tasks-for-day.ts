@@ -27,9 +27,10 @@ export function useTasksForDay({
     return tasks.length > 0 ? addPlacing(tasks) : [];
   }
 
-  async function handleChanged(changedFile: TFile) {
+  async function handleChanged(operation: string, changedFile: TFile) {
     const noteForDay = getDailyNote(get(day), getAllDailyNotes());
 
+    // todo: we should filter for paths of any task present in timeline
     if (noteForDay.path === changedFile.path) {
       tasks.set(getPlacedTasksFor(get(day)));
     }

@@ -69,6 +69,8 @@ export default class DayPlanner extends Plugin {
           this.settings,
           this.obsidianFacade,
           this.planEditor,
+          this.dataviewFacade,
+          this.app.metadataCache,
         ),
     );
 
