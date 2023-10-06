@@ -5,11 +5,9 @@ import {
   createDailyNote,
   getAllDailyNotes,
   getDailyNote,
-  getDateFromFile,
 } from "obsidian-daily-notes-interface";
-import { isInstanceOf, isNotVoid } from "typed-assert";
+import { isInstanceOf } from "typed-assert";
 
-import { parsePlanItems } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
 
 export class ObsidianFacade {
@@ -26,7 +24,6 @@ export class ObsidianFacade {
     return this.app.workspace.activeEditor?.editor;
   }
 
-  // todo: this class should not know about daily notes
   async openFileForDay(moment: Moment) {
     const dailyNote =
       getDailyNote(moment, getAllDailyNotes()) ||
@@ -70,32 +67,5 @@ export class ObsidianFacade {
     const newContents = editFn(contents);
 
     await this.app.vault.modify(file, newContents);
-  }
-
-  // todo: move to plan-editor. it should be a wrapper for plans
-  async getPlanItemsFromFile(file: TFile) {
-    if (!file) {
-      return [];
-    }
-
-    const { plannerHeading } = this.settings();
-
-    const fileContents = await this.app.vault.read(file);
-    const metadata = this.app.metadataCache.getFileCache(file);
-
-    const fileDay = getDateFromFile(file, "day");
-
-    isNotVoid(
-      fileDay,
-      `Tried to parse plan in file that is not a daily note: ${file.path}`,
-    );
-
-    return parsePlanItems(
-      fileContents,
-      metadata,
-      plannerHeading,
-      file.path,
-      fileDay,
-    );
   }
 }

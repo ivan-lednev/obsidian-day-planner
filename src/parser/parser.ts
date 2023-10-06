@@ -1,61 +1,12 @@
 import type { Moment } from "moment";
-import type { CachedMetadata, ListItemCache } from "obsidian";
+import type { CachedMetadata } from "obsidian";
 import { dedent } from "ts-dedent";
 
-import { isTopLevelListItem } from "../../obsidian-metadata-utils/src/list";
-import { getTextAtPosition } from "../../obsidian-metadata-utils/src/position";
 import { timestampRegExp } from "../regexp";
-import type { PlanItem, PlanItemLocation } from "../types";
+import type { PlanItemLocation } from "../types";
 import { getId } from "../util/id";
-import { getMinutesSinceMidnightOfDayTo } from "../util/moment";
-import { getEndTime } from "../util/task-utils";
 
-import { calculateDefaultDuration } from "./calculate-default-duration";
 import { parseTimestamp } from "./timestamp/timestamp";
-
-export function parsePlanItems(
-  content: string,
-  metadata: CachedMetadata,
-  planHeadingContent: string,
-  path: string,
-  day: Moment,
-): PlanItem[] {
-  const listItemsUnderPlan = getListItemsUnderHeading(
-    metadata,
-    planHeadingContent,
-  );
-
-  if (!listItemsUnderPlan) {
-    return [];
-  }
-
-  const listItemsWithContent = getListItemContent(content, listItemsUnderPlan);
-  return listItemsWithContent
-    .map((li) =>
-      createPlanItem({
-        line: li.listItemLineContent,
-        completeContent: li.listItemCompleteContent,
-        location: { path, line: li.line },
-        day,
-      }),
-    )
-    .filter((item) => item !== null)
-    .map((item, index, items) => {
-      const next = items[index + 1];
-
-      const durationMinutes = calculateDefaultDuration(item, next);
-
-      const endTime = item.endTime || getEndTime({ ...item, durationMinutes });
-
-      return {
-        ...item,
-        endTime,
-        startMinutes: getMinutesSinceMidnightOfDayTo(day, item.startTime),
-        durationMinutes,
-      };
-    })
-    .sort((a, b) => a.startMinutes - b.startMinutes);
-}
 
 // todo: this belongs to metadata-utils
 export function getListItemsUnderHeading(
@@ -158,39 +109,4 @@ function getDisplayedText(
   const formattedLinesAfterFirst = dedent(linesAfterFirst).trimStart();
 
   return `${text}\n${formattedLinesAfterFirst}`;
-}
-
-function groupTopListItemsWithDescendants(listItems: ListItemCache[]) {
-  return listItems.reduce((result, current) => {
-    if (isTopLevelListItem(current)) {
-      result.push({ root: current, descendants: [] });
-    } else {
-      const previousTopListItem = result[result.length - 1];
-      previousTopListItem.descendants.push(current);
-    }
-
-    return result;
-  }, []);
-}
-
-function getListItemContent(content: string, listItems: ListItemCache[]) {
-  return groupTopListItemsWithDescendants(listItems).map(
-    ({ root, descendants }) => {
-      const lastDescendantPosition =
-        descendants?.[descendants.length - 1]?.position?.end;
-      const betweenRootAndLastDescendant = {
-        start: root.position.start,
-        end: lastDescendantPosition || root.position.end,
-      };
-
-      return {
-        line: root.position.start.line,
-        listItemLineContent: getTextAtPosition(content, root.position),
-        listItemCompleteContent: getTextAtPosition(
-          content,
-          betweenRootAndLastDescendant,
-        ),
-      };
-    },
-  );
 }

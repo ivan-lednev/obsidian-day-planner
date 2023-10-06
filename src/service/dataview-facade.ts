@@ -2,6 +2,7 @@ import { Moment } from "moment";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { DataviewApi, STask, DateTime } from "obsidian-dataview";
 
+import { defaultDurationMinutes } from "../constants";
 import { createPlanItem } from "../parser/parser";
 import { timeRegExp } from "../regexp";
 import { PlanItem } from "../types";
@@ -40,6 +41,7 @@ function sTaskToPlanItem(sTask: STask, day: Moment): PlanItem {
     location: {
       path: sTask.path,
       line: sTask.line,
+      position: sTask.position,
     },
   });
 
@@ -51,13 +53,14 @@ function sTaskToPlanItem(sTask: STask, day: Moment): PlanItem {
     firstLineText,
     text,
     durationMinutes: getDiffInMinutes(
-      endTime || startTime.clone().add(30, "minutes"),
+      endTime || startTime.clone().add(defaultDurationMinutes, "minutes"),
       startTime,
     ),
     startMinutes: getMinutesSinceMidnight(startTime),
     location: {
       path: sTask.path,
       line: sTask.line,
+      position: sTask.position,
     },
     id: getId(),
   };

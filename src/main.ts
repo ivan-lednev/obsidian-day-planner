@@ -1,9 +1,5 @@
-import { FileView, Plugin, TFile, WorkspaceLeaf } from "obsidian";
-import {
-  getAllDailyNotes,
-  getDailyNote,
-  getDateFromFile,
-} from "obsidian-daily-notes-interface";
+import { FileView, Plugin, WorkspaceLeaf } from "obsidian";
+import { getDateFromFile } from "obsidian-daily-notes-interface";
 import { getAPI } from "obsidian-dataview";
 import { get, Writable } from "svelte/store";
 
@@ -78,29 +74,6 @@ export default class DayPlanner extends Plugin {
 
     this.app.workspace.onLayoutReady(this.handleLayoutReady);
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
-    this.app.metadataCache.on("changed", async (changedFile: TFile) => {
-      // todo: be clever about figuring out which days we need to update
-      // todo: this is just to trigger UI update
-      // visibleDateRange.update((prev) => [...prev]);
-      //
-      // if (this.settings().dataviewModeEnabled) {
-      //   return;
-      // }
-      //
-      // const noteForDayInTimeline = getDailyNote(
-      //   get(visibleDayInTimeline),
-      //   getAllDailyNotes(),
-      // );
-      //
-      // // todo: because of this, the tasks are going to become stale. We need to re-parse, when the active day changes
-      // if (noteForDayInTimeline.path !== changedFile.path) {
-      //   return;
-      // }
-      //
-      // const parsedTasks =
-      //   await this.obsidianFacade.getPlanItemsFromFile(noteForDayInTimeline);
-      //
-    });
 
     this.registerInterval(
       window.setInterval(
@@ -194,8 +167,7 @@ export default class DayPlanner extends Plugin {
 
   private updateStatusBar = async () => {
     if (dailyNoteExists()) {
-      const note = getDailyNote(window.moment(), getAllDailyNotes());
-      const planItems = await this.obsidianFacade.getPlanItemsFromFile(note);
+      const planItems = this.dataviewFacade.getTasksFor(window.moment());
       await this.statusBar.update(planItems);
     } else {
       this.statusBar.setEmpty();

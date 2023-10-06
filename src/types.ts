@@ -1,5 +1,5 @@
 import type { Moment } from "moment";
-import { MetadataCache } from "obsidian";
+import { MetadataCache, Pos } from "obsidian";
 
 import type { settingsWithUtils } from "./global-store/settings-with-utils";
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
@@ -9,6 +9,7 @@ import type { ObsidianFacade } from "./service/obsidian-facade";
 export interface PlanItemLocation {
   path: string;
   line: number;
+  position: Pos;
 }
 
 export type OnUpdateFn = (

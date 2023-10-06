@@ -18,6 +18,18 @@ export const basePlanItem: PlacedPlanItem = {
   location: {
     path: "path",
     line: 0,
+    position: {
+      start: {
+        line: 0,
+        col: 0,
+        offset: 0,
+      },
+      end: {
+        line: 0,
+        col: 0,
+        offset: 0,
+      },
+    },
   },
   id: "id",
 };

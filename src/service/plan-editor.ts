@@ -86,19 +86,21 @@ export class PlanEditor {
     return `${headingTokens} ${plannerHeading}`;
   }
 
-  // todo: we might want to update not only duration. Better: syncTaskWithNote
   private updateTaskInFileContents(contents: string, task: PlanItem) {
     return contents
       .split("\n")
       .map((line, index) => {
         // todo: if a task is newly created, it's not going to have a line. We need a clearer way to track this information
+        //  once this is done, remove optional chaining
         if (index === task.location?.line) {
           const taskAsString = this.taskLineToString(task, {
             startMinutes: task.startMinutes,
             durationMinutes: task.durationMinutes,
           });
 
-          return line.replace(/^(\s*).+/, `$1${taskAsString}`);
+          return (
+            line.substring(0, task.location.position.start.col) + taskAsString
+          );
         }
 
         return line;
