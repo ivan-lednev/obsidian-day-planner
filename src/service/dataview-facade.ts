@@ -37,7 +37,7 @@ function sTaskToPlanItem(sTask: STask, day: Moment): PlanItem {
     startTime,
     rawStartTime: "-",
     rawEndTime: "-",
-    listTokens: `${sTask.symbol} `,
+    listTokens: `${sTask.symbol} [${sTask.status}] `,
     firstLineText,
     text,
     durationMinutes: getDiffInMinutes(
