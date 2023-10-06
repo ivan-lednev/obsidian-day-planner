@@ -1,9 +1,6 @@
-import { ItemView, MetadataCache, WorkspaceLeaf } from "obsidian";
+import { ItemView, WorkspaceLeaf } from "obsidian";
 
-import { obsidianContext, viewTypeWeekly } from "../constants";
-import { DataviewFacade } from "../service/dataview-facade";
-import type { ObsidianFacade } from "../service/obsidian-facade";
-import type { PlanEditor } from "../service/plan-editor";
+import { viewTypeWeekly } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 
 import HeaderActions from "./components/week/header-actions.svelte";
@@ -16,10 +13,7 @@ export default class WeeklyView extends ItemView {
   constructor(
     leaf: WorkspaceLeaf,
     private readonly settings: () => DayPlannerSettings,
-    private readonly obsidianFacade: ObsidianFacade,
-    private readonly planEditor: PlanEditor,
-    private readonly dataviewFacade: DataviewFacade,
-    private readonly metadataCache: MetadataCache,
+    private readonly componentContext: Map<string, Record<string, unknown>>,
   ) {
     super(leaf);
   }
@@ -51,17 +45,7 @@ export default class WeeklyView extends ItemView {
 
     this.weekComponent = new Week({
       target: contentEl,
-      context: new Map([
-        [
-          obsidianContext,
-          {
-            obsidianFacade: this.obsidianFacade,
-            dataviewFacade: this.dataviewFacade,
-            metadataCache: this.metadataCache,
-            onUpdate: this.planEditor.syncTasksWithFile,
-          },
-        ],
-      ]),
+      context: this.componentContext,
     });
   }
 

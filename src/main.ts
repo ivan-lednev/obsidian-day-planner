@@ -7,7 +7,7 @@ import {
 import { getAPI } from "obsidian-dataview";
 import { get, Writable } from "svelte/store";
 
-import { viewTypeTimeline, viewTypeWeekly } from "./constants";
+import { obsidianContext, viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { settings } from "./global-store/settings";
 import { visibleDateRange } from "./global-store/visible-date-range";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
@@ -47,31 +47,29 @@ export default class DayPlanner extends Plugin {
     // todo: it's unclear why it's sometimes undefined. Perhaps it has to do with the load order
     this.dataviewFacade = new DataviewFacade(() => getAPI(this.app));
 
+    const componentContext = new Map([
+      [
+        obsidianContext,
+        {
+          obsidianFacade: this.obsidianFacade,
+          dataviewFacade: this.dataviewFacade,
+          metadataCache: this.app.metadataCache,
+          onUpdate: this.planEditor.syncTasksWithFile,
+          initWeeklyView: this.initWeeklyLeaf,
+        },
+      ],
+    ]);
+
     this.registerView(
       viewTypeTimeline,
       (leaf: WorkspaceLeaf) =>
-        new TimelineView(
-          leaf,
-          this.settings,
-          this.obsidianFacade,
-          this.planEditor,
-          this.initWeeklyLeaf,
-          this.dataviewFacade,
-          this.app.metadataCache,
-        ),
+        new TimelineView(leaf, this.settings, componentContext),
     );
 
     this.registerView(
       viewTypeWeekly,
       (leaf: WorkspaceLeaf) =>
-        new WeeklyView(
-          leaf,
-          this.settings,
-          this.obsidianFacade,
-          this.planEditor,
-          this.dataviewFacade,
-          this.app.metadataCache,
-        ),
+        new WeeklyView(leaf, this.settings, componentContext),
     );
 
     this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
