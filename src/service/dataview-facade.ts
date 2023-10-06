@@ -8,10 +8,22 @@ import { PlanItem } from "../types";
 import { getId } from "../util/id";
 import { getDiffInMinutes, getMinutesSinceMidnight } from "../util/moment";
 
-type Node = { text: string; children: Node[]; scheduled?: DateTime };
+interface Node {
+  text: string;
+  symbol: string;
+  children: Node[];
+  status?: string;
+  scheduled?: DateTime;
+}
+
+function sTaskLineToString(node: Node) {
+  const status = node.status ? `[${node.status}] ` : " ";
+
+  return `${node.symbol} ${status} ${node.text}\n`;
+}
 
 function sTaskToString(node: Node, indentation = "") {
-  let result = `- ${node.text}\n`;
+  let result = sTaskLineToString(node);
 
   for (const child of node.children) {
     if (!child.scheduled && !timeRegExp.test(child.text)) {
@@ -24,7 +36,7 @@ function sTaskToString(node: Node, indentation = "") {
 
 function sTaskToPlanItem(sTask: STask, day: Moment): PlanItem {
   const { startTime, endTime, firstLineText, text } = createPlanItem({
-    line: `- ${sTask.text}`,
+    line: sTaskLineToString(sTask),
     completeContent: sTaskToString(sTask),
     day,
     location: {
