@@ -22,29 +22,39 @@ export class PlanEditor {
     );
 
     const dirty = difference(updated, pristine);
-    const [edited, created] = partition((task) => task.location.line, dirty);
-    const path = updated[0].location.path;
+    const [edited, created] = partition(
+      (task) => task.location.line !== undefined,
+      dirty,
+    );
 
-    await this.obsidianFacade.editFile(path, (contents) => {
-      const withUpdatedEdited = edited.reduce(
-        (result, current) => this.updateTaskInFileContents(result, current),
-        contents,
-      );
-
-      const createdList = created.map((task) =>
-        this.taskLineToString(task, { ...task }),
-      );
-      const metadata = this.obsidianFacade.getMetadataForPath(path) || {};
-      const [planEndLine, splitContents] = this.getPlanEndLine(
-        withUpdatedEdited.split("\n"),
-        metadata,
-      );
-
-      const result = [...splitContents];
-      result.splice(planEndLine + 1, 0, ...createdList);
-      return result.join("\n");
-    });
+    return Promise.all([
+      ...edited.map(async (task) => {
+        await this.obsidianFacade.editFile(task.location.path, (contents) => {
+          return this.updateTaskInFileContents(contents, task);
+        });
+      }),
+      ...created.map(async (task) => {
+        await this.obsidianFacade.editFile(task.location.path, (contents) => {
+          return this.writeTaskToFileContents(task, contents);
+        });
+      }),
+    ]);
   };
+
+  writeTaskToFileContents(task: PlanItem, contents: string) {
+    const metadata =
+      this.obsidianFacade.getMetadataForPath(task.location.path) || {};
+    const [planEndLine, splitContents] = this.getPlanEndLine(
+      contents.split("\n"),
+      metadata,
+    );
+
+    const result = [...splitContents];
+
+    result.splice(planEndLine + 1, 0, this.taskLineToString(task, { ...task }));
+
+    return result.join("\n");
+  }
 
   createPlannerHeading() {
     const { plannerHeading, plannerHeadingLevel } = this.settings();

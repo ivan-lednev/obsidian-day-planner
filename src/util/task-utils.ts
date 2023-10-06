@@ -11,15 +11,6 @@ export function isEqualTask(a: PlanItem, b: PlanItem) {
   );
 }
 
-export function createTask(original?: PlanItem) {
-  return {
-    ...(original || {}),
-    get endMinutes() {
-      return this.startMinutes + this.durationMinutes;
-    },
-  };
-}
-
 export function getEndMinutes(task: {
   startMinutes: number;
   durationMinutes: number;
