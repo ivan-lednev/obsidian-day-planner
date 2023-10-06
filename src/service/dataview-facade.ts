@@ -67,7 +67,6 @@ export class DataviewFacade {
   constructor(private readonly dataview: () => DataviewApi) {}
 
   getTasksFor(day: Moment): PlanItem[] {
-    // todo: what if it doesn't exist?
     const noteForDay = getDailyNote(day, getAllDailyNotes());
 
     return this.dataview()
@@ -89,6 +88,8 @@ export class DataviewFacade {
 
         return scheduledMoment.isSame(day, "day");
       })
-      .map((sTask: STask) => sTaskToPlanItem(sTask, day));
+      .map((sTask: STask) => sTaskToPlanItem(sTask, day))
+      .sort((task: PlanItem) => task.startMinutes)
+      .array();
   }
 }

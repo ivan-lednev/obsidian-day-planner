@@ -5,9 +5,7 @@
   import { Readable, writable } from "svelte/store";
 
   import { obsidianContext } from "../../constants";
-  import {
-    editCancellation,
-  } from "../../global-store/edit-events";
+  import { editCancellation } from "../../global-store/edit-events";
   import { settings } from "../../global-store/settings";
   import { snap } from "../../global-store/settings-utils";
   import type { ObsidianContext, PlacedPlanItem, PlanItem } from "../../types";

@@ -1,4 +1,4 @@
-import { difference, partition } from "lodash/fp";
+import { difference, groupBy, partition } from "lodash/fp";
 import type { Moment } from "moment";
 import type { CachedMetadata } from "obsidian";
 
@@ -27,18 +27,40 @@ export class PlanEditor {
       dirty,
     );
 
-    return Promise.all([
-      ...edited.map(async (task) => {
-        await this.obsidianFacade.editFile(task.location.path, (contents) => {
-          return this.updateTaskInFileContents(contents, task);
-        });
-      }),
-      ...created.map(async (task) => {
-        await this.obsidianFacade.editFile(task.location.path, (contents) => {
-          return this.writeTaskToFileContents(task, contents);
-        });
-      }),
-    ]);
+    if (created.length > 1) {
+      throw new Error("Creating more than 1 task is not supported");
+    }
+
+    if (edited.length > 0 && created.length > 0) {
+      throw new Error(
+        "Creating and editing at the same time is not supported and might cause inconsistent behaviors due to race conditions",
+      );
+    }
+
+    if (created.length > 0) {
+      const task = created[0];
+
+      return this.obsidianFacade.editFile(task.location.path, (contents) => {
+        return this.writeTaskToFileContents(task, contents);
+      });
+    }
+
+    const pathToEditedTasksLookup = groupBy(
+      (task) => task.location.path,
+      edited,
+    );
+
+    const editPromises = Object.keys(pathToEditedTasksLookup).map(
+      async (path) =>
+        await this.obsidianFacade.editFile(path, (contents) =>
+          pathToEditedTasksLookup[path].reduce(
+            (result, current) => this.updateTaskInFileContents(result, current),
+            contents,
+          ),
+        ),
+    );
+
+    return Promise.all(editPromises);
   };
 
   writeTaskToFileContents(task: PlanItem, contents: string) {
