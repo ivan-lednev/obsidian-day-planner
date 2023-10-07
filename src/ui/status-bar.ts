@@ -172,8 +172,8 @@ export class StatusBar {
     const trimmedNow = ellipsis(currentItem.firstLineText, 15);
     const trimmedNext = nextItem ? ellipsis(nextItem.firstLineText, 15) : "";
     this.statusBarText.textContent =
-      `▶ ${trimmedNow} (-${timeLeft})` +
-      (trimmedNext.length > 0 ? " ▶▶ " + trimmedNext : "");
+      `Now: ${trimmedNow} (-${timeLeft})` +
+      (trimmedNext.length > 0 ? " Next: " + trimmedNext : "");
   }
 
   private taskNotification(

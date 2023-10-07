@@ -19,6 +19,9 @@ export type OnUpdateFn = (
 
 export interface PlanItem {
   startTime: Moment;
+  /**
+   * @deprecated this will be replaced with dataview `symbol` and `status`
+   */
   listTokens: string;
   firstLineText: string;
   text: string;

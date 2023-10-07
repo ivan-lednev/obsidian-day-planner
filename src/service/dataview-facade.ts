@@ -18,7 +18,8 @@ interface Node {
 }
 
 function sTaskLineToString(node: Node) {
-  return `${node.symbol} [${node.status}] ${node.text}\n`;
+  const status = node.status ? `[${node.status}] ` : "";
+  return `${node.symbol} ${status}${node.text}\n`;
 }
 
 function sTaskToString(node: Node, indentation = "") {

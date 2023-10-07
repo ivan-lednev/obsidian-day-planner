@@ -12,7 +12,6 @@ interface UseTaskSourceProps {
   dataviewFacade: DataviewFacade;
 }
 
-// todo: this is a custom store, not a hook
 export function useTasksForDay({
   day,
   metadataCache,
@@ -22,8 +21,7 @@ export function useTasksForDay({
   const tasks = writable(initial);
 
   function getPlacedTasksFor(moment: Moment) {
-    const tasks = [...dataviewFacade.getTasksFor(moment)];
-    return tasks.length > 0 ? addPlacing(tasks) : [];
+    return addPlacing(dataviewFacade.getTasksFor(moment));
   }
 
   async function handleChanged(operation: string, changedFile: TFile) {

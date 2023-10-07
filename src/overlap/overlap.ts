@@ -118,6 +118,10 @@ function overlaps(a: TimeBlock, b: TimeBlock) {
 }
 
 export function addPlacing(planItems: PlanItem[]) {
+  if (planItems.length === 0) {
+    return [];
+  }
+
   const overlapLookup = computeOverlap(planItems);
 
   return planItems.map((planItem) => {
