@@ -14,8 +14,8 @@ interface UseEditProps {
   onUpdate: OnUpdateFn;
 }
 
-// todo: this is duplicated, but this version is more efficient
-export function offsetYToMinutes_NEW(
+// todo: move to utils
+export function offsetYToMinutes(
   offsetY: number,
   zoomLevel: number,
   startHour: number,
@@ -41,7 +41,7 @@ export function useEdit({
         return $baselineTasks;
       }
 
-      const cursorMinutes = offsetYToMinutes_NEW(
+      const cursorMinutes = offsetYToMinutes(
         $pointerOffsetY,
         $settings.zoomLevel,
         $settings.startHour,

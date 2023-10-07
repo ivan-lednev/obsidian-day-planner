@@ -15,7 +15,7 @@
   import { cursorForMode } from "../hooks/use-edit/cursor";
   import { createPlanItem } from "../hooks/use-edit/transform/create";
   import { EditMode } from "../hooks/use-edit/types";
-  import { offsetYToMinutes_NEW, useEdit } from "../hooks/use-edit/use-edit";
+  import { offsetYToMinutes, useEdit } from "../hooks/use-edit/use-edit";
   import { useTasksForDay } from "../hooks/use-tasks-for-day";
 
   import Task from "./task.svelte";
@@ -50,7 +50,7 @@
   async function handleMouseDown() {
     const newTask = await createPlanItem(
       $day,
-      offsetYToMinutes_NEW(
+      offsetYToMinutes(
         $pointerOffsetY,
         $settings.zoomLevel,
         $settings.startHour,

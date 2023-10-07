@@ -1,4 +1,4 @@
-import { derived, get } from "svelte/store";
+import { derived } from "svelte/store";
 
 import { snapStepMinutes } from "../constants";
 
@@ -27,26 +27,7 @@ export const timeToTimelineOffset = derived(
       minutes * $settings.zoomLevel - $hiddenHoursSize,
 );
 
+// todo: out of place
 export function snap(coords: number, zoomLevel: number) {
   return coords - (coords % (snapStepMinutes * zoomLevel));
 }
-
-// todo: this is out of place
-export function getTimeFromYOffset(yCoords: number) {
-  const { zoomLevel } = get(settings);
-  return (yCoords + get(hiddenHoursSize)) / zoomLevel;
-}
-
-// todo: this is out of place
-export function sizeToDuration(size: number) {
-  const { zoomLevel } = get(settings);
-  return size / zoomLevel;
-}
-
-// todo: this is out of place
-export const durationToSize = derived(settings, ($settings) => {
-  return (duration: number) => {
-    const { zoomLevel } = $settings;
-    return duration * zoomLevel;
-  };
-});

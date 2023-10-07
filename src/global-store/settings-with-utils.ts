@@ -1,12 +1,5 @@
 import { settings } from "./settings";
-import {
-  durationToSize,
-  getTimeFromYOffset,
-  hiddenHoursSize,
-  hourSize,
-  sizeToDuration,
-  visibleHours,
-} from "./settings-utils";
+import { hiddenHoursSize, hourSize, visibleHours } from "./settings-utils";
 
 // todo: remove this
 export const settingsWithUtils = {
@@ -14,7 +7,4 @@ export const settingsWithUtils = {
   hourSize,
   hiddenHoursSize,
   visibleHours,
-  sizeToDuration,
-  durationToSize,
-  getTimeFromYOffset,
 };
