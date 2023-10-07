@@ -1,7 +1,6 @@
 import type { Moment } from "moment";
 import { MetadataCache, Pos } from "obsidian";
 
-import type { settingsWithUtils } from "./global-store/settings-with-utils";
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import { DataviewFacade } from "./service/dataview-facade";
 import type { ObsidianFacade } from "./service/obsidian-facade";
@@ -61,8 +60,6 @@ export type Timestamp = {
   startMinutes: number;
   durationMinutes: number;
 };
-
-export type ReactiveSettingsWithUtils = typeof settingsWithUtils;
 
 export interface ObsidianContext {
   obsidianFacade: ObsidianFacade;

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { currentTime } from "../../global-store/current-time";
-  import { settingsWithUtils } from "../../global-store/settings-with-utils";
+  import { settings } from "../../global-store/settings";
   import type { PlacedPlanItem } from "../../types";
   import { useTaskVisuals } from "../hooks/use-task-visuals";
 
@@ -11,7 +11,7 @@
 
   $: ({ height, offset, relationToNow, backgroundColor, properContrastColors } =
     useTaskVisuals(planItem, {
-      settings: settingsWithUtils,
+      settings,
       currentTime,
     }));
 </script>

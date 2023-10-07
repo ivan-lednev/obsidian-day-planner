@@ -1,7 +1,7 @@
 import { get, writable } from "svelte/store";
 
 import { currentTime } from "../../global-store/current-time";
-import { settingsWithUtils } from "../../global-store/settings-with-utils";
+import { settings } from "../../global-store/settings";
 import { timeToMinutes } from "../../util/moment";
 
 import { basePlanItem } from "./test-utils";
@@ -10,7 +10,7 @@ import { useTaskVisuals } from "./use-task-visuals";
 function getBaseUseTaskProps() {
   const cursorOffsetY = writable(0);
   return {
-    settings: settingsWithUtils,
+    settings,
     currentTime,
     cursorOffsetY,
     onUpdate: jest.fn(),
@@ -37,7 +37,7 @@ test.skip("tasks change position and size when zoom level changes", () => {
   );
 
   // todo: this is leaking state to other tests, need to copy settings
-  settingsWithUtils.settings.update((previous) => ({
+  settings.update((previous) => ({
     ...previous,
     zoomLevel: 1,
   }));

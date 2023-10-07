@@ -1,36 +1,36 @@
 import type { Moment } from "moment";
-import { derived, Readable } from "svelte/store";
+import { derived, Readable, Writable } from "svelte/store";
 
-import type { PlacedPlanItem, ReactiveSettingsWithUtils } from "../../types";
+import { getHiddenHoursSize } from "../../global-store/settings-utils";
+import { DayPlannerSettings } from "../../settings";
+import type { PlacedPlanItem } from "../../types";
 import { getRelationToNow } from "../../util/moment";
 import { getEndTime } from "../../util/task-utils";
 
 import { useColor } from "./use-color";
 
-interface UseTaskProps {
-  settings: ReactiveSettingsWithUtils;
+interface UseTaskVisualsProps {
+  settings: Writable<DayPlannerSettings>;
   currentTime: Readable<Moment>;
 }
 
 export function useTaskVisuals(
   task: PlacedPlanItem,
-  { settings, currentTime }: UseTaskProps,
+  { settings, currentTime }: UseTaskVisualsProps,
 ) {
-  // todo: settings.settings is lame
-  const useColorValues = useColor({ settings: settings.settings, task });
+  const useColorValues = useColor({ settings, task });
 
-  const offset = derived(
-    [settings.settings, settings.hiddenHoursSize],
-    ([$settings, $hiddenHoursSize]) => {
-      return task.startMinutes * $settings.zoomLevel - $hiddenHoursSize;
-    },
-  );
+  const offset = derived(settings, ($settings) => {
+    return (
+      task.startMinutes * $settings.zoomLevel - getHiddenHoursSize($settings)
+    );
+  });
 
-  const height = derived([settings.settings], ([$settings]) => {
+  const height = derived(settings, ($settings) => {
     return task.durationMinutes * $settings.zoomLevel;
   });
 
-  const relationToNow = derived([currentTime], ([$currentTime]) => {
+  const relationToNow = derived(currentTime, ($currentTime) => {
     return getRelationToNow($currentTime, task.startTime, getEndTime(task));
   });
 
