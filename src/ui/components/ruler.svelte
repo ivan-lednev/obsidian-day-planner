@@ -1,12 +1,13 @@
 <script lang="ts">
-  import { hourSize } from "../../global-store/settings-utils";
+  import { settings } from "../../global-store/settings";
+  import { getHourSize } from "../../global-store/settings-utils";
 
   export let visibleHours: number[];
 </script>
 
 <div class="hours-container">
   {#each visibleHours as hour}
-    <div style:height="{$hourSize}px" class="hour">
+    <div style:height="{getHourSize($settings)}px" class="hour">
       <div class="hour-number-container">
         {hour}
       </div>

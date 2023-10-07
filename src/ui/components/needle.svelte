@@ -8,7 +8,10 @@
   export let autoScrollBlocked = false;
 
   let el: HTMLDivElement;
-  let coords = $timeToTimelineOffset(getMinutesSinceMidnight($currentTime));
+  let coords = timeToTimelineOffset(
+    getMinutesSinceMidnight($currentTime),
+    $settings,
+  );
 
   function scrollIntoView() {
     if (
@@ -21,7 +24,10 @@
   }
 
   $: {
-    coords = $timeToTimelineOffset(getMinutesSinceMidnight($currentTime));
+    coords = timeToTimelineOffset(
+      getMinutesSinceMidnight($currentTime),
+      $settings,
+    );
     scrollIntoView();
   }
 </script>

@@ -3,7 +3,8 @@
   import { writable } from "svelte/store";
 
   import { obsidianContext } from "../../../constants";
-  import { visibleHours } from "../../../global-store/settings-utils";
+  import { settings } from "../../../global-store/settings";
+  import { getVisibleHours } from "../../../global-store/settings-utils";
   import { visibleDateRange } from "../../../global-store/visible-date-range";
   import type { ObsidianContext } from "../../../types";
   import { isToday } from "../../../util/moment";
@@ -31,11 +32,11 @@
   {/each}
 </div>
 <div class="days">
-  <Ruler visibleHours={$visibleHours} />
+  <Ruler visibleHours={getVisibleHours($settings)} />
   {#each $visibleDateRange as day}
     <div class="day-column">
       <div class="scale-with-days">
-        <Column visibleHours={$visibleHours}>
+        <Column visibleHours={getVisibleHours($settings)}>
           {#if isToday(day)}
             <Needle autoScrollBlocked={true} />
           {/if}

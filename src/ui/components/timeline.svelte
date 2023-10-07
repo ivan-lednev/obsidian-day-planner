@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { visibleHours } from "../../global-store/settings-utils";
+  import { settings } from "../../global-store/settings";
+  import {
+    getVisibleHours,
+  } from "../../global-store/settings-utils";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import { isToday } from "../../util/moment";
 
@@ -27,8 +30,8 @@
   on:mouseleave={handleMouseLeave}
 >
   <div class="scale-with-days">
-    <Ruler visibleHours={$visibleHours} />
-    <Column visibleHours={$visibleHours}>
+    <Ruler visibleHours={getVisibleHours($settings)} />
+    <Column visibleHours={getVisibleHours($settings)}>
       {#if isToday($visibleDayInTimeline)}
         <Needle autoScrollBlocked={userHoversOverScroller} />
       {/if}

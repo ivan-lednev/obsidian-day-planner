@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { hourSize } from "../../global-store/settings-utils";
+  import { settings } from "../../global-store/settings";
+  import { getHourSize } from "../../global-store/settings-utils";
 
   export let visibleHours: number[];
 </script>
@@ -7,8 +8,11 @@
 <div class="task-grid">
   <slot />
   {#each visibleHours as hour}
-    <div style:height="{$hourSize}px" class="time-grid-block">
-      <div style:height="{$hourSize / 2}px" class="half-hour-separator"></div>
+    <div style:height="{getHourSize($settings)}px" class="time-grid-block">
+      <div
+        style:height="{getHourSize($settings) / 2}px"
+        class="half-hour-separator"
+      ></div>
     </div>
   {/each}
 </div>
