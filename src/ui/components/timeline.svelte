@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { settings } from "../../global-store/settings";
   import {
     getVisibleHours,
   } from "../../global-store/derived-settings";
+  import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import { isToday } from "../../util/moment";
 

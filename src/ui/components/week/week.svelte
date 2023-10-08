@@ -3,8 +3,8 @@
   import { writable } from "svelte/store";
 
   import { obsidianContext } from "../../../constants";
-  import { settings } from "../../../global-store/settings";
   import { getVisibleHours } from "../../../global-store/derived-settings";
+  import { settings } from "../../../global-store/settings";
   import { visibleDateRange } from "../../../global-store/visible-date-range";
   import type { ObsidianContext } from "../../../types";
   import { isToday } from "../../../util/moment";

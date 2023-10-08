@@ -1,7 +1,7 @@
 import { FileView, Plugin, WorkspaceLeaf } from "obsidian";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
-import { getAPI } from "obsidian-dataview";
-import { get, Writable } from "svelte/store";
+import { getAPI, STask } from "obsidian-dataview";
+import { get, readable, Readable, Writable } from "svelte/store";
 
 import { obsidianContext, viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { settings } from "./global-store/settings";
@@ -16,6 +16,7 @@ import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
+import { debounceWhileTyping } from "./util/debounce-while-typing";
 import { getDaysOfCurrentWeek, isToday } from "./util/moment";
 
 export default class DayPlanner extends Plugin {
@@ -25,6 +26,7 @@ export default class DayPlanner extends Plugin {
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
   private dataviewFacade: DataviewFacade;
+  private tasks: Readable<STask[]>;
 
   async onload() {
     await this.initSettingsStore();
@@ -47,6 +49,27 @@ export default class DayPlanner extends Plugin {
 
     this.app.workspace.onLayoutReady(this.handleLayoutReady);
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
+
+    this.tasks = readable([], (set) => {
+      const [debouncedUpdate, cleanUp] = debounceWhileTyping(() => {
+        set(getAPI(this.app).pages().file.tasks);
+      }, 1000);
+
+      const ref = this.app.metadataCache.on(
+        // @ts-expect-error
+        "dataview:metadata-change",
+        debouncedUpdate,
+      );
+
+      return () => {
+        cleanUp();
+        this.app.metadataCache.offref(ref);
+      };
+    });
+
+    this.tasks.subscribe((value) => {
+      console.log({ value: [...value] });
+    });
 
     this.registerInterval(
       window.setInterval(

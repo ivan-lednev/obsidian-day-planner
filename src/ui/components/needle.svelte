@@ -1,7 +1,7 @@
 <script lang="ts">
   import { currentTime } from "../../global-store/current-time";
-  import { settings } from "../../global-store/settings";
   import { timeToTimelineOffset } from "../../global-store/derived-settings";
+  import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import { getMinutesSinceMidnight, isToday } from "../../util/moment";
 
