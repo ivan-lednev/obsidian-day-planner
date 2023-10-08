@@ -27,50 +27,23 @@ export default class DayPlanner extends Plugin {
   private dataviewFacade: DataviewFacade;
 
   async onload() {
-    this.settingsStore = await this.initSettingsStore();
-    this.settings = () => get(this.settingsStore);
-
-    this.statusBar = new StatusBar(
-      this.settings,
-      this.addStatusBarItem(),
-      this.initTimelineLeaf,
-    );
-
-    this.registerCommands();
+    await this.initSettingsStore();
 
     this.obsidianFacade = new ObsidianFacade(this.app);
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
     // todo: it's unclear why it's sometimes undefined. Perhaps it has to do with the load order
     this.dataviewFacade = new DataviewFacade(() => getAPI(this.app));
 
-    const componentContext = new Map([
-      [
-        obsidianContext,
-        {
-          obsidianFacade: this.obsidianFacade,
-          dataviewFacade: this.dataviewFacade,
-          metadataCache: this.app.metadataCache,
-          onUpdate: this.planEditor.syncTasksWithFile,
-          initWeeklyView: this.initWeeklyLeaf,
-        },
-      ],
-    ]);
-
-    this.registerView(
-      viewTypeTimeline,
-      (leaf: WorkspaceLeaf) =>
-        new TimelineView(leaf, this.settings, componentContext),
-    );
-
-    this.registerView(
-      viewTypeWeekly,
-      (leaf: WorkspaceLeaf) =>
-        new WeeklyView(leaf, this.settings, componentContext),
-    );
+    this.registerCommands();
+    this.registerViews();
 
     this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
-
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
+    this.statusBar = new StatusBar(
+      this.settings,
+      this.addStatusBarItem(),
+      this.initTimelineLeaf,
+    );
 
     this.app.workspace.onLayoutReady(this.handleLayoutReady);
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
@@ -144,7 +117,8 @@ export default class DayPlanner extends Plugin {
       }),
     );
 
-    return settings;
+    this.settingsStore = settings;
+    this.settings = () => get(settings);
   }
 
   private handleLayoutReady = async () => {
@@ -197,6 +171,33 @@ export default class DayPlanner extends Plugin {
     // - or the tabs get hidden
     return Promise.all(
       this.app.workspace.getLeavesOfType(type).map((leaf) => leaf.detach()),
+    );
+  }
+
+  private registerViews() {
+    const componentContext = new Map([
+      [
+        obsidianContext,
+        {
+          obsidianFacade: this.obsidianFacade,
+          dataviewFacade: this.dataviewFacade,
+          metadataCache: this.app.metadataCache,
+          onUpdate: this.planEditor.syncTasksWithFile,
+          initWeeklyView: this.initWeeklyLeaf,
+        },
+      ],
+    ]);
+
+    this.registerView(
+      viewTypeTimeline,
+      (leaf: WorkspaceLeaf) =>
+        new TimelineView(leaf, this.settings, componentContext),
+    );
+
+    this.registerView(
+      viewTypeWeekly,
+      (leaf: WorkspaceLeaf) =>
+        new WeeklyView(leaf, this.settings, componentContext),
     );
   }
 }

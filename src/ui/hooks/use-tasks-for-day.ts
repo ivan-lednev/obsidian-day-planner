@@ -26,6 +26,7 @@ export function useTasksForDay({
 
   async function handleChanged(operation: string, changedFile: TFile) {
     const taskPaths = get(tasks).map((task) => task.location.path);
+    // todo: this is not going to work if I add a new task in a new file
     const relatedFileChanged = taskPaths.some(
       (path) => path === changedFile.path,
     );

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { settings } from "../../global-store/settings";
-  import { getHourSize } from "../../global-store/settings-utils";
+  import { getHourSize } from "../../global-store/derived-settings";
 
   export let visibleHours: number[];
 </script>

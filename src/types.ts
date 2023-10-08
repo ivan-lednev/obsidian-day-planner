@@ -22,8 +22,11 @@ export interface PlanItem {
    * @deprecated this will be replaced with dataview `symbol` and `status`
    */
   listTokens: string;
+
+  // todo: the distinction needs to be clearer
   firstLineText: string;
   text: string;
+
   durationMinutes: number;
   startMinutes: number;
   location?: PlanItemLocation;

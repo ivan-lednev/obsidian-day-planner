@@ -4,7 +4,7 @@
 
   import { obsidianContext } from "../../../constants";
   import { settings } from "../../../global-store/settings";
-  import { getVisibleHours } from "../../../global-store/settings-utils";
+  import { getVisibleHours } from "../../../global-store/derived-settings";
   import { visibleDateRange } from "../../../global-store/visible-date-range";
   import type { ObsidianContext } from "../../../types";
   import { isToday } from "../../../util/moment";

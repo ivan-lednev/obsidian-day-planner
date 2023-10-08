@@ -2,7 +2,7 @@
   import { settings } from "../../global-store/settings";
   import {
     getVisibleHours,
-  } from "../../global-store/settings-utils";
+  } from "../../global-store/derived-settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import { isToday } from "../../util/moment";
 

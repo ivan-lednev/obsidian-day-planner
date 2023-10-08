@@ -7,7 +7,7 @@
   import { obsidianContext } from "../../constants";
   import { editCancellation } from "../../global-store/edit-events";
   import { settings } from "../../global-store/settings";
-  import { snap } from "../../global-store/settings-utils";
+  import { snap } from "../../global-store/derived-settings";
   import type { ObsidianContext, PlacedPlanItem, PlanItem } from "../../types";
   import { getId } from "../../util/id";
   import { getRenderKey } from "../../util/task-utils";

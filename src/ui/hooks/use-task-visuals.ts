@@ -1,7 +1,7 @@
 import type { Moment } from "moment";
 import { derived, Readable, Writable } from "svelte/store";
 
-import { getHiddenHoursSize } from "../../global-store/settings-utils";
+import { getHiddenHoursSize } from "../../global-store/derived-settings";
 import { DayPlannerSettings } from "../../settings";
 import type { PlacedPlanItem } from "../../types";
 import { getRelationToNow } from "../../util/moment";
