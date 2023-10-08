@@ -38,7 +38,7 @@ export default class DayPlanner extends Plugin {
 
     this.registerCommands();
 
-    this.obsidianFacade = new ObsidianFacade(this.app, this.settings);
+    this.obsidianFacade = new ObsidianFacade(this.app);
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
     // todo: it's unclear why it's sometimes undefined. Perhaps it has to do with the load order
     this.dataviewFacade = new DataviewFacade(() => getAPI(this.app));

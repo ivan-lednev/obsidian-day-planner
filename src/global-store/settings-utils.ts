@@ -1,8 +1,6 @@
 import { snapStepMinutes } from "../constants";
 import { DayPlannerSettings } from "../settings";
 
-// todo: re-implement as getters for ergonomics
-
 export function getHourSize(settings: DayPlannerSettings) {
   return settings.zoomLevel * 60;
 }

@@ -8,13 +8,8 @@ import {
 } from "obsidian-daily-notes-interface";
 import { isInstanceOf } from "typed-assert";
 
-import type { DayPlannerSettings } from "../settings";
-
 export class ObsidianFacade {
-  constructor(
-    readonly app: App,
-    private readonly settings: () => DayPlannerSettings,
-  ) {}
+  constructor(readonly app: App) {}
 
   async openFileInEditor(file: TFile) {
     const leaf = this.app.workspace.getLeaf(false);
