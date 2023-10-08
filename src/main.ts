@@ -26,10 +26,11 @@ export default class DayPlanner extends Plugin {
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
   private dataviewFacade: DataviewFacade;
-  private tasks: Readable<STask[]>;
+  private dataviewTasks: Readable<STask[]>;
 
   async onload() {
     await this.initSettingsStore();
+    this.initDataviewTasks();
 
     this.obsidianFacade = new ObsidianFacade(this.app);
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
@@ -50,7 +51,17 @@ export default class DayPlanner extends Plugin {
     this.app.workspace.onLayoutReady(this.handleLayoutReady);
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
 
-    this.tasks = readable([], (set) => {
+    // todo: do this on dv update, not on interval
+    this.registerInterval(
+      window.setInterval(
+        () => this.updateStatusBarOnFailed(this.updateStatusBar),
+        5000,
+      ),
+    );
+  }
+
+  private initDataviewTasks() {
+    this.dataviewTasks = readable([], (set) => {
       const [debouncedUpdate, cleanUp] = debounceWhileTyping(() => {
         set(getAPI(this.app).pages().file.tasks);
       }, 1000);
@@ -66,17 +77,6 @@ export default class DayPlanner extends Plugin {
         this.app.metadataCache.offref(ref);
       };
     });
-
-    this.tasks.subscribe((value) => {
-      console.log({ value: [...value] });
-    });
-
-    this.registerInterval(
-      window.setInterval(
-        () => this.updateStatusBarOnFailed(this.updateStatusBar),
-        5000,
-      ),
-    );
   }
 
   private handleActiveLeafChanged = ({ view }: WorkspaceLeaf) => {
@@ -207,6 +207,7 @@ export default class DayPlanner extends Plugin {
           metadataCache: this.app.metadataCache,
           onUpdate: this.planEditor.syncTasksWithFile,
           initWeeklyView: this.initWeeklyLeaf,
+          dataviewTasks: this.dataviewTasks,
         },
       ],
     ]);

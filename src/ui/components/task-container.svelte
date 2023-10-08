@@ -22,14 +22,13 @@
 
   export let day: Readable<Moment>;
 
-  const { obsidianFacade, onUpdate, dataviewFacade, metadataCache } =
-    getContext<ObsidianContext>(obsidianContext);
-
-  const tasks = useTasksForDay({ day, dataviewFacade, metadataCache });
-
   let el: HTMLDivElement;
 
+  const { obsidianFacade, onUpdate, dataviewTasks } =
+    getContext<ObsidianContext>(obsidianContext);
+
   const pointerOffsetY = writable(0);
+  const tasks = useTasksForDay({ day, dataviewTasks });
 
   $: ({ startEdit, displayedTasks, cancelEdit, editStatus, confirmEdit } =
     useEdit({

@@ -34,7 +34,7 @@ function sTaskToString(node: Node, indentation = "") {
   return result;
 }
 
-function sTaskToPlanItem(sTask: STask, day: Moment): PlanItem {
+export function sTaskToPlanItem(sTask: STask, day: Moment): PlanItem {
   const { startTime, endTime, firstLineText, text } = createPlanItem({
     line: sTaskLineToString(sTask),
     completeContent: sTaskToString(sTask),

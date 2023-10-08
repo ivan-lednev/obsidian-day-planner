@@ -1,5 +1,7 @@
 import type { Moment } from "moment";
 import { MetadataCache, Pos } from "obsidian";
+import { STask } from "obsidian-dataview";
+import { Readable } from "svelte/store";
 
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import { DataviewFacade } from "./service/dataview-facade";
@@ -70,4 +72,5 @@ export interface ObsidianContext {
   metadataCache: MetadataCache;
   onUpdate: OnUpdateFn;
   initWeeklyView: () => Promise<void>;
+  dataviewTasks: Readable<STask[]>;
 }

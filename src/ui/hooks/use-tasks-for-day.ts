@@ -1,51 +1,44 @@
 import { Moment } from "moment";
-import { MetadataCache, TFile } from "obsidian";
-import { onDestroy } from "svelte";
-import { get, Readable, writable } from "svelte/store";
+import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
+import { STask } from "obsidian-dataview";
+import { derived, Readable } from "svelte/store";
 
 import { addPlacing } from "../../overlap/overlap";
-import { DataviewFacade } from "../../service/dataview-facade";
+import { timeRegExp } from "../../regexp";
+import { sTaskToPlanItem } from "../../service/dataview-facade";
+import { PlanItem } from "../../types";
 
 interface UseTaskSourceProps {
   day: Readable<Moment>;
-  metadataCache: MetadataCache;
-  dataviewFacade: DataviewFacade;
+  dataviewTasks: Readable<STask[]>;
 }
 
-export function useTasksForDay({
-  day,
-  metadataCache,
-  dataviewFacade,
-}: UseTaskSourceProps) {
-  const initial = getPlacedTasksFor(get(day));
-  const tasks = writable(initial);
+export function useTasksForDay({ day, dataviewTasks }: UseTaskSourceProps) {
+  return derived([day, dataviewTasks], ([$day, $dataviewTasks]) => {
+    const noteForDay = getDailyNote($day, getAllDailyNotes());
+    const tasksForDay = $dataviewTasks
+      // @ts-expect-error
+      .where((task: STask) => {
+        if (!timeRegExp.test(task.text)) {
+          return false;
+        }
 
-  function getPlacedTasksFor(moment: Moment) {
-    return addPlacing(dataviewFacade.getTasksFor(moment));
-  }
+        if (task.path === noteForDay?.path) {
+          return true;
+        }
 
-  async function handleChanged(operation: string, changedFile: TFile) {
-    const taskPaths = get(tasks).map((task) => task.location.path);
-    // todo: this is not going to work if I add a new task in a new file
-    const relatedFileChanged = taskPaths.some(
-      (path) => path === changedFile.path,
-    );
+        if (!task.scheduled) {
+          return false;
+        }
 
-    if (relatedFileChanged) {
-      tasks.set(getPlacedTasksFor(get(day)));
-    }
-  }
+        const scheduledMoment = window.moment(task.scheduled.toMillis());
 
-  day.subscribe((updated) => {
-    tasks.set(getPlacedTasksFor(updated));
+        return scheduledMoment.isSame($day, "day");
+      })
+      .map((sTask: STask) => sTaskToPlanItem(sTask, $day))
+      .sort((task: PlanItem) => task.startMinutes)
+      .array();
+
+    return addPlacing(tasksForDay);
   });
-
-  // @ts-expect-error
-  metadataCache.on("dataview:metadata-change", handleChanged);
-
-  onDestroy(() => {
-    metadataCache.off("dataview:metadata-change", handleChanged);
-  });
-
-  return tasks;
 }
