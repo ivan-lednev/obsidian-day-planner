@@ -60,10 +60,14 @@ export default class DayPlanner extends Plugin {
     );
   }
 
+  private getAllTasks() {
+    return getAPI(this.app).pages().file.tasks;
+  }
+
   private initDataviewTasks() {
-    this.dataviewTasks = readable([], (set) => {
+    this.dataviewTasks = readable(this.getAllTasks(), (set) => {
       const [updateTasks, delayUpdateTasks] = debounceWithDelay(() => {
-        set(getAPI(this.app).pages().file.tasks);
+        set(this.getAllTasks());
       }, 1000);
 
       this.app.metadataCache.on(
