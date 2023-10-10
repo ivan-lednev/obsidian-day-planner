@@ -16,7 +16,7 @@ import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
-import { debounceWhileTyping } from "./util/debounce-while-typing";
+import { debounceWithDelay } from "./util/debounce-with-delay";
 import { getDaysOfCurrentWeek, isToday } from "./util/moment";
 
 export default class DayPlanner extends Plugin {
@@ -62,19 +62,20 @@ export default class DayPlanner extends Plugin {
 
   private initDataviewTasks() {
     this.dataviewTasks = readable([], (set) => {
-      const [debouncedUpdate, cleanUp] = debounceWhileTyping(() => {
+      const [updateTasks, delayUpdateTasks] = debounceWithDelay(() => {
         set(getAPI(this.app).pages().file.tasks);
       }, 1000);
 
-      const ref = this.app.metadataCache.on(
+      this.app.metadataCache.on(
         // @ts-expect-error
         "dataview:metadata-change",
-        debouncedUpdate,
+        updateTasks,
       );
+      document.addEventListener("keydown", delayUpdateTasks);
 
       return () => {
-        cleanUp();
-        this.app.metadataCache.offref(ref);
+        this.app.metadataCache.off("dataview:metadata-change", updateTasks);
+        document.removeEventListener("keydown", delayUpdateTasks);
       };
     });
   }
