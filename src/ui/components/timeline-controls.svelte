@@ -7,6 +7,10 @@
     FileInput,
     HelpCircle,
     Table2,
+    Filter,
+    FilterX,
+    AlertTriangle,
+    Info,
   } from "lucide-svelte";
   import type { Moment } from "moment";
   import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
@@ -17,6 +21,7 @@
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import type { ObsidianContext } from "../../types";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
+  import { useDataviewSource } from "../hooks/useDataviewSource";
 
   import ControlButton from "./control-button.svelte";
   import Dropdown from "./obsidian/dropdown.svelte";
@@ -24,14 +29,21 @@
 
   export let day: Moment;
 
-  const { obsidianFacade, initWeeklyView } =
+  const { obsidianFacade, initWeeklyView, refreshTasks } =
     getContext<ObsidianContext>(obsidianContext);
+
+  const {
+    sourceIsEmpty,
+    errorMessage: dataviewErrorMessage,
+    dataviewSourceInput,
+  } = useDataviewSource({ refreshTasks });
 
   const startHourOptions = range(0, 13).map(String);
   const zoomLevelOptions = range(1, 5).map(String);
 
   let settingsVisible = false;
   let helpVisible = false;
+  let filterVisible = false;
 
   function toggleSettings() {
     settingsVisible = !settingsVisible;
@@ -39,6 +51,10 @@
 
   function toggleHelp() {
     helpVisible = !helpVisible;
+  }
+
+  function toggleFilter() {
+    filterVisible = !filterVisible;
   }
 
   async function goBack() {
@@ -89,7 +105,7 @@
     </ControlButton>
 
     <ControlButton
-      --grid-column-start="3"
+      --grid-column-start="4"
       --justify-self="flex-end"
       label="Go to previous daily plan"
       on:click={goBack}
@@ -115,6 +131,17 @@
       <ArrowRight class="svg-icon" />
     </ControlButton>
 
+    <ControlButton
+      isActive={filterVisible}
+      label="Dataview source"
+      on:click={toggleFilter}
+    >
+      {#if $sourceIsEmpty}
+        <FilterX class="svg-icon" />
+      {:else}
+        <Filter class="svg-icon" />
+      {/if}
+    </ControlButton>
     <ControlButton isActive={helpVisible} label="Help" on:click={toggleHelp}>
       <HelpCircle class="svg-icon" />
     </ControlButton>
@@ -126,6 +153,34 @@
       <Settings class="svg-icon" />
     </ControlButton>
   </div>
+  {#if filterVisible}
+    <div class="filter-container">
+      <input
+        placeholder={`-#archived and -"notes/personal"`}
+        spellcheck="false"
+        type="text"
+        bind:value={$dataviewSourceInput}
+      />
+      {#if $sourceIsEmpty}
+        <div class="info-container">
+          <AlertTriangle class="svg-icon" />
+          Tasks are pulled from everywhere
+        </div>
+      {/if}
+      {#if $dataviewErrorMessage.length > 0}
+        <div class="info-container">
+          <pre class="error-message">{$dataviewErrorMessage}</pre>
+        </div>
+      {/if}
+      <div class="info-container">
+        <Info class="svg-icon" />
+        <a
+          href="https://blacksmithgu.github.io/obsidian-dataview/reference/sources/"
+          >Dataview source reference</a
+        >
+      </div>
+    </div>
+  {/if}
   {#if helpVisible}
     <p class="help-item"><strong>Advanced editing:</strong></p>
     <p class="help-item">Hold <strong>Shift</strong> and drag to copy</p>
@@ -189,6 +244,37 @@
 </div>
 
 <style>
+  .filter-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4-2);
+
+    margin: var(--size-4-2);
+
+    font-size: var(--font-ui-small);
+    color: var(--text-muted);
+  }
+
+  :global(.mod-error) {
+    color: var(--text-error);
+  }
+
+  .filter-container input {
+    font-family: var(--font-monospace);
+  }
+
+  .info-container {
+    display: flex;
+    gap: var(--size-4-1);
+  }
+
+  .error-message {
+    overflow-x: auto;
+    padding: var(--size-4-1);
+    border: 1px solid var(--text-error);
+    border-radius: var(--radius-s);
+  }
+
   .help-item {
     margin: var(--size-2-3) var(--size-4-4);
     font-size: var(--font-ui-small);
@@ -217,8 +303,8 @@
 
   .header {
     display: grid;
-    grid-template-columns: repeat(2, var(--size-4-8)) repeat(3, 1fr) repeat(
-        2,
+    grid-template-columns: repeat(3, var(--size-4-8)) repeat(3, 1fr) repeat(
+        3,
         var(--size-4-8)
       );
     margin: var(--size-4-2);

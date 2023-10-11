@@ -17,7 +17,7 @@ export interface DayPlannerSettings {
   timelineStartColor: HexString;
   timelineEndColor: HexString;
   timestampFormat: string;
-  dataviewModeEnabled: boolean;
+  dataviewSource: string;
 }
 
 export const defaultSettings = {
@@ -37,8 +37,7 @@ export const defaultSettings = {
   timelineStartColor: "#006466",
   timelineEndColor: "#4d194d",
   timestampFormat: "HH:mm",
-  // todo: set to false
-  dataviewModeEnabled: true,
+  dataviewSource: "",
 };
 
 export const defaultSettingsForTests = {

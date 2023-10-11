@@ -73,4 +73,5 @@ export interface ObsidianContext {
   onUpdate: OnUpdateFn;
   initWeeklyView: () => Promise<void>;
   dataviewTasks: Readable<STask[]>;
+  refreshTasks: (source: string) => void;
 }

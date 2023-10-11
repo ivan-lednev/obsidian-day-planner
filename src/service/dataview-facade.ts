@@ -67,6 +67,7 @@ export function sTaskToPlanItem(sTask: STask, day: Moment): PlanItem {
   };
 }
 
+// todo: we don't need this
 export class DataviewFacade {
   constructor(private readonly dataview: () => DataviewApi) {}
 

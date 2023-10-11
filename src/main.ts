@@ -1,4 +1,4 @@
-import { FileView, Plugin, WorkspaceLeaf } from "obsidian";
+import { FileView, Notice, Plugin, WorkspaceLeaf } from "obsidian";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
 import { getAPI, STask } from "obsidian-dataview";
 import { get, readable, Readable, Writable } from "svelte/store";
@@ -52,21 +52,44 @@ export default class DayPlanner extends Plugin {
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
 
     // todo: do this on dv update, not on interval
-    this.registerInterval(
-      window.setInterval(
-        () => this.updateStatusBarOnFailed(this.updateStatusBar),
-        5000,
-      ),
-    );
+    // this.registerInterval(
+    //   window.setInterval(
+    //     () => this.updateStatusBarOnFailed(this.updateStatusBar),
+    //     5000,
+    //   ),
+    // );
   }
 
   private getAllTasks() {
-    return getAPI(this.app).pages().file.tasks;
+    const source = this.settings().dataviewSource;
+    return this.refreshTasks(source);
   }
+
+  private refreshTasks = (source: string) => {
+    performance.mark("query-start");
+    const result = getAPI(this.app).pages(source).file.tasks;
+    performance.mark("query-end");
+
+    const measure = performance.measure(
+      "query-time",
+      "query-start",
+      "query-end",
+    );
+
+    console.debug(
+      `obsidian-day-planner:
+  source: "${source}"
+  took: ${measure.duration} ms`,
+    );
+
+    return result;
+  };
 
   private initDataviewTasks() {
     this.dataviewTasks = readable(this.getAllTasks(), (set) => {
       const [updateTasks, delayUpdateTasks] = debounceWithDelay(() => {
+        // todo: delete
+        new Notice("Dataview refreshed");
         set(this.getAllTasks());
       }, 1000);
 
@@ -213,6 +236,7 @@ export default class DayPlanner extends Plugin {
           onUpdate: this.planEditor.syncTasksWithFile,
           initWeeklyView: this.initWeeklyLeaf,
           dataviewTasks: this.dataviewTasks,
+          refreshTasks: this.refreshTasks,
         },
       ],
     ]);
