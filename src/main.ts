@@ -7,7 +7,6 @@ import { obsidianContext, viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { settings } from "./global-store/settings";
 import { visibleDateRange } from "./global-store/visible-date-range";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
-import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
@@ -25,7 +24,6 @@ export default class DayPlanner extends Plugin {
   private statusBar: StatusBar;
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
-  private dataviewFacade: DataviewFacade;
   private dataviewTasks: Readable<STask[]>;
 
   async onload() {
@@ -34,8 +32,6 @@ export default class DayPlanner extends Plugin {
 
     this.obsidianFacade = new ObsidianFacade(this.app);
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
-    // todo: it's unclear why it's sometimes undefined. Perhaps it has to do with the load order
-    this.dataviewFacade = new DataviewFacade(() => getAPI(this.app));
 
     this.registerCommands();
     this.registerViews();
@@ -192,8 +188,9 @@ export default class DayPlanner extends Plugin {
 
   private updateStatusBar = async () => {
     if (dailyNoteExists()) {
-      const planItems = this.dataviewFacade.getTasksFor(window.moment());
-      await this.statusBar.update(planItems);
+      // todo: fix
+      // const planItems = this.dataviewFacade.getTasksFor(window.moment());
+      // await this.statusBar.update(planItems);
     } else {
       this.statusBar.setEmpty();
     }
@@ -231,7 +228,6 @@ export default class DayPlanner extends Plugin {
         obsidianContext,
         {
           obsidianFacade: this.obsidianFacade,
-          dataviewFacade: this.dataviewFacade,
           metadataCache: this.app.metadataCache,
           onUpdate: this.planEditor.syncTasksWithFile,
           initWeeklyView: this.initWeeklyLeaf,

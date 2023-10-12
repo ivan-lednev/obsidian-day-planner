@@ -1,6 +1,5 @@
 import { Moment } from "moment";
-import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
-import { DataviewApi, STask, DateTime } from "obsidian-dataview";
+import { STask, DateTime } from "obsidian-dataview";
 
 import { defaultDurationMinutes } from "../constants";
 import { createPlanItem } from "../parser/parser";
@@ -65,36 +64,4 @@ export function sTaskToPlanItem(sTask: STask, day: Moment): PlanItem {
     },
     id: getId(),
   };
-}
-
-// todo: we don't need this
-export class DataviewFacade {
-  constructor(private readonly dataview: () => DataviewApi) {}
-
-  getTasksFor(day: Moment): PlanItem[] {
-    const noteForDay = getDailyNote(day, getAllDailyNotes());
-
-    return this.dataview()
-      .pages()
-      .file.tasks.where((task: STask) => {
-        if (!timeRegExp.test(task.text)) {
-          return false;
-        }
-
-        if (task.path === noteForDay?.path) {
-          return true;
-        }
-
-        if (!task.scheduled) {
-          return false;
-        }
-
-        const scheduledMoment = window.moment(task.scheduled.toMillis());
-
-        return scheduledMoment.isSame(day, "day");
-      })
-      .map((sTask: STask) => sTaskToPlanItem(sTask, day))
-      .sort((task: PlanItem) => task.startMinutes)
-      .array();
-  }
 }

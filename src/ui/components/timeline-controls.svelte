@@ -139,7 +139,7 @@
       {#if $sourceIsEmpty}
         <FilterX class="svg-icon" />
       {:else}
-        <Filter class="svg-icon" />
+        <Filter class="svg-icon active-filter" />
       {/if}
     </ControlButton>
     <ControlButton isActive={helpVisible} label="Help" on:click={toggleHelp}>
@@ -244,6 +244,10 @@
 </div>
 
 <style>
+  :global(.active-filter) {
+    color: var(--text-success);
+  }
+
   .filter-container {
     display: flex;
     flex-direction: column;

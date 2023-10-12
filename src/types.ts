@@ -4,7 +4,6 @@ import { STask } from "obsidian-dataview";
 import { Readable } from "svelte/store";
 
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
-import { DataviewFacade } from "./service/dataview-facade";
 import type { ObsidianFacade } from "./service/obsidian-facade";
 
 export interface PlanItemLocation {
@@ -68,7 +67,6 @@ export type Timestamp = {
 
 export interface ObsidianContext {
   obsidianFacade: ObsidianFacade;
-  dataviewFacade: DataviewFacade;
   metadataCache: MetadataCache;
   onUpdate: OnUpdateFn;
   initWeeklyView: () => Promise<void>;
