@@ -68,6 +68,7 @@ export function useEdit({
     editOperation.set(undefined);
 
     await onUpdate(parsedTasks, currentTasks);
+    // todo: disable edit until next parse
   }
 
   function cancelEdit() {

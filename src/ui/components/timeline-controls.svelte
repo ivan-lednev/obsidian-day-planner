@@ -21,7 +21,7 @@
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import type { ObsidianContext } from "../../types";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
-  import { useDataviewSource } from "../hooks/useDataviewSource";
+  import { useDataviewSource } from "../hooks/use-dataview-source";
 
   import ControlButton from "./control-button.svelte";
   import Dropdown from "./obsidian/dropdown.svelte";
@@ -29,7 +29,7 @@
 
   export let day: Moment;
 
-  const { obsidianFacade, initWeeklyView, refreshTasks } =
+  const { obsidianFacade, initWeeklyView, refreshTasks, dataviewLoaded } =
     getContext<ObsidianContext>(obsidianContext);
 
   const {
@@ -153,8 +153,14 @@
       <Settings class="svg-icon" />
     </ControlButton>
   </div>
+  {#if !$dataviewLoaded}
+    <div class="info-container">
+      <AlertTriangle class="svg-icon mod-error" />
+      Dataview is not loaded, tasks won't be shown
+    </div>
+  {/if}
   {#if filterVisible}
-    <div class="filter-container">
+    <div class="container">
       <input
         placeholder={`-#archived and -"notes/personal"`}
         spellcheck="false"
@@ -248,7 +254,7 @@
     color: var(--text-success);
   }
 
-  .filter-container {
+  .container {
     display: flex;
     flex-direction: column;
     gap: var(--size-4-2);
@@ -263,13 +269,14 @@
     color: var(--text-error);
   }
 
-  .filter-container input {
+  .container input {
     font-family: var(--font-monospace);
   }
 
   .info-container {
     display: flex;
     gap: var(--size-4-1);
+    margin: var(--size-4-2);
   }
 
   .error-message {

@@ -1,7 +1,7 @@
-import { FileView, Notice, Plugin, WorkspaceLeaf } from "obsidian";
+import { FileView, Plugin, WorkspaceLeaf } from "obsidian";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
 import { getAPI, STask } from "obsidian-dataview";
-import { get, readable, Readable, Writable } from "svelte/store";
+import { get, readable, Readable, writable, Writable } from "svelte/store";
 
 import { obsidianContext, viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { settings } from "./global-store/settings";
@@ -25,6 +25,7 @@ export default class DayPlanner extends Plugin {
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
   private dataviewTasks: Readable<STask[]>;
+  private readonly dataviewLoaded = writable(false);
 
   async onload() {
     await this.initSettingsStore();
@@ -62,8 +63,16 @@ export default class DayPlanner extends Plugin {
   }
 
   private refreshTasks = (source: string) => {
+    const dataview = getAPI(this.app);
+
+    if (!dataview) {
+      return [];
+    }
+
+    this.dataviewLoaded.set(true);
+
     performance.mark("query-start");
-    const result = getAPI(this.app).pages(source).file.tasks;
+    const result = dataview.pages(source).file.tasks;
     performance.mark("query-end");
 
     const measure = performance.measure(
@@ -84,8 +93,6 @@ export default class DayPlanner extends Plugin {
   private initDataviewTasks() {
     this.dataviewTasks = readable(this.getAllTasks(), (set) => {
       const [updateTasks, delayUpdateTasks] = debounceWithDelay(() => {
-        // todo: delete
-        new Notice("Dataview refreshed");
         set(this.getAllTasks());
       }, 1000);
 
@@ -233,6 +240,7 @@ export default class DayPlanner extends Plugin {
           initWeeklyView: this.initWeeklyLeaf,
           dataviewTasks: this.dataviewTasks,
           refreshTasks: this.refreshTasks,
+          dataviewLoaded: this.dataviewLoaded,
         },
       ],
     ]);
