@@ -273,10 +273,11 @@
 
   .migration-dialogue {
     display: flex;
-    align-items: center;
     flex-direction: column;
-    margin: var(--size-4-2);
     gap: var(--size-4-2);
+    align-items: center;
+
+    margin: var(--size-4-2);
   }
 
   .container {

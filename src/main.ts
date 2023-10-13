@@ -1,6 +1,6 @@
 import { FileView, Plugin, WorkspaceLeaf } from "obsidian";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
-import { getAPI, STask } from "obsidian-dataview";
+import { DataArray, getAPI, STask } from "obsidian-dataview";
 import { get, readable, Readable, writable, Writable } from "svelte/store";
 
 import { obsidianContext, viewTypeTimeline, viewTypeWeekly } from "./constants";
@@ -14,8 +14,9 @@ import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
-import { createDailyNoteIfNeeded, dailyNoteExists } from "./util/daily-notes";
+import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { debounceWithDelay } from "./util/debounce-with-delay";
+import { getTasksForDay } from "./util/get-tasks-for-day";
 import { getDaysOfCurrentWeek, isToday } from "./util/moment";
 
 export default class DayPlanner extends Plugin {
@@ -24,7 +25,7 @@ export default class DayPlanner extends Plugin {
   private statusBar: StatusBar;
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
-  private dataviewTasks: Readable<STask[]>;
+  private dataviewTasks: Readable<DataArray<STask>>;
   private readonly dataviewLoaded = writable(false);
 
   async onload() {
@@ -44,17 +45,10 @@ export default class DayPlanner extends Plugin {
       this.addStatusBarItem(),
       this.initTimelineLeaf,
     );
+    this.register(this.dataviewTasks.subscribe(this.updateStatusBar));
 
     this.app.workspace.onLayoutReady(this.handleLayoutReady);
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
-
-    // todo: do this on dv update, not on interval
-    // this.registerInterval(
-    //   window.setInterval(
-    //     () => this.updateStatusBarOnFailed(this.updateStatusBar),
-    //     5000,
-    //   ),
-    // );
   }
 
   private getAllTasks() {
@@ -184,23 +178,10 @@ export default class DayPlanner extends Plugin {
     await this.detachLeavesOfType(viewTypeWeekly);
   }
 
-  private async updateStatusBarOnFailed(fn: () => Promise<void>) {
-    try {
-      await fn();
-    } catch (error) {
-      this.statusBar.setText(`⚠️ Planner update failed (see console)`);
-      console.error(error);
-    }
-  }
+  private updateStatusBar = async (dataviewTasks: DataArray<STask>) => {
+    const today = window.moment();
 
-  private updateStatusBar = async () => {
-    if (dailyNoteExists()) {
-      // todo: fix
-      // const planItems = this.dataviewFacade.getTasksFor(window.moment());
-      // await this.statusBar.update(planItems);
-    } else {
-      this.statusBar.setEmpty();
-    }
+    await this.statusBar.update(getTasksForDay(today, dataviewTasks));
   };
 
   initWeeklyLeaf = async () => {

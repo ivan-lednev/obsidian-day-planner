@@ -9,7 +9,3 @@ import {
 export async function createDailyNoteIfNeeded(moment: Moment): Promise<TFile> {
   return getDailyNote(moment, getAllDailyNotes()) || createDailyNote(moment);
 }
-
-export function dailyNoteExists() {
-  return Boolean(getDailyNote(window.moment(), getAllDailyNotes()));
-}
