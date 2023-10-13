@@ -14,6 +14,7 @@ const hourMinuteSeparator = `[:. ]`;
 const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))?\\s*([apAP][mM])?`;
 
 export const timeRegExp = new RegExp(time);
+export const timeFromStartRegExp = new RegExp(`^${time}`);
 export const timestampRegExp = new RegExp(
   `^(?<listTokens>${listToken}${checkboxOrNothing})(?<times>(?<start>${time})(?:${durationSeparator}(?<end>${time}))?)(?<text>.+)$`,
   "im",

@@ -2,7 +2,7 @@ import { Moment } from "moment/moment";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { DataArray, STask } from "obsidian-dataview";
 
-import { timeRegExp } from "../regexp";
+import { timeFromStartRegExp } from "../regexp";
 import { sTaskToPlanItem } from "../service/dataview-facade";
 import { PlanItem } from "../types";
 
@@ -15,7 +15,7 @@ export function getTasksForDay(day: Moment, dataviewTasks: DataArray<STask>) {
 
   return dataviewTasks
     .where((task: STask) => {
-      const timeIsSet = timeRegExp.test(task.text);
+      const timeIsSet = timeFromStartRegExp.test(task.text);
 
       if (!timeIsSet) {
         return false;

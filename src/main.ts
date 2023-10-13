@@ -1,7 +1,14 @@
 import { FileView, Plugin, WorkspaceLeaf } from "obsidian";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
 import { DataArray, getAPI, STask } from "obsidian-dataview";
-import { get, readable, Readable, writable, Writable } from "svelte/store";
+import {
+  derived,
+  get,
+  readable,
+  Readable,
+  writable,
+  Writable,
+} from "svelte/store";
 
 import { obsidianContext, viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { settings } from "./global-store/settings";
@@ -95,9 +102,18 @@ export default class DayPlanner extends Plugin {
       );
       document.addEventListener("keydown", delayUpdateTasks);
 
+      const source = derived(this.settingsStore, ($settings) => {
+        return $settings.dataviewSource;
+      });
+
+      const unsubscribeFromSettings = source.subscribe(() => {
+        updateTasks();
+      });
+
       return () => {
         this.app.metadataCache.off("dataview:metadata-change", updateTasks);
         document.removeEventListener("keydown", delayUpdateTasks);
+        unsubscribeFromSettings();
       };
     });
   }
