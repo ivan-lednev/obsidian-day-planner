@@ -5,7 +5,6 @@ import { get, readable, Readable, writable, Writable } from "svelte/store";
 
 import { obsidianContext, viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { settings } from "./global-store/settings";
-import { visibleDateRange } from "./global-store/visible-date-range";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
@@ -17,7 +16,7 @@ import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { debounceWithDelay } from "./util/debounce-with-delay";
 import { getTasksForDay } from "./util/get-tasks-for-day";
-import { getDaysOfCurrentWeek, isToday } from "./util/moment";
+import { isToday } from "./util/moment";
 
 export default class DayPlanner extends Plugin {
   settings: () => DayPlannerSettings;
@@ -47,7 +46,6 @@ export default class DayPlanner extends Plugin {
     );
     this.register(this.dataviewTasks.subscribe(this.updateStatusBar));
 
-    this.app.workspace.onLayoutReady(this.handleLayoutReady);
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
   }
 
@@ -168,10 +166,6 @@ export default class DayPlanner extends Plugin {
     this.settingsStore = settings;
     this.settings = () => get(settings);
   }
-
-  private handleLayoutReady = async () => {
-    visibleDateRange.set(getDaysOfCurrentWeek());
-  };
 
   async onunload() {
     await this.detachLeavesOfType(viewTypeTimeline);

@@ -35,7 +35,7 @@
       {#if isToday($visibleDayInTimeline)}
         <Needle autoScrollBlocked={userHoversOverScroller} />
       {/if}
-      <TaskContainer day={visibleDayInTimeline} />
+      <TaskContainer day={$visibleDayInTimeline} />
     </Column>
   </div>
 </div>

@@ -1,4 +1,5 @@
 import type { HexString } from "obsidian";
+import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
 export interface DayPlannerSettings {
   circularProgress: boolean;
@@ -29,7 +30,7 @@ export const defaultSettings = {
   timelineIcon: "calendar-with-checkmark",
   endLabel: "All done",
   startHour: 6,
-  timelineDateFormat: "LLLL",
+  timelineDateFormat: DEFAULT_DAILY_NOTE_FORMAT,
   centerNeedle: false,
   showHelp: true,
   plannerHeading: "Day planner",

@@ -2,7 +2,7 @@
   import { GripVertical } from "lucide-svelte";
   import type { Moment } from "moment";
   import { getContext } from "svelte";
-  import { Readable, writable } from "svelte/store";
+  import { writable } from "svelte/store";
 
   import { obsidianContext } from "../../constants";
   import { snap } from "../../global-store/derived-settings";
@@ -20,7 +20,7 @@
 
   import Task from "./task.svelte";
 
-  export let day: Readable<Moment>;
+  export let day: Moment;
 
   let el: HTMLDivElement;
 
@@ -28,11 +28,12 @@
     getContext<ObsidianContext>(obsidianContext);
 
   const pointerOffsetY = writable(0);
-  const tasks = useTasksForDay({ day, dataviewTasks });
+
+  $: parsedTasks = useTasksForDay({ day, dataviewTasks: $dataviewTasks });
 
   $: ({ startEdit, displayedTasks, cancelEdit, editStatus, confirmEdit } =
     useEdit({
-      parsedTasks: $tasks,
+      parsedTasks,
       settings,
       pointerOffsetY: pointerOffsetY,
       onUpdate,
@@ -48,7 +49,7 @@
 
   async function handleMouseDown() {
     const newTask = await createPlanItem(
-      $day,
+      day,
       offsetYToMinutes(
         $pointerOffsetY,
         $settings.zoomLevel,

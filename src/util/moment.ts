@@ -17,10 +17,6 @@ export function timeToMinutes(time: string) {
   return getMinutesSinceMidnight(parsed);
 }
 
-export function getMinutesSinceMidnightOfDayTo(day: Moment, moment: Moment) {
-  return getDiffInMinutes(moment, day.clone().startOf("day"));
-}
-
 export function getDiffInMinutes(a: Moment, b: Moment) {
   return Math.abs(a.diff(b, "minutes"));
 }

@@ -1,4 +1,6 @@
 import type { Moment } from "moment";
 import { writable } from "svelte/store";
 
-export const visibleDateRange = writable<Moment[]>();
+import { getDaysOfCurrentWeek } from "../util/moment";
+
+export const visibleDateRange = writable<Moment[]>(getDaysOfCurrentWeek());

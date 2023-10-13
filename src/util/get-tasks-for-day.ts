@@ -7,6 +7,10 @@ import { sTaskToPlanItem } from "../service/dataview-facade";
 import { PlanItem } from "../types";
 
 export function getTasksForDay(day: Moment, dataviewTasks: DataArray<STask>) {
+  if (dataviewTasks.length === 0) {
+    return [];
+  }
+
   const noteForDay = getDailyNote(day, getAllDailyNotes());
 
   return dataviewTasks

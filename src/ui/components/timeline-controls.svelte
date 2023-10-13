@@ -13,7 +13,6 @@
     Info,
   } from "lucide-svelte";
   import type { Moment } from "moment";
-  import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../constants";
@@ -120,7 +119,7 @@
         await obsidianFacade.openFileInEditor(note);
       }}
     >
-      <span class="date">{day.format(DEFAULT_DAILY_NOTE_FORMAT)}</span>
+      <span class="date">{day.format($settings.timelineDateFormat)}</span>
     </ControlButton>
 
     <ControlButton

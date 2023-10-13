@@ -1,8 +1,7 @@
 <script lang="ts">
   import { getContext } from "svelte";
-  import { writable } from "svelte/store";
-
-  import { obsidianContext } from "../../../constants";
+  
+import { obsidianContext } from "../../../constants";
   import { getVisibleHours } from "../../../global-store/derived-settings";
   import { settings } from "../../../global-store/settings";
   import { visibleDateRange } from "../../../global-store/visible-date-range";
@@ -26,7 +25,7 @@
         label="Open note for day"
         on:click={async () => await obsidianFacade.openFileForDay(day)}
       >
-        {day.format("MMM D, ddd")}
+        {day.format($settings.timelineDateFormat)}
       </ControlButton>
     </div>
   {/each}
@@ -40,7 +39,7 @@
           {#if isToday(day)}
             <Needle autoScrollBlocked={true} />
           {/if}
-          <TaskContainer day={writable(day)} />
+          <TaskContainer {day} />
         </Column>
       </div>
     </div>
@@ -83,9 +82,8 @@
   }
 
   .day-header {
+    overflow-x: hidden;
     flex: 1 0 150px;
-
-    padding: 5px;
 
     background-color: var(--background-primary);
     border-right: 1px solid var(--background-modifier-border);

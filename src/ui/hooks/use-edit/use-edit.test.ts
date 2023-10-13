@@ -9,7 +9,7 @@ import { useEdit } from "./use-edit";
 
 const baseTasks = [basePlanItem];
 
-function createProps({ tasks } = { tasks: baseTasks }) {
+function createProps({ parsedTasks } = { parsedTasks: baseTasks }) {
   const pointerOffsetY = writable(0);
 
   function movePointerTo(time: string) {
@@ -18,7 +18,7 @@ function createProps({ tasks } = { tasks: baseTasks }) {
 
   return {
     pointerOffsetY,
-    parsedTasks: tasks,
+    parsedTasks,
     settings: writable(defaultSettingsForTests),
     onUpdate: () => Promise.resolve(),
     movePointerTo,
@@ -84,7 +84,7 @@ describe("drag many", () => {
       },
     ];
 
-    const { movePointerTo, ...props } = createProps({ tasks });
+    const { movePointerTo, ...props } = createProps({ parsedTasks: tasks });
 
     const { displayedTasks, startEdit } = useEdit(props);
 
@@ -110,7 +110,7 @@ describe("drag many", () => {
       },
     ];
 
-    const { movePointerTo, ...props } = createProps({ tasks });
+    const { movePointerTo, ...props } = createProps({ parsedTasks: tasks });
 
     const { displayedTasks, startEdit } = useEdit(props);
 
@@ -142,7 +142,7 @@ describe("drag many", () => {
       },
     ];
 
-    const { movePointerTo, ...props } = createProps({ tasks });
+    const { movePointerTo, ...props } = createProps({ parsedTasks: tasks });
 
     const { displayedTasks, startEdit } = useEdit(props);
 
