@@ -10,6 +10,9 @@
 - [What it looks like](#what-it-looks-like)
 - [Drag-and-drop demos](#drag-and-drop-demos)
 - [How to use it](#how-to-use-it)
+  - [Dataview integration](#dataview-integration)
+    - [How to schedule a task anywhere in the vault](#how-to-schedule-a-task-anywhere-in-the-vault)
+    - [Dataview source filter](#dataview-source-filter)
 - [What else you can do](#what-else-you-can-do)
 - [Commands](#commands)
 - [Note on the old plugin version](#note-on-the-old-plugin-version)
@@ -39,10 +42,38 @@
 ## How to use it
 
 1. **Either the core 'Daily Notes' or the 'Periodic Notes' plugins should be enabled**
+1. **The Dataview plugin should be enabled**
 1. Install the plugin
-1. Start writing your daily plan in the daily note
-   - Note that the plugin searches for tasks under a preconfigured heading (by default it's `# Day planner`)
-1. Open timeline view to monitor your progress with the command: `Show the day planner timeline`
+1. Open timeline view to monitor your progress with the command: `Show the day planner timeline` or by clicking on the ribbon icon
+
+### Dataview integration
+
+A task is going to show up in the timeline for a given day
+
+- If it's inside a daily note for the day
+- Or if it's scheduled for the day
+
+Everything Dataview recognizes as a task is shown in the timeline, including:
+
+- Tasks inside callouts
+- Nested tasks. If a nested task has a timestamp, it'll show up as a separate block, and will be excluded from its parent's unscheduled sub-items list
+
+#### How to schedule a task anywhere in the vault
+
+To schedule a task add time and a date that Dataview recognizes: `⏳ 2021-08-29` or `[scheduled:: 2021-08-29]` or `(scheduled:: 2021-08-29)`.
+
+Full examples:
+
+```md
+- [ ] 08:00 - 10:00 This task uses the shorthand format (used by obsidian-tasks) ⏳ 2021-08-29
+- [ ] 11:00 - 13:00 This task uses the Dataview property format [scheduled:: 2021-08-29]
+```
+
+[obsidian-tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) adds a modal with some handy shortcuts for adding dates like these.
+
+#### Dataview source filter
+
+You can set up Dataview to search for tasks only in specific folders or tags. This improves performance on large vaults. [Here are the docs on how to use the syntax](https://blacksmithgu.github.io/obsidian-dataview/reference/sources/).
 
 ## What else you can do
 
@@ -71,3 +102,5 @@ If for some reason you still want to use the old version, there are community fo
 
 - Thanks to [James Lynch](https://github.com/lynchjames) for the original plugin
 - Thanks to [replete](https://github.com/replete), whose fork I initially forked
+- Thanks to [Michael Brenan](https://github.com/blacksmithgu) for Dataview
+- Thanks to [Joshua Tazman Reinier](https://github.com/joshuatazrein) for his plugin, which gave me an idea of how to integrate with Dataview
