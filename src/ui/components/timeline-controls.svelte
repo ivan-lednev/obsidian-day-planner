@@ -153,6 +153,23 @@
       <Settings class="svg-icon" />
     </ControlButton>
   </div>
+  {#if $settings.showDataviewMigrationWarning}
+    <div class="migration-dialogue">
+      <AlertTriangle class="svg-icon" />
+      <span>
+        List items without checkboxes are no longer shown.
+        <a href="https://github.com/ivan-lednev/obsidian-day-planner#readme"
+          >Check out the Dataview section in the docs</a
+        >.
+      </span>
+      <button
+        on:click={() => {
+          $settings.showDataviewMigrationWarning = false;
+        }}
+        >Got it
+      </button>
+    </div>
+  {/if}
   {#if !$dataviewLoaded}
     <div class="info-container">
       <AlertTriangle class="svg-icon mod-error" />
@@ -254,6 +271,14 @@
     color: var(--text-success);
   }
 
+  .migration-dialogue {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: var(--size-4-2);
+    gap: var(--size-4-2);
+  }
+
   .container {
     display: flex;
     flex-direction: column;
@@ -277,6 +302,10 @@
     display: flex;
     gap: var(--size-4-1);
     margin: var(--size-4-2);
+  }
+
+  .info-container :global(.svg-icon) {
+    flex-shrink: 0;
   }
 
   .error-message {
