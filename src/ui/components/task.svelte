@@ -37,10 +37,12 @@
       text={planItem.text}
     />
     <slot />
-    <hr
-      class="workspace-leaf-resize-handle"
-      on:mousedown|stopPropagation={onResizeStart}
-    />
+    {#if !planItem.isGhost}
+      <hr
+        class="workspace-leaf-resize-handle"
+        on:mousedown|stopPropagation={onResizeStart}
+      />
+    {/if}
   </div>
 </div>
 

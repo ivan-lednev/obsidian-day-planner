@@ -12,7 +12,7 @@
   import { getId } from "../../util/id";
   import { getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
-  import { cursorForMode } from "../hooks/use-edit/cursor";
+  import { useCursor } from "../hooks/use-edit/cursor";
   import { createPlanItem } from "../hooks/use-edit/transform/create";
   import { EditMode } from "../hooks/use-edit/types";
   import { offsetYToMinutes, useEdit } from "../hooks/use-edit/use-edit";
@@ -24,7 +24,7 @@
 
   let el: HTMLDivElement;
 
-  const { obsidianFacade, onUpdate, dataviewTasks } =
+  const { obsidianFacade, onUpdate, dataviewTasks, fileSyncInProgress } =
     getContext<ObsidianContext>(obsidianContext);
 
   const pointerOffsetY = writable(0);
@@ -36,10 +36,14 @@
       parsedTasks,
       settings,
       pointerOffsetY: pointerOffsetY,
+      fileSyncInProgress,
       onUpdate,
     }));
 
-  $: ({ bodyCursor, gripCursor } = cursorForMode($editStatus));
+  $: ({ bodyCursor, gripCursor, containerCursor } = useCursor({
+    editBlocked: $fileSyncInProgress,
+    editMode: $editStatus,
+  }));
 
   $: {
     $editCancellation;
@@ -121,6 +125,7 @@
 
 <div
   bind:this={el}
+  style:cursor={containerCursor}
   class="task-container absolute-stretch-x"
   on:mousedown={handleMouseDown}
   on:mouseup|stopPropagation={handleMouseUp}

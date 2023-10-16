@@ -40,7 +40,7 @@ export class PlanEditor {
     if (created.length > 0) {
       const task = created[0];
 
-      return this.obsidianFacade.editFile(task.location.path, (contents) => {
+      await this.obsidianFacade.editFile(task.location.path, (contents) => {
         return this.writeTaskToFileContents(task, contents);
       });
     }
@@ -60,7 +60,7 @@ export class PlanEditor {
         ),
     );
 
-    return Promise.all(editPromises);
+    await Promise.all(editPromises);
   };
 
   writeTaskToFileContents(task: PlanItem, contents: string) {

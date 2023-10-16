@@ -16,6 +16,7 @@ import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
+import { PlanItem } from "./types";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
@@ -33,6 +34,7 @@ export default class DayPlanner extends Plugin {
   private planEditor: PlanEditor;
   private dataviewTasks: Readable<DataArray<STask>>;
   private readonly dataviewLoaded = writable(false);
+  private readonly fileSyncInProgress = writable(false);
 
   async onload() {
     await this.initSettingsStore();
@@ -51,6 +53,7 @@ export default class DayPlanner extends Plugin {
       this.addStatusBarItem(),
       this.initTimelineLeaf,
     );
+
     this.register(this.dataviewTasks.subscribe(this.updateStatusBar));
 
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
@@ -92,7 +95,11 @@ export default class DayPlanner extends Plugin {
   private initDataviewTasks() {
     this.dataviewTasks = readable(this.getAllTasks(), (set) => {
       const [updateTasks, delayUpdateTasks] = debounceWithDelay(() => {
-        set(this.getAllTasks());
+        try {
+          set(this.getAllTasks());
+        } finally {
+          this.fileSyncInProgress.set(false);
+        }
       }, 1000);
 
       this.app.metadataCache.on(
@@ -220,6 +227,11 @@ export default class DayPlanner extends Plugin {
     );
   }
 
+  private syncTasksWithFile = async (base: PlanItem[], updated: PlanItem[]) => {
+    this.fileSyncInProgress.set(true);
+    await this.planEditor.syncTasksWithFile(base, updated);
+  };
+
   private registerViews() {
     const componentContext = new Map([
       [
@@ -227,11 +239,12 @@ export default class DayPlanner extends Plugin {
         {
           obsidianFacade: this.obsidianFacade,
           metadataCache: this.app.metadataCache,
-          onUpdate: this.planEditor.syncTasksWithFile,
+          onUpdate: this.syncTasksWithFile,
           initWeeklyView: this.initWeeklyLeaf,
           dataviewTasks: this.dataviewTasks,
           refreshTasks: this.refreshTasks,
           dataviewLoaded: this.dataviewLoaded,
+          fileSyncInProgress: this.fileSyncInProgress,
         },
       ],
     ]);

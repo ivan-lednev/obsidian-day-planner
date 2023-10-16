@@ -1,10 +1,23 @@
 import { EditMode } from "./types";
 
-export function cursorForMode(mode: EditMode) {
+interface UseCursorProps {
+  editMode: EditMode;
+  editBlocked: boolean;
+}
+
+export function useCursor({ editMode, editBlocked }: UseCursorProps) {
+  if (editBlocked) {
+    return {
+      bodyCursor: "unset",
+      gripCursor: "not-allowed",
+      containerCursor: "wait",
+    };
+  }
+
   if (
-    mode === EditMode.CREATE ||
-    mode === EditMode.DRAG ||
-    mode === EditMode.DRAG_AND_SHIFT_OTHERS
+    editMode === EditMode.CREATE ||
+    editMode === EditMode.DRAG ||
+    editMode === EditMode.DRAG_AND_SHIFT_OTHERS
   ) {
     return {
       bodyCursor: "grabbing",
@@ -12,12 +25,15 @@ export function cursorForMode(mode: EditMode) {
     };
   }
 
-  if (mode === EditMode.RESIZE || mode === EditMode.RESIZE_AND_SHIFT_OTHERS) {
+  if (
+    editMode === EditMode.RESIZE ||
+    editMode === EditMode.RESIZE_AND_SHIFT_OTHERS
+  ) {
     return { bodyCursor: "row-resize", gripCursor: "grab" };
   }
 
   return {
-    bodyCursor: undefined,
+    bodyCursor: "unset",
     gripCursor: "grab",
   };
 }

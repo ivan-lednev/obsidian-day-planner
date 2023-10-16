@@ -73,4 +73,5 @@ export interface ObsidianContext {
   dataviewTasks: Readable<DataArray<STask>>;
   refreshTasks: (source: string) => void;
   dataviewLoaded: Writable<boolean>;
+  fileSyncInProgress: Readable<boolean>;
 }
