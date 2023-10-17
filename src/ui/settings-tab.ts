@@ -222,6 +222,38 @@ When you open a file, the plugin will search for this heading to detect a day pl
           }),
       );
 
+    containerEl.createEl("h2", { text: "Duration" });
+
+    new Setting(containerEl)
+      .setName("Stretch task until next one in timeline if it has no end time")
+      .setDesc(
+        'By "no end time" we mean "- [ ] 10:00 Wake up" instead of "- [ ] 10:00 - 11:00 Wake up"',
+      )
+      .addToggle((component) => {
+        component
+          .setValue(this.plugin.settings().extendDurationUntilNext)
+          .onChange((value) => {
+            this.update({ extendDurationUntilNext: value });
+          });
+      });
+
+    new Setting(containerEl)
+      .setName("Default task duration")
+      .setDesc(
+        "Used when you create a task with drag-and-drop & when you don't specify an end time",
+      )
+      .addSlider((slider) =>
+        slider
+          .setLimits(20, 120, 10)
+          .setValue(Number(this.plugin.settings().defaultDurationMinutes))
+          .setDynamicTooltip()
+          .onChange((value: number) => {
+            this.update({ defaultDurationMinutes: value });
+          }),
+      );
+
+    containerEl.createEl("h2", { text: "Colors" });
+
     new Setting(containerEl)
       .setName("Colorful Timeline")
       .setDesc(

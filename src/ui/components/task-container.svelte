@@ -29,7 +29,7 @@
 
   const pointerOffsetY = writable(0);
 
-  $: parsedTasks = useTasksForDay({ day, dataviewTasks: $dataviewTasks });
+  $: parsedTasks = useTasksForDay({ day, dataviewTasks: $dataviewTasks, settings: $settings });
 
   $: ({ startEdit, displayedTasks, cancelEdit, editStatus, confirmEdit } =
     useEdit({

@@ -1,7 +1,6 @@
 import { Moment } from "moment";
 import { STask, DateTime } from "obsidian-dataview";
 
-import { defaultDurationMinutes } from "../constants";
 import { createPlanItem } from "../parser/parser";
 import { timeRegExp } from "../regexp";
 import { PlanItem } from "../types";
@@ -45,6 +44,10 @@ export function sTaskToPlanItem(sTask: STask, day: Moment): PlanItem {
     },
   });
 
+  const durationMinutes = endTime
+    ? getDiffInMinutes(endTime, startTime)
+    : undefined;
+
   return {
     startTime,
     rawStartTime: "-",
@@ -52,10 +55,7 @@ export function sTaskToPlanItem(sTask: STask, day: Moment): PlanItem {
     listTokens: `${sTask.symbol} [${sTask.status}] `,
     firstLineText,
     text,
-    durationMinutes: getDiffInMinutes(
-      endTime || startTime.clone().add(defaultDurationMinutes, "minutes"),
-      startTime,
-    ),
+    durationMinutes,
     startMinutes: getMinutesSinceMidnight(startTime),
     location: {
       path: sTask.path,

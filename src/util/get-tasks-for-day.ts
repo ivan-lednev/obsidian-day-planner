@@ -5,6 +5,7 @@ import { DataArray, STask } from "obsidian-dataview";
 
 import { timeFromStartRegExp } from "../regexp";
 import { sTaskToPlanItem } from "../service/dataview-facade";
+import { DayPlannerSettings } from "../settings";
 import { PlanItem } from "../types";
 
 function isScheduledForThisDay(task: STask, day: Moment) {
@@ -29,14 +30,48 @@ function isScheduledForAnotherDay(task: STask, day: Moment) {
   return task.scheduled && !isScheduledForThisDay(task, day);
 }
 
-export function getTasksForDay(day: Moment, dataviewTasks: DataArray<STask>) {
+type DurationOptions = Pick<
+  DayPlannerSettings,
+  "defaultDurationMinutes" | "extendDurationUntilNext"
+>;
+
+function calculateDuration(tasks: PlanItem[], options: DurationOptions) {
+  return tasks.map((current, i, array) => {
+    if (current.durationMinutes) {
+      return current;
+    }
+
+    const next = array[i + 1];
+    const shouldExtendUntilNext = next && options.extendDurationUntilNext;
+
+    if (shouldExtendUntilNext) {
+      const minutesUntilNext = next.startMinutes - current.startMinutes;
+
+      return {
+        ...current,
+        durationMinutes: minutesUntilNext,
+      };
+    }
+
+    return {
+      ...current,
+      durationMinutes: options.defaultDurationMinutes,
+    };
+  });
+}
+
+export function getTasksForDay(
+  day: Moment,
+  dataviewTasks: DataArray<STask>,
+  options: DurationOptions,
+): PlanItem[] {
   if (dataviewTasks.length === 0) {
     return [];
   }
 
   const noteForThisDay = getDailyNote(day, getAllDailyNotes());
 
-  return dataviewTasks
+  const planItems = dataviewTasks
     .where(
       (task: STask) =>
         isTimeSetOnTask(task) &&
@@ -47,4 +82,6 @@ export function getTasksForDay(day: Moment, dataviewTasks: DataArray<STask>) {
     .map((sTask: STask) => sTaskToPlanItem(sTask, day))
     .sort((task: PlanItem) => task.startMinutes)
     .array();
+
+  return calculateDuration(planItems, options);
 }

@@ -73,7 +73,7 @@
       {
         "selector": "enum",
         "format": [
-          "StrictPascalCase"
+          "PascalCase"
         ]
       },
       {
@@ -85,7 +85,7 @@
       {
         "selector": "interface",
         "format": [
-          "StrictPascalCase"
+          "PascalCase"
         ],
         "custom": {
           "regex": "^I[A-Z]",

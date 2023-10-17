@@ -198,7 +198,9 @@ export default class DayPlanner extends Plugin {
   private updateStatusBar = async (dataviewTasks: DataArray<STask>) => {
     const today = window.moment();
 
-    await this.statusBar.update(getTasksForDay(today, dataviewTasks));
+    await this.statusBar.update(
+      getTasksForDay(today, dataviewTasks, { ...this.settings() }),
+    );
   };
 
   initWeeklyLeaf = async () => {
