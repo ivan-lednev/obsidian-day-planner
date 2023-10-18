@@ -11,6 +11,7 @@ interface UseEditProps {
   parsedTasks: PlacedPlanItem[];
   pointerOffsetY: Readable<number>;
   settings: typeof settings;
+  fileSyncInProgress: Readable<boolean>;
   onUpdate: OnUpdateFn;
 }
 
@@ -29,6 +30,7 @@ export function useEdit({
   parsedTasks,
   pointerOffsetY,
   settings,
+  fileSyncInProgress,
   onUpdate,
 }: UseEditProps) {
   const baselineTasks = writable(parsedTasks);
@@ -57,18 +59,22 @@ export function useEdit({
   );
 
   function startEdit(operation: EditOperation) {
-    editOperation.set(operation);
+    if (!get(fileSyncInProgress)) {
+      editOperation.set(operation);
+    }
   }
 
   async function confirmEdit() {
+    if (get(editOperation) === undefined) {
+      return;
+    }
+
     const currentTasks = get(displayedTasks);
 
-    // todo: this should be hidden inside creation logic?
-    baselineTasks.set(currentTasks.map((t) => ({ ...t, isGhost: false })));
+    baselineTasks.set(currentTasks.map((t) => ({ ...t, isGhost: true })));
     editOperation.set(undefined);
 
     await onUpdate(parsedTasks, currentTasks);
-    // todo: disable edit until next parse
   }
 
   function cancelEdit() {

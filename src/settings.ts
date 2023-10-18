@@ -20,6 +20,8 @@ export interface DayPlannerSettings {
   timestampFormat: string;
   dataviewSource: string;
   showDataviewMigrationWarning: boolean;
+  extendDurationUntilNext: boolean;
+  defaultDurationMinutes: number;
 }
 
 export const defaultSettings = {
@@ -41,6 +43,8 @@ export const defaultSettings = {
   timestampFormat: "HH:mm",
   dataviewSource: "",
   showDataviewMigrationWarning: true,
+  extendDurationUntilNext: false,
+  defaultDurationMinutes: 30,
 };
 
 export const defaultSettingsForTests = {

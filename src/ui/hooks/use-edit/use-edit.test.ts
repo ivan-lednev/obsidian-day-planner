@@ -20,6 +20,7 @@ function createProps({ parsedTasks } = { parsedTasks: baseTasks }) {
     pointerOffsetY,
     parsedTasks,
     settings: writable(defaultSettingsForTests),
+    fileSyncInProgress: writable(false),
     onUpdate: () => Promise.resolve(),
     movePointerTo,
   };

@@ -336,6 +336,7 @@
   }
 
   .controls {
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     border-bottom: 1px solid var(--background-modifier-border);

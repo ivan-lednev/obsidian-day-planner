@@ -1,3 +1,4 @@
+- ✨ [Check out new features and other changes](https://github.com/ivan-lednev/obsidian-day-planner/releases)
 - 🪲 [Create issues](https://github.com/ivan-lednev/obsidian-day-planner/issues)
 - 🪛 [Submit pull-requests](./CONTRIBUTING.md)
 - ❤️ Support directly:
