@@ -336,6 +336,7 @@
   }
 
   .controls {
+    flex: 0 0 auto;
     overflow: hidden;
     display: flex;
     flex-direction: column;

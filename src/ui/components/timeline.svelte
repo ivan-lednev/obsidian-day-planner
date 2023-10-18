@@ -43,7 +43,7 @@
 <style>
   .vertical-scroller {
     overflow: auto;
-    height: 100%;
+    flex: 1 0 0;
   }
 
   .scale-with-days {
