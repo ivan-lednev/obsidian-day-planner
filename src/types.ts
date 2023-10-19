@@ -17,8 +17,7 @@ export type OnUpdateFn = (
   updated: PlanItem[],
 ) => Promise<void | void[]>;
 
-export interface PlanItem {
-  startTime: Moment;
+export interface UnscheduledPlanItem {
   /**
    * @deprecated this will be replaced with dataview `symbol` and `status`
    */
@@ -28,24 +27,21 @@ export interface PlanItem {
   firstLineText: string;
   text: string;
 
-  durationMinutes: number;
-  startMinutes: number;
-  location?: PlanItemLocation;
   id: string;
-  /**
-   * @deprecated derive it from startTime instead
-   */
-  rawStartTime: string;
-  /**
-   * @deprecated derive it from startTime and duration instead
-   */
-  rawEndTime: string;
+  location?: PlanItemLocation;
+  placing?: ReturnType<typeof getHorizontalPlacing>;
+  isGhost?: boolean;
+
+  durationMinutes: number;
 }
 
-export interface PlacedPlanItem extends PlanItem {
-  placing: ReturnType<typeof getHorizontalPlacing>;
-  isGhost?: boolean;
+export interface PlanItem extends UnscheduledPlanItem {
+  startTime: Moment;
+  startMinutes: number;
 }
+
+// todo: we don't need this, since it's all optional
+export interface PlacedPlanItem extends PlanItem {}
 
 export type RelationToNow = "past" | "present" | "future";
 

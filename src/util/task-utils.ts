@@ -11,6 +11,10 @@ export function isEqualTask(a: PlanItem, b: PlanItem) {
   );
 }
 
+export function isWithTime(task: Partial<Pick<PlanItem, "startTime">>) {
+  return Boolean(task.startTime);
+}
+
 export function getEndMinutes(task: {
   startMinutes: number;
   durationMinutes: number;

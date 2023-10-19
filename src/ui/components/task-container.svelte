@@ -1,6 +1,5 @@
 <script lang="ts">
   import { GripVertical } from "lucide-svelte";
-  import type { Moment } from "moment";
   import { getContext } from "svelte";
   import { writable } from "svelte/store";
   import Column from "./column.svelte";
@@ -27,6 +26,7 @@
   import TimelineControls from "./timeline-controls.svelte";
 
   // export let day: Moment;
+  // todo: won't work for week
   $: day = $visibleDayInTimeline;
 
   let el: HTMLDivElement;
@@ -36,15 +36,16 @@
 
   const pointerOffsetY = writable(0);
 
-  $: parsedTasks = useTasksForDay({
-    day,
-    dataviewTasks: $dataviewTasks,
-    settings: $settings,
-  });
+  $: ({ scheduled: scheduledTasks, unscheduled: unscheduledTasks } =
+    useTasksForDay({
+      day,
+      dataviewTasks: $dataviewTasks,
+      settings: $settings,
+    }));
 
   $: ({ startEdit, displayedTasks, cancelEdit, editStatus, confirmEdit } =
     useEdit({
-      parsedTasks,
+      parsedTasks: scheduledTasks,
       settings,
       pointerOffsetY: pointerOffsetY,
       fileSyncInProgress,
@@ -146,24 +147,8 @@
 
 <TimelineControls day={$visibleDayInTimeline} />
 <div class="unscheduled-task-container">
-  {#each $displayedTasks as planItem (getRenderKey(planItem))}
-    <Task
-      --position="static"
-      onResizeStart={(event) => handleResizeStart(event, planItem)}
-      {planItem}
-      on:mouseup={() => handleTaskMouseUp(planItem)}
-    >
-      {#if !planItem.isGhost}
-        <div
-          style:cursor={gripCursor}
-          class="grip"
-          on:mousedown|stopPropagation={(event) =>
-            handleGripMouseDown(event, planItem)}
-        >
-          <GripVertical class="svg-icon" />
-        </div>
-      {/if}
-    </Task>
+  {#each unscheduledTasks as planItem}
+    <Task --position="static" {planItem} on:mouseup={() => {}} />
   {/each}
 </div>
 <div
@@ -191,11 +176,7 @@
         {/if}
 
         {#each $displayedTasks as planItem (getRenderKey(planItem))}
-          <Task
-            onResizeStart={(event) => handleResizeStart(event, planItem)}
-            {planItem}
-            on:mouseup={() => handleTaskMouseUp(planItem)}
-          >
+          <Task {planItem} on:mouseup={() => handleTaskMouseUp(planItem)}>
             {#if !planItem.isGhost}
               <div
                 style:cursor={gripCursor}
@@ -205,6 +186,11 @@
               >
                 <GripVertical class="svg-icon" />
               </div>
+              <hr
+                class="workspace-leaf-resize-handle"
+                on:mousedown|stopPropagation={(event) =>
+                  handleResizeStart(event, planItem)}
+              />
             {/if}
           </Task>
         {/each}
@@ -222,6 +208,20 @@
     to {
       opacity: 0.2;
     }
+  }
+
+  :not(#dummy).workspace-leaf-resize-handle {
+    cursor: row-resize;
+
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    display: block; /* obsidian hides them sometimes, we don't want that */
+
+    height: calc(var(--divider-width-hover) * 2);
+
+    border-bottom-width: var(--divider-width);
   }
 
   .unscheduled-task-container {

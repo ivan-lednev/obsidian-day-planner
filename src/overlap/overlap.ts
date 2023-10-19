@@ -117,7 +117,7 @@ function overlaps(a: TimeBlock, b: TimeBlock) {
   return getEndMinutes(early) > late.startMinutes;
 }
 
-export function addPlacing(planItems: PlanItem[]) {
+export function addHorizontalPlacing(planItems: PlanItem[]) {
   if (planItems.length === 0) {
     return [];
   }

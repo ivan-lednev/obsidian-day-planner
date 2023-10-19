@@ -4,9 +4,13 @@ import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { DataArray, STask } from "obsidian-dataview";
 
 import { timeFromStartRegExp } from "../regexp";
-import { sTaskToPlanItem } from "../service/dataview-facade";
+import {
+  sTaskToPlanItem,
+  sTaskToUnscheduledPlanItem,
+} from "../service/dataview-facade";
 import { DayPlannerSettings } from "../settings";
-import { PlanItem } from "../types";
+import { PlanItem, UnscheduledPlanItem } from "../types";
+import { partition } from "lodash/fp";
 
 function isScheduledForThisDay(task: STask, day: Moment) {
   if (!task?.scheduled?.toMillis) {
@@ -64,24 +68,37 @@ export function getTasksForDay(
   day: Moment,
   dataviewTasks: DataArray<STask>,
   options: DurationOptions,
-): PlanItem[] {
+): {
+  scheduled: PlanItem[];
+  unscheduled: PlanItem[];
+} {
   if (dataviewTasks.length === 0) {
-    return [];
+    return { scheduled: [], unscheduled: [] };
   }
 
   const noteForThisDay = getDailyNote(day, getAllDailyNotes());
 
-  const planItems = dataviewTasks
+  const tasksForDay = dataviewTasks
     .where(
       (task: STask) =>
-        isTimeSetOnTask(task) &&
         !isScheduledForAnotherDay(task, day) &&
         (isScheduledForThisDay(task, day) ||
           isTaskInFile(task, noteForThisDay)),
     )
-    .map((sTask: STask) => sTaskToPlanItem(sTask, day))
-    .sort((task: PlanItem) => task.startMinutes)
     .array();
 
-  return calculateDuration(planItems, options);
+  const [withTime, withoutTime] = partition(isTimeSetOnTask, tasksForDay);
+
+  const tasksWithTime = withTime
+    .map((sTask: STask) => sTaskToPlanItem(sTask, day))
+    .sort((task: PlanItem) => task.startMinutes);
+
+  const tasksWithoutTime = withoutTime.map((sTask: STask) =>
+    sTaskToUnscheduledPlanItem(sTask, day),
+  );
+
+  const scheduled = calculateDuration(tasksWithTime, options);
+
+  // todo: better: withTime, withoutTime
+  return { scheduled, unscheduled: tasksWithoutTime };
 }

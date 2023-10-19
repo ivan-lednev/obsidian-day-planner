@@ -2,7 +2,7 @@ import type { Moment } from "moment";
 import type { CachedMetadata } from "obsidian";
 import { dedent } from "ts-dedent";
 
-import { timestampRegExp } from "../regexp";
+import { sTaskTimestampRegExp, timestampRegExp } from "../regexp";
 import type { PlanItemLocation } from "../types";
 import { getId } from "../util/id";
 

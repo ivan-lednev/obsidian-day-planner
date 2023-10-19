@@ -19,4 +19,8 @@ export const timestampRegExp = new RegExp(
   `^(?<listTokens>${listToken}${checkboxOrNothing})(?<times>(?<start>${time})(?:${durationSeparator}(?<end>${time}))?)(?<text>.+)$`,
   "im",
 );
-export const scheduledDateRegExp = / ⏳ \d{4}-\d{2}-\d{2}/;
+
+export const sTaskTimestampRegExp = new RegExp(
+  `^(?<start>${time})(?:${durationSeparator}(?<end>${time}))?$`,
+  "im",
+);

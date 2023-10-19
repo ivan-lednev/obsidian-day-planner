@@ -1,13 +1,12 @@
 <script lang="ts">
   import { currentTime } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
-  import type { PlacedPlanItem } from "../../types";
+  import type { PlanItem } from "../../types";
   import { useTaskVisuals } from "../hooks/use-task-visuals";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
-  export let planItem: PlacedPlanItem;
-  export let onResizeStart: (event: MouseEvent) => void;
+  export let planItem: PlanItem;
 
   $: ({ height, offset, relationToNow, backgroundColor, properContrastColors } =
     useTaskVisuals(planItem, {
@@ -19,8 +18,8 @@
 <div
   style:height="{$height}px"
   style:top="{$offset}px"
-  style:width="{planItem.placing.widthPercent || 100}%"
-  style:left="{planItem.placing.xOffsetPercent || 0}%"
+  style:width="{planItem?.placing?.widthPercent || 100}%"
+  style:left="{planItem?.placing?.xOffsetPercent || 0}%"
   class="task-padding-box"
 >
   <div
@@ -37,30 +36,10 @@
       text={planItem.text}
     />
     <slot />
-    {#if !planItem.isGhost}
-      <hr
-        class="workspace-leaf-resize-handle"
-        on:mousedown|stopPropagation={onResizeStart}
-      />
-    {/if}
   </div>
 </div>
 
 <style>
-  :not(#dummy).workspace-leaf-resize-handle {
-    cursor: row-resize;
-
-    right: 0;
-    bottom: 0;
-    left: 0;
-
-    display: block; /* obsidian hides them sometimes, we don't want that */
-
-    height: calc(var(--divider-width-hover) * 2);
-
-    border-bottom-width: var(--divider-width);
-  }
-
   .task-padding-box {
     display: flex;
     padding: 0 1px 2px;
