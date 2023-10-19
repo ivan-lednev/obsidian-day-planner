@@ -3,9 +3,12 @@
   import type { Moment } from "moment";
   import { getContext } from "svelte";
   import { writable } from "svelte/store";
+  import Column from "./column.svelte";
+  import Needle from "./needle.svelte";
+  import Ruler from "./ruler.svelte";
 
   import { obsidianContext } from "../../constants";
-  import { snap } from "../../global-store/derived-settings";
+  import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { editCancellation } from "../../global-store/edit-events";
   import { settings } from "../../global-store/settings";
   import type { ObsidianContext, PlacedPlanItem, PlanItem } from "../../types";
@@ -19,8 +22,12 @@
   import { useTasksForDay } from "../hooks/use-tasks-for-day";
 
   import Task from "./task.svelte";
+  import { isToday } from "../../util/moment";
+  import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
+  import TimelineControls from "./timeline-controls.svelte";
 
-  export let day: Moment;
+  // export let day: Moment;
+  $: day = $visibleDayInTimeline;
 
   let el: HTMLDivElement;
 
@@ -29,7 +36,11 @@
 
   const pointerOffsetY = writable(0);
 
-  $: parsedTasks = useTasksForDay({ day, dataviewTasks: $dataviewTasks, settings: $settings });
+  $: parsedTasks = useTasksForDay({
+    day,
+    dataviewTasks: $dataviewTasks,
+    settings: $settings,
+  });
 
   $: ({ startEdit, displayedTasks, cancelEdit, editStatus, confirmEdit } =
     useEdit({
@@ -109,6 +120,16 @@
 
     startEdit({ task, mode });
   }
+
+  let userHoversOverScroller = false;
+
+  function handleMouseEnter() {
+    userHoversOverScroller = true;
+  }
+
+  function handleMouseLeave() {
+    userHoversOverScroller = false;
+  }
 </script>
 
 <svelte:body use:styledCursor={bodyCursor} />
@@ -123,18 +144,11 @@
   }}
 />
 
-<div
-  bind:this={el}
-  style:cursor={containerCursor}
-  class="task-container absolute-stretch-x"
-  on:mousedown={handleMouseDown}
-  on:mouseup|stopPropagation={handleMouseUp}
->
-  {#if $editStatus && $settings.showHelp}
-    <div class="banner">Release outside this column to cancel edit</div>
-  {/if}
+<TimelineControls day={$visibleDayInTimeline} />
+<div class="unscheduled-task-container">
   {#each $displayedTasks as planItem (getRenderKey(planItem))}
     <Task
+      --position="static"
       onResizeStart={(event) => handleResizeStart(event, planItem)}
       {planItem}
       on:mouseup={() => handleTaskMouseUp(planItem)}
@@ -152,6 +166,52 @@
     </Task>
   {/each}
 </div>
+<div
+  class="scroller"
+  on:mouseenter={handleMouseEnter}
+  on:mouseleave={handleMouseLeave}
+>
+  <div class="container">
+    <Ruler visibleHours={getVisibleHours($settings)} />
+
+    <Column visibleHours={getVisibleHours($settings)}>
+      {#if isToday($visibleDayInTimeline)}
+        <Needle autoScrollBlocked={userHoversOverScroller} />
+      {/if}
+
+      <div
+        bind:this={el}
+        style:cursor={containerCursor}
+        class="tasks absolute-stretch-x"
+        on:mousedown={handleMouseDown}
+        on:mouseup|stopPropagation={handleMouseUp}
+      >
+        {#if $editStatus && $settings.showHelp}
+          <div class="banner">Release outside this column to cancel edit</div>
+        {/if}
+
+        {#each $displayedTasks as planItem (getRenderKey(planItem))}
+          <Task
+            onResizeStart={(event) => handleResizeStart(event, planItem)}
+            {planItem}
+            on:mouseup={() => handleTaskMouseUp(planItem)}
+          >
+            {#if !planItem.isGhost}
+              <div
+                style:cursor={gripCursor}
+                class="grip"
+                on:mousedown|stopPropagation={(event) =>
+                  handleGripMouseDown(event, planItem)}
+              >
+                <GripVertical class="svg-icon" />
+              </div>
+            {/if}
+          </Task>
+        {/each}
+      </div>
+    </Column>
+  </div>
+</div>
 
 <style>
   @keyframes pulse {
@@ -162,6 +222,15 @@
     to {
       opacity: 0.2;
     }
+  }
+
+  .unscheduled-task-container {
+    padding: 1px 20px 0 40px;
+    border-bottom: 1px solid var(--background-modifier-border);
+  }
+
+  .container {
+    display: flex;
   }
 
   .banner {
@@ -178,7 +247,7 @@
     animation: pulse 1s infinite alternate;
   }
 
-  .task-container {
+  .tasks {
     top: 0;
     bottom: 0;
 
@@ -201,5 +270,10 @@
 
   .grip:hover {
     color: var(--text-muted);
+  }
+
+  .scroller {
+    overflow: auto;
+    flex: 1 0 0;
   }
 </style>

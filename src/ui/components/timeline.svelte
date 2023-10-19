@@ -1,14 +1,6 @@
 <script lang="ts">
-  import {
-    getVisibleHours,
-  } from "../../global-store/derived-settings";
-  import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
-  import { isToday } from "../../util/moment";
 
-  import Column from "./column.svelte";
-  import Needle from "./needle.svelte";
-  import Ruler from "./ruler.svelte";
   import TaskContainer from "./task-container.svelte";
   import TimelineControls from "./timeline-controls.svelte";
 
@@ -25,28 +17,17 @@
 
 <TimelineControls day={$visibleDayInTimeline} />
 <div
-  class="vertical-scroller"
+  class="scroller"
   on:mouseenter={handleMouseEnter}
   on:mouseleave={handleMouseLeave}
 >
-  <div class="scale-with-days">
-    <Ruler visibleHours={getVisibleHours($settings)} />
-    <Column visibleHours={getVisibleHours($settings)}>
-      {#if isToday($visibleDayInTimeline)}
-        <Needle autoScrollBlocked={userHoversOverScroller} />
-      {/if}
-      <TaskContainer day={$visibleDayInTimeline} />
-    </Column>
-  </div>
+  <TaskContainer day={$visibleDayInTimeline} />
 </div>
 
 <style>
-  .vertical-scroller {
+  .scroller {
     overflow: auto;
     flex: 1 0 0;
   }
 
-  .scale-with-days {
-    display: flex;
-  }
 </style>

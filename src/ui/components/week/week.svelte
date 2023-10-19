@@ -34,7 +34,7 @@ import { obsidianContext } from "../../../constants";
   <Ruler visibleHours={getVisibleHours($settings)} />
   {#each $visibleDateRange as day}
     <div class="day-column">
-      <div class="scale-with-days">
+      <div class="container">
         <Column visibleHours={getVisibleHours($settings)}>
           {#if isToday(day)}
             <Needle autoScrollBlocked={true} />
@@ -95,7 +95,7 @@ import { obsidianContext } from "../../../constants";
     background-color: var(--color-accent);
   }
 
-  .scale-with-days {
+  .container {
     display: flex;
   }
 </style>

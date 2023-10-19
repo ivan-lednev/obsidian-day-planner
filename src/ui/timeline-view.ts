@@ -4,6 +4,7 @@ import { viewTypeTimeline } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 
 import Timeline from "./components/timeline.svelte";
+import TaskContainer from "./components/task-container.svelte"
 
 export default class TimelineView extends ItemView {
   private timeline: Timeline;
@@ -30,7 +31,7 @@ export default class TimelineView extends ItemView {
 
   async onOpen() {
     const contentEl = this.containerEl.children[1];
-    this.timeline = new Timeline({
+    this.timeline = new TaskContainer({
       target: contentEl,
       context: this.componentContext,
     });

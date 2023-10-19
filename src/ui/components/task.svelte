@@ -21,11 +21,11 @@
   style:top="{$offset}px"
   style:width="{planItem.placing.widthPercent || 100}%"
   style:left="{planItem.placing.xOffsetPercent || 0}%"
-  class="gap-box absolute-stretch-x"
+  class="task-padding-box"
 >
   <div
     style:background-color={$backgroundColor}
-    class="task {$relationToNow}"
+    class="task-block {$relationToNow}"
     class:is-ghost={planItem.isGhost}
     on:mousedown={(event) => event.stopPropagation()}
     on:mouseup
@@ -61,13 +61,16 @@
     border-bottom-width: var(--divider-width);
   }
 
-  .gap-box {
+  .task-padding-box {
     display: flex;
     padding: 0 1px 2px;
     transition: 0.05s linear;
+    position: var(--position, absolute);
+    left: 0;
+    width: 100%;
   }
 
-  .task {
+  .task-block {
     position: relative;
 
     overflow: hidden;
