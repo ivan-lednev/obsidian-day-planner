@@ -1,13 +1,13 @@
 import { Moment } from "moment";
 import { STask, DateTime } from "obsidian-dataview";
 
+import { defaultDurationMinutes } from "../constants";
 import { createPlanItem } from "../parser/parser";
+import { parseTimestamp } from "../parser/timestamp/timestamp";
 import { sTaskTimestampRegExp, timeRegExp } from "../regexp";
 import { PlanItem } from "../types";
 import { getId } from "../util/id";
 import { getDiffInMinutes, getMinutesSinceMidnight } from "../util/moment";
-import { parseTimestamp } from "../parser/timestamp/timestamp";
-import { defaultDurationMinutes } from "../constants";
 
 interface Node {
   text: string;

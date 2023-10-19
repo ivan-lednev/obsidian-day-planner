@@ -2,16 +2,15 @@
   import { GripVertical } from "lucide-svelte";
   import { getContext } from "svelte";
   import { writable } from "svelte/store";
-  import Column from "./column.svelte";
-  import Needle from "./needle.svelte";
-  import Ruler from "./ruler.svelte";
 
   import { obsidianContext } from "../../constants";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { editCancellation } from "../../global-store/edit-events";
   import { settings } from "../../global-store/settings";
+  import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import type { ObsidianContext, PlacedPlanItem, PlanItem } from "../../types";
   import { getId } from "../../util/id";
+  import { isToday } from "../../util/moment";
   import { getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
@@ -20,10 +19,12 @@
   import { offsetYToMinutes, useEdit } from "../hooks/use-edit/use-edit";
   import { useTasksForDay } from "../hooks/use-tasks-for-day";
 
+  import Column from "./column.svelte";
+  import Needle from "./needle.svelte";
+  import Ruler from "./ruler.svelte";
   import Task from "./task.svelte";
-  import { isToday } from "../../util/moment";
-  import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import TimelineControls from "./timeline-controls.svelte";
+  import ScheduledTask from "./scheduled-task.svelte";
 
   // export let day: Moment;
   // todo: won't work for week
@@ -148,7 +149,11 @@
 <TimelineControls day={$visibleDayInTimeline} />
 <div class="unscheduled-task-container">
   {#each unscheduledTasks as planItem}
-    <Task --position="static" {planItem} on:mouseup={() => {}} />
+    <Task
+      --task-height="{$settings.defaultDurationMinutes * $settings.zoomLevel}px"
+      {planItem}
+      on:mouseup={() => {}}
+    />
   {/each}
 </div>
 <div
@@ -176,7 +181,10 @@
         {/if}
 
         {#each $displayedTasks as planItem (getRenderKey(planItem))}
-          <Task {planItem} on:mouseup={() => handleTaskMouseUp(planItem)}>
+          <ScheduledTask
+            {planItem}
+            on:mouseup={() => handleTaskMouseUp(planItem)}
+          >
             {#if !planItem.isGhost}
               <div
                 style:cursor={gripCursor}
@@ -192,7 +200,7 @@
                   handleResizeStart(event, planItem)}
               />
             {/if}
-          </Task>
+          </ScheduledTask>
         {/each}
       </div>
     </Column>

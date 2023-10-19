@@ -1,3 +1,4 @@
+import { partition } from "lodash/fp";
 import { Moment } from "moment/moment";
 import { TFile } from "obsidian";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
@@ -9,8 +10,7 @@ import {
   sTaskToUnscheduledPlanItem,
 } from "../service/dataview-facade";
 import { DayPlannerSettings } from "../settings";
-import { PlanItem, UnscheduledPlanItem } from "../types";
-import { partition } from "lodash/fp";
+import { PlanItem } from "../types";
 
 function isScheduledForThisDay(task: STask, day: Moment) {
   if (!task?.scheduled?.toMillis) {

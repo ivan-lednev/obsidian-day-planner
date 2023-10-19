@@ -3,8 +3,8 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 import { viewTypeTimeline } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 
+import TaskContainer from "./components/task-container.svelte";
 import Timeline from "./components/timeline.svelte";
-import TaskContainer from "./components/task-container.svelte"
 
 export default class TimelineView extends ItemView {
   private timeline: Timeline;

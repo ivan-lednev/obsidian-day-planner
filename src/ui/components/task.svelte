@@ -1,40 +1,24 @@
 <script lang="ts">
-  import { currentTime } from "../../global-store/current-time";
-  import { settings } from "../../global-store/settings";
   import type { PlanItem } from "../../types";
-  import { useTaskVisuals } from "../hooks/use-task-visuals";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
   export let planItem: PlanItem;
-
-  $: ({ height, offset, relationToNow, backgroundColor, properContrastColors } =
-    useTaskVisuals(planItem, {
-      settings,
-      currentTime,
-    }));
+  export let relationToNow = "future";
 </script>
 
 <div
-  style:height="{$height}px"
-  style:top="{$offset}px"
   style:width="{planItem?.placing?.widthPercent || 100}%"
   style:left="{planItem?.placing?.xOffsetPercent || 0}%"
   class="task-padding-box"
 >
   <div
-    style:background-color={$backgroundColor}
-    class="task-block {$relationToNow}"
+    class="task-block {relationToNow}"
     class:is-ghost={planItem.isGhost}
     on:mousedown={(event) => event.stopPropagation()}
     on:mouseup
   >
-    <RenderedMarkdown
-      --text-faint={$properContrastColors.faint}
-      --text-muted={$properContrastColors.muted}
-      --text-normal={$properContrastColors.normal}
-      text={planItem.text}
-    />
+    <RenderedMarkdown text={planItem.text} />
     <slot />
   </div>
 </div>
@@ -44,7 +28,10 @@
     display: flex;
     padding: 0 1px 2px;
     transition: 0.05s linear;
-    position: var(--position, absolute);
+    position: var(--position, static);
+    top: var(--offset);
+    height: var(--task-height);
+    background-color: var(--task-background-color, var(--background-primary));
     left: 0;
     width: 100%;
   }

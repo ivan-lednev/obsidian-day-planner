@@ -3,8 +3,8 @@ import { DataArray, STask } from "obsidian-dataview";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
 import { DayPlannerSettings } from "../../settings";
+import { PlanItem } from "../../types";
 import { getTasksForDay } from "../../util/get-tasks-for-day";
-import { PlacedPlanItem, PlanItem, UnscheduledPlanItem } from "../../types";
 
 interface UseTaskSourceProps {
   day: Moment;
