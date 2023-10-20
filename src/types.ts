@@ -31,7 +31,6 @@ export interface UnscheduledPlanItem {
   location?: PlanItemLocation;
   placing?: ReturnType<typeof getHorizontalPlacing>;
   isGhost?: boolean;
-
   durationMinutes: number;
 }
 

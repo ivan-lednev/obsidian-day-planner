@@ -36,7 +36,6 @@ function sTaskToString(node: Node, indentation = "") {
 
 export function sTaskToUnscheduledPlanItem(sTask: STask, day: Moment) {
   return {
-    startMinutes: 0,
     durationMinutes: defaultDurationMinutes,
     listTokens: `${sTask.symbol} [${sTask.status}] `,
     firstLineText: sTaskLineToString(sTask),
@@ -93,8 +92,6 @@ export function sTaskToPlanItem(sTask: STask, day: Moment): PlanItem {
 
   return {
     startTime,
-    rawStartTime: "-",
-    rawEndTime: "-",
     listTokens: `${sTask.symbol} [${sTask.status}] `,
     firstLineText,
     text,

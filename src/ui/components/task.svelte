@@ -4,7 +4,8 @@
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
   export let planItem: PlanItem;
-  export let relationToNow = "future";
+  // todo: this should live in useTaskVisuals
+  export let relationToNow = "";
 </script>
 
 <div

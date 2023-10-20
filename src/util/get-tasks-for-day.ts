@@ -10,7 +10,7 @@ import {
   sTaskToUnscheduledPlanItem,
 } from "../service/dataview-facade";
 import { DayPlannerSettings } from "../settings";
-import { PlanItem } from "../types";
+import { PlanItem, UnscheduledPlanItem } from "../types";
 
 function isScheduledForThisDay(task: STask, day: Moment) {
   if (!task?.scheduled?.toMillis) {
@@ -70,7 +70,7 @@ export function getTasksForDay(
   options: DurationOptions,
 ): {
   scheduled: PlanItem[];
-  unscheduled: PlanItem[];
+  unscheduled: UnscheduledPlanItem[];
 } {
   if (dataviewTasks.length === 0) {
     return { scheduled: [], unscheduled: [] };
