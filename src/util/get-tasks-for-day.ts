@@ -9,7 +9,7 @@ import { DayPlannerSettings } from "../settings";
 import { PlanItem } from "../types";
 
 function isScheduledForThisDay(task: STask, day: Moment) {
-  if (!task.scheduled) {
+  if (!task?.scheduled?.toMillis) {
     return false;
   }
 
