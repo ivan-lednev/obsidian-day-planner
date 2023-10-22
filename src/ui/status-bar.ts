@@ -141,9 +141,9 @@ export class StatusBar {
     const currentTaskStatus = `Current Task (${percent}% complete)`;
 
     // todo: this is out of place
-    const currentTaskTimeAndText = `${current.rawStartTime} ${current.text}`;
+    const currentTaskTimeAndText = current.text;
     const nextTask = `Next Task (in ${minsText})`;
-    const nextTaskTimeAndText = `${next.rawStartTime} ${next.text}`;
+    const nextTaskTimeAndText = next.text;
 
     this.cardCurrent.textContent = `${currentTaskStatus}: ${currentTaskTimeAndText}`;
     this.cardNext.textContent = `${nextTask}: ${nextTaskTimeAndText}`;

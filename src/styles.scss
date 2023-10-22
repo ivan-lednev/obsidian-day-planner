@@ -1,5 +1,15 @@
 @use "../vendor/progress_pie_scss";
 
+@keyframes pulse {
+  from {
+    opacity: 0.8;
+  }
+
+  to {
+    opacity: 0.2;
+  }
+}
+
 .day-planner {
   position: relative;
 }

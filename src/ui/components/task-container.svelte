@@ -5,13 +5,11 @@
 
   import { obsidianContext } from "../../constants";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
-  import { editCancellation } from "../../global-store/edit-events";
   import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import type { ObsidianContext, PlacedPlanItem, PlanItem } from "../../types";
-  import { getId } from "../../util/id";
   import { isToday } from "../../util/moment";
-  import { getRenderKey } from "../../util/task-utils";
+  import { copy, getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
   import { createPlanItem } from "../hooks/use-edit/transform/create";
@@ -22,9 +20,9 @@
   import Column from "./column.svelte";
   import Needle from "./needle.svelte";
   import Ruler from "./ruler.svelte";
+  import ScheduledTask from "./scheduled-task.svelte";
   import Task from "./task.svelte";
   import TimelineControls from "./timeline-controls.svelte";
-  import ScheduledTask from "./scheduled-task.svelte";
 
   // export let day: Moment;
   // todo: won't work for week
@@ -57,12 +55,6 @@
     editBlocked: $fileSyncInProgress,
     editMode: $editStatus,
   }));
-
-  $: {
-    $editCancellation;
-
-    cancelEdit();
-  }
 
   async function handleMouseDown() {
     const newTask = await createPlanItem(
@@ -98,29 +90,14 @@
     await obsidianFacade.revealLineInFile(path, line);
   }
 
-  async function handleGripMouseDown(
-    event: MouseEvent,
-    planItem: PlacedPlanItem,
-  ) {
-    // todo: this can be moved to hook
-    let mode = EditMode.DRAG;
-    let task = planItem;
-
+  async function handleGripMouseDown(event: MouseEvent, task: PlacedPlanItem) {
     if (event.ctrlKey) {
-      mode = EditMode.DRAG_AND_SHIFT_OTHERS;
+      startEdit({ task, mode: EditMode.DRAG_AND_SHIFT_OTHERS });
     } else if (event.shiftKey) {
-      mode = EditMode.CREATE;
-
-      // todo: again, a lame way to track which tasks are new
-      task = {
-        ...planItem,
-        id: getId(),
-        isGhost: true,
-        location: { ...planItem.location, line: undefined },
-      };
+      startEdit({ task: copy(task), mode: EditMode.CREATE });
+    } else {
+      startEdit({ task, mode: EditMode.DRAG });
     }
-
-    startEdit({ task, mode });
   }
 
   let userHoversOverScroller = false;
@@ -134,10 +111,10 @@
   }
 </script>
 
+<svelte:window on:blur={cancelEdit} />
 <svelte:body use:styledCursor={bodyCursor} />
-
 <svelte:document
-  on:mouseup={editCancellation.trigger}
+  on:mouseup={cancelEdit}
   on:mousemove={(event) => {
     const viewportToElOffsetY = el.getBoundingClientRect().top;
     const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
@@ -153,7 +130,16 @@
       --task-height="{$settings.defaultDurationMinutes * $settings.zoomLevel}px"
       {planItem}
       on:mouseup={() => {}}
-    />
+    >
+      <div
+        style:cursor={gripCursor}
+        class="grip"
+        on:mousedown|stopPropagation={(event) =>
+          handleGripMouseDown(event, planItem)}
+      >
+        <GripVertical class="svg-icon" />
+      </div>
+    </Task>
   {/each}
 </div>
 <div
@@ -208,16 +194,6 @@
 </div>
 
 <style>
-  @keyframes pulse {
-    from {
-      opacity: 0.8;
-    }
-
-    to {
-      opacity: 0.2;
-    }
-  }
-
   :not(#dummy).workspace-leaf-resize-handle {
     cursor: row-resize;
 

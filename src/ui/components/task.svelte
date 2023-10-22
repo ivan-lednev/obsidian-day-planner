@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { PlanItem } from "../../types";
+  import type { UnscheduledPlanItem } from "../../types";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
-  export let planItem: PlanItem;
+  export let planItem: UnscheduledPlanItem;
   // todo: this should live in useTaskVisuals
   export let relationToNow = "";
 </script>

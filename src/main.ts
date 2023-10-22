@@ -23,7 +23,6 @@ import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { debounceWithDelay } from "./util/debounce-with-delay";
-import { getTasksForDay } from "./util/get-tasks-for-day";
 import { isToday } from "./util/moment";
 
 export default class DayPlanner extends Plugin {
@@ -196,11 +195,11 @@ export default class DayPlanner extends Plugin {
   }
 
   private updateStatusBar = async (dataviewTasks: DataArray<STask>) => {
-    const today = window.moment();
-
-    await this.statusBar.update(
-      getTasksForDay(today, dataviewTasks, { ...this.settings() }),
-    );
+    // const today = window.moment();
+    //
+    // await this.statusBar.update(
+    //   getTasksForDay(today, dataviewTasks, { ...this.settings() }),
+    // );
   };
 
   initWeeklyLeaf = async () => {
