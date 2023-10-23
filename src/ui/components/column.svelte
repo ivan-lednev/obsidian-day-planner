@@ -5,10 +5,10 @@
   export let visibleHours: number[];
 </script>
 
-<div class="task-grid">
+<div class="column">
   <slot />
   {#each visibleHours as hour}
-    <div style:height="{getHourSize($settings)}px" class="time-grid-block">
+    <div style:height="{getHourSize($settings)}px" class="hour-block">
       <div
         style:height="{getHourSize($settings) / 2}px"
         class="half-hour-separator"
@@ -18,12 +18,12 @@
 </div>
 
 <style>
-  .task-grid {
+  .column {
     position: relative;
     flex: 1 0 0;
   }
 
-  .time-grid-block {
+  .hour-block {
     flex: 1 0 0;
     border-bottom: 1px solid var(--background-modifier-border);
   }

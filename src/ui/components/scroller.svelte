@@ -15,12 +15,18 @@
   on:mouseenter={handleMouseEnter}
   on:mouseleave={handleMouseLeave}
 >
-  <slot {hovering} />
+  <div class="container">
+    <slot {hovering} />
+  </div>
 </div>
 
 <style>
   .scroller {
     overflow: auto;
     flex: 1 0 0;
+  }
+
+  .container {
+    display: flex;
   }
 </style>

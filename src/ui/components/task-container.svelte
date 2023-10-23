@@ -2,8 +2,8 @@
   import { getContext } from "svelte";
   import { writable } from "svelte/store";
 
-  import { defaultDurationMinutes, obsidianContext } from "../../constants";
-  import { getVisibleHours, snap } from "../../global-store/derived-settings";
+  import { obsidianContext } from "../../constants";
+  import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import type {
@@ -29,12 +29,13 @@
   import Scroller from "./scroller.svelte";
   import Task from "./task.svelte";
   import TimelineControls from "./timeline-controls.svelte";
+  import ScheduledTaskContainer from "./scheduled-task-container.svelte";
+  import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
+  import Banner from "./banner.svelte";
 
   // export let day: Moment;
   // todo: won't work for week
   $: day = $visibleDayInTimeline;
-
-  let el: HTMLDivElement;
 
   const { obsidianFacade, onUpdate, dataviewTasks, fileSyncInProgress } =
     getContext<ObsidianContext>(obsidianContext);
@@ -71,10 +72,6 @@
     const newTask = await createPlanItem(day, cursorMinutes);
 
     startEdit({ task: { ...newTask, isGhost: true }, mode: EditMode.CREATE });
-  }
-
-  async function handleMouseUp() {
-    await confirmEdit();
   }
 
   function handleResizeStart(event: MouseEvent, task: PlacedPlanItem) {
@@ -118,23 +115,11 @@
 
 <svelte:window on:blur={cancelEdit} />
 <svelte:body use:styledCursor={bodyCursor} />
-<svelte:document
-  on:mouseup={cancelEdit}
-  on:mousemove={(event) => {
-    const viewportToElOffsetY = el.getBoundingClientRect().top;
-    const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
-
-    pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings.zoomLevel));
-  }}
-/>
+<svelte:document on:mouseup={cancelEdit} />
 
 <TimelineControls day={$visibleDayInTimeline} />
 {#if $displayedTasks.noTime.length > 0}
-  <!--todo: remove repeated calculation-->
-  <div
-    style:max-height="{$settings.zoomLevel * defaultDurationMinutes * 2}px"
-    class="unscheduled-task-container"
-  >
+  <UnscheduledTaskContainer>
     {#each $displayedTasks.noTime as planItem}
       <Task
         --task-height="{$settings.defaultDurationMinutes *
@@ -148,82 +133,42 @@
         />
       </Task>
     {/each}
-  </div>
+  </UnscheduledTaskContainer>
 {/if}
-<Scroller let:hovering={userHoversOverScroller}>
-  <div class="container">
-    <Ruler visibleHours={getVisibleHours($settings)} />
+<Scroller let:hovering={autoScrollBlocked}>
+  <Ruler visibleHours={getVisibleHours($settings)} />
 
-    <Column visibleHours={getVisibleHours($settings)}>
-      {#if isToday($visibleDayInTimeline)}
-        <Needle autoScrollBlocked={userHoversOverScroller} />
+  <Column visibleHours={getVisibleHours($settings)}>
+    {#if isToday($visibleDayInTimeline)}
+      <Needle {autoScrollBlocked} />
+    {/if}
+
+    <ScheduledTaskContainer
+      cursor={containerCursor}
+      {pointerOffsetY}
+      on:mousedown={handleMouseDown}
+      on:mouseup={confirmEdit}
+    >
+      {#if $editStatus && $settings.showHelp}
+        <Banner />
       {/if}
 
-      <div
-        bind:this={el}
-        style:cursor={containerCursor}
-        class="tasks absolute-stretch-x"
-        on:mousedown={handleMouseDown}
-        on:mouseup|stopPropagation={handleMouseUp}
-      >
-        {#if $editStatus && $settings.showHelp}
-          <div class="banner">Release outside this column to cancel edit</div>
-        {/if}
-
-        {#each $displayedTasks.withTime as planItem (getRenderKey(planItem))}
-          <ScheduledTask
-            {planItem}
-            on:mouseup={() => handleTaskMouseUp(planItem)}
-          >
-            {#if !planItem.isGhost}
-              <Grip
-                cursor={gripCursor}
-                on:mousedown={(event) => handleGripMouseDown(event, planItem)}
-              />
-              <ResizeHandle
-                on:mousedown={(event) => handleResizeStart(event, planItem)}
-              />
-            {/if}
-          </ScheduledTask>
-        {/each}
-      </div>
-    </Column>
-  </div>
+      {#each $displayedTasks.withTime as planItem (getRenderKey(planItem))}
+        <ScheduledTask
+          {planItem}
+          on:mouseup={() => handleTaskMouseUp(planItem)}
+        >
+          {#if !planItem.isGhost}
+            <Grip
+              cursor={gripCursor}
+              on:mousedown={(event) => handleGripMouseDown(event, planItem)}
+            />
+            <ResizeHandle
+              on:mousedown={(event) => handleResizeStart(event, planItem)}
+            />
+          {/if}
+        </ScheduledTask>
+      {/each}
+    </ScheduledTaskContainer>
+  </Column>
 </Scroller>
-
-<style>
-  .unscheduled-task-container {
-    padding: 1px 10px 0 10px;
-    border-bottom: 1px solid var(--background-modifier-border);
-    overflow: auto;
-  }
-
-  .container {
-    display: flex;
-  }
-
-  .banner {
-    position: sticky;
-    z-index: 10;
-    top: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: var(--size-4-4);
-
-    animation: pulse 1s infinite alternate;
-  }
-
-  .tasks {
-    top: 0;
-    bottom: 0;
-
-    display: flex;
-    flex-direction: column;
-
-    margin-right: 10px;
-    margin-left: 10px;
-  }
-</style>
