@@ -6,10 +6,14 @@ import { basePlanItem } from "../test-utils";
 
 import { EditMode } from "./types";
 import { useEdit } from "./use-edit";
+import { TasksForDay } from "../../../types";
 
-const baseTasks = [basePlanItem];
+const baseTasksForDay: TasksForDay = {
+  withTime: [basePlanItem],
+  noTime: [],
+};
 
-function createProps({ parsedTasks } = { parsedTasks: baseTasks }) {
+function createProps({ tasks } = { tasks: baseTasksForDay }) {
   const pointerOffsetY = writable(0);
 
   function movePointerTo(time: string) {
@@ -18,7 +22,7 @@ function createProps({ parsedTasks } = { parsedTasks: baseTasks }) {
 
   return {
     pointerOffsetY,
-    parsedTasks,
+    tasks,
     settings: writable(defaultSettingsForTests),
     fileSyncInProgress: writable(false),
     onUpdate: () => Promise.resolve(),
@@ -35,7 +39,7 @@ describe("drag one & common edit mechanics", () => {
 
     pointerOffsetY.set(200);
 
-    expect(get(displayedTasks)).toEqual(baseTasks);
+    expect(get(displayedTasks)).toEqual(baseTasksForDay);
   });
 
   test("when drag starts, target task reacts to cursor", () => {
@@ -46,7 +50,9 @@ describe("drag one & common edit mechanics", () => {
     startEdit({ task: basePlanItem, mode: EditMode.DRAG });
     movePointerTo("09:00");
 
-    const [updatedItem] = get(displayedTasks);
+    const {
+      withTime: [updatedItem],
+    } = get(displayedTasks);
 
     expect(updatedItem).toMatchObject({
       startMinutes: timeToMinutes("09:00"),
@@ -64,7 +70,9 @@ describe("drag one & common edit mechanics", () => {
     confirmEdit();
     movePointerTo("10:00");
 
-    const [updatedItem] = get(displayedTasks);
+    const {
+      withTime: [updatedItem],
+    } = get(displayedTasks);
 
     expect(updatedItem).toMatchObject({
       startMinutes: timeToMinutes("09:00"),
@@ -75,24 +83,29 @@ describe("drag one & common edit mechanics", () => {
 
 describe("drag many", () => {
   test("tasks below react to shifting selected task once they start overlap", () => {
-    const tasks = [
-      basePlanItem,
-      {
-        ...basePlanItem,
-        startMinutes: timeToMinutes("01:10"),
-        durationMinutes: 60,
-        id: "2",
-      },
-    ];
+    const tasks = {
+      ...baseTasksForDay,
+      withTime: [
+        basePlanItem,
+        {
+          ...basePlanItem,
+          startMinutes: timeToMinutes("01:10"),
+          durationMinutes: 60,
+          id: "2",
+        },
+      ],
+    };
 
-    const { movePointerTo, ...props } = createProps({ parsedTasks: tasks });
+    const { movePointerTo, ...props } = createProps({ tasks: tasks });
 
     const { displayedTasks, startEdit } = useEdit(props);
 
     startEdit({ task: basePlanItem, mode: EditMode.DRAG_AND_SHIFT_OTHERS });
     movePointerTo("01:10");
 
-    const [, next] = get(displayedTasks);
+    const {
+      withTime: [, next],
+    } = get(displayedTasks);
 
     expect(next).toMatchObject({
       startMinutes: timeToMinutes("02:10"),
@@ -101,17 +114,20 @@ describe("drag many", () => {
   });
 
   test("tasks below stay in initial position once the overlap is reversed", () => {
-    const tasks = [
-      basePlanItem,
-      {
-        ...basePlanItem,
-        startMinutes: timeToMinutes("01:10"),
-        durationMinutes: 60,
-        id: "2",
-      },
-    ];
+    const tasks = {
+      ...baseTasksForDay,
+      withTime: [
+        basePlanItem,
+        {
+          ...basePlanItem,
+          startMinutes: timeToMinutes("01:10"),
+          durationMinutes: 60,
+          id: "2",
+        },
+      ],
+    };
 
-    const { movePointerTo, ...props } = createProps({ parsedTasks: tasks });
+    const { movePointerTo, ...props } = createProps({ tasks: tasks });
 
     const { displayedTasks, startEdit } = useEdit(props);
 
@@ -119,7 +135,9 @@ describe("drag many", () => {
     movePointerTo("01:10");
     movePointerTo("00:00");
 
-    const [, next] = get(displayedTasks);
+    const {
+      withTime: [, next],
+    } = get(displayedTasks);
 
     expect(next).toMatchObject({
       startMinutes: timeToMinutes("01:10"),
@@ -128,29 +146,37 @@ describe("drag many", () => {
   });
 
   test("tasks above react to shifting in the same way", () => {
-    const tasks = [
-      {
-        ...basePlanItem,
-        startMinutes: timeToMinutes("01:00"),
-        durationMinutes: 60,
-        id: "1",
-      },
-      {
-        ...basePlanItem,
-        startMinutes: timeToMinutes("02:00"),
-        durationMinutes: 60,
-        id: "2",
-      },
-    ];
+    const tasks = {
+      ...baseTasksForDay,
+      withTime: [
+        {
+          ...basePlanItem,
+          startMinutes: timeToMinutes("01:00"),
+          durationMinutes: 60,
+          id: "1",
+        },
+        {
+          ...basePlanItem,
+          startMinutes: timeToMinutes("02:00"),
+          durationMinutes: 60,
+          id: "2",
+        },
+      ],
+    };
 
-    const { movePointerTo, ...props } = createProps({ parsedTasks: tasks });
+    const { movePointerTo, ...props } = createProps({ tasks });
 
     const { displayedTasks, startEdit } = useEdit(props);
 
-    startEdit({ task: tasks[1], mode: EditMode.DRAG_AND_SHIFT_OTHERS });
+    startEdit({
+      task: tasks.withTime[1],
+      mode: EditMode.DRAG_AND_SHIFT_OTHERS,
+    });
     movePointerTo("01:30");
 
-    const [previous, edited] = get(displayedTasks);
+    const {
+      withTime: [previous, edited],
+    } = get(displayedTasks);
 
     expect(edited).toMatchObject({
       startMinutes: timeToMinutes("01:30"),
@@ -174,7 +200,9 @@ describe("create", () => {
     startEdit({ task: basePlanItem, mode: EditMode.DRAG });
     movePointerTo("09:00");
 
-    const [createdItem] = get(displayedTasks);
+    const {
+      withTime: [createdItem],
+    } = get(displayedTasks);
 
     expect(createdItem).toMatchObject({
       startMinutes: timeToMinutes("09:00"),

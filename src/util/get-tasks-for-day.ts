@@ -10,7 +10,7 @@ import {
   sTaskToUnscheduledPlanItem,
 } from "../service/dataview-facade";
 import { DayPlannerSettings } from "../settings";
-import { PlanItem, UnscheduledPlanItem } from "../types";
+import { PlanItem, TasksForDay } from "../types";
 
 function isScheduledForThisDay(task: STask, day: Moment) {
   if (!task?.scheduled?.toMillis) {
@@ -68,12 +68,9 @@ export function getTasksForDay(
   day: Moment,
   dataviewTasks: DataArray<STask>,
   options: DurationOptions,
-): {
-  scheduled: PlanItem[];
-  unscheduled: UnscheduledPlanItem[];
-} {
+): TasksForDay {
   if (dataviewTasks.length === 0) {
-    return { scheduled: [], unscheduled: [] };
+    return { withTime: [], noTime: [] };
   }
 
   const noteForThisDay = getDailyNote(day, getAllDailyNotes());
@@ -93,12 +90,11 @@ export function getTasksForDay(
     .map((sTask: STask) => sTaskToPlanItem(sTask, day))
     .sort((task: PlanItem) => task.startMinutes);
 
-  const tasksWithoutTime = withoutTime.map((sTask: STask) =>
+  const noTime = withoutTime.map((sTask: STask) =>
     sTaskToUnscheduledPlanItem(sTask, day),
   );
 
-  const scheduled = calculateDuration(tasksWithTime, options);
+  const withTimeAndDuration = calculateDuration(tasksWithTime, options);
 
-  // todo: better: withTime, withoutTime
-  return { scheduled, unscheduled: tasksWithoutTime };
+  return { withTime: withTimeAndDuration, noTime };
 }

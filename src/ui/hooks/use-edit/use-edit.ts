@@ -2,13 +2,13 @@ import type { Readable } from "svelte/store";
 import { derived, get, writable } from "svelte/store";
 
 import type { settings } from "../../../global-store/settings";
-import type { OnUpdateFn, PlacedPlanItem } from "../../../types";
+import type { OnUpdateFn, TasksForDay } from "../../../types";
 
 import { transform } from "./transform/transform";
 import type { EditOperation } from "./types";
 
 interface UseEditProps {
-  parsedTasks: PlacedPlanItem[];
+  tasks: TasksForDay;
   pointerOffsetY: Readable<number>;
   settings: typeof settings;
   fileSyncInProgress: Readable<boolean>;
@@ -27,20 +27,20 @@ export function offsetYToMinutes(
 }
 
 export function useEdit({
-  parsedTasks,
+  tasks,
   pointerOffsetY,
   settings,
   fileSyncInProgress,
   onUpdate,
 }: UseEditProps) {
-  const baselineTasks = writable(parsedTasks);
+  const baseline = writable(tasks);
   const editOperation = writable<EditOperation | undefined>();
 
   const displayedTasks = derived(
-    [editOperation, pointerOffsetY, baselineTasks, settings],
-    ([$editOperation, $pointerOffsetY, $baselineTasks, $settings]) => {
+    [editOperation, pointerOffsetY, baseline, settings],
+    ([$editOperation, $pointerOffsetY, baseline, $settings]) => {
       if (!$editOperation) {
-        return $baselineTasks;
+        return baseline;
       }
 
       const cursorMinutes = offsetYToMinutes(
@@ -49,7 +49,10 @@ export function useEdit({
         $settings.startHour,
       );
 
-      return transform($baselineTasks, cursorMinutes, $editOperation);
+      return {
+        ...baseline,
+        withTime: transform(baseline.withTime, cursorMinutes, $editOperation),
+      };
     },
   );
 
@@ -71,10 +74,13 @@ export function useEdit({
 
     const currentTasks = get(displayedTasks);
 
-    baselineTasks.set(currentTasks.map((t) => ({ ...t, isGhost: true })));
+    baseline.set({
+      ...currentTasks,
+      withTime: currentTasks.withTime.map((t) => ({ ...t, isGhost: true })),
+    });
     editOperation.set(undefined);
 
-    await onUpdate(parsedTasks, currentTasks);
+    await onUpdate(tasks.withTime, currentTasks.withTime);
   }
 
   function cancelEdit() {

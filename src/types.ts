@@ -39,6 +39,11 @@ export interface PlanItem extends UnscheduledPlanItem {
   startMinutes: number;
 }
 
+export interface TasksForDay {
+  withTime: PlacedPlanItem[];
+  noTime: UnscheduledPlanItem[];
+}
+
 // todo: we don't need this, since it's all optional
 export interface PlacedPlanItem extends PlanItem {}
 

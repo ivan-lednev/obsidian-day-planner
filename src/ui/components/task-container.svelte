@@ -35,16 +35,15 @@
 
   const pointerOffsetY = writable(0);
 
-  $: ({ scheduled: scheduledTasks, unscheduled: unscheduledTasks } =
-    useTasksForDay({
-      day,
-      dataviewTasks: $dataviewTasks,
-      settings: $settings,
-    }));
+  $: tasks = useTasksForDay({
+    day,
+    dataviewTasks: $dataviewTasks,
+    settings: $settings,
+  });
 
   $: ({ startEdit, displayedTasks, cancelEdit, editStatus, confirmEdit } =
     useEdit({
-      parsedTasks: scheduledTasks,
+      tasks,
       settings,
       pointerOffsetY: pointerOffsetY,
       fileSyncInProgress,
@@ -125,7 +124,7 @@
 
 <TimelineControls day={$visibleDayInTimeline} />
 <div class="unscheduled-task-container">
-  {#each unscheduledTasks as planItem}
+  {#each $displayedTasks.noTime as planItem}
     <Task
       --task-height="{$settings.defaultDurationMinutes * $settings.zoomLevel}px"
       {planItem}
@@ -166,7 +165,7 @@
           <div class="banner">Release outside this column to cancel edit</div>
         {/if}
 
-        {#each $displayedTasks as planItem (getRenderKey(planItem))}
+        {#each $displayedTasks.withTime as planItem (getRenderKey(planItem))}
           <ScheduledTask
             {planItem}
             on:mouseup={() => handleTaskMouseUp(planItem)}
