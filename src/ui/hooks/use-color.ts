@@ -38,9 +38,9 @@ export function useColor({ settings, task }: UseColorProps) {
       return $settings.timelineColored && task.startTime
         ? getTextColorWithEnoughContrast($backgroundColor)
         : {
-            normal: "var(--text-normal)",
-            muted: "var(--text-muted)",
-            faint: "var(--text-faint)",
+            normal: "inherit",
+            muted: "inherit",
+            faint: "inherit",
           };
     },
   );

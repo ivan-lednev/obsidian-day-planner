@@ -15,7 +15,7 @@
   on:mouseenter={handleMouseEnter}
   on:mouseleave={handleMouseLeave}
 >
-  <div class="container">
+  <div class="stretcher">
     <slot {hovering} />
   </div>
 </div>
@@ -26,7 +26,7 @@
     flex: 1 0 0;
   }
 
-  .container {
+  .stretcher {
     display: flex;
   }
 </style>

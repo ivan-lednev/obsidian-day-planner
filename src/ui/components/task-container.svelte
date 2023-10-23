@@ -33,6 +33,7 @@
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
   import Banner from "./banner.svelte";
 
+  export let hideRuler = false;
   // export let day: Moment;
   // todo: won't work for week
   $: day = $visibleDayInTimeline;
@@ -117,7 +118,8 @@
 <svelte:body use:styledCursor={bodyCursor} />
 <svelte:document on:mouseup={cancelEdit} />
 
-<TimelineControls day={$visibleDayInTimeline} />
+<!-- TODO: this should be optional-->
+<!--<TimelineControls day={$visibleDayInTimeline} />-->
 {#if $displayedTasks.noTime.length > 0}
   <UnscheduledTaskContainer>
     {#each $displayedTasks.noTime as planItem}
@@ -136,7 +138,9 @@
   </UnscheduledTaskContainer>
 {/if}
 <Scroller let:hovering={autoScrollBlocked}>
-  <Ruler visibleHours={getVisibleHours($settings)} />
+  {#if !hideRuler}
+    <Ruler visibleHours={getVisibleHours($settings)} />
+  {/if}
 
   <Column visibleHours={getVisibleHours($settings)}>
     {#if isToday($visibleDayInTimeline)}

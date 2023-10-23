@@ -176,7 +176,7 @@
     </div>
   {/if}
   {#if filterVisible}
-    <div class="container">
+    <div class="stretcher">
       <input
         placeholder={`-#archived and -"notes/personal"`}
         spellcheck="false"
@@ -279,7 +279,7 @@
     margin: var(--size-4-2);
   }
 
-  .container {
+  .stretcher {
     display: flex;
     flex-direction: column;
     gap: var(--size-4-2);
@@ -294,7 +294,7 @@
     color: var(--text-error);
   }
 
-  .container input {
+  .stretcher input {
     font-family: var(--font-monospace);
   }
 

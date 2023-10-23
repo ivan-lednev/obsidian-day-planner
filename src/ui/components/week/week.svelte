@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getContext } from "svelte";
-  
-import { obsidianContext } from "../../../constants";
+
+  import { obsidianContext } from "../../../constants";
   import { getVisibleHours } from "../../../global-store/derived-settings";
   import { settings } from "../../../global-store/settings";
   import { visibleDateRange } from "../../../global-store/visible-date-range";
@@ -16,6 +16,7 @@ import { obsidianContext } from "../../../constants";
   const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
 </script>
 
+<!--TODO: move to component-->
 <div class="week-header">
   <div class="corner"></div>
   {#each $visibleDateRange as day}
@@ -30,17 +31,14 @@ import { obsidianContext } from "../../../constants";
     </div>
   {/each}
 </div>
-<div class="days">
+
+<!--TODO move to component-->
+<div class="day-columns">
   <Ruler visibleHours={getVisibleHours($settings)} />
   {#each $visibleDateRange as day}
     <div class="day-column">
-      <div class="container">
-        <Column visibleHours={getVisibleHours($settings)}>
-          {#if isToday(day)}
-            <Needle autoScrollBlocked={true} />
-          {/if}
-          <TaskContainer {day} />
-        </Column>
+      <div class="stretcher">
+        <TaskContainer hideRuler />
       </div>
     </div>
   {/each}
@@ -61,7 +59,7 @@ import { obsidianContext } from "../../../constants";
     border-left: none;
   }
 
-  .days {
+  .day-columns {
     display: flex;
   }
 
@@ -95,7 +93,7 @@ import { obsidianContext } from "../../../constants";
     background-color: var(--color-accent);
   }
 
-  .container {
+  .stretcher {
     display: flex;
   }
 </style>

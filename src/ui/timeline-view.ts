@@ -4,10 +4,9 @@ import { viewTypeTimeline } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 
 import TaskContainer from "./components/task-container.svelte";
-import Timeline from "./components/timeline.svelte";
 
 export default class TimelineView extends ItemView {
-  private timeline: Timeline;
+  private timeline: TaskContainer;
 
   constructor(
     leaf: WorkspaceLeaf,
