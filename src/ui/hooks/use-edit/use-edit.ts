@@ -33,14 +33,14 @@ export function useEdit({
   fileSyncInProgress,
   onUpdate,
 }: UseEditProps) {
-  const baseline = writable(tasks);
+  const baselineTasks = writable(tasks);
   const editOperation = writable<EditOperation | undefined>();
 
   const displayedTasks = derived(
-    [editOperation, pointerOffsetY, baseline, settings],
-    ([$editOperation, $pointerOffsetY, baseline, $settings]) => {
+    [editOperation, pointerOffsetY, baselineTasks, settings],
+    ([$editOperation, $pointerOffsetY, $baselineTasks, $settings]) => {
       if (!$editOperation) {
-        return baseline;
+        return $baselineTasks;
       }
 
       const cursorMinutes = offsetYToMinutes(
@@ -49,10 +49,7 @@ export function useEdit({
         $settings.startHour,
       );
 
-      return {
-        ...baseline,
-        withTime: transform(baseline.withTime, cursorMinutes, $editOperation),
-      };
+      return transform($baselineTasks, cursorMinutes, $editOperation);
     },
   );
 
@@ -74,9 +71,12 @@ export function useEdit({
 
     const currentTasks = get(displayedTasks);
 
-    baseline.set({
+    baselineTasks.set({
       ...currentTasks,
-      withTime: currentTasks.withTime.map((t) => ({ ...t, isGhost: true })),
+      withTime: currentTasks.withTime.map((task) => ({
+        ...task,
+        isGhost: true,
+      })),
     });
     editOperation.set(undefined);
 

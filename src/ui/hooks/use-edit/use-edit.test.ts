@@ -191,6 +191,7 @@ describe("drag many", () => {
   test.todo("tasks stop moving once there is not enough time");
 });
 
+// todo: why is it skipped?
 describe("create", () => {
   test.skip("create a task", () => {
     const { movePointerTo, ...props } = createProps();
@@ -208,5 +209,31 @@ describe("create", () => {
       startMinutes: timeToMinutes("09:00"),
       durationMinutes: 30,
     });
+  });
+});
+
+describe("schedule", () => {
+  test("base case", () => {
+    const tasks: TasksForDay = {
+      noTime: [basePlanItem],
+      withTime: [],
+    };
+
+    const { movePointerTo, ...props } = createProps({ tasks });
+
+    const { displayedTasks, startEdit } = useEdit(props);
+
+    startEdit({
+      task: tasks.noTime[0],
+      mode: EditMode.SCHEDULE,
+    });
+    movePointerTo("01:30");
+
+    const { noTime, withTime } = get(displayedTasks);
+
+    expect(withTime[0]).toMatchObject({
+      startMinutes: timeToMinutes("01:30"),
+    });
+    expect(noTime).toHaveLength(0);
   });
 });

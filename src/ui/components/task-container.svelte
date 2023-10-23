@@ -7,7 +7,12 @@
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
-  import type { ObsidianContext, PlacedPlanItem, PlanItem } from "../../types";
+  import type {
+    ObsidianContext,
+    PlacedPlanItem,
+    PlanItem,
+    UnscheduledPlanItem,
+  } from "../../types";
   import { isToday } from "../../util/moment";
   import { copy, getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
@@ -89,7 +94,7 @@
     await obsidianFacade.revealLineInFile(path, line);
   }
 
-  async function handleGripMouseDown(event: MouseEvent, task: PlacedPlanItem) {
+  function handleGripMouseDown(event: MouseEvent, task: PlacedPlanItem) {
     if (event.ctrlKey) {
       startEdit({ task, mode: EditMode.DRAG_AND_SHIFT_OTHERS });
     } else if (event.shiftKey) {
@@ -97,6 +102,23 @@
     } else {
       startEdit({ task, mode: EditMode.DRAG });
     }
+  }
+
+  function startScheduling(task: UnscheduledPlanItem) {
+    const cursorMinutes = offsetYToMinutes(
+      $pointerOffsetY,
+      $settings.zoomLevel,
+      $settings.startHour,
+    );
+
+    const withAddedTime = {
+      ...task,
+      startMinutes: cursorMinutes,
+      // todo: remove this. It's added just for type compatibility
+      startTime: window.moment(),
+    };
+
+    startEdit({ task: withAddedTime, mode: EditMode.SCHEDULE });
   }
 
   let userHoversOverScroller = false;
@@ -133,8 +155,7 @@
       <div
         style:cursor={gripCursor}
         class="grip"
-        on:mousedown|stopPropagation={(event) =>
-          handleGripMouseDown(event, planItem)}
+        on:mousedown|stopPropagation={(event) => startScheduling(planItem)}
       >
         <GripVertical class="svg-icon" />
       </div>

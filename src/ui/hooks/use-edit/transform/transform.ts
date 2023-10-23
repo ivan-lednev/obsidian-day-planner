@@ -1,4 +1,4 @@
-import type { PlacedPlanItem } from "../../../../types";
+import type { PlacedPlanItem, TasksForDay } from "../../../../types";
 import { EditMode, EditOperation } from "../types";
 
 import { create } from "./create";
@@ -6,8 +6,28 @@ import { drag } from "./drag";
 import { dragAndShiftOthers } from "./drag-and-shift-others";
 import { resize } from "./resize";
 import { resizeAndShiftOthers } from "./resize-and-shift-others";
+import { schedule } from "./schedule";
 
 export function transform(
+  baseline: TasksForDay,
+  cursorTime: number,
+  { task, mode }: EditOperation,
+) {
+  switch (mode) {
+    case EditMode.SCHEDULE:
+      return schedule(baseline, task, cursorTime);
+    default:
+      return {
+        ...baseline,
+        withTime: transformTasksWithTime(baseline.withTime, cursorTime, {
+          task,
+          mode,
+        }),
+      };
+  }
+}
+
+export function transformTasksWithTime(
   baseline: PlacedPlanItem[],
   cursorTime: number,
   { task, mode }: EditOperation,
