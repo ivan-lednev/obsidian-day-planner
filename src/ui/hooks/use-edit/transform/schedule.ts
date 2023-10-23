@@ -1,4 +1,4 @@
-import { PlanItem, TasksForDay, UnscheduledPlanItem } from "../../../../types";
+import { PlanItem, TasksForDay } from "../../../../types";
 
 export function schedule(
   baseline: TasksForDay,

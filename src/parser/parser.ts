@@ -48,6 +48,7 @@ export function getHeadingByText(metadata: CachedMetadata, text: string) {
   return headings?.find((h) => h.heading === text);
 }
 
+// todo: we don't need this, delete it
 export function createPlanItem({
   line,
   completeContent,

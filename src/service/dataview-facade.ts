@@ -38,7 +38,7 @@ export function sTaskToUnscheduledPlanItem(sTask: STask, day: Moment) {
   return {
     durationMinutes: defaultDurationMinutes,
     listTokens: `${sTask.symbol} [${sTask.status}] `,
-    firstLineText: sTaskLineToString(sTask),
+    firstLineText: sTask.text,
     text: sTaskToString(sTask),
     location: {
       path: sTask.path,

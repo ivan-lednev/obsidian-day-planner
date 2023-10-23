@@ -32,7 +32,6 @@
     position: var(--position, static);
     top: var(--offset);
     height: var(--task-height);
-    background-color: var(--task-background-color, var(--background-primary));
     left: 0;
     width: 100%;
   }
@@ -53,6 +52,7 @@
 
     border: 1px solid var(--color-base-50);
     border-radius: var(--radius-s);
+    background-color: var(--task-background-color, var(--background-primary));
   }
 
   .past {

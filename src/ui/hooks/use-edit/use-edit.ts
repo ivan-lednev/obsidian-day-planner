@@ -28,6 +28,7 @@ export function offsetYToMinutes(
 
 export function useEdit({
   tasks,
+  // todo: just pass time
   pointerOffsetY,
   settings,
   fileSyncInProgress,

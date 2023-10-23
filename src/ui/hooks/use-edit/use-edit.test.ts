@@ -1,12 +1,12 @@
 import { get, writable } from "svelte/store";
 
 import { defaultSettingsForTests } from "../../../settings";
+import { TasksForDay } from "../../../types";
 import { timeToMinutes } from "../../../util/moment";
 import { basePlanItem } from "../test-utils";
 
 import { EditMode } from "./types";
 import { useEdit } from "./use-edit";
-import { TasksForDay } from "../../../types";
 
 const baseTasksForDay: TasksForDay = {
   withTime: [basePlanItem],
@@ -224,7 +224,7 @@ describe("schedule", () => {
     const { displayedTasks, startEdit } = useEdit(props);
 
     startEdit({
-      task: tasks.noTime[0],
+      task: basePlanItem,
       mode: EditMode.SCHEDULE,
     });
     movePointerTo("01:30");

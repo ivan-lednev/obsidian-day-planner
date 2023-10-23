@@ -1,0 +1,26 @@
+<script lang="ts">
+  let hovering = false;
+
+  function handleMouseEnter() {
+    hovering = true;
+  }
+
+  function handleMouseLeave() {
+    hovering = false;
+  }
+</script>
+
+<div
+  class="scroller"
+  on:mouseenter={handleMouseEnter}
+  on:mouseleave={handleMouseLeave}
+>
+  <slot {hovering} />
+</div>
+
+<style>
+  .scroller {
+    overflow: auto;
+    flex: 1 0 0;
+  }
+</style>

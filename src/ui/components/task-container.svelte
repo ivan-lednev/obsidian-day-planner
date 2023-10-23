@@ -1,16 +1,14 @@
 <script lang="ts">
-  import { GripVertical } from "lucide-svelte";
   import { getContext } from "svelte";
   import { writable } from "svelte/store";
 
-  import { obsidianContext } from "../../constants";
+  import { defaultDurationMinutes, obsidianContext } from "../../constants";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import type {
     ObsidianContext,
     PlacedPlanItem,
-    PlanItem,
     UnscheduledPlanItem,
   } from "../../types";
   import { isToday } from "../../util/moment";
@@ -23,9 +21,12 @@
   import { useTasksForDay } from "../hooks/use-tasks-for-day";
 
   import Column from "./column.svelte";
+  import Grip from "./grip.svelte";
   import Needle from "./needle.svelte";
+  import ResizeHandle from "./resize-handle.svelte";
   import Ruler from "./ruler.svelte";
   import ScheduledTask from "./scheduled-task.svelte";
+  import Scroller from "./scroller.svelte";
   import Task from "./task.svelte";
   import TimelineControls from "./timeline-controls.svelte";
 
@@ -39,7 +40,13 @@
     getContext<ObsidianContext>(obsidianContext);
 
   const pointerOffsetY = writable(0);
+  $: cursorMinutes = offsetYToMinutes(
+    $pointerOffsetY,
+    $settings.zoomLevel,
+    $settings.startHour,
+  );
 
+  // todo: use one big hook
   $: tasks = useTasksForDay({
     day,
     dataviewTasks: $dataviewTasks,
@@ -61,14 +68,7 @@
   }));
 
   async function handleMouseDown() {
-    const newTask = await createPlanItem(
-      day,
-      offsetYToMinutes(
-        $pointerOffsetY,
-        $settings.zoomLevel,
-        $settings.startHour,
-      ),
-    );
+    const newTask = await createPlanItem(day, cursorMinutes);
 
     startEdit({ task: { ...newTask, isGhost: true }, mode: EditMode.CREATE });
   }
@@ -85,7 +85,7 @@
     startEdit({ task, mode });
   }
 
-  async function handleTaskMouseUp(task: PlanItem) {
+  async function handleTaskMouseUp(task: UnscheduledPlanItem) {
     if ($editStatus) {
       return;
     }
@@ -105,12 +105,6 @@
   }
 
   function startScheduling(task: UnscheduledPlanItem) {
-    const cursorMinutes = offsetYToMinutes(
-      $pointerOffsetY,
-      $settings.zoomLevel,
-      $settings.startHour,
-    );
-
     const withAddedTime = {
       ...task,
       startMinutes: cursorMinutes,
@@ -119,16 +113,6 @@
     };
 
     startEdit({ task: withAddedTime, mode: EditMode.SCHEDULE });
-  }
-
-  let userHoversOverScroller = false;
-
-  function handleMouseEnter() {
-    userHoversOverScroller = true;
-  }
-
-  function handleMouseLeave() {
-    userHoversOverScroller = false;
   }
 </script>
 
@@ -145,28 +129,28 @@
 />
 
 <TimelineControls day={$visibleDayInTimeline} />
-<div class="unscheduled-task-container">
-  {#each $displayedTasks.noTime as planItem}
-    <Task
-      --task-height="{$settings.defaultDurationMinutes * $settings.zoomLevel}px"
-      {planItem}
-      on:mouseup={() => {}}
-    >
-      <div
-        style:cursor={gripCursor}
-        class="grip"
-        on:mousedown|stopPropagation={(event) => startScheduling(planItem)}
+{#if $displayedTasks.noTime.length > 0}
+  <!--todo: remove repeated calculation-->
+  <div
+    style:max-height="{$settings.zoomLevel * defaultDurationMinutes * 2}px"
+    class="unscheduled-task-container"
+  >
+    {#each $displayedTasks.noTime as planItem}
+      <Task
+        --task-height="{$settings.defaultDurationMinutes *
+          $settings.zoomLevel}px"
+        {planItem}
+        on:mouseup={() => handleTaskMouseUp(planItem)}
       >
-        <GripVertical class="svg-icon" />
-      </div>
-    </Task>
-  {/each}
-</div>
-<div
-  class="scroller"
-  on:mouseenter={handleMouseEnter}
-  on:mouseleave={handleMouseLeave}
->
+        <Grip
+          cursor={gripCursor}
+          on:mousedown={() => startScheduling(planItem)}
+        />
+      </Task>
+    {/each}
+  </div>
+{/if}
+<Scroller let:hovering={userHoversOverScroller}>
   <div class="container">
     <Ruler visibleHours={getVisibleHours($settings)} />
 
@@ -192,18 +176,12 @@
             on:mouseup={() => handleTaskMouseUp(planItem)}
           >
             {#if !planItem.isGhost}
-              <div
-                style:cursor={gripCursor}
-                class="grip"
-                on:mousedown|stopPropagation={(event) =>
-                  handleGripMouseDown(event, planItem)}
-              >
-                <GripVertical class="svg-icon" />
-              </div>
-              <hr
-                class="workspace-leaf-resize-handle"
-                on:mousedown|stopPropagation={(event) =>
-                  handleResizeStart(event, planItem)}
+              <Grip
+                cursor={gripCursor}
+                on:mousedown={(event) => handleGripMouseDown(event, planItem)}
+              />
+              <ResizeHandle
+                on:mousedown={(event) => handleResizeStart(event, planItem)}
               />
             {/if}
           </ScheduledTask>
@@ -211,26 +189,13 @@
       </div>
     </Column>
   </div>
-</div>
+</Scroller>
 
 <style>
-  :not(#dummy).workspace-leaf-resize-handle {
-    cursor: row-resize;
-
-    right: 0;
-    bottom: 0;
-    left: 0;
-
-    display: block; /* obsidian hides them sometimes, we don't want that */
-
-    height: calc(var(--divider-width-hover) * 2);
-
-    border-bottom-width: var(--divider-width);
-  }
-
   .unscheduled-task-container {
-    padding: 1px 20px 0 40px;
+    padding: 1px 10px 0 10px;
     border-bottom: 1px solid var(--background-modifier-border);
+    overflow: auto;
   }
 
   .container {
@@ -260,24 +225,5 @@
 
     margin-right: 10px;
     margin-left: 10px;
-  }
-
-  .grip {
-    position: relative;
-    right: -4px;
-
-    grid-column: 2;
-    align-self: flex-start;
-
-    color: var(--text-faint);
-  }
-
-  .grip:hover {
-    color: var(--text-muted);
-  }
-
-  .scroller {
-    overflow: auto;
-    flex: 1 0 0;
   }
 </style>
