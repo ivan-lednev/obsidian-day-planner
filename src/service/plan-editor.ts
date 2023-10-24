@@ -6,7 +6,7 @@ import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
 import type { PlanItem, Timestamp } from "../types";
 import { addMinutes, minutesToMoment } from "../util/moment";
-import { isEqualTask } from "../util/task-utils";
+import { isEqualTask, getEndTime } from "../util/task-utils";
 
 import type { ObsidianFacade } from "./obsidian-facade";
 
@@ -84,6 +84,62 @@ export class PlanEditor {
     const headingTokens = "#".repeat(plannerHeadingLevel);
 
     return `${headingTokens} ${plannerHeading}`;
+  }
+
+  autoCompleteTasks = async (
+    planItems: PlanItem[],
+    autoIncomplete: boolean = false,
+  ) => {
+    const filePath = planItems[0].location.path;
+
+    const now = window.moment();
+
+    const lastPastTaskIndex = planItems.findLastIndex((item) =>
+      getEndTime(item).isBefore(now),
+    );
+
+    const pastTasks = planItems.slice(0, lastPastTaskIndex + 1);
+    const followingTasks = planItems.slice(lastPastTaskIndex + 1);
+
+    const tasksToComplete = this.replaceListTokens(
+      pastTasks,
+      "- [ ] ",
+      "- [x] ",
+    );
+
+    if (autoIncomplete) {
+      const tasksToIncomplete = this.replaceListTokens(
+        followingTasks,
+        "- [x] ",
+        "- [ ] ",
+      );
+      await this.updateTasks(filePath, [
+        ...tasksToComplete,
+        ...tasksToIncomplete,
+      ]);
+    } else {
+      await this.updateTasks(filePath, tasksToComplete);
+    }
+  };
+
+  private replaceListTokens(planItems: PlanItem[], from: string, to: string) {
+    return planItems
+      .filter((task) => task.listTokens == from)
+      .map((task) => {
+        task.listTokens = to;
+        return task;
+      });
+  }
+
+  private async updateTasks(path: string, itemsToBeUpdated: PlanItem[]) {
+    if (itemsToBeUpdated.length > 0) {
+      await this.obsidianFacade.editFile(path, (contents) => {
+        return itemsToBeUpdated.reduce(
+          (result, current) => this.updateTaskInFileContents(result, current),
+          contents,
+        );
+      });
+    }
   }
 
   private updateTaskInFileContents(contents: string, task: PlanItem) {
