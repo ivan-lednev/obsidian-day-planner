@@ -26,14 +26,17 @@
 
 <style>
   .task-padding-box {
-    display: flex;
-    padding: 0 1px 2px;
-    transition: 0.05s linear;
     position: var(--position, static);
     top: var(--offset);
-    height: var(--task-height);
     left: 0;
+
+    display: flex;
+
     width: 100%;
+    height: var(--task-height);
+    padding: 0 1px 2px;
+
+    transition: 0.05s linear;
   }
 
   .task-block {
@@ -50,9 +53,9 @@
     overflow-wrap: anywhere;
     white-space: normal;
 
+    background-color: var(--task-background-color, var(--background-primary));
     border: 1px solid var(--color-base-50);
     border-radius: var(--radius-s);
-    background-color: var(--task-background-color, var(--background-primary));
   }
 
   .past {

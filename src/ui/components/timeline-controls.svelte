@@ -336,10 +336,11 @@
   }
 
   .controls {
-    flex: 0 0 auto;
     overflow: hidden;
     display: flex;
+    flex: 0 0 auto;
     flex-direction: column;
+
     border-bottom: 1px solid var(--background-modifier-border);
   }
 

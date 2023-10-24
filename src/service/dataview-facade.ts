@@ -3,8 +3,7 @@ import { STask, DateTime } from "obsidian-dataview";
 
 import { defaultDurationMinutes } from "../constants";
 import { createPlanItem } from "../parser/parser";
-import { parseTimestamp } from "../parser/timestamp/timestamp";
-import { sTaskTimestampRegExp, timeRegExp } from "../regexp";
+import { timeRegExp } from "../regexp";
 import { PlanItem } from "../types";
 import { getId } from "../util/id";
 import { getDiffInMinutes, getMinutesSinceMidnight } from "../util/moment";
@@ -46,31 +45,6 @@ export function sTaskToUnscheduledPlanItem(sTask: STask, day: Moment) {
       position: sTask.position,
     },
     id: getId(),
-  };
-}
-
-function parseTime(line: string, day: Moment) {
-  const match = sTaskTimestampRegExp.exec(line);
-
-  if (!match) {
-    return {};
-  }
-
-  const {
-    groups: { start, end },
-  } = match;
-
-  const startTime = parseTimestamp(start, day);
-  const endTime = parseTimestamp(end, day);
-  const startMinutes = getMinutesSinceMidnight(startTime);
-  const durationMinutes = endTime
-    ? getDiffInMinutes(endTime, startTime)
-    : undefined;
-
-  return {
-    startTime,
-    startMinutes,
-    durationMinutes,
   };
 }
 
