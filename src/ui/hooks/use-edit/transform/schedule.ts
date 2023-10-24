@@ -8,6 +8,7 @@ export function schedule(
   const scheduledTask = {
     ...editedTask,
     startMinutes: cursorTime,
+    isGhost: true,
   };
 
   return {

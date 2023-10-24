@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Moment } from "moment";
   import { getContext } from "svelte";
   import { writable } from "svelte/store";
 
@@ -31,8 +30,8 @@
   import ScheduledTask from "./scheduled-task.svelte";
   import Scroller from "./scroller.svelte";
   import Task from "./task.svelte";
-  import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
   import TimelineControls from "./timeline-controls.svelte";
+  import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
 
   export let hideControls = false;
   export let day = $visibleDayInTimeline;
