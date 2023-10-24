@@ -117,7 +117,7 @@
 <svelte:document on:mouseup={cancelEdit} />
 
 {#if !hideControls}
-  <TimelineControls day={$visibleDayInTimeline} />
+  <TimelineControls {day} />
 
   {#if $displayedTasks.noTime.length > 0}
     <UnscheduledTaskContainer>
@@ -143,7 +143,7 @@
   {/if}
 
   <Column visibleHours={getVisibleHours($settings)}>
-    {#if isToday($visibleDayInTimeline)}
+    {#if isToday(day)}
       <Needle {autoScrollBlocked} />
     {/if}
 
