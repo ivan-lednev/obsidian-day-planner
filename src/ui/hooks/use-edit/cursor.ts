@@ -9,7 +9,7 @@ export function useCursor({ editMode, editBlocked }: UseCursorProps) {
   if (editBlocked) {
     return {
       bodyCursor: "unset",
-      gripCursor: "not-allowed",
+      gripCursor: "wait",
       containerCursor: "wait",
     };
   }

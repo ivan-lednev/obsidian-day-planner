@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Moment } from "moment";
   import { getContext } from "svelte";
   import { writable } from "svelte/store";
 
@@ -20,23 +21,21 @@
   import { offsetYToMinutes, useEdit } from "../hooks/use-edit/use-edit";
   import { useTasksForDay } from "../hooks/use-tasks-for-day";
 
+  import Banner from "./banner.svelte";
   import Column from "./column.svelte";
   import Grip from "./grip.svelte";
   import Needle from "./needle.svelte";
   import ResizeHandle from "./resize-handle.svelte";
   import Ruler from "./ruler.svelte";
+  import ScheduledTaskContainer from "./scheduled-task-container.svelte";
   import ScheduledTask from "./scheduled-task.svelte";
   import Scroller from "./scroller.svelte";
   import Task from "./task.svelte";
-  import TimelineControls from "./timeline-controls.svelte";
-  import ScheduledTaskContainer from "./scheduled-task-container.svelte";
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
-  import Banner from "./banner.svelte";
+  import TimelineControls from "./timeline-controls.svelte";
 
-  export let hideRuler = false;
-  // export let day: Moment;
-  // todo: won't work for week
-  $: day = $visibleDayInTimeline;
+  export let hideControls = false;
+  export let day = $visibleDayInTimeline;
 
   const { obsidianFacade, onUpdate, dataviewTasks, fileSyncInProgress } =
     getContext<ObsidianContext>(obsidianContext);
@@ -118,27 +117,29 @@
 <svelte:body use:styledCursor={bodyCursor} />
 <svelte:document on:mouseup={cancelEdit} />
 
-<!-- TODO: this should be optional-->
-<!--<TimelineControls day={$visibleDayInTimeline} />-->
-{#if $displayedTasks.noTime.length > 0}
-  <UnscheduledTaskContainer>
-    {#each $displayedTasks.noTime as planItem}
-      <Task
-        --task-height="{$settings.defaultDurationMinutes *
-          $settings.zoomLevel}px"
-        {planItem}
-        on:mouseup={() => handleTaskMouseUp(planItem)}
-      >
-        <Grip
-          cursor={gripCursor}
-          on:mousedown={() => startScheduling(planItem)}
-        />
-      </Task>
-    {/each}
-  </UnscheduledTaskContainer>
+{#if !hideControls}
+  <TimelineControls day={$visibleDayInTimeline} />
+
+  {#if $displayedTasks.noTime.length > 0}
+    <UnscheduledTaskContainer>
+      {#each $displayedTasks.noTime as planItem}
+        <Task
+          --task-height="{$settings.defaultDurationMinutes *
+            $settings.zoomLevel}px"
+          {planItem}
+          on:mouseup={() => handleTaskMouseUp(planItem)}
+        >
+          <Grip
+            cursor={gripCursor}
+            on:mousedown={() => startScheduling(planItem)}
+          />
+        </Task>
+      {/each}
+    </UnscheduledTaskContainer>
+  {/if}
 {/if}
 <Scroller let:hovering={autoScrollBlocked}>
-  {#if !hideRuler}
+  {#if !hideControls}
     <Ruler visibleHours={getVisibleHours($settings)} />
   {/if}
 
@@ -162,11 +163,11 @@
           {planItem}
           on:mouseup={() => handleTaskMouseUp(planItem)}
         >
+          <Grip
+            cursor={gripCursor}
+            on:mousedown={(event) => handleGripMouseDown(event, planItem)}
+          />
           {#if !planItem.isGhost}
-            <Grip
-              cursor={gripCursor}
-              on:mousedown={(event) => handleGripMouseDown(event, planItem)}
-            />
             <ResizeHandle
               on:mousedown={(event) => handleResizeStart(event, planItem)}
             />

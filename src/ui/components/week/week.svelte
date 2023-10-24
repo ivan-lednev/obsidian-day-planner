@@ -7,16 +7,13 @@
   import { visibleDateRange } from "../../../global-store/visible-date-range";
   import type { ObsidianContext } from "../../../types";
   import { isToday } from "../../../util/moment";
-  import Column from "../column.svelte";
   import ControlButton from "../control-button.svelte";
-  import Needle from "../needle.svelte";
   import Ruler from "../ruler.svelte";
   import TaskContainer from "../task-container.svelte";
 
   const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
 </script>
 
-<!--TODO: move to component-->
 <div class="week-header">
   <div class="corner"></div>
   {#each $visibleDateRange as day}
@@ -32,13 +29,12 @@
   {/each}
 </div>
 
-<!--TODO move to component-->
 <div class="day-columns">
   <Ruler visibleHours={getVisibleHours($settings)} />
   {#each $visibleDateRange as day}
     <div class="day-column">
       <div class="stretcher">
-        <TaskContainer hideRuler />
+        <TaskContainer {day} hideControls />
       </div>
     </div>
   {/each}
