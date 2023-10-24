@@ -3,7 +3,7 @@ import { STask, DateTime } from "obsidian-dataview";
 
 import { defaultDurationMinutes } from "../constants";
 import { createPlanItem } from "../parser/parser";
-import { timeRegExp } from "../regexp";
+import { timeFromStartRegExp } from "../regexp";
 import { PlanItem } from "../types";
 import { getId } from "../util/id";
 import { getDiffInMinutes, getMinutesSinceMidnight } from "../util/moment";
@@ -25,7 +25,7 @@ function sTaskToString(node: Node, indentation = "") {
   let result = `${indentation}${sTaskLineToString(node)}`;
 
   for (const child of node.children) {
-    if (!child.scheduled && !timeRegExp.test(child.text)) {
+    if (!child.scheduled && !timeFromStartRegExp.test(child.text)) {
       result += sTaskToString(child, `\t${indentation}`);
     }
   }
