@@ -27,6 +27,13 @@
 ## Drag-and-drop demos
 
 <details>
+<summary>Adding time to tasks</summary>
+
+![](assets/schedule-demo.gif)
+
+</details>
+
+<details>
 <summary>Basic editing: create, move, resize (click to expand)</summary>
 
 ![](assets/basic-edit.gif)
