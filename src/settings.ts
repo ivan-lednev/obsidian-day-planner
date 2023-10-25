@@ -24,6 +24,8 @@ export interface DayPlannerSettings {
   defaultDurationMinutes: number;
   showPathInTaskBlock: boolean;
   showTimestampInTaskBlock: boolean;
+  unscheduledTasksHeight: number;
+  showUncheduledTasks: boolean;
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -49,6 +51,8 @@ export const defaultSettings: DayPlannerSettings = {
   defaultDurationMinutes: 30,
   showPathInTaskBlock: true,
   showTimestampInTaskBlock: false,
+  unscheduledTasksHeight: 100,
+  showUncheduledTasks: true,
 };
 
 export const defaultSettingsForTests = {

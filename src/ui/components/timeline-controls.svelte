@@ -87,6 +87,11 @@
     $settings.startHour = Number(event.currentTarget.value);
   }
 
+  function handleUnscheduledTasksHeightInput(event: Event) {
+    // @ts-expect-error
+    $settings.unscheduledTasksHeight = Number(event.currentTarget.value);
+  }
+
   function handleZoomLevelInput(event: Event) {
     // @ts-expect-error
     $settings.zoomLevel = Number(event.currentTarget.value);
@@ -231,6 +236,35 @@
           on:input={handleZoomLevelInput}
         />
       </SettingItem>
+
+      <SettingItem>
+        <svelte:fragment slot="name">Show unscheduled tasks</svelte:fragment>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div
+          slot="control"
+          class="checkbox-container mod-small"
+          class:is-enabled={$settings.showUncheduledTasks}
+          on:click={() => {
+            $settings.showUncheduledTasks = !$settings.showUncheduledTasks;
+          }}
+        >
+          <input tabindex="0" type="checkbox" />
+        </div>
+      </SettingItem>
+
+      {#if $settings.showUncheduledTasks}
+        <SettingItem>
+          <svelte:fragment slot="name"
+            >Unscheduled tasks height limit
+          </svelte:fragment>
+          <Dropdown
+            slot="control"
+            value={String($settings.unscheduledTasksHeight)}
+            values={["50", "100", "150", "200", "250", "300", "350", "400"]}
+            on:input={handleUnscheduledTasksHeightInput}
+          />
+        </SettingItem>
+      {/if}
 
       <SettingItem>
         <svelte:fragment slot="name">Auto-scroll to now</svelte:fragment>

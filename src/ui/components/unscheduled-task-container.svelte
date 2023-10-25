@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { defaultDurationMinutes } from "../../constants";
   import { settings } from "../../global-store/settings";
 </script>
 
 <div
-  style:max-height="{$settings.zoomLevel * defaultDurationMinutes * 2}px"
+  style:max-height="{$settings.unscheduledTasksHeight}px"
   class="unscheduled-task-container"
 >
   <slot />

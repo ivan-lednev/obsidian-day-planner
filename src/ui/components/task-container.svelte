@@ -119,12 +119,11 @@
 {#if !hideControls}
   <TimelineControls {day} />
 
-  {#if $displayedTasks.noTime.length > 0}
+  {#if $displayedTasks.noTime.length > 0 && $settings.showUncheduledTasks}
     <UnscheduledTaskContainer>
       {#each $displayedTasks.noTime as planItem}
         <Task
-          --task-height="{$settings.defaultDurationMinutes *
-            $settings.zoomLevel}px"
+          --task-height="{$settings.defaultDurationMinutes}px"
           {planItem}
           on:mouseup={() => handleTaskMouseUp(planItem)}
         >
