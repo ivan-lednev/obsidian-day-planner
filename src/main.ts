@@ -1,4 +1,10 @@
-import { FileView, Plugin, WorkspaceLeaf } from "obsidian";
+import {
+  Component,
+  FileView,
+  MarkdownRenderer,
+  Plugin,
+  WorkspaceLeaf,
+} from "obsidian";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
 import { DataArray, getAPI, STask } from "obsidian-dataview";
 import {
@@ -233,6 +239,18 @@ export default class DayPlanner extends Plugin {
     await this.planEditor.syncTasksWithFile(base, updated);
   };
 
+  renderMarkdown = (el: HTMLElement, text: string) => {
+    const loader = new Component();
+
+    el.empty();
+
+    MarkdownRenderer.render(this.app, text, el, "", loader);
+
+    loader.load();
+
+    return () => loader.unload();
+  };
+
   private registerViews() {
     const componentContext = new Map([
       [
@@ -246,6 +264,7 @@ export default class DayPlanner extends Plugin {
           refreshTasks: this.refreshTasks,
           dataviewLoaded: this.dataviewLoaded,
           fileSyncInProgress: this.fileSyncInProgress,
+          renderMarkdown: this.renderMarkdown,
         },
       ],
     ]);

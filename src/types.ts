@@ -65,6 +65,9 @@ export type Timestamp = {
   durationMinutes: number;
 };
 
+export type CleanUp = () => void;
+export type RenderMarkdown = (el: HTMLElement, markdown: string) => CleanUp;
+
 export interface ObsidianContext {
   obsidianFacade: ObsidianFacade;
   metadataCache: MetadataCache;
@@ -74,4 +77,5 @@ export interface ObsidianContext {
   refreshTasks: (source: string) => void;
   dataviewLoaded: Writable<boolean>;
   fileSyncInProgress: Readable<boolean>;
+  renderMarkdown: RenderMarkdown;
 }

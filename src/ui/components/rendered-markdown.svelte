@@ -1,44 +1,39 @@
 <script lang="ts">
-  import { Component, MarkdownRenderer } from "obsidian";
-  import { getContext, onDestroy } from "svelte";
+  import { getContext } from "svelte";
 
   import { obsidianContext } from "../../constants";
-  import type { ObsidianContext } from "../../types";
+  import { settings } from "../../global-store/settings";
+  import type {
+    ObsidianContext,
+    UnscheduledPlanItem,
+  } from "../../types";
+  import { renderTaskMarkdown } from "../actions/render-task-markdown";
 
-  export let text: string;
+  export let task: UnscheduledPlanItem;
 
-  let markdownLifecycleManager = new Component();
-  let el: HTMLDivElement;
-
-  const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
-
-  onDestroy(() => {
-    markdownLifecycleManager.unload();
-  });
-
-  $: if (el) {
-    markdownLifecycleManager.unload();
-    markdownLifecycleManager = new Component();
-
-    el.empty();
-    MarkdownRenderer.render(
-      obsidianFacade.app,
-      text,
-      el,
-      "",
-      markdownLifecycleManager,
-    );
-    markdownLifecycleManager.load();
-
-    el.querySelectorAll(`input[type="checkbox"]`)?.forEach((checkbox) =>
-      checkbox.setAttribute("disabled", "true"),
-    );
-  }
+  const { renderMarkdown } = getContext<ObsidianContext>(obsidianContext);
 </script>
 
-<div bind:this={el} class="rendered-markdown"></div>
+<div
+  class="rendered-markdown"
+  use:renderTaskMarkdown={{ task, settings: $settings, renderMarkdown }}
+></div>
 
 <style>
+  :global(.day-planner-task-decoration) {
+    padding: var(--tag-padding-y) var(--tag-padding-x);
+
+    font-size: var(--tag-size);
+    font-weight: var(--tag-weight);
+    line-height: 1;
+    color: var(--tag-color);
+    text-decoration: var(--tag-decoration);
+
+    background-color: var(--tag-background);
+    border: var(--tag-border-width) solid var(--tag-border-color);
+    border-radius: var(--tag-radius);
+  }
+
   .rendered-markdown {
     --checkbox-size: var(--font-ui-small);
 

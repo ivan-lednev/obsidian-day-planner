@@ -22,9 +22,11 @@ export interface DayPlannerSettings {
   showDataviewMigrationWarning: boolean;
   extendDurationUntilNext: boolean;
   defaultDurationMinutes: number;
+  showPathInTaskBlock: boolean;
+  showTimestampInTaskBlock: boolean;
 }
 
-export const defaultSettings = {
+export const defaultSettings: DayPlannerSettings = {
   circularProgress: false,
   nowAndNextInStatusBar: false,
   showTaskNotification: false,
@@ -45,6 +47,8 @@ export const defaultSettings = {
   showDataviewMigrationWarning: true,
   extendDurationUntilNext: false,
   defaultDurationMinutes: 30,
+  showPathInTaskBlock: true,
+  showTimestampInTaskBlock: false,
 };
 
 export const defaultSettingsForTests = {

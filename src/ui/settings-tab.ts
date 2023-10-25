@@ -222,6 +222,28 @@ When you open a file, the plugin will search for this heading to detect a day pl
           }),
       );
 
+    containerEl.createEl("h2", { text: "Task decoration" });
+
+    new Setting(containerEl)
+      .setName("Add file path after task text in timeline")
+      .addToggle((component) => {
+        component
+          .setValue(this.plugin.settings().showPathInTaskBlock)
+          .onChange((value) => {
+            this.update({ showPathInTaskBlock: value });
+          });
+      });
+
+    new Setting(containerEl)
+      .setName("Show a timestamp next to task text in timeline")
+      .addToggle((component) => {
+        component
+          .setValue(this.plugin.settings().showTimestampInTaskBlock)
+          .onChange((value) => {
+            this.update({ showTimestampInTaskBlock: value });
+          });
+      });
+
     containerEl.createEl("h2", { text: "Duration" });
 
     new Setting(containerEl)

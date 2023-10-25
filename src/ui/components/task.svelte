@@ -19,7 +19,7 @@
     on:mousedown={(event) => event.stopPropagation()}
     on:mouseup
   >
-    <RenderedMarkdown text={planItem.text} />
+    <RenderedMarkdown task={planItem} />
     <slot />
   </div>
 </div>
