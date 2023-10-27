@@ -10,6 +10,7 @@
     "lint": "prettier --check src && eslint src && stylelint src/**/*.svelte && tsc --noEmit && svelte-check src/",
     "typescript": "tsc --noEmit",
     "test": "jest src/",
+    "test:coverage": "jest src/ --collectCoverage",
     "prepare": "husky install",
     "commitlint": "commitlint --edit"
   },
@@ -50,6 +51,7 @@
     "obsidian-dataview": "^0.5.56",
     "postcss-html": "^1.5.0",
     "sass": "^1.64.2",
+    "simple-git": "^3.20.0",
     "stylelint": "^15.10.2",
     "stylelint-config-html": "^1.1.0",
     "stylelint-config-standard": "^34.0.0",
