@@ -6,19 +6,12 @@
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
-  import type {
-    ObsidianContext,
-    PlacedTask,
-    UnscheduledTask,
-  } from "../../types";
+  import type { ObsidianContext } from "../../types";
   import { isToday } from "../../util/moment";
-  import { copy, getRenderKey } from "../../util/task-utils";
+  import { getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
-  import { createTask } from "../hooks/use-edit/transform/create";
-  import { EditMode } from "../hooks/use-edit/types";
-  import { offsetYToMinutes, useEdit } from "../hooks/use-edit/use-edit";
-  import { useTasksForDay } from "../hooks/use-tasks-for-day";
+  import { useTasks } from "../hooks/use-tasks";
 
   import Banner from "./banner.svelte";
   import Column from "./column.svelte";
@@ -40,76 +33,31 @@
     getContext<ObsidianContext>(obsidianContext);
 
   const pointerOffsetY = writable(0);
-  $: cursorMinutes = offsetYToMinutes(
-    $pointerOffsetY,
-    $settings.zoomLevel,
-    $settings.startHour,
-  );
 
-  // todo: use one big hook
-  $: tasks = useTasksForDay({
+  $: ({
+    displayedTasks,
+    cancelEdit,
+    editStatus,
+    confirmEdit,
+    handleMouseDown,
+    handleResizeStart,
+    handleTaskMouseUp,
+    handleGripMouseDown,
+    startScheduling,
+  } = useTasks({
     day,
+    obsidianFacade,
     dataviewTasks: $dataviewTasks,
     settings: $settings,
-  });
-
-  $: ({ startEdit, displayedTasks, cancelEdit, editStatus, confirmEdit } =
-    useEdit({
-      tasks,
-      settings,
-      pointerOffsetY: pointerOffsetY,
-      fileSyncInProgress,
-      onUpdate,
-    }));
+    pointerOffsetY,
+    fileSyncInProgress,
+    onUpdate,
+  }));
 
   $: ({ bodyCursor, gripCursor, containerCursor } = useCursor({
     editBlocked: $fileSyncInProgress,
     editMode: $editStatus,
   }));
-
-  async function handleMouseDown() {
-    const newTask = await createTask(day, cursorMinutes);
-
-    startEdit({ task: { ...newTask, isGhost: true }, mode: EditMode.CREATE });
-  }
-
-  function handleResizeStart(event: MouseEvent, task: PlacedTask) {
-    const mode = event.ctrlKey
-      ? EditMode.RESIZE_AND_SHIFT_OTHERS
-      : EditMode.RESIZE;
-
-    startEdit({ task, mode });
-  }
-
-  async function handleTaskMouseUp(task: UnscheduledTask) {
-    if ($editStatus) {
-      return;
-    }
-
-    const { path, line } = task.location;
-    await obsidianFacade.revealLineInFile(path, line);
-  }
-
-  function handleGripMouseDown(event: MouseEvent, task: PlacedTask) {
-    if (event.ctrlKey) {
-      startEdit({ task, mode: EditMode.DRAG_AND_SHIFT_OTHERS });
-    } else if (event.shiftKey) {
-      startEdit({ task: copy(task), mode: EditMode.CREATE });
-    } else {
-      startEdit({ task, mode: EditMode.DRAG });
-    }
-  }
-
-  function startScheduling(task: UnscheduledTask) {
-    const withAddedTime = {
-      ...task,
-      startMinutes: cursorMinutes,
-      // todo: remove this. It's added just for type compatibility
-      startTime: window.moment(),
-    };
-
-    startEdit({ task: withAddedTime, mode: EditMode.SCHEDULE });
-  }
 </script>
 
 <svelte:window on:blur={cancelEdit} />

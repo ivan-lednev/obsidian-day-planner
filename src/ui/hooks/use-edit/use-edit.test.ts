@@ -24,7 +24,7 @@ function createProps({ tasks } = { tasks: baseTasksForDay }) {
   return {
     pointerOffsetY,
     tasks,
-    settings: writable(defaultSettingsForTests),
+    settings: defaultSettingsForTests,
     fileSyncInProgress: writable(false),
     onUpdate,
     movePointerTo,

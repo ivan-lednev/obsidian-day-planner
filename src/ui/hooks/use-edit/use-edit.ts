@@ -1,9 +1,9 @@
 import type { Readable } from "svelte/store";
 import { derived, get, writable } from "svelte/store";
 
-import type { settings } from "../../../global-store/settings";
+import { DayPlannerSettings } from "../../../settings";
 import type { OnUpdateFn, TasksForDay } from "../../../types";
-import { findUpdated } from "../../../util/task-utils";
+import { findUpdated, offsetYToMinutes } from "../../../util/task-utils";
 
 import { transform } from "./transform/transform";
 import type { EditOperation } from "./types";
@@ -11,25 +11,13 @@ import type { EditOperation } from "./types";
 interface UseEditProps {
   tasks: TasksForDay;
   pointerOffsetY: Readable<number>;
-  settings: typeof settings;
+  settings: DayPlannerSettings;
   fileSyncInProgress: Readable<boolean>;
   onUpdate: OnUpdateFn;
 }
 
-// todo: move to utils
-export function offsetYToMinutes(
-  offsetY: number,
-  zoomLevel: number,
-  startHour: number,
-) {
-  const hiddenHoursSize = startHour * 60 * zoomLevel;
-
-  return (offsetY + hiddenHoursSize) / zoomLevel;
-}
-
 export function useEdit({
   tasks,
-  // todo: just pass time
   pointerOffsetY,
   settings,
   fileSyncInProgress,
@@ -39,16 +27,16 @@ export function useEdit({
   const editOperation = writable<EditOperation | undefined>();
 
   const displayedTasks = derived(
-    [editOperation, pointerOffsetY, baselineTasks, settings],
-    ([$editOperation, $pointerOffsetY, $baselineTasks, $settings]) => {
+    [editOperation, pointerOffsetY, baselineTasks],
+    ([$editOperation, $pointerOffsetY, $baselineTasks]) => {
       if (!$editOperation) {
         return $baselineTasks;
       }
 
       const cursorMinutes = offsetYToMinutes(
         $pointerOffsetY,
-        $settings.zoomLevel,
-        $settings.startHour,
+        settings.zoomLevel,
+        settings.startHour,
       );
 
       return transform($baselineTasks, cursorMinutes, $editOperation);

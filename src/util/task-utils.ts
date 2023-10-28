@@ -63,3 +63,13 @@ export function findUpdated(baseline: Task[], updated: Task[]) {
 
   return difference(updated, pristine);
 }
+
+export function offsetYToMinutes(
+  offsetY: number,
+  zoomLevel: number,
+  startHour: number,
+) {
+  const hiddenHoursSize = startHour * 60 * zoomLevel;
+
+  return (offsetY + hiddenHoursSize) / zoomLevel;
+}
