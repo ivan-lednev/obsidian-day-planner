@@ -1,8 +1,8 @@
-import { PlanItem, TasksForDay } from "../../../../types";
+import { Task, TasksForDay } from "../../../../types";
 
 export function schedule(
   baseline: TasksForDay,
-  editedTask: PlanItem,
+  editedTask: Task,
   cursorTime: number,
 ): TasksForDay {
   const scheduledTask = {

@@ -1,10 +1,10 @@
 import { DayPlannerSettings } from "../../settings";
-import { UnscheduledPlanItem } from "../../types";
+import { UnscheduledTask } from "../../types";
 import { createTimestamp } from "../../util/task-utils";
 
 export function decorate(
   el: HTMLElement,
-  task: UnscheduledPlanItem,
+  task: UnscheduledTask,
   settings: DayPlannerSettings,
 ) {
   const checkBox = el.querySelector('input[type="checkbox"]');

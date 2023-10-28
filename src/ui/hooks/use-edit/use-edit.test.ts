@@ -3,13 +3,13 @@ import { get, writable } from "svelte/store";
 import { defaultSettingsForTests } from "../../../settings";
 import { TasksForDay } from "../../../types";
 import { timeToMinutes } from "../../../util/moment";
-import { basePlanItem } from "../test-utils";
+import { baseTask } from "../test-utils";
 
 import { EditMode } from "./types";
 import { useEdit } from "./use-edit";
 
 const baseTasksForDay: TasksForDay = {
-  withTime: [basePlanItem],
+  withTime: [baseTask],
   noTime: [],
 };
 
@@ -47,7 +47,7 @@ describe("drag one & common edit mechanics", () => {
 
     const { displayedTasks, startEdit } = useEdit(props);
 
-    startEdit({ task: basePlanItem, mode: EditMode.DRAG });
+    startEdit({ task: baseTask, mode: EditMode.DRAG });
     movePointerTo("09:00");
 
     const {
@@ -65,7 +65,7 @@ describe("drag one & common edit mechanics", () => {
 
     const { displayedTasks, startEdit, confirmEdit } = useEdit(props);
 
-    startEdit({ task: basePlanItem, mode: EditMode.DRAG });
+    startEdit({ task: baseTask, mode: EditMode.DRAG });
     movePointerTo("09:00");
     confirmEdit();
     movePointerTo("10:00");
@@ -86,9 +86,9 @@ describe("drag many", () => {
     const tasks = {
       ...baseTasksForDay,
       withTime: [
-        basePlanItem,
+        baseTask,
         {
-          ...basePlanItem,
+          ...baseTask,
           startMinutes: timeToMinutes("01:10"),
           durationMinutes: 60,
           id: "2",
@@ -100,7 +100,7 @@ describe("drag many", () => {
 
     const { displayedTasks, startEdit } = useEdit(props);
 
-    startEdit({ task: basePlanItem, mode: EditMode.DRAG_AND_SHIFT_OTHERS });
+    startEdit({ task: baseTask, mode: EditMode.DRAG_AND_SHIFT_OTHERS });
     movePointerTo("01:10");
 
     const {
@@ -117,9 +117,9 @@ describe("drag many", () => {
     const tasks = {
       ...baseTasksForDay,
       withTime: [
-        basePlanItem,
+        baseTask,
         {
-          ...basePlanItem,
+          ...baseTask,
           startMinutes: timeToMinutes("01:10"),
           durationMinutes: 60,
           id: "2",
@@ -131,7 +131,7 @@ describe("drag many", () => {
 
     const { displayedTasks, startEdit } = useEdit(props);
 
-    startEdit({ task: basePlanItem, mode: EditMode.DRAG_AND_SHIFT_OTHERS });
+    startEdit({ task: baseTask, mode: EditMode.DRAG_AND_SHIFT_OTHERS });
     movePointerTo("01:10");
     movePointerTo("00:00");
 
@@ -150,13 +150,13 @@ describe("drag many", () => {
       ...baseTasksForDay,
       withTime: [
         {
-          ...basePlanItem,
+          ...baseTask,
           startMinutes: timeToMinutes("01:00"),
           durationMinutes: 60,
           id: "1",
         },
         {
-          ...basePlanItem,
+          ...baseTask,
           startMinutes: timeToMinutes("02:00"),
           durationMinutes: 60,
           id: "2",
@@ -198,7 +198,7 @@ describe("create", () => {
 
     const { displayedTasks, startEdit } = useEdit(props);
 
-    startEdit({ task: basePlanItem, mode: EditMode.DRAG });
+    startEdit({ task: baseTask, mode: EditMode.DRAG });
     movePointerTo("09:00");
 
     const {
@@ -215,7 +215,7 @@ describe("create", () => {
 describe("schedule", () => {
   test("base case", () => {
     const tasks: TasksForDay = {
-      noTime: [basePlanItem],
+      noTime: [baseTask],
       withTime: [],
     };
 
@@ -224,7 +224,7 @@ describe("schedule", () => {
     const { displayedTasks, startEdit } = useEdit(props);
 
     startEdit({
-      task: basePlanItem,
+      task: baseTask,
       mode: EditMode.SCHEDULE,
     });
     movePointerTo("01:30");

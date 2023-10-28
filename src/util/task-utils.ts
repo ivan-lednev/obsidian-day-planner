@@ -1,12 +1,12 @@
 import type { Moment } from "moment";
 
-import type { PlanItem } from "../types";
-import { PlacedPlanItem } from "../types";
+import type { Task } from "../types";
+import { PlacedTask } from "../types";
 
 import { getId } from "./id";
 import { addMinutes, minutesToMoment } from "./moment";
 
-export function isEqualTask(a: PlanItem, b: PlanItem) {
+export function isEqualTask(a: Task, b: Task) {
   return (
     a.id === b.id &&
     a.startMinutes === b.startMinutes &&
@@ -28,13 +28,13 @@ export function getEndTime(task: {
   return task.startTime.clone().add(task.durationMinutes, "minutes");
 }
 
-export function getRenderKey(task: PlacedPlanItem) {
+export function getRenderKey(task: PlacedTask) {
   return `${task.startMinutes} ${getEndMinutes(task)} ${task.text} ${
     task.isGhost ?? ""
   }`;
 }
 
-export function copy(task: PlanItem): PlanItem {
+export function copy(task: Task): Task {
   return {
     ...task,
     id: getId(),

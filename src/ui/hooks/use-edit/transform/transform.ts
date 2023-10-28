@@ -1,4 +1,4 @@
-import type { PlacedPlanItem, TasksForDay } from "../../../../types";
+import type { PlacedTask, TasksForDay } from "../../../../types";
 import { EditMode, EditOperation } from "../types";
 
 import { create } from "./create";
@@ -28,7 +28,7 @@ export function transform(
 }
 
 export function transformTasksWithTime(
-  baseline: PlacedPlanItem[],
+  baseline: PlacedTask[],
   cursorTime: number,
   { task, mode }: EditOperation,
 ) {

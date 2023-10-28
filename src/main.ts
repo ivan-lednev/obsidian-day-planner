@@ -22,7 +22,7 @@ import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
-import { PlanItem } from "./types";
+import { Task } from "./types";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
@@ -234,7 +234,7 @@ export default class DayPlanner extends Plugin {
     );
   }
 
-  private syncTasksWithFile = async (base: PlanItem[], updated: PlanItem[]) => {
+  private syncTasksWithFile = async (base: Task[], updated: Task[]) => {
     this.fileSyncInProgress.set(true);
     await this.planEditor.syncTasksWithFile(base, updated);
   };

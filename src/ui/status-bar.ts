@@ -1,5 +1,5 @@
 import type { DayPlannerSettings } from "../settings";
-import type { PlanItem } from "../types";
+import type { Task } from "../types";
 import { ellipsis } from "../util/ellipsis";
 import { getDiffInMinutes } from "../util/moment";
 import { getEndTime } from "../util/task-utils";
@@ -38,10 +38,10 @@ export class StatusBar {
     this.setupStatusBarEvents();
   }
 
-  async update(planItems: PlanItem[]) {
+  async update(tasks: Task[]) {
     this.containerEl.show();
-    if (planItems.length > 0) {
-      this.updateProgress(planItems);
+    if (tasks.length > 0) {
+      this.updateProgress(tasks);
     } else {
       this.setEmpty();
     }
@@ -75,10 +75,10 @@ export class StatusBar {
     this.nextText.hide();
   }
 
-  private updateProgress(planItems: PlanItem[]) {
+  private updateProgress(tasks: Task[]) {
     const now = window.moment();
 
-    const currentItemIndex = planItems.findIndex(
+    const currentItemIndex = tasks.findIndex(
       (item) => item.startTime.isBefore(now) && getEndTime(item).isAfter(now),
     );
 
@@ -89,8 +89,8 @@ export class StatusBar {
     }
 
     // todo: move calculations out
-    const currentItem = planItems[currentItemIndex];
-    const nextItem = planItems[currentItemIndex + 1];
+    const currentItem = tasks[currentItemIndex];
+    const nextItem = tasks[currentItemIndex + 1];
 
     const minutesFromStart = getDiffInMinutes(currentItem.startTime, now);
     const percentageComplete =
@@ -128,8 +128,8 @@ export class StatusBar {
 
   private setStatusText(
     minsUntilNext: number,
-    current: PlanItem,
-    next: PlanItem,
+    current: Task,
+    next: Task,
     percentageComplete: number,
   ) {
     const minsUntilNextText = minsUntilNext === 0 ? "1" : minsUntilNext;
@@ -157,7 +157,7 @@ export class StatusBar {
     );
   }
 
-  private updateStatusBarText(currentItem: PlanItem, nextItem?: PlanItem) {
+  private updateStatusBarText(currentItem: Task, nextItem?: Task) {
     const minutesLeft = getDiffInMinutes(
       getEndTime(currentItem),
       window.moment(),
@@ -177,7 +177,7 @@ export class StatusBar {
   }
 
   private taskNotification(
-    current: PlanItem,
+    current: Task,
     currentTaskTimeAndText: string,
     nextTask: string,
     nextTaskText: string,

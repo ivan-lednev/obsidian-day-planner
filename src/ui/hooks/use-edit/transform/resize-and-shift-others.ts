@@ -1,13 +1,13 @@
 import { last } from "lodash";
 
-import type { PlacedPlanItem } from "../../../../types";
+import type { PlacedTask } from "../../../../types";
 import { getEndMinutes } from "../../../../util/task-utils";
 
 export function resizeAndShiftOthers(
-  baseline: PlacedPlanItem[],
-  editTarget: PlacedPlanItem,
+  baseline: PlacedTask[],
+  editTarget: PlacedTask,
   cursorTime: number,
-): PlacedPlanItem[] {
+): PlacedTask[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
   const preceding = baseline.slice(0, index);
   const following = baseline.slice(index + 1);

@@ -1,11 +1,11 @@
-import type { PlacedPlanItem } from "../../../../types";
+import type { PlacedTask } from "../../../../types";
 import { toSpliced } from "../../../../util/to-spliced";
 
 export function drag(
-  baseline: PlacedPlanItem[],
-  editTarget: PlacedPlanItem,
+  baseline: PlacedTask[],
+  editTarget: PlacedTask,
   cursorTime: number,
-): PlacedPlanItem[] {
+): PlacedTask[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
 
   const startMinutes = cursorTime;

@@ -3,7 +3,7 @@ import { derived, Readable, Writable } from "svelte/store";
 
 import { getHiddenHoursSize } from "../../global-store/derived-settings";
 import { DayPlannerSettings } from "../../settings";
-import type { PlanItem } from "../../types";
+import type { Task } from "../../types";
 import { getRelationToNow } from "../../util/moment";
 import { getEndTime } from "../../util/task-utils";
 
@@ -15,7 +15,7 @@ interface UseTaskVisualsProps {
 }
 
 export function useTaskVisuals(
-  task: PlanItem,
+  task: Task,
   { settings, currentTime }: UseTaskVisualsProps,
 ) {
   const useColorValues = useColor({ settings, task });

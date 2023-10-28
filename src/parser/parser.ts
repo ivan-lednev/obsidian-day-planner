@@ -3,7 +3,7 @@ import type { CachedMetadata } from "obsidian";
 import { dedent } from "ts-dedent";
 
 import { timestampRegExp } from "../regexp";
-import type { PlanItemLocation } from "../types";
+import type { TaskLocation } from "../types";
 import { getId } from "../util/id";
 
 import { parseTimestamp } from "./timestamp/timestamp";
@@ -49,7 +49,7 @@ export function getHeadingByText(metadata: CachedMetadata, text: string) {
 }
 
 // todo: we don't need this, delete it
-export function createPlanItem({
+export function createTask({
   line,
   completeContent,
   location,
@@ -57,7 +57,7 @@ export function createPlanItem({
 }: {
   line: string;
   completeContent: string;
-  location: PlanItemLocation;
+  location: TaskLocation;
   day: Moment;
 }) {
   const match = timestampRegExp.exec(line.trim());

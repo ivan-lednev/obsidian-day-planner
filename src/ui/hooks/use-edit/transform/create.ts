@@ -1,16 +1,16 @@
 import type { Moment } from "moment";
 
 import { defaultDurationMinutes } from "../../../../constants";
-import type { PlacedPlanItem } from "../../../../types";
+import type { PlacedTask } from "../../../../types";
 import { createDailyNoteIfNeeded } from "../../../../util/daily-notes";
 import { getId } from "../../../../util/id";
 import { minutesToMomentOfDay } from "../../../../util/moment";
 
 export function create(
-  baseline: PlacedPlanItem[],
-  editTarget: PlacedPlanItem,
+  baseline: PlacedTask[],
+  editTarget: PlacedTask,
   cursorTime: number,
-): PlacedPlanItem[] {
+): PlacedTask[] {
   const startMinutes = cursorTime;
 
   const updated = {
@@ -22,10 +22,10 @@ export function create(
 }
 
 // todo: this belongs to task utils
-export async function createPlanItem(
+export async function createTask(
   day: Moment,
   startMinutes: number,
-): Promise<PlacedPlanItem> {
+): Promise<PlacedTask> {
   const endMinutes = startMinutes + defaultDurationMinutes;
 
   const { path } = await createDailyNoteIfNeeded(day);

@@ -2,12 +2,12 @@ import chroma from "chroma-js";
 import { derived } from "svelte/store";
 
 import type { settings } from "../../global-store/settings";
-import type { PlanItem } from "../../types";
+import type { Task } from "../../types";
 import { getTextColorWithEnoughContrast } from "../../util/color";
 
 interface UseColorProps {
   settings: typeof settings;
-  task: PlanItem;
+  task: Task;
 }
 
 export function useColor({ settings, task }: UseColorProps) {

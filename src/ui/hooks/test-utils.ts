@@ -1,8 +1,8 @@
 import moment from "moment/moment";
 
-import type { PlacedPlanItem } from "../../types";
+import type { PlacedTask } from "../../types";
 
-export const basePlanItem: PlacedPlanItem = {
+export const baseTask: PlacedTask = {
   listTokens: "- ",
   startTime: moment("2023-01-01"),
   startMinutes: 0,

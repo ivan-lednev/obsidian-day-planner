@@ -6,11 +6,11 @@ import { DataArray, STask } from "obsidian-dataview";
 
 import { timeFromStartRegExp } from "../regexp";
 import {
-  sTaskToPlanItem,
-  sTaskToUnscheduledPlanItem,
+  sTaskToTask,
+  sTaskToUnscheduledTask,
 } from "../service/dataview-facade";
 import { DayPlannerSettings } from "../settings";
-import { PlanItem, TasksForDay } from "../types";
+import { Task, TasksForDay } from "../types";
 
 function isScheduledForThisDay(task: STask, day: Moment) {
   if (!task?.scheduled?.toMillis) {
@@ -39,7 +39,7 @@ type DurationOptions = Pick<
   "defaultDurationMinutes" | "extendDurationUntilNext"
 >;
 
-function calculateDuration(tasks: PlanItem[], options: DurationOptions) {
+function calculateDuration(tasks: Task[], options: DurationOptions) {
   return tasks.map((current, i, array) => {
     if (current.durationMinutes) {
       return current;
@@ -87,11 +87,11 @@ export function getTasksForDay(
   const [withTime, withoutTime] = partition(isTimeSetOnTask, tasksForDay);
 
   const tasksWithTime = withTime
-    .map((sTask: STask) => sTaskToPlanItem(sTask, day))
-    .sort((task: PlanItem) => task.startMinutes);
+    .map((sTask: STask) => sTaskToTask(sTask, day))
+    .sort((task: Task) => task.startMinutes);
 
   const noTime = withoutTime.map((sTask: STask) =>
-    sTaskToUnscheduledPlanItem(sTask, day),
+    sTaskToUnscheduledTask(sTask, day),
   );
 
   const withTimeAndDuration = calculateDuration(tasksWithTime, options);

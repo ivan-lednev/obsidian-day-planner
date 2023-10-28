@@ -1,12 +1,12 @@
 import { DayPlannerSettings } from "../../settings";
-import type { RenderMarkdown, UnscheduledPlanItem } from "../../types";
+import type { RenderMarkdown, UnscheduledTask } from "../../types";
 import { getRenderKey } from "../../util/task-utils";
 
 import { createMemo } from "./memoize-props";
 import { decorate, disableCheckBoxes } from "./post-process-task-markdown";
 
 interface RenderedMarkdownProps {
-  task: UnscheduledPlanItem;
+  task: UnscheduledTask;
   settings: DayPlannerSettings;
   renderMarkdown: RenderMarkdown;
 }

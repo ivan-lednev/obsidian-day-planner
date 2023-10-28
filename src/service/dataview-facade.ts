@@ -2,9 +2,9 @@ import { Moment } from "moment";
 import { STask, DateTime } from "obsidian-dataview";
 
 import { defaultDurationMinutes } from "../constants";
-import { createPlanItem } from "../parser/parser";
+import { createTask } from "../parser/parser";
 import { timeFromStartRegExp } from "../regexp";
-import { PlanItem } from "../types";
+import { Task } from "../types";
 import { getId } from "../util/id";
 import { getDiffInMinutes, getMinutesSinceMidnight } from "../util/moment";
 
@@ -33,7 +33,7 @@ function sTaskToString(node: Node, indentation = "") {
   return result;
 }
 
-export function sTaskToUnscheduledPlanItem(sTask: STask, day: Moment) {
+export function sTaskToUnscheduledTask(sTask: STask, day: Moment) {
   return {
     durationMinutes: defaultDurationMinutes,
     listTokens: `${sTask.symbol} [${sTask.status}] `,
@@ -48,8 +48,8 @@ export function sTaskToUnscheduledPlanItem(sTask: STask, day: Moment) {
   };
 }
 
-export function sTaskToPlanItem(sTask: STask, day: Moment): PlanItem {
-  const { startTime, endTime, firstLineText, text } = createPlanItem({
+export function sTaskToTask(sTask: STask, day: Moment): Task {
+  const { startTime, endTime, firstLineText, text } = createTask({
     line: sTaskLineToString(sTask),
     completeContent: sTaskToString(sTask),
     day,

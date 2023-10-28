@@ -3,7 +3,7 @@ import type { CachedMetadata } from "obsidian";
 
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
-import type { PlanItem, Timestamp } from "../types";
+import type { Task, Timestamp } from "../types";
 import { createTimestamp, isEqualTask } from "../util/task-utils";
 
 import type { ObsidianFacade } from "./obsidian-facade";
@@ -14,7 +14,7 @@ export class PlanEditor {
     private readonly obsidianFacade: ObsidianFacade,
   ) {}
 
-  syncTasksWithFile = async (baseline: PlanItem[], updated: PlanItem[]) => {
+  syncTasksWithFile = async (baseline: Task[], updated: Task[]) => {
     const pristine = updated.filter((task) =>
       baseline.find((baselineTask) => isEqualTask(task, baselineTask)),
     );
@@ -61,7 +61,7 @@ export class PlanEditor {
     await Promise.all(editPromises);
   };
 
-  writeTaskToFileContents(task: PlanItem, contents: string) {
+  writeTaskToFileContents(task: Task, contents: string) {
     const metadata =
       this.obsidianFacade.getMetadataForPath(task.location.path) || {};
     const [planEndLine, splitContents] = this.getPlanEndLine(
@@ -84,7 +84,7 @@ export class PlanEditor {
     return `${headingTokens} ${plannerHeading}`;
   }
 
-  private updateTaskInFileContents(contents: string, task: PlanItem) {
+  private updateTaskInFileContents(contents: string, task: Task) {
     return contents
       .split("\n")
       .map((line, index) => {
@@ -136,13 +136,13 @@ export class PlanEditor {
   }
 
   private taskLineToString(
-    planItem: PlanItem,
+    task: Task,
     { startMinutes, durationMinutes }: Timestamp,
   ) {
-    return `${planItem.listTokens}${createTimestamp(
+    return `${task.listTokens}${createTimestamp(
       startMinutes,
       durationMinutes,
       this.settings().timestampFormat,
-    )} ${planItem.firstLineText}`;
+    )} ${task.firstLineText}`;
   }
 }

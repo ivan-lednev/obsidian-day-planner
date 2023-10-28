@@ -1,25 +1,25 @@
 <script lang="ts">
-  import type { UnscheduledPlanItem } from "../../types";
+  import type { UnscheduledTask } from "../../types";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
-  export let planItem: UnscheduledPlanItem;
+  export let task: UnscheduledTask;
   // todo: this should live in useTaskVisuals
   export let relationToNow = "";
 </script>
 
 <div
-  style:width="{planItem?.placing?.widthPercent || 100}%"
-  style:left="{planItem?.placing?.xOffsetPercent || 0}%"
+  style:width="{task?.placing?.widthPercent || 100}%"
+  style:left="{task?.placing?.xOffsetPercent || 0}%"
   class="task-padding-box"
 >
   <div
     class="task-block {relationToNow}"
-    class:is-ghost={planItem.isGhost}
+    class:is-ghost={task.isGhost}
     on:mousedown={(event) => event.stopPropagation()}
     on:mouseup
   >
-    <RenderedMarkdown task={planItem} />
+    <RenderedMarkdown task={task} />
     <slot />
   </div>
 </div>

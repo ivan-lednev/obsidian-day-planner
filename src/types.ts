@@ -6,18 +6,18 @@ import { Readable, Writable } from "svelte/store";
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import type { ObsidianFacade } from "./service/obsidian-facade";
 
-export interface PlanItemLocation {
+export interface TaskLocation {
   path: string;
   line: number;
   position: Pos;
 }
 
 export type OnUpdateFn = (
-  baseline: PlanItem[],
-  updated: PlanItem[],
+  baseline: Task[],
+  updated: Task[],
 ) => Promise<void | void[]>;
 
-export interface UnscheduledPlanItem {
+export interface UnscheduledTask {
   /**
    * @deprecated this will be replaced with dataview `symbol` and `status`
    */
@@ -28,31 +28,28 @@ export interface UnscheduledPlanItem {
   text: string;
 
   id: string;
-  location?: PlanItemLocation;
+  location?: TaskLocation;
   placing?: ReturnType<typeof getHorizontalPlacing>;
   isGhost?: boolean;
   durationMinutes: number;
 }
 
-export interface PlanItem extends UnscheduledPlanItem {
+export interface Task extends UnscheduledTask {
   startTime: Moment;
   startMinutes: number;
 }
 
 export interface TasksForDay {
-  withTime: PlacedPlanItem[];
-  noTime: UnscheduledPlanItem[];
+  withTime: PlacedTask[];
+  noTime: UnscheduledTask[];
 }
 
 // todo: we don't need this, since it's all optional
-export interface PlacedPlanItem extends PlanItem {}
+export interface PlacedTask extends Task {}
 
 export type RelationToNow = "past" | "present" | "future";
 
-export type TimeBlock = Pick<
-  PlanItem,
-  "startMinutes" | "durationMinutes" | "id"
->;
+export type TimeBlock = Pick<Task, "startMinutes" | "durationMinutes" | "id">;
 
 export interface Overlap {
   columns: number;

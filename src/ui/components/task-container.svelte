@@ -8,14 +8,14 @@
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import type {
     ObsidianContext,
-    PlacedPlanItem,
-    UnscheduledPlanItem,
+    PlacedTask,
+    UnscheduledTask,
   } from "../../types";
   import { isToday } from "../../util/moment";
   import { copy, getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
-  import { createPlanItem } from "../hooks/use-edit/transform/create";
+  import { createTask } from "../hooks/use-edit/transform/create";
   import { EditMode } from "../hooks/use-edit/types";
   import { offsetYToMinutes, useEdit } from "../hooks/use-edit/use-edit";
   import { useTasksForDay } from "../hooks/use-tasks-for-day";
@@ -68,12 +68,12 @@
   }));
 
   async function handleMouseDown() {
-    const newTask = await createPlanItem(day, cursorMinutes);
+    const newTask = await createTask(day, cursorMinutes);
 
     startEdit({ task: { ...newTask, isGhost: true }, mode: EditMode.CREATE });
   }
 
-  function handleResizeStart(event: MouseEvent, task: PlacedPlanItem) {
+  function handleResizeStart(event: MouseEvent, task: PlacedTask) {
     const mode = event.ctrlKey
       ? EditMode.RESIZE_AND_SHIFT_OTHERS
       : EditMode.RESIZE;
@@ -81,7 +81,7 @@
     startEdit({ task, mode });
   }
 
-  async function handleTaskMouseUp(task: UnscheduledPlanItem) {
+  async function handleTaskMouseUp(task: UnscheduledTask) {
     if ($editStatus) {
       return;
     }
@@ -90,7 +90,7 @@
     await obsidianFacade.revealLineInFile(path, line);
   }
 
-  function handleGripMouseDown(event: MouseEvent, task: PlacedPlanItem) {
+  function handleGripMouseDown(event: MouseEvent, task: PlacedTask) {
     if (event.ctrlKey) {
       startEdit({ task, mode: EditMode.DRAG_AND_SHIFT_OTHERS });
     } else if (event.shiftKey) {
@@ -100,7 +100,7 @@
     }
   }
 
-  function startScheduling(task: UnscheduledPlanItem) {
+  function startScheduling(task: UnscheduledTask) {
     const withAddedTime = {
       ...task,
       startMinutes: cursorMinutes,
@@ -121,16 +121,16 @@
 
   {#if $displayedTasks.noTime.length > 0 && $settings.showUncheduledTasks}
     <UnscheduledTaskContainer>
-      {#each $displayedTasks.noTime as planItem}
+      {#each $displayedTasks.noTime as task}
         <Task
           --task-height="{$settings.defaultDurationMinutes *
             $settings.zoomLevel}px"
-          {planItem}
-          on:mouseup={() => handleTaskMouseUp(planItem)}
+          {task}
+          on:mouseup={() => handleTaskMouseUp(task)}
         >
           <Grip
             cursor={gripCursor}
-            on:mousedown={() => startScheduling(planItem)}
+            on:mousedown={() => startScheduling(task)}
           />
         </Task>
       {/each}
@@ -157,18 +157,18 @@
         <Banner />
       {/if}
 
-      {#each $displayedTasks.withTime as planItem (getRenderKey(planItem))}
+      {#each $displayedTasks.withTime as task (getRenderKey(task))}
         <ScheduledTask
-          {planItem}
-          on:mouseup={() => handleTaskMouseUp(planItem)}
+          {task}
+          on:mouseup={() => handleTaskMouseUp(task)}
         >
           <Grip
             cursor={gripCursor}
-            on:mousedown={(event) => handleGripMouseDown(event, planItem)}
+            on:mousedown={(event) => handleGripMouseDown(event, task)}
           />
-          {#if !planItem.isGhost}
+          {#if !task.isGhost}
             <ResizeHandle
-              on:mousedown={(event) => handleResizeStart(event, planItem)}
+              on:mousedown={(event) => handleResizeStart(event, task)}
             />
           {/if}
         </ScheduledTask>

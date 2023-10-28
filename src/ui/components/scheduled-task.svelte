@@ -1,21 +1,21 @@
 <script lang="ts">
   import { currentTime } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
-  import type { PlanItem } from "../../types";
+  import type { Task } from "../../types";
   import { useTaskVisuals } from "../hooks/use-task-visuals";
 
-  import Task from "./task.svelte";
+  import TaskComponent from "./task.svelte";
 
-  export let planItem: PlanItem;
+  export let task: Task;
 
   $: ({ height, offset, relationToNow, backgroundColor, properContrastColors } =
-    useTaskVisuals(planItem, {
+    useTaskVisuals(task, {
       settings,
       currentTime,
     }));
 </script>
 
-<Task
+<TaskComponent
   --offset="{$offset}px"
   --position="absolute"
   --task-background-color={$backgroundColor}
@@ -23,9 +23,9 @@
   --text-faint={$properContrastColors.faint}
   --text-muted={$properContrastColors.muted}
   --text-normal={$properContrastColors.normal}
-  {planItem}
   relationToNow={$relationToNow}
+  {task}
   on:mouseup
 >
   <slot />
-</Task>
+</TaskComponent>

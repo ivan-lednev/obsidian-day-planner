@@ -1,4 +1,4 @@
-import type { PlacedPlanItem } from "../../../types";
+import type { PlacedTask } from "../../../types";
 
 export enum EditMode {
   DRAG = "DRAG",
@@ -14,6 +14,6 @@ export enum EditMode {
 }
 
 export interface EditOperation {
-  task: PlacedPlanItem;
+  task: PlacedTask;
   mode: EditMode;
 }
