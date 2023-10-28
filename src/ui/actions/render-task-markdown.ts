@@ -50,10 +50,13 @@ function decorate(
   task: UnscheduledPlanItem,
   settings: DayPlannerSettings,
 ) {
-  const firstListItem = el.querySelector("li");
-  const checkBox = firstListItem.querySelector('input[type="checkbox"]');
+  const checkBox = el.querySelector('input[type="checkbox"]');
 
-  if (settings.showPathInTaskBlock) {
+  if (!checkBox) {
+    return;
+  }
+
+  if (settings.showPathInTaskBlock && task.location) {
     const formattedPath = task.location.path.replace(/\.md$/, "");
 
     checkBox.after(
