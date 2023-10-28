@@ -1,4 +1,12 @@
-<hr class="workspace-leaf-resize-handle" on:mousedown|stopPropagation />
+<script lang="ts">
+  export let visible = true;
+</script>
+
+<hr
+  style:display={visible ? "block" : "none"}
+  class="workspace-leaf-resize-handle"
+  on:mousedown|stopPropagation
+/>
 
 <style>
   :not(#dummy).workspace-leaf-resize-handle {
@@ -7,8 +15,6 @@
     right: 0;
     bottom: 0;
     left: 0;
-
-    display: block; /* obsidian hides them sometimes, we don't want that */
 
     height: calc(var(--divider-width-hover) * 2);
 

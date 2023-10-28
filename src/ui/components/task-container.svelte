@@ -158,19 +158,15 @@
       {/if}
 
       {#each $displayedTasks.withTime as task (getRenderKey(task))}
-        <ScheduledTask
-          {task}
-          on:mouseup={() => handleTaskMouseUp(task)}
-        >
+        <ScheduledTask {task} on:mouseup={() => handleTaskMouseUp(task)}>
           <Grip
             cursor={gripCursor}
             on:mousedown={(event) => handleGripMouseDown(event, task)}
           />
-          {#if !task.isGhost}
-            <ResizeHandle
-              on:mousedown={(event) => handleResizeStart(event, task)}
-            />
-          {/if}
+          <ResizeHandle
+            visible={!$editStatus && !$fileSyncInProgress}
+            on:mousedown={(event) => handleResizeStart(event, task)}
+          />
         </ScheduledTask>
       {/each}
     </ScheduledTaskContainer>
