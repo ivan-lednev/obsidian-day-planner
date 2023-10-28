@@ -3,6 +3,7 @@ import { derived, get, writable } from "svelte/store";
 
 import type { settings } from "../../../global-store/settings";
 import type { OnUpdateFn, TasksForDay } from "../../../types";
+import { findUpdated } from "../../../util/task-utils";
 
 import { transform } from "./transform/transform";
 import type { EditOperation } from "./types";
@@ -72,16 +73,17 @@ export function useEdit({
 
     const currentTasks = get(displayedTasks);
 
-    baselineTasks.set({
-      ...currentTasks,
-      withTime: currentTasks.withTime.map((task) => ({
-        ...task,
-        isGhost: true,
-      })),
-    });
+    // todo: order matters! Make it more explicit
     editOperation.set(undefined);
 
-    await onUpdate(tasks.withTime, currentTasks.withTime);
+    const dirty = findUpdated(tasks.withTime, currentTasks.withTime);
+
+    if (dirty.length === 0) {
+      return;
+    }
+
+    baselineTasks.set(currentTasks);
+    await onUpdate(dirty);
   }
 
   function cancelEdit() {

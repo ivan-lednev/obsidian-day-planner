@@ -234,9 +234,10 @@ export default class DayPlanner extends Plugin {
     );
   }
 
-  private syncTasksWithFile = async (base: Task[], updated: Task[]) => {
+  private syncTasksWithFile = async (dirty: Task[]) => {
     this.fileSyncInProgress.set(true);
-    await this.planEditor.syncTasksWithFile(base, updated);
+
+    await this.planEditor.syncTasksWithFile(dirty);
   };
 
   renderMarkdown = (el: HTMLElement, text: string) => {

@@ -12,10 +12,7 @@ export interface TaskLocation {
   position: Pos;
 }
 
-export type OnUpdateFn = (
-  baseline: Task[],
-  updated: Task[],
-) => Promise<void | void[]>;
+export type OnUpdateFn = (updated: Task[]) => Promise<void | void[]>;
 
 export interface UnscheduledTask {
   /**

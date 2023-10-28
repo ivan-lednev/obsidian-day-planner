@@ -1,11 +1,16 @@
 <script lang="ts">
-  import type { UnscheduledTask } from "../../types";
+  import { getContext } from "svelte";
+
+  import { obsidianContext } from "../../constants";
+  import type { ObsidianContext, UnscheduledTask } from "../../types";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
   export let task: UnscheduledTask;
   // todo: this should live in useTaskVisuals
   export let relationToNow = "";
+
+  const { fileSyncInProgress } = getContext<ObsidianContext>(obsidianContext);
 </script>
 
 <div
@@ -15,11 +20,11 @@
 >
   <div
     class="task-block {relationToNow}"
-    class:is-ghost={task.isGhost}
+    class:is-ghost={task.isGhost || $fileSyncInProgress}
     on:mousedown={(event) => event.stopPropagation()}
     on:mouseup
   >
-    <RenderedMarkdown task={task} />
+    <RenderedMarkdown {task} />
     <slot />
   </div>
 </div>

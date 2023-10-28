@@ -1,10 +1,10 @@
-import { difference, groupBy, partition } from "lodash/fp";
+import { groupBy, partition } from "lodash/fp";
 import type { CachedMetadata } from "obsidian";
 
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
 import type { Task, Timestamp } from "../types";
-import { createTimestamp, isEqualTask } from "../util/task-utils";
+import { createTimestamp } from "../util/task-utils";
 
 import type { ObsidianFacade } from "./obsidian-facade";
 
@@ -14,15 +14,10 @@ export class PlanEditor {
     private readonly obsidianFacade: ObsidianFacade,
   ) {}
 
-  syncTasksWithFile = async (baseline: Task[], updated: Task[]) => {
-    const pristine = updated.filter((task) =>
-      baseline.find((baselineTask) => isEqualTask(task, baselineTask)),
-    );
-
-    const dirty = difference(updated, pristine);
+  syncTasksWithFile = async (tasks: Task[]) => {
     const [edited, created] = partition(
       (task) => task.location.line !== undefined,
-      dirty,
+      tasks,
     );
 
     if (created.length > 1) {

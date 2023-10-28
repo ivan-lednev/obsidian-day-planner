@@ -1,3 +1,4 @@
+import { difference } from "lodash/fp";
 import type { Moment } from "moment";
 
 import type { Task } from "../types";
@@ -53,4 +54,12 @@ export function createTimestamp(
   const end = addMinutes(start, durationMinutes);
 
   return `${start.format(format)} - ${end.format(format)}`;
+}
+
+export function findUpdated(baseline: Task[], updated: Task[]) {
+  const pristine = updated.filter((task) =>
+    baseline.find((baselineTask) => isEqualTask(task, baselineTask)),
+  );
+
+  return difference(updated, pristine);
 }

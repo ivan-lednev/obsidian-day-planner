@@ -15,6 +15,7 @@ const baseTasksForDay: TasksForDay = {
 
 function createProps({ tasks } = { tasks: baseTasksForDay }) {
   const pointerOffsetY = writable(0);
+  const onUpdate = jest.fn();
 
   function movePointerTo(time: string) {
     pointerOffsetY.set(timeToMinutes(time));
@@ -25,7 +26,7 @@ function createProps({ tasks } = { tasks: baseTasksForDay }) {
     tasks,
     settings: writable(defaultSettingsForTests),
     fileSyncInProgress: writable(false),
-    onUpdate: () => Promise.resolve(),
+    onUpdate,
     movePointerTo,
   };
 }
@@ -78,6 +79,17 @@ describe("drag one & common edit mechanics", () => {
       startMinutes: timeToMinutes("09:00"),
       durationMinutes: 60,
     });
+  });
+
+  test("when a task is set to its current time, nothing happens", () => {
+    const props = createProps();
+
+    const { startEdit, confirmEdit } = useEdit(props);
+
+    startEdit({ task: baseTask, mode: EditMode.DRAG });
+    confirmEdit();
+
+    expect(props.onUpdate).not.toHaveBeenCalled();
   });
 });
 
