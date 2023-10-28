@@ -41,14 +41,12 @@ export function getListItemsUnderHeading(
   });
 }
 
-// todo: this belongs to metadata-utils
 export function getHeadingByText(metadata: CachedMetadata, text: string) {
   const { headings = [] } = metadata;
 
   return headings?.find((h) => h.heading === text);
 }
 
-// todo: we don't need this, delete it
 export function createTask({
   line,
   completeContent,

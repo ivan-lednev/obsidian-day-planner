@@ -60,7 +60,7 @@ export function sTaskToTask(sTask: STask, day: Moment): Task {
     },
   });
 
-  const durationMinutes = endTime
+  const durationMinutes = endTime?.isAfter(startTime)
     ? getDiffInMinutes(endTime, startTime)
     : undefined;
 
