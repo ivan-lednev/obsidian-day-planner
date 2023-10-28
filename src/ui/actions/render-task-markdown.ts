@@ -1,10 +1,11 @@
+import { identity } from "lodash/fp";
 import { DayPlannerSettings } from "../../settings";
 import type {
   PlanItem,
   RenderMarkdown,
   UnscheduledPlanItem,
 } from "../../types";
-import { getEndTime } from "../../util/task-utils";
+import { getEndTime, getRenderKey } from "../../util/task-utils";
 
 interface RenderedMarkdownProps {
   task: UnscheduledPlanItem;
@@ -12,11 +13,46 @@ interface RenderedMarkdownProps {
   renderMarkdown: RenderMarkdown;
 }
 
+type IdentityGetters<T> = Partial<{
+  [Prop in keyof T]: (value: T[Prop]) => string;
+}>;
+
+// Can't figure out how to make TypeScript happy
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createMemo<T extends Record<string, any>>(
+  initialProps: T,
+  identityGetters: IdentityGetters<T>,
+) {
+  let previousProps = initialProps;
+
+  function shouldUpdate(newProps: T) {
+    for (const [propKey, propValue] of Object.entries(newProps)) {
+      const previousValue = previousProps[propKey];
+      const identityFn = identityGetters?.[propKey] || identity;
+      const propChanged = identityFn(propValue) !== identityFn(previousValue);
+
+      if (propChanged) {
+        previousProps = newProps;
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  return shouldUpdate;
+}
+
 export function renderTaskMarkdown(
   el: HTMLElement,
-  props: RenderedMarkdownProps,
+  initial: RenderedMarkdownProps,
 ) {
   let onDestroy: () => void;
+
+  const shouldUpdate = createMemo(initial, {
+    task: getRenderKey,
+  });
 
   function decorate(task: UnscheduledPlanItem, settings: DayPlannerSettings) {
     const firstListItem = el.querySelector("li");
@@ -74,11 +110,13 @@ export function renderTaskMarkdown(
     decorate(task, settings);
   }
 
-  refresh(props);
+  refresh(initial);
 
   return {
     update(props: RenderedMarkdownProps) {
-      refresh(props);
+      if (shouldUpdate(props)) {
+        refresh(props);
+      }
     },
     destroy() {
       onDestroy?.();
