@@ -11,11 +11,9 @@ export function create(
   editTarget: PlacedTask,
   cursorTime: number,
 ): PlacedTask[] {
-  const startMinutes = cursorTime;
-
   const updated = {
     ...editTarget,
-    startMinutes,
+    durationMinutes: cursorTime - editTarget.startMinutes,
   };
 
   return [...baseline, updated];

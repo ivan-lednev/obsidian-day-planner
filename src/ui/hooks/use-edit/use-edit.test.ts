@@ -203,23 +203,24 @@ describe("drag many", () => {
   test.todo("tasks stop moving once there is not enough time");
 });
 
-// todo: why is it skipped?
 describe("create", () => {
-  test.skip("create a task", () => {
-    const { movePointerTo, ...props } = createProps();
+  test("when creating and dragging, task duration changes", () => {
+    const { movePointerTo, ...props } = createProps({
+      tasks: { noTime: [], withTime: [] },
+    });
 
     const { displayedTasks, startEdit } = useEdit(props);
 
-    startEdit({ task: baseTask, mode: EditMode.DRAG });
-    movePointerTo("09:00");
+    startEdit({ task: baseTask, mode: EditMode.CREATE });
+    movePointerTo("03:00");
 
     const {
       withTime: [createdItem],
     } = get(displayedTasks);
 
     expect(createdItem).toMatchObject({
-      startMinutes: timeToMinutes("09:00"),
-      durationMinutes: 30,
+      startMinutes: timeToMinutes("00:00"),
+      durationMinutes: 180,
     });
   });
 });
