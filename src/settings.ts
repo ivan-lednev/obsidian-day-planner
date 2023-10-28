@@ -25,6 +25,7 @@ export interface DayPlannerSettings {
   showTimestampInTaskBlock: boolean;
   unscheduledTasksHeight: number;
   showUncheduledTasks: boolean;
+  showUnscheduledNestedTasks: boolean;
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -51,6 +52,7 @@ export const defaultSettings: DayPlannerSettings = {
   showTimestampInTaskBlock: false,
   unscheduledTasksHeight: 100,
   showUncheduledTasks: true,
+  showUnscheduledNestedTasks: true,
 };
 
 export const defaultSettingsForTests = {

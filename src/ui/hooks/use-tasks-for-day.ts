@@ -17,9 +17,7 @@ export function useTasksForDay({
   dataviewTasks,
   settings,
 }: UseTaskSourceProps): TasksForDay {
-  const { withTime, noTime } = getTasksForDay(day, dataviewTasks, {
-    ...settings,
-  });
+  const { withTime, noTime } = getTasksForDay(day, dataviewTasks, settings);
 
   return { withTime: addHorizontalPlacing(withTime), noTime };
 }

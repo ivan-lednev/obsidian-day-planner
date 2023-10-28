@@ -67,7 +67,7 @@ function calculateDuration(tasks: Task[], options: DurationOptions) {
 export function getTasksForDay(
   day: Moment,
   dataviewTasks: DataArray<STask>,
-  options: DurationOptions,
+  settings: DayPlannerSettings,
 ): TasksForDay {
   if (dataviewTasks.length === 0) {
     return { withTime: [], noTime: [] };
@@ -90,11 +90,13 @@ export function getTasksForDay(
     .map((sTask: STask) => sTaskToTask(sTask, day))
     .sort((a, b) => a.startMinutes - b.startMinutes);
 
-  const noTime = withoutTime.map((sTask: STask) =>
-    sTaskToUnscheduledTask(sTask, day),
-  );
+  const noTime = withoutTime
+    .filter((sTask) =>
+      settings.showUnscheduledNestedTasks ? true : !sTask.parent,
+    )
+    .map((sTask: STask) => sTaskToUnscheduledTask(sTask, day));
 
-  const withTimeAndDuration = calculateDuration(tasksWithTime, options);
+  const withTimeAndDuration = calculateDuration(tasksWithTime, settings);
 
   return { withTime: withTimeAndDuration, noTime };
 }
