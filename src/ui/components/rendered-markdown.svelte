@@ -3,10 +3,7 @@
 
   import { obsidianContext } from "../../constants";
   import { settings } from "../../global-store/settings";
-  import type {
-    ObsidianContext,
-    UnscheduledPlanItem,
-  } from "../../types";
+  import type { ObsidianContext, UnscheduledPlanItem } from "../../types";
   import { renderTaskMarkdown } from "../actions/render-task-markdown";
 
   export let task: UnscheduledPlanItem;
@@ -21,7 +18,8 @@
 
 <style>
   :global(.day-planner-task-decoration) {
-    padding: var(--tag-padding-y) var(--tag-padding-x);
+    margin: 0 0.1em;
+    padding: 0.1em;
 
     font-size: var(--tag-size);
     font-weight: var(--tag-weight);
@@ -30,8 +28,7 @@
     text-decoration: var(--tag-decoration);
 
     background-color: var(--tag-background);
-    border: var(--tag-border-width) solid var(--tag-border-color);
-    border-radius: var(--tag-radius);
+    border-radius: var(--radius-s);
   }
 
   .rendered-markdown {
