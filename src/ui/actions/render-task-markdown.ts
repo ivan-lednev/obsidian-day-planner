@@ -1,99 +1,14 @@
-import { identity } from "lodash/fp";
-
 import { DayPlannerSettings } from "../../settings";
-import type {
-  PlanItem,
-  RenderMarkdown,
-  UnscheduledPlanItem,
-} from "../../types";
-import { getEndTime, getRenderKey } from "../../util/task-utils";
+import type { RenderMarkdown, UnscheduledPlanItem } from "../../types";
+import { getRenderKey } from "../../util/task-utils";
+
+import { createMemo } from "./memoize-props";
+import { decorate, disableCheckBoxes } from "./post-process-task-markdown";
 
 interface RenderedMarkdownProps {
   task: UnscheduledPlanItem;
   settings: DayPlannerSettings;
   renderMarkdown: RenderMarkdown;
-}
-
-type IdentityGetters<T> = Partial<{
-  [Prop in keyof T]: (value: T[Prop]) => string;
-}>;
-
-// Can't figure out how to make TypeScript happy
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function createMemo<T extends Record<string, any>>(
-  initialProps: T,
-  identityGetters: IdentityGetters<T>,
-) {
-  let previousProps = initialProps;
-
-  function shouldUpdate(newProps: T) {
-    for (const [propKey, propValue] of Object.entries(newProps)) {
-      const previousValue = previousProps[propKey];
-      const identityFn = identityGetters?.[propKey] || identity;
-      const propChanged = identityFn(propValue) !== identityFn(previousValue);
-
-      if (propChanged) {
-        previousProps = newProps;
-
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  return shouldUpdate;
-}
-
-function decorate(
-  el: HTMLElement,
-  task: UnscheduledPlanItem,
-  settings: DayPlannerSettings,
-) {
-  const checkBox = el.querySelector('input[type="checkbox"]');
-
-  if (!checkBox) {
-    return;
-  }
-
-  if (settings.showPathInTaskBlock && task.location) {
-    const formattedPath = task.location.path.replace(/\.md$/, "");
-
-    checkBox.after(
-      createSpan({
-        text: formattedPath,
-        cls: "day-planner-task-decoration",
-      }),
-    );
-  }
-
-  if (settings.showTimestampInTaskBlock) {
-    // @ts-ignore
-    if (!task.startTime) {
-      return;
-    }
-
-    const startTime = (task as PlanItem).startTime.format(
-      settings.timestampFormat,
-    );
-    const endTime = getEndTime(task as PlanItem).format(
-      settings.timestampFormat,
-    );
-    const timestamp = `${startTime} - ${endTime}`;
-
-    checkBox.after(
-      createSpan({
-        text: timestamp,
-        cls: "day-planner-task-decoration",
-      }),
-    );
-  }
-}
-
-function disableCheckBoxes(el: HTMLElement) {
-  el
-    .querySelectorAll(`input[type="checkbox"]`)
-    ?.forEach((checkbox) => checkbox.setAttribute("disabled", "true"));
 }
 
 export function renderTaskMarkdown(
@@ -109,6 +24,7 @@ export function renderTaskMarkdown(
   function refresh({ task, settings, renderMarkdown }: RenderedMarkdownProps) {
     onDestroy?.();
     onDestroy = renderMarkdown(el, task.text);
+
     disableCheckBoxes(el);
     decorate(el, task, settings);
   }

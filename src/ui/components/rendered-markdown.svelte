@@ -18,8 +18,8 @@
 
 <style>
   :global(.day-planner-task-decoration) {
-    margin: 0 0.1em;
-    padding: 0.1em;
+    margin: 0 0.25em;
+    padding: 0.1em 0.25em;
 
     font-size: var(--tag-size);
     font-weight: var(--tag-weight);

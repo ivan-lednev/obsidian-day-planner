@@ -4,6 +4,7 @@ import type { PlanItem } from "../types";
 import { PlacedPlanItem } from "../types";
 
 import { getId } from "./id";
+import { addMinutes, minutesToMoment } from "./moment";
 
 export function isEqualTask(a: PlanItem, b: PlanItem) {
   return (
@@ -11,10 +12,6 @@ export function isEqualTask(a: PlanItem, b: PlanItem) {
     a.startMinutes === b.startMinutes &&
     a.durationMinutes === b.durationMinutes
   );
-}
-
-export function isWithTime(task: Partial<Pick<PlanItem, "startTime">>) {
-  return Boolean(task.startTime);
 }
 
 export function getEndMinutes(task: {
@@ -45,4 +42,15 @@ export function copy(task: PlanItem): PlanItem {
     // todo: there should be a better way to track which tasks are new
     location: { ...task.location, line: undefined },
   };
+}
+
+export function createTimestamp(
+  startMinutes: number,
+  durationMinutes: number,
+  format: string,
+) {
+  const start = minutesToMoment(startMinutes);
+  const end = addMinutes(start, durationMinutes);
+
+  return `${start.format(format)} - ${end.format(format)}`;
 }

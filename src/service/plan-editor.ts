@@ -1,12 +1,10 @@
 import { difference, groupBy, partition } from "lodash/fp";
-import type { Moment } from "moment";
 import type { CachedMetadata } from "obsidian";
 
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
 import type { PlanItem, Timestamp } from "../types";
-import { addMinutes, minutesToMoment } from "../util/moment";
-import { isEqualTask } from "../util/task-utils";
+import { createTimestamp, isEqualTask } from "../util/task-utils";
 
 import type { ObsidianFacade } from "./obsidian-facade";
 
@@ -141,20 +139,10 @@ export class PlanEditor {
     planItem: PlanItem,
     { startMinutes, durationMinutes }: Timestamp,
   ) {
-    return `${planItem.listTokens}${this.createTimestamp(
+    return `${planItem.listTokens}${createTimestamp(
       startMinutes,
       durationMinutes,
+      this.settings().timestampFormat,
     )} ${planItem.firstLineText}`;
-  }
-
-  private createTimestamp(startMinutes: number, durationMinutes: number) {
-    const start = minutesToMoment(startMinutes);
-    const end = addMinutes(start, durationMinutes);
-
-    return `${this.formatTimestamp(start)} - ${this.formatTimestamp(end)}`;
-  }
-
-  private formatTimestamp(moment: Moment) {
-    return moment.format(this.settings().timestampFormat);
   }
 }

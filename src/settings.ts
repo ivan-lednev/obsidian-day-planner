@@ -22,7 +22,6 @@ export interface DayPlannerSettings {
   showDataviewMigrationWarning: boolean;
   extendDurationUntilNext: boolean;
   defaultDurationMinutes: number;
-  showPathInTaskBlock: boolean;
   showTimestampInTaskBlock: boolean;
   unscheduledTasksHeight: number;
   showUncheduledTasks: boolean;
@@ -49,7 +48,6 @@ export const defaultSettings: DayPlannerSettings = {
   showDataviewMigrationWarning: true,
   extendDurationUntilNext: false,
   defaultDurationMinutes: 30,
-  showPathInTaskBlock: true,
   showTimestampInTaskBlock: false,
   unscheduledTasksHeight: 100,
   showUncheduledTasks: true,
