@@ -12,7 +12,14 @@
 <style>
   .unscheduled-task-container {
     overflow: auto;
-    padding: 1px 10px 0;
+    padding: var(--size-4-1) var(--size-4-2);
     border-bottom: 1px solid var(--background-modifier-border);
+    background: repeating-linear-gradient(
+      45deg,
+      var(--background-secondary),
+      var(--background-secondary) 10px,
+      var(--background-modifier-border) 10px,
+      var(--background-modifier-border) 20px
+    );
   }
 </style>
