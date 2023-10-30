@@ -12,7 +12,6 @@
     AlertTriangle,
     Info,
   } from "lucide-svelte";
-  import type { Moment } from "moment";
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../constants";
@@ -25,8 +24,6 @@
   import ControlButton from "./control-button.svelte";
   import Dropdown from "./obsidian/dropdown.svelte";
   import SettingItem from "./obsidian/setting-item.svelte";
-
-  export let day: Moment;
 
   const { obsidianFacade, initWeeklyView, refreshTasks, dataviewLoaded } =
     getContext<ObsidianContext>(obsidianContext);
@@ -120,11 +117,13 @@
     <ControlButton
       label="Go to file"
       on:click={async () => {
-        const note = await createDailyNoteIfNeeded(day);
+        const note = await createDailyNoteIfNeeded($visibleDayInTimeline);
         await obsidianFacade.openFileInEditor(note);
       }}
     >
-      <span class="date">{day.format($settings.timelineDateFormat)}</span>
+      <span class="date"
+        >{$visibleDayInTimeline.format($settings.timelineDateFormat)}</span
+      >
     </ControlButton>
 
     <ControlButton

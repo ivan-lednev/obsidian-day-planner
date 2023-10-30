@@ -31,8 +31,8 @@
 
 <style>
   .task-padding-box {
-    position: var(--position, static);
-    top: var(--offset);
+    position: var(--task-position, static);
+    top: var(--task-offset);
     left: 0;
 
     display: flex;

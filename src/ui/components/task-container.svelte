@@ -11,7 +11,7 @@
   import { getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
-  import { useTasks } from "../hooks/use-tasks";
+  import { useEditHandlers } from "../hooks/use-edit-handlers";
 
   import Banner from "./banner.svelte";
   import Column from "./column.svelte";
@@ -44,7 +44,7 @@
     handleTaskMouseUp,
     handleGripMouseDown,
     startScheduling,
-  } = useTasks({
+  } = useEditHandlers({
     day,
     obsidianFacade,
     dataviewTasks: $dataviewTasks,
@@ -65,7 +65,7 @@
 <svelte:document on:mouseup={cancelEdit} />
 
 {#if !hideControls}
-  <TimelineControls {day} />
+  <TimelineControls />
 
   {#if $displayedTasks.noTime.length > 0 && $settings.showUncheduledTasks}
     <UnscheduledTaskContainer>

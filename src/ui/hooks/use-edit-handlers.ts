@@ -23,7 +23,7 @@ export interface UseTasksProps {
   obsidianFacade: ObsidianFacade;
 }
 
-export function useTasks({
+export function useEditHandlers({
   day,
   dataviewTasks,
   settings,

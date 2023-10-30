@@ -16,10 +16,10 @@
 </script>
 
 <TaskComponent
-  --offset="{$offset}px"
-  --position="absolute"
   --task-background-color={$backgroundColor}
   --task-height="{$height}px"
+  --task-offset="{$offset}px"
+  --task-position="absolute"
   --text-faint={$properContrastColors.faint}
   --text-muted={$properContrastColors.muted}
   --text-normal={$properContrastColors.normal}
