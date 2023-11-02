@@ -23,7 +23,7 @@ function createTaskSourceStub() {
       return tasksForDay.get(day);
     }
 
-    throw new Error(`Fake tasks not provided for day: ${day}`);
+    throw new Error(`Stub tasks not provided for day: ${day}`);
   };
 }
 
@@ -119,7 +119,7 @@ describe("drag one & common edit mechanics", () => {
 });
 
 describe("moving tasks between containers", () => {
-  test("when the pointer hovers over another column, the edited task gets moved there and removed from its original column", () => {
+  test("when the pointer hovers over another column, the task gets moved there and removed from its original column", () => {
     const props = createProps();
 
     const { getEditHandlers } = useEditContext(props);
@@ -136,5 +136,31 @@ describe("moving tasks between containers", () => {
 
     expect(get(displayedTasksForDay).withTime).toHaveLength(0);
     expect(get(displayedTasksForNextDay).withTime).toHaveLength(1);
+  });
+
+  test("when the pointer hovers over another column, the task reacts to mouse movement", () => {
+    const props = createProps();
+    const { movePointerTo } = props;
+
+    const { getEditHandlers } = useEditContext(props);
+
+    const { displayedTasks: displayedTasksForDay, handleGripMouseDown } =
+      getEditHandlers(day);
+    const {
+      displayedTasks: displayedTasksForNextDay,
+      handleMouseEnter: moveMouseToNextDay,
+    } = getEditHandlers(nextDay);
+
+    handleGripMouseDown({} as MouseEvent, baseTask);
+    moveMouseToNextDay();
+    movePointerTo("9:00");
+
+    const {
+      withTime: [task],
+    } = get(displayedTasksForNextDay);
+
+    expect(task).toMatchObject({
+      startMinutes: timeToMinutes("09:00"),
+    });
   });
 });

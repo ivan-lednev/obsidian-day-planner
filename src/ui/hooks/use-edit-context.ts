@@ -57,6 +57,7 @@ export function useEditContext({
     const handlers = useEditHandlers({
       day,
       obsidianFacade,
+      // todo: wrap it in a cleaner way or move the base up
       startEdit: (operation: EditOperation) => {
         dayUnderEdit.set(day);
         startEdit(operation);
@@ -72,27 +73,27 @@ export function useEditContext({
     const displayedTasks = derived(
       [baseDisplayedTasks, editOperation, dayUnderEdit],
       ([$baseDisplayedTasks, $editOperation, $dayUnderEdit]) => {
-        if (
-          $dayUnderEdit?.isSame(day, "day") &&
-          $editOperation &&
-          !$baseDisplayedTasks.withTime.includes($editOperation.task)
-        ) {
-          return {
-            ...$baseDisplayedTasks,
-            withTime: [...$baseDisplayedTasks.withTime, $editOperation.task],
-          };
-        }
+        if ($editOperation) {
+          const thisDayIsUnderEdit = $dayUnderEdit.isSame(day, "day");
+          const editedTaskComesFromThisDay = $baseDisplayedTasks.withTime.some(
+            (task) => $editOperation.task.id === task.id,
+          );
 
-        if (
-          !$dayUnderEdit?.isSame(day, "day") &&
-          $editOperation?.task.startTime.isSame(day, "day")
-        ) {
-          return {
-            ...$baseDisplayedTasks,
-            withTime: $baseDisplayedTasks.withTime.filter(
-              (task) => task.id !== $editOperation.task.id,
-            ),
-          };
+          if (thisDayIsUnderEdit && !editedTaskComesFromThisDay) {
+            return {
+              ...$baseDisplayedTasks,
+              withTime: [...$baseDisplayedTasks.withTime, $editOperation.task],
+            };
+          }
+
+          if (!thisDayIsUnderEdit && editedTaskComesFromThisDay) {
+            return {
+              ...$baseDisplayedTasks,
+              withTime: $baseDisplayedTasks.withTime.filter(
+                (task) => task.id !== $editOperation.task.id,
+              ),
+            };
+          }
         }
 
         return $baseDisplayedTasks;
@@ -101,6 +102,7 @@ export function useEditContext({
 
     return {
       ...handlers,
+      pointerOffsetY,
       cancelEdit,
       confirmEdit,
       displayedTasks,

@@ -3,7 +3,10 @@
   import { writable } from "svelte/store";
 
   import { obsidianContext } from "../../../constants";
-  import { getVisibleHours } from "../../../global-store/derived-settings";
+  import {
+    getVisibleHours,
+    snap,
+  } from "../../../global-store/derived-settings";
   import { settings } from "../../../global-store/settings";
   import { visibleDateRange } from "../../../global-store/visible-date-range";
   import type { ObsidianContext } from "../../../types";
@@ -15,6 +18,8 @@
 
   const { obsidianFacade, onUpdate, getTasksForDay, fileSyncInProgress } =
     getContext<ObsidianContext>(obsidianContext);
+  const pointerOffsetY = writable(0);
+  let el: HTMLDivElement;
 
   // todo: potentially this is not going to be re-run when $getTasksForDay changes
   $: setContext(
@@ -25,10 +30,19 @@
       getTasksForDay: $getTasksForDay,
       fileSyncInProgress,
       settings: $settings,
-      pointerOffsetY: writable(0),
+      pointerOffsetY,
     }),
   );
 </script>
+
+<svelte:document
+  on:mousemove={(event) => {
+    const viewportToElOffsetY = el.getBoundingClientRect().top;
+    const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
+
+    pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings.zoomLevel));
+  }}
+/>
 
 <div class="week-header">
   <div class="corner"></div>
@@ -47,13 +61,15 @@
 
 <div class="day-columns">
   <Ruler visibleHours={getVisibleHours($settings)} />
-  {#each $visibleDateRange as day}
-    <div class="day-column">
-      <div class="stretcher">
-        <TaskContainer {day} hideControls />
+  <div bind:this={el} style="display: contents; ">
+    {#each $visibleDateRange as day}
+      <div class="day-column">
+        <div class="stretcher">
+          <TaskContainer {day} hideControls />
+        </div>
       </div>
-    </div>
-  {/each}
+    {/each}
+  </div>
 </div>
 
 <style>

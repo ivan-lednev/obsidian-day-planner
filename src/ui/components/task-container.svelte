@@ -11,8 +11,8 @@
   import { getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
-  
-import Banner from "./banner.svelte";
+
+  import Banner from "./banner.svelte";
   import Column from "./column.svelte";
   import Grip from "./grip.svelte";
   import Needle from "./needle.svelte";
@@ -31,8 +31,6 @@ import Banner from "./banner.svelte";
   const { fileSyncInProgress } = getContext<ObsidianContext>(obsidianContext);
   const { getEditHandlers } = getContext("editContext");
 
-  const pointerOffsetY = writable(0);
-
   $: ({
     displayedTasks,
     cancelEdit,
@@ -43,7 +41,7 @@ import Banner from "./banner.svelte";
     handleTaskMouseUp,
     handleGripMouseDown,
     startScheduling,
-    handleMouseEnter
+    handleMouseEnter,
   } = getEditHandlers(day));
 
   $: ({ bodyCursor, gripCursor, containerCursor } = useCursor({
@@ -89,7 +87,7 @@ import Banner from "./banner.svelte";
 
     <ScheduledTaskContainer
       cursor={containerCursor}
-      {pointerOffsetY}
+      pointerOffsetY={writable(0)}
       on:mousedown={handleMouseDown}
       on:mouseup={confirmEdit}
       on:mouseenter={handleMouseEnter}
