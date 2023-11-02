@@ -87,7 +87,17 @@ export function getTasksForDay(
   const [withTime, withoutTime] = partition(isTimeSetOnTask, tasksForDay);
 
   const tasksWithTime = withTime
-    .map((sTask: STask) => sTaskToTask(sTask, day))
+    .reduce((result, sTask) => {
+      try {
+        const task = sTaskToTask(sTask, day);
+
+        result.push(task);
+      } catch (error) {
+        console.error(`Could not parse Dataview task: ${error}`);
+      }
+
+      return result;
+    }, [])
     .sort((a, b) => a.startMinutes - b.startMinutes);
 
   const noTime = withoutTime
