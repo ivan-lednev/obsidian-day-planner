@@ -1,6 +1,5 @@
 import type { Moment } from "moment";
 import { MetadataCache, Pos } from "obsidian";
-import { DataArray, STask } from "obsidian-dataview";
 import { Readable, Writable } from "svelte/store";
 
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
@@ -61,13 +60,14 @@ export type Timestamp = {
 
 export type CleanUp = () => void;
 export type RenderMarkdown = (el: HTMLElement, markdown: string) => CleanUp;
+export type GetTasksForDay = (day: Moment) => TasksForDay;
 
 export interface ObsidianContext {
   obsidianFacade: ObsidianFacade;
   metadataCache: MetadataCache;
   onUpdate: OnUpdateFn;
   initWeeklyView: () => Promise<void>;
-  dataviewTasks: Readable<DataArray<STask>>;
+  getTasksForDay: Readable<GetTasksForDay>;
   refreshTasks: (source: string) => void;
   dataviewLoaded: Writable<boolean>;
   fileSyncInProgress: Readable<boolean>;

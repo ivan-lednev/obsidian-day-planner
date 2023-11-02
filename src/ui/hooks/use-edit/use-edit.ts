@@ -1,4 +1,4 @@
-import type { Readable } from "svelte/store";
+import type { Readable, Writable } from "svelte/store";
 import { derived, get, writable } from "svelte/store";
 
 import { DayPlannerSettings } from "../../../settings";
@@ -14,17 +14,19 @@ interface UseEditProps {
   settings: DayPlannerSettings;
   fileSyncInProgress: Readable<boolean>;
   onUpdate: OnUpdateFn;
+  editOperation: Writable<EditOperation | undefined>;
 }
 
 export function useEdit({
+  editOperation,
   tasks,
   pointerOffsetY,
   settings,
+  // todo: move up
   fileSyncInProgress,
   onUpdate,
 }: UseEditProps) {
   const baselineTasks = writable(tasks);
-  const editOperation = writable<EditOperation | undefined>();
 
   const displayedTasks = derived(
     [editOperation, pointerOffsetY, baselineTasks],

@@ -1,53 +1,28 @@
 import { Moment } from "moment/moment";
-import { DataArray, STask } from "obsidian-dataview";
-import { derived, get, Readable } from "svelte/store";
+import { get, Readable } from "svelte/store";
 
-import { addHorizontalPlacing } from "../../overlap/overlap";
 import { ObsidianFacade } from "../../service/obsidian-facade";
-import { DayPlannerSettings } from "../../settings";
-import { OnUpdateFn, PlacedTask, UnscheduledTask } from "../../types";
-import { getTasksForDay } from "../../util/get-tasks-for-day";
-import { copy, offsetYToMinutes } from "../../util/task-utils";
+import { PlacedTask, UnscheduledTask } from "../../types";
+import { copy } from "../../util/task-utils";
 
 import { createTask } from "./use-edit/transform/create";
 import { EditMode } from "./use-edit/types";
 import { useEdit } from "./use-edit/use-edit";
 
-export interface UseTasksProps {
+export interface UseTasksProps
+  extends Pick<ReturnType<typeof useEdit>, "startEdit" | "editStatus"> {
   day: Moment;
-  dataviewTasks: DataArray<STask>;
-  settings: DayPlannerSettings;
-  pointerOffsetY: Readable<number>;
-  fileSyncInProgress: Readable<boolean>;
-  onUpdate: OnUpdateFn;
   obsidianFacade: ObsidianFacade;
+  cursorMinutes: Readable<number>;
 }
 
 export function useEditHandlers({
   day,
-  dataviewTasks,
-  settings,
-  pointerOffsetY,
-  fileSyncInProgress,
-  onUpdate,
   obsidianFacade,
+  startEdit,
+  editStatus,
+  cursorMinutes,
 }: UseTasksProps) {
-  const { withTime, noTime } = getTasksForDay(day, dataviewTasks, settings);
-  const tasks = { withTime: addHorizontalPlacing(withTime), noTime };
-
-  const cursorMinutes = derived([pointerOffsetY], ([$pointerOffsetY]) =>
-    offsetYToMinutes($pointerOffsetY, settings.zoomLevel, settings.startHour),
-  );
-
-  const { startEdit, cancelEdit, confirmEdit, editStatus, displayedTasks } =
-    useEdit({
-      tasks,
-      settings,
-      pointerOffsetY,
-      fileSyncInProgress,
-      onUpdate,
-    });
-
   async function handleMouseDown() {
     const newTask = await createTask(day, get(cursorMinutes));
 
@@ -93,10 +68,6 @@ export function useEditHandlers({
   }
 
   return {
-    cancelEdit,
-    confirmEdit,
-    editStatus,
-    displayedTasks,
     handleMouseDown,
     handleResizeStart,
     handleTaskMouseUp,

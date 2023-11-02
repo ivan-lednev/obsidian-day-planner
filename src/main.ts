@@ -1,3 +1,4 @@
+import { Moment } from "moment";
 import {
   Component,
   FileView,
@@ -22,13 +23,14 @@ import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
-import { Task } from "./types";
+import { GetTasksForDay, Task } from "./types";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { debounceWithDelay } from "./util/debounce-with-delay";
+import { getTasksForDay } from "./util/get-tasks-for-day";
 import { isToday } from "./util/moment";
 
 export default class DayPlanner extends Plugin {
@@ -38,6 +40,7 @@ export default class DayPlanner extends Plugin {
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
   private dataviewTasks: Readable<DataArray<STask>>;
+  private getTasksForDay: Readable<GetTasksForDay>;
   private readonly dataviewLoaded = writable(false);
   private readonly fileSyncInProgress = writable(false);
 
@@ -126,6 +129,12 @@ export default class DayPlanner extends Plugin {
         this.app.metadataCache.off("dataview:metadata-change", updateTasks);
         document.removeEventListener("keydown", delayUpdateTasks);
         unsubscribeFromSettings();
+      };
+    });
+
+    this.getTasksForDay = derived(this.dataviewTasks, ($dataviewTasks) => {
+      return (day: Moment) => {
+        return getTasksForDay(day, $dataviewTasks, this.settings());
       };
     });
   }
@@ -261,7 +270,7 @@ export default class DayPlanner extends Plugin {
           metadataCache: this.app.metadataCache,
           onUpdate: this.syncTasksWithFile,
           initWeeklyView: this.initWeeklyLeaf,
-          dataviewTasks: this.dataviewTasks,
+          getTasksForDay: this.getTasksForDay,
           refreshTasks: this.refreshTasks,
           dataviewLoaded: this.dataviewLoaded,
           fileSyncInProgress: this.fileSyncInProgress,

@@ -11,9 +11,8 @@
   import { getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
-  import { useEditHandlers } from "../hooks/use-edit-handlers";
-
-  import Banner from "./banner.svelte";
+  
+import Banner from "./banner.svelte";
   import Column from "./column.svelte";
   import Grip from "./grip.svelte";
   import Needle from "./needle.svelte";
@@ -29,8 +28,8 @@
   export let hideControls = false;
   export let day = $visibleDayInTimeline;
 
-  const { obsidianFacade, onUpdate, dataviewTasks, fileSyncInProgress } =
-    getContext<ObsidianContext>(obsidianContext);
+  const { fileSyncInProgress } = getContext<ObsidianContext>(obsidianContext);
+  const { getEditHandlers } = getContext("editContext");
 
   const pointerOffsetY = writable(0);
 
@@ -44,15 +43,8 @@
     handleTaskMouseUp,
     handleGripMouseDown,
     startScheduling,
-  } = useEditHandlers({
-    day,
-    obsidianFacade,
-    dataviewTasks: $dataviewTasks,
-    settings: $settings,
-    pointerOffsetY,
-    fileSyncInProgress,
-    onUpdate,
-  }));
+    handleMouseEnter
+  } = getEditHandlers(day));
 
   $: ({ bodyCursor, gripCursor, containerCursor } = useCursor({
     editBlocked: $fileSyncInProgress,
@@ -100,6 +92,7 @@
       {pointerOffsetY}
       on:mousedown={handleMouseDown}
       on:mouseup={confirmEdit}
+      on:mouseenter={handleMouseEnter}
     >
       {#if $editStatus && $settings.showHelp}
         <Banner />

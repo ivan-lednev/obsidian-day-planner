@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { getContext } from "svelte";
+  import { getContext, setContext } from "svelte";
+  import { writable } from "svelte/store";
 
   import { obsidianContext } from "../../../constants";
   import { getVisibleHours } from "../../../global-store/derived-settings";
@@ -7,11 +8,26 @@
   import { visibleDateRange } from "../../../global-store/visible-date-range";
   import type { ObsidianContext } from "../../../types";
   import { isToday } from "../../../util/moment";
+  import { useEditContext } from "../../hooks/use-edit-context";
   import ControlButton from "../control-button.svelte";
   import Ruler from "../ruler.svelte";
   import TaskContainer from "../task-container.svelte";
 
-  const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
+  const { obsidianFacade, onUpdate, getTasksForDay, fileSyncInProgress } =
+    getContext<ObsidianContext>(obsidianContext);
+
+  // todo: potentially this is not going to be re-run when $getTasksForDay changes
+  $: setContext(
+    "editContext",
+    useEditContext({
+      obsidianFacade,
+      onUpdate,
+      getTasksForDay: $getTasksForDay,
+      fileSyncInProgress,
+      settings: $settings,
+      pointerOffsetY: writable(0),
+    }),
+  );
 </script>
 
 <div class="week-header">
