@@ -10,18 +10,19 @@ import { EditMode } from "./use-edit/types";
 import { useEdit } from "./use-edit/use-edit";
 
 export interface UseTasksProps
-  extends Pick<ReturnType<typeof useEdit>, "startEdit" | "editStatus"> {
+  extends Pick<ReturnType<typeof useEdit>, "startEdit"> {
   day: Moment;
   obsidianFacade: ObsidianFacade;
   cursorMinutes: Readable<number>;
+  dayUnderEdit: Readable<Moment>;
 }
 
 export function useEditHandlers({
   day,
   obsidianFacade,
   startEdit,
-  editStatus,
   cursorMinutes,
+  dayUnderEdit,
 }: UseTasksProps) {
   async function handleMouseDown() {
     const newTask = await createTask(day, get(cursorMinutes));
@@ -38,7 +39,7 @@ export function useEditHandlers({
   }
 
   async function handleTaskMouseUp(task: UnscheduledTask) {
-    if (get(editStatus)) {
+    if (get(dayUnderEdit)) {
       return;
     }
 
@@ -67,7 +68,12 @@ export function useEditHandlers({
     startEdit({ task: withAddedTime, mode: EditMode.SCHEDULE });
   }
 
+  function handleMouseEnter() {
+    dayUnderEdit.set(day);
+  }
+
   return {
+    handleMouseEnter,
     handleMouseDown,
     handleResizeStart,
     handleTaskMouseUp,

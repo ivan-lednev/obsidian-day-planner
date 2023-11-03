@@ -1,14 +1,14 @@
 import { Moment } from "moment";
-import { derived, Readable, writable } from "svelte/store";
+import { derived, get, Readable, Writable, writable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
 import { ObsidianFacade } from "../../service/obsidian-facade";
 import { DayPlannerSettings } from "../../settings";
-import { GetTasksForDay, OnUpdateFn } from "../../types";
-import { offsetYToMinutes } from "../../util/task-utils";
+import { GetTasksForDay, OnUpdateFn, Task, TasksForDay } from "../../types";
+import { findUpdated, offsetYToMinutes } from "../../util/task-utils";
 
+import { transform } from "./use-edit/transform/transform";
 import { EditOperation } from "./use-edit/types";
-import { useEdit } from "./use-edit/use-edit";
 import { useEditHandlers } from "./use-edit-handlers";
 
 export interface CreateEditContextProps {
@@ -20,7 +20,132 @@ export interface CreateEditContextProps {
   settings: DayPlannerSettings;
 }
 
+function removeTask(task: Task, tasks: TasksForDay) {
+  return {
+    ...tasks,
+    withTime: tasks.withTime.filter((t) => t.id !== task.id),
+  };
+}
+
+function addTask(task: Task, tasks: TasksForDay) {
+  return {
+    ...tasks,
+    withTime: [...tasks.withTime, task],
+  };
+}
+
+interface UseDisplayedTasksProps {
+  day: Moment;
+  editOperation: Readable<EditOperation>;
+  cursorMinutes: Readable<number>;
+  baselineTasks: Readable<TasksForDay>;
+  dayUnderEdit: Readable<Moment>;
+}
+
+function useDisplayedTasks({
+  day,
+  editOperation,
+  cursorMinutes,
+  baselineTasks,
+  dayUnderEdit,
+}: UseDisplayedTasksProps) {
+  return derived(
+    [editOperation, cursorMinutes, baselineTasks, dayUnderEdit],
+    ([$editOperation, $cursorMinutes, $baselineTasks, $dayUnderEdit]) => {
+      if (!$editOperation) {
+        return $baselineTasks;
+      }
+
+      const thisDayIsUnderCursor = $dayUnderEdit.isSame(day, "day");
+      const taskComesFromThisDay = $editOperation.task.startTime.isSame(
+        day,
+        "day",
+      );
+
+      let tasksToTransform = $baselineTasks;
+
+      if (thisDayIsUnderCursor && !taskComesFromThisDay) {
+        tasksToTransform = addTask($editOperation.task, $baselineTasks);
+      } else if (!thisDayIsUnderCursor && taskComesFromThisDay) {
+        tasksToTransform = removeTask($editOperation.task, $baselineTasks);
+      }
+
+      return transform(tasksToTransform, $cursorMinutes, $editOperation);
+    },
+  );
+}
+
+interface UseEditProps {
+  day: Moment;
+  baselineTasks: Writable<TasksForDay>;
+  dayUnderEdit: Writable<Moment>;
+  editOperation: Writable<EditOperation>;
+  displayedTasks: Readable<TasksForDay>;
+  fileSyncInProgress: Readable<boolean>;
+  onUpdate: OnUpdateFn;
+}
+
+function useEdit({
+  day,
+  editOperation,
+  baselineTasks,
+  displayedTasks,
+  dayUnderEdit,
+  fileSyncInProgress,
+  onUpdate,
+}: UseEditProps) {
+  function startEdit(operation: EditOperation) {
+    if (!get(fileSyncInProgress)) {
+      dayUnderEdit.set(day);
+      editOperation.set(operation);
+    }
+  }
+
+  async function confirmEdit() {
+    if (get(editOperation) === undefined) {
+      return;
+    }
+
+    const currentTasks = get(displayedTasks);
+
+    // todo: order matters! Make it more explicit
+    editOperation.set(undefined);
+
+    const dirty = findUpdated(
+      get(baselineTasks).withTime,
+      currentTasks.withTime,
+    );
+
+    if (dirty.length === 0) {
+      return;
+    }
+
+    baselineTasks.set(currentTasks);
+    await onUpdate(dirty);
+  }
+
+  function cancelEdit() {
+    editOperation.set(undefined);
+  }
+
+  return {
+    startEdit,
+    confirmEdit,
+    cancelEdit,
+  };
+}
+
+function useCursorMinutes(
+  pointerOffsetY: Readable<number>,
+  settings: DayPlannerSettings,
+) {
+  return derived(pointerOffsetY, ($pointerOffsetY) =>
+    offsetYToMinutes($pointerOffsetY, settings.zoomLevel, settings.startHour),
+  );
+}
+
 export function useEditContext({
+  // todo: just derive a lookup from dataview results
   getTasksForDay,
   fileSyncInProgress,
   obsidianFacade,
@@ -29,84 +154,46 @@ export function useEditContext({
   settings,
 }: CreateEditContextProps) {
   const dayUnderEdit = writable<Moment | undefined>();
+  // todo: add dayUnderEdit to editOperation
   const editOperation = writable<EditOperation | undefined>();
+  const cursorMinutes = useCursorMinutes(pointerOffsetY, settings);
 
   function getEditHandlers(day: Moment) {
     const { withTime, noTime } = getTasksForDay(day);
     const tasks = { withTime: addHorizontalPlacing(withTime), noTime };
+    const baselineTasks = writable(tasks);
 
-    const cursorMinutes = derived(pointerOffsetY, ($pointerOffsetY) =>
-      offsetYToMinutes($pointerOffsetY, settings.zoomLevel, settings.startHour),
-    );
-
-    const {
-      startEdit,
-      cancelEdit,
-      confirmEdit,
-      editStatus,
-      displayedTasks: baseDisplayedTasks,
-    } = useEdit({
+    const displayedTasks = useDisplayedTasks({
+      day,
       editOperation,
-      tasks,
-      settings,
-      pointerOffsetY,
+      cursorMinutes,
+      baselineTasks,
+      dayUnderEdit,
+    });
+
+    const { startEdit, confirmEdit, cancelEdit } = useEdit({
+      day,
+      editOperation,
+      baselineTasks,
+      displayedTasks,
+      dayUnderEdit,
       fileSyncInProgress,
       onUpdate,
     });
 
     const handlers = useEditHandlers({
       day,
+      dayUnderEdit,
       obsidianFacade,
-      // todo: wrap it in a cleaner way or move the base up
-      startEdit: (operation: EditOperation) => {
-        dayUnderEdit.set(day);
-        startEdit(operation);
-      },
-      editStatus,
+      startEdit,
       cursorMinutes,
     });
 
-    function handleMouseEnter() {
-      dayUnderEdit.set(day);
-    }
-
-    const displayedTasks = derived(
-      [baseDisplayedTasks, editOperation, dayUnderEdit],
-      ([$baseDisplayedTasks, $editOperation, $dayUnderEdit]) => {
-        if ($editOperation) {
-          const thisDayIsUnderEdit = $dayUnderEdit.isSame(day, "day");
-          const editedTaskComesFromThisDay = $baseDisplayedTasks.withTime.some(
-            (task) => $editOperation.task.id === task.id,
-          );
-
-          if (thisDayIsUnderEdit && !editedTaskComesFromThisDay) {
-            return {
-              ...$baseDisplayedTasks,
-              withTime: [...$baseDisplayedTasks.withTime, $editOperation.task],
-            };
-          }
-
-          if (!thisDayIsUnderEdit && editedTaskComesFromThisDay) {
-            return {
-              ...$baseDisplayedTasks,
-              withTime: $baseDisplayedTasks.withTime.filter(
-                (task) => task.id !== $editOperation.task.id,
-              ),
-            };
-          }
-        }
-
-        return $baseDisplayedTasks;
-      },
-    );
-
     return {
       ...handlers,
-      pointerOffsetY,
+      displayedTasks,
       cancelEdit,
       confirmEdit,
-      displayedTasks,
-      handleMouseEnter,
     };
   }
 

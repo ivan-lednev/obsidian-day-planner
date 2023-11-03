@@ -28,7 +28,7 @@ export function useEdit({
 }: UseEditProps) {
   const baselineTasks = writable(tasks);
 
-  const displayedTasks = derived(
+  const baseDisplayedTasks = derived(
     [editOperation, pointerOffsetY, baselineTasks],
     ([$editOperation, $pointerOffsetY, $baselineTasks]) => {
       if (!$editOperation) {
@@ -61,7 +61,7 @@ export function useEdit({
       return;
     }
 
-    const currentTasks = get(displayedTasks);
+    const currentTasks = get(baseDisplayedTasks);
 
     // todo: order matters! Make it more explicit
     editOperation.set(undefined);
@@ -84,7 +84,7 @@ export function useEdit({
     startEdit,
     confirmEdit,
     cancelEdit,
-    displayedTasks,
+    displayedTasks: baseDisplayedTasks,
     editStatus,
   };
 }
