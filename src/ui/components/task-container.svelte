@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Moment } from "moment";
   import { getContext } from "svelte";
   import { writable } from "svelte/store";
 
@@ -27,7 +28,9 @@
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
 
   export let hideControls = false;
-  export let day = $visibleDayInTimeline;
+  export let day: Moment | undefined = undefined;
+
+  $: actualDay = day || $visibleDayInTimeline;
 
   const { obsidianFacade, onUpdate, dataviewTasks, fileSyncInProgress } =
     getContext<ObsidianContext>(obsidianContext);
@@ -45,7 +48,7 @@
     handleGripMouseDown,
     startScheduling,
   } = useEditHandlers({
-    day,
+    day: actualDay,
     obsidianFacade,
     dataviewTasks: $dataviewTasks,
     settings: $settings,
@@ -91,7 +94,7 @@
   {/if}
 
   <Column visibleHours={getVisibleHours($settings)}>
-    {#if isToday(day)}
+    {#if isToday(actualDay)}
       <Needle {autoScrollBlocked} />
     {/if}
 
