@@ -31,7 +31,6 @@ function createProps({ tasks } = { tasks: baseTasksForDay }) {
   };
 }
 
-
 describe("create", () => {
   test("when creating and dragging, task duration changes", () => {
     const { movePointerTo, ...props } = createProps({

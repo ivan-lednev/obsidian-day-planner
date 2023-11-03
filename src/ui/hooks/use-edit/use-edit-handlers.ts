@@ -1,20 +1,19 @@
 import { Moment } from "moment/moment";
-import { get, Readable } from "svelte/store";
+import { get, Readable, Writable } from "svelte/store";
 
-import { ObsidianFacade } from "../../service/obsidian-facade";
-import { PlacedTask, UnscheduledTask } from "../../types";
-import { copy } from "../../util/task-utils";
+import { ObsidianFacade } from "../../../service/obsidian-facade";
+import { PlacedTask, UnscheduledTask } from "../../../types";
+import { copy } from "../../../util/task-utils";
 
-import { createTask } from "./use-edit/transform/create";
-import { EditMode } from "./use-edit/types";
-import { useEdit } from "./use-edit/use-edit";
+import { createTask } from "./transform/create";
+import { EditMode, EditOperation } from "./types";
 
-export interface UseTasksProps
-  extends Pick<ReturnType<typeof useEdit>, "startEdit"> {
+export interface UseEditHandlersProps {
+  startEdit: any;
   day: Moment;
   obsidianFacade: ObsidianFacade;
   cursorMinutes: Readable<number>;
-  dayUnderEdit: Readable<Moment>;
+  editOperation: Writable<EditOperation>;
 }
 
 export function useEditHandlers({
@@ -22,12 +21,16 @@ export function useEditHandlers({
   obsidianFacade,
   startEdit,
   cursorMinutes,
-  dayUnderEdit,
-}: UseTasksProps) {
+  editOperation,
+}: UseEditHandlersProps) {
   async function handleMouseDown() {
     const newTask = await createTask(day, get(cursorMinutes));
 
-    startEdit({ task: { ...newTask, isGhost: true }, mode: EditMode.CREATE });
+    startEdit({
+      task: { ...newTask, isGhost: true },
+      mode: EditMode.CREATE,
+      day,
+    });
   }
 
   function handleResizeStart(event: MouseEvent, task: PlacedTask) {
@@ -35,11 +38,11 @@ export function useEditHandlers({
       ? EditMode.RESIZE_AND_SHIFT_OTHERS
       : EditMode.RESIZE;
 
-    startEdit({ task, mode });
+    startEdit({ task, mode, day });
   }
 
   async function handleTaskMouseUp(task: UnscheduledTask) {
-    if (get(dayUnderEdit)) {
+    if (get(editOperation)) {
       return;
     }
 
@@ -49,11 +52,11 @@ export function useEditHandlers({
 
   function handleGripMouseDown(event: MouseEvent, task: PlacedTask) {
     if (event.ctrlKey) {
-      startEdit({ task, mode: EditMode.DRAG_AND_SHIFT_OTHERS });
+      startEdit({ task, mode: EditMode.DRAG_AND_SHIFT_OTHERS, day });
     } else if (event.shiftKey) {
-      startEdit({ task: copy(task), mode: EditMode.CREATE });
+      startEdit({ task: copy(task), mode: EditMode.CREATE, day });
     } else {
-      startEdit({ task, mode: EditMode.DRAG });
+      startEdit({ task, mode: EditMode.DRAG, day });
     }
   }
 
@@ -65,11 +68,13 @@ export function useEditHandlers({
       startTime: window.moment(),
     };
 
-    startEdit({ task: withAddedTime, mode: EditMode.SCHEDULE });
+    startEdit({ task: withAddedTime, mode: EditMode.SCHEDULE, day });
   }
 
   function handleMouseEnter() {
-    dayUnderEdit.set(day);
+    if (get(editOperation)) {
+      editOperation.update((prev) => ({ ...prev, day }));
+    }
   }
 
   return {

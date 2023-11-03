@@ -2,12 +2,12 @@ import { enableMapSet, produce } from "immer";
 import moment, { Moment } from "moment";
 import { get, writable } from "svelte/store";
 
-import { ObsidianFacade } from "../../service/obsidian-facade";
-import { defaultSettingsForTests } from "../../settings";
-import { TasksForDay } from "../../types";
-import { timeToMinutes } from "../../util/moment";
+import { ObsidianFacade } from "../../../service/obsidian-facade";
+import { defaultSettingsForTests } from "../../../settings";
+import { TasksForDay } from "../../../types";
+import { timeToMinutes } from "../../../util/moment";
+import { baseTask } from "../test-utils";
 
-import { baseTask } from "./test-utils";
 import { useEditContext } from "./use-edit-context";
 
 enableMapSet();
@@ -221,6 +221,10 @@ describe("drag many", () => {
 });
 
 describe("moving tasks between containers", () => {
+  test.todo(
+    "with no edit operation in progress, nothing happens on mouse move",
+  );
+
   test("the task gets moved to another container", () => {
     const props = createProps();
 

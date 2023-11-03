@@ -11,7 +11,7 @@
   import { visibleDateRange } from "../../../global-store/visible-date-range";
   import type { ObsidianContext } from "../../../types";
   import { isToday } from "../../../util/moment";
-  import { useEditContext } from "../../hooks/use-edit-context";
+  import { useEditContext } from "../../hooks/use-edit/use-edit-context";
   import ControlButton from "../control-button.svelte";
   import Ruler from "../ruler.svelte";
   import TaskContainer from "../task-container.svelte";
@@ -21,7 +21,6 @@
   const pointerOffsetY = writable(0);
   let el: HTMLDivElement;
 
-  // todo: potentially this is not going to be re-run when $getTasksForDay changes
   $: setContext(
     "editContext",
     useEditContext({

@@ -1,3 +1,5 @@
+import { Moment } from "moment";
+
 import type { PlacedTask } from "../../../types";
 
 export enum EditMode {
@@ -12,4 +14,5 @@ export enum EditMode {
 export interface EditOperation {
   task: PlacedTask;
   mode: EditMode;
+  day: Moment;
 }
