@@ -24,6 +24,7 @@ import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
 import { GetTasksForDay, Task } from "./types";
+import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
@@ -43,6 +44,7 @@ export default class DayPlanner extends Plugin {
   private getTasksForDay: Readable<GetTasksForDay>;
   private readonly dataviewLoaded = writable(false);
   private readonly fileSyncInProgress = writable(false);
+  private editContext: any;
 
   async onload() {
     await this.initSettingsStore();
@@ -52,7 +54,6 @@ export default class DayPlanner extends Plugin {
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
 
     this.registerCommands();
-    this.registerViews();
 
     this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
@@ -64,6 +65,7 @@ export default class DayPlanner extends Plugin {
 
     this.register(this.dataviewTasks.subscribe(this.updateStatusBar));
 
+    this.registerViews();
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
   }
 
@@ -243,10 +245,10 @@ export default class DayPlanner extends Plugin {
     );
   }
 
-  private syncTasksWithFile = async (dirty: Task[]) => {
+  private syncTasksWithFile = async (tasks: Task[]) => {
     this.fileSyncInProgress.set(true);
 
-    await this.planEditor.syncTasksWithFile(dirty);
+    await this.planEditor.syncTasksWithFile(tasks);
   };
 
   renderMarkdown = (el: HTMLElement, text: string) => {
@@ -262,19 +264,29 @@ export default class DayPlanner extends Plugin {
   };
 
   private registerViews() {
+    this.editContext = derived(
+      [this.settingsStore, this.getTasksForDay],
+      ([$settings, $getTasksForDay]) => {
+        return useEditContext({
+          obsidianFacade: this.obsidianFacade,
+          onUpdate: this.syncTasksWithFile,
+          getTasksForDay: $getTasksForDay,
+          fileSyncInProgress: this.fileSyncInProgress,
+          settings: $settings,
+        });
+      },
+    );
     const componentContext = new Map([
       [
         obsidianContext,
         {
+          // todo: once editContext is lifted up, we don't need half of this stuff
           obsidianFacade: this.obsidianFacade,
-          metadataCache: this.app.metadataCache,
-          onUpdate: this.syncTasksWithFile,
           initWeeklyView: this.initWeeklyLeaf,
-          getTasksForDay: this.getTasksForDay,
           refreshTasks: this.refreshTasks,
           dataviewLoaded: this.dataviewLoaded,
-          fileSyncInProgress: this.fileSyncInProgress,
           renderMarkdown: this.renderMarkdown,
+          editContext: this.editContext,
         },
       ],
     ]);

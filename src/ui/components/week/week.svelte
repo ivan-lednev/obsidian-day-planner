@@ -1,47 +1,18 @@
 <script lang="ts">
-  import { getContext, setContext } from "svelte";
-  import { writable } from "svelte/store";
+  import { getContext } from "svelte";
 
   import { obsidianContext } from "../../../constants";
-  import {
-    getVisibleHours,
-    snap,
-  } from "../../../global-store/derived-settings";
+  import { getVisibleHours } from "../../../global-store/derived-settings";
   import { settings } from "../../../global-store/settings";
   import { visibleDateRange } from "../../../global-store/visible-date-range";
   import type { ObsidianContext } from "../../../types";
   import { isToday } from "../../../util/moment";
-  import { useEditContext } from "../../hooks/use-edit/use-edit-context";
   import ControlButton from "../control-button.svelte";
   import Ruler from "../ruler.svelte";
   import TaskContainer from "../task-container.svelte";
 
-  const { obsidianFacade, onUpdate, getTasksForDay, fileSyncInProgress } =
-    getContext<ObsidianContext>(obsidianContext);
-  const pointerOffsetY = writable(0);
-  let el: HTMLDivElement;
-
-  $: setContext(
-    "editContext",
-    useEditContext({
-      obsidianFacade,
-      onUpdate,
-      getTasksForDay: $getTasksForDay,
-      fileSyncInProgress,
-      settings: $settings,
-      pointerOffsetY,
-    }),
-  );
+  const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
 </script>
-
-<svelte:document
-  on:mousemove={(event) => {
-    const viewportToElOffsetY = el.getBoundingClientRect().top;
-    const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
-
-    pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings.zoomLevel));
-  }}
-/>
 
 <div class="week-header">
   <div class="corner"></div>
@@ -60,15 +31,13 @@
 
 <div class="day-columns">
   <Ruler visibleHours={getVisibleHours($settings)} />
-  <div bind:this={el} style="display: contents; ">
-    {#each $visibleDateRange as day}
-      <div class="day-column">
-        <div class="stretcher">
-          <TaskContainer {day} hideControls />
-        </div>
+  {#each $visibleDateRange as day}
+    <div class="day-column">
+      <div class="stretcher">
+        <TaskContainer {day} hideControls />
       </div>
-    {/each}
-  </div>
+    </div>
+  {/each}
 </div>
 
 <style>

@@ -1,7 +1,6 @@
 import { Moment } from "moment";
 import { derived, Readable, writable } from "svelte/store";
 
-import { addHorizontalPlacing } from "../../../overlap/overlap";
 import { ObsidianFacade } from "../../../service/obsidian-facade";
 import { DayPlannerSettings } from "../../../settings";
 import { GetTasksForDay, OnUpdateFn } from "../../../types";
@@ -17,7 +16,6 @@ export interface UseEditContextProps {
   fileSyncInProgress: Readable<boolean>;
   obsidianFacade: ObsidianFacade;
   onUpdate: OnUpdateFn;
-  pointerOffsetY: Readable<number>;
   settings: DayPlannerSettings;
 }
 
@@ -35,15 +33,15 @@ export function useEditContext({
   fileSyncInProgress,
   obsidianFacade,
   onUpdate,
-  pointerOffsetY,
   settings,
 }: UseEditContextProps) {
   const editOperation = writable<EditOperation | undefined>();
+  const pointerOffsetY = writable(0);
   const cursorMinutes = useCursorMinutes(pointerOffsetY, settings);
 
   function getEditHandlers(day: Moment) {
     const { withTime, noTime } = getTasksForDay(day);
-    const tasks = { withTime: addHorizontalPlacing(withTime), noTime };
+    const tasks = { withTime, noTime };
     const baselineTasks = writable(tasks);
 
     const displayedTasks = useDisplayedTasks({
@@ -69,7 +67,7 @@ export function useEditContext({
       editOperation,
     });
 
-    return { ...handlers, ...actions, displayedTasks };
+    return { ...handlers, ...actions, displayedTasks, pointerOffsetY };
   }
 
   return {

@@ -1,6 +1,6 @@
 import { enableMapSet, produce } from "immer";
 import moment, { Moment } from "moment";
-import { get, writable } from "svelte/store";
+import { get, Writable, writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
 import { defaultSettingsForTests } from "../../../settings";
@@ -51,53 +51,63 @@ function createTaskSourceStub(tasks: Map<Moment, TasksForDay>) {
   };
 }
 
+function setPointerTime(pointerOffsetY: Writable<number>, time: string) {
+  pointerOffsetY.set(timeToMinutes(time));
+}
+
 function createProps({ tasks } = { tasks: baseTasks }) {
-  const pointerOffsetY = writable(0);
   const onUpdate = jest.fn();
   const obsidianFacade = jest.fn() as unknown as ObsidianFacade;
   const getTasksForDay = createTaskSourceStub(tasks);
 
-  function movePointerTo(time: string) {
-    pointerOffsetY.set(timeToMinutes(time));
-  }
-
   return {
     getTasksForDay,
-    pointerOffsetY,
     settings: defaultSettingsForTests,
     fileSyncInProgress: writable(false),
     onUpdate,
-    movePointerTo,
     obsidianFacade,
   };
 }
 
+function setUp() {
+  const { getEditHandlers } = useEditContext(createProps());
+
+  const todayControls = getEditHandlers(day);
+  const { pointerOffsetY } = todayControls;
+  const nextDayControls = getEditHandlers(nextDay);
+
+  function moveCursorTo(time: string) {
+    pointerOffsetY.set(timeToMinutes(time));
+  }
+
+  return { todayControls, nextDayControls, moveCursorTo };
+}
+
 describe("drag one & common edit mechanics", () => {
   test("with no edit in progress, tasks don't change", () => {
-    const props = createProps();
-    const { pointerOffsetY, getTasksForDay } = props;
+    const { moveCursorTo, todayControls } = setUp();
 
-    const { getEditHandlers } = useEditContext(props);
-    const { displayedTasks } = getEditHandlers(day);
+    moveCursorTo("8:00");
 
-    pointerOffsetY.set(200);
+    const {
+      withTime: [task],
+    } = get(todayControls.displayedTasks);
 
-    expect(get(displayedTasks)).toEqual(getTasksForDay(day));
+    expect(task).toMatchObject({
+      startMinutes: timeToMinutes("00:00"),
+      durationMinutes: 60,
+    });
   });
 
   test("when drag starts, target task reacts to cursor", () => {
-    const props = createProps();
-    const { movePointerTo } = props;
+    const { moveCursorTo, todayControls } = setUp();
 
-    const { getEditHandlers } = useEditContext(props);
-    const { displayedTasks, handleGripMouseDown } = getEditHandlers(day);
-
-    handleGripMouseDown({} as MouseEvent, baseTask);
-    movePointerTo("09:00");
+    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    moveCursorTo("09:00");
 
     const {
       withTime: [updatedItem],
-    } = get(displayedTasks);
+    } = get(todayControls.displayedTasks);
 
     expect(updatedItem).toMatchObject({
       startMinutes: timeToMinutes("09:00"),
@@ -107,16 +117,15 @@ describe("drag one & common edit mechanics", () => {
 
   test("after edit confirmation, tasks freeze and stop reacting to cursor", () => {
     const props = createProps();
-    const { movePointerTo } = props;
 
     const { getEditHandlers } = useEditContext(props);
-    const { displayedTasks, handleGripMouseDown, confirmEdit } =
+    const { displayedTasks, handleGripMouseDown, confirmEdit, pointerOffsetY } =
       getEditHandlers(day);
 
     handleGripMouseDown({} as MouseEvent, baseTask);
-    movePointerTo("09:00");
+    setPointerTime(pointerOffsetY, "09:00");
     confirmEdit();
-    movePointerTo("10:00");
+    setPointerTime(pointerOffsetY, "10:00");
 
     const {
       withTime: [updatedItem],
@@ -144,15 +153,16 @@ describe("drag one & common edit mechanics", () => {
 
 describe("drag many", () => {
   test("tasks below react to shifting selected task once they start overlap", () => {
-    const { movePointerTo, ...props } = createProps({
+    const props = createProps({
       tasks: twoTasksInColumn,
     });
     const { getEditHandlers } = useEditContext(props);
 
-    const { displayedTasks, handleGripMouseDown } = getEditHandlers(day);
+    const { displayedTasks, handleGripMouseDown, pointerOffsetY } =
+      getEditHandlers(day);
 
     handleGripMouseDown({ ctrlKey: true } as MouseEvent, baseTask);
-    movePointerTo("01:10");
+    setPointerTime(pointerOffsetY, "01:10");
 
     const {
       withTime: [, next],
@@ -165,16 +175,17 @@ describe("drag many", () => {
   });
 
   test("tasks below stay in initial position once the overlap is reversed", () => {
-    const { movePointerTo, ...props } = createProps({
+    const props = createProps({
       tasks: twoTasksInColumn,
     });
     const { getEditHandlers } = useEditContext(props);
 
-    const { displayedTasks, handleGripMouseDown } = getEditHandlers(day);
+    const { displayedTasks, handleGripMouseDown, pointerOffsetY } =
+      getEditHandlers(day);
 
     handleGripMouseDown({ ctrlKey: true } as MouseEvent, baseTask);
-    movePointerTo("01:10");
-    movePointerTo("00:00");
+    setPointerTime(pointerOffsetY, "01:10");
+    setPointerTime(pointerOffsetY, "00:00");
 
     const {
       withTime: [, next],
@@ -204,13 +215,14 @@ describe("drag many", () => {
       draft.get(day).withTime = [earlyTask, lateTask];
     });
 
-    const { movePointerTo, ...props } = createProps({ tasks });
+    const props = createProps({ tasks });
 
     const { getEditHandlers } = useEditContext(props);
-    const { displayedTasks, handleGripMouseDown } = getEditHandlers(day);
+    const { displayedTasks, handleGripMouseDown, pointerOffsetY } =
+      getEditHandlers(day);
 
     handleGripMouseDown({ ctrlKey: true } as MouseEvent, lateTask);
-    movePointerTo("01:30");
+    setPointerTime(pointerOffsetY, "01:30");
 
     const {
       withTime: [previous, edited],
@@ -232,14 +244,15 @@ describe("drag many", () => {
 
 describe("create", () => {
   test("when creating and dragging, task duration changes", async () => {
-    const { movePointerTo, ...props } = createProps({ tasks: emptyTasks });
+    const props = createProps({ tasks: emptyTasks });
 
     const { getEditHandlers } = useEditContext(props);
-    const { displayedTasks, handleMouseDown } = getEditHandlers(day);
+    const { displayedTasks, handleMouseDown, pointerOffsetY } =
+      getEditHandlers(day);
 
-    movePointerTo("01:30");
+    setPointerTime(pointerOffsetY, "01:30");
     await handleMouseDown();
-    movePointerTo("02:30");
+    setPointerTime(pointerOffsetY, "02:30");
 
     const {
       withTime: [newTask],
@@ -254,15 +267,16 @@ describe("create", () => {
 
 describe("schedule", () => {
   test("base case", () => {
-    const { movePointerTo, ...props } = createProps({
+    const props = createProps({
       tasks: oneUnscheduledTask,
     });
 
     const { getEditHandlers } = useEditContext(props);
-    const { displayedTasks, startScheduling } = getEditHandlers(day);
+    const { displayedTasks, startScheduling, pointerOffsetY } =
+      getEditHandlers(day);
 
     startScheduling(baseTask);
-    movePointerTo("02:30");
+    setPointerTime(pointerOffsetY, "02:30");
 
     const {
       withTime: [newTask],
@@ -301,23 +315,19 @@ describe("moving tasks between containers", () => {
 
   test("the task reacts to mouse movement in another container", () => {
     const props = createProps();
-    const { movePointerTo } = props;
 
     const { getEditHandlers } = useEditContext(props);
 
-    const { handleGripMouseDown } = getEditHandlers(day);
-    const {
-      displayedTasks: displayedTasksForNextDay,
-      handleMouseEnter: moveMouseToNextDay,
-    } = getEditHandlers(nextDay);
+    const { pointerOffsetY, ...dayControls } = getEditHandlers(day);
+    const nextDayControls = getEditHandlers(nextDay);
 
-    handleGripMouseDown({} as MouseEvent, baseTask);
-    moveMouseToNextDay();
-    movePointerTo("9:00");
+    dayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    nextDayControls.handleMouseEnter();
+    setPointerTime(pointerOffsetY, "9:00");
 
     const {
       withTime: [task],
-    } = get(displayedTasksForNextDay);
+    } = get(nextDayControls.displayedTasks);
 
     expect(task).toMatchObject({
       startMinutes: timeToMinutes("09:00"),
@@ -359,4 +369,6 @@ describe("moving tasks between containers", () => {
       );
     },
   );
+
+  test.todo("moving a task to day without a note");
 });

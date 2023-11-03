@@ -72,4 +72,5 @@ export interface ObsidianContext {
   dataviewLoaded: Writable<boolean>;
   fileSyncInProgress: Readable<boolean>;
   renderMarkdown: RenderMarkdown;
+  getEditHandlers: any;
 }

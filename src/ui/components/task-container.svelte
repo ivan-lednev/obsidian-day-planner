@@ -1,8 +1,7 @@
 <script lang="ts">
   import { getContext } from "svelte";
-  import { writable } from "svelte/store";
-
-  import { obsidianContext } from "../../constants";
+  
+import { obsidianContext } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
@@ -28,8 +27,8 @@
   export let hideControls = false;
   export let day = $visibleDayInTimeline;
 
-  const { fileSyncInProgress } = getContext<ObsidianContext>(obsidianContext);
-  const { getEditHandlers } = getContext("editContext");
+  const { fileSyncInProgress, editContext } =
+    getContext<ObsidianContext>(obsidianContext);
 
   $: ({
     displayedTasks,
@@ -42,7 +41,8 @@
     handleGripMouseDown,
     startScheduling,
     handleMouseEnter,
-  } = getEditHandlers(day));
+    pointerOffsetY,
+  } = $editContext.getEditHandlers(day));
 
   $: ({ bodyCursor, gripCursor, containerCursor } = useCursor({
     editBlocked: $fileSyncInProgress,
@@ -87,7 +87,7 @@
 
     <ScheduledTaskContainer
       cursor={containerCursor}
-      pointerOffsetY={writable(0)}
+      {pointerOffsetY}
       on:mousedown={handleMouseDown}
       on:mouseup={confirmEdit}
       on:mouseenter={handleMouseEnter}
