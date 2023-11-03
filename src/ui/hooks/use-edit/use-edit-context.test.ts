@@ -251,7 +251,7 @@ describe("create", () => {
       getEditHandlers(day);
 
     setPointerTime(pointerOffsetY, "01:30");
-    await handleMouseDown();
+    handleMouseDown();
     setPointerTime(pointerOffsetY, "02:30");
 
     const {

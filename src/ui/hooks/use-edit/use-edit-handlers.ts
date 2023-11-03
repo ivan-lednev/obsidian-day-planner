@@ -22,8 +22,8 @@ export function useEditHandlers({
   cursorMinutes,
   editOperation,
 }: UseEditHandlersProps) {
-  async function handleMouseDown() {
-    const newTask = await createTask(day, get(cursorMinutes));
+  function handleMouseDown() {
+    const newTask = createTask(day, get(cursorMinutes));
 
     startEdit({
       task: { ...newTask, isGhost: true },

@@ -4,6 +4,7 @@ import type { CachedMetadata } from "obsidian";
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
 import type { Task, Timestamp } from "../types";
+import { createDailyNoteIfNeeded } from "../util/daily-notes";
 import { createTimestamp } from "../util/task-utils";
 
 import type { ObsidianFacade } from "./obsidian-facade";
@@ -14,9 +15,25 @@ export class PlanEditor {
     private readonly obsidianFacade: ObsidianFacade,
   ) {}
 
-  syncTasksWithFile = async (tasks: Task[]) => {
+  async ensureTasksForPaths(tasks: Task[]) {
+    return Promise.all(
+      tasks.map(async (task) => {
+        if (task.location?.path) {
+          return task;
+        }
+
+        const { path } = await createDailyNoteIfNeeded(task.startTime);
+        return { ...task, location: { path } };
+      }),
+    );
+  }
+
+  syncTasksWithFile = async (unsafeTasks: Task[]) => {
+    const tasks = await this.ensureTasksForPaths(unsafeTasks);
+
+    // todo: ensureFilesForTasks
     const [edited, created] = partition(
-      (task) => task.location.line !== undefined,
+      (task) => task.location?.line !== undefined,
       tasks,
     );
 

@@ -5,7 +5,6 @@ import { defaultDurationMinutes } from "../constants";
 import type { Task } from "../types";
 import { PlacedTask } from "../types";
 
-import { createDailyNoteIfNeeded } from "./daily-notes";
 import { getId } from "./id";
 import { addMinutes, minutesToMoment, minutesToMomentOfDay } from "./moment";
 
@@ -76,13 +75,7 @@ export function offsetYToMinutes(
   return (offsetY + hiddenHoursSize) / zoomLevel;
 }
 
-// todo: this belongs to task utils
-export async function createTask(
-  day: Moment,
-  startMinutes: number,
-): Promise<PlacedTask> {
-  const { path } = await createDailyNoteIfNeeded(day);
-
+export function createTask(day: Moment, startMinutes: number): PlacedTask {
   return {
     id: getId(),
     startMinutes,
@@ -91,11 +84,6 @@ export async function createTask(
     text: "New item",
     startTime: minutesToMomentOfDay(startMinutes, day),
     listTokens: "- [ ] ",
-    // todo: fix this, do not check for newly created tasks using their location
-    // @ts-expect-error
-    location: {
-      path,
-    },
     placing: {
       widthPercent: 100,
       xOffsetPercent: 0,
