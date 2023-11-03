@@ -145,7 +145,6 @@ function useCursorMinutes(
 }
 
 export function useEditContext({
-  // todo: just derive a lookup from dataview results
   getTasksForDay,
   fileSyncInProgress,
   obsidianFacade,
@@ -166,17 +165,17 @@ export function useEditContext({
     const displayedTasks = useDisplayedTasks({
       day,
       editOperation,
+      dayUnderEdit,
       cursorMinutes,
       baselineTasks,
-      dayUnderEdit,
     });
 
     const { startEdit, confirmEdit, cancelEdit } = useEdit({
       day,
+      dayUnderEdit,
       editOperation,
       baselineTasks,
       displayedTasks,
-      dayUnderEdit,
       fileSyncInProgress,
       onUpdate,
     });
