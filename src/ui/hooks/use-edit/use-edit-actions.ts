@@ -1,4 +1,3 @@
-import { Moment } from "moment/moment";
 import { get, Readable, Writable } from "svelte/store";
 
 import { OnUpdateFn, TasksForDay } from "../../../types";
@@ -7,7 +6,6 @@ import { findUpdated } from "../../../util/task-utils";
 import { EditOperation } from "./types";
 
 interface UseEditActionsProps {
-  day: Moment;
   baselineTasks: Writable<TasksForDay>;
   editOperation: Writable<EditOperation>;
   displayedTasks: Readable<TasksForDay>;
@@ -16,7 +14,6 @@ interface UseEditActionsProps {
 }
 
 export function useEditActions({
-  day,
   editOperation,
   baselineTasks,
   displayedTasks,
@@ -25,7 +22,7 @@ export function useEditActions({
 }: UseEditActionsProps) {
   function startEdit(operation: EditOperation) {
     if (!get(fileSyncInProgress)) {
-      editOperation.set({ ...operation, day });
+      editOperation.set(operation);
     }
   }
 

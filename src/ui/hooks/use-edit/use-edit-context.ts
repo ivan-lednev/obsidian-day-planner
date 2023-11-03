@@ -53,8 +53,7 @@ export function useEditContext({
       baselineTasks,
     });
 
-    const { startEdit, confirmEdit, cancelEdit } = useEditActions({
-      day,
+    const { startEdit, ...actions } = useEditActions({
       editOperation,
       baselineTasks,
       displayedTasks,
@@ -70,12 +69,7 @@ export function useEditContext({
       editOperation,
     });
 
-    return {
-      ...handlers,
-      displayedTasks,
-      cancelEdit,
-      confirmEdit,
-    };
+    return { ...handlers, ...actions, displayedTasks };
   }
 
   return {

@@ -1,11 +1,13 @@
 import { difference } from "lodash/fp";
 import type { Moment } from "moment";
 
+import { defaultDurationMinutes } from "../constants";
 import type { Task } from "../types";
 import { PlacedTask } from "../types";
 
+import { createDailyNoteIfNeeded } from "./daily-notes";
 import { getId } from "./id";
-import { addMinutes, minutesToMoment } from "./moment";
+import { addMinutes, minutesToMoment, minutesToMomentOfDay } from "./moment";
 
 export function isEqualTask(a: Task, b: Task) {
   return (
@@ -72,4 +74,31 @@ export function offsetYToMinutes(
   const hiddenHoursSize = startHour * 60 * zoomLevel;
 
   return (offsetY + hiddenHoursSize) / zoomLevel;
+}
+
+// todo: this belongs to task utils
+export async function createTask(
+  day: Moment,
+  startMinutes: number,
+): Promise<PlacedTask> {
+  const { path } = await createDailyNoteIfNeeded(day);
+
+  return {
+    id: getId(),
+    startMinutes,
+    durationMinutes: defaultDurationMinutes,
+    firstLineText: "New item",
+    text: "New item",
+    startTime: minutesToMomentOfDay(startMinutes, day),
+    listTokens: "- [ ] ",
+    // todo: fix this, do not check for newly created tasks using their location
+    // @ts-expect-error
+    location: {
+      path,
+    },
+    placing: {
+      widthPercent: 100,
+      xOffsetPercent: 0,
+    },
+  };
 }

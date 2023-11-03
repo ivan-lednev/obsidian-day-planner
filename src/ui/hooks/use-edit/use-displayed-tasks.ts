@@ -46,15 +46,23 @@ export function useDisplayedTasks({
         "day",
       );
 
-      let tasksToTransform = $baselineTasks;
-
-      if (thisDayIsUnderCursor && !taskComesFromThisDay) {
-        tasksToTransform = addTask($editOperation.task, $baselineTasks);
-      } else if (!thisDayIsUnderCursor && taskComesFromThisDay) {
-        tasksToTransform = removeTask($editOperation.task, $baselineTasks);
+      if (thisDayIsUnderCursor && taskComesFromThisDay) {
+        return transform($baselineTasks, $cursorMinutes, $editOperation);
       }
 
-      return transform(tasksToTransform, $cursorMinutes, $editOperation);
+      if (thisDayIsUnderCursor && !taskComesFromThisDay) {
+        const tasks = addTask($editOperation.task, $baselineTasks);
+
+        return transform(tasks, $cursorMinutes, $editOperation);
+      }
+
+      if (!thisDayIsUnderCursor && taskComesFromThisDay) {
+        const tasks = removeTask($editOperation.task, $baselineTasks);
+
+        return transform(tasks, $cursorMinutes, $editOperation);
+      }
+
+      return $baselineTasks;
     },
   );
 }

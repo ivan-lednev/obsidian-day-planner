@@ -15,6 +15,11 @@ enableMapSet();
 const day = moment("2023-01-01");
 const nextDay = moment("2023-01-02");
 
+const emptyTasks = new Map<Moment, TasksForDay>([
+  [day, { withTime: [], noTime: [] }],
+  [nextDay, { withTime: [], noTime: [] }],
+]);
+
 const baseTasks = new Map<Moment, TasksForDay>([
   [day, { withTime: [baseTask], noTime: [] }],
   [nextDay, { withTime: [], noTime: [] }],
@@ -30,6 +35,11 @@ const secondTask = {
 const twoTasksInColumn = produce(baseTasks, (draft) => {
   draft.get(day).withTime.push(secondTask);
 });
+
+const oneUnscheduledTask = new Map<Moment, TasksForDay>([
+  [day, { withTime: [], noTime: [] }],
+  [nextDay, { withTime: [], noTime: [baseTask] }],
+]);
 
 function createTaskSourceStub(tasks: Map<Moment, TasksForDay>) {
   return (day: Moment) => {
@@ -218,6 +228,51 @@ describe("drag many", () => {
 
   test.todo("tasks stop moving once there is not enough time");
   test.todo("drag-many works across columns");
+});
+
+describe("create", () => {
+  test("when creating and dragging, task duration changes", async () => {
+    const { movePointerTo, ...props } = createProps({ tasks: emptyTasks });
+
+    const { getEditHandlers } = useEditContext(props);
+    const { displayedTasks, handleMouseDown } = getEditHandlers(day);
+
+    movePointerTo("01:30");
+    await handleMouseDown();
+    movePointerTo("02:30");
+
+    const {
+      withTime: [newTask],
+    } = get(displayedTasks);
+
+    expect(newTask).toMatchObject({
+      startMinutes: timeToMinutes("01:30"),
+      durationMinutes: 60,
+    });
+  });
+});
+
+describe("schedule", () => {
+  test("base case", () => {
+    const { movePointerTo, ...props } = createProps({
+      tasks: oneUnscheduledTask,
+    });
+
+    const { getEditHandlers } = useEditContext(props);
+    const { displayedTasks, startScheduling } = getEditHandlers(day);
+
+    startScheduling(baseTask);
+    movePointerTo("02:30");
+
+    const {
+      withTime: [newTask],
+    } = get(displayedTasks);
+
+    expect(newTask).toMatchObject({
+      startMinutes: timeToMinutes("02:30"),
+      durationMinutes: 60,
+    });
+  });
 });
 
 describe("moving tasks between containers", () => {
