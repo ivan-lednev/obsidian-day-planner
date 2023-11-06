@@ -76,7 +76,7 @@ function setUp() {
   const { pointerOffsetY } = todayControls;
   const nextDayControls = getEditHandlers(nextDay);
 
-  function moveCursorTo(time: string) {
+  function moveCursorTo(time: string, day?: Moment) {
     pointerOffsetY.set(timeToMinutes(time));
   }
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getContext } from "svelte";
-  
-import { obsidianContext } from "../../constants";
+
+  import { obsidianContext } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";

@@ -33,6 +33,7 @@ import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { debounceWithDelay } from "./util/debounce-with-delay";
 import { getTasksForDay } from "./util/get-tasks-for-day";
 import { isToday } from "./util/moment";
+import { visibleDateRange } from "./global-store/visible-date-range";
 
 export default class DayPlanner extends Plugin {
   settings: () => DayPlannerSettings;
@@ -264,6 +265,23 @@ export default class DayPlanner extends Plugin {
   };
 
   private registerViews() {
+    const visibleDays = derived(
+      [visibleDayInTimeline, visibleDateRange],
+      ([$visibleDayInTimeline, $visibleDateRange]) => {
+        return [$visibleDayInTimeline, ...$visibleDayInTimeline];
+      },
+    );
+
+    const visibleTasks = derived(
+      [visibleDays, this.dataviewTasks],
+      ([$visibleDays, $dataviewTasks]) => {
+        return $dataviewTasks.where((sTask) => {
+          // todo: group by day, then filter
+          return [];
+        });
+      },
+    );
+
     this.editContext = derived(
       [this.settingsStore, this.getTasksForDay],
       ([$settings, $getTasksForDay]) => {
@@ -276,6 +294,7 @@ export default class DayPlanner extends Plugin {
         });
       },
     );
+
     const componentContext = new Map([
       [
         obsidianContext,

@@ -59,6 +59,7 @@ export function useEditContext({
       onUpdate,
     });
 
+    // todo: define handlers outside
     const handlers = useEditHandlers({
       day,
       obsidianFacade,
