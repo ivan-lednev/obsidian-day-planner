@@ -100,8 +100,7 @@ describe("moving tasks between containers", () => {
     const tasks: Record<string, TasksForDay> = {
       [dayKey]: {
         withTime: [
-          { ...baseTask, id: "1", startMinutes: toMinutes("01:00") },
-
+          baseTask,
           { ...baseTask, id: "2", startMinutes: toMinutes("01:00") },
         ],
         noTime: [],
@@ -112,9 +111,10 @@ describe("moving tasks between containers", () => {
       },
     };
 
-    const { todayControls, nextDayControls, moveCursorTo } = setUp_MULTIDAY({
-      tasks,
-    });
+    const { todayControls, nextDayControls, moveCursorTo, displayedTasks } =
+      setUp_MULTIDAY({
+        tasks,
+      });
 
     todayControls.handleGripMouseDown(
       { ctrlKey: true } as MouseEvent,
@@ -123,22 +123,16 @@ describe("moving tasks between containers", () => {
     nextDayControls.handleMouseEnter();
     moveCursorTo("01:00");
 
-    const {
-      withTime: [task2],
-    } = get(todayControls.displayedTasks);
-
-    const {
-      withTime: [task1, task3],
-    } = get(nextDayControls.displayedTasks);
-
-    expect(task1).toMatchObject({
-      startMinutes: toMinutes("01:00"),
-    });
-    expect(task2).toMatchObject({
-      startMinutes: toMinutes("01:00"),
-    });
-    expect(task3).toMatchObject({
-      startMinutes: toMinutes("02:00"),
+    expect(get(displayedTasks)).toMatchObject({
+      [dayKey]: {
+        withTime: [{ id: "2", startMinutes: toMinutes("01:00") }],
+      },
+      [nextDayKey]: {
+        withTime: [
+          { startMinutes: toMinutes("01:00") },
+          { id: "3", startMinutes: toMinutes("02:00") },
+        ],
+      },
     });
   });
 });

@@ -138,6 +138,7 @@ export function useEditContext_MULTIDAY({
   }
 
   return {
+    displayedTasks,
     getEditHandlers,
   };
 }
