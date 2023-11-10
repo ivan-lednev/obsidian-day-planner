@@ -1,4 +1,5 @@
 import { Moment } from "moment";
+import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { STask, DateTime } from "obsidian-dataview";
 
 import { defaultDurationMinutes } from "../constants";
@@ -78,4 +79,13 @@ export function sTaskToTask(sTask: STask, day: Moment): Task {
     },
     id: getId(),
   };
+}
+
+export function getScheduledDay(sTask: STask) {
+  const scheduledPropDay = sTask.scheduled?.toFormat("yyyy-MM-dd"); // luxon
+  const dailyNoteDay = getDateFromPath(sTask.path, "day")?.format(
+    "YYYY-MM-DD", // moment
+  );
+
+  return scheduledPropDay || dailyNoteDay;
 }

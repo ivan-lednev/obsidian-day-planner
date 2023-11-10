@@ -1,19 +1,24 @@
 import { Moment } from "moment/moment";
 import { derived, Readable } from "svelte/store";
 
-import { Task, TasksForDay } from "../../../types";
+import {
+  CursorPos,
+  Task,
+  TasksForDay,
+  Tasks,
+} from "../../../types";
 
-import { transform } from "./transform/transform";
+import { transform, transform_MULTIDAY } from "./transform/transform";
 import { EditOperation } from "./types";
 
-export function removeTask(task: Task, tasks: TasksForDay) {
+export function removeTaskWithTime(task: Task, tasks: TasksForDay) {
   return {
     ...tasks,
     withTime: tasks.withTime.filter((t) => t.id !== task.id),
   };
 }
 
-export function addTask(task: Task, tasks: TasksForDay) {
+export function addTaskWithTime(task: Task, tasks: TasksForDay) {
   return {
     ...tasks,
     withTime: [...tasks.withTime, task],
@@ -51,18 +56,41 @@ export function useDisplayedTasks({
       }
 
       if (thisDayIsUnderCursor && !taskComesFromThisDay) {
-        const tasks = addTask($editOperation.task, $baselineTasks);
+        const tasks = addTaskWithTime($editOperation.task, $baselineTasks);
 
         return transform(tasks, $cursorMinutes, $editOperation);
       }
 
       if (!thisDayIsUnderCursor && taskComesFromThisDay) {
-        const tasks = removeTask($editOperation.task, $baselineTasks);
+        const tasks = removeTaskWithTime($editOperation.task, $baselineTasks);
 
         return transform(tasks, $cursorMinutes, $editOperation);
       }
 
       return $baselineTasks;
+    },
+  );
+}
+
+export interface UseDisplayedTasksProps_MULTIDAY {
+  editOperation: Readable<EditOperation>;
+  cursorPos: Readable<CursorPos>;
+  baselineTasks: Readable<Tasks>;
+}
+
+export function useDisplayedTasks_MULTIDAY({
+  editOperation,
+  baselineTasks,
+  cursorPos,
+}: UseDisplayedTasksProps_MULTIDAY) {
+  return derived(
+    [editOperation, cursorPos, baselineTasks],
+    ([$editOperation, $cursorPos, $baselineTasks]) => {
+      if (!$editOperation) {
+        return $baselineTasks;
+      }
+
+      return transform_MULTIDAY($baselineTasks, $cursorPos, $editOperation);
     },
   );
 }

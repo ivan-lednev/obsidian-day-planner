@@ -4,6 +4,7 @@ import { Readable, Writable } from "svelte/store";
 
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import type { ObsidianFacade } from "./service/obsidian-facade";
+import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 
 export interface TaskLocation {
   path: string;
@@ -72,5 +73,12 @@ export interface ObsidianContext {
   dataviewLoaded: Writable<boolean>;
   fileSyncInProgress: Readable<boolean>;
   renderMarkdown: RenderMarkdown;
-  getEditHandlers: any;
+  editContext: Readable<ReturnType<typeof useEditContext>>;
+}
+
+export type Tasks = Record<string, TasksForDay>;
+
+export interface CursorPos {
+  minutes: number;
+  day: Moment;
 }

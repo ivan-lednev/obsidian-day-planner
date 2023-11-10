@@ -64,26 +64,11 @@ function calculateDuration(tasks: Task[], options: DurationOptions) {
   });
 }
 
-export function getTasksForDay(
+export function mapToTasksForDay(
   day: Moment,
-  dataviewTasks: DataArray<STask>,
+  tasksForDay: STask[],
   settings: DayPlannerSettings,
-): TasksForDay {
-  if (dataviewTasks.length === 0) {
-    return { withTime: [], noTime: [] };
-  }
-
-  const noteForThisDay = getDailyNote(day, getAllDailyNotes());
-
-  const tasksForDay = dataviewTasks
-    .where(
-      (task: STask) =>
-        !isScheduledForAnotherDay(task, day) &&
-        (isScheduledForThisDay(task, day) ||
-          isTaskInFile(task, noteForThisDay)),
-    )
-    .array();
-
+) {
   const [withTime, withoutTime] = partition(isTimeSetOnTask, tasksForDay);
 
   const tasksWithTime = withTime
@@ -109,4 +94,27 @@ export function getTasksForDay(
   const withTimeAndDuration = calculateDuration(tasksWithTime, settings);
 
   return { withTime: withTimeAndDuration, noTime };
+}
+
+export function getTasksForDay(
+  day: Moment,
+  dataviewTasks: DataArray<STask>,
+  settings: DayPlannerSettings,
+): TasksForDay {
+  if (dataviewTasks.length === 0) {
+    return { withTime: [], noTime: [] };
+  }
+
+  const noteForThisDay = getDailyNote(day, getAllDailyNotes());
+
+  const sTasksForDay = dataviewTasks
+    .where(
+      (task: STask) =>
+        !isScheduledForAnotherDay(task, day) &&
+        (isScheduledForThisDay(task, day) ||
+          isTaskInFile(task, noteForThisDay)),
+    )
+    .array();
+
+  return mapToTasksForDay(day, sTasksForDay, settings);
 }

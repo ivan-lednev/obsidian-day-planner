@@ -20,10 +20,12 @@ import {
 import { obsidianContext, viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { settings } from "./global-store/settings";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
+import { visibleDays } from "./global-store/visible-days";
+import { getScheduledDay } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
-import { GetTasksForDay, Task } from "./types";
+import { GetTasksForDay, Task, TasksForDay } from "./types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
@@ -31,9 +33,8 @@ import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { debounceWithDelay } from "./util/debounce-with-delay";
-import { getTasksForDay } from "./util/get-tasks-for-day";
+import { getTasksForDay, mapToTasksForDay } from "./util/get-tasks-for-day";
 import { isToday } from "./util/moment";
-import { visibleDateRange } from "./global-store/visible-date-range";
 
 export default class DayPlanner extends Plugin {
   settings: () => DayPlannerSettings;
@@ -265,32 +266,50 @@ export default class DayPlanner extends Plugin {
   };
 
   private registerViews() {
-    const visibleDays = derived(
-      [visibleDayInTimeline, visibleDateRange],
-      ([$visibleDayInTimeline, $visibleDateRange]) => {
-        return [$visibleDayInTimeline, ...$visibleDayInTimeline];
+    const visibleTasks = derived(
+      [visibleDays, this.dataviewTasks, this.settingsStore],
+      ([$visibleDays, $dataviewTasks, $settings]) => {
+        const dayToSTasksLookup: Record<string, STask[]> = Object.fromEntries(
+          $dataviewTasks
+            .groupBy(getScheduledDay)
+            .map(({ key, rows }) => [key, rows.array()])
+            .array(),
+        );
+
+        return $visibleDays.reduce<Record<string, TasksForDay>>(
+          (result, day) => {
+            const keyForVisibleDay = day.format("YYYY-MM-DD");
+            const sTasksForDay = dayToSTasksLookup[keyForVisibleDay];
+
+            if (sTasksForDay) {
+              result[keyForVisibleDay] = mapToTasksForDay(
+                day,
+                sTasksForDay,
+                $settings,
+              );
+            }
+
+            return result;
+          },
+          {},
+        );
       },
     );
 
-    const visibleTasks = derived(
-      [visibleDays, this.dataviewTasks],
-      ([$visibleDays, $dataviewTasks]) => {
-        return $dataviewTasks.where((sTask) => {
-          // todo: group by day, then filter
-          return [];
-        });
-      },
-    );
+    visibleTasks.subscribe((v) => {
+      console.log(v);
+    });
 
     this.editContext = derived(
-      [this.settingsStore, this.getTasksForDay],
-      ([$settings, $getTasksForDay]) => {
+      [this.settingsStore, this.getTasksForDay, visibleTasks],
+      ([$settings, $getTasksForDay, $visibleTasks]) => {
         return useEditContext({
           obsidianFacade: this.obsidianFacade,
           onUpdate: this.syncTasksWithFile,
           getTasksForDay: $getTasksForDay,
           fileSyncInProgress: this.fileSyncInProgress,
           settings: $settings,
+          visibleTasks: $visibleTasks,
         });
       },
     );

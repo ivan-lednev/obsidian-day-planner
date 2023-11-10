@@ -33,7 +33,7 @@
   $: ({
     displayedTasks,
     cancelEdit,
-    editStatus,
+    editStatus = undefined,
     confirmEdit,
     handleMouseDown,
     handleResizeStart,

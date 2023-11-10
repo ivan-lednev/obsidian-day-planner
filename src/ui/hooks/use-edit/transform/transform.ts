@@ -1,12 +1,25 @@
-import type { PlacedTask, TasksForDay } from "../../../../types";
+import type {
+  PlacedTask,
+  TasksForDay,
+  Tasks,
+  CursorPos,
+} from "../../../../types";
 import { EditMode, EditOperation } from "../types";
 
 import { create } from "./create";
 import { drag } from "./drag";
-import { dragAndShiftOthers } from "./drag-and-shift-others";
+import { dragAndShiftOthers, dragAndShiftOthers_MULTIDAY } from "./drag-and-shift-others";
 import { resize } from "./resize";
 import { resizeAndShiftOthers } from "./resize-and-shift-others";
 import { schedule } from "./schedule";
+
+export function transform_MULTIDAY(
+  baseline: Tasks,
+  cursorPos: CursorPos,
+  operation: EditOperation,
+) {
+  return dragAndShiftOthers_MULTIDAY(baseline, cursorPos, operation)
+}
 
 export function transform(
   baseline: TasksForDay,

@@ -11,7 +11,7 @@ export function getMinutesSinceMidnight(moment: Moment) {
   return moment.diff(moment.clone().startOf("day"), "minutes");
 }
 
-export function timeToMinutes(time: string) {
+export function toMinutes(time: string) {
   const parsed = moment(time, defaultTimestampFormat);
 
   return getMinutesSinceMidnight(parsed);
