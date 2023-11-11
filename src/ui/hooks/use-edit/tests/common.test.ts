@@ -5,11 +5,7 @@ import { baseTask } from "../../test-utils";
 import { useEditContext } from "../use-edit-context";
 
 import { day, dayKey } from "./util/fixtures";
-import {
-  createProps,
-  setPointerTime,
-  setUp_MULTIDAY,
-} from "./util/setup";
+import { createProps, setPointerTime, setUp_MULTIDAY } from "./util/setup";
 
 describe("drag one & common edit mechanics", () => {
   test("when drag starts, target task reacts to cursor", () => {
@@ -26,6 +22,7 @@ describe("drag one & common edit mechanics", () => {
     });
   });
 
+  // todo: rewrite
   test("after edit confirmation, tasks freeze and stop reacting to cursor", () => {
     const props = createProps();
 
@@ -49,6 +46,7 @@ describe("drag one & common edit mechanics", () => {
     expect(props.onUpdate).toHaveBeenCalled();
   });
 
+  // todo: rewrite
   test("when a task is set to its current time, nothing happens", () => {
     const props = createProps();
 

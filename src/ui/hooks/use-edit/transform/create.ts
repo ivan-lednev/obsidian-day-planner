@@ -5,10 +5,14 @@ export function create(
   editTarget: PlacedTask,
   cursorTime: number,
 ): PlacedTask[] {
-  const updated = {
-    ...editTarget,
-    durationMinutes: cursorTime - editTarget.startMinutes,
-  };
+  return baseline.map((task) => {
+    if (task.id === editTarget.id) {
+      return {
+        ...editTarget,
+        durationMinutes: cursorTime - editTarget.startMinutes,
+      };
+    }
 
-  return [...baseline, updated];
+    return task;
+  });
 }

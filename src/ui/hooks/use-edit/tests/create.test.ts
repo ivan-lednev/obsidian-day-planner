@@ -1,30 +1,25 @@
 import { get } from "svelte/store";
 
 import { toMinutes } from "../../../../util/moment";
-import { useEditContext } from "../use-edit-context";
 
-import { day, emptyTasks } from "./util/fixtures";
-import { createProps, setPointerTime } from "./util/setup";
+import { dayKey, emptyTasks } from "./util/fixtures";
+import { setUp_MULTIDAY } from "./util/setup";
 
 describe("create", () => {
   test("when creating and dragging, task duration changes", async () => {
-    const props = createProps({ tasks: emptyTasks });
+    const { todayControls, moveCursorTo, displayedTasks } = setUp_MULTIDAY({
+      tasks: emptyTasks,
+    });
 
-    const { getEditHandlers } = useEditContext(props);
-    const { displayedTasks, handleMouseDown, pointerOffsetY } =
-      getEditHandlers(day);
+    moveCursorTo("01:00");
+    todayControls.handleMouseEnter();
+    todayControls.handleMouseDown();
+    moveCursorTo("02:00");
 
-    setPointerTime(pointerOffsetY, "01:30");
-    handleMouseDown();
-    setPointerTime(pointerOffsetY, "02:30");
-
-    const {
-      withTime: [newTask],
-    } = get(displayedTasks);
-
-    expect(newTask).toMatchObject({
-      startMinutes: toMinutes("01:30"),
-      durationMinutes: 60,
+    expect(get(displayedTasks)).toMatchObject({
+      [dayKey]: {
+        withTime: [{ startMinutes: toMinutes("01:00"), durationMinutes: 60 }],
+      },
     });
   });
 });

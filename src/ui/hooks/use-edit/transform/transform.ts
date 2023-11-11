@@ -23,6 +23,7 @@ import { schedule } from "./schedule";
 const transformers: Partial<Record<EditMode, typeof drag>> = {
   [EditMode.DRAG]: drag,
   [EditMode.DRAG_AND_SHIFT_OTHERS]: dragAndShiftOthers,
+  [EditMode.CREATE]: create,
 };
 
 export function transform_MULTIDAY(
