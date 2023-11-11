@@ -25,7 +25,8 @@
   class="tasks absolute-stretch-x"
   on:mousedown
   on:mouseup|stopPropagation
-  on:mouseenter
+  on:mousemove
+
 >
   <slot />
 </div>

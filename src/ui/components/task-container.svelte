@@ -30,20 +30,6 @@
   const { fileSyncInProgress, editContext } =
     getContext<ObsidianContext>(obsidianContext);
 
-  // $: ({
-  //   displayedTasks,
-  //   cancelEdit,
-  //   editStatus = undefined,
-  //   confirmEdit,
-  //   handleMouseDown,
-  //   handleResizeStart,
-  //   handleTaskMouseUp,
-  //   handleGripMouseDown,
-  //   startScheduling,
-  //   handleMouseEnter,
-  //   pointerOffsetY,
-  // } = $editContext.getEditHandlers(day));
-
   $: ({
     displayedTasks,
     cancelEdit,
@@ -71,7 +57,7 @@
 <svelte:document on:mouseup={cancelEdit} />
 
 {#if !hideControls}
-<!--  <TimelineControls />-->
+  <!--  <TimelineControls />-->
 
   {#if $displayedTasks.noTime.length > 0 && $settings.showUncheduledTasks}
     <UnscheduledTaskContainer>

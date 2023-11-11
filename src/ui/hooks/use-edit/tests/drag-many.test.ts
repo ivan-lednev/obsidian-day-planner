@@ -4,9 +4,7 @@ import { Tasks } from "../../../../types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 
-import {
-  dayKey,
-} from "./util/fixtures";
+import { dayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
 
 describe("drag many", () => {
