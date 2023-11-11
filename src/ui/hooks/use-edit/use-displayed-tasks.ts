@@ -14,6 +14,11 @@ export function removeTask(task: Task, tasks: TasksForDay) {
   };
 }
 
+export function moveToTimed(task: Task, tasks: TasksForDay) {
+  const withRemoved = removeTask(task, tasks);
+  return { ...withRemoved, withTime: [...withRemoved.withTime, task] };
+}
+
 export function addTaskWithTime(task: Task, tasks: TasksForDay) {
   return {
     ...tasks,

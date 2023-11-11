@@ -7,6 +7,7 @@ import type {
   TasksForDay,
 } from "../../../../types";
 import { EditMode, EditOperation } from "../types";
+import { moveToTimed } from "../use-displayed-tasks";
 
 import { create } from "./create";
 import { drag } from "./drag";
@@ -29,7 +30,18 @@ export function transform_MULTIDAY(
   cursorPos: CursorPos,
   operation: EditOperation,
 ) {
-  const moved = moveTaskToDay(baseline, operation.task, cursorPos.day);
+  let moved = baseline;
+
+  if (cursorPos.day.isSame(operation.task.startTime, "day")) {
+    const key = getDayKey(operation.task.startTime);
+
+    moved = {
+      ...baseline,
+      [key]: moveToTimed(operation.task, baseline[key]),
+    };
+  } else {
+    moved = moveTaskToDay(baseline, operation.task, cursorPos.day);
+  }
 
   const destKey = getDayKey(cursorPos.day);
   const destTasks = moved[destKey];

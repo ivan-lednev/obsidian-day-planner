@@ -4,38 +4,25 @@ import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 import { useEditContext } from "../use-edit-context";
 
-import { day } from "./util/fixtures";
-import { createProps, setPointerTime, setUp } from "./util/setup";
+import { day, dayKey } from "./util/fixtures";
+import {
+  createProps,
+  setPointerTime,
+  setUp_MULTIDAY,
+} from "./util/setup";
 
 describe("drag one & common edit mechanics", () => {
-  test("with no edit in progress, tasks don't change", () => {
-    const { moveCursorTo, todayControls } = setUp();
-
-    moveCursorTo("8:00");
-
-    const {
-      withTime: [task],
-    } = get(todayControls.displayedTasks);
-
-    expect(task).toMatchObject({
-      startMinutes: toMinutes("00:00"),
-      durationMinutes: 60,
-    });
-  });
-
   test("when drag starts, target task reacts to cursor", () => {
-    const { moveCursorTo, todayControls } = setUp();
+    const { todayControls, moveCursorTo, displayedTasks } = setUp_MULTIDAY();
 
+    todayControls.handleMouseEnter();
     todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
-    moveCursorTo("09:00");
+    moveCursorTo("01:00");
 
-    const {
-      withTime: [updatedTask],
-    } = get(todayControls.displayedTasks);
-
-    expect(updatedTask).toMatchObject({
-      startMinutes: toMinutes("09:00"),
-      durationMinutes: 60,
+    expect(get(displayedTasks)).toMatchObject({
+      [dayKey]: {
+        withTime: [{ startMinutes: toMinutes("01:00") }],
+      },
     });
   });
 

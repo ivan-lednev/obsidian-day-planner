@@ -3,10 +3,9 @@ import { get } from "svelte/store";
 import { Tasks } from "../../../../types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
-import { useEditContext } from "../use-edit-context";
 
-import { baseTasks, day, dayKey, nextDay, nextDayKey } from "./util/fixtures";
-import { createProps, setUp_MULTIDAY } from "./util/setup";
+import { baseTasks, dayKey, nextDayKey } from "./util/fixtures";
+import { setUp_MULTIDAY } from "./util/setup";
 
 describe("moving tasks between containers", () => {
   test("with no edit operation in progress, nothing happens on mouse move", () => {
@@ -21,42 +20,6 @@ describe("moving tasks between containers", () => {
 
     expect(get(displayedTasks)).toEqual(initial);
   });
-
-  test.skip.each([
-    ["handleResizeStart", false],
-    ["handleGripMouseDown", true],
-    ["startScheduling", true],
-  ])(
-    "the task moves to another container only for certain operations",
-    (
-      editMode: keyof ReturnType<
-        ReturnType<typeof useEditContext>["getEditHandlers"]
-      >,
-      shouldMove: boolean,
-    ) => {
-      const props = createProps();
-
-      const { getEditHandlers } = useEditContext(props);
-
-      const { displayedTasks: tasksForDay, ...handlers } = getEditHandlers(day);
-      const {
-        displayedTasks: tasksForNextDay,
-        handleMouseEnter: moveMouseToNextDay,
-      } = getEditHandlers(nextDay);
-
-      handlers[editMode]({} as MouseEvent, baseTask);
-      moveMouseToNextDay();
-
-      const [lengthOfTasksForDay, lengthOfTasksForNextDay] = shouldMove
-        ? [0, 1]
-        : [1, 0];
-
-      expect(get(tasksForDay).withTime).toHaveLength(lengthOfTasksForDay);
-      expect(get(tasksForNextDay).withTime).toHaveLength(
-        lengthOfTasksForNextDay,
-      );
-    },
-  );
 
   test.todo("moving a task to day without a note");
 
