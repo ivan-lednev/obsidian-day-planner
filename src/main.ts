@@ -26,7 +26,7 @@ import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
 import { GetTasksForDay, Task, TasksForDay } from "./types";
-import { useEditContext_MULTIDAY } from "./ui/hooks/use-edit/use-edit-context";
+import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
@@ -292,7 +292,7 @@ export default class DayPlanner extends Plugin {
     this.editContext = derived(
       [this.settingsStore, visibleTasks],
       ([$settings, $visibleTasks]) => {
-        return useEditContext_MULTIDAY({
+        return useEditContext({
           obsidianFacade: this.obsidianFacade,
           onUpdate: this.syncTasksWithFiles,
           // todo: remove
