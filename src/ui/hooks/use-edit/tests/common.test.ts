@@ -22,28 +22,27 @@ describe("drag one & common edit mechanics", () => {
     });
   });
 
-  // todo: rewrite
   test("after edit confirmation, tasks freeze and stop reacting to cursor", () => {
-    const props = createProps();
-
-    const { getEditHandlers } = useEditContext(props);
-    const { displayedTasks, handleGripMouseDown, confirmEdit, pointerOffsetY } =
-      getEditHandlers(day);
-
-    handleGripMouseDown({} as MouseEvent, baseTask);
-    setPointerTime(pointerOffsetY, "09:00");
-    confirmEdit();
-    setPointerTime(pointerOffsetY, "10:00");
-
     const {
-      withTime: [updatedItem],
-    } = get(displayedTasks);
+      todayControls,
+      nextDayControls,
+      moveCursorTo,
+      displayedTasks,
+      confirmEdit,
+    } = setUp_MULTIDAY();
 
-    expect(updatedItem).toMatchObject({
-      startMinutes: toMinutes("09:00"),
-      durationMinutes: 60,
+    todayControls.handleMouseEnter();
+    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    moveCursorTo("01:00");
+    confirmEdit();
+    nextDayControls.handleMouseEnter();
+    moveCursorTo("03:00");
+
+    expect(get(displayedTasks)).toMatchObject({
+      [dayKey]: {
+        withTime: [{ startMinutes: toMinutes("01:00") }],
+      },
     });
-    expect(props.onUpdate).toHaveBeenCalled();
   });
 
   test("when a task is set to its current time, nothing happens", () => {
