@@ -1,61 +1,28 @@
 import { get } from "svelte/store";
 
+import { Tasks } from "../../../../types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 import { useEditContext } from "../use-edit-context";
 
-import { day, dayKey, nextDay, nextDayKey } from "./util/fixtures";
+import { baseTasks, day, dayKey, nextDay, nextDayKey } from "./util/fixtures";
 import {
   createProps,
-  setPointerTime,
-  setUp,
   setUp_MULTIDAY,
 } from "./util/setup";
-import { TasksForDay } from "../../../../types";
 
 describe("moving tasks between containers", () => {
-  test.todo(
-    "with no edit operation in progress, nothing happens on mouse move",
-  );
-
-  test("the task gets moved to another container", () => {
-    const props = createProps();
-
-    const { getEditHandlers } = useEditContext(props);
-
-    const { displayedTasks: tasksForDay, handleGripMouseDown } =
-      getEditHandlers(day);
-    const {
-      displayedTasks: tasksForNextDay,
-      handleMouseEnter: moveMouseToNextDay,
-    } = getEditHandlers(nextDay);
-
-    handleGripMouseDown({} as MouseEvent, baseTask);
-    moveMouseToNextDay();
-
-    expect(get(tasksForDay).withTime).toHaveLength(0);
-    expect(get(tasksForNextDay).withTime).toHaveLength(1);
-  });
-
-  test("the task reacts to mouse movement in another container", () => {
-    const props = createProps();
-
-    const { getEditHandlers } = useEditContext(props);
-
-    const { pointerOffsetY, ...dayControls } = getEditHandlers(day);
-    const nextDayControls = getEditHandlers(nextDay);
-
-    dayControls.handleGripMouseDown({} as MouseEvent, baseTask);
-    nextDayControls.handleMouseEnter();
-    setPointerTime(pointerOffsetY, "9:00");
-
-    const {
-      withTime: [task],
-    } = get(nextDayControls.displayedTasks);
-
-    expect(task).toMatchObject({
-      startMinutes: toMinutes("09:00"),
+  test("with no edit operation in progress, nothing happens on mouse move", () => {
+    const { todayControls, moveCursorTo, displayedTasks } = setUp_MULTIDAY({
+      tasks: baseTasks,
     });
+
+    const initial = get(displayedTasks);
+
+    todayControls.handleMouseEnter();
+    moveCursorTo("01:00");
+
+    expect(get(displayedTasks)).toEqual(initial);
   });
 
   test.skip.each([
@@ -96,8 +63,45 @@ describe("moving tasks between containers", () => {
 
   test.todo("moving a task to day without a note");
 
+  test("drag works between days", () => {
+    const tasks: Tasks = {
+      [dayKey]: {
+        withTime: [
+          baseTask,
+          { ...baseTask, id: "2", startMinutes: toMinutes("01:00") },
+        ],
+        noTime: [],
+      },
+      [nextDayKey]: {
+        withTime: [{ ...baseTask, id: "3", startMinutes: toMinutes("01:00") }],
+        noTime: [],
+      },
+    };
+
+    const { todayControls, nextDayControls, moveCursorTo, displayedTasks } =
+      setUp_MULTIDAY({
+        tasks,
+      });
+
+    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    nextDayControls.handleMouseEnter();
+    moveCursorTo("01:00");
+
+    expect(get(displayedTasks)).toMatchObject({
+      [dayKey]: {
+        withTime: [{ id: "2", startMinutes: toMinutes("01:00") }],
+      },
+      [nextDayKey]: {
+        withTime: [
+          { startMinutes: toMinutes("01:00") },
+          { id: "3", startMinutes: toMinutes("01:00") },
+        ],
+      },
+    });
+  });
+
   test("drag many works between days", () => {
-    const tasks: Record<string, TasksForDay> = {
+    const tasks: Tasks = {
       [dayKey]: {
         withTime: [
           baseTask,

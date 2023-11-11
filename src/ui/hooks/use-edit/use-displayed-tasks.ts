@@ -1,12 +1,7 @@
 import { Moment } from "moment/moment";
 import { derived, Readable } from "svelte/store";
 
-import {
-  CursorPos,
-  Task,
-  TasksForDay,
-  Tasks,
-} from "../../../types";
+import { CursorPos, Task, TasksForDay, Tasks } from "../../../types";
 
 import { transform, transform_MULTIDAY } from "./transform/transform";
 import { EditOperation } from "./types";

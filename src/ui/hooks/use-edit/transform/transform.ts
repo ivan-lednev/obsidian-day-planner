@@ -1,24 +1,50 @@
 import type {
-  PlacedTask,
-  TasksForDay,
-  Tasks,
   CursorPos,
+  PlacedTask,
+  Tasks,
+  TasksForDay,
 } from "../../../../types";
 import { EditMode, EditOperation } from "../types";
 
 import { create } from "./create";
 import { drag } from "./drag";
-import { dragAndShiftOthers, dragAndShiftOthers_MULTIDAY } from "./drag-and-shift-others";
+import {
+  dragAndShiftOthers,
+  getDayKey,
+  moveTaskToDay,
+} from "./drag-and-shift-others";
 import { resize } from "./resize";
 import { resizeAndShiftOthers } from "./resize-and-shift-others";
 import { schedule } from "./schedule";
+
+const transformers: Record<EditMode, typeof drag> = {
+  [EditMode.DRAG]: drag,
+  [EditMode.DRAG_AND_SHIFT_OTHERS]: dragAndShiftOthers,
+};
 
 export function transform_MULTIDAY(
   baseline: Tasks,
   cursorPos: CursorPos,
   operation: EditOperation,
 ) {
-  return dragAndShiftOthers_MULTIDAY(baseline, cursorPos, operation)
+  const moved = moveTaskToDay(baseline, operation.task, cursorPos.day);
+
+  const destKey = getDayKey(cursorPos.day);
+  const destTasks = moved[destKey];
+
+  const transformFn = transformers[operation.mode];
+
+  return {
+    ...moved,
+    [destKey]: {
+      ...destTasks,
+      withTime: transformFn(
+        destTasks.withTime.sort((a, b) => a.startMinutes - b.startMinutes),
+        operation.task,
+        cursorPos.minutes,
+      ),
+    },
+  };
 }
 
 export function transform(

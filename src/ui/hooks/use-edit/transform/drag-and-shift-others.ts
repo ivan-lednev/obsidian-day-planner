@@ -1,12 +1,12 @@
 import { last } from "lodash";
+import { Moment } from "moment";
+import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
 import type { PlacedTask, Task } from "../../../../types";
+import { Tasks } from "../../../../types";
 import { getEndMinutes } from "../../../../util/task-utils";
-import { CursorPos, Tasks } from "../../../../types";
-import { EditOperation } from "../types";
-import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 import { addTaskWithTime, removeTaskWithTime } from "../use-displayed-tasks";
-import { Moment } from "moment";
+
 
 export function getDayKey(day: Moment) {
   return day.format(DEFAULT_DAILY_NOTE_FORMAT);
@@ -26,32 +26,6 @@ export function moveTaskToDay(baseline: Tasks, task: Task, day: Moment) {
     ...baseline,
     [sourceKey]: removeTaskWithTime(task, source),
     [destKey]: addTaskWithTime(task, dest),
-  };
-}
-
-export function dragAndShiftOthers_MULTIDAY(
-  baseline: Tasks,
-  cursorPos: CursorPos,
-  operation: EditOperation,
-) {
-  // todo: move this above
-  const moved = moveTaskToDay(baseline, operation.task, cursorPos.day);
-
-  const destKey = getDayKey(cursorPos.day);
-  const destTasks = moved[destKey];
-
-  const transformedDest = {
-    ...destTasks,
-    withTime: dragAndShiftOthers(
-      destTasks.withTime.sort((a, b) => a.startMinutes - b.startMinutes),
-      operation.task,
-      cursorPos.minutes,
-    ),
-  };
-
-  return {
-    ...moved,
-    [destKey]: transformedDest,
   };
 }
 

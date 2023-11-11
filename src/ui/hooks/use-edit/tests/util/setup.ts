@@ -4,7 +4,10 @@ import { writable, Writable } from "svelte/store";
 import { ObsidianFacade } from "../../../../../service/obsidian-facade";
 import { defaultSettingsForTests } from "../../../../../settings";
 import { toMinutes } from "../../../../../util/moment";
-import { useEditContext, useEditContext_MULTIDAY } from "../../use-edit-context";
+import {
+  useEditContext,
+  useEditContext_MULTIDAY,
+} from "../../use-edit-context";
 
 import { baseTasks, day, nextDay } from "./fixtures";
 

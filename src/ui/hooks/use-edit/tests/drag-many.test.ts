@@ -8,9 +8,6 @@ import { useEditContext } from "../use-edit-context";
 import { baseTasks, day, dayKey, twoTasksInColumn } from "./util/fixtures";
 import { createProps, setPointerTime } from "./util/setup";
 
-
-
-
 describe("drag many", () => {
   test("tasks below react to shifting selected task once they start overlap", () => {
     const props = createProps({

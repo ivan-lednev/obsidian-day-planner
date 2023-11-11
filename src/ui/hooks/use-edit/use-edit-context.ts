@@ -7,6 +7,7 @@ import { DayPlannerSettings } from "../../../settings";
 import { OnUpdateFn, TasksForDay } from "../../../types";
 import { offsetYToMinutes } from "../../../util/task-utils";
 
+import { getDayKey } from "./transform/drag-and-shift-others";
 import { EditOperation } from "./types";
 import {
   useDisplayedTasks,
@@ -14,7 +15,6 @@ import {
 } from "./use-displayed-tasks";
 import { useEditActions } from "./use-edit-actions";
 import { useEditHandlers } from "./use-edit-handlers";
-import { getDayKey } from "./transform/drag-and-shift-others";
 
 export interface UseEditContextProps {
   fileSyncInProgress: Readable<boolean>;
@@ -89,6 +89,7 @@ export function useEditContext_MULTIDAY({
 }: UseEditContextProps) {
   const editOperation = writable<EditOperation | undefined>();
   const pointerOffsetY = writable(0);
+  const hoveredDay = writable<Moment>();
   const cursorMinutes = useCursorMinutes(pointerOffsetY, settings);
 
   function startEdit(operation: EditOperation) {
@@ -100,11 +101,11 @@ export function useEditContext_MULTIDAY({
   }
 
   const cursorPos = derived(
-    [editOperation, cursorMinutes],
-    ([$editOperation, $cursorMinutes]) => {
+    [hoveredDay, cursorMinutes],
+    ([$hoveredDay, $cursorMinutes]) => {
       return {
         minutes: $cursorMinutes,
-        day: $editOperation.day,
+        day: $hoveredDay,
       };
     },
   );
@@ -127,8 +128,13 @@ export function useEditContext_MULTIDAY({
       editOperation,
     });
 
+    function handleMouseEnter() {
+      hoveredDay.set(day);
+    }
+
     return {
       ...handlers,
+      handleMouseEnter,
       cancelEdit,
       pointerOffsetY,
       displayedTasks: derived(displayedTasks, ($displayedTasks) => {
