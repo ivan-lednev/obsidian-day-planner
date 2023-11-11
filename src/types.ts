@@ -4,9 +4,7 @@ import { Readable, Writable } from "svelte/store";
 
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import type { ObsidianFacade } from "./service/obsidian-facade";
-import {
-  useEditContext_MULTIDAY,
-} from "./ui/hooks/use-edit/use-edit-context";
+import { useEditContext_MULTIDAY } from "./ui/hooks/use-edit/use-edit-context";
 
 export interface TaskLocation {
   path: string;

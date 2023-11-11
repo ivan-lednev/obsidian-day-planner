@@ -14,19 +14,20 @@
   on:mousemove={(event) => {
     const viewportToElOffsetY = el.getBoundingClientRect().top;
     const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
+    console.log({ viewportToElOffsetY, borderTopToPointerOffsetY });
 
     pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings.zoomLevel));
   }}
 />
 
+<!--todo: prevent propagation in handler -->
 <div
   bind:this={el}
   style:cursor
   class="tasks absolute-stretch-x"
   on:mousedown
   on:mouseup|stopPropagation
-  on:mousemove
-
+  on:mouseenter
 >
   <slot />
 </div>

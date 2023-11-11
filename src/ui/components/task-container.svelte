@@ -22,6 +22,7 @@
   import ScheduledTask from "./scheduled-task.svelte";
   import Scroller from "./scroller.svelte";
   import Task from "./task.svelte";
+  import TimelineControls from "./timeline-controls.svelte";
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
 
   export let hideControls = false;
@@ -57,7 +58,7 @@
 <svelte:document on:mouseup={cancelEdit} />
 
 {#if !hideControls}
-  <!--  <TimelineControls />-->
+  <TimelineControls />
 
   {#if $displayedTasks.noTime.length > 0 && $settings.showUncheduledTasks}
     <UnscheduledTaskContainer>
@@ -92,7 +93,7 @@
       {pointerOffsetY}
       on:mousedown={handleMouseDown}
       on:mouseup={confirmEdit}
-      on:mousemove={handleMouseEnter}
+      on:mouseenter={handleMouseEnter}
     >
       {#if $editStatus && $settings.showHelp}
         <Banner />

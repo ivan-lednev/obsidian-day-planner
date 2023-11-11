@@ -130,16 +130,6 @@ export function useEditContext_MULTIDAY({
   const cursorPos = derived(
     [hoveredDay, cursorMinutes],
     ([$hoveredDay, $cursorMinutes]) => {
-      console.log(
-        `cursorpos: ${JSON.stringify(
-          {
-            minutes: $cursorMinutes,
-            day: $hoveredDay,
-          },
-          null,
-          2,
-        )}`,
-      );
       return {
         minutes: $cursorMinutes,
         day: $hoveredDay,

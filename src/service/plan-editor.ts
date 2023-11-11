@@ -15,7 +15,7 @@ export class PlanEditor {
     private readonly obsidianFacade: ObsidianFacade,
   ) {}
 
-  async ensureTasksForPaths(tasks: Task[]) {
+  async ensureFilesForTasks(tasks: Task[]) {
     return Promise.all(
       tasks.map(async (task) => {
         if (task.location?.path) {
@@ -29,9 +29,8 @@ export class PlanEditor {
   }
 
   syncTasksWithFile = async (unsafeTasks: Task[]) => {
-    const tasks = await this.ensureTasksForPaths(unsafeTasks);
+    const tasks = await this.ensureFilesForTasks(unsafeTasks);
 
-    // todo: ensureFilesForTasks
     const [edited, created] = partition(
       (task) => task.location?.line !== undefined,
       tasks,

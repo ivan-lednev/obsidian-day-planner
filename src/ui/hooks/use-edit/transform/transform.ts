@@ -1,8 +1,10 @@
+import { Moment } from "moment";
 import { isNotVoid } from "typed-assert";
 
 import type {
   CursorPos,
   PlacedTask,
+  Task,
   Tasks,
   TasksForDay,
 } from "../../../../types";
@@ -26,33 +28,39 @@ const transformers: Partial<Record<EditMode, typeof drag>> = {
   [EditMode.CREATE]: create,
 };
 
+function moveTaskToColumn(day: Moment, task: Task, baseline: Tasks) {
+  if (day.isSame(task.startTime, "day")) {
+    const key = getDayKey(task.startTime);
+
+    return {
+      ...baseline,
+      [key]: moveToTimed(task, baseline[key]),
+    };
+  }
+
+  return moveTaskToDay(baseline, task, day);
+}
+
 export function transform_MULTIDAY(
   baseline: Tasks,
   cursorPos: CursorPos,
   operation: EditOperation,
 ) {
-  // todo: clean up this crap
-  let moved = baseline;
-  if (cursorPos.day.isSame(operation.task.startTime, "day")) {
-    const key = getDayKey(operation.task.startTime);
-
-    moved = {
-      ...baseline,
-      [key]: moveToTimed(operation.task, baseline[key]),
-    };
-  } else {
-    moved = moveTaskToDay(baseline, operation.task, cursorPos.day);
-  }
+  const withTaskInRightColumn = moveTaskToColumn(
+    cursorPos.day,
+    operation.task,
+    baseline,
+  );
 
   const destKey = getDayKey(cursorPos.day);
-  const destTasks = moved[destKey];
+  const destTasks = withTaskInRightColumn[destKey];
 
   const transformFn = transformers[operation.mode];
 
   isNotVoid(transformFn, `No transformer for operation: ${operation.mode}`);
 
   return {
-    ...moved,
+    ...withTaskInRightColumn,
     [destKey]: {
       ...destTasks,
       withTime: transformFn(
