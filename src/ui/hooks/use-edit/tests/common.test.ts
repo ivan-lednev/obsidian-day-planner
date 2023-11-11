@@ -46,14 +46,11 @@ describe("drag one & common edit mechanics", () => {
     expect(props.onUpdate).toHaveBeenCalled();
   });
 
-  // todo: rewrite
   test("when a task is set to its current time, nothing happens", () => {
-    const props = createProps();
+    const { todayControls, confirmEdit, props } = setUp_MULTIDAY();
 
-    const { getEditHandlers } = useEditContext(props);
-    const { handleGripMouseDown, confirmEdit } = getEditHandlers(day);
-
-    handleGripMouseDown({} as MouseEvent, baseTask);
+    todayControls.handleMouseEnter();
+    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
     confirmEdit();
 
     expect(props.onUpdate).not.toHaveBeenCalled();

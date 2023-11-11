@@ -1,11 +1,11 @@
 import { Moment } from "moment";
 import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
-import { derived, Readable, writable } from "svelte/store";
+import { derived, get, Readable, writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
 import { DayPlannerSettings } from "../../../settings";
-import { OnUpdateFn, TasksForDay } from "../../../types";
-import { offsetYToMinutes } from "../../../util/task-utils";
+import { OnUpdateFn, Tasks, TasksForDay } from "../../../types";
+import { findUpdated, offsetYToMinutes } from "../../../util/task-utils";
 
 import { getDayKey } from "./transform/drag-and-shift-others";
 import { EditOperation } from "./types";
@@ -100,6 +100,33 @@ export function useEditContext_MULTIDAY({
     editOperation.set(undefined);
   }
 
+  async function confirmEdit() {
+    if (get(editOperation) === undefined) {
+      return;
+    }
+
+    const currentTasks = get(displayedTasks);
+
+    // todo: order matters! Make it more explicit
+    editOperation.set(undefined);
+
+    function getAllWithTime(tasks: Tasks) {
+      return Object.values(tasks).flatMap(({ withTime }) => withTime);
+    }
+
+    const dirty = findUpdated(
+      getAllWithTime(get(baselineTasks)),
+      getAllWithTime(currentTasks),
+    );
+
+    if (dirty.length === 0) {
+      return;
+    }
+
+    baselineTasks.set(currentTasks);
+    await onUpdate(dirty);
+  }
+
   const cursorPos = derived(
     [hoveredDay, cursorMinutes],
     ([$hoveredDay, $cursorMinutes]) => {
@@ -145,6 +172,7 @@ export function useEditContext_MULTIDAY({
 
   return {
     displayedTasks,
+    confirmEdit,
     getEditHandlers,
   };
 }

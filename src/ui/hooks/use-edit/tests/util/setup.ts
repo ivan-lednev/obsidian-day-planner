@@ -45,7 +45,8 @@ export function setUp({ tasks } = { tasks: baseTasks }) {
 
 export function setUp_MULTIDAY({ tasks } = { tasks: baseTasks }) {
   const props = createProps({ tasks });
-  const { getEditHandlers, displayedTasks } = useEditContext_MULTIDAY(props);
+  const { getEditHandlers, displayedTasks, confirmEdit } =
+    useEditContext_MULTIDAY(props);
 
   const todayControls = getEditHandlers(day);
   const { pointerOffsetY } = todayControls;
@@ -55,5 +56,12 @@ export function setUp_MULTIDAY({ tasks } = { tasks: baseTasks }) {
     pointerOffsetY.set(toMinutes(time));
   }
 
-  return { todayControls, nextDayControls, moveCursorTo, displayedTasks };
+  return {
+    todayControls,
+    nextDayControls,
+    moveCursorTo,
+    displayedTasks,
+    confirmEdit,
+    props
+  };
 }
