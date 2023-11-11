@@ -6,9 +6,10 @@ import { CursorPos, Task, TasksForDay, Tasks } from "../../../types";
 import { transform, transform_MULTIDAY } from "./transform/transform";
 import { EditOperation } from "./types";
 
-export function removeTaskWithTime(task: Task, tasks: TasksForDay) {
+export function removeTask(task: Task, tasks: TasksForDay) {
   return {
     ...tasks,
+    noTime: tasks.noTime.filter((t) => t.id !== task.id),
     withTime: tasks.withTime.filter((t) => t.id !== task.id),
   };
 }
@@ -57,7 +58,7 @@ export function useDisplayedTasks({
       }
 
       if (!thisDayIsUnderCursor && taskComesFromThisDay) {
-        const tasks = removeTaskWithTime($editOperation.task, $baselineTasks);
+        const tasks = removeTask($editOperation.task, $baselineTasks);
 
         return transform(tasks, $cursorMinutes, $editOperation);
       }

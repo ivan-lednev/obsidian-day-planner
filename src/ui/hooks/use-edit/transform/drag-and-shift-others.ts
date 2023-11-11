@@ -5,18 +5,13 @@ import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 import type { PlacedTask, Task } from "../../../../types";
 import { Tasks } from "../../../../types";
 import { getEndMinutes } from "../../../../util/task-utils";
-import { addTaskWithTime, removeTaskWithTime } from "../use-displayed-tasks";
-
+import { addTaskWithTime, removeTask } from "../use-displayed-tasks";
 
 export function getDayKey(day: Moment) {
   return day.format(DEFAULT_DAILY_NOTE_FORMAT);
 }
 
 export function moveTaskToDay(baseline: Tasks, task: Task, day: Moment) {
-  if (day.isSame(task.startTime, "day")) {
-    return baseline;
-  }
-
   const sourceKey = getDayKey(task.startTime);
   const destKey = getDayKey(day);
   const source = baseline[sourceKey];
@@ -24,7 +19,7 @@ export function moveTaskToDay(baseline: Tasks, task: Task, day: Moment) {
 
   return {
     ...baseline,
-    [sourceKey]: removeTaskWithTime(task, source),
+    [sourceKey]: removeTask(task, source),
     [destKey]: addTaskWithTime(task, dest),
   };
 }

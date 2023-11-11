@@ -6,10 +6,7 @@ import { baseTask } from "../../test-utils";
 import { useEditContext } from "../use-edit-context";
 
 import { baseTasks, day, dayKey, nextDay, nextDayKey } from "./util/fixtures";
-import {
-  createProps,
-  setUp_MULTIDAY,
-} from "./util/setup";
+import { createProps, setUp_MULTIDAY } from "./util/setup";
 
 describe("moving tasks between containers", () => {
   test("with no edit operation in progress, nothing happens on mouse move", () => {
@@ -62,6 +59,38 @@ describe("moving tasks between containers", () => {
   );
 
   test.todo("moving a task to day without a note");
+
+  test("scheduling works between days", () => {
+    const tasks: Tasks = {
+      [dayKey]: {
+        withTime: [],
+        noTime: [baseTask],
+      },
+      [nextDayKey]: {
+        withTime: [],
+        noTime: [],
+      },
+    };
+
+    const { todayControls, nextDayControls, moveCursorTo, displayedTasks } =
+      setUp_MULTIDAY({
+        tasks,
+      });
+
+    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    nextDayControls.handleMouseEnter();
+    moveCursorTo("01:00");
+
+    expect(get(displayedTasks)).toMatchObject({
+      [dayKey]: {
+        noTime: [],
+        withTime: [],
+      },
+      [nextDayKey]: {
+        withTime: [{ startMinutes: toMinutes("01:00") }],
+      },
+    });
+  });
 
   test("drag works between days", () => {
     const tasks: Tasks = {

@@ -1,3 +1,5 @@
+import { isNotVoid } from "typed-assert";
+
 import type {
   CursorPos,
   PlacedTask,
@@ -17,7 +19,7 @@ import { resize } from "./resize";
 import { resizeAndShiftOthers } from "./resize-and-shift-others";
 import { schedule } from "./schedule";
 
-const transformers: Record<EditMode, typeof drag> = {
+const transformers: Partial<Record<EditMode, typeof drag>> = {
   [EditMode.DRAG]: drag,
   [EditMode.DRAG_AND_SHIFT_OTHERS]: dragAndShiftOthers,
 };
@@ -33,6 +35,8 @@ export function transform_MULTIDAY(
   const destTasks = moved[destKey];
 
   const transformFn = transformers[operation.mode];
+
+  isNotVoid(transformFn, `No transformer for operation: ${operation.mode}`);
 
   return {
     ...moved,
