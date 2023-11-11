@@ -23,11 +23,6 @@ export const baseTasks: Record<string, TasksForDay> = {
   [nextDayKey]: { withTime: [], noTime: [] },
 };
 
-export const oneUnscheduledTask: Record<string, TasksForDay> = {
-  [dayKey]: { withTime: [], noTime: [baseTask] },
-  [nextDayKey]: { withTime: [], noTime: [] },
-};
-
 const secondTask = {
   ...baseTask,
   startMinutes: toMinutes("01:10"),

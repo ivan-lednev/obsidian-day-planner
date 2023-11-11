@@ -62,6 +62,6 @@ export function setUp_MULTIDAY({ tasks } = { tasks: baseTasks }) {
     moveCursorTo,
     displayedTasks,
     confirmEdit,
-    props
+    props,
   };
 }

@@ -1,100 +1,95 @@
-import { produce } from "immer";
 import { get } from "svelte/store";
 
+import { Tasks } from "../../../../types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
-import { useEditContext } from "../use-edit-context";
 
-import { baseTasks, day, dayKey, twoTasksInColumn } from "./util/fixtures";
-import { createProps, setPointerTime } from "./util/setup";
+import {
+  dayKey,
+} from "./util/fixtures";
+import { setUp_MULTIDAY } from "./util/setup";
 
 describe("drag many", () => {
   test("tasks below react to shifting selected task once they start overlap", () => {
-    const props = createProps({
-      tasks: twoTasksInColumn,
-    });
-    const { getEditHandlers } = useEditContext(props);
-
-    const { displayedTasks, handleGripMouseDown, pointerOffsetY } =
-      getEditHandlers(day);
-
-    handleGripMouseDown({ ctrlKey: true } as MouseEvent, baseTask);
-    setPointerTime(pointerOffsetY, "01:10");
-
-    const {
-      withTime: [, next],
-    } = get(displayedTasks);
-
-    expect(next).toMatchObject({
-      startMinutes: toMinutes("02:10"),
-      durationMinutes: 60,
-    });
-  });
-
-  test("tasks below stay in initial position once the overlap is reversed", () => {
-    const props = createProps({
-      tasks: twoTasksInColumn,
-    });
-    const { getEditHandlers } = useEditContext(props);
-
-    const { displayedTasks, handleGripMouseDown, pointerOffsetY } =
-      getEditHandlers(day);
-
-    handleGripMouseDown({ ctrlKey: true } as MouseEvent, baseTask);
-    setPointerTime(pointerOffsetY, "01:10");
-    setPointerTime(pointerOffsetY, "00:00");
-
-    const {
-      withTime: [, next],
-    } = get(displayedTasks);
-
-    expect(next).toMatchObject({
-      startMinutes: toMinutes("01:10"),
-      durationMinutes: 60,
-    });
-  });
-
-  test("tasks above react to shifting in the same way", () => {
-    const earlyTask = {
+    const middleTask = {
       ...baseTask,
-      startMinutes: toMinutes("01:00"),
-      durationMinutes: 60,
-      id: "1",
-    };
-    const lateTask = {
-      ...baseTask,
-      startMinutes: toMinutes("02:00"),
-      durationMinutes: 60,
       id: "2",
+      startMinutes: toMinutes("02:00"),
     };
 
-    const tasks = produce(baseTasks, (draft) => {
-      draft[dayKey].withTime = [earlyTask, lateTask];
+    const tasks: Tasks = {
+      [dayKey]: {
+        withTime: [
+          { ...baseTask, id: "1", startMinutes: toMinutes("01:00") },
+          middleTask,
+          { ...baseTask, id: "3", startMinutes: toMinutes("03:00") },
+        ],
+        noTime: [],
+      },
+    };
+
+    const { todayControls, moveCursorTo, displayedTasks } = setUp_MULTIDAY({
+      tasks,
     });
 
-    const props = createProps({ tasks });
+    todayControls.handleMouseEnter();
+    todayControls.handleGripMouseDown(
+      { ctrlKey: true } as MouseEvent,
+      middleTask,
+    );
+    moveCursorTo("03:00");
 
-    const { getEditHandlers } = useEditContext(props);
-    const { displayedTasks, handleGripMouseDown, pointerOffsetY } =
-      getEditHandlers(day);
-
-    handleGripMouseDown({ ctrlKey: true } as MouseEvent, lateTask);
-    setPointerTime(pointerOffsetY, "01:30");
-
-    const {
-      withTime: [previous, edited],
-    } = get(displayedTasks);
-
-    expect(edited).toMatchObject({
-      startMinutes: toMinutes("01:30"),
-      durationMinutes: 60,
+    expect(get(displayedTasks)).toMatchObject({
+      [dayKey]: {
+        withTime: [
+          { id: "1", startMinutes: toMinutes("01:00") },
+          { id: "2", startMinutes: toMinutes("03:00") },
+          { id: "3", startMinutes: toMinutes("04:00") },
+        ],
+      },
     });
-    expect(previous).toMatchObject({
-      startMinutes: toMinutes("00:30"),
-      durationMinutes: 60,
+  });
+
+  test("tasks below stay in initial position once the overlap is reversed, tasks above shift as well", () => {
+    const middleTask = {
+      ...baseTask,
+      id: "2",
+      startMinutes: toMinutes("02:00"),
+    };
+
+    const tasks: Tasks = {
+      [dayKey]: {
+        withTime: [
+          { ...baseTask, id: "1", startMinutes: toMinutes("01:00") },
+          middleTask,
+          { ...baseTask, id: "3", startMinutes: toMinutes("03:00") },
+        ],
+        noTime: [],
+      },
+    };
+
+    const { todayControls, moveCursorTo, displayedTasks } = setUp_MULTIDAY({
+      tasks,
+    });
+
+    todayControls.handleMouseEnter();
+    todayControls.handleGripMouseDown(
+      { ctrlKey: true } as MouseEvent,
+      middleTask,
+    );
+    moveCursorTo("03:00");
+    moveCursorTo("01:00");
+
+    expect(get(displayedTasks)).toMatchObject({
+      [dayKey]: {
+        withTime: [
+          { id: "1", startMinutes: toMinutes("00:00") },
+          { id: "2", startMinutes: toMinutes("01:00") },
+          { id: "3", startMinutes: toMinutes("03:00") },
+        ],
+      },
     });
   });
 
   test.todo("tasks stop moving once there is not enough time");
-  test.todo("drag-many works across columns");
 });

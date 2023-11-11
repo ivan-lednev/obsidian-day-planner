@@ -2,10 +2,9 @@ import { get } from "svelte/store";
 
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
-import { useEditContext } from "../use-edit-context";
 
-import { day, dayKey } from "./util/fixtures";
-import { createProps, setPointerTime, setUp_MULTIDAY } from "./util/setup";
+import { dayKey } from "./util/fixtures";
+import { setUp_MULTIDAY } from "./util/setup";
 
 describe("drag one & common edit mechanics", () => {
   test("when drag starts, target task reacts to cursor", () => {
