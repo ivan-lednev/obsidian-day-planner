@@ -7,7 +7,7 @@ import { baseTask } from "../../test-utils";
 import {
   dayKey,
 } from "./util/fixtures";
-import { setUp_MULTIDAY } from "./util/setup";
+import { setUp } from "./util/setup";
 
 describe("drag many", () => {
   test("tasks below react to shifting selected task once they start overlap", () => {
@@ -28,7 +28,7 @@ describe("drag many", () => {
       },
     };
 
-    const { todayControls, moveCursorTo, displayedTasks } = setUp_MULTIDAY({
+    const { todayControls, moveCursorTo, displayedTasks } = setUp({
       tasks,
     });
 
@@ -68,7 +68,7 @@ describe("drag many", () => {
       },
     };
 
-    const { todayControls, moveCursorTo, displayedTasks } = setUp_MULTIDAY({
+    const { todayControls, moveCursorTo, displayedTasks } = setUp({
       tasks,
     });
 

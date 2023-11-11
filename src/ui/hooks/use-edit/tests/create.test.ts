@@ -3,11 +3,11 @@ import { get } from "svelte/store";
 import { toMinutes } from "../../../../util/moment";
 
 import { dayKey, emptyTasks } from "./util/fixtures";
-import { setUp_MULTIDAY } from "./util/setup";
+import { setUp } from "./util/setup";
 
 describe("create", () => {
   test("when creating and dragging, task duration changes", () => {
-    const { todayControls, moveCursorTo, displayedTasks } = setUp_MULTIDAY({
+    const { todayControls, moveCursorTo, displayedTasks } = setUp({
       tasks: emptyTasks,
     });
 

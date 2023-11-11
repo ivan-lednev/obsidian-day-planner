@@ -4,11 +4,11 @@ import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 
 import { dayKey } from "./util/fixtures";
-import { setUp_MULTIDAY } from "./util/setup";
+import { setUp } from "./util/setup";
 
 describe("drag one & common edit mechanics", () => {
   test("when drag starts, target task reacts to cursor", () => {
-    const { todayControls, moveCursorTo, displayedTasks } = setUp_MULTIDAY();
+    const { todayControls, moveCursorTo, displayedTasks } = setUp();
 
     todayControls.handleMouseEnter();
     todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
@@ -28,7 +28,7 @@ describe("drag one & common edit mechanics", () => {
       moveCursorTo,
       displayedTasks,
       confirmEdit,
-    } = setUp_MULTIDAY();
+    } = setUp();
 
     todayControls.handleMouseEnter();
     todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
@@ -45,7 +45,7 @@ describe("drag one & common edit mechanics", () => {
   });
 
   test("when a task is set to its current time, nothing happens", () => {
-    const { todayControls, confirmEdit, props } = setUp_MULTIDAY();
+    const { todayControls, confirmEdit, props } = setUp();
 
     todayControls.handleMouseEnter();
     todayControls.handleGripMouseDown({} as MouseEvent, baseTask);

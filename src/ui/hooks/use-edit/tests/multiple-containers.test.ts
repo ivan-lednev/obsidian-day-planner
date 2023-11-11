@@ -5,11 +5,11 @@ import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 
 import { baseTasks, dayKey, emptyTasks, nextDayKey } from "./util/fixtures";
-import { setUp_MULTIDAY } from "./util/setup";
+import { setUp } from "./util/setup";
 
 describe("moving tasks between containers", () => {
   test("with no edit operation in progress, nothing happens on mouse move", () => {
-    const { todayControls, moveCursorTo, displayedTasks } = setUp_MULTIDAY({
+    const { todayControls, moveCursorTo, displayedTasks } = setUp({
       tasks: baseTasks,
     });
 
@@ -36,7 +36,7 @@ describe("moving tasks between containers", () => {
     };
 
     const { todayControls, nextDayControls, moveCursorTo, displayedTasks } =
-      setUp_MULTIDAY({
+      setUp({
         tasks,
       });
 
@@ -71,7 +71,7 @@ describe("moving tasks between containers", () => {
     };
 
     const { todayControls, nextDayControls, moveCursorTo, displayedTasks } =
-      setUp_MULTIDAY({
+      setUp({
         tasks,
       });
 
@@ -108,7 +108,7 @@ describe("moving tasks between containers", () => {
     };
 
     const { todayControls, nextDayControls, moveCursorTo, displayedTasks } =
-      setUp_MULTIDAY({
+      setUp({
         tasks,
       });
 
@@ -134,7 +134,7 @@ describe("moving tasks between containers", () => {
 
   test("create works between days", () => {
     const { todayControls, moveCursorTo, nextDayControls, displayedTasks } =
-      setUp_MULTIDAY({
+      setUp({
         tasks: emptyTasks,
       });
 
