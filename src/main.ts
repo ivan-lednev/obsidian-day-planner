@@ -26,7 +26,9 @@ import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
 import { GetTasksForDay, Task, TasksForDay } from "./types";
-import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
+import {
+  useEditContext_MULTIDAY,
+} from "./ui/hooks/use-edit/use-edit-context";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
@@ -35,6 +37,7 @@ import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { debounceWithDelay } from "./util/debounce-with-delay";
 import { getTasksForDay, mapToTasksForDay } from "./util/get-tasks-for-day";
 import { isToday } from "./util/moment";
+import { emptyTasksForDay } from "./util/task-utils";
 
 export default class DayPlanner extends Plugin {
   settings: () => DayPlannerSettings;
@@ -278,15 +281,13 @@ export default class DayPlanner extends Plugin {
 
         return $visibleDays.reduce<Record<string, TasksForDay>>(
           (result, day) => {
-            const keyForVisibleDay = day.format("YYYY-MM-DD");
-            const sTasksForDay = dayToSTasksLookup[keyForVisibleDay];
+            const key = day.format("YYYY-MM-DD");
+            const sTasksForDay = dayToSTasksLookup[key];
 
             if (sTasksForDay) {
-              result[keyForVisibleDay] = mapToTasksForDay(
-                day,
-                sTasksForDay,
-                $settings,
-              );
+              result[key] = mapToTasksForDay(day, sTasksForDay, $settings);
+            } else {
+              result[key] = emptyTasksForDay();
             }
 
             return result;
@@ -296,17 +297,12 @@ export default class DayPlanner extends Plugin {
       },
     );
 
-    visibleTasks.subscribe((v) => {
-      console.log(v);
-    });
-
     this.editContext = derived(
-      [this.settingsStore, this.getTasksForDay, visibleTasks],
-      ([$settings, $getTasksForDay, $visibleTasks]) => {
-        return useEditContext({
+      [this.settingsStore, visibleTasks],
+      ([$settings, $visibleTasks]) => {
+        return useEditContext_MULTIDAY({
           obsidianFacade: this.obsidianFacade,
           onUpdate: this.syncTasksWithFile,
-          getTasksForDay: $getTasksForDay,
           fileSyncInProgress: this.fileSyncInProgress,
           settings: $settings,
           visibleTasks: $visibleTasks,

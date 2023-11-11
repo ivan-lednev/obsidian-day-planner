@@ -31,8 +31,8 @@ export function transform_MULTIDAY(
   cursorPos: CursorPos,
   operation: EditOperation,
 ) {
+  // todo: clean up this crap
   let moved = baseline;
-
   if (cursorPos.day.isSame(operation.task.startTime, "day")) {
     const key = getDayKey(operation.task.startTime);
 

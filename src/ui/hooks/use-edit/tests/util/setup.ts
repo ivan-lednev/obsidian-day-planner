@@ -1,5 +1,5 @@
 import { Moment } from "moment/moment";
-import { writable, Writable } from "svelte/store";
+import { writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../../../service/obsidian-facade";
 import { defaultSettingsForTests } from "../../../../../settings";
@@ -7,10 +7,6 @@ import { toMinutes } from "../../../../../util/moment";
 import { useEditContext_MULTIDAY } from "../../use-edit-context";
 
 import { baseTasks, day, nextDay } from "./fixtures";
-
-export function setPointerTime(pointerOffsetY: Writable<number>, time: string) {
-  pointerOffsetY.set(toMinutes(time));
-}
 
 export function createProps({ tasks } = { tasks: baseTasks }) {
   const onUpdate = jest.fn();

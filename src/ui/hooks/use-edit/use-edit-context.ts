@@ -165,7 +165,7 @@ export function useEditContext_MULTIDAY({
       cancelEdit,
       pointerOffsetY,
       displayedTasks: derived(displayedTasks, ($displayedTasks) => {
-        return $displayedTasks[dayKey];
+        return $displayedTasks[dayKey] || { withTime: [], noTime: [] };
       }),
     };
   }

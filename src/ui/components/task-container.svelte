@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getContext } from "svelte";
+  import { writable } from "svelte/store";
 
   import { obsidianContext } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
@@ -21,7 +22,6 @@
   import ScheduledTask from "./scheduled-task.svelte";
   import Scroller from "./scroller.svelte";
   import Task from "./task.svelte";
-  import TimelineControls from "./timeline-controls.svelte";
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
 
   export let hideControls = false;
@@ -30,11 +30,23 @@
   const { fileSyncInProgress, editContext } =
     getContext<ObsidianContext>(obsidianContext);
 
+  // $: ({
+  //   displayedTasks,
+  //   cancelEdit,
+  //   editStatus = undefined,
+  //   confirmEdit,
+  //   handleMouseDown,
+  //   handleResizeStart,
+  //   handleTaskMouseUp,
+  //   handleGripMouseDown,
+  //   startScheduling,
+  //   handleMouseEnter,
+  //   pointerOffsetY,
+  // } = $editContext.getEditHandlers(day));
+
   $: ({
     displayedTasks,
     cancelEdit,
-    editStatus = undefined,
-    confirmEdit,
     handleMouseDown,
     handleResizeStart,
     handleTaskMouseUp,
@@ -44,9 +56,13 @@
     pointerOffsetY,
   } = $editContext.getEditHandlers(day));
 
+  $: ({ confirmEdit } = $editContext);
+
+  const editStatus = writable(false);
+
   $: ({ bodyCursor, gripCursor, containerCursor } = useCursor({
     editBlocked: $fileSyncInProgress,
-    editMode: $editStatus,
+    editMode: undefined,
   }));
 </script>
 
@@ -55,7 +71,7 @@
 <svelte:document on:mouseup={cancelEdit} />
 
 {#if !hideControls}
-  <TimelineControls />
+<!--  <TimelineControls />-->
 
   {#if $displayedTasks.noTime.length > 0 && $settings.showUncheduledTasks}
     <UnscheduledTaskContainer>
@@ -90,7 +106,7 @@
       {pointerOffsetY}
       on:mousedown={handleMouseDown}
       on:mouseup={confirmEdit}
-      on:mouseenter={handleMouseEnter}
+      on:mousemove={handleMouseEnter}
     >
       {#if $editStatus && $settings.showHelp}
         <Banner />

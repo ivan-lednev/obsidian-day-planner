@@ -2,7 +2,7 @@ import { difference } from "lodash/fp";
 import type { Moment } from "moment";
 
 import { defaultDurationMinutes } from "../constants";
-import type { Task } from "../types";
+import type { Task, TasksForDay } from "../types";
 import { PlacedTask } from "../types";
 
 import { getId } from "./id";
@@ -89,4 +89,8 @@ export function createTask(day: Moment, startMinutes: number): PlacedTask {
       xOffsetPercent: 0,
     },
   };
+}
+
+export function emptyTasksForDay(): TasksForDay {
+  return { withTime: [], noTime: [] };
 }
