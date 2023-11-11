@@ -6,7 +6,7 @@ import { dayKey, emptyTasks } from "./util/fixtures";
 import { setUp_MULTIDAY } from "./util/setup";
 
 describe("create", () => {
-  test("when creating and dragging, task duration changes", async () => {
+  test("when creating and dragging, task duration changes", () => {
     const { todayControls, moveCursorTo, displayedTasks } = setUp_MULTIDAY({
       tasks: emptyTasks,
     });

@@ -4,7 +4,7 @@ import { Tasks } from "../../../../types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 
-import { baseTasks, dayKey, nextDayKey } from "./util/fixtures";
+import { baseTasks, dayKey, emptyTasks, nextDayKey } from "./util/fixtures";
 import { setUp_MULTIDAY } from "./util/setup";
 
 describe("moving tasks between containers", () => {
@@ -128,6 +128,28 @@ describe("moving tasks between containers", () => {
           { startMinutes: toMinutes("01:00") },
           { id: "3", startMinutes: toMinutes("02:00") },
         ],
+      },
+    });
+  });
+
+  test("create works between days", () => {
+    const { todayControls, moveCursorTo, nextDayControls, displayedTasks } =
+      setUp_MULTIDAY({
+        tasks: emptyTasks,
+      });
+
+    moveCursorTo("01:00");
+    todayControls.handleMouseEnter();
+    todayControls.handleMouseDown();
+    nextDayControls.handleMouseEnter();
+    moveCursorTo("02:00");
+
+    expect(get(displayedTasks)).toMatchObject({
+      [dayKey]: {
+        withTime: [],
+      },
+      [nextDayKey]: {
+        withTime: [{ startMinutes: toMinutes("01:00"), durationMinutes: 60 }],
       },
     });
   });
