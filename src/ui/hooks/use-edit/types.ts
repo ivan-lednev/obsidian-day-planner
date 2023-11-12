@@ -14,5 +14,6 @@ export enum EditMode {
 export interface EditOperation {
   task: PlacedTask;
   mode: EditMode;
+  // todo: should be startDay/initialDay
   day: Moment;
 }

@@ -1,4 +1,3 @@
-import { Moment } from "moment";
 import {
   Component,
   FileView,
@@ -25,7 +24,7 @@ import { getScheduledDay } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
-import { GetTasksForDay, Task, TasksForDay } from "./types";
+import { Task, TasksForDay } from "./types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
@@ -33,9 +32,9 @@ import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { debounceWithDelay } from "./util/debounce-with-delay";
-import { getTasksForDay, mapToTasksForDay } from "./util/get-tasks-for-day";
+import { mapToTasksForDay } from "./util/get-tasks-for-day";
 import { isToday } from "./util/moment";
-import { emptyTasksForDay } from "./util/task-utils";
+import { getEmptyTasksForDay } from "./util/tasks-utils";
 
 export default class DayPlanner extends Plugin {
   settings: () => DayPlannerSettings;
@@ -44,7 +43,6 @@ export default class DayPlanner extends Plugin {
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
   private dataviewTasks: Readable<DataArray<STask>>;
-  private getTasksForDay: Readable<GetTasksForDay>;
   private readonly dataviewLoaded = writable(false);
   private readonly fileSyncInProgress = writable(false);
   private editContext: any;
@@ -130,12 +128,6 @@ export default class DayPlanner extends Plugin {
         this.app.metadataCache.off("dataview:metadata-change", updateTasks);
         document.removeEventListener("keydown", delayUpdateTasks);
         unsubscribeFromSettings();
-      };
-    });
-
-    this.getTasksForDay = derived(this.dataviewTasks, ($dataviewTasks) => {
-      return (day: Moment) => {
-        return getTasksForDay(day, $dataviewTasks, this.settings());
       };
     });
   }
@@ -279,7 +271,7 @@ export default class DayPlanner extends Plugin {
             if (sTasksForDay) {
               result[key] = mapToTasksForDay(day, sTasksForDay, $settings);
             } else {
-              result[key] = emptyTasksForDay();
+              result[key] = getEmptyTasksForDay();
             }
 
             return result;

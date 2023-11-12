@@ -41,6 +41,8 @@ export interface TasksForDay {
   noTime: UnscheduledTask[];
 }
 
+export type Tasks = Record<string, TasksForDay>;
+
 // todo: we don't need this, since it's all optional
 export interface PlacedTask extends Task {}
 
@@ -75,8 +77,6 @@ export interface ObsidianContext {
   renderMarkdown: RenderMarkdown;
   editContext: Readable<ReturnType<typeof useEditContext>>;
 }
-
-export type Tasks = Record<string, TasksForDay>;
 
 export interface CursorPos {
   minutes: number;

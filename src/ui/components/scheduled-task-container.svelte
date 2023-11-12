@@ -14,7 +14,6 @@
   on:mousemove={(event) => {
     const viewportToElOffsetY = el.getBoundingClientRect().top;
     const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
-    console.log({ viewportToElOffsetY, borderTopToPointerOffsetY });
 
     pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings.zoomLevel));
   }}

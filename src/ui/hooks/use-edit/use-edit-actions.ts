@@ -1,15 +1,15 @@
 import { get, Readable, Writable } from "svelte/store";
 
-import { OnUpdateFn, TasksForDay } from "../../../types";
+import { OnUpdateFn, Tasks } from "../../../types";
 import { findUpdated } from "../../../util/task-utils";
+import { getTasksWithTime } from "../../../util/tasks-utils";
 
 import { EditOperation } from "./types";
 
 interface UseEditActionsProps {
-  baselineTasks: Writable<TasksForDay>;
+  baselineTasks: Writable<Tasks>;
   editOperation: Writable<EditOperation>;
-  displayedTasks: Readable<TasksForDay>;
-  fileSyncInProgress: Readable<boolean>;
+  displayedTasks: Readable<Tasks>;
   onUpdate: OnUpdateFn;
 }
 
@@ -17,13 +17,14 @@ export function useEditActions({
   editOperation,
   baselineTasks,
   displayedTasks,
-  fileSyncInProgress,
   onUpdate,
 }: UseEditActionsProps) {
   function startEdit(operation: EditOperation) {
-    if (!get(fileSyncInProgress)) {
-      editOperation.set(operation);
-    }
+    editOperation.set(operation);
+  }
+
+  function cancelEdit() {
+    editOperation.set(undefined);
   }
 
   async function confirmEdit() {
@@ -37,8 +38,8 @@ export function useEditActions({
     editOperation.set(undefined);
 
     const dirty = findUpdated(
-      get(baselineTasks).withTime,
-      currentTasks.withTime,
+      getTasksWithTime(get(baselineTasks)),
+      getTasksWithTime(currentTasks),
     );
 
     if (dirty.length === 0) {
@@ -47,10 +48,6 @@ export function useEditActions({
 
     baselineTasks.set(currentTasks);
     await onUpdate(dirty);
-  }
-
-  function cancelEdit() {
-    editOperation.set(undefined);
   }
 
   return {

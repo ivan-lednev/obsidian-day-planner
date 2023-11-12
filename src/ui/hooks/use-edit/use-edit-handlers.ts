@@ -59,6 +59,7 @@ export function useEditHandlers({
     }
   }
 
+  // todo: this might not be needed
   function startScheduling(task: UnscheduledTask) {
     const withAddedTime = {
       ...task,
@@ -70,14 +71,7 @@ export function useEditHandlers({
     startEdit({ task: withAddedTime, mode: EditMode.SCHEDULE, day });
   }
 
-  function handleMouseEnter() {
-    if (get(editOperation)) {
-      editOperation.update((prev) => ({ ...prev, day }));
-    }
-  }
-
   return {
-    handleMouseEnter,
     handleMouseDown,
     handleResizeStart,
     handleTaskMouseUp,
