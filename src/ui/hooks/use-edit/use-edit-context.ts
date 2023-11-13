@@ -54,7 +54,13 @@ export function useEditContext({
     });
 
     function handleMouseEnter() {
-      editOperation.update((prev) => prev && { ...prev, day });
+      editOperation.update(
+        (previous) =>
+          previous && {
+            ...previous,
+            task: { ...previous.task, startTime: day },
+          },
+      );
     }
 
     return {

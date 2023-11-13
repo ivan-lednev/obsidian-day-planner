@@ -3,7 +3,7 @@ import type { CachedMetadata } from "obsidian";
 
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
-import type { Task, Timestamp } from "../types";
+import type { Diff, Task, Timestamp } from "../types";
 import { createDailyNoteIfNeeded } from "../util/daily-notes";
 import { createTimestamp } from "../util/task-utils";
 
@@ -28,13 +28,8 @@ export class PlanEditor {
     );
   }
 
-  syncTasksWithFile = async (unsafeTasks: Task[]) => {
+  syncTasksWithFile = async (diff: Diff) => {
     const tasks = await this.ensureFilesForTasks(unsafeTasks);
-
-    const [edited, created] = partition(
-      (task) => task.location?.line !== undefined,
-      tasks,
-    );
 
     if (created.length > 1) {
       throw new Error("Creating more than 1 task is not supported");

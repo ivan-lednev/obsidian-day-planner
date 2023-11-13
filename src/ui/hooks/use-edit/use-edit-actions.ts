@@ -1,7 +1,7 @@
 import { get, Readable, Writable } from "svelte/store";
 
 import { OnUpdateFn, Tasks } from "../../../types";
-import { findUpdated } from "../../../util/task-utils";
+import { getDiff, isDiffEmpty } from "../../../util/task-utils";
 import { getTasksWithTime } from "../../../util/tasks-utils";
 
 import { EditOperation } from "./types";
@@ -37,17 +37,14 @@ export function useEditActions({
     // todo: order matters! Make it more explicit
     editOperation.set(undefined);
 
-    const dirty = findUpdated(
-      getTasksWithTime(get(baselineTasks)),
-      getTasksWithTime(currentTasks),
-    );
+    const diff = getDiff(get(baselineTasks), currentTasks);
 
-    if (dirty.length === 0) {
+    if (isDiffEmpty(diff)) {
       return;
     }
 
     baselineTasks.set(currentTasks);
-    await onUpdate(dirty);
+    await onUpdate(diff);
   }
 
   return {

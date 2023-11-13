@@ -5,6 +5,7 @@ import { Readable, Writable } from "svelte/store";
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import type { ObsidianFacade } from "./service/obsidian-facade";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
+import { getDiff } from "./util/task-utils";
 
 export interface TaskLocation {
   path: string;
@@ -12,7 +13,9 @@ export interface TaskLocation {
   position: Pos;
 }
 
-export type OnUpdateFn = (updated: Task[]) => Promise<void | void[]>;
+export type OnUpdateFn = (diff: Diff) => Promise<void | void[]>;
+
+export type Diff = ReturnType<typeof getDiff>
 
 export interface UnscheduledTask {
   /**
@@ -44,7 +47,8 @@ export interface TasksForDay {
 export type Tasks = Record<string, TasksForDay>;
 
 // todo: we don't need this, since it's all optional
-export interface PlacedTask extends Task {}
+export interface PlacedTask extends Task {
+}
 
 export type RelationToNow = "past" | "present" | "future";
 
