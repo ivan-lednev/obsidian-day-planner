@@ -1,7 +1,7 @@
 import { baseTask } from "../../test-utils";
 
+import { nextDayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
-import { day, nextDay } from "./util/fixtures";
 
 describe("Finding diff before writing updates to files", () => {
   test("Finds tasks moved between days", async () => {
@@ -14,7 +14,9 @@ describe("Finding diff before writing updates to files", () => {
 
     expect(props.onUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
-        updatedDay: [expect.objectContaining({ id: "id", startTime: nextDay })],
+        updatedDay: expect.objectContaining({
+          [nextDayKey]: [expect.objectContaining({ id: baseTask.id })],
+        }),
       }),
     );
   });

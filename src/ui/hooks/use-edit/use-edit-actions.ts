@@ -2,7 +2,6 @@ import { get, Readable, Writable } from "svelte/store";
 
 import { OnUpdateFn, Tasks } from "../../../types";
 import { getDiff, isDiffEmpty } from "../../../util/task-utils";
-import { getTasksWithTime } from "../../../util/tasks-utils";
 
 import { EditOperation } from "./types";
 

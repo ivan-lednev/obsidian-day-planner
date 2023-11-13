@@ -58,7 +58,7 @@ export function useEditContext({
         (previous) =>
           previous && {
             ...previous,
-            task: { ...previous.task, startTime: day },
+            day,
           },
       );
     }

@@ -15,7 +15,7 @@ export interface TaskLocation {
 
 export type OnUpdateFn = (diff: Diff) => Promise<void | void[]>;
 
-export type Diff = ReturnType<typeof getDiff>
+export type Diff = ReturnType<typeof getDiff>;
 
 export interface UnscheduledTask {
   /**
@@ -47,8 +47,7 @@ export interface TasksForDay {
 export type Tasks = Record<string, TasksForDay>;
 
 // todo: we don't need this, since it's all optional
-export interface PlacedTask extends Task {
-}
+export interface PlacedTask extends Task {}
 
 export type RelationToNow = "past" | "present" | "future";
 

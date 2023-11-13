@@ -1,4 +1,4 @@
-import { groupBy, partition } from "lodash/fp";
+import { groupBy } from "lodash/fp";
 import type { CachedMetadata } from "obsidian";
 
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";

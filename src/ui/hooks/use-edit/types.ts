@@ -14,4 +14,5 @@ export enum EditMode {
 export interface EditOperation {
   task: PlacedTask;
   mode: EditMode;
+  day: Moment;
 }

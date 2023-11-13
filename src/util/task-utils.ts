@@ -4,10 +4,10 @@ import type { Moment } from "moment";
 import { defaultDurationMinutes } from "../constants";
 import type { Task, Tasks } from "../types";
 import { PlacedTask } from "../types";
+import { getDayKey } from "../ui/hooks/use-edit/transform/drag-and-shift-others";
 
 import { getId } from "./id";
 import { addMinutes, minutesToMoment, minutesToMomentOfDay } from "./moment";
-import { getDayKey } from "../ui/hooks/use-edit/transform/drag-and-shift-others";
 import { getTasksWithTime } from "./tasks-utils";
 
 export function isEqualTask(a: Task, b: Task) {
@@ -60,16 +60,30 @@ export function createTimestamp(
 }
 
 export function getTasksWithUpdatedDay(tasks: Tasks) {
-  return Object.entries(tasks)
+  const newDayToTask = Object.entries(tasks)
     .flatMap(([dayKey, tasks]) =>
       tasks.withTime.map((task) => ({ dayKey, task })),
     )
-    .filter(({ dayKey, task }) => dayKey !== getDayKey(task.startTime))
-    .map(({ task }) => task);
+    .filter(({ dayKey, task }) => dayKey !== getDayKey(task.startTime));
+
+  return newDayToTask.reduce<Record<string, Task[]>>(
+    (result, { dayKey, task }) => {
+      if (dayKey in result) {
+        result[dayKey].push(task);
+      } else {
+        result[dayKey] = [task];
+      }
+
+      return result;
+    },
+    {},
+  );
 }
 
 export function isDiffEmpty(diff: ReturnType<typeof getDiff>) {
-  return Object.values(diff).flat().every((tasks) => tasks.length === 0);
+  return Object.values(diff)
+    .flat()
+    .every((tasks) => tasks.length === 0);
 }
 
 function getPristine(flatBaseline: PlacedTask[], flatNext: PlacedTask[]) {
