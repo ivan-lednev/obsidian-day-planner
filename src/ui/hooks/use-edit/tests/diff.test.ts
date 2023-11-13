@@ -1,6 +1,7 @@
+import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 
-import { nextDayKey } from "./util/fixtures";
+import { emptyTasks, nextDayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
 
 describe("Finding diff before writing updates to files", () => {
@@ -21,7 +22,36 @@ describe("Finding diff before writing updates to files", () => {
     );
   });
 
-  test.todo("Finds created tasks");
+  test("Finds created tasks", async () => {
+    const { todayControls, confirmEdit, props } = setUp({
+      tasks: emptyTasks,
+    });
 
-  test.todo("Finds tasks moved within one day");
+    todayControls.handleMouseDown();
+
+    await confirmEdit();
+
+    expect(props.onUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        created: [expect.objectContaining({ startMinutes: 0 })],
+      }),
+    );
+  });
+
+  test("Finds tasks moved within one day", async () => {
+    const { todayControls, confirmEdit, props, moveCursorTo } = setUp();
+
+    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    moveCursorTo("2:00");
+
+    await confirmEdit();
+
+    expect(props.onUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        updatedTime: [
+          expect.objectContaining({ startMinutes: toMinutes("2:00") }),
+        ],
+      }),
+    );
+  });
 });

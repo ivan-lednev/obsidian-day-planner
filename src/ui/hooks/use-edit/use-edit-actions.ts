@@ -1,7 +1,7 @@
 import { get, Readable, Writable } from "svelte/store";
 
 import { OnUpdateFn, Tasks } from "../../../types";
-import { getDiff, isDiffEmpty } from "../../../util/task-utils";
+import { getDiff, areValuesEmpty } from "../../../util/task-utils";
 
 import { EditOperation } from "./types";
 
@@ -38,7 +38,7 @@ export function useEditActions({
 
     const diff = getDiff(get(baselineTasks), currentTasks);
 
-    if (isDiffEmpty(diff)) {
+    if (areValuesEmpty(diff)) {
       return;
     }
 

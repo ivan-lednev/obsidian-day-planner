@@ -1,4 +1,4 @@
-import { difference, differenceBy } from "lodash/fp";
+import { difference, differenceBy, isEmpty } from "lodash/fp";
 import type { Moment } from "moment";
 
 import { defaultDurationMinutes } from "../constants";
@@ -80,10 +80,8 @@ export function getTasksWithUpdatedDay(tasks: Tasks) {
   );
 }
 
-export function isDiffEmpty(diff: ReturnType<typeof getDiff>) {
-  return Object.values(diff)
-    .flat()
-    .every((tasks) => tasks.length === 0);
+export function areValuesEmpty(record: Record<string, [] | object>) {
+  return Object.values(record).every(isEmpty);
 }
 
 function getPristine(flatBaseline: PlacedTask[], flatNext: PlacedTask[]) {
@@ -93,9 +91,7 @@ function getPristine(flatBaseline: PlacedTask[], flatNext: PlacedTask[]) {
 }
 
 function getCreatedTasks(flatBaseline: PlacedTask[], flatNext: PlacedTask[]) {
-  const [, created] = differenceBy((task) => task.id, flatBaseline, flatNext);
-
-  return created;
+  return differenceBy((task) => task.id, flatNext, flatBaseline);
 }
 
 function getTasksWithUpdatedTime(
