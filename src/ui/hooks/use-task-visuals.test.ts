@@ -42,9 +42,3 @@ test.skip("tasks change position and size when zoom level changes", () => {
   expect(get(offset)).toEqual(4 * 60);
   expect(get(height)).toEqual(60);
 });
-
-test.todo(
-  "to-be-created tasks (ghost tasks) follow the cursor and snap to round numbers",
-);
-
-test.todo("navigates to file on click");

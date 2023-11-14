@@ -22,7 +22,6 @@ const transformers: Record<EditMode, typeof drag> = {
 const multidayModes: Partial<EditMode[]> = [
   EditMode.DRAG,
   EditMode.DRAG_AND_SHIFT_OTHERS,
-  EditMode.CREATE,
 ];
 
 function isMultiday(mode: EditMode) {
@@ -34,17 +33,16 @@ export function transform(
   cursorMinutes: number,
   operation: EditOperation,
 ) {
-  let withTaskInRightColumn = baseline;
-  let destKey = getDayKey(operation.task.startTime);
+  const destDay = isMultiday(operation.mode)
+    ? operation.day
+    : operation.task.startTime;
+  const destKey = getDayKey(destDay);
 
-  if (isMultiday(operation.mode)) {
-    withTaskInRightColumn = moveTaskToColumn(
-      operation.day,
-      operation.task,
-      baseline,
-    );
-    destKey = getDayKey(operation.day);
-  }
+  const withTaskInRightColumn = moveTaskToColumn(
+    destDay,
+    operation.task,
+    baseline,
+  );
 
   const destTasks = withTaskInRightColumn[destKey];
   const withTimeSorted = produce(destTasks.withTime, (draft) =>

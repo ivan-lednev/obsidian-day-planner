@@ -27,8 +27,6 @@ describe("moving tasks between containers", () => {
     expect(get(displayedTasks)).toEqual(initial);
   });
 
-  test.todo("moving a task to day without a note");
-
   test("scheduling works between days", () => {
     const { todayControls, nextDayControls, moveCursorTo, displayedTasks } =
       setUp({
@@ -127,7 +125,7 @@ describe("moving tasks between containers", () => {
     });
   });
 
-  test.skip("create doesn't work between days", () => {
+  test("create doesn't work between days", () => {
     const { todayControls, moveCursorTo, nextDayControls, displayedTasks } =
       setUp({
         tasks: emptyTasks,

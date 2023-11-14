@@ -264,7 +264,3 @@ test("stops at first occupied slot from previous group", () => {
     ]),
   );
 });
-
-test.todo(
-  "rare edge case: middle slot of the second group is occupied by an item from the first group",
-);
