@@ -11,6 +11,7 @@
   import { getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
+  import { useEditHandlers } from "../hooks/use-edit-handlers";
 
   import Banner from "./banner.svelte";
   import Column from "./column.svelte";
@@ -26,7 +27,9 @@
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
 
   export let hideControls = false;
-  export let day = $visibleDayInTimeline;
+  export let day: Moment | undefined = undefined;
+
+  $: actualDay = day || $visibleDayInTimeline;
 
   const { fileSyncInProgress, editContext } =
     getContext<ObsidianContext>(obsidianContext);
@@ -41,7 +44,7 @@
     startScheduling,
     handleMouseEnter,
     pointerOffsetY,
-  } = $editContext.getEditHandlers(day));
+  } = $editContext.getEditHandlers(actualDay));
 
   $: ({ confirmEdit } = $editContext);
 
@@ -93,7 +96,6 @@
       {pointerOffsetY}
       on:mousedown={handleMouseDown}
       on:mouseup={confirmEdit}
-      on:mouseenter={handleMouseEnter}
     >
       {#if $editStatus && $settings.showHelp}
         <Banner />
