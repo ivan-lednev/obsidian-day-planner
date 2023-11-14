@@ -1,7 +1,7 @@
 import { get, Readable, Writable } from "svelte/store";
 
 import { OnUpdateFn, Tasks } from "../../../types";
-import { getDiff, areValuesEmpty } from "../../../util/task-utils";
+import { getDiff, areValuesEmpty, updateText } from "../../../util/task-utils";
 
 import { EditOperation } from "./types";
 
@@ -43,7 +43,8 @@ export function useEditActions({
     }
 
     baselineTasks.set(currentTasks);
-    await onUpdate(diff);
+
+    await onUpdate(updateText(diff));
   }
 
   return {

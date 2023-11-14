@@ -1,7 +1,7 @@
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 
-import { emptyTasks, nextDayKey } from "./util/fixtures";
+import { emptyTasks } from "./util/fixtures";
 import { setUp } from "./util/setup";
 
 describe("Finding diff before writing updates to files", () => {
@@ -15,9 +15,12 @@ describe("Finding diff before writing updates to files", () => {
 
     expect(props.onUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
-        updatedDay: expect.objectContaining({
-          [nextDayKey]: [expect.objectContaining({ id: baseTask.id })],
-        }),
+        updated: [
+          expect.objectContaining({
+            id: baseTask.id,
+            firstLineText: expect.stringContaining("⌛ 2023-01-02"),
+          }),
+        ],
       }),
     );
   });
@@ -34,6 +37,7 @@ describe("Finding diff before writing updates to files", () => {
     expect(props.onUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
         created: [expect.objectContaining({ startMinutes: 0 })],
+        updated: [],
       }),
     );
   });
@@ -48,8 +52,10 @@ describe("Finding diff before writing updates to files", () => {
 
     expect(props.onUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
-        updatedTime: [
-          expect.objectContaining({ startMinutes: toMinutes("2:00") }),
+        updated: [
+          expect.objectContaining({
+            startMinutes: toMinutes("2:00"),
+          }),
         ],
       }),
     );

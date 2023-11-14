@@ -1,8 +1,15 @@
 import { difference, differenceBy, isEmpty } from "lodash/fp";
 import type { Moment } from "moment";
+import { get } from "svelte/store";
 
 import { defaultDurationMinutes } from "../constants";
-import type { Task, Tasks } from "../types";
+import { settings } from "../global-store/settings";
+import {
+  keylessScheduledPropRegExp,
+  scheduledPropRegExp,
+  shortScheduledPropRegExp,
+} from "../regexp";
+import type { Diff, Task, Tasks } from "../types";
 import { PlacedTask } from "../types";
 import { getDayKey } from "../ui/hooks/use-edit/transform/drag-and-shift-others";
 
@@ -60,24 +67,14 @@ export function createTimestamp(
 }
 
 export function getTasksWithUpdatedDay(tasks: Tasks) {
-  const newDayToTask = Object.entries(tasks)
+  return Object.entries(tasks)
     .flatMap(([dayKey, tasks]) =>
       tasks.withTime.map((task) => ({ dayKey, task })),
     )
-    .filter(({ dayKey, task }) => dayKey !== getDayKey(task.startTime));
-
-  return newDayToTask.reduce<Record<string, Task[]>>(
-    (result, { dayKey, task }) => {
-      if (dayKey in result) {
-        result[dayKey].push(task);
-      } else {
-        result[dayKey] = [task];
-      }
-
-      return result;
-    },
-    {},
-  );
+    .filter(
+      ({ dayKey, task }) =>
+        !task.isGhost && dayKey !== getDayKey(task.startTime),
+    );
 }
 
 export function areValuesEmpty(record: Record<string, [] | object>) {
@@ -100,7 +97,7 @@ function getTasksWithUpdatedTime(
 ) {
   const pristine = getPristine(flatBaseline, flatNext);
 
-  return difference(flatNext, pristine);
+  return difference(flatNext, pristine).filter((task) => !task.isGhost);
 }
 
 export function getDiff(baseline: Tasks, next: Tasks) {
@@ -111,6 +108,51 @@ export function getDiff(baseline: Tasks, next: Tasks) {
     updatedTime: getTasksWithUpdatedTime(flatBaseline, flatNext),
     updatedDay: getTasksWithUpdatedDay(next),
     created: getCreatedTasks(flatBaseline, flatNext),
+  };
+}
+
+// todo: broken?
+function taskLineToString(task: Task) {
+  return `${task.listTokens}${createTimestamp(
+    task.startMinutes,
+    task.durationMinutes,
+    get(settings).timestampFormat,
+  )} ${task.firstLineText}`;
+}
+
+function updateScheduledPropInText(text: string, dayKey: string) {
+  const updated = text
+    .replace(shortScheduledPropRegExp, `$1${dayKey}`)
+    .replace(scheduledPropRegExp, `$1${dayKey}$2`)
+    .replace(keylessScheduledPropRegExp, `$1${dayKey}$2`);
+
+  if (updated !== text) {
+    return updated;
+  }
+
+  return `${text} ⌛ ${dayKey}`;
+}
+
+function updateTaskText(task: Task) {
+  return { ...task, firstLineText: taskLineToString(task) };
+}
+
+function updateTaskScheduledDay(task: Task, dayKey: string) {
+  return {
+    ...task,
+    firstLineText: updateScheduledPropInText(task.firstLineText, dayKey),
+  };
+}
+
+export function updateText(diff: Diff) {
+  return {
+    created: diff.created.map(updateTaskText),
+    updated: [
+      ...diff.updatedTime.map(updateTaskText),
+      ...diff.updatedDay.map(({ dayKey, task }) =>
+        updateTaskText(updateTaskScheduledDay(task, dayKey)),
+      ),
+    ],
   };
 }
 

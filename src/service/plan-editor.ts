@@ -3,9 +3,8 @@ import type { CachedMetadata } from "obsidian";
 
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
-import type { Diff, Task, Timestamp } from "../types";
+import type { Task } from "../types";
 import { createDailyNoteIfNeeded } from "../util/daily-notes";
-import { createTimestamp } from "../util/task-utils";
 
 import type { ObsidianFacade } from "./obsidian-facade";
 
@@ -28,21 +27,25 @@ export class PlanEditor {
     );
   }
 
-  syncTasksWithFile = async (diff: Diff) => {
-    const tasks = await this.ensureFilesForTasks(unsafeTasks);
-
+  syncTasksWithFile = async ({
+    updated,
+    created,
+  }: {
+    updated: Task[];
+    created: Task[];
+  }) => {
     if (created.length > 1) {
       throw new Error("Creating more than 1 task is not supported");
     }
 
-    if (edited.length > 0 && created.length > 0) {
+    if (updated.length > 0 && created.length > 0) {
       throw new Error(
         "Creating and editing at the same time is not supported and might cause inconsistent behaviors due to race conditions",
       );
     }
 
     if (created.length > 0) {
-      const task = created[0];
+      const [task] = await this.ensureFilesForTasks(created);
 
       await this.obsidianFacade.editFile(task.location.path, (contents) => {
         return this.writeTaskToFileContents(task, contents);
@@ -51,7 +54,7 @@ export class PlanEditor {
 
     const pathToEditedTasksLookup = groupBy(
       (task) => task.location.path,
-      edited,
+      updated,
     );
 
     const editPromises = Object.keys(pathToEditedTasksLookup).map(
@@ -77,7 +80,7 @@ export class PlanEditor {
 
     const result = [...splitContents];
 
-    result.splice(planEndLine + 1, 0, this.taskLineToString(task, { ...task }));
+    result.splice(planEndLine + 1, 0, task.firstLineText);
 
     return result.join("\n");
   }
@@ -94,16 +97,10 @@ export class PlanEditor {
     return contents
       .split("\n")
       .map((line, index) => {
-        // todo: if a task is newly created, it's not going to have a line. We need a clearer way to track this information
-        //  once this is done, remove optional chaining
         if (index === task.location?.line) {
-          const taskAsString = this.taskLineToString(task, {
-            startMinutes: task.startMinutes,
-            durationMinutes: task.durationMinutes,
-          });
-
           return (
-            line.substring(0, task.location.position.start.col) + taskAsString
+            line.substring(0, task.location.position.start.col) +
+            task.firstLineText
           );
         }
 
@@ -139,16 +136,5 @@ export class PlanEditor {
     const withNewPlan = [...contents, "", this.createPlannerHeading(), ""];
 
     return [withNewPlan.length, withNewPlan];
-  }
-
-  private taskLineToString(
-    task: Task,
-    { startMinutes, durationMinutes }: Timestamp,
-  ) {
-    return `${task.listTokens}${createTimestamp(
-      startMinutes,
-      durationMinutes,
-      this.settings().timestampFormat,
-    )} ${task.firstLineText}`;
   }
 }
