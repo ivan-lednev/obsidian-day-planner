@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Moment } from "moment";
   import { getContext } from "svelte";
   import { writable } from "svelte/store";
 
@@ -11,7 +12,6 @@
   import { getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
-  import { useEditHandlers } from "../hooks/use-edit-handlers";
 
   import Banner from "./banner.svelte";
   import Column from "./column.svelte";
@@ -87,7 +87,7 @@
   {/if}
 
   <Column visibleHours={getVisibleHours($settings)}>
-    {#if isToday(day)}
+    {#if isToday(actualDay)}
       <Needle {autoScrollBlocked} />
     {/if}
 
@@ -96,6 +96,7 @@
       {pointerOffsetY}
       on:mousedown={handleMouseDown}
       on:mouseup={confirmEdit}
+      on:mouseenter={handleMouseEnter}
     >
       {#if $editStatus && $settings.showHelp}
         <Banner />
