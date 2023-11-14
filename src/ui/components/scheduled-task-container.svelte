@@ -10,20 +10,17 @@
   let el: HTMLDivElement;
 </script>
 
-<svelte:document
+<!--todo: prevent propagation in handler -->
+<div
+  bind:this={el}
+  style:cursor
+  class="tasks absolute-stretch-x"
   on:mousemove={(event) => {
     const viewportToElOffsetY = el.getBoundingClientRect().top;
     const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
 
     pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings.zoomLevel));
   }}
-/>
-
-<!--todo: prevent propagation in handler -->
-<div
-  bind:this={el}
-  style:cursor
-  class="tasks absolute-stretch-x"
   on:mousedown
   on:mouseup|stopPropagation
   on:mouseenter
