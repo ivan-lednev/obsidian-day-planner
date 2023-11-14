@@ -139,7 +139,6 @@ describe("moving tasks between containers", () => {
       });
 
     moveCursorTo("01:00");
-    todayControls.handleMouseEnter();
     todayControls.handleMouseDown();
     nextDayControls.handleMouseEnter();
     moveCursorTo("02:00");
@@ -153,4 +152,6 @@ describe("moving tasks between containers", () => {
       },
     });
   });
+
+  test.todo("resize doesn't work between days");
 });
