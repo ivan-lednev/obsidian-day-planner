@@ -1,7 +1,14 @@
 import { difference, differenceBy } from "lodash/fp";
 import { Moment } from "moment/moment";
 
-import { Diff, PlacedTask, Task, Tasks, TasksForDay } from "../types";
+import {
+  Diff,
+  PlacedTask,
+  Task,
+  Tasks,
+  TasksForDay,
+  UnscheduledTask,
+} from "../types";
 import {
   getDayKey,
   moveTaskToDay,
@@ -19,6 +26,13 @@ export function getEmptyTasksForDay(): TasksForDay {
 
 export function getTasksWithTime(tasks: Tasks) {
   return Object.values(tasks).flatMap(({ withTime }) => withTime);
+}
+
+export function getFlatTasks(tasks: Tasks) {
+  return Object.values(tasks).flatMap(({ withTime, noTime }) => [
+    ...withTime,
+    ...noTime,
+  ]);
 }
 
 export function removeTask(task: Task, tasks: TasksForDay) {
@@ -71,27 +85,24 @@ function getPristine(flatBaseline: PlacedTask[], flatNext: PlacedTask[]) {
   );
 }
 
-function getCreatedTasks(flatBaseline: PlacedTask[], flatNext: PlacedTask[]) {
-  return differenceBy((task) => task.id, flatNext, flatBaseline);
+function getCreatedTasks(base: UnscheduledTask[], next: UnscheduledTask[]) {
+  return differenceBy((task) => task.id, next, base);
 }
 
-function getTasksWithUpdatedTime(
-  flatBaseline: PlacedTask[],
-  flatNext: PlacedTask[],
-) {
-  const pristine = getPristine(flatBaseline, flatNext);
+function getTasksWithUpdatedTime(base: PlacedTask[], next: PlacedTask[]) {
+  const pristine = getPristine(base, next);
 
-  return difference(flatNext, pristine).filter((task) => !task.isGhost);
+  return difference(next, pristine).filter((task) => !task.isGhost);
 }
 
-export function getDiff(baseline: Tasks, next: Tasks) {
-  const flatBaseline = getTasksWithTime(baseline);
-  const flatNext = getTasksWithTime(next);
-
+export function getDiff(base: Tasks, next: Tasks) {
   return {
-    updatedTime: getTasksWithUpdatedTime(flatBaseline, flatNext),
+    updatedTime: getTasksWithUpdatedTime(
+      getTasksWithTime(base),
+      getTasksWithTime(next),
+    ),
     updatedDay: getTasksWithUpdatedDay(next),
-    created: getCreatedTasks(flatBaseline, flatNext),
+    created: getCreatedTasks(getFlatTasks(base), getFlatTasks(next)),
   };
 }
 

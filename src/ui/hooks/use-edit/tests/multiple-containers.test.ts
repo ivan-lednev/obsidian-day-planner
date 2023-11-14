@@ -4,7 +4,13 @@ import { Tasks } from "../../../../types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 
-import { baseTasks, dayKey, emptyTasks, nextDayKey } from "./util/fixtures";
+import {
+  baseTasks,
+  dayKey,
+  emptyTasks,
+  nextDayKey,
+  unscheduledTask,
+} from "./util/fixtures";
 import { setUp } from "./util/setup";
 
 describe("moving tasks between containers", () => {
@@ -24,20 +30,9 @@ describe("moving tasks between containers", () => {
   test.todo("moving a task to day without a note");
 
   test("scheduling works between days", () => {
-    const tasks: Tasks = {
-      [dayKey]: {
-        withTime: [],
-        noTime: [baseTask],
-      },
-      [nextDayKey]: {
-        withTime: [],
-        noTime: [],
-      },
-    };
-
     const { todayControls, nextDayControls, moveCursorTo, displayedTasks } =
       setUp({
-        tasks,
+        tasks: unscheduledTask,
       });
 
     todayControls.handleGripMouseDown({} as MouseEvent, baseTask);

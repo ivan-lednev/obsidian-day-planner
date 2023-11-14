@@ -5,7 +5,7 @@ import { Readable, Writable } from "svelte/store";
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import type { ObsidianFacade } from "./service/obsidian-facade";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
-import { getDiff } from "./util/tasks-utils";
+import { getDiff, updateText } from "./util/tasks-utils";
 
 export interface TaskLocation {
   path: string;
@@ -13,7 +13,9 @@ export interface TaskLocation {
   position: Pos;
 }
 
-export type OnUpdateFn = (diff: Diff) => Promise<void | void[]>;
+export type OnUpdateFn = (
+  taskUpdate: ReturnType<typeof updateText>,
+) => Promise<void | void[]>;
 
 export type Diff = ReturnType<typeof getDiff>;
 

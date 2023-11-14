@@ -20,3 +20,8 @@ export const baseTasks: Record<string, TasksForDay> = {
   [dayKey]: { withTime: [baseTask], noTime: [] },
   [nextDayKey]: { withTime: [], noTime: [] },
 };
+
+export const unscheduledTask: Record<string, TasksForDay> = {
+  [dayKey]: { withTime: [], noTime: [baseTask] },
+  [nextDayKey]: { withTime: [], noTime: [] },
+};

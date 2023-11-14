@@ -1,7 +1,7 @@
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 
-import { emptyTasks } from "./util/fixtures";
+import { emptyTasks, unscheduledTask } from "./util/fixtures";
 import { setUp } from "./util/setup";
 
 describe("Finding diff before writing updates to files", () => {
@@ -52,6 +52,28 @@ describe("Finding diff before writing updates to files", () => {
 
     expect(props.onUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
+        updated: [
+          expect.objectContaining({
+            startMinutes: toMinutes("2:00"),
+          }),
+        ],
+      }),
+    );
+  });
+
+  test("Finds newly scheduled tasks", async () => {
+    const { todayControls, confirmEdit, props, moveCursorTo } = setUp({
+      tasks: unscheduledTask,
+    });
+
+    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    moveCursorTo("2:00");
+
+    await confirmEdit();
+
+    expect(props.onUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        created: [],
         updated: [
           expect.objectContaining({
             startMinutes: toMinutes("2:00"),

@@ -1,3 +1,4 @@
+import { produce } from "immer";
 import { isNotVoid } from "typed-assert";
 
 import type { Tasks } from "../../../../types";
@@ -9,7 +10,6 @@ import { drag } from "./drag";
 import { dragAndShiftOthers, getDayKey } from "./drag-and-shift-others";
 import { resize } from "./resize";
 import { resizeAndShiftOthers } from "./resize-and-shift-others";
-import { produce } from "immer";
 
 const transformers: Record<EditMode, typeof drag> = {
   [EditMode.DRAG]: drag,
