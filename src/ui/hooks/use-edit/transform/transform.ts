@@ -9,6 +9,7 @@ import { drag } from "./drag";
 import { dragAndShiftOthers, getDayKey } from "./drag-and-shift-others";
 import { resize } from "./resize";
 import { resizeAndShiftOthers } from "./resize-and-shift-others";
+import { produce } from "immer";
 
 const transformers: Record<EditMode, typeof drag> = {
   [EditMode.DRAG]: drag,
@@ -46,6 +47,9 @@ export function transform(
   }
 
   const destTasks = withTaskInRightColumn[destKey];
+  const withTimeSorted = produce(destTasks.withTime, (draft) =>
+    draft.sort((a, b) => a.startMinutes - b.startMinutes),
+  );
   const transformFn = transformers[operation.mode];
 
   isNotVoid(transformFn, `No transformer for operation: ${operation.mode}`);
@@ -54,11 +58,7 @@ export function transform(
     ...withTaskInRightColumn,
     [destKey]: {
       ...destTasks,
-      withTime: transformFn(
-        destTasks.withTime.sort((a, b) => a.startMinutes - b.startMinutes),
-        operation.task,
-        cursorMinutes,
-      ),
+      withTime: transformFn(withTimeSorted, operation.task, cursorMinutes),
     },
   };
 }
