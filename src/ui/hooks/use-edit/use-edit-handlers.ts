@@ -8,7 +8,7 @@ import { copy, createTask } from "../../../util/task-utils";
 import { EditMode, EditOperation } from "./types";
 
 export interface UseEditHandlersProps {
-  startEdit: any;
+  startEdit: (operation: EditOperation) => void;
   day: Moment;
   obsidianFacade: ObsidianFacade;
   cursorMinutes: Readable<number>;

@@ -20,6 +20,8 @@ export interface UseEditContextProps {
   visibleTasks: Record<string, TasksForDay>;
 }
 
+export type EditContext = ReturnType<typeof useEditContext>;
+
 export function useEditContext({
   obsidianFacade,
   onUpdate,

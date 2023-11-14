@@ -24,8 +24,11 @@ import { getScheduledDay } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
-import { Task, TasksForDay } from "./types";
-import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
+import { TasksForDay } from "./types";
+import {
+  EditContext,
+  useEditContext,
+} from "./ui/hooks/use-edit/use-edit-context";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
@@ -45,7 +48,7 @@ export default class DayPlanner extends Plugin {
   private dataviewTasks: Readable<DataArray<STask>>;
   private readonly dataviewLoaded = writable(false);
   private readonly fileSyncInProgress = writable(false);
-  private editContext: any;
+  private editContext: Readable<EditContext>;
 
   async onload() {
     await this.initSettingsStore();
@@ -236,10 +239,6 @@ export default class DayPlanner extends Plugin {
     );
   }
 
-  private syncTasksWithFiles = async (tasks: Task[]) => {
-    await this.planEditor.syncTasksWithFile(tasks);
-  };
-
   renderMarkdown = (el: HTMLElement, text: string) => {
     const loader = new Component();
 
@@ -286,7 +285,7 @@ export default class DayPlanner extends Plugin {
       ([$settings, $visibleTasks]) => {
         return useEditContext({
           obsidianFacade: this.obsidianFacade,
-          onUpdate: this.syncTasksWithFiles,
+          onUpdate: this.planEditor.syncTasksWithFile,
           // todo: remove
           fileSyncInProgress: this.fileSyncInProgress,
           settings: $settings,

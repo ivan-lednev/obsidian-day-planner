@@ -124,7 +124,10 @@ describe("drag", () => {
 
       expect(get(displayedTasks)).toMatchObject({
         [dayKey]: {
-          withTime: [{ startMinutes: toMinutes("21:00") }, { startMinutes: toMinutes("22:00")}],
+          withTime: [
+            { startMinutes: toMinutes("21:00") },
+            { startMinutes: toMinutes("22:00") },
+          ],
         },
       });
 
@@ -132,7 +135,10 @@ describe("drag", () => {
 
       expect(get(displayedTasks)).toMatchObject({
         [dayKey]: {
-          withTime: [{ startMinutes: toMinutes("21:00") }, { startMinutes: toMinutes("22:00")}],
+          withTime: [
+            { startMinutes: toMinutes("21:00") },
+            { startMinutes: toMinutes("22:00") },
+          ],
         },
       });
     });

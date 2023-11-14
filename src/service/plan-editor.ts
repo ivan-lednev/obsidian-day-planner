@@ -48,6 +48,7 @@ export class PlanEditor {
       const [task] = await this.ensureFilesForTasks(created);
 
       await this.obsidianFacade.editFile(task.location.path, (contents) => {
+        // @ts-ignore
         return this.writeTaskToFileContents(task, contents);
       });
     }
