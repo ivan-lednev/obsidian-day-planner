@@ -101,6 +101,40 @@ describe("drag", () => {
       });
     });
 
-    test.todo("tasks stop moving once there is not enough time");
+    test.skip("tasks stop moving once there is not enough time", () => {
+      const tasks: Tasks = {
+        [dayKey]: {
+          withTime: [
+            baseTask,
+            { ...baseTask, id: "2", startMinutes: toMinutes("03:00") },
+          ],
+          noTime: [],
+        },
+      };
+
+      const { todayControls, moveCursorTo, displayedTasks } = setUp({
+        tasks,
+      });
+
+      todayControls.handleGripMouseDown(
+        { ctrlKey: true } as MouseEvent,
+        baseTask,
+      );
+      moveCursorTo("21:00");
+
+      expect(get(displayedTasks)).toMatchObject({
+        [dayKey]: {
+          withTime: [{ startMinutes: toMinutes("21:00") }, { startMinutes: toMinutes("22:00")}],
+        },
+      });
+
+      moveCursorTo("22:00");
+
+      expect(get(displayedTasks)).toMatchObject({
+        [dayKey]: {
+          withTime: [{ startMinutes: toMinutes("21:00") }, { startMinutes: toMinutes("22:00")}],
+        },
+      });
+    });
   });
 });
