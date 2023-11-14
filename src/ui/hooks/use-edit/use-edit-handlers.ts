@@ -68,7 +68,7 @@ export function useEditHandlers({
       startTime: window.moment(),
     };
 
-    startEdit({ task: withAddedTime, mode: EditMode.SCHEDULE, day });
+    startEdit({ task: withAddedTime, mode: EditMode.DRAG, day });
   }
 
   return {

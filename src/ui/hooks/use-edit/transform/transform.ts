@@ -7,27 +7,45 @@ import { EditMode, EditOperation } from "../types";
 import { create } from "./create";
 import { drag } from "./drag";
 import { dragAndShiftOthers, getDayKey } from "./drag-and-shift-others";
+import { resize } from "./resize";
+import { resizeAndShiftOthers } from "./resize-and-shift-others";
 
-const transformers: Partial<Record<EditMode, typeof drag>> = {
+const transformers: Record<EditMode, typeof drag> = {
   [EditMode.DRAG]: drag,
   [EditMode.DRAG_AND_SHIFT_OTHERS]: dragAndShiftOthers,
   [EditMode.CREATE]: create,
+  [EditMode.RESIZE]: resize,
+  [EditMode.RESIZE_AND_SHIFT_OTHERS]: resizeAndShiftOthers,
 };
+
+const multidayModes: Partial<EditMode[]> = [
+  EditMode.DRAG,
+  EditMode.DRAG_AND_SHIFT_OTHERS,
+  EditMode.CREATE,
+];
+
+function isMultiday(mode: EditMode) {
+  return multidayModes.includes(mode);
+}
 
 export function transform(
   baseline: Tasks,
   cursorMinutes: number,
   operation: EditOperation,
 ) {
-  const withTaskInRightColumn = moveTaskToColumn(
-    operation.day,
-    operation.task,
-    baseline,
-  );
+  let withTaskInRightColumn = baseline;
+  let destKey = getDayKey(operation.task.startTime);
 
-  const destKey = getDayKey(operation.day);
+  if (isMultiday(operation.mode)) {
+    withTaskInRightColumn = moveTaskToColumn(
+      operation.day,
+      operation.task,
+      baseline,
+    );
+    destKey = getDayKey(operation.day);
+  }
+
   const destTasks = withTaskInRightColumn[destKey];
-
   const transformFn = transformers[operation.mode];
 
   isNotVoid(transformFn, `No transformer for operation: ${operation.mode}`);

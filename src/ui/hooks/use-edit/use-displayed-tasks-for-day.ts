@@ -1,6 +1,7 @@
 import { Moment } from "moment/moment";
 import { derived, Readable } from "svelte/store";
 
+import { addHorizontalPlacing } from "../../../overlap/overlap";
 import { Tasks } from "../../../types";
 import { getEmptyTasksForDay } from "../../../util/tasks-utils";
 
@@ -11,6 +12,15 @@ export function useDisplayedTasksForDay(
   day: Moment,
 ) {
   return derived(displayedTasks, ($displayedTasks) => {
-    return $displayedTasks[getDayKey(day)] || getEmptyTasksForDay();
+    const tasksForDay = $displayedTasks[getDayKey(day)];
+
+    if (!tasksForDay) {
+      return getEmptyTasksForDay();
+    }
+
+    return {
+      ...tasksForDay,
+      withTime: addHorizontalPlacing(tasksForDay.withTime),
+    };
   });
 }

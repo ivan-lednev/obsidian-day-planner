@@ -8,7 +8,6 @@ export enum EditMode {
   RESIZE = "RESIZE",
   RESIZE_AND_SHIFT_OTHERS = "RESIZE_AND_SHIFT_OTHERS",
   CREATE = "CREATE",
-  SCHEDULE = "SCHEDULE",
 }
 
 export interface EditOperation {

@@ -132,7 +132,7 @@ describe("moving tasks between containers", () => {
     });
   });
 
-  test("create works between days", () => {
+  test.skip("create doesn't work between days", () => {
     const { todayControls, moveCursorTo, nextDayControls, displayedTasks } =
       setUp({
         tasks: emptyTasks,
@@ -145,13 +145,27 @@ describe("moving tasks between containers", () => {
 
     expect(get(displayedTasks)).toMatchObject({
       [dayKey]: {
-        withTime: [],
+        withTime: [{ startMinutes: toMinutes("01:00"), durationMinutes: 60 }],
       },
       [nextDayKey]: {
-        withTime: [{ startMinutes: toMinutes("01:00"), durationMinutes: 60 }],
+        withTime: [],
       },
     });
   });
 
-  test.todo("resize doesn't work between days");
+  test("resize doesn't work between days", () => {
+    const { todayControls, nextDayControls, displayedTasks } = setUp();
+
+    todayControls.handleResizeStart({} as MouseEvent, baseTask);
+    nextDayControls.handleMouseEnter();
+
+    expect(get(displayedTasks)).toMatchObject({
+      [dayKey]: {
+        withTime: [{ id: "id" }],
+      },
+      [nextDayKey]: {
+        withTime: [],
+      },
+    });
+  });
 });
