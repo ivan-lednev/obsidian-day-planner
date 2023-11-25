@@ -1,10 +1,11 @@
 import type { Moment } from "moment";
-import { MetadataCache, Pos } from "obsidian";
-import { Readable, Writable } from "svelte/store";
+import { Pos } from "obsidian";
+import { Writable } from "svelte/store";
 
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
+import { PlannedItem, PlannedItems } from "./planned-items/planned-items";
 import type { ObsidianFacade } from "./service/obsidian-facade";
-import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
+import { PlanEditor } from "./service/plan-editor";
 import { getDiff, updateText } from "./util/tasks-utils";
 
 export interface TaskLocation {
@@ -72,13 +73,10 @@ export type GetTasksForDay = (day: Moment) => TasksForDay;
 
 export interface ObsidianContext {
   obsidianFacade: ObsidianFacade;
-  metadataCache: MetadataCache;
-  onUpdate: OnUpdateFn;
   initWeeklyView: () => Promise<void>;
-  getTasksForDay: Readable<GetTasksForDay>;
   refreshTasks: (source: string) => void;
   dataviewLoaded: Writable<boolean>;
   renderMarkdown: RenderMarkdown;
-  editContext: Readable<ReturnType<typeof useEditContext>>;
-  visibleTasks: Readable<Tasks>;
+  plannedItems: PlannedItems<PlannedItem>;
+  planEditor: PlanEditor;
 }

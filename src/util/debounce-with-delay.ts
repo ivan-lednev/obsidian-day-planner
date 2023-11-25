@@ -15,9 +15,11 @@ export function debounceWithDelay(
   function debouncedFn(...args: unknown[]) {
     lastArgs = args;
 
-    if (!lastTimeout) {
-      set();
+    if (lastTimeout) {
+      clearTimeout(lastTimeout);
     }
+
+    set();
   }
 
   function delay() {

@@ -10,22 +10,22 @@ import { getAPI } from "obsidian-dataview";
 import { derived, get, writable, Writable } from "svelte/store";
 
 import { obsidianContext, viewTypeTimeline, viewTypeWeekly } from "./constants";
-import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
+import CompositeLoader from "./planned-items/loader/composite-loader";
+import DailyNotesItemLoader from "./planned-items/loader/daily-notes-item-loader";
+import NullLoader from "./planned-items/loader/null-loader";
+import { ProfilingWrapper } from "./planned-items/loader/profiling-wrapper";
+import ScheduledTasksLoader from "./planned-items/loader/scheduled-tasks-loader";
+import { PlannedItem, PlannedItems } from "./planned-items/planned-items";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
-import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
-import { useDebouncedDataviewTasks } from "./ui/hooks/use-debounced-dataview-tasks";
-import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
-import { useVisibleTasks } from "./ui/hooks/use-visible-tasks";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { isToday } from "./util/moment";
-import { getDayKey } from "./util/tasks-utils";
 
 export default class DayPlanner extends Plugin {
   settings: () => DayPlannerSettings;
@@ -33,9 +33,11 @@ export default class DayPlanner extends Plugin {
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
   private readonly dataviewLoaded = writable(false);
+  private plannedItems: PlannedItems<PlannedItem>;
 
   async onload() {
     await this.initSettingsStore();
+    this.initPlannedItems();
 
     this.obsidianFacade = new ObsidianFacade(this.app);
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
@@ -49,73 +51,46 @@ export default class DayPlanner extends Plugin {
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
   }
 
-  async onunload() {
-    await this.detachLeavesOfType(viewTypeTimeline);
-    await this.detachLeavesOfType(viewTypeWeekly);
-  }
-
-  initWeeklyLeaf = async () => {
-    await this.detachLeavesOfType(viewTypeWeekly);
-    await this.app.workspace.getLeaf(false).setViewState({
-      type: viewTypeWeekly,
-      active: true,
-    });
-  };
-
-  initTimelineLeaf = async () => {
-    await this.detachLeavesOfType(viewTypeTimeline);
-    await this.app.workspace.getRightLeaf(false).setViewState({
-      type: viewTypeTimeline,
-      active: true,
-    });
-    this.app.workspace.rightSplit.expand();
-  };
-
-  renderMarkdown = (el: HTMLElement, text: string) => {
-    const loader = new Component();
-
-    el.empty();
-
-    // todo: investigate why `await` doesn't work as expected here
-    MarkdownRenderer.render(this.app, text, el, "", loader);
-
-    loader.load();
-
-    return () => loader.unload();
-  };
-
-  getAllTasks = () => {
-    const source = this.settings().dataviewSource;
-    return this.refreshTasks(source);
-  };
-
-  private refreshTasks = (source: string) => {
+  private initPlannedItems() {
     const dataview = getAPI(this.app);
 
-    if (!dataview) {
-      return [];
+    let loader = new NullLoader();
+
+    if (dataview) {
+      this.dataviewLoaded.set(true);
+
+      loader = new CompositeLoader([
+        new ProfilingWrapper(new DailyNotesItemLoader(dataview)),
+        new ProfilingWrapper(new ScheduledTasksLoader(dataview)),
+      ]);
     }
 
-    this.dataviewLoaded.set(true);
+    this.plannedItems = new PlannedItems(loader, 100);
 
-    performance.mark("query-start");
-    const result = dataview.pages(source).file.tasks;
-    performance.mark("query-end");
+    const refresh = () => {
+      this.plannedItems.refresh();
+    };
 
-    const measure = performance.measure(
-      "query-time",
-      "query-start",
-      "query-end",
+    const delayRefresh = () => {
+      this.plannedItems.delayRefresh();
+    };
+
+    this.app.metadataCache.on(
+      // @ts-expect-error
+      "dataview:metadata-change",
+      refresh,
     );
 
-    console.debug(
-      `obsidian-day-planner:
-  source: "${source}"
-  took: ${measure.duration} ms`,
-    );
+    document.addEventListener("keydown", delayRefresh);
 
-    return result;
-  };
+    const source = derived(this.settingsStore, ($settings) => {
+      return $settings.dataviewSource;
+    });
+
+    source.subscribe(() => {
+      refresh();
+    });
+  }
 
   private handleActiveLeafChanged = ({ view }: WorkspaceLeaf) => {
     if (!(view instanceof FileView) || !view.file) {
@@ -182,6 +157,41 @@ export default class DayPlanner extends Plugin {
     this.settings = () => get(settings);
   }
 
+  async onunload() {
+    await this.detachLeavesOfType(viewTypeTimeline);
+    await this.detachLeavesOfType(viewTypeWeekly);
+  }
+
+  initWeeklyLeaf = async () => {
+    await this.detachLeavesOfType(viewTypeWeekly);
+    await this.app.workspace.getLeaf(false).setViewState({
+      type: viewTypeWeekly,
+      active: true,
+    });
+  };
+
+  initTimelineLeaf = async () => {
+    await this.detachLeavesOfType(viewTypeTimeline);
+    await this.app.workspace.getRightLeaf(false).setViewState({
+      type: viewTypeTimeline,
+      active: true,
+    });
+    this.app.workspace.rightSplit.expand();
+  };
+
+  renderMarkdown = (el: HTMLElement, text: string) => {
+    const loader = new Component();
+
+    el.empty();
+
+    // todo: investigate why `await` doesn't work as expected here
+    MarkdownRenderer.render(this.app, text, el, "", loader);
+
+    loader.load();
+
+    return () => loader.unload();
+  };
+
   private async detachLeavesOfType(type: string) {
     // Although this is synchronous, without wrapping into a promise, weird things happen:
     // - when re-initializing the weekly view, it gets deleted every other time instead of getting re-created
@@ -190,52 +200,17 @@ export default class DayPlanner extends Plugin {
   }
 
   private registerViews() {
-    const dataviewTasks = useDebouncedDataviewTasks({
-      metadataCache: this.app.metadataCache,
-      getAllTasks: this.getAllTasks,
-    });
-
-    const visibleTasks = useVisibleTasks({ dataviewTasks });
-
-    const tasksForToday = derived(
-      [visibleTasks, currentTime],
-      ([$visibleTasks, $currentTime]) => {
-        return $visibleTasks[getDayKey($currentTime)];
-      },
-    );
-
-    // todo: think of a way to unwrap the hook from the derived store
-    const editContext = derived(
-      [this.settingsStore, visibleTasks],
-      ([$settings, $visibleTasks]) => {
-        return useEditContext({
-          obsidianFacade: this.obsidianFacade,
-          onUpdate: this.planEditor.syncTasksWithFile,
-          settings: $settings,
-          visibleTasks: $visibleTasks,
-        });
-      },
-    );
-
-    new StatusBarWidget({
-      target: this.addStatusBarItem(),
-      props: {
-        onClick: this.initTimelineLeaf,
-        tasksForToday,
-      },
-    });
-
     const componentContext = new Map([
       [
         obsidianContext,
         {
           obsidianFacade: this.obsidianFacade,
           initWeeklyView: this.initWeeklyLeaf,
-          refreshTasks: this.refreshTasks,
+          refreshTasks: () => this.plannedItems.refresh(),
           dataviewLoaded: this.dataviewLoaded,
           renderMarkdown: this.renderMarkdown,
-          editContext,
-          visibleTasks,
+          plannedItems: this.plannedItems,
+          planEditor: this.planEditor,
         },
       ],
     ]);

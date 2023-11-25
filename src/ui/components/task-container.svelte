@@ -6,11 +6,14 @@
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
+  import Day from "../../planned-items/day";
   import type { ObsidianContext } from "../../types";
+  import { mapToTasksForDay } from "../../util/get-tasks-for-day";
   import { isToday } from "../../util/moment";
   import { getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
+  import { useEditContext } from "../hooks/use-edit/use-edit-context";
 
   import Column from "./column.svelte";
   import Grip from "./grip.svelte";
@@ -26,12 +29,21 @@
 
   export let hideControls = false;
   export let day: Moment | undefined = undefined;
+  export let tasks = undefined;
+
+  const { plannedItems, planEditor } =
+    getContext<ObsidianContext>(obsidianContext);
 
   $: actualDay = day || $visibleDayInTimeline;
+  $: tasks = plannedItems.forDay(Day.fromMoment(actualDay || window.moment()));
 
-  const { editContext } = getContext<ObsidianContext>(obsidianContext);
+  $: editContext = useEditContext({
+    obsidianFacade: this.obsidianFacade,
+    onUpdate: planEditor.syncTasksWithFile,
+    settings: $settings,
+    visibleTasks: { [actualDay.format("YYYY-MM-DD")]: mapToTasksForDay(actualDay, $tasks, $settings) }
+  });
 
-  $: ({ confirmEdit, editOperation, getEditHandlers } = $editContext);
   $: ({
     displayedTasks,
     cancelEdit,
@@ -41,11 +53,13 @@
     handleGripMouseDown,
     handleUnscheduledTaskGripMouseDown,
     handleMouseEnter,
-    pointerOffsetY,
-  } = getEditHandlers(actualDay));
+    pointerOffsetY
+  } = editContext.getEditHandlers(actualDay));
+
+  $: ({ confirmEdit, editOperation } = editContext);
 
   $: ({ bodyCursor, gripCursor } = useCursor({
-    editMode: $editOperation?.mode,
+    editMode: undefined
   }));
 </script>
 
