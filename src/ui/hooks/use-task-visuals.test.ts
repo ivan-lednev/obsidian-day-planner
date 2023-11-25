@@ -18,7 +18,6 @@ function getBaseUseTaskProps() {
   };
 }
 
-// todo: use non-default zoom & start hours
 test("derives task offset from settings and time", () => {
   const { offset, height, relationToNow } = useTaskVisuals(
     { ...baseTask, startMinutes: toMinutes("13:00") },

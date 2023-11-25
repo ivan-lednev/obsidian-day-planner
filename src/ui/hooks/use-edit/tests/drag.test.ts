@@ -22,7 +22,7 @@ describe("drag", () => {
   });
 
   describe("drag many", () => {
-    test("tasks below react to shifting selected task once they start overlap", () => {
+    test("tasks below react to shifting selected task once there is overlap", () => {
       const middleTask = {
         ...baseTask,
         id: "2",

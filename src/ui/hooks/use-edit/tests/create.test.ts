@@ -12,8 +12,7 @@ describe("create", () => {
     });
 
     moveCursorTo("01:00");
-    todayControls.handleMouseEnter();
-    todayControls.handleMouseDown();
+    todayControls.handleContainerMouseDown();
     moveCursorTo("02:00");
 
     expect(get(displayedTasks)).toMatchObject({

@@ -1,13 +1,13 @@
 import { produce } from "immer";
 import { isNotVoid } from "typed-assert";
 
-import type { Tasks } from "../../../../types";
-import { moveTaskToColumn } from "../../../../util/tasks-utils";
+import type { Task, Tasks } from "../../../../types";
+import { getDayKey, moveTaskToColumn } from "../../../../util/tasks-utils";
 import { EditMode, EditOperation } from "../types";
 
 import { create } from "./create";
 import { drag } from "./drag";
-import { dragAndShiftOthers, getDayKey } from "./drag-and-shift-others";
+import { dragAndShiftOthers } from "./drag-and-shift-others";
 import { resize } from "./resize";
 import { resizeAndShiftOthers } from "./resize-and-shift-others";
 
@@ -28,14 +28,22 @@ function isMultiday(mode: EditMode) {
   return multidayModes.includes(mode);
 }
 
+function getDestDay(operation: EditOperation) {
+  return isMultiday(operation.mode) ? operation.day : operation.task.startTime;
+}
+
+function sortByStartMinutes(tasks: Task[]) {
+  return produce(tasks, (draft) =>
+    draft.sort((a, b) => a.startMinutes - b.startMinutes),
+  );
+}
+
 export function transform(
   baseline: Tasks,
   cursorMinutes: number,
   operation: EditOperation,
 ) {
-  const destDay = isMultiday(operation.mode)
-    ? operation.day
-    : operation.task.startTime;
+  const destDay = getDestDay(operation);
   const destKey = getDayKey(destDay);
 
   const withTaskInRightColumn = moveTaskToColumn(
@@ -45,10 +53,8 @@ export function transform(
   );
 
   const destTasks = withTaskInRightColumn[destKey];
-  const withTimeSorted = produce(destTasks.withTime, (draft) =>
-    draft.sort((a, b) => a.startMinutes - b.startMinutes),
-  );
   const transformFn = transformers[operation.mode];
+  const withTimeSorted = sortByStartMinutes(destTasks.withTime);
 
   isNotVoid(transformFn, `No transformer for operation: ${operation.mode}`);
 

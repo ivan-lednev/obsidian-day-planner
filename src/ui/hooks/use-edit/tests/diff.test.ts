@@ -1,7 +1,7 @@
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 
-import { emptyTasks, unscheduledTask } from "./util/fixtures";
+import { emptyTasks, nextDayKey, unscheduledTask } from "./util/fixtures";
 import { setUp } from "./util/setup";
 
 describe("Finding diff before writing updates to files", () => {
@@ -18,7 +18,7 @@ describe("Finding diff before writing updates to files", () => {
         updated: [
           expect.objectContaining({
             id: baseTask.id,
-            firstLineText: expect.stringContaining("⌛ 2023-01-02"),
+            firstLineText: expect.stringContaining(`⌛ ${nextDayKey}`),
           }),
         ],
       }),
@@ -30,7 +30,7 @@ describe("Finding diff before writing updates to files", () => {
       tasks: emptyTasks,
     });
 
-    todayControls.handleMouseDown();
+    todayControls.handleContainerMouseDown();
 
     await confirmEdit();
 
@@ -57,6 +57,7 @@ describe("Finding diff before writing updates to files", () => {
             startMinutes: toMinutes("2:00"),
           }),
         ],
+        created: []
       }),
     );
   });

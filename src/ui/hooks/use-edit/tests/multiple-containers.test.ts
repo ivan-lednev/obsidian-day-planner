@@ -132,7 +132,7 @@ describe("moving tasks between containers", () => {
       });
 
     moveCursorTo("01:00");
-    todayControls.handleMouseDown();
+    todayControls.handleContainerMouseDown();
     nextDayControls.handleMouseEnter();
     moveCursorTo("02:00");
 
@@ -149,7 +149,7 @@ describe("moving tasks between containers", () => {
   test("resize doesn't work between days", () => {
     const { todayControls, nextDayControls, displayedTasks } = setUp();
 
-    todayControls.handleResizeStart({} as MouseEvent, baseTask);
+    todayControls.handleResizerMouseDown({} as MouseEvent, baseTask);
     nextDayControls.handleMouseEnter();
 
     expect(get(displayedTasks)).toMatchObject({

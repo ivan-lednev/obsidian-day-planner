@@ -1,28 +1,7 @@
 import { last } from "lodash";
-import { Moment } from "moment";
-import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
-import type { PlacedTask, Task } from "../../../../types";
-import { Tasks } from "../../../../types";
+import type { PlacedTask } from "../../../../types";
 import { getEndMinutes } from "../../../../util/task-utils";
-import { addTaskWithTime, removeTask } from "../../../../util/tasks-utils";
-
-export function getDayKey(day: Moment) {
-  return day.format(DEFAULT_DAILY_NOTE_FORMAT);
-}
-
-export function moveTaskToDay(baseline: Tasks, task: Task, day: Moment) {
-  const sourceKey = getDayKey(task.startTime);
-  const destKey = getDayKey(day);
-  const source = baseline[sourceKey];
-  const dest = baseline[destKey];
-
-  return {
-    ...baseline,
-    [sourceKey]: removeTask(task, source),
-    [destKey]: addTaskWithTime(task, dest),
-  };
-}
 
 export function dragAndShiftOthers(
   baseline: PlacedTask[],

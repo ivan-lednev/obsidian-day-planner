@@ -9,16 +9,13 @@ import {
   TasksForDay,
   UnscheduledTask,
 } from "../types";
-import {
-  getDayKey,
-  moveTaskToDay,
-} from "../ui/hooks/use-edit/transform/drag-and-shift-others";
 
 import {
   isEqualTask,
   updateTaskScheduledDay,
   updateTaskText,
 } from "./task-utils";
+import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
 export function getEmptyTasksForDay(): TasksForDay {
   return { withTime: [], noTime: [] };
@@ -53,6 +50,23 @@ export function addTaskWithTime(task: Task, tasks: TasksForDay) {
 export function moveToTimed(task: Task, tasks: TasksForDay) {
   const withRemoved = removeTask(task, tasks);
   return { ...withRemoved, withTime: [...withRemoved.withTime, task] };
+}
+
+export function getDayKey(day: Moment) {
+  return day.format(DEFAULT_DAILY_NOTE_FORMAT);
+}
+
+export function moveTaskToDay(baseline: Tasks, task: Task, day: Moment) {
+  const sourceKey = getDayKey(task.startTime);
+  const destKey = getDayKey(day);
+  const source = baseline[sourceKey];
+  const dest = baseline[destKey];
+
+  return {
+    ...baseline,
+    [sourceKey]: removeTask(task, source),
+    [destKey]: addTaskWithTime(task, dest),
+  };
 }
 
 export function moveTaskToColumn(day: Moment, task: Task, baseline: Tasks) {

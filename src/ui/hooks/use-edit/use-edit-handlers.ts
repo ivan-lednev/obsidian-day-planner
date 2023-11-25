@@ -22,7 +22,7 @@ export function useEditHandlers({
   cursorMinutes,
   editOperation,
 }: UseEditHandlersProps) {
-  function handleMouseDown() {
+  function handleContainerMouseDown() {
     const newTask = createTask(day, get(cursorMinutes));
 
     startEdit({
@@ -32,7 +32,7 @@ export function useEditHandlers({
     });
   }
 
-  function handleResizeStart(event: MouseEvent, task: PlacedTask) {
+  function handleResizerMouseDown(event: MouseEvent, task: PlacedTask) {
     const mode = event.ctrlKey
       ? EditMode.RESIZE_AND_SHIFT_OTHERS
       : EditMode.RESIZE;
@@ -59,12 +59,10 @@ export function useEditHandlers({
     }
   }
 
-  // todo: this might not be needed
-  function startScheduling(task: UnscheduledTask) {
+  function handleUnscheduledTaskGripMouseDown(task: UnscheduledTask) {
     const withAddedTime = {
       ...task,
       startMinutes: get(cursorMinutes),
-      // todo: remove this. It's added just for type compatibility
       startTime: window.moment(),
     };
 
@@ -72,10 +70,10 @@ export function useEditHandlers({
   }
 
   return {
-    handleMouseDown,
-    handleResizeStart,
-    handleTaskMouseUp,
     handleGripMouseDown,
-    startScheduling,
+    handleContainerMouseDown,
+    handleResizerMouseDown,
+    handleTaskMouseUp,
+    handleUnscheduledTaskGripMouseDown,
   };
 }

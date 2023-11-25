@@ -31,17 +31,18 @@
 
   $: actualDay = day || $visibleDayInTimeline;
 
+  // todo: remove fileSyncInProgress
   const { fileSyncInProgress, editContext } =
     getContext<ObsidianContext>(obsidianContext);
 
   $: ({
     displayedTasks,
     cancelEdit,
-    handleMouseDown,
-    handleResizeStart,
+    handleContainerMouseDown,
+    handleResizerMouseDown,
     handleTaskMouseUp,
     handleGripMouseDown,
-    startScheduling,
+    handleUnscheduledTaskGripMouseDown,
     handleMouseEnter,
     pointerOffsetY,
   } = $editContext.getEditHandlers(actualDay));
@@ -74,7 +75,7 @@
         >
           <Grip
             cursor={gripCursor}
-            on:mousedown={() => startScheduling(task)}
+            on:mousedown={() => handleUnscheduledTaskGripMouseDown(task)}
           />
         </Task>
       {/each}
@@ -94,7 +95,7 @@
     <ScheduledTaskContainer
       cursor={containerCursor}
       {pointerOffsetY}
-      on:mousedown={handleMouseDown}
+      on:mousedown={handleContainerMouseDown}
       on:mouseup={confirmEdit}
       on:mouseenter={handleMouseEnter}
     >
@@ -110,7 +111,7 @@
           />
           <ResizeHandle
             visible={!$editStatus && !$fileSyncInProgress}
-            on:mousedown={(event) => handleResizeStart(event, task)}
+            on:mousedown={(event) => handleResizerMouseDown(event, task)}
           />
         </ScheduledTask>
       {/each}

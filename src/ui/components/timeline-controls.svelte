@@ -176,7 +176,9 @@
   {#if !$dataviewLoaded}
     <div class="info-container">
       <AlertTriangle class="svg-icon mod-error" />
-      Dataview is not loaded, tasks won't be shown
+      You need to install and enable
+      <a href="https://github.com/blacksmithgu/obsidian-dataview">Dataview</a> for
+      the day planner to work.
     </div>
   {/if}
   {#if filterVisible}

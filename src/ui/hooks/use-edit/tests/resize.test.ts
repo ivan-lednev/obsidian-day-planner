@@ -11,7 +11,7 @@ describe("resize", () => {
   test("resizing changes duration", () => {
     const { todayControls, moveCursorTo, displayedTasks } = setUp();
 
-    todayControls.handleResizeStart({} as MouseEvent, baseTask);
+    todayControls.handleResizerMouseDown({} as MouseEvent, baseTask);
     moveCursorTo("03:00");
 
     expect(get(displayedTasks)).toMatchObject({
@@ -44,7 +44,7 @@ describe("resize", () => {
         tasks,
       });
 
-      todayControls.handleResizeStart(
+      todayControls.handleResizerMouseDown(
         { ctrlKey: true } as MouseEvent,
         middleTask,
       );

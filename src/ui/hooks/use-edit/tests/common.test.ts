@@ -7,7 +7,7 @@ import { dayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
 
 describe("drag one & common edit mechanics", () => {
-  test("after edit confirmation, tasks freeze and stop reacting to cursor", () => {
+  test("after edit confirmation, tasks freeze and stop reacting to cursor", async () => {
     const {
       todayControls,
       nextDayControls,
@@ -18,7 +18,7 @@ describe("drag one & common edit mechanics", () => {
 
     todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
     moveCursorTo("01:00");
-    confirmEdit();
+    await confirmEdit();
     nextDayControls.handleMouseEnter();
     moveCursorTo("03:00");
 
@@ -29,11 +29,11 @@ describe("drag one & common edit mechanics", () => {
     });
   });
 
-  test("when a task is set to its current time, nothing happens", () => {
+  test("when a task is set to its current time, nothing happens", async () => {
     const { todayControls, confirmEdit, props } = setUp();
 
     todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
-    confirmEdit();
+    await confirmEdit();
 
     expect(props.onUpdate).not.toHaveBeenCalled();
   });

@@ -82,8 +82,3 @@ export interface ObsidianContext {
   renderMarkdown: RenderMarkdown;
   editContext: Readable<ReturnType<typeof useEditContext>>;
 }
-
-export interface CursorPos {
-  minutes: number;
-  day: Moment;
-}
