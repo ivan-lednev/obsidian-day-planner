@@ -176,9 +176,11 @@
   {#if !$dataviewLoaded}
     <div class="info-container">
       <AlertTriangle class="svg-icon mod-error" />
-      You need to install and enable
-      <a href="https://github.com/blacksmithgu/obsidian-dataview">Dataview</a> for
-      the day planner to work.
+      <span
+        >You need to install and enable
+        <a href="https://github.com/blacksmithgu/obsidian-dataview">Dataview</a>
+        for the day planner to work.</span
+      >
     </div>
   {/if}
   {#if filterVisible}

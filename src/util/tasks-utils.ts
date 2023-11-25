@@ -1,5 +1,6 @@
 import { difference, differenceBy } from "lodash/fp";
 import { Moment } from "moment/moment";
+import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
 import {
   Diff,
@@ -15,7 +16,6 @@ import {
   updateTaskScheduledDay,
   updateTaskText,
 } from "./task-utils";
-import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
 export function getEmptyTasksForDay(): TasksForDay {
   return { withTime: [], noTime: [] };

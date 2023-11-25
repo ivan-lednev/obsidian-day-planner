@@ -37,7 +37,7 @@ import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { debounceWithDelay } from "./util/debounce-with-delay";
 import { mapToTasksForDay } from "./util/get-tasks-for-day";
 import { isToday } from "./util/moment";
-import { getEmptyTasksForDay } from "./util/tasks-utils";
+import { getDayKey, getEmptyTasksForDay } from "./util/tasks-utils";
 
 export default class DayPlanner extends Plugin {
   settings: () => DayPlannerSettings;
@@ -255,6 +255,13 @@ export default class DayPlanner extends Plugin {
     const visibleTasks = derived(
       [visibleDays, this.dataviewTasks, this.settingsStore],
       ([$visibleDays, $dataviewTasks, $settings]) => {
+        // todo: make this simpler
+        if ($dataviewTasks.length === 0) {
+          return Object.fromEntries(
+            $visibleDays.map((day) => [getDayKey(day), getEmptyTasksForDay()]),
+          );
+        }
+
         const dayToSTasksLookup: Record<string, STask[]> = Object.fromEntries(
           $dataviewTasks
             .groupBy(getScheduledDay)

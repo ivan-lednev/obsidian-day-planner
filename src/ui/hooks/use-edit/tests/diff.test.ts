@@ -57,7 +57,7 @@ describe("Finding diff before writing updates to files", () => {
             startMinutes: toMinutes("2:00"),
           }),
         ],
-        created: []
+        created: [],
       }),
     );
   });
