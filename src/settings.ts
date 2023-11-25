@@ -11,7 +11,6 @@ export interface DayPlannerSettings {
   startHour: number;
   timelineDateFormat: string;
   centerNeedle: boolean;
-  showHelp: boolean;
   plannerHeading: string;
   plannerHeadingLevel: number;
   timelineColored: boolean;
@@ -38,7 +37,6 @@ export const defaultSettings: DayPlannerSettings = {
   startHour: 6,
   timelineDateFormat: DEFAULT_DAILY_NOTE_FORMAT,
   centerNeedle: false,
-  showHelp: true,
   plannerHeading: "Day planner",
   plannerHeadingLevel: 1,
   timelineColored: false,

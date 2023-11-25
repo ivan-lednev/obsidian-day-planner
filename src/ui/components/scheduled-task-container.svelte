@@ -5,7 +5,6 @@
   import { settings } from "../../global-store/settings";
 
   export let pointerOffsetY: Writable<number>;
-  export let cursor: string;
 
   let el: HTMLDivElement;
 </script>
@@ -13,7 +12,6 @@
 <!--todo: prevent propagation in handler -->
 <div
   bind:this={el}
-  style:cursor
   class="tasks absolute-stretch-x"
   on:mousemove={(event) => {
     const viewportToElOffsetY = el.getBoundingClientRect().top;

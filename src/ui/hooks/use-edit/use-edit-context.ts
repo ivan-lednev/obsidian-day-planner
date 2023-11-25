@@ -78,5 +78,6 @@ export function useEditContext({
     displayedTasks,
     confirmEdit,
     getEditHandlers,
+    editOperation,
   };
 }

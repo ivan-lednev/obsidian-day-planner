@@ -2,18 +2,9 @@ import { EditMode } from "./types";
 
 interface UseCursorProps {
   editMode: EditMode;
-  editBlocked: boolean;
 }
 
-export function useCursor({ editMode, editBlocked }: UseCursorProps) {
-  if (editBlocked) {
-    return {
-      bodyCursor: "unset",
-      gripCursor: "wait",
-      containerCursor: "wait",
-    };
-  }
-
+export function useCursor({ editMode }: UseCursorProps) {
   if (
     editMode === EditMode.CREATE ||
     editMode === EditMode.DRAG ||

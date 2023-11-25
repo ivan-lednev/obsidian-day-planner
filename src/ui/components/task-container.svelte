@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Moment } from "moment";
   import { getContext } from "svelte";
-  import { writable } from "svelte/store";
 
   import { obsidianContext } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
@@ -13,7 +12,6 @@
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
 
-  import Banner from "./banner.svelte";
   import Column from "./column.svelte";
   import Grip from "./grip.svelte";
   import Needle from "./needle.svelte";
@@ -31,10 +29,9 @@
 
   $: actualDay = day || $visibleDayInTimeline;
 
-  // todo: remove fileSyncInProgress
-  const { fileSyncInProgress, editContext } =
-    getContext<ObsidianContext>(obsidianContext);
+  const { editContext } = getContext<ObsidianContext>(obsidianContext);
 
+  $: ({ confirmEdit, editOperation, getEditHandlers } = $editContext);
   $: ({
     displayedTasks,
     cancelEdit,
@@ -45,15 +42,10 @@
     handleUnscheduledTaskGripMouseDown,
     handleMouseEnter,
     pointerOffsetY,
-  } = $editContext.getEditHandlers(actualDay));
+  } = getEditHandlers(actualDay));
 
-  $: ({ confirmEdit } = $editContext);
-
-  const editStatus = writable(false);
-
-  $: ({ bodyCursor, gripCursor, containerCursor } = useCursor({
-    editBlocked: $fileSyncInProgress,
-    editMode: undefined,
+  $: ({ bodyCursor, gripCursor } = useCursor({
+    editMode: $editOperation?.mode,
   }));
 </script>
 
@@ -93,16 +85,11 @@
     {/if}
 
     <ScheduledTaskContainer
-      cursor={containerCursor}
       {pointerOffsetY}
       on:mousedown={handleContainerMouseDown}
       on:mouseup={confirmEdit}
       on:mouseenter={handleMouseEnter}
     >
-      {#if $editStatus && $settings.showHelp}
-        <Banner />
-      {/if}
-
       {#each $displayedTasks.withTime as task (getRenderKey(task))}
         <ScheduledTask {task} on:mouseup={() => handleTaskMouseUp(task)}>
           <Grip
@@ -110,7 +97,7 @@
             on:mousedown={(event) => handleGripMouseDown(event, task)}
           />
           <ResizeHandle
-            visible={!$editStatus && !$fileSyncInProgress}
+            visible={!$editOperation}
             on:mousedown={(event) => handleResizerMouseDown(event, task)}
           />
         </ScheduledTask>

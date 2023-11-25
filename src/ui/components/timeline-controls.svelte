@@ -283,21 +283,6 @@
           <input tabindex="0" type="checkbox" />
         </div>
       </SettingItem>
-
-      <SettingItem>
-        <svelte:fragment slot="name">Show help while dragging</svelte:fragment>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div
-          slot="control"
-          class="checkbox-container mod-small"
-          class:is-enabled={$settings.showHelp}
-          on:click={() => {
-            $settings.showHelp = !$settings.showHelp;
-          }}
-        >
-          <input tabindex="0" type="checkbox" />
-        </div>
-      </SettingItem>
     </div>
   {/if}
 </div>
