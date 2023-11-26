@@ -13,7 +13,7 @@ const hourMinuteSeparator = `[:. ]`;
 
 const date = "\\d{4}-\\d{2}-\\d{2}";
 
-const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))?\\s*([apAP][mM])?`;
+const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))?\\s*([apAP][mM](?!\\w))?`;
 
 export const timeRegExp = new RegExp(time);
 export const timeFromStartRegExp = new RegExp(`^${time}`);
