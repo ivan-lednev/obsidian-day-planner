@@ -196,8 +196,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Planner Heading")
       .setDesc(
-        `When you create a planner, this text is going to be in the heading.
-When you open a file, the plugin will search for this heading to detect a day plan`,
+        `When you create a planner, this text is going to be in the heading`,
       )
       .addText((component) =>
         component
