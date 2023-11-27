@@ -239,6 +239,22 @@
           on:input={handleZoomLevelInput}
         />
       </SettingItem>
+      <SettingItem>
+        <svelte:fragment slot="name">Auto-scroll to now</svelte:fragment>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div
+          slot="control"
+          class="checkbox-container mod-small"
+          class:is-enabled={$settings.centerNeedle}
+          on:click={() => {
+            $settings.centerNeedle = !$settings.centerNeedle;
+          }}
+        >
+          <input tabindex="0" type="checkbox" />
+        </div>
+      </SettingItem>
+
+      <div class="controls-section">Unscheduled tasks</div>
 
       <SettingItem>
         <svelte:fragment slot="name">Show unscheduled tasks</svelte:fragment>
@@ -258,6 +274,24 @@
       {#if $settings.showUncheduledTasks}
         <SettingItem>
           <svelte:fragment slot="name"
+            >Show unscheduled sub-tasks</svelte:fragment
+          >
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <div
+            slot="control"
+            class="checkbox-container mod-small"
+            class:is-enabled={$settings.showUnscheduledNestedTasks}
+            on:click={() => {
+              $settings.showUnscheduledNestedTasks =
+                !$settings.showUnscheduledNestedTasks;
+            }}
+          >
+            <input tabindex="0" type="checkbox" />
+          </div>
+        </SettingItem>
+
+        <SettingItem>
+          <svelte:fragment slot="name"
             >Unscheduled tasks height limit
           </svelte:fragment>
           <Dropdown
@@ -268,21 +302,6 @@
           />
         </SettingItem>
       {/if}
-
-      <SettingItem>
-        <svelte:fragment slot="name">Auto-scroll to now</svelte:fragment>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div
-          slot="control"
-          class="checkbox-container mod-small"
-          class:is-enabled={$settings.centerNeedle}
-          on:click={() => {
-            $settings.centerNeedle = !$settings.centerNeedle;
-          }}
-        >
-          <input tabindex="0" type="checkbox" />
-        </div>
-      </SettingItem>
     </div>
   {/if}
 </div>
@@ -335,6 +354,13 @@
     padding: var(--size-4-1);
     border: 1px solid var(--text-error);
     border-radius: var(--radius-s);
+  }
+
+  .controls-section {
+    font-weight: var(--font-medium);
+    margin: var(--size-4-2);
+    font-size: var(--font-ui-medium);
+    text-align: center;
   }
 
   .help-item {
