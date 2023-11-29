@@ -7,7 +7,10 @@ import { PlannedItem, PlannedItemLoader } from "../planned-items";
 export default class DailyNotesItemLoader
   implements PlannedItemLoader<PlannedItem>
 {
-  constructor(private dataview: DataviewApi) {}
+  constructor(
+    private dataview: DataviewApi,
+    private heading: string,
+  ) {}
 
   public async forDays(days: Set<Day>): Promise<Map<Day, Array<PlannedItem>>> {
     const allDailyNotes = getAllDailyNotes();
@@ -27,10 +30,34 @@ export default class DailyNotesItemLoader
 
       result.set(
         day,
-        tasks.filter((item) => !item.task || (item.task && !item.scheduled)),
+        tasks.filter((item) => this.isValidItem(item)),
       );
     }
 
     return result;
+  }
+
+  public setHeading(heading: string): void {
+    this.heading = heading;
+  }
+
+  private isValidItem(item: PlannedItem): boolean {
+    return (
+      this.inCorrectSection(item) &&
+      this.istopLevelItem(item) &&
+      this.islistItemOrUnscheduledTask(item)
+    );
+  }
+
+  private inCorrectSection(item: PlannedItem): boolean {
+    return item.section.subpath === this.heading;
+  }
+
+  private istopLevelItem(item: PlannedItem): boolean {
+    return !item.parent;
+  }
+
+  private islistItemOrUnscheduledTask(item: PlannedItem): boolean {
+    return !item.task || (item.task && !item.scheduled);
   }
 }

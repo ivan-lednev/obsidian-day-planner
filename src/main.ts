@@ -54,18 +54,25 @@ export default class DayPlanner extends Plugin {
   private initPlannedItems() {
     const dataview = getAPI(this.app);
 
-    let loader = new NullLoader();
-
-    if (dataview) {
-      this.dataviewLoaded.set(true);
-
-      loader = new CompositeLoader([
-        new ProfilingWrapper(new DailyNotesItemLoader(dataview)),
-        new ProfilingWrapper(new ScheduledTasksLoader(dataview)),
-      ]);
+    if (!dataview) {
+      this.plannedItems = new PlannedItems(new NullLoader(), 100);
+      return;
     }
 
-    this.plannedItems = new PlannedItems(loader, 100);
+    this.dataviewLoaded.set(true);
+
+    const dailyNotesItemLoader = new DailyNotesItemLoader(
+      dataview,
+      this.settings().plannerHeading,
+    );
+
+    this.plannedItems = new PlannedItems(
+      new CompositeLoader([
+        new ProfilingWrapper(dailyNotesItemLoader),
+        new ProfilingWrapper(new ScheduledTasksLoader(dataview)),
+      ]),
+      100,
+    );
 
     const refresh = () => {
       this.plannedItems.refresh();
@@ -81,15 +88,16 @@ export default class DayPlanner extends Plugin {
       refresh,
     );
 
-    document.addEventListener("keydown", delayRefresh);
-
-    const source = derived(this.settingsStore, ($settings) => {
-      return $settings.dataviewSource;
+    const plannerHeading = derived(this.settingsStore, ($settings) => {
+      return $settings.plannerHeading;
     });
 
-    source.subscribe(() => {
+    plannerHeading.subscribe((heading) => {
+      dailyNotesItemLoader.setHeading(heading);
       refresh();
     });
+
+    document.addEventListener("keydown", delayRefresh);
   }
 
   private handleActiveLeafChanged = ({ view }: WorkspaceLeaf) => {
