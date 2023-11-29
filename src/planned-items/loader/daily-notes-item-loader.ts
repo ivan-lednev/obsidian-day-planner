@@ -1,3 +1,4 @@
+import { TFile } from "obsidian";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { DataviewApi } from "obsidian-dataview";
 
@@ -17,21 +18,7 @@ export default class DailyNotesItemLoader
     const result = new Map();
 
     for (const day of days) {
-      const dailyNote = getDailyNote(window.moment(day.asIso()), allDailyNotes);
-      if (dailyNote === null) {
-        result.set(day, []);
-        continue;
-      }
-
-      const note = this.dataview.page(dailyNote.basename);
-
-      const tasks: Array<PlannedItem> =
-        typeof note === "undefined" ? [] : note.file.lists.values;
-
-      result.set(
-        day,
-        tasks.filter((item) => this.isValidItem(item)),
-      );
+      result.set(day, this.itemsFor(day, allDailyNotes));
     }
 
     return result;
@@ -41,11 +28,30 @@ export default class DailyNotesItemLoader
     this.heading = heading;
   }
 
+  private itemsFor(
+    day: Day,
+    allDailyNotes: Record<string, TFile>,
+  ): Array<PlannedItem> {
+    const dailyNote = getDailyNote(window.moment(day.asIso()), allDailyNotes);
+    if (dailyNote === null) {
+      return [];
+    }
+
+    const note = this.dataview.page(dailyNote.basename);
+    if (typeof note === "undefined") {
+      return [];
+    }
+
+    return note.file.lists.values.filter((item: PlannedItem) =>
+      this.isValidItem(item),
+    );
+  }
+
   private isValidItem(item: PlannedItem): boolean {
     return (
       this.inCorrectSection(item) &&
       this.istopLevelItem(item) &&
-      this.islistItemOrUnscheduledTask(item)
+      this.isListItemOrUnscheduledTask(item)
     );
   }
 
@@ -57,7 +63,7 @@ export default class DailyNotesItemLoader
     return !item.parent;
   }
 
-  private islistItemOrUnscheduledTask(item: PlannedItem): boolean {
+  private isListItemOrUnscheduledTask(item: PlannedItem): boolean {
     return !item.task || (item.task && !item.scheduled);
   }
 }
