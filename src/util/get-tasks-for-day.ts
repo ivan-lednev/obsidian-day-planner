@@ -83,6 +83,7 @@ export function mapToTasksForDay(
 
       return result;
     }, [])
+    // todo: sortByStartMinutes()
     .sort((a, b) => a.startMinutes - b.startMinutes);
 
   const noTime = withoutTime

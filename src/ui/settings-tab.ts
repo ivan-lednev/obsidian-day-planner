@@ -13,38 +13,10 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
     super(plugin.app, plugin);
   }
 
-  private update(patch: Partial<DayPlannerSettings>) {
-    this.settingsStore.update((previous) => ({ ...previous, ...patch }));
-  }
-
   display(): void {
     const { containerEl } = this;
 
     containerEl.empty();
-
-    new Setting(containerEl)
-      .setName("Status Bar - Circular Progress")
-      .setDesc("Display a circular progress bar in the status bar")
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings().circularProgress)
-          .onChange((value: boolean) => {
-            this.update({ circularProgress: value });
-          }),
-      );
-
-    new Setting(containerEl)
-      .setName("Status Bar - Now and Next")
-      .setDesc("Display now and next tasks in the status bar")
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings().nowAndNextInStatusBar)
-          .onChange((value: boolean) => {
-            this.update({
-              nowAndNextInStatusBar: value,
-            });
-          }),
-      );
 
     new Setting(containerEl)
       .setName("Task Notification")
@@ -117,6 +89,21 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
+      .setName("Center the Pointer in the Timeline View")
+      .setDesc(
+        "Should the pointer continuously get scrolled to the center of the view",
+      )
+      .addToggle((component) => {
+        component
+          .setValue(this.plugin.settings().centerNeedle)
+          .onChange((value) => {
+            this.update({ centerNeedle: value });
+          });
+      });
+
+    containerEl.createEl("h2", { text: "Date & Time Formats" });
+
+    new Setting(containerEl)
       .setName("Default timestamp format")
       .then((component) => {
         component.setDesc(
@@ -180,21 +167,10 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
         );
       });
 
-    new Setting(containerEl)
-      .setName("Center the Pointer in the Timeline View")
-      .setDesc(
-        "Should the pointer continuously get scrolled to the center of the view",
-      )
-      .addToggle((component) => {
-        component
-          .setValue(this.plugin.settings().centerNeedle)
-          .onChange((value) => {
-            this.update({ centerNeedle: value });
-          });
-      });
+    containerEl.createEl("h2", { text: "Planner Heading" });
 
     new Setting(containerEl)
-      .setName("Planner Heading")
+      .setName("Planner Heading Text")
       .setDesc(
         `When you create a planner, this text is going to be in the heading`,
       )
@@ -218,6 +194,42 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           .setValue(this.plugin.settings().plannerHeadingLevel)
           .onChange((value) => {
             this.update({ plannerHeadingLevel: value });
+          }),
+      );
+
+    containerEl.createEl("h2", { text: "Status bar widget" });
+
+    new Setting(containerEl).setName("Show active task").addToggle((toggle) =>
+      toggle
+        .setValue(this.plugin.settings().showNow)
+        .onChange((value: boolean) => {
+          this.update({ showNow: value });
+        }),
+    );
+
+    new Setting(containerEl).setName("Show upcoming task").addToggle((toggle) =>
+      toggle
+        .setValue(this.plugin.settings().showNext)
+        .onChange((value: boolean) => {
+          this.update({ showNext: value });
+        }),
+    );
+
+    new Setting(containerEl)
+      .setName("Current task progress indicator")
+      .addDropdown((component) =>
+        component
+          .addOptions({
+            bar: "bar",
+            pie: "pie",
+            none: "none",
+          })
+          .setValue(String(this.plugin.settings().progressIndicator))
+          .onChange((value) => {
+            this.update({
+              progressIndicator:
+                value as DayPlannerSettings["progressIndicator"],
+            });
           }),
       );
 
@@ -297,5 +309,9 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             this.update({ timelineEndColor: value });
           });
       });
+  }
+
+  private update(patch: Partial<DayPlannerSettings>) {
+    this.settingsStore.update((previous) => ({ ...previous, ...patch }));
   }
 }

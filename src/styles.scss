@@ -77,14 +77,8 @@
 }
 
 .progress-pie.day-planner {
-  float: left;
-  display: none;
-
   width: 20px;
   height: 20px;
-  margin: 0.3px 10px 0.3px 0;
-
-  background-color: var(--text-muted);
 }
 
 .progress-pie.day-planner::after {

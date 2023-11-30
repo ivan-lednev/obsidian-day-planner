@@ -2,8 +2,7 @@ import type { HexString } from "obsidian";
 import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
 export interface DayPlannerSettings {
-  circularProgress: boolean;
-  nowAndNextInStatusBar: boolean;
+  progressIndicator: "pie" | "bar" | "none";
   showTaskNotification: boolean;
   zoomLevel: number;
   timelineIcon: string;
@@ -25,11 +24,12 @@ export interface DayPlannerSettings {
   unscheduledTasksHeight: number;
   showUncheduledTasks: boolean;
   showUnscheduledNestedTasks: boolean;
+  showNow: boolean;
+  showNext: boolean;
 }
 
 export const defaultSettings: DayPlannerSettings = {
-  circularProgress: false,
-  nowAndNextInStatusBar: false,
+  progressIndicator: "bar",
   showTaskNotification: false,
   zoomLevel: 2,
   timelineIcon: "calendar-with-checkmark",
@@ -51,6 +51,8 @@ export const defaultSettings: DayPlannerSettings = {
   unscheduledTasksHeight: 100,
   showUncheduledTasks: true,
   showUnscheduledNestedTasks: true,
+  showNow: true,
+  showNext: true,
 };
 
 export const defaultSettingsForTests = {

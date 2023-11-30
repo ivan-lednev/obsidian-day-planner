@@ -7,52 +7,40 @@ import {
 } from "obsidian";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
 import { DataArray, getAPI, STask } from "obsidian-dataview";
-import {
-  derived,
-  get,
-  readable,
-  Readable,
-  writable,
-  Writable,
-} from "svelte/store";
+import { derived, get, Readable, writable, Writable } from "svelte/store";
 
 import { obsidianContext, viewTypeTimeline, viewTypeWeekly } from "./constants";
+import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
-import { visibleDays } from "./global-store/visible-days";
-import { getScheduledDay } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
-import { TasksForDay } from "./types";
-import {
-  EditContext,
-  useEditContext,
-} from "./ui/hooks/use-edit/use-edit-context";
+import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
+import { useDebouncedDataviewTasks } from "./ui/hooks/use-debounced-dataview-tasks";
+import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
+import { useVisibleTasks } from "./ui/hooks/use-visible-tasks";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
-import { StatusBar } from "./ui/status-bar";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
-import { debounceWithDelay } from "./util/debounce-with-delay";
-import { mapToTasksForDay } from "./util/get-tasks-for-day";
 import { isToday } from "./util/moment";
-import { getDayKey, getEmptyTasksForDay } from "./util/tasks-utils";
+import { getDayKey } from "./util/tasks-utils";
 
 export default class DayPlanner extends Plugin {
   settings: () => DayPlannerSettings;
   private settingsStore: Writable<DayPlannerSettings>;
-  private statusBar: StatusBar;
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
   private dataviewTasks: Readable<DataArray<STask>>;
   private readonly dataviewLoaded = writable(false);
-  private readonly fileSyncInProgress = writable(false);
-  private editContext: Readable<EditContext>;
 
   async onload() {
     await this.initSettingsStore();
-    this.initDataviewTasks();
+    this.dataviewTasks = useDebouncedDataviewTasks({
+      metadataCache: this.app.metadataCache,
+      getAllTasks: this.getAllTasks,
+    });
 
     this.obsidianFacade = new ObsidianFacade(this.app);
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
@@ -61,22 +49,50 @@ export default class DayPlanner extends Plugin {
 
     this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
-    this.statusBar = new StatusBar(
-      this.settings,
-      this.addStatusBarItem(),
-      this.initTimelineLeaf,
-    );
-
-    this.register(this.dataviewTasks.subscribe(this.updateStatusBar));
 
     this.registerViews();
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
   }
 
-  private getAllTasks() {
+  async onunload() {
+    await this.detachLeavesOfType(viewTypeTimeline);
+    await this.detachLeavesOfType(viewTypeWeekly);
+  }
+
+  initWeeklyLeaf = async () => {
+    await this.detachLeavesOfType(viewTypeWeekly);
+    await this.app.workspace.getLeaf(false).setViewState({
+      type: viewTypeWeekly,
+      active: true,
+    });
+  };
+
+  initTimelineLeaf = async () => {
+    await this.detachLeavesOfType(viewTypeTimeline);
+    await this.app.workspace.getRightLeaf(false).setViewState({
+      type: viewTypeTimeline,
+      active: true,
+    });
+    this.app.workspace.rightSplit.expand();
+  };
+
+  renderMarkdown = (el: HTMLElement, text: string) => {
+    const loader = new Component();
+
+    el.empty();
+
+    // todo: investigate why `await` doesn't work as expected here
+    MarkdownRenderer.render(this.app, text, el, "", loader);
+
+    loader.load();
+
+    return () => loader.unload();
+  };
+
+  getAllTasks = () => {
     const source = this.settings().dataviewSource;
     return this.refreshTasks(source);
-  }
+  };
 
   private refreshTasks = (source: string) => {
     const dataview = getAPI(this.app);
@@ -105,35 +121,6 @@ export default class DayPlanner extends Plugin {
 
     return result;
   };
-
-  private initDataviewTasks() {
-    this.dataviewTasks = readable(this.getAllTasks(), (set) => {
-      const [updateTasks, delayUpdateTasks] = debounceWithDelay(() => {
-        set(this.getAllTasks());
-      }, 1000);
-
-      this.app.metadataCache.on(
-        // @ts-expect-error
-        "dataview:metadata-change",
-        updateTasks,
-      );
-      document.addEventListener("keydown", delayUpdateTasks);
-
-      const source = derived(this.settingsStore, ($settings) => {
-        return $settings.dataviewSource;
-      });
-
-      const unsubscribeFromSettings = source.subscribe(() => {
-        updateTasks();
-      });
-
-      return () => {
-        this.app.metadataCache.off("dataview:metadata-change", updateTasks);
-        document.removeEventListener("keydown", delayUpdateTasks);
-        unsubscribeFromSettings();
-      };
-    });
-  }
 
   private handleActiveLeafChanged = ({ view }: WorkspaceLeaf) => {
     if (!(view instanceof FileView) || !view.file) {
@@ -200,118 +187,54 @@ export default class DayPlanner extends Plugin {
     this.settings = () => get(settings);
   }
 
-  async onunload() {
-    await this.detachLeavesOfType(viewTypeTimeline);
-    await this.detachLeavesOfType(viewTypeWeekly);
-  }
-
-  private updateStatusBar = async (dataviewTasks: DataArray<STask>) => {
-    // const today = window.moment();
-    //
-    // await this.statusBar.update(
-    //   getTasksForDay(today, dataviewTasks, { ...this.settings() }),
-    // );
-  };
-
-  initWeeklyLeaf = async () => {
-    await this.detachLeavesOfType(viewTypeWeekly);
-    await this.app.workspace.getLeaf(false).setViewState({
-      type: viewTypeWeekly,
-      active: true,
-    });
-  };
-
-  initTimelineLeaf = async () => {
-    await this.detachLeavesOfType(viewTypeTimeline);
-    await this.app.workspace.getRightLeaf(false).setViewState({
-      type: viewTypeTimeline,
-      active: true,
-    });
-    this.app.workspace.rightSplit.expand();
-  };
-
   private async detachLeavesOfType(type: string) {
-    // Although detatch() is synchronous, without wrapping into a promise, weird things happen:
+    // Although this is synchronous, without wrapping into a promise, weird things happen:
     // - when re-initializing the weekly view, it gets deleted every other time instead of getting re-created
     // - or the tabs get hidden
-    return Promise.all(
-      this.app.workspace.getLeavesOfType(type).map((leaf) => leaf.detach()),
-    );
+    await this.app.workspace.detachLeavesOfType(type);
   }
 
-  renderMarkdown = (el: HTMLElement, text: string) => {
-    const loader = new Component();
-
-    el.empty();
-
-    MarkdownRenderer.render(this.app, text, el, "", loader);
-
-    loader.load();
-
-    return () => loader.unload();
-  };
-
   private registerViews() {
-    const visibleTasks = derived(
-      [visibleDays, this.dataviewTasks, this.settingsStore],
-      ([$visibleDays, $dataviewTasks, $settings]) => {
-        // todo: make this simpler
-        if ($dataviewTasks.length === 0) {
-          return Object.fromEntries(
-            $visibleDays.map((day) => [getDayKey(day), getEmptyTasksForDay()]),
-          );
-        }
+    const visibleTasks = useVisibleTasks({ dataviewTasks: this.dataviewTasks });
 
-        const dayToSTasksLookup: Record<string, STask[]> = Object.fromEntries(
-          $dataviewTasks
-            .groupBy(getScheduledDay)
-            .map(({ key, rows }) => [key, rows.array()])
-            .array(),
-        );
-
-        return $visibleDays.reduce<Record<string, TasksForDay>>(
-          (result, day) => {
-            const key = day.format("YYYY-MM-DD");
-            const sTasksForDay = dayToSTasksLookup[key];
-
-            if (sTasksForDay) {
-              result[key] = mapToTasksForDay(day, sTasksForDay, $settings);
-            } else {
-              result[key] = getEmptyTasksForDay();
-            }
-
-            return result;
-          },
-          {},
-        );
+    const tasksForToday = derived(
+      [visibleTasks, currentTime],
+      ([$visibleTasks, $currentTime]) => {
+        return $visibleTasks[getDayKey($currentTime)];
       },
     );
 
-    this.editContext = derived(
+    const editContext = derived(
       [this.settingsStore, visibleTasks],
       ([$settings, $visibleTasks]) => {
         return useEditContext({
           obsidianFacade: this.obsidianFacade,
           onUpdate: this.planEditor.syncTasksWithFile,
-          // todo: remove
-          fileSyncInProgress: this.fileSyncInProgress,
           settings: $settings,
           visibleTasks: $visibleTasks,
         });
       },
     );
 
+    new StatusBarWidget({
+      target: this.addStatusBarItem(),
+      props: {
+        onClick: this.initTimelineLeaf,
+        tasksForToday,
+      },
+    });
+
     const componentContext = new Map([
       [
         obsidianContext,
         {
-          // todo: once editContext is lifted up, we don't need half of this stuff
           obsidianFacade: this.obsidianFacade,
           initWeeklyView: this.initWeeklyLeaf,
           refreshTasks: this.refreshTasks,
           dataviewLoaded: this.dataviewLoaded,
           renderMarkdown: this.renderMarkdown,
-          editContext: this.editContext,
+          editContext,
+          visibleTasks,
         },
       ],
     ]);

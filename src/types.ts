@@ -81,4 +81,5 @@ export interface ObsidianContext {
   fileSyncInProgress: Readable<boolean>;
   renderMarkdown: RenderMarkdown;
   editContext: Readable<ReturnType<typeof useEditContext>>;
+  visibleTasks: Readable<Tasks>;
 }

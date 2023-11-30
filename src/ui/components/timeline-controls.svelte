@@ -357,9 +357,9 @@
   }
 
   .controls-section {
-    font-weight: var(--font-medium);
     margin: var(--size-4-2);
     font-size: var(--font-ui-medium);
+    font-weight: var(--font-medium);
     text-align: center;
   }
 

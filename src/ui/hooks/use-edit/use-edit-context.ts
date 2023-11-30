@@ -1,5 +1,5 @@
 import { Moment } from "moment";
-import { Readable, writable } from "svelte/store";
+import { writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
 import { DayPlannerSettings } from "../../../settings";
@@ -13,7 +13,6 @@ import { useEditActions } from "./use-edit-actions";
 import { useEditHandlers } from "./use-edit-handlers";
 
 export interface UseEditContextProps {
-  fileSyncInProgress: Readable<boolean>;
   obsidianFacade: ObsidianFacade;
   onUpdate: OnUpdateFn;
   settings: DayPlannerSettings;
