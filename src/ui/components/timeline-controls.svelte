@@ -357,10 +357,9 @@
   }
 
   .controls-section {
-    margin: var(--size-4-2);
-    font-size: var(--font-ui-medium);
+    margin: var(--size-4-2) 0;
+    font-size: var(--font-ui-small);
     font-weight: var(--font-medium);
-    text-align: center;
   }
 
   .help-item {
