@@ -13,15 +13,15 @@
 <div
   bind:this={el}
   class="tasks absolute-stretch-x"
+  on:mousedown
+  on:mouseenter
   on:mousemove={(event) => {
     const viewportToElOffsetY = el.getBoundingClientRect().top;
     const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
 
-    pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings.zoomLevel));
+    pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings));
   }}
-  on:mousedown
   on:mouseup|stopPropagation
-  on:mouseenter
 >
   <slot />
 </div>

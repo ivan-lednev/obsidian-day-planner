@@ -2,7 +2,6 @@ export const viewTypeTimeline = "timeline";
 export const viewTypeWeekly = "weekly";
 export const obsidianContext = "obsidian";
 export const defaultDurationMinutes = 30;
-export const snapStepMinutes = 10;
 export const statusBarTextLimit = 15;
 
 export const icons = [

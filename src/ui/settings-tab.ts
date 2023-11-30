@@ -19,6 +19,19 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
+      .setName("Round time to minutes")
+      .setDesc("While editing, tasks are going to get rounded to this number")
+      .addSlider((slider) =>
+        slider
+          .setLimits(5, 20, 5)
+          .setValue(this.plugin.settings().snapStepMinutes)
+          .setDynamicTooltip()
+          .onChange((value: number) => {
+            this.update({ snapStepMinutes: value });
+          }),
+      );
+
+    new Setting(containerEl)
       .setName("Task Notification")
       .setDesc("Display a notification when a new task is started")
       .addToggle((toggle) =>

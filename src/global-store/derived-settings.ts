@@ -1,4 +1,3 @@
-import { snapStepMinutes } from "../constants";
 import { DayPlannerSettings } from "../settings";
 
 export function getHourSize(settings: DayPlannerSettings) {
@@ -20,6 +19,9 @@ export function timeToTimelineOffset(
   return minutes * settings.zoomLevel - getHiddenHoursSize(settings);
 }
 
-export function snap(coords: number, zoomLevel: number) {
+export function snap(
+  coords: number,
+  { zoomLevel, snapStepMinutes }: DayPlannerSettings,
+) {
   return coords - (coords % (snapStepMinutes * zoomLevel));
 }

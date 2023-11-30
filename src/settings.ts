@@ -27,9 +27,11 @@ export interface DayPlannerSettings {
   showUnscheduledNestedTasks: boolean;
   showNow: boolean;
   showNext: boolean;
+  snapStepMinutes: number;
 }
 
 export const defaultSettings: DayPlannerSettings = {
+  snapStepMinutes: 10,
   progressIndicator: "bar",
   showTaskNotification: false,
   zoomLevel: 2,
