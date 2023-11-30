@@ -78,7 +78,6 @@ export interface ObsidianContext {
   getTasksForDay: Readable<GetTasksForDay>;
   refreshTasks: (source: string) => void;
   dataviewLoaded: Writable<boolean>;
-  fileSyncInProgress: Readable<boolean>;
   renderMarkdown: RenderMarkdown;
   editContext: Readable<ReturnType<typeof useEditContext>>;
   visibleTasks: Readable<Tasks>;

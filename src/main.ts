@@ -6,8 +6,8 @@ import {
   WorkspaceLeaf,
 } from "obsidian";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
-import { DataArray, getAPI, STask } from "obsidian-dataview";
-import { derived, get, Readable, writable, Writable } from "svelte/store";
+import { getAPI } from "obsidian-dataview";
+import { derived, get, writable, Writable } from "svelte/store";
 
 import { obsidianContext, viewTypeTimeline, viewTypeWeekly } from "./constants";
 import { currentTime } from "./global-store/current-time";
@@ -32,15 +32,10 @@ export default class DayPlanner extends Plugin {
   private settingsStore: Writable<DayPlannerSettings>;
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
-  private dataviewTasks: Readable<DataArray<STask>>;
   private readonly dataviewLoaded = writable(false);
 
   async onload() {
     await this.initSettingsStore();
-    this.dataviewTasks = useDebouncedDataviewTasks({
-      metadataCache: this.app.metadataCache,
-      getAllTasks: this.getAllTasks,
-    });
 
     this.obsidianFacade = new ObsidianFacade(this.app);
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
@@ -195,7 +190,12 @@ export default class DayPlanner extends Plugin {
   }
 
   private registerViews() {
-    const visibleTasks = useVisibleTasks({ dataviewTasks: this.dataviewTasks });
+    const dataviewTasks = useDebouncedDataviewTasks({
+      metadataCache: this.app.metadataCache,
+      getAllTasks: this.getAllTasks,
+    });
+
+    const visibleTasks = useVisibleTasks({ dataviewTasks });
 
     const tasksForToday = derived(
       [visibleTasks, currentTime],
@@ -204,6 +204,7 @@ export default class DayPlanner extends Plugin {
       },
     );
 
+    // todo: think of a way to unwrap the hook from the derived store
     const editContext = derived(
       [this.settingsStore, visibleTasks],
       ([$settings, $visibleTasks]) => {

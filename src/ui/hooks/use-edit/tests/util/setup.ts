@@ -1,5 +1,4 @@
 import { Moment } from "moment/moment";
-import { writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../../../service/obsidian-facade";
 import { defaultSettingsForTests } from "../../../../../settings";
@@ -14,7 +13,6 @@ export function createProps({ tasks } = { tasks: baseTasks }) {
 
   return {
     settings: defaultSettingsForTests,
-    fileSyncInProgress: writable(false),
     onUpdate,
     obsidianFacade,
     visibleTasks: tasks,
