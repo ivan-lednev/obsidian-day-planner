@@ -16,6 +16,7 @@ export interface DayPlannerSettings {
   timelineStartColor: HexString;
   timelineEndColor: HexString;
   timestampFormat: string;
+  hourFormat: string;
   dataviewSource: string;
   showDataviewMigrationWarning: boolean;
   extendDurationUntilNext: boolean;
@@ -43,6 +44,7 @@ export const defaultSettings: DayPlannerSettings = {
   timelineStartColor: "#006466",
   timelineEndColor: "#4d194d",
   timestampFormat: "HH:mm",
+  hourFormat: "H",
   dataviewSource: "",
   showDataviewMigrationWarning: true,
   extendDurationUntilNext: false,

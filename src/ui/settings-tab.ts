@@ -103,13 +103,44 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
 
     containerEl.createEl("h2", { text: "Date & Time Formats" });
 
+    new Setting(containerEl).setName("Hour format").then((component) => {
+      component.setDesc(
+        createFragment((fragment) => {
+          fragment.appendText(
+            "This is the format used in the time ruler. Use 'H' for 24 hours; use 'h' for 12 hours. Your current syntax looks like this: ",
+          );
+          component.addMomentFormat((momentFormat) =>
+            momentFormat
+              .setValue(this.plugin.settings().hourFormat)
+              .setSampleEl(fragment.createSpan())
+              .onChange((value: string) => {
+                this.update({ hourFormat: value.trim() });
+              }),
+          );
+          fragment.append(
+            createEl("br"),
+            createEl(
+              "a",
+              {
+                text: "format reference",
+                href: "https://momentjs.com/docs/#/displaying/format/",
+              },
+              (a) => {
+                a.setAttr("target", "_blank");
+              },
+            ),
+          );
+        }),
+      );
+    });
+
     new Setting(containerEl)
       .setName("Default timestamp format")
       .then((component) => {
         component.setDesc(
           createFragment((fragment) => {
             fragment.appendText(
-              "When you create or edit tasks with drag-and-drop, the plugin use this format. Your current syntax looks like this: ",
+              "When you create or edit tasks with drag-and-drop, the plugin use this format. Use 'HH:mm' for 24 hours; use 'hh:mm' for 12 hours. Your current syntax looks like this: ",
             );
             component.addMomentFormat((momentFormat) =>
               momentFormat
