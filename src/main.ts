@@ -9,7 +9,12 @@ import { getDateFromFile } from "obsidian-daily-notes-interface";
 import { getAPI } from "obsidian-dataview";
 import { derived, get, writable, Writable } from "svelte/store";
 
-import { obsidianContext, viewTypeTimeline, viewTypeWeekly } from "./constants";
+import {
+  obsidianContext,
+  viewTypeTimeline,
+  viewTypeTimeTracker,
+  viewTypeWeekly,
+} from "./constants";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
@@ -21,6 +26,7 @@ import { useDebouncedDataviewTasks } from "./ui/hooks/use-debounced-dataview-tas
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { useVisibleTasks } from "./ui/hooks/use-visible-tasks";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
+import TimeTrackerView from "./ui/time-tracker-view";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
@@ -60,6 +66,15 @@ export default class DayPlanner extends Plugin {
       type: viewTypeWeekly,
       active: true,
     });
+  };
+
+  initTimeTrackerLeaf = async () => {
+    await this.detachLeavesOfType(viewTypeTimeTracker);
+    await this.app.workspace.getRightLeaf(false).setViewState({
+      type: viewTypeTimeTracker,
+      active: true,
+    });
+    this.app.workspace.rightSplit.expand();
   };
 
   initTimelineLeaf = async () => {
@@ -150,6 +165,12 @@ export default class DayPlanner extends Plugin {
       id: "show-weekly-view",
       name: "Show the Week Planner",
       callback: this.initWeeklyLeaf,
+    });
+
+    this.addCommand({
+      id: "show-time-tracker-view",
+      name: "Show Time Tracker",
+      callback: this.initTimeTrackerLeaf,
     });
 
     this.addCommand({
@@ -244,6 +265,12 @@ export default class DayPlanner extends Plugin {
       viewTypeTimeline,
       (leaf: WorkspaceLeaf) =>
         new TimelineView(leaf, this.settings, componentContext),
+    );
+
+    this.registerView(
+      viewTypeTimeTracker,
+      (leaf: WorkspaceLeaf) =>
+        new TimeTrackerView(leaf, this.settings, componentContext),
     );
 
     this.registerView(

@@ -21,15 +21,14 @@
   import ScheduledTaskContainer from "./scheduled-task-container.svelte";
   import ScheduledTask from "./scheduled-task.svelte";
   import Scroller from "./scroller.svelte";
-  import Task from "./task.svelte";
-  import TimelineControls from "./timeline-controls.svelte";
-  import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
 
+  // todo: showRuler or add <slot name="left-gutter" />
   export let hideControls = false;
   export let day: Moment | undefined = undefined;
 
   $: actualDay = day || $visibleDayInTimeline;
 
+  // todo: use a different context
   const { editContext } = getContext<ObsidianContext>(obsidianContext);
 
   $: ({ confirmEdit, editOperation, getEditHandlers } = $editContext);
@@ -40,7 +39,6 @@
     handleResizerMouseDown,
     handleTaskMouseUp,
     handleGripMouseDown,
-    handleUnscheduledTaskGripMouseDown,
     handleMouseEnter,
     pointerOffsetY,
   } = getEditHandlers(actualDay));
@@ -54,27 +52,6 @@
 <svelte:body use:styledCursor={bodyCursor} />
 <svelte:document on:mouseup={cancelEdit} />
 
-{#if !hideControls}
-  <TimelineControls />
-
-  {#if $displayedTasks.noTime.length > 0 && $settings.showUncheduledTasks}
-    <UnscheduledTaskContainer>
-      {#each $displayedTasks.noTime as task}
-        <Task
-          --task-height="{$settings.defaultDurationMinutes *
-            $settings.zoomLevel}px"
-          {task}
-          on:mouseup={() => handleTaskMouseUp(task)}
-        >
-          <Grip
-            cursor={gripCursor}
-            on:mousedown={() => handleUnscheduledTaskGripMouseDown(task)}
-          />
-        </Task>
-      {/each}
-    </UnscheduledTaskContainer>
-  {/if}
-{/if}
 <Scroller let:hovering={autoScrollBlocked}>
   {#if !hideControls}
     <Ruler visibleHours={getVisibleHours($settings)} />

@@ -10,6 +10,7 @@
 
 <div class="container">
   <!--TODO: fade when folded (Obsidian does that)-->
+<!--  TODO: brighten when active -->
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div class="tree-item-self is-clickable" on:click={toggleTree}>
     <div class="tree-item-inner">{title}</div>
