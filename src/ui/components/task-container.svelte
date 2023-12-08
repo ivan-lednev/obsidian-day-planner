@@ -1,6 +1,8 @@
 <script lang="ts">
   import { Moment } from "moment";
   import { getContext } from "svelte";
+  import ClockControls from "./time-tracker/clock-controls.svelte"
+  import ActiveClocks from "./time-tracker/active-clocks.svelte"
 
   import { obsidianContext } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
@@ -54,6 +56,8 @@
 <svelte:document on:mouseup={cancelEdit} />
 
 {#if !hideControls}
+  <ClockControls />
+  <ActiveClocks />
   <TimelineControls />
 
   {#if $displayedTasks.noTime.length > 0 && $settings.showUncheduledTasks}
