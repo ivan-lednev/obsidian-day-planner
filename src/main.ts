@@ -19,6 +19,7 @@ import {
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
+import { getScheduledDay } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
@@ -26,6 +27,7 @@ import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { useActiveClocks } from "./ui/hooks/use-active-clocks";
 import { useDebouncedDataviewTasks } from "./ui/hooks/use-debounced-dataview-tasks";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
+import { useVisibleClockRecords } from "./ui/hooks/use-visible-clock-records";
 import { useVisibleTasks } from "./ui/hooks/use-visible-tasks";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimeTrackerView from "./ui/time-tracker-view";
@@ -220,7 +222,20 @@ export default class DayPlanner extends Plugin {
       },
     );
 
-    const visibleTasks = useVisibleTasks({ dataviewTasks });
+    const dayToSTasksLookup = derived(dataviewTasks, ($dataviewTasks) => {
+      if (!$dataviewTasks) {
+        return {};
+      }
+
+      return Object.fromEntries(
+        $dataviewTasks
+          .groupBy(getScheduledDay)
+          .map(({ key, rows }) => [key, rows.array()])
+          .array(),
+      );
+    });
+
+    const visibleTasks = useVisibleTasks({ dayToSTasksLookup });
 
     const tasksForToday = derived(
       [visibleTasks, currentTime],
@@ -230,6 +245,7 @@ export default class DayPlanner extends Plugin {
     );
 
     const activeClocks = useActiveClocks({ dataviewTasks });
+    const visibleClockRecords = useVisibleClockRecords({ dayToSTasksLookup });
 
     // todo: think of a way to unwrap the hook from the derived store
     const editContext = derived(
@@ -240,6 +256,18 @@ export default class DayPlanner extends Plugin {
           onUpdate: this.planEditor.syncTasksWithFile,
           settings: $settings,
           visibleTasks: $visibleTasks,
+        });
+      },
+    );
+
+    const timeTrackerEditContext = derived(
+      [this.settingsStore, visibleClockRecords],
+      ([$settings, $visibleClockRecords]) => {
+        return useEditContext({
+          obsidianFacade: this.obsidianFacade,
+          onUpdate: this.planEditor.syncTasksWithFile,
+          settings: $settings,
+          visibleTasks: $visibleClockRecords,
         });
       },
     );
@@ -269,6 +297,11 @@ export default class DayPlanner extends Plugin {
       [editContextKey, { editContext }],
     ]);
 
+    const timeTrackerContext = new Map([
+      ...componentContext,
+      [editContextKey, { editContext: timeTrackerEditContext }],
+    ]);
+
     this.registerView(
       viewTypeTimeline,
       (leaf: WorkspaceLeaf) =>
@@ -278,7 +311,7 @@ export default class DayPlanner extends Plugin {
     this.registerView(
       viewTypeTimeTracker,
       (leaf: WorkspaceLeaf) =>
-        new TimeTrackerView(leaf, this.settings, componentContext),
+        new TimeTrackerView(leaf, this.settings, timeTrackerContext),
     );
 
     this.registerView(
