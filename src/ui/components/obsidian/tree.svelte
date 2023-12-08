@@ -8,13 +8,13 @@
   }
 </script>
 
-<!--  TODO: add collapse animation-->
-<!--TODO: fade when folded (Obsidian does that)-->
 <div class="container">
+  <!--TODO: fade when folded (Obsidian does that)-->
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div class="tree-item-self is-clickable" on:click={toggleTree}>
     <div class="tree-item-inner">{title}</div>
   </div>
+  <!--  TODO: add collapse animation-->
   {#if isTreeVisible}
     <slot />
   {/if}
