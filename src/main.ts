@@ -6,10 +6,11 @@ import {
   WorkspaceLeaf,
 } from "obsidian";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
-import { getAPI } from "obsidian-dataview";
-import { derived, get, writable, Writable } from "svelte/store";
+import { DataArray, getAPI, STask } from "obsidian-dataview";
+import { derived, get, Readable, Writable, writable } from "svelte/store";
 
 import {
+  editContextKey,
   obsidianContext,
   viewTypeTimeline,
   viewTypeTimeTracker,
@@ -22,6 +23,7 @@ import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
+import { useActiveClocks } from "./ui/hooks/use-active-clocks";
 import { useDebouncedDataviewTasks } from "./ui/hooks/use-debounced-dataview-tasks";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { useVisibleTasks } from "./ui/hooks/use-visible-tasks";
@@ -211,10 +213,12 @@ export default class DayPlanner extends Plugin {
   }
 
   private registerViews() {
-    const dataviewTasks = useDebouncedDataviewTasks({
-      metadataCache: this.app.metadataCache,
-      getAllTasks: this.getAllTasks,
-    });
+    const dataviewTasks: Readable<DataArray<STask>> = useDebouncedDataviewTasks(
+      {
+        metadataCache: this.app.metadataCache,
+        getAllTasks: this.getAllTasks,
+      },
+    );
 
     const visibleTasks = useVisibleTasks({ dataviewTasks });
 
@@ -224,6 +228,8 @@ export default class DayPlanner extends Plugin {
         return $visibleTasks[getDayKey($currentTime)];
       },
     );
+
+    const activeClocks = useActiveClocks({ dataviewTasks });
 
     // todo: think of a way to unwrap the hook from the derived store
     const editContext = derived(
@@ -257,8 +263,10 @@ export default class DayPlanner extends Plugin {
           renderMarkdown: this.renderMarkdown,
           editContext,
           visibleTasks,
+          activeClocks,
         },
       ],
+      [editContextKey, { editContext }],
     ]);
 
     this.registerView(

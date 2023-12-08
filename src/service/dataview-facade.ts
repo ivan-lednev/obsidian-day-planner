@@ -17,12 +17,12 @@ interface Node {
   scheduled?: DateTime;
 }
 
-function sTaskLineToString(node: Node) {
+export function sTaskLineToString(node: Node) {
   const status = node.status ? `[${node.status}] ` : "";
   return `${node.symbol} ${status}${node.text}\n`;
 }
 
-function sTaskToString(node: Node, indentation = "") {
+export function sTaskToString(node: Node, indentation = "") {
   let result = `${indentation}${sTaskLineToString(node)}`;
 
   for (const child of node.children) {

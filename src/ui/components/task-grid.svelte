@@ -3,11 +3,10 @@
   import { getContext } from "svelte";
 
 
-  import { obsidianContext } from "../../constants";
+  import { editContextKey } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
-  import type { ObsidianContext } from "../../types";
   import { isToday } from "../../util/moment";
   import { getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
@@ -28,8 +27,7 @@
 
   $: actualDay = day || $visibleDayInTimeline;
 
-  // todo: use a different context
-  const { editContext } = getContext<ObsidianContext>(obsidianContext);
+  const { editContext } = getContext(editContextKey);
 
   $: ({ confirmEdit, editOperation, getEditHandlers } = $editContext);
   $: ({

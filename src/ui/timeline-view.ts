@@ -2,6 +2,7 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 
 import { viewTypeTimeline } from "../constants";
 import type { DayPlannerSettings } from "../settings";
+import { ComponentContext } from "../types";
 
 import TaskContainer from "./components/task-container.svelte";
 
@@ -11,7 +12,7 @@ export default class TimelineView extends ItemView {
   constructor(
     leaf: WorkspaceLeaf,
     private readonly settings: () => DayPlannerSettings,
-    private readonly componentContext: Map<string, Record<string, unknown>>,
+    private readonly componentContext: ComponentContext,
   ) {
     super(leaf);
   }

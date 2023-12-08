@@ -82,3 +82,5 @@ export interface ObsidianContext {
   editContext: Readable<ReturnType<typeof useEditContext>>;
   visibleTasks: Readable<Tasks>;
 }
+
+export type ComponentContext = Map<string, unknown>;
