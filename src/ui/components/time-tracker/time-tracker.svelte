@@ -14,7 +14,7 @@
 <!--TODO: align padding with the upper one-->
 <TimelineControls />
 
-<TaskGrid />
+<TaskGrid readonly={true} />
 
 <style>
   .controls-container {

@@ -23,6 +23,7 @@
 
   // todo: showRuler or add <slot name="left-gutter" />
   export let hideControls = false;
+  export let readonly = false;
   export let day: Moment | undefined = undefined;
 
   $: actualDay = day || $visibleDayInTimeline;
@@ -68,14 +69,16 @@
     >
       {#each $displayedTasks.withTime as task (getRenderKey(task))}
         <ScheduledTask {task} on:mouseup={() => handleTaskMouseUp(task)}>
-          <Grip
-            cursor={gripCursor}
-            on:mousedown={(event) => handleGripMouseDown(event, task)}
-          />
-          <ResizeHandle
-            visible={!$editOperation}
-            on:mousedown={(event) => handleResizerMouseDown(event, task)}
-          />
+          {#if !readonly }
+            <Grip
+              cursor={gripCursor}
+              on:mousedown={(event) => handleGripMouseDown(event, task)}
+            />
+            <ResizeHandle
+              visible={!$editOperation}
+              on:mousedown={(event) => handleResizerMouseDown(event, task)}
+            />
+          {/if}
         </ScheduledTask>
       {/each}
     </ScheduledTaskContainer>
