@@ -1,31 +1,30 @@
 <script lang="ts">
-  import { Pause, Trash2 } from "lucide-svelte";
+  import { Play, Pause, Trash2 } from "lucide-svelte";
 
   import ControlButton from "../control-button.svelte";
   import Tree from "../obsidian/tree.svelte";
 </script>
 
-<Tree title="Active clocks">
-  <div class="inner-container">
+<Tree title="Editor clocks">
+  <div class="buttons">
+    <ControlButton
+      isActive={false}
+      label="Clock in (no task under cursor)"
+      on:click={() => {}}
+    >
+      <Play class="svg-icon" />
+    </ControlButton>
     <ControlButton isActive={false} label="Clock out" on:click={() => {}}>
       <Pause class="svg-icon" />
     </ControlButton>
     <ControlButton isActive={false} label="Cancel clock" on:click={() => {}}>
       <Trash2 class="svg-icon" />
     </ControlButton>
-    <div class="task-text">Water the cat</div>
   </div>
 </Tree>
 
 <style>
-  /*   TODO: rename classes */
-  .inner-container {
+  .buttons {
     display: flex;
-  }
-
-  .task-text {
-    display: flex;
-    align-items: center;
-    margin: var(--size-4-2);
   }
 </style>

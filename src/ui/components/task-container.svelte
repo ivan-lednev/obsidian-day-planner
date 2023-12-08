@@ -1,8 +1,7 @@
 <script lang="ts">
   import { Moment } from "moment";
   import { getContext } from "svelte";
-  import ClockControls from "./time-tracker/clock-controls.svelte"
-  import ActiveClocks from "./time-tracker/active-clocks.svelte"
+
 
   import { obsidianContext } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
@@ -23,6 +22,8 @@
   import ScheduledTask from "./scheduled-task.svelte";
   import Scroller from "./scroller.svelte";
   import Task from "./task.svelte";
+  import ActiveClocks from "./time-tracker/active-clocks.svelte"
+  import EditorClocks from "./time-tracker/editor-clocks.svelte"
   import TimelineControls from "./timeline-controls.svelte";
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
 
@@ -56,8 +57,10 @@
 <svelte:document on:mouseup={cancelEdit} />
 
 {#if !hideControls}
-  <ClockControls />
-  <ActiveClocks />
+  <div class="controls-container">
+    <EditorClocks />
+    <ActiveClocks />
+  </div>
   <TimelineControls />
 
   {#if $displayedTasks.noTime.length > 0 && $settings.showUncheduledTasks}
@@ -109,3 +112,9 @@
     </ScheduledTaskContainer>
   </Column>
 </Scroller>
+
+<style>
+  .controls-container {
+      margin: var(--size-4-2);
+  }
+</style>
