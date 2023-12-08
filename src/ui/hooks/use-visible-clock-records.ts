@@ -6,7 +6,6 @@ import { sTaskToClocks } from "../../service/dataview-facade";
 import { TasksForDay } from "../../types";
 import { getDayKey, getEmptyTasksForDay } from "../../util/tasks-utils";
 
-
 interface UseVisibleClockRecordsProps {
   dayToSTasksLookup: Readable<Record<string, STask[]>>;
 }
