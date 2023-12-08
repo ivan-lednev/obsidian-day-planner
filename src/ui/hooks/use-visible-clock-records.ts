@@ -2,10 +2,10 @@ import { STask } from "obsidian-dataview";
 import { derived, Readable } from "svelte/store";
 
 import { visibleDays } from "../../global-store/visible-days";
+import { sTaskToClocks } from "../../service/dataview-facade";
 import { TasksForDay } from "../../types";
 import { getDayKey, getEmptyTasksForDay } from "../../util/tasks-utils";
 
-import { sTaskToClocks } from "./use-clocks";
 
 interface UseVisibleClockRecordsProps {
   dayToSTasksLookup: Readable<Record<string, STask[]>>;

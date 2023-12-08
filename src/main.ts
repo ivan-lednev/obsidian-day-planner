@@ -1,3 +1,5 @@
+import { noop } from "lodash/fp";
+import { Moment } from "moment";
 import {
   Component,
   FileView,
@@ -263,12 +265,26 @@ export default class DayPlanner extends Plugin {
     const timeTrackerEditContext = derived(
       [this.settingsStore, visibleClockRecords],
       ([$settings, $visibleClockRecords]) => {
-        return useEditContext({
+        const base = useEditContext({
           obsidianFacade: this.obsidianFacade,
           onUpdate: this.planEditor.syncTasksWithFile,
           settings: $settings,
           visibleTasks: $visibleClockRecords,
         });
+
+        function disableEditHandlers(day: Moment) {
+          return {
+            ...base.getEditHandlers(day),
+            handleGripMouseDown: noop,
+            handleContainerMouseDown: noop,
+            handleResizerMouseDown: noop,
+          };
+        }
+
+        return {
+          ...base,
+          getEditHandlers: disableEditHandlers,
+        };
       },
     );
 
