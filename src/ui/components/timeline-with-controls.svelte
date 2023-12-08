@@ -2,26 +2,18 @@
   import { Moment } from "moment";
   import { getContext } from "svelte";
 
+
   import { obsidianContext } from "../../constants";
-  import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import type { ObsidianContext } from "../../types";
-  import { isToday } from "../../util/moment";
-  import { getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
 
-  import Column from "./column.svelte";
   import Grip from "./grip.svelte";
-  import Needle from "./needle.svelte";
-  import ResizeHandle from "./resize-handle.svelte";
-  import Ruler from "./ruler.svelte";
-  import ScheduledTaskContainer from "./scheduled-task-container.svelte";
-  import ScheduledTask from "./scheduled-task.svelte";
-  import Scroller from "./scroller.svelte";
   import Task from "./task.svelte";
   import TimelineControls from "./timeline-controls.svelte";
+  import Timeline from "./timeline.svelte"
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
 
   export let hideControls = false;
@@ -31,17 +23,12 @@
 
   const { editContext } = getContext<ObsidianContext>(obsidianContext);
 
-  $: ({ confirmEdit, editOperation, getEditHandlers } = $editContext);
+  $: ({ editOperation, getEditHandlers } = $editContext);
   $: ({
     displayedTasks,
     cancelEdit,
-    handleContainerMouseDown,
-    handleResizerMouseDown,
     handleTaskMouseUp,
-    handleGripMouseDown,
     handleUnscheduledTaskGripMouseDown,
-    handleMouseEnter,
-    pointerOffsetY,
   } = getEditHandlers(actualDay));
 
   $: ({ bodyCursor, gripCursor } = useCursor({
@@ -74,34 +61,4 @@
     </UnscheduledTaskContainer>
   {/if}
 {/if}
-<Scroller let:hovering={autoScrollBlocked}>
-  {#if !hideControls}
-    <Ruler visibleHours={getVisibleHours($settings)} />
-  {/if}
-
-  <Column visibleHours={getVisibleHours($settings)}>
-    {#if isToday(actualDay)}
-      <Needle {autoScrollBlocked} />
-    {/if}
-
-    <ScheduledTaskContainer
-      {pointerOffsetY}
-      on:mousedown={handleContainerMouseDown}
-      on:mouseup={confirmEdit}
-      on:mouseenter={handleMouseEnter}
-    >
-      {#each $displayedTasks.withTime as task (getRenderKey(task))}
-        <ScheduledTask {task} on:mouseup={() => handleTaskMouseUp(task)}>
-          <Grip
-            cursor={gripCursor}
-            on:mousedown={(event) => handleGripMouseDown(event, task)}
-          />
-          <ResizeHandle
-            visible={!$editOperation}
-            on:mousedown={(event) => handleResizerMouseDown(event, task)}
-          />
-        </ScheduledTask>
-      {/each}
-    </ScheduledTaskContainer>
-  </Column>
-</Scroller>
+<Timeline {day} {hideControls} />

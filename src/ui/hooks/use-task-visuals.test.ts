@@ -32,7 +32,7 @@ test("derives task offset from settings and time", () => {
 test.skip("tasks change position and size when zoom level changes", () => {
   const { offset, height } = useTaskVisuals(baseTask, getBaseUseTaskProps());
 
-  // todo: this is leaking state to other tests, need to copy settings
+  // TODO: this is leaking state to other tests, need to copy settings
   settings.update((previous) => ({
     ...previous,
     zoomLevel: 1,

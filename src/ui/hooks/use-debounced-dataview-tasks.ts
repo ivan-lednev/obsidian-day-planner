@@ -2,14 +2,15 @@ import { MetadataCache } from "obsidian";
 import { derived, readable } from "svelte/store";
 
 import { settings } from "../../global-store/settings";
-import DayPlanner from "../../main";
+import { DataviewFacade } from "../../service/dataview-facade";
 import { debounceWithDelay } from "../../util/debounce-with-delay";
 
 export interface UseDataviewTasksProps {
   metadataCache: MetadataCache;
-  getAllTasks: ReturnType<DayPlanner["getAllTasks"]>;
+  getAllTasks: ReturnType<DataviewFacade["getAllTasks"]>;
 }
 
+// TODO: dataview logic can be split from this
 export function useDebouncedDataviewTasks({
   metadataCache,
   getAllTasks,
@@ -35,6 +36,7 @@ export function useDebouncedDataviewTasks({
     });
 
     return () => {
+      // todo: this potentially creates a leak. try offref
       metadataCache.off("dataview:metadata-change", updateTasks);
       document.removeEventListener("keydown", delayUpdateTasks);
       unsubscribeFromSettings();

@@ -1,13 +1,13 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 
-import { viewTypeTimeline } from "../constants";
+import { viewTypeTimeTracker } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 import { ComponentContext } from "../types";
 
-import TimelineWithControls from "./components/timeline-with-controls.svelte";
+import TimeTracker from "./components/time-tracker/time-tracker.svelte";
 
-export default class TimelineView extends ItemView {
-  private timeline: TimelineWithControls;
+export default class TimeTrackerView extends ItemView {
+  private timeTracker: TimeTracker;
 
   constructor(
     leaf: WorkspaceLeaf,
@@ -18,26 +18,26 @@ export default class TimelineView extends ItemView {
   }
 
   getViewType(): string {
-    return viewTypeTimeline;
+    return viewTypeTimeTracker;
   }
 
   getDisplayText(): string {
-    return "Day Planner Timeline";
+    return "Time Tracker";
   }
 
   getIcon() {
-    return this.settings().timelineIcon;
+    return "timer";
   }
 
   async onOpen() {
     const contentEl = this.containerEl.children[1];
-    this.timeline = new TimelineWithControls({
+    this.timeTracker = new TimeTracker({
       target: contentEl,
       context: this.componentContext,
     });
   }
 
   async onClose() {
-    this.timeline?.$destroy();
+    this.timeTracker?.$destroy();
   }
 }

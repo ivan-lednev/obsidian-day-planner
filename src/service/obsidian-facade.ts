@@ -35,6 +35,14 @@ export class ObsidianFacade {
     return file;
   }
 
+  getActiveMarkdownView = () => {
+    const view = this.app.workspace.getMostRecentLeaf()?.view;
+
+    isInstanceOf(view, MarkdownView, "No markdown editor is active");
+
+    return view;
+  };
+
   getMetadataForPath(path: string) {
     const file = this.getFileByPath(path);
 

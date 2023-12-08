@@ -48,7 +48,7 @@ export function copy(task: Task): Task {
     ...task,
     id: getId(),
     isGhost: true,
-    // todo: there should be a better way to track which tasks are new
+    // TODO: there should be a better way to track which tasks are new
     location: { ...task.location, line: undefined },
   };
 }
@@ -68,7 +68,7 @@ export function areValuesEmpty(record: Record<string, [] | object>) {
   return Object.values(record).every(isEmpty);
 }
 
-// todo: broken?
+// TODO: broken?
 function taskLineToString(task: Task) {
   return `${task.listTokens}${createTimestamp(
     task.startMinutes,

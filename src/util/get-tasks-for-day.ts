@@ -5,12 +5,10 @@ import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { DataArray, STask } from "obsidian-dataview";
 
 import { timeFromStartRegExp } from "../regexp";
-import {
-  sTaskToTask,
-  sTaskToUnscheduledTask,
-} from "../service/dataview-facade";
 import { DayPlannerSettings } from "../settings";
 import { Task, TasksForDay } from "../types";
+
+import { toTask, toUnscheduledTask } from "./dataview";
 
 function isScheduledForThisDay(task: STask, day: Moment) {
   if (!task?.scheduled?.toMillis) {
@@ -74,7 +72,7 @@ export function mapToTasksForDay(
   const tasksWithTime = withTime
     .reduce((result, sTask) => {
       try {
-        const task = sTaskToTask(sTask, day);
+        const task = toTask(sTask, day);
 
         result.push(task);
       } catch (error) {
@@ -83,14 +81,14 @@ export function mapToTasksForDay(
 
       return result;
     }, [])
-    // todo: sortByStartMinutes()
+    // TODO: sortByStartMinutes()
     .sort((a, b) => a.startMinutes - b.startMinutes);
 
   const noTime = withoutTime
     .filter((sTask) =>
       settings.showUnscheduledNestedTasks ? true : !sTask.parent,
     )
-    .map((sTask: STask) => sTaskToUnscheduledTask(sTask, day));
+    .map((sTask: STask) => toUnscheduledTask(sTask, day));
 
   const withTimeAndDuration = calculateDuration(tasksWithTime, settings);
 

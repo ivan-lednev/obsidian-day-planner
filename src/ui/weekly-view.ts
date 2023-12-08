@@ -2,6 +2,7 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 
 import { viewTypeWeekly } from "../constants";
 import type { DayPlannerSettings } from "../settings";
+import { ComponentContext } from "../types";
 
 import HeaderActions from "./components/week/header-actions.svelte";
 import Week from "./components/week/week.svelte";
@@ -13,7 +14,7 @@ export default class WeeklyView extends ItemView {
   constructor(
     leaf: WorkspaceLeaf,
     private readonly settings: () => DayPlannerSettings,
-    private readonly componentContext: Map<string, Record<string, unknown>>,
+    private readonly componentContext: ComponentContext,
   ) {
     super(leaf);
   }

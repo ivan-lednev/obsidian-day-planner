@@ -9,7 +9,7 @@
   import { isToday } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
   import Ruler from "../ruler.svelte";
-  import TaskContainer from "../task-container.svelte";
+  import TimelineWithControls from "../timeline-with-controls.svelte";
 
   const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
 </script>
@@ -34,7 +34,8 @@
   {#each $visibleDateRange as day}
     <div class="day-column">
       <div class="stretcher">
-        <TaskContainer {day} hideControls />
+<!--    TODO: remove the wrapper    -->
+        <TimelineWithControls {day} hideControls />
       </div>
     </div>
   {/each}

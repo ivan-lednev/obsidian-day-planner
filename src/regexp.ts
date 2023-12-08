@@ -36,3 +36,5 @@ export const keylessScheduledPropRegExp = new RegExp(
 );
 
 export const shortScheduledPropRegExp = new RegExp(`(⌛\\s*)${date}`);
+
+export const propRegexp = /\[(.+)::(.*)]/g;

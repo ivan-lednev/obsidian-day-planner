@@ -1,57 +1,108 @@
+import { flow } from "lodash/fp";
 import {
-  Component,
-  FileView,
-  MarkdownRenderer,
+  MarkdownFileInfo,
+  MarkdownView,
+  Notice,
   Plugin,
   WorkspaceLeaf,
 } from "obsidian";
-import { getDateFromFile } from "obsidian-daily-notes-interface";
-import { getAPI } from "obsidian-dataview";
-import { derived, get, writable, Writable } from "svelte/store";
+import { STask } from "obsidian-dataview";
+import { get, Writable } from "svelte/store";
+import { isInstanceOf, isNotVoid } from "typed-assert";
 
-import { obsidianContext, viewTypeTimeline, viewTypeWeekly } from "./constants";
-import { currentTime } from "./global-store/current-time";
+import {
+  editContextKey,
+  obsidianContext,
+  viewTypeTimeline,
+  viewTypeTimeTracker,
+  viewTypeWeekly,
+} from "./constants";
 import { settings } from "./global-store/settings";
-import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
+import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
-import { useDebouncedDataviewTasks } from "./ui/hooks/use-debounced-dataview-tasks";
-import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
-import { useVisibleTasks } from "./ui/hooks/use-visible-tasks";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
+import TimeTrackerView from "./ui/time-tracker-view";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
+import {
+  assertActiveClock,
+  assertNoActiveClock,
+  withActiveClock,
+  withActiveClockCompleted,
+  withoutActiveClock,
+} from "./util/clock";
+import { createRenderMarkdown } from "./util/create-render-markdown";
+import { createHooks } from "./util/createHooks";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
-import { isToday } from "./util/moment";
-import { getDayKey } from "./util/tasks-utils";
+import { replaceSTaskInFile, toMarkdown } from "./util/dataview";
+import { locToEditorPosition } from "./util/editor";
+import { handleActiveLeafChange } from "./util/handle-active-leaf-change";
+import { withNotice } from "./util/with-notice";
 
 export default class DayPlanner extends Plugin {
-  settings: () => DayPlannerSettings;
-  private settingsStore: Writable<DayPlannerSettings>;
-  private obsidianFacade: ObsidianFacade;
-  private planEditor: PlanEditor;
-  private readonly dataviewLoaded = writable(false);
+  settings!: () => DayPlannerSettings;
+  private settingsStore!: Writable<DayPlannerSettings>;
+  private obsidianFacade!: ObsidianFacade;
+  private planEditor!: PlanEditor;
+  private dataviewFacade!: DataviewFacade;
 
   async onload() {
     await this.initSettingsStore();
 
     this.obsidianFacade = new ObsidianFacade(this.app);
+    this.dataviewFacade = new DataviewFacade(this.app, this.settings);
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
 
-    this.registerCommands();
-
+    this.registerViews();
     this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
 
-    this.registerViews();
-    this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
+    this.registerCommands();
+
+    this.registerEvent(
+      this.app.workspace.on("active-leaf-change", handleActiveLeafChange),
+    );
+
+    this.registerEvent(
+      this.app.workspace.on("editor-menu", (menu, editor, view) => {
+        try {
+          this.getSTaskUnderCursor(view);
+        } catch {
+          return;
+        }
+
+        menu.addItem((item) => {
+          item
+            .setTitle("Clock in")
+            .setIcon("play")
+            .onClick(this.clockInUnderCursor);
+        });
+
+        menu.addItem((item) => {
+          item
+            .setTitle("Clock out")
+            .setIcon("square")
+            .onClick(this.clockOutUnderCursor);
+        });
+
+        menu.addItem((item) => {
+          item
+            .setTitle("Cancel clock")
+            .setIcon("trash")
+            .onClick(this.cancelClockUnderCursor);
+        });
+      }),
+    );
   }
 
   async onunload() {
-    await this.detachLeavesOfType(viewTypeTimeline);
-    await this.detachLeavesOfType(viewTypeWeekly);
+    return Promise.all([
+      this.detachLeavesOfType(viewTypeTimeline),
+      this.detachLeavesOfType(viewTypeWeekly),
+    ]);
   }
 
   initWeeklyLeaf = async () => {
@@ -62,6 +113,15 @@ export default class DayPlanner extends Plugin {
     });
   };
 
+  initTimeTrackerLeaf = async () => {
+    await this.detachLeavesOfType(viewTypeTimeTracker);
+    await this.app.workspace.getRightLeaf(false).setViewState({
+      type: viewTypeTimeTracker,
+      active: true,
+    });
+    this.app.workspace.rightSplit.expand();
+  };
+
   initTimelineLeaf = async () => {
     await this.detachLeavesOfType(viewTypeTimeline);
     await this.app.workspace.getRightLeaf(false).setViewState({
@@ -69,74 +129,6 @@ export default class DayPlanner extends Plugin {
       active: true,
     });
     this.app.workspace.rightSplit.expand();
-  };
-
-  renderMarkdown = (el: HTMLElement, text: string) => {
-    const loader = new Component();
-
-    el.empty();
-
-    // todo: investigate why `await` doesn't work as expected here
-    MarkdownRenderer.render(this.app, text, el, "", loader);
-
-    loader.load();
-
-    return () => loader.unload();
-  };
-
-  getAllTasks = () => {
-    const source = this.settings().dataviewSource;
-    return this.refreshTasks(source);
-  };
-
-  private refreshTasks = (source: string) => {
-    const dataview = getAPI(this.app);
-
-    if (!dataview) {
-      return [];
-    }
-
-    this.dataviewLoaded.set(true);
-
-    performance.mark("query-start");
-    const result = dataview.pages(source).file.tasks;
-    performance.mark("query-end");
-
-    const measure = performance.measure(
-      "query-time",
-      "query-start",
-      "query-end",
-    );
-
-    console.debug(
-      `obsidian-day-planner:
-  source: "${source}"
-  took: ${measure.duration} ms`,
-    );
-
-    return result;
-  };
-
-  private handleActiveLeafChanged = ({ view }: WorkspaceLeaf) => {
-    if (!(view instanceof FileView) || !view.file) {
-      return;
-    }
-
-    const dayUserSwitchedTo = getDateFromFile(view.file, "day");
-
-    if (dayUserSwitchedTo?.isSame(get(visibleDayInTimeline), "day")) {
-      return;
-    }
-
-    if (!dayUserSwitchedTo) {
-      if (isToday(get(visibleDayInTimeline))) {
-        visibleDayInTimeline.set(window.moment());
-      }
-
-      return;
-    }
-
-    visibleDayInTimeline.set(dayUserSwitchedTo);
   };
 
   private registerCommands() {
@@ -153,6 +145,12 @@ export default class DayPlanner extends Plugin {
     });
 
     this.addCommand({
+      id: "show-time-tracker-view",
+      name: "Show Time Tracker",
+      callback: this.initTimeTrackerLeaf,
+    });
+
+    this.addCommand({
       id: "show-day-planner-today-note",
       name: "Open today's Day Planner",
       callback: async () =>
@@ -166,6 +164,24 @@ export default class DayPlanner extends Plugin {
       name: "Insert Planner Heading at Cursor",
       editorCallback: (editor) =>
         editor.replaceSelection(this.planEditor.createPlannerHeading()),
+    });
+
+    this.addCommand({
+      id: "clock-into-task-under-cursor",
+      name: "Clock into task under cursor",
+      callback: this.clockInUnderCursor,
+    });
+
+    this.addCommand({
+      id: "clock-out-of-task-under-cursor",
+      name: "Clock out of task under cursor",
+      callback: this.clockOutUnderCursor,
+    });
+
+    this.addCommand({
+      id: "cancel-clock-under-cursor",
+      name: "Cancel clock on task under cursor",
+      callback: this.clockOutUnderCursor,
     });
   }
 
@@ -189,33 +205,111 @@ export default class DayPlanner extends Plugin {
     await this.app.workspace.detachLeavesOfType(type);
   }
 
+  private getSTaskUnderCursor = (view: MarkdownFileInfo) => {
+    isInstanceOf(
+      view,
+      MarkdownView,
+      "You can only get tasks from markdown editor views",
+    );
+
+    const file = view.file;
+
+    isNotVoid(file, "There is no file for view");
+
+    const sTask = this.dataviewFacade
+      .getTasksFromPath(file.path)
+      .find((sTask: STask) => sTask.line === view.editor.getCursor().line);
+
+    isNotVoid(sTask, "There is no task under cursor");
+
+    return sTask;
+  };
+
+  // todo: move out
+  private getSTaskUnderCursorFromLastView = () => {
+    const view = this.obsidianFacade.getActiveMarkdownView();
+    return this.getSTaskUnderCursor(view);
+  };
+
+  // todo: move out
+  private replaceSTaskUnderCursor = (newMarkdown: string) => {
+    const view = this.obsidianFacade.getActiveMarkdownView();
+    const sTask = this.getSTaskUnderCursorFromLastView();
+
+    view.editor.replaceRange(
+      newMarkdown,
+      locToEditorPosition(sTask.position.start),
+      locToEditorPosition(sTask.position.end),
+    );
+  };
+
+  // todo: move out
+  private clockInUnderCursor = withNotice(
+    flow(
+      this.getSTaskUnderCursorFromLastView,
+      assertNoActiveClock,
+      withActiveClock,
+      toMarkdown,
+      this.replaceSTaskUnderCursor,
+    ),
+  );
+
+  // todo: move out
+  private clockOutUnderCursor = withNotice(
+    flow(
+      this.getSTaskUnderCursorFromLastView,
+      assertActiveClock,
+      withActiveClockCompleted,
+      toMarkdown,
+      this.replaceSTaskUnderCursor,
+    ),
+  );
+
+  // todo: move out
+  private cancelClockUnderCursor = withNotice(
+    flow(
+      this.getSTaskUnderCursorFromLastView,
+      assertActiveClock,
+      withoutActiveClock,
+      toMarkdown,
+      this.replaceSTaskUnderCursor,
+    ),
+  );
+
   private registerViews() {
-    const dataviewTasks = useDebouncedDataviewTasks({
-      metadataCache: this.app.metadataCache,
-      getAllTasks: this.getAllTasks,
+    const {
+      timeTrackerEditContext,
+      editContext,
+      tasksForToday,
+      sTasksWithActiveClockProps,
+      visibleTasks,
+    } = createHooks({
+      app: this.app,
+      dataviewFacade: this.dataviewFacade,
+      obsidianFacade: this.obsidianFacade,
+      settingsStore: this.settingsStore,
+      planEditor: this.planEditor,
     });
 
-    const visibleTasks = useVisibleTasks({ dataviewTasks });
+    const clockOut = withNotice(async (sTask: STask) => {
+      await this.obsidianFacade.editFile(sTask.path, (contents) =>
+        replaceSTaskInFile(
+          contents,
+          sTask,
+          toMarkdown(withActiveClockCompleted(sTask)),
+        ),
+      );
+    });
 
-    const tasksForToday = derived(
-      [visibleTasks, currentTime],
-      ([$visibleTasks, $currentTime]) => {
-        return $visibleTasks[getDayKey($currentTime)];
-      },
-    );
-
-    // todo: think of a way to unwrap the hook from the derived store
-    const editContext = derived(
-      [this.settingsStore, visibleTasks],
-      ([$settings, $visibleTasks]) => {
-        return useEditContext({
-          obsidianFacade: this.obsidianFacade,
-          onUpdate: this.planEditor.syncTasksWithFile,
-          settings: $settings,
-          visibleTasks: $visibleTasks,
-        });
-      },
-    );
+    const cancelClock = withNotice(async (sTask: STask) => {
+      await this.obsidianFacade.editFile(sTask.path, (contents) =>
+        replaceSTaskInFile(
+          contents,
+          sTask,
+          toMarkdown(withoutActiveClock(sTask)),
+        ),
+      );
+    });
 
     new StatusBarWidget({
       target: this.addStatusBarItem(),
@@ -225,25 +319,53 @@ export default class DayPlanner extends Plugin {
       },
     });
 
+    const defaultObsidianContext: object = {
+      obsidianFacade: this.obsidianFacade,
+      initWeeklyView: this.initWeeklyLeaf,
+      refreshTasks: this.dataviewFacade.getAllTasks,
+      dataviewLoaded: this.dataviewFacade.dataviewLoaded,
+      renderMarkdown: createRenderMarkdown(this.app),
+      editContext,
+      visibleTasks,
+      sTasksWithActiveClockProps,
+      clockOut,
+      cancelClock,
+      clockOutUnderCursor: this.clockOutUnderCursor,
+      clockInUnderCursor: this.clockInUnderCursor,
+      cancelClockUnderCursor: this.cancelClockUnderCursor,
+    };
+
+    // TODO: move out building context
     const componentContext = new Map([
-      [
-        obsidianContext,
-        {
-          obsidianFacade: this.obsidianFacade,
-          initWeeklyView: this.initWeeklyLeaf,
-          refreshTasks: this.refreshTasks,
-          dataviewLoaded: this.dataviewLoaded,
-          renderMarkdown: this.renderMarkdown,
-          editContext,
-          visibleTasks,
-        },
-      ],
+      [obsidianContext, defaultObsidianContext],
+      [editContextKey, { editContext }],
+    ]);
+
+    const timeTrackerContext = new Map([
+      ...componentContext,
+      ...new Map([
+        [
+          obsidianContext,
+          {
+            ...defaultObsidianContext,
+            initWeeklyView: () =>
+              new Notice("Time tracker weekly view is not yet implemented"),
+          },
+        ],
+      ]),
+      ...new Map([[editContextKey, { editContext: timeTrackerEditContext }]]),
     ]);
 
     this.registerView(
       viewTypeTimeline,
       (leaf: WorkspaceLeaf) =>
         new TimelineView(leaf, this.settings, componentContext),
+    );
+
+    this.registerView(
+      viewTypeTimeTracker,
+      (leaf: WorkspaceLeaf) =>
+        new TimeTrackerView(leaf, this.settings, timeTrackerContext),
     );
 
     this.registerView(

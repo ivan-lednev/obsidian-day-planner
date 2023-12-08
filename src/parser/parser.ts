@@ -8,7 +8,6 @@ import { getId } from "../util/id";
 
 import { parseTimestamp } from "./timestamp/timestamp";
 
-// todo: this belongs to metadata-utils
 export function getListItemsUnderHeading(
   metadata: CachedMetadata,
   heading: string,
@@ -74,8 +73,6 @@ export function createTask({
     listTokens,
     startTime,
     endTime: parseTimestamp(end, day),
-    rawStartTime: start,
-    rawEndTime: end,
     text: getDisplayedText(match, completeContent),
     firstLineText: text.trim(),
     location,

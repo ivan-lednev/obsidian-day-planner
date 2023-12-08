@@ -5,7 +5,7 @@ import { derived, Readable } from "svelte/store";
 import { addHorizontalPlacing } from "../../../overlap/overlap";
 import { Tasks } from "../../../types";
 import { getRenderKey } from "../../../util/task-utils";
-import { getDayKey, getEmptyTasksForDay } from "../../../util/tasks-utils";
+import { getDayKey, getEmptyRecordsForDay } from "../../../util/tasks-utils";
 
 export function useDisplayedTasksForDay(
   displayedTasks: Readable<Tasks>,
@@ -15,7 +15,7 @@ export function useDisplayedTasksForDay(
     const tasksForDay = $displayedTasks[getDayKey(day)];
 
     if (!tasksForDay) {
-      return getEmptyTasksForDay();
+      return getEmptyRecordsForDay();
     }
 
     return {

@@ -1,91 +1,42 @@
-import { Moment } from "moment";
-import { getDateFromPath } from "obsidian-daily-notes-interface";
-import { STask, DateTime } from "obsidian-dataview";
+import { App } from "obsidian";
+import { getAPI } from "obsidian-dataview";
+import { writable } from "svelte/store";
 
-import { defaultDurationMinutes } from "../constants";
-import { createTask } from "../parser/parser";
-import { timeFromStartRegExp } from "../regexp";
-import { Task } from "../types";
-import { getId } from "../util/id";
-import { getDiffInMinutes, getMinutesSinceMidnight } from "../util/moment";
+import { DayPlannerSettings } from "../settings";
+import { reportQueryPerformance, withPerformance } from "../util/performance";
 
-interface Node {
-  text: string;
-  symbol: string;
-  children: Node[];
-  status?: string;
-  scheduled?: DateTime;
-}
+export class DataviewFacade {
+  readonly dataviewLoaded = writable(false);
 
-function sTaskLineToString(node: Node) {
-  const status = node.status ? `[${node.status}] ` : "";
-  return `${node.symbol} ${status}${node.text}\n`;
-}
+  constructor(
+    private readonly app: App,
+    private readonly settings: () => DayPlannerSettings,
+  ) {}
 
-function sTaskToString(node: Node, indentation = "") {
-  let result = `${indentation}${sTaskLineToString(node)}`;
+  getAllTasksFromConfiguredSource = () => {
+    const source = this.settings().dataviewSource;
+    return this.getAllTasks(source);
+  };
 
-  for (const child of node.children) {
-    if (!child.scheduled && !timeFromStartRegExp.test(child.text)) {
-      result += sTaskToString(child, `\t${indentation}`);
+  getAllTasks = (source: string) => {
+    const dataview = getAPI(this.app);
+
+    if (!dataview) {
+      return [];
     }
-  }
 
-  return result;
-}
+    this.dataviewLoaded.set(true);
 
-export function sTaskToUnscheduledTask(sTask: STask, day: Moment) {
-  return {
-    durationMinutes: defaultDurationMinutes,
-    listTokens: `${sTask.symbol} [${sTask.status}] `,
-    firstLineText: sTask.text,
-    text: sTaskToString(sTask),
-    location: {
-      path: sTask.path,
-      line: sTask.line,
-      position: sTask.position,
-    },
-    id: getId(),
+    const { result, duration } = withPerformance(
+      () => dataview.pages(source).file.tasks,
+    );
+
+    console.debug(reportQueryPerformance(source, duration));
+
+    return result;
   };
-}
 
-export function sTaskToTask(sTask: STask, day: Moment): Task {
-  const { startTime, endTime, firstLineText, text } = createTask({
-    line: sTaskLineToString(sTask),
-    completeContent: sTaskToString(sTask),
-    day,
-    location: {
-      path: sTask.path,
-      line: sTask.line,
-      position: sTask.position,
-    },
-  });
-
-  const durationMinutes = endTime?.isAfter(startTime)
-    ? getDiffInMinutes(endTime, startTime)
-    : undefined;
-
-  return {
-    startTime,
-    listTokens: `${sTask.symbol} [${sTask.status}] `,
-    firstLineText,
-    text,
-    durationMinutes,
-    startMinutes: getMinutesSinceMidnight(startTime),
-    location: {
-      path: sTask.path,
-      line: sTask.line,
-      position: sTask.position,
-    },
-    id: getId(),
+  getTasksFromPath = (path: string) => {
+    return getAPI(this.app)?.page(path)?.file?.tasks;
   };
-}
-
-export function getScheduledDay(sTask: STask) {
-  const scheduledPropDay = sTask.scheduled?.toFormat?.("yyyy-MM-dd"); // luxon
-  const dailyNoteDay = getDateFromPath(sTask.path, "day")?.format(
-    "YYYY-MM-DD", // moment
-  );
-
-  return scheduledPropDay || dailyNoteDay;
 }

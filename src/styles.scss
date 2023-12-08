@@ -96,7 +96,8 @@
 }
 
 [data-type="timeline"] .view-content,
-[data-type="weekly"] .view-content {
+[data-type="weekly"] .view-content,
+[data-type="timeTracker"] .view-content {
   --time-ruler-width: 30px;
 
   display: flex;

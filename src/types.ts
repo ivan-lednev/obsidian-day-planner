@@ -1,5 +1,6 @@
 import type { Moment } from "moment";
-import { MetadataCache, Pos } from "obsidian";
+import { Pos } from "obsidian";
+import { STask } from "obsidian-dataview";
 import { Readable, Writable } from "svelte/store";
 
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
@@ -25,7 +26,7 @@ export interface UnscheduledTask {
    */
   listTokens: string;
 
-  // todo: the distinction needs to be clearer
+  // TODO: the distinction needs to be clearer
   firstLineText: string;
   text: string;
 
@@ -48,7 +49,7 @@ export interface TasksForDay {
 
 export type Tasks = Record<string, TasksForDay>;
 
-// todo: we don't need this, since it's all optional
+// TODO: delete this type
 export interface PlacedTask extends Task {}
 
 export type RelationToNow = "past" | "present" | "future";
@@ -61,24 +62,23 @@ export interface Overlap {
   start: number;
 }
 
-export type Timestamp = {
-  startMinutes: number;
-  durationMinutes: number;
-};
-
 export type CleanUp = () => void;
 export type RenderMarkdown = (el: HTMLElement, markdown: string) => CleanUp;
-export type GetTasksForDay = (day: Moment) => TasksForDay;
 
 export interface ObsidianContext {
   obsidianFacade: ObsidianFacade;
-  metadataCache: MetadataCache;
-  onUpdate: OnUpdateFn;
   initWeeklyView: () => Promise<void>;
-  getTasksForDay: Readable<GetTasksForDay>;
   refreshTasks: (source: string) => void;
   dataviewLoaded: Writable<boolean>;
   renderMarkdown: RenderMarkdown;
   editContext: Readable<ReturnType<typeof useEditContext>>;
   visibleTasks: Readable<Tasks>;
+  clockOut: (sTask: STask) => void;
+  cancelClock: (sTask: STask) => void;
+  clockInUnderCursor: () => void;
+  clockOutUnderCursor: () => void;
+  cancelClockUnderCursor: () => void;
+  sTasksWithActiveClockProps: Readable<STask[]>;
 }
+
+export type ComponentContext = Map<string, unknown>;

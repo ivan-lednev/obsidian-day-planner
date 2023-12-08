@@ -1,4 +1,5 @@
 import type { Editor } from "obsidian";
+import { Loc } from "obsidian";
 
 export function selectText(editor: Editor, text: string) {
   const startOffset = editor.getValue().lastIndexOf(text);
@@ -8,4 +9,7 @@ export function selectText(editor: Editor, text: string) {
     editor.offsetToPos(startOffset),
     editor.offsetToPos(endOffset),
   );
+}
+export function locToEditorPosition({ line, col }: Loc) {
+  return { line, ch: col };
 }

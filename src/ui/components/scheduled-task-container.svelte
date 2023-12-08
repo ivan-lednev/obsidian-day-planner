@@ -9,7 +9,6 @@
   let el: HTMLDivElement;
 </script>
 
-<!--todo: prevent propagation in handler -->
 <div
   bind:this={el}
   class="tasks absolute-stretch-x"

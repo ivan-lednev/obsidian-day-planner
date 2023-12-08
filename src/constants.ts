@@ -1,8 +1,14 @@
 export const viewTypeTimeline = "timeline";
 export const viewTypeWeekly = "weekly";
+export const viewTypeTimeTracker = "timeTracker";
 export const obsidianContext = "obsidian";
+export const editContextKey = "editContext";
+export const clockSeparator = "--";
 export const defaultDurationMinutes = 30;
 export const statusBarTextLimit = 15;
+export const indentBeforeTaskParagraph = 6;
+export const clockKey = "clocked";
+export const clockFormat = "YYYY-MM-DDTHH:mm:ss";
 
 export const icons = [
   "any-key",

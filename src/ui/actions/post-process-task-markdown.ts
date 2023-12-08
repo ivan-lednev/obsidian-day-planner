@@ -9,7 +9,7 @@ export function decorate(
 ) {
   const checkBox = el.querySelector('input[type="checkbox"]');
 
-  // todo: fix this forking
+  // TODO: fix this forking
   // @ts-expect-error
   if (checkBox && settings.showTimestampInTaskBlock && task.startMinutes) {
     const timestamp = createTimestamp(
