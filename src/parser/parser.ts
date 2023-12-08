@@ -74,8 +74,6 @@ export function createTask({
     listTokens,
     startTime,
     endTime: parseTimestamp(end, day),
-    rawStartTime: start,
-    rawEndTime: end,
     text: getDisplayedText(match, completeContent),
     firstLineText: text.trim(),
     location,
