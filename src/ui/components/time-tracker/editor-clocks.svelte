@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Play, Pause, Trash2 } from "lucide-svelte";
+  import { Play, Square, Trash2 } from "lucide-svelte";
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../../constants";
@@ -17,7 +17,7 @@
       <Play class="svg-icon" />
     </ControlButton>
     <ControlButton label="Clock out" on:click={clockOutUnderCursor}>
-      <Pause class="svg-icon" />
+      <Square class="svg-icon" />
     </ControlButton>
     <ControlButton label="Cancel clock" on:click={cancelClockUnderCursor}>
       <Trash2 class="svg-icon" />

@@ -1,3 +1,5 @@
+import { propRegexp } from "../regexp";
+
 export function createProp(key: string, value: string) {
   return `[${key}::${value}]`;
 }
@@ -7,8 +9,11 @@ export function updateProp(
   updateFn: (previous: string) => string,
 ) {
   // todo: move out
-  const propValueRegexp = /\[(.+)::(.*)]/;
-  const [, key, previous] = propValueRegexp.exec(line);
+  const [, key, previous] = propRegexp.exec(line);
 
   return `[${key}::${updateFn(previous)}]`;
+}
+
+export function deleteProps(line: string) {
+  return line.replaceAll(propRegexp, "").trim();
 }

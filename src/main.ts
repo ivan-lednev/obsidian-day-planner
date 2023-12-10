@@ -379,7 +379,11 @@ export default class DayPlanner extends Plugin {
 
     const cancelClock = async (sTask?: STask) => {
       await this.obsidianFacade.editFile(sTask.path, (contents) =>
-        replaceSTaskInFile(contents, sTask, toMarkdown(withoutActiveClock(sTask))),
+        replaceSTaskInFile(
+          contents,
+          sTask,
+          toMarkdown(withoutActiveClock(sTask)),
+        ),
       );
     };
 
