@@ -26,7 +26,7 @@ export default class TimeTrackerView extends ItemView {
   }
 
   getIcon() {
-    return this.settings().timelineIcon;
+    return "timer";
   }
 
   async onOpen() {

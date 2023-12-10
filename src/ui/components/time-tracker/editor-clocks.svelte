@@ -1,11 +1,14 @@
 <script lang="ts">
-  import { Play, Square, Trash2 } from "lucide-svelte";
+  import { Play } from "lucide-svelte";
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../../constants";
   import { ObsidianContext } from "../../../types";
   import ControlButton from "../control-button.svelte";
   import Tree from "../obsidian/tree.svelte";
+
+  import CancelClockButton from "./cancel-clock-button.svelte"
+  import ClockOutButton from "./clock-out-button.svelte"
 
   const { clockInUnderCursor, clockOutUnderCursor, cancelClockUnderCursor } =
     getContext<ObsidianContext>(obsidianContext);
@@ -16,12 +19,8 @@
     <ControlButton label="Clock in" on:click={clockInUnderCursor}>
       <Play class="svg-icon" />
     </ControlButton>
-    <ControlButton label="Clock out" on:click={clockOutUnderCursor}>
-      <Square class="svg-icon" />
-    </ControlButton>
-    <ControlButton label="Cancel clock" on:click={cancelClockUnderCursor}>
-      <Trash2 class="svg-icon" />
-    </ControlButton>
+    <ClockOutButton onClick={clockOutUnderCursor} />
+    <CancelClockButton onClick={cancelClockUnderCursor} />
   </div>
 </Tree>
 

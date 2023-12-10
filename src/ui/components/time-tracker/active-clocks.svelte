@@ -1,18 +1,20 @@
 <script lang="ts">
-  import { Square, Trash2 } from "lucide-svelte";
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../../constants";
   import { sTaskToUnscheduledTask } from "../../../service/dataview-facade";
   import { ObsidianContext } from "../../../types";
   import { deleteProps } from "../../../util/properties";
-  import ControlButton from "../control-button.svelte";
   import Tree from "../obsidian/tree.svelte";
   import Task from "../task.svelte";
+
+  import CancelClockButton from "./cancel-clock-button.svelte";
+  import ClockOutButton from "./clock-out-button.svelte";
 
   const { activeClocks, clockOut, cancelClock } =
     getContext<ObsidianContext>(obsidianContext);
 
+  // TODO: move out
   $: formattedTasks = $activeClocks.map((sTask) => {
     return sTaskToUnscheduledTask(
       { ...sTask, text: deleteProps(sTask.text) },
@@ -26,13 +28,8 @@
   {#each formattedTasks as task}
     <Task {task}>
       <div class="buttons">
-        <!--        TODO: introduce separate components -->
-        <ControlButton label="Clock out" on:click={() => clockOut(task)}>
-          <Square class="svg-icon" />
-        </ControlButton>
-        <ControlButton label="Cancel clock" on:click={() => cancelClock(task)}>
-          <Trash2 class="svg-icon" />
-        </ControlButton>
+        <ClockOutButton onClick={() => clockOut(task)} />
+        <CancelClockButton onClick={() => cancelClock(task)} />
       </div>
     </Task>
   {/each}

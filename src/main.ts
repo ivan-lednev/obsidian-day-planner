@@ -7,6 +7,7 @@ import {
   FileView,
   MarkdownRenderer,
   MarkdownView,
+  Notice,
   Plugin,
   WorkspaceLeaf,
 } from "obsidian";
@@ -242,6 +243,20 @@ export default class DayPlanner extends Plugin {
     await this.app.workspace.detachLeavesOfType(type);
   }
 
+  private withNotice = (
+    fn: (...args: unknown[]) => unknown | Promise<unknown>,
+  ) => {
+    return async (...args: unknown[]) => {
+      try {
+        await fn(...args);
+      } catch (error: unknown) {
+        console.error(error);
+        // @ts-ignore
+        new Notice(error?.message || error);
+      }
+    };
+  };
+
   private registerViews() {
     const dataviewTasks: Readable<DataArray<STask>> = useDebouncedDataviewTasks(
       {
@@ -314,6 +329,7 @@ export default class DayPlanner extends Plugin {
       },
     );
 
+    // TODO: move out
     const editTaskUnderCursor = (editFn: (original: STask) => string) => {
       const view = this.app.workspace.getMostRecentLeaf()?.view;
 
@@ -339,16 +355,17 @@ export default class DayPlanner extends Plugin {
       }
     };
 
-    const clockInUnderCursor = () =>
+    const clockInUnderCursor = this.withNotice(() =>
       editTaskUnderCursor((original) => {
         if (hasActiveClock(original)) {
           throw new Error("The task already has an active clock");
         }
 
         return toMarkdown(withActiveClock(original));
-      });
+      }),
+    );
 
-    const clockOutUnderCursor = () => {
+    const clockOutUnderCursor = this.withNotice(() => {
       editTaskUnderCursor((original) => {
         if (!hasActiveClock(original)) {
           throw new Error("The task has no open clocks");
@@ -356,18 +373,37 @@ export default class DayPlanner extends Plugin {
 
         return toMarkdown(withActiveClockCompleted(original));
       });
-    };
+    });
 
-    const cancelClockUnderCursor = () =>
+    const cancelClockUnderCursor = this.withNotice(() =>
       editTaskUnderCursor((original) => {
         if (!hasActiveClock(original)) {
           throw new Error("The task has no open clocks");
         }
 
         return toMarkdown(withoutActiveClock(original));
-      });
+      }),
+    );
 
-    const clockOut = async (sTask?: STask) => {
+    this.addCommand({
+      id: "clock-into-task-under-cursor",
+      name: "Clock into task under cursor",
+      callback: clockInUnderCursor,
+    });
+
+    this.addCommand({
+      id: "clock-out-of-task-under-cursor",
+      name: "Clock out of task under cursor",
+      callback: clockOutUnderCursor,
+    });
+
+    this.addCommand({
+      id: "cancel-clock-under-cursor",
+      name: "Cancel clock on task under cursor",
+      callback: clockOutUnderCursor,
+    });
+
+    const clockOut = this.withNotice(async (sTask?: STask) => {
       await this.obsidianFacade.editFile(sTask.path, (contents) =>
         replaceSTaskInFile(
           contents,
@@ -375,9 +411,9 @@ export default class DayPlanner extends Plugin {
           toMarkdown(withActiveClockCompleted(sTask)),
         ),
       );
-    };
+    });
 
-    const cancelClock = async (sTask?: STask) => {
+    const cancelClock = this.withNotice(async (sTask?: STask) => {
       await this.obsidianFacade.editFile(sTask.path, (contents) =>
         replaceSTaskInFile(
           contents,
@@ -385,7 +421,7 @@ export default class DayPlanner extends Plugin {
           toMarkdown(withoutActiveClock(sTask)),
         ),
       );
-    };
+    });
 
     new StatusBarWidget({
       target: this.addStatusBarItem(),
