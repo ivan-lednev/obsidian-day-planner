@@ -81,6 +81,9 @@ export interface ObsidianContext {
   renderMarkdown: RenderMarkdown;
   editContext: Readable<ReturnType<typeof useEditContext>>;
   visibleTasks: Readable<Tasks>;
+  clockIn: () => void;
+  clockOut: () => void;
+  cancelClock: () => void;
 }
 
 export type ComponentContext = Map<string, unknown>;

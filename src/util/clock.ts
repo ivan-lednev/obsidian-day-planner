@@ -1,9 +1,11 @@
+import { isString } from "lodash/fp";
 import { Moment } from "moment";
 import { STask } from "obsidian-dataview";
 
-import { clockSeparator } from "../constants";
+import { clockFormat, clockKey, clockSeparator } from "../constants";
 
 import { getDiffInMinutes, getMinutesSinceMidnight } from "./moment";
+import { createProp, updateProp } from "./properties";
 
 interface Time {
   startMinutes: number;
@@ -16,7 +18,7 @@ interface Clock {
 }
 
 export function parseClock(rawClock: string) {
-  if (typeof rawClock !== "string") {
+  if (!isString(rawClock)) {
     return null;
   }
 
@@ -42,16 +44,61 @@ export function clockToTime({ start, end }: Clock): Time {
   };
 }
 
-export function hasActiveClock(task: STask) {
-  if (!task.clocked) {
+export function hasActiveClock(sTask: STask) {
+  if (!sTask.clocked) {
     return false;
   }
 
-  if (Array.isArray(task.clocked)) {
-    return task.clocked.some(
-      (clock) => !String(clock).contains(clockSeparator),
-    );
+  if (Array.isArray(sTask.clocked)) {
+    return sTask.clocked.some((prop) => containsActiveClock(prop));
   }
 
-  return !String(task.clocked).contains(clockSeparator);
+  return containsActiveClock(String(sTask.clocked));
+}
+
+export function createClockTimestamp() {
+  return window.moment().format(clockFormat);
+}
+
+export function createActiveClock() {
+  return createProp(clockKey, createClockTimestamp());
+}
+
+export function clockOut(line: string) {
+  return updateProp(
+    line,
+    (previous) => `${previous}${clockSeparator}${createClockTimestamp()}`,
+  );
+}
+
+export function containsActiveClock(line: string) {
+  return line.includes(clockKey) && !line.includes(clockSeparator);
+}
+
+export function withActiveClock(sTask: STask) {
+  return {
+    ...sTask,
+    text: `${sTask.text}
+${createActiveClock()}`,
+  };
+}
+
+export function withoutActiveClock(sTask: STask) {
+  return {
+    ...sTask,
+    text: sTask.text
+      .split("\n")
+      .filter((line) => !containsActiveClock(line))
+      .join("\n"),
+  };
+}
+
+export function withActiveClockCompleted(sTask: STask) {
+  return {
+    ...sTask,
+    text: sTask.text
+      .split("\n")
+      .map((line) => (containsActiveClock(line) ? clockOut(line) : line))
+      .join("\n"),
+  };
 }

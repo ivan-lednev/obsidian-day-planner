@@ -2,7 +2,10 @@ import { Moment } from "moment";
 import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { DateTime, STask } from "obsidian-dataview";
 
-import { defaultDurationMinutes } from "../constants";
+import {
+  defaultDurationMinutes,
+  indentBeforeTaskParagraph,
+} from "../constants";
 import { createTask } from "../parser/parser";
 import { timeFromStartRegExp } from "../regexp";
 import { Task } from "../types";
@@ -91,6 +94,7 @@ export function getScheduledDay(sTask: STask) {
   return scheduledPropDay || dailyNoteDay;
 }
 
+// todo: separate notions of UI clock/property `clocked`/a pair of start-end
 export function sTaskToClocks(sTask: STask, rawClock: string | []) {
   if (Array.isArray(rawClock)) {
     return rawClock.map((clock: string) => sTaskToClocks(sTask, clock));
@@ -115,4 +119,21 @@ export function sTaskToClocks(sTask: STask, rawClock: string | []) {
     },
     id: getId(),
   };
+}
+
+export function toMarkdown(sTask: STask) {
+  const baseIndent = "\t".repeat(sTask.position.start.col);
+  const extraIndent = " ".repeat(indentBeforeTaskParagraph);
+
+  return sTask.text
+    .split("\n")
+    .map((line, i) => {
+      if (i === 0) {
+        // TODO: remove duplication
+        return `${baseIndent}${sTask.symbol} [${sTask.status}] ${line}`;
+      }
+
+      return `${baseIndent}${extraIndent}${line}`;
+    })
+    .join("\n");
 }

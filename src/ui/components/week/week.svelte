@@ -34,6 +34,7 @@
   {#each $visibleDateRange as day}
     <div class="day-column">
       <div class="stretcher">
+<!--    TODO: remove the wrapper    -->
         <TaskContainer {day} hideControls />
       </div>
     </div>

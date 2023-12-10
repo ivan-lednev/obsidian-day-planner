@@ -1,9 +1,12 @@
+import { EditorView, ViewUpdate } from "@codemirror/view";
 import { noop } from "lodash/fp";
 import { Moment } from "moment";
 import {
   Component,
+  debounce,
   FileView,
   MarkdownRenderer,
+  MarkdownView,
   Plugin,
   WorkspaceLeaf,
 } from "obsidian";
@@ -21,7 +24,7 @@ import {
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
-import { getScheduledDay } from "./service/dataview-facade";
+import { getScheduledDay, toMarkdown } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
@@ -35,6 +38,12 @@ import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimeTrackerView from "./ui/time-tracker-view";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
+import {
+  hasActiveClock,
+  withActiveClock,
+  withActiveClockCompleted,
+  withoutActiveClock,
+} from "./util/clock";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { isToday } from "./util/moment";
 import { getDayKey } from "./util/tasks-utils";
@@ -288,6 +297,58 @@ export default class DayPlanner extends Plugin {
       },
     );
 
+    const editTaskUnderCursor = (editFn: (original: STask) => string) => {
+      const view = this.app.workspace.getMostRecentLeaf()?.view;
+
+      if (view instanceof MarkdownView) {
+        const cursor = view.editor.getCursor();
+
+        // todo: hide dataview api
+        const dataview = getAPI(this.app);
+        const sTask = dataview
+          .page(view.file.path)
+          ?.file?.tasks?.find((sTask: STask) => sTask.line === cursor.line);
+
+        if (!sTask) {
+          throw new Error("There is no task under cursor");
+        }
+
+        view.editor.replaceRange(
+          editFn(sTask),
+          // TODO: find a simpler way
+          { line: sTask.position.start.line, ch: sTask.position.start.col },
+          { line: sTask.position.end.line, ch: sTask.position.end.col },
+        );
+      }
+    };
+
+    const clockIn = () =>
+      editTaskUnderCursor((original) => {
+        if (hasActiveClock(original)) {
+          throw new Error("The task already has an active clock");
+        }
+
+        return toMarkdown(withActiveClock(original));
+      });
+
+    const clockOut = () =>
+      editTaskUnderCursor((original) => {
+        if (!hasActiveClock(original)) {
+          throw new Error("The task has no open clocks");
+        }
+
+        return toMarkdown(withActiveClockCompleted(original));
+      });
+
+    const cancelClock = () =>
+      editTaskUnderCursor((original) => {
+        if (!hasActiveClock(original)) {
+          throw new Error("The task has no open clocks");
+        }
+
+        return toMarkdown(withoutActiveClock(original));
+      });
+
     new StatusBarWidget({
       target: this.addStatusBarItem(),
       props: {
@@ -308,6 +369,9 @@ export default class DayPlanner extends Plugin {
           editContext,
           visibleTasks,
           activeClocks,
+          clockOut,
+          clockIn,
+          cancelClock,
         },
       ],
       [editContextKey, { editContext }],
@@ -315,7 +379,7 @@ export default class DayPlanner extends Plugin {
 
     const timeTrackerContext = new Map([
       ...componentContext,
-      [editContextKey, { editContext: timeTrackerEditContext }],
+      ...new Map([[editContextKey, { editContext: timeTrackerEditContext }]]),
     ]);
 
     this.registerView(
