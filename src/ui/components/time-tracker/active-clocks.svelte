@@ -7,20 +7,21 @@
   import ControlButton from "../control-button.svelte";
   import Tree from "../obsidian/tree.svelte";
 
-
-  const { activeClocks } = getContext<ObsidianContext>(obsidianContext);
+  const { activeClocks, clockOut, cancelClock } =
+    getContext<ObsidianContext>(obsidianContext);
 </script>
 
 <Tree title="Active clocks">
-  {#each $activeClocks as clock}
+<!--  TODO: -> sTasksWithActiveClocks -->
+  {#each $activeClocks as sTask}
     <div class="inner-container">
-      <ControlButton label="Clock out" on:click={() => {}}>
+      <ControlButton label="Clock out" on:click={() => clockOut(sTask)}>
         <Pause class="svg-icon" />
       </ControlButton>
-      <ControlButton label="Cancel clock" on:click={() => {}}>
+      <ControlButton label="Cancel clock" on:click={() => cancelClock(sTask)}>
         <Trash2 class="svg-icon" />
       </ControlButton>
-      <div class="task-text">{clock.text}</div>
+      <div class="task-text">{sTask.text}</div>
     </div>
   {/each}
 </Tree>

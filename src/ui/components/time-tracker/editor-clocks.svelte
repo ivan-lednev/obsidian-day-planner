@@ -7,20 +7,19 @@
   import ControlButton from "../control-button.svelte";
   import Tree from "../obsidian/tree.svelte";
 
-
-  const { clockIn, clockOut, cancelClock } =
+  const { clockInUnderCursor, clockOutUnderCursor, cancelClockUnderCursor } =
     getContext<ObsidianContext>(obsidianContext);
 </script>
 
 <Tree title="Editor clocks">
   <div class="buttons">
-    <ControlButton label="Clock in" on:click={clockIn}>
+    <ControlButton label="Clock in" on:click={clockInUnderCursor}>
       <Play class="svg-icon" />
     </ControlButton>
-    <ControlButton label="Clock out" on:click={clockOut}>
+    <ControlButton label="Clock out" on:click={clockOutUnderCursor}>
       <Pause class="svg-icon" />
     </ControlButton>
-    <ControlButton label="Cancel clock" on:click={cancelClock}>
+    <ControlButton label="Cancel clock" on:click={cancelClockUnderCursor}>
       <Trash2 class="svg-icon" />
     </ControlButton>
   </div>

@@ -137,3 +137,12 @@ export function toMarkdown(sTask: STask) {
     })
     .join("\n");
 }
+
+export function replaceSTaskInFile(contents: string, sTask: STask, newText: string) {
+  const lines = contents.split("\n");
+  const deleteCount = sTask.position.end.line - sTask.position.start.line + 1;
+
+  lines.splice(sTask.position.start.line, deleteCount, newText);
+
+  return lines.join("\n");
+}

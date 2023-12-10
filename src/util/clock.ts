@@ -50,10 +50,10 @@ export function hasActiveClock(sTask: STask) {
   }
 
   if (Array.isArray(sTask.clocked)) {
-    return sTask.clocked.some((prop) => containsActiveClock(prop));
+    return sTask.clocked.some((prop) => !String(prop).includes(clockSeparator));
   }
 
-  return containsActiveClock(String(sTask.clocked));
+  return !String(sTask.clocked).includes(clockSeparator);
 }
 
 export function createClockTimestamp() {

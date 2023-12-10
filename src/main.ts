@@ -24,7 +24,11 @@ import {
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
-import { getScheduledDay, toMarkdown } from "./service/dataview-facade";
+import {
+  getScheduledDay,
+  replaceSTaskInFile,
+  toMarkdown,
+} from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
@@ -68,6 +72,19 @@ export default class DayPlanner extends Plugin {
 
     this.registerViews();
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
+
+    const lineUnderCursor = writable();
+    const debounced = debounce(lineUnderCursor.set, 1000, true);
+
+    this.registerEditorExtension([
+      EditorView.updateListener.of((viewUpdate: ViewUpdate) => {
+        debounced("TODO");
+        console.log(
+          viewUpdate.state.doc.lineAt(viewUpdate.state.selection.ranges[0].from)
+            .text,
+        );
+      }),
+    ]);
   }
 
   async onunload() {
@@ -322,7 +339,7 @@ export default class DayPlanner extends Plugin {
       }
     };
 
-    const clockIn = () =>
+    const clockInUnderCursor = () =>
       editTaskUnderCursor((original) => {
         if (hasActiveClock(original)) {
           throw new Error("The task already has an active clock");
@@ -331,7 +348,7 @@ export default class DayPlanner extends Plugin {
         return toMarkdown(withActiveClock(original));
       });
 
-    const clockOut = () =>
+    const clockOutUnderCursor = () => {
       editTaskUnderCursor((original) => {
         if (!hasActiveClock(original)) {
           throw new Error("The task has no open clocks");
@@ -339,8 +356,9 @@ export default class DayPlanner extends Plugin {
 
         return toMarkdown(withActiveClockCompleted(original));
       });
+    };
 
-    const cancelClock = () =>
+    const cancelClockUnderCursor = () =>
       editTaskUnderCursor((original) => {
         if (!hasActiveClock(original)) {
           throw new Error("The task has no open clocks");
@@ -348,6 +366,22 @@ export default class DayPlanner extends Plugin {
 
         return toMarkdown(withoutActiveClock(original));
       });
+
+    const clockOut = async (sTask?: STask) => {
+      await this.obsidianFacade.editFile(sTask.path, (contents) =>
+        replaceSTaskInFile(
+          contents,
+          sTask,
+          toMarkdown(withActiveClockCompleted(sTask)),
+        ),
+      );
+    };
+
+    const cancelClock = async (sTask?: STask) => {
+      await this.obsidianFacade.editFile(sTask.path, (contents) =>
+        replaceSTaskInFile(contents, sTask, toMarkdown(withoutActiveClock(sTask))),
+      );
+    };
 
     new StatusBarWidget({
       target: this.addStatusBarItem(),
@@ -370,8 +404,10 @@ export default class DayPlanner extends Plugin {
           visibleTasks,
           activeClocks,
           clockOut,
-          clockIn,
           cancelClock,
+          clockOutUnderCursor,
+          clockInUnderCursor,
+          cancelClockUnderCursor,
         },
       ],
       [editContextKey, { editContext }],
