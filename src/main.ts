@@ -84,44 +84,45 @@ export default class DayPlanner extends Plugin {
       }),
     ]);
 
-    this.registerEvent(
-      this.app.workspace.on("editor-menu", (menu, editor, view) => {
-        // TODO: get task under cursor
-        // TODO: add items only if relevant
+    // todo: check for memory leaks after plugin unloads
+    this.app.workspace.on("editor-menu", (menu, editor, view) => {
+      // TODO: get task under cursor
+      // TODO: add items only if relevant
 
-        menu.addItem((item) => {
-          item
-            .setTitle("Clock in")
-            .setIcon("play")
-            .onClick(() => {
-              console.log("Click!");
-            });
-        });
+      menu.addItem((item) => {
+        item
+          .setTitle("Clock in")
+          .setIcon("play")
+          .onClick(() => {
+            console.log("Click!");
+          });
+      });
 
-        menu.addItem((item) => {
-          item
-            .setTitle("Clock out")
-            .setIcon("square")
-            .onClick(() => {
-              console.log("Click!");
-            });
-        });
+      menu.addItem((item) => {
+        item
+          .setTitle("Clock out")
+          .setIcon("square")
+          .onClick(() => {
+            console.log("Click!");
+          });
+      });
 
-        menu.addItem((item) => {
-          item
-            .setTitle("Cancel clock")
-            .setIcon("trash")
-            .onClick(() => {
-              console.log("Click!");
-            });
-        });
-      }),
-    );
+      menu.addItem((item) => {
+        item
+          .setTitle("Cancel clock")
+          .setIcon("trash")
+          .onClick(() => {
+            console.log("Click!");
+          });
+      });
+    });
   }
 
   async onunload() {
-    await this.detachLeavesOfType(viewTypeTimeline);
-    await this.detachLeavesOfType(viewTypeWeekly);
+    return Promise.all([
+      this.detachLeavesOfType(viewTypeTimeline),
+      this.detachLeavesOfType(viewTypeWeekly),
+    ]);
   }
 
   initWeeklyLeaf = async () => {
