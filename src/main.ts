@@ -1,14 +1,6 @@
-import { EditorView, ViewUpdate } from "@codemirror/view";
 import { flow, noop } from "lodash/fp";
 import { Moment } from "moment";
-import {
-  debounce,
-  FileView,
-  Loc,
-  MarkdownView,
-  Plugin,
-  WorkspaceLeaf,
-} from "obsidian";
+import { FileView, Loc, MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
 import { DataArray, getAPI, STask } from "obsidian-dataview";
 import { derived, get, Readable, Writable, writable } from "svelte/store";
@@ -328,6 +320,8 @@ export default class DayPlanner extends Plugin {
         if (!sTask) {
           throw new Error("There is no task under cursor");
         }
+
+        return sTask;
       }
     };
 
@@ -371,31 +365,34 @@ export default class DayPlanner extends Plugin {
       return sTask;
     };
 
-    const createTaskEditor = (
-      assertFn: (sTask: STask) => STask,
-      transformFn: (sTask: STask) => STask,
-    ) =>
-      withNotice(
-        flow(
-          getTaskUnderCursor,
-          assertFn,
-          transformFn,
-          toMarkdown,
-          replaceTaskUnderCursor,
-        ),
-      );
+    const clockInUnderCursor = withNotice(
+      flow(
+        getTaskUnderCursor,
+        assertNoActiveClock,
+        withActiveClock,
+        toMarkdown,
+        replaceTaskUnderCursor,
+      ),
+    );
 
-    const clockInUnderCursor = createTaskEditor(
-      assertNoActiveClock,
-      withActiveClock,
+    const clockOutUnderCursor = withNotice(
+      flow(
+        getTaskUnderCursor,
+        assertActiveClock,
+        withActiveClockCompleted,
+        toMarkdown,
+        replaceTaskUnderCursor,
+      ),
     );
-    const clockOutUnderCursor = createTaskEditor(
-      assertActiveClock,
-      withActiveClockCompleted,
-    );
-    const cancelClockUnderCursor = createTaskEditor(
-      assertActiveClock,
-      withoutActiveClock,
+
+    const cancelClockUnderCursor = withNotice(
+      flow(
+        getTaskUnderCursor,
+        assertActiveClock,
+        withoutActiveClock,
+        toMarkdown,
+        replaceTaskUnderCursor,
+      ),
     );
 
     // todo: out of place
