@@ -3,6 +3,7 @@ import { Moment } from "moment";
 import { STask } from "obsidian-dataview";
 
 import { clockFormat, clockKey, clockSeparator } from "../constants";
+import { toClockRecordOrRecords } from "../service/dataview-facade";
 
 import { getDiffInMinutes, getMinutesSinceMidnight } from "./moment";
 import { createProp, updateProp } from "./properties";
@@ -12,17 +13,18 @@ interface Time {
   durationMinutes: number;
 }
 
-interface Clock {
+interface ClockMoments {
   start: Moment;
   end: Moment;
 }
 
-export function parseClock(rawClock: string) {
-  if (!isString(rawClock)) {
+// TODO: simplify
+export function toMoments(clockPropValue: string) {
+  if (!isString(clockPropValue)) {
     return null;
   }
 
-  const [rawStart, rawEnd] = rawClock.split(clockSeparator);
+  const [rawStart, rawEnd] = clockPropValue.split(clockSeparator);
 
   if (!rawStart || !rawEnd) {
     return null;
@@ -37,7 +39,7 @@ export function parseClock(rawClock: string) {
   return { start, end };
 }
 
-export function clockToTime({ start, end }: Clock): Time {
+export function toTime({ start, end }: ClockMoments): Time {
   return {
     startMinutes: getMinutesSinceMidnight(start),
     durationMinutes: getDiffInMinutes(end, start),
@@ -75,7 +77,7 @@ export function containsActiveClock(line: string) {
   return line.includes(clockKey) && !line.includes(clockSeparator);
 }
 
-export function withActiveClock(sTask: STask) {
+export function withActiveClock(sTask: STask): STask {
   return {
     ...sTask,
     text: `${sTask.text}
@@ -101,4 +103,11 @@ export function withActiveClockCompleted(sTask: STask) {
       .map((line) => (containsActiveClock(line) ? clockOut(line) : line))
       .join("\n"),
   };
+}
+
+export function toClockRecords(sTasks: STask[]) {
+  return sTasks
+    .filter((task) => task.clocked)
+    .flatMap((sTask) => toClockRecordOrRecords(sTask, sTask.clocked))
+    .filter(Boolean);
 }

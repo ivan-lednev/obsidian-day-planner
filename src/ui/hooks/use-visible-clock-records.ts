@@ -2,20 +2,12 @@ import { STask } from "obsidian-dataview";
 import { derived, Readable } from "svelte/store";
 
 import { visibleDays } from "../../global-store/visible-days";
-import { sTaskToClocks } from "../../service/dataview-facade";
 import { TasksForDay } from "../../types";
-import { getDayKey, getEmptyTasksForDay } from "../../util/tasks-utils";
+import { toClockRecords } from "../../util/clock";
+import { getDayKey, getEmptyRecordsForDay } from "../../util/tasks-utils";
 
 interface UseVisibleClockRecordsProps {
   dayToSTasksLookup: Readable<Record<string, STask[]>>;
-}
-
-// todo: move
-export function mapToClockRecords(sTasks: STask[]) {
-  return sTasks
-    .filter((task) => task.clocked)
-    .flatMap((sTask) => sTaskToClocks(sTask, sTask.clocked))
-    .filter(Boolean);
 }
 
 // todo: remove duplication from Tasks
@@ -31,11 +23,11 @@ export function useVisibleClockRecords({
 
         if (sTasksForDay) {
           result[key] = {
-            withTime: mapToClockRecords(sTasksForDay),
+            withTime: toClockRecords(sTasksForDay),
             noTime: [],
           };
         } else {
-          result[key] = getEmptyTasksForDay();
+          result[key] = getEmptyRecordsForDay();
         }
 
         return result;

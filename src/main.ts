@@ -1,13 +1,11 @@
 import { EditorView, ViewUpdate } from "@codemirror/view";
-import { noop } from "lodash/fp";
+import { flow, noop } from "lodash/fp";
 import { Moment } from "moment";
 import {
-  Component,
   debounce,
   FileView,
-  MarkdownRenderer,
+  Loc,
   MarkdownView,
-  Notice,
   Plugin,
   WorkspaceLeaf,
 } from "obsidian";
@@ -25,16 +23,13 @@ import {
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
-import {
-  getScheduledDay,
-  replaceSTaskInFile,
-  toMarkdown,
-} from "./service/dataview-facade";
+import { replaceSTaskInFile, toMarkdown } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { useActiveClocks } from "./ui/hooks/use-active-clocks";
+import { useDayToStasksLookup } from "./ui/hooks/use-day-to-stasks-lookup";
 import { useDebouncedDataviewTasks } from "./ui/hooks/use-debounced-dataview-tasks";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { useVisibleClockRecords } from "./ui/hooks/use-visible-clock-records";
@@ -49,9 +44,11 @@ import {
   withActiveClockCompleted,
   withoutActiveClock,
 } from "./util/clock";
+import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { isToday } from "./util/moment";
 import { getDayKey } from "./util/tasks-utils";
+import { withNotice } from "./util/with-notice";
 
 export default class DayPlanner extends Plugin {
   settings: () => DayPlannerSettings;
@@ -117,19 +114,6 @@ export default class DayPlanner extends Plugin {
       active: true,
     });
     this.app.workspace.rightSplit.expand();
-  };
-
-  renderMarkdown = (el: HTMLElement, text: string) => {
-    const loader = new Component();
-
-    el.empty();
-
-    // todo: investigate why `await` doesn't work as expected here
-    MarkdownRenderer.render(this.app, text, el, "", loader);
-
-    loader.load();
-
-    return () => loader.unload();
   };
 
   getAllTasks = () => {
@@ -243,20 +227,6 @@ export default class DayPlanner extends Plugin {
     await this.app.workspace.detachLeavesOfType(type);
   }
 
-  private withNotice = (
-    fn: (...args: unknown[]) => unknown | Promise<unknown>,
-  ) => {
-    return async (...args: unknown[]) => {
-      try {
-        await fn(...args);
-      } catch (error: unknown) {
-        console.error(error);
-        // @ts-ignore
-        new Notice(error?.message || error);
-      }
-    };
-  };
-
   private registerViews() {
     const dataviewTasks: Readable<DataArray<STask>> = useDebouncedDataviewTasks(
       {
@@ -264,29 +234,14 @@ export default class DayPlanner extends Plugin {
         getAllTasks: this.getAllTasks,
       },
     );
-
-    const dayToSTasksLookup = derived(dataviewTasks, ($dataviewTasks) => {
-      if (!$dataviewTasks) {
-        return {};
-      }
-
-      return Object.fromEntries(
-        $dataviewTasks
-          .groupBy(getScheduledDay)
-          .map(({ key, rows }) => [key, rows.array()])
-          .array(),
-      );
-    });
-
+    const dayToSTasksLookup = useDayToStasksLookup({ dataviewTasks });
     const visibleTasks = useVisibleTasks({ dayToSTasksLookup });
-
     const tasksForToday = derived(
       [visibleTasks, currentTime],
       ([$visibleTasks, $currentTime]) => {
         return $visibleTasks[getDayKey($currentTime)];
       },
     );
-
     const activeClocks = useActiveClocks({ dataviewTasks });
     const visibleClockRecords = useVisibleClockRecords({ dayToSTasksLookup });
 
@@ -330,14 +285,39 @@ export default class DayPlanner extends Plugin {
     );
 
     // TODO: move out
-    const editTaskUnderCursor = (editFn: (original: STask) => string) => {
+    // todo: split dataview/editor/workspace
+
+    function locToEditorPosition({ line, col }: Loc) {
+      return { line, ch: col };
+    }
+
+    const dataview = getAPI(this.app);
+
+    const getTaskUnderCursor = () => {
       const view = this.app.workspace.getMostRecentLeaf()?.view;
 
       if (view instanceof MarkdownView) {
         const cursor = view.editor.getCursor();
 
         // todo: hide dataview api
-        const dataview = getAPI(this.app);
+        const sTask = dataview
+          .page(view.file.path)
+          ?.file?.tasks?.find((sTask: STask) => sTask.line === cursor.line);
+
+        if (!sTask) {
+          throw new Error("There is no task under cursor");
+        }
+      }
+    };
+
+    // todo: remove duplication
+    const replaceTaskUnderCursor = (newMarkdown: string) => {
+      const view = this.app.workspace.getMostRecentLeaf()?.view;
+
+      if (view instanceof MarkdownView) {
+        const cursor = view.editor.getCursor();
+
+        // todo: hide dataview api
         const sTask = dataview
           .page(view.file.path)
           ?.file?.tasks?.find((sTask: STask) => sTask.line === cursor.line);
@@ -347,42 +327,54 @@ export default class DayPlanner extends Plugin {
         }
 
         view.editor.replaceRange(
-          editFn(sTask),
-          // TODO: find a simpler way
-          { line: sTask.position.start.line, ch: sTask.position.start.col },
-          { line: sTask.position.end.line, ch: sTask.position.end.col },
+          newMarkdown,
+          locToEditorPosition(sTask.position.start),
+          locToEditorPosition(sTask.position.end),
         );
       }
     };
 
-    const clockInUnderCursor = this.withNotice(() =>
-      editTaskUnderCursor((original) => {
-        if (hasActiveClock(original)) {
-          throw new Error("The task already has an active clock");
-        }
+    const assertActiveClock = (sTask: STask) => {
+      if (!hasActiveClock(sTask)) {
+        throw new Error("The task has no active clocks");
+      }
 
-        return toMarkdown(withActiveClock(original));
-      }),
+      return sTask;
+    };
+
+    const assertNoActiveClock = (sTask: STask) => {
+      if (hasActiveClock(sTask)) {
+        throw new Error("The task already has an active clock");
+      }
+
+      return sTask;
+    };
+
+    const createTaskEditor = (
+      assertFn: (sTask: STask) => STask,
+      transformFn: (sTask: STask) => STask,
+    ) =>
+      withNotice(
+        flow(
+          getTaskUnderCursor,
+          assertFn,
+          transformFn,
+          toMarkdown,
+          replaceTaskUnderCursor,
+        ),
+      );
+
+    const clockInUnderCursor = createTaskEditor(
+      assertNoActiveClock,
+      withActiveClock,
     );
-
-    const clockOutUnderCursor = this.withNotice(() => {
-      editTaskUnderCursor((original) => {
-        if (!hasActiveClock(original)) {
-          throw new Error("The task has no open clocks");
-        }
-
-        return toMarkdown(withActiveClockCompleted(original));
-      });
-    });
-
-    const cancelClockUnderCursor = this.withNotice(() =>
-      editTaskUnderCursor((original) => {
-        if (!hasActiveClock(original)) {
-          throw new Error("The task has no open clocks");
-        }
-
-        return toMarkdown(withoutActiveClock(original));
-      }),
+    const clockOutUnderCursor = createTaskEditor(
+      assertActiveClock,
+      withActiveClockCompleted,
+    );
+    const cancelClockUnderCursor = createTaskEditor(
+      assertActiveClock,
+      withoutActiveClock,
     );
 
     this.addCommand({
@@ -403,7 +395,7 @@ export default class DayPlanner extends Plugin {
       callback: clockOutUnderCursor,
     });
 
-    const clockOut = this.withNotice(async (sTask?: STask) => {
+    const clockOut = withNotice(async (sTask?: STask) => {
       await this.obsidianFacade.editFile(sTask.path, (contents) =>
         replaceSTaskInFile(
           contents,
@@ -413,7 +405,7 @@ export default class DayPlanner extends Plugin {
       );
     });
 
-    const cancelClock = this.withNotice(async (sTask?: STask) => {
+    const cancelClock = withNotice(async (sTask?: STask) => {
       await this.obsidianFacade.editFile(sTask.path, (contents) =>
         replaceSTaskInFile(
           contents,
@@ -431,6 +423,7 @@ export default class DayPlanner extends Plugin {
       },
     });
 
+    // TODO: move out building context
     const componentContext = new Map([
       [
         obsidianContext,
@@ -439,7 +432,7 @@ export default class DayPlanner extends Plugin {
           initWeeklyView: this.initWeeklyLeaf,
           refreshTasks: this.refreshTasks,
           dataviewLoaded: this.dataviewLoaded,
-          renderMarkdown: this.renderMarkdown,
+          renderMarkdown: createRenderMarkdown(this.app),
           editContext,
           visibleTasks,
           activeClocks,

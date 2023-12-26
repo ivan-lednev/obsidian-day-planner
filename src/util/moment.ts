@@ -77,3 +77,13 @@ export function getRelationToNow(
 export function isToday(moment: Moment) {
   return moment.isSame(window.moment(), "day");
 }
+
+export function splitByDay(start: Moment, end: Moment) {
+  // const chunks = [];
+
+  // if (start.isSame(end, "day")) {
+  //   return [[start, end]];
+  // }
+  //
+  // const daysBetween = start.diff(end, "days");
+}

@@ -17,7 +17,7 @@ import {
   updateTaskText,
 } from "./task-utils";
 
-export function getEmptyTasksForDay(): TasksForDay {
+export function getEmptyRecordsForDay(): TasksForDay {
   return { withTime: [], noTime: [] };
 }
 

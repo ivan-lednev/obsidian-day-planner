@@ -10,6 +10,7 @@ export interface UseDataviewTasksProps {
   getAllTasks: ReturnType<DayPlanner["getAllTasks"]>;
 }
 
+// todo: dataview logic can be split from this
 export function useDebouncedDataviewTasks({
   metadataCache,
   getAllTasks,

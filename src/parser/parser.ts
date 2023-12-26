@@ -8,7 +8,6 @@ import { getId } from "../util/id";
 
 import { parseTimestamp } from "./timestamp/timestamp";
 
-// todo: this belongs to metadata-utils
 export function getListItemsUnderHeading(
   metadata: CachedMetadata,
   heading: string,

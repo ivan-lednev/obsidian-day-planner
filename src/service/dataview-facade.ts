@@ -9,7 +9,7 @@ import {
 import { createTask } from "../parser/parser";
 import { timeFromStartRegExp } from "../regexp";
 import { Task } from "../types";
-import { clockToTime, parseClock } from "../util/clock";
+import { toMoments, toTime } from "../util/clock";
 import { getId } from "../util/id";
 import { getDiffInMinutes, getMinutesSinceMidnight } from "../util/moment";
 
@@ -95,21 +95,27 @@ export function getScheduledDay(sTask: STask) {
 }
 
 // todo: separate notions of UI clock/property `clocked`/a pair of start-end
-export function sTaskToClocks(sTask: STask, rawClock: string | []) {
-  if (Array.isArray(rawClock)) {
-    return rawClock.map((clock: string) => sTaskToClocks(sTask, clock));
+export function toClockRecordOrRecords(
+  sTask: STask,
+  clockPropValueOrValues: string | [],
+) {
+  if (Array.isArray(clockPropValueOrValues)) {
+    return clockPropValueOrValues.map((clockPropValue: string) =>
+      toClockRecordOrRecords(sTask, clockPropValue),
+    );
   }
 
-  const parsedClock = parseClock(rawClock);
+  // TODO: merge with clockToTime()
+  const clockMoments = toMoments(clockPropValueOrValues);
 
-  if (!parsedClock) {
+  if (!clockMoments) {
     return null;
   }
 
   // todo: use factory
   return {
-    ...clockToTime(parsedClock),
-    startTime: parsedClock.start,
+    ...toTime(clockMoments),
+    startTime: clockMoments.start,
     firstLineText: sTaskLineToString(sTask),
     text: sTaskToString(sTask),
     location: {

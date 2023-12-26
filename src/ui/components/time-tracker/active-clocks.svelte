@@ -25,19 +25,47 @@
 
 <Tree title="Active clocks">
   <!--  TODO: -> sTasksWithActiveClocks -->
-  {#each formattedTasks as task}
-    <Task {task}>
-      <div class="buttons">
-        <ClockOutButton onClick={() => clockOut(task)} />
-        <CancelClockButton onClick={() => cancelClock(task)} />
-      </div>
-    </Task>
-  {/each}
+  {#if formattedTasks.length === 0}
+    <span class="message">No active clocks</span>
+  {:else}
+    <!--TODO: this container deserves its own component-->
+    <div class="active-clocks">
+      {#each formattedTasks as task}
+        <Task --task-background-color="var(--background-secondary)" {task}>
+          <div class="task-decorations">
+            <ClockOutButton onClick={() => clockOut(task)} />
+            <CancelClockButton onClick={() => cancelClock(task)} />
+          </div>
+        </Task>
+      {/each}
+    </div>
+  {/if}
 </Tree>
 
 <style>
-  .buttons {
+  .task-decorations {
     display: flex;
-    flex-direction: column;
+    gap: var(--size-4-1);
+    align-items: center;
+  }
+
+  .task-decorations > :global(*) {
+    flex: 1 0 0;
+  }
+
+  .active-clocks {
+    margin-left: var(--size-4-3);
+    padding: var(--size-4-1) 0 var(--size-4-1) var(--size-4-3);
+    border-left: 1px solid var(--background-modifier-border);
+  }
+
+  .message {
+    font-size: var(--font-ui-small);
+    color: var(--text-faint);
+  }
+
+  .active-clocks :global(svg.svg-icon) {
+    width: var(--icon-xs);
+    height: var(--icon-xs);
   }
 </style>
