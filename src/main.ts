@@ -64,25 +64,11 @@ export default class DayPlanner extends Plugin {
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
 
     this.registerCommands();
-
+    this.registerViews();
     this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
 
-    this.registerViews();
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
-
-    const lineUnderCursor = writable();
-    const debounced = debounce(lineUnderCursor.set, 1000, true);
-
-    this.registerEditorExtension([
-      EditorView.updateListener.of((viewUpdate: ViewUpdate) => {
-        debounced("TODO");
-        console.log(
-          viewUpdate.state.doc.lineAt(viewUpdate.state.selection.ranges[0].from)
-            .text,
-        );
-      }),
-    ]);
 
     // todo: check for memory leaks after plugin unloads
     this.app.workspace.on("editor-menu", (menu, editor, view) => {
@@ -412,6 +398,7 @@ export default class DayPlanner extends Plugin {
       withoutActiveClock,
     );
 
+    // todo: out of place
     this.addCommand({
       id: "clock-into-task-under-cursor",
       name: "Clock into task under cursor",
