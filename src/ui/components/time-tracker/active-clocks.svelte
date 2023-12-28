@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { STask } from "obsidian-dataview";
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../../constants";
@@ -11,28 +10,23 @@
   import CancelClockButton from "./cancel-clock-button.svelte";
   import ClockOutButton from "./clock-out-button.svelte";
 
-  const { activeClocks, clockOut, cancelClock } =
+  const { sTasksWithActiveClockProps, clockOut, cancelClock } =
     getContext<ObsidianContext>(obsidianContext);
-
-  // TODO: move out
-  // todo: remove duplication
-  $: formattedTasks = $activeClocks.map((sTask: STask) => {
-    return sTaskToUnscheduledTask(sTask, window.moment());
-  });
 </script>
 
 <Tree title="Active clocks">
-  <!--  TODO: -> sTasksWithActiveClocks -->
-  {#if formattedTasks.length === 0}
+  {#if $sTasksWithActiveClockProps.length === 0}
     <span class="message">No active clocks</span>
   {:else}
-    <!--TODO: this container deserves its own component-->
     <div class="active-clocks">
-      {#each formattedTasks as task}
-        <Task --task-background-color="var(--background-secondary)" {task}>
+      {#each $sTasksWithActiveClockProps as sTask}
+        <Task
+          --task-background-color="var(--background-secondary)"
+          task={sTaskToUnscheduledTask(sTask, window.moment())}
+        >
           <div class="task-decorations">
-            <ClockOutButton onClick={() => clockOut(task)} />
-            <CancelClockButton onClick={() => cancelClock(task)} />
+            <ClockOutButton onClick={() => clockOut(sTask)} />
+            <CancelClockButton onClick={() => cancelClock(sTask)} />
           </div>
         </Task>
       {/each}

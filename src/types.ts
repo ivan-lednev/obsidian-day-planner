@@ -1,5 +1,6 @@
 import type { Moment } from "moment";
 import { MetadataCache, Pos } from "obsidian";
+import { STask } from "obsidian-dataview";
 import { Readable, Writable } from "svelte/store";
 
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
@@ -61,11 +62,6 @@ export interface Overlap {
   start: number;
 }
 
-export type Timestamp = {
-  startMinutes: number;
-  durationMinutes: number;
-};
-
 export type CleanUp = () => void;
 export type RenderMarkdown = (el: HTMLElement, markdown: string) => CleanUp;
 export type GetTasksForDay = (day: Moment) => TasksForDay;
@@ -81,9 +77,9 @@ export interface ObsidianContext {
   renderMarkdown: RenderMarkdown;
   editContext: Readable<ReturnType<typeof useEditContext>>;
   visibleTasks: Readable<Tasks>;
-  clockIn: () => void;
-  clockOut: () => void;
-  cancelClock: () => void;
+  clockOut: (sTask: STask) => void;
+  cancelClock: (sTask: STask) => void;
+  sTasksWithActiveClockProps: Readable<STask[]>;
 }
 
 export type ComponentContext = Map<string, unknown>;

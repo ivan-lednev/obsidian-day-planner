@@ -1,6 +1,7 @@
 import { flow, noop } from "lodash/fp";
 import { Moment } from "moment";
-import { Loc, MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
+import { FileView, Loc, MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
+import { getDateFromFile } from "obsidian-daily-notes-interface";
 import { DataArray, getAPI, STask } from "obsidian-dataview";
 import { derived, get, Readable, Writable, writable } from "svelte/store";
 
@@ -13,6 +14,7 @@ import {
 } from "./constants";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
+import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
 import { replaceSTaskInFile, toMarkdown } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
@@ -37,6 +39,7 @@ import {
 } from "./util/clock";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
+import { isToday } from "./util/moment";
 import { getDayKey } from "./util/tasks-utils";
 import { withNotice } from "./util/with-notice";
 
@@ -57,6 +60,8 @@ export default class DayPlanner extends Plugin {
     this.registerViews();
     this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
+
+    this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
 
     // TODO: check for memory leaks after plugin unloads
     this.registerEvent(
@@ -160,6 +165,28 @@ export default class DayPlanner extends Plugin {
     return result;
   };
 
+  private handleActiveLeafChanged = ({ view }: WorkspaceLeaf) => {
+    if (!(view instanceof FileView) || !view.file) {
+      return;
+    }
+
+    const dayUserSwitchedTo = getDateFromFile(view.file, "day");
+
+    if (dayUserSwitchedTo?.isSame(get(visibleDayInTimeline), "day")) {
+      return;
+    }
+
+    if (!dayUserSwitchedTo) {
+      if (isToday(get(visibleDayInTimeline))) {
+        visibleDayInTimeline.set(window.moment());
+      }
+
+      return;
+    }
+
+    visibleDayInTimeline.set(dayUserSwitchedTo);
+  };
+
   private registerCommands() {
     this.addCommand({
       id: "show-day-planner-timeline",
@@ -216,6 +243,7 @@ export default class DayPlanner extends Plugin {
     await this.app.workspace.detachLeavesOfType(type);
   }
 
+  // todo: this is way too big
   private registerViews() {
     const dataviewTasks: Readable<DataArray<STask>> = useDebouncedDataviewTasks(
       {
@@ -232,8 +260,9 @@ export default class DayPlanner extends Plugin {
       },
     );
 
-    // todo: rename
-    const activeClocks = useStasksWithActiveClockProps({ dataviewTasks });
+    const sTasksWithActiveClockProps = useStasksWithActiveClockProps({
+      dataviewTasks,
+    });
     const dayToStasksWithClockMoments = useDayToStasksWithClockMoments({
       dataviewTasks,
     });
@@ -398,7 +427,7 @@ export default class DayPlanner extends Plugin {
       callback: clockOutUnderCursor,
     });
 
-    const clockOut = withNotice(async (sTask?: STask) => {
+    const clockOut = withNotice(async (sTask: STask) => {
       await this.obsidianFacade.editFile(sTask.path, (contents) =>
         replaceSTaskInFile(
           contents,
@@ -408,7 +437,7 @@ export default class DayPlanner extends Plugin {
       );
     });
 
-    const cancelClock = withNotice(async (sTask?: STask) => {
+    const cancelClock = withNotice(async (sTask: STask) => {
       await this.obsidianFacade.editFile(sTask.path, (contents) =>
         replaceSTaskInFile(
           contents,
@@ -438,7 +467,7 @@ export default class DayPlanner extends Plugin {
           renderMarkdown: createRenderMarkdown(this.app),
           editContext,
           visibleTasks,
-          activeClocks,
+          sTasksWithActiveClockProps,
           clockOut,
           cancelClock,
           clockOutUnderCursor,
