@@ -71,7 +71,7 @@ export function containsActiveClock(line: string) {
 export function withActiveClock(sTask: STask): STask {
   return {
     ...sTask,
-    text: `${sTask.text}
+    text: `${sTask.text.trimEnd()}
 ${createActiveClock()}`,
   };
 }
