@@ -2,12 +2,9 @@ import { isString } from "lodash/fp";
 import { STask } from "obsidian-dataview";
 import { derived } from "svelte/store";
 
-import {
-  areValidClockMoments,
-  liftToArray,
-  toClockMoments,
-} from "../../util/clock";
+import { areValidClockMoments, toClockMoments } from "../../util/clock";
 import { unwrap } from "../../util/dataview";
+import { liftToArray } from "../../util/lift";
 import { splitMultiday } from "../../util/moment";
 import { getDayKey } from "../../util/tasks-utils";
 

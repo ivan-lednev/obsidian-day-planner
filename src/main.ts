@@ -1,9 +1,10 @@
 import { flow, noop } from "lodash/fp";
 import { Moment } from "moment";
-import { FileView, Loc, MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
+import { FileView, MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
 import { DataArray, getAPI, STask } from "obsidian-dataview";
 import { derived, get, Readable, Writable, writable } from "svelte/store";
+import { isInstanceOf, isNotVoid } from "typed-assert";
 
 import {
   editContextKey,
@@ -32,13 +33,15 @@ import TimeTrackerView from "./ui/time-tracker-view";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import {
-  hasActiveClockProp,
+  assertActiveClock,
+  assertNoActiveClock,
   withActiveClock,
   withActiveClockCompleted,
   withoutActiveClock,
 } from "./util/clock";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
+import { locToEditorPosition } from "./util/editor";
 import { isToday } from "./util/moment";
 import { getDayKey } from "./util/tasks-utils";
 import { withNotice } from "./util/with-notice";
@@ -56,44 +59,47 @@ export default class DayPlanner extends Plugin {
     this.obsidianFacade = new ObsidianFacade(this.app);
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
 
-    this.registerCommands();
     this.registerViews();
     this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
+
+    this.registerCommands();
 
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
 
     // TODO: check for memory leaks after plugin unloads
     this.registerEvent(
       this.app.workspace.on("editor-menu", (menu, editor, view) => {
-        // TODO: get task under cursor
-        // TODO: add items only if relevant
+        // todo: this is duplicated
+        const sTask = getAPI(this.app)
+          .page(view.file.path)
+          ?.file?.tasks?.find(
+            (sTask: STask) => sTask.line === view.editor.getCursor().line,
+          );
+
+        if (!sTask) {
+          return;
+        }
 
         menu.addItem((item) => {
           item
             .setTitle("Clock in")
             .setIcon("play")
-            .onClick(() => {
-              console.log("Click!");
-            });
+            .onClick(this.clockInUnderCursor);
         });
 
         menu.addItem((item) => {
           item
             .setTitle("Clock out")
             .setIcon("square")
-            .onClick(() => {
-              console.log("Click!");
-            });
+            .onClick(this.clockOutUnderCursor);
         });
 
         menu.addItem((item) => {
           item
             .setTitle("Cancel clock")
             .setIcon("trash")
-            .onClick(() => {
-              console.log("Click!");
-            });
+            .onClick(this.cancelClockUnderCursor);
         });
       }),
     );
@@ -221,6 +227,24 @@ export default class DayPlanner extends Plugin {
       editorCallback: (editor) =>
         editor.replaceSelection(this.planEditor.createPlannerHeading()),
     });
+
+    this.addCommand({
+      id: "clock-into-task-under-cursor",
+      name: "Clock into task under cursor",
+      callback: this.clockInUnderCursor,
+    });
+
+    this.addCommand({
+      id: "clock-out-of-task-under-cursor",
+      name: "Clock out of task under cursor",
+      callback: this.clockOutUnderCursor,
+    });
+
+    this.addCommand({
+      id: "cancel-clock-under-cursor",
+      name: "Cancel clock on task under cursor",
+      callback: this.clockOutUnderCursor,
+    });
   }
 
   private async initSettingsStore() {
@@ -243,7 +267,71 @@ export default class DayPlanner extends Plugin {
     await this.app.workspace.detachLeavesOfType(type);
   }
 
-  // todo: this is way too big
+  private getActiveMarkdownView = () => {
+    const view = this.app.workspace.getMostRecentLeaf()?.view;
+
+    isInstanceOf(view, MarkdownView, "No markdown editor is active");
+
+    return view;
+  };
+
+  private getSTaskUnderCursor = () => {
+    const view = this.getActiveMarkdownView();
+
+    // TODO: hide dataview api
+    const sTask = getAPI(this.app)
+      .page(view.file.path)
+      ?.file?.tasks?.find(
+        (sTask: STask) => sTask.line === view.editor.getCursor().line,
+      );
+
+    isNotVoid("There is no task under cursor");
+
+    return sTask;
+  };
+
+  private replaceSTaskUnderCursor = (newMarkdown: string) => {
+    const view = this.getActiveMarkdownView();
+    const sTask = this.getSTaskUnderCursor();
+
+    view.editor.replaceRange(
+      newMarkdown,
+      locToEditorPosition(sTask.position.start),
+      locToEditorPosition(sTask.position.end),
+    );
+  };
+
+  private clockInUnderCursor = withNotice(
+    flow(
+      this.getSTaskUnderCursor,
+      assertNoActiveClock,
+      withActiveClock,
+      toMarkdown,
+      this.replaceSTaskUnderCursor,
+    ),
+  );
+
+  private clockOutUnderCursor = withNotice(
+    flow(
+      this.getSTaskUnderCursor,
+      assertActiveClock,
+      withActiveClockCompleted,
+      toMarkdown,
+      this.replaceSTaskUnderCursor,
+    ),
+  );
+
+  private cancelClockUnderCursor = withNotice(
+    flow(
+      this.getSTaskUnderCursor,
+      assertActiveClock,
+      withoutActiveClock,
+      toMarkdown,
+      this.replaceSTaskUnderCursor,
+    ),
+  );
+
+  // todo: split planner context from tracker context
   private registerViews() {
     const dataviewTasks: Readable<DataArray<STask>> = useDebouncedDataviewTasks(
       {
@@ -310,123 +398,6 @@ export default class DayPlanner extends Plugin {
       },
     );
 
-    // TODO: move out
-    // TODO: split dataview/editor/workspace
-    function locToEditorPosition({ line, col }: Loc) {
-      return { line, ch: col };
-    }
-
-    const dataview = getAPI(this.app);
-
-    // TODO: fix inconsistent return points
-    const getTaskUnderCursor = () => {
-      const view = this.app.workspace.getMostRecentLeaf()?.view;
-
-      if (view instanceof MarkdownView) {
-        const cursor = view.editor.getCursor();
-
-        // TODO: hide dataview api
-        const sTask = dataview
-          .page(view.file.path)
-          ?.file?.tasks?.find((sTask: STask) => sTask.line === cursor.line);
-
-        if (!sTask) {
-          throw new Error("There is no task under cursor");
-        }
-
-        return sTask;
-      }
-    };
-
-    // TODO: remove duplication
-    const replaceTaskUnderCursor = (newMarkdown: string) => {
-      const view = this.app.workspace.getMostRecentLeaf()?.view;
-
-      if (view instanceof MarkdownView) {
-        const cursor = view.editor.getCursor();
-
-        // TODO: hide dataview api
-        const sTask = dataview
-          .page(view.file.path)
-          ?.file?.tasks?.find((sTask: STask) => sTask.line === cursor.line);
-
-        if (!sTask) {
-          throw new Error("There is no task under cursor");
-        }
-
-        view.editor.replaceRange(
-          newMarkdown,
-          locToEditorPosition(sTask.position.start),
-          locToEditorPosition(sTask.position.end),
-        );
-      }
-    };
-
-    const assertActiveClock = (sTask: STask) => {
-      if (!hasActiveClockProp(sTask)) {
-        throw new Error("The task has no active clocks");
-      }
-
-      return sTask;
-    };
-
-    const assertNoActiveClock = (sTask: STask) => {
-      if (hasActiveClockProp(sTask)) {
-        throw new Error("The task already has an active clock");
-      }
-
-      return sTask;
-    };
-
-    const clockInUnderCursor = withNotice(
-      flow(
-        getTaskUnderCursor,
-        assertNoActiveClock,
-        withActiveClock,
-        toMarkdown,
-        replaceTaskUnderCursor,
-      ),
-    );
-
-    const clockOutUnderCursor = withNotice(
-      flow(
-        getTaskUnderCursor,
-        assertActiveClock,
-        withActiveClockCompleted,
-        toMarkdown,
-        replaceTaskUnderCursor,
-      ),
-    );
-
-    const cancelClockUnderCursor = withNotice(
-      flow(
-        getTaskUnderCursor,
-        assertActiveClock,
-        withoutActiveClock,
-        toMarkdown,
-        replaceTaskUnderCursor,
-      ),
-    );
-
-    // TODO: out of place
-    this.addCommand({
-      id: "clock-into-task-under-cursor",
-      name: "Clock into task under cursor",
-      callback: clockInUnderCursor,
-    });
-
-    this.addCommand({
-      id: "clock-out-of-task-under-cursor",
-      name: "Clock out of task under cursor",
-      callback: clockOutUnderCursor,
-    });
-
-    this.addCommand({
-      id: "cancel-clock-under-cursor",
-      name: "Cancel clock on task under cursor",
-      callback: clockOutUnderCursor,
-    });
-
     const clockOut = withNotice(async (sTask: STask) => {
       await this.obsidianFacade.editFile(sTask.path, (contents) =>
         replaceSTaskInFile(
@@ -470,9 +441,9 @@ export default class DayPlanner extends Plugin {
           sTasksWithActiveClockProps,
           clockOut,
           cancelClock,
-          clockOutUnderCursor,
-          clockInUnderCursor,
-          cancelClockUnderCursor,
+          clockOutUnderCursor: this.clockOutUnderCursor,
+          clockInUnderCursor: this.clockInUnderCursor,
+          cancelClockUnderCursor: this.cancelClockUnderCursor,
         },
       ],
       [editContextKey, { editContext }],

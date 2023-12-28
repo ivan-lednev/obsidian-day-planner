@@ -96,7 +96,18 @@ export function withActiveClockCompleted(sTask: STask) {
   };
 }
 
-// todo: out of place
-export function liftToArray<T>(value: T | T[]) {
-  return Array.isArray(value) ? value : [value];
+export function assertActiveClock(sTask: STask) {
+  if (!hasActiveClockProp(sTask)) {
+    throw new Error("The task has no active clocks");
+  }
+
+  return sTask;
+}
+
+export function assertNoActiveClock(sTask: STask) {
+  if (hasActiveClockProp(sTask)) {
+    throw new Error("The task already has an active clock");
+  }
+
+  return sTask;
 }
