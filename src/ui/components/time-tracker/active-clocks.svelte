@@ -4,22 +4,20 @@
   import { obsidianContext } from "../../../constants";
   import { sTaskToUnscheduledTask } from "../../../service/dataview-facade";
   import { ObsidianContext } from "../../../types";
-  import { deleteProps } from "../../../util/properties";
   import Tree from "../obsidian/tree.svelte";
   import Task from "../task.svelte";
 
   import CancelClockButton from "./cancel-clock-button.svelte";
   import ClockOutButton from "./clock-out-button.svelte";
+  import { STask } from "obsidian-dataview";
 
   const { activeClocks, clockOut, cancelClock } =
     getContext<ObsidianContext>(obsidianContext);
 
   // TODO: move out
-  $: formattedTasks = $activeClocks.map((sTask) => {
-    return sTaskToUnscheduledTask(
-      { ...sTask, text: deleteProps(sTask.text) },
-      window.moment(),
-    );
+  // todo: remove duplication
+  $: formattedTasks = $activeClocks.map((sTask: STask) => {
+    return sTaskToUnscheduledTask(sTask, window.moment());
   });
 </script>
 

@@ -12,6 +12,7 @@ import { Task } from "../types";
 import { ClockMoments, toTime } from "../util/clock";
 import { getId } from "../util/id";
 import { getDiffInMinutes, getMinutesSinceMidnight } from "../util/moment";
+import { deleteProps } from "../util/properties";
 
 interface Node {
   text: string;
@@ -21,11 +22,13 @@ interface Node {
   scheduled?: DateTime;
 }
 
+// todo: stask can be multiline, bad name
 export function sTaskLineToString(node: Node) {
   const status = node.status ? `[${node.status}] ` : "";
-  return `${node.symbol} ${status}${node.text}\n`;
+  return `${node.symbol} ${status}${deleteProps(node.text)}\n`;
 }
 
+// todo: remove duplication: toMarkdown
 export function sTaskToString(node: Node, indentation = "") {
   let result = `${indentation}${sTaskLineToString(node)}`;
 
@@ -41,6 +44,7 @@ export function sTaskToString(node: Node, indentation = "") {
 export function sTaskToUnscheduledTask(sTask: STask, day: Moment) {
   return {
     durationMinutes: defaultDurationMinutes,
+    // todo: bad abstraction
     listTokens: `${sTask.symbol} [${sTask.status}] `,
     firstLineText: sTask.text,
     text: sTaskToString(sTask),

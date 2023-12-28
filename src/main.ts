@@ -1,7 +1,6 @@
 import { flow, noop } from "lodash/fp";
 import { Moment } from "moment";
-import { FileView, Loc, MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
-import { getDateFromFile } from "obsidian-daily-notes-interface";
+import { Loc, MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
 import { DataArray, getAPI, STask } from "obsidian-dataview";
 import { derived, get, Readable, Writable, writable } from "svelte/store";
 
@@ -14,7 +13,6 @@ import {
 } from "./constants";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
-import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
 import { replaceSTaskInFile, toMarkdown } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
@@ -39,7 +37,6 @@ import {
 } from "./util/clock";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
-import { isToday } from "./util/moment";
 import { getDayKey } from "./util/tasks-utils";
 import { withNotice } from "./util/with-notice";
 
@@ -60,8 +57,6 @@ export default class DayPlanner extends Plugin {
     this.registerViews();
     this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
-
-    this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
 
     // TODO: check for memory leaks after plugin unloads
     this.app.workspace.on("editor-menu", (menu, editor, view) => {
@@ -163,28 +158,6 @@ export default class DayPlanner extends Plugin {
     return result;
   };
 
-  private handleActiveLeafChanged = ({ view }: WorkspaceLeaf) => {
-    if (!(view instanceof FileView) || !view.file) {
-      return;
-    }
-
-    const dayUserSwitchedTo = getDateFromFile(view.file, "day");
-
-    if (dayUserSwitchedTo?.isSame(get(visibleDayInTimeline), "day")) {
-      return;
-    }
-
-    if (!dayUserSwitchedTo) {
-      if (isToday(get(visibleDayInTimeline))) {
-        visibleDayInTimeline.set(window.moment());
-      }
-
-      return;
-    }
-
-    visibleDayInTimeline.set(dayUserSwitchedTo);
-  };
-
   private registerCommands() {
     this.addCommand({
       id: "show-day-planner-timeline",
@@ -257,12 +230,13 @@ export default class DayPlanner extends Plugin {
       },
     );
 
+    // todo: rename
     const activeClocks = useStasksWithActiveClockProps({ dataviewTasks });
-    const clockDayToStasksLookup = useDayToStasksWithClockMoments({
+    const dayToStasksWithClockMoments = useDayToStasksWithClockMoments({
       dataviewTasks,
     });
     const visibleClockRecords = useVisibleClockRecords({
-      dayToSTasksLookup: clockDayToStasksLookup,
+      dayToSTasksLookup: dayToStasksWithClockMoments,
     });
 
     // TODO: unwrap the hook from the derived store to remove extra-indirection
