@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { STask } from "obsidian-dataview";
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../../constants";
@@ -9,7 +10,6 @@
 
   import CancelClockButton from "./cancel-clock-button.svelte";
   import ClockOutButton from "./clock-out-button.svelte";
-  import { STask } from "obsidian-dataview";
 
   const { activeClocks, clockOut, cancelClock } =
     getContext<ObsidianContext>(obsidianContext);

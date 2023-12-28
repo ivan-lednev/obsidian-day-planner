@@ -1,3 +1,4 @@
+import { isString } from "lodash/fp";
 import { STask } from "obsidian-dataview";
 import { derived } from "svelte/store";
 
@@ -14,6 +15,7 @@ import { UseDayToScheduledStasksProps } from "./use-day-to-scheduled-stasks";
 
 function withClockMoments(sTask: STask) {
   return liftToArray(sTask.clocked)
+    .filter(isString)
     .map(toClockMoments)
     .filter(areValidClockMoments)
     .flatMap(([start, end]) => splitMultiday(start, end))
