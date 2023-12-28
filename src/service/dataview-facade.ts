@@ -9,13 +9,9 @@ import {
 import { createTask } from "../parser/parser";
 import { timeFromStartRegExp } from "../regexp";
 import { Task } from "../types";
-import { ClockMoments, toMoments, toTime } from "../util/clock";
+import { ClockMoments, toTime } from "../util/clock";
 import { getId } from "../util/id";
-import {
-  getDiffInMinutes,
-  getMinutesSinceMidnight,
-  splitByDay,
-} from "../util/moment";
+import { getDiffInMinutes, getMinutesSinceMidnight } from "../util/moment";
 
 interface Node {
   text: string;
@@ -96,30 +92,6 @@ export function getScheduledDay(sTask: STask) {
   );
 
   return scheduledPropDay || dailyNoteDay;
-}
-
-// todo: separate notions of UI clock/property `clocked`/a pair of start-end
-// todo: fix nulls everywhere
-export function toClockRecordOrRecords(
-  sTask: STask,
-  clockPropValueOrValues: string | [],
-): Array<ReturnType<typeof createClockRecord> | null> | null {
-  if (Array.isArray(clockPropValueOrValues)) {
-    return clockPropValueOrValues.flatMap((clockPropValue: string) =>
-      toClockRecordOrRecords(sTask, clockPropValue),
-    );
-  }
-
-  // TODO: merge with clockToTime()
-  const clockMoments = toMoments(clockPropValueOrValues);
-
-  if (!clockMoments) {
-    return null;
-  }
-
-  return splitByDay(...clockMoments).map((clockMoments) =>
-    createClockRecord(sTask, clockMoments),
-  );
 }
 
 export function createClockRecord(sTask: STask, clockMoments: ClockMoments) {

@@ -10,7 +10,7 @@ type IdentityGetters<T> = Partial<{
  * @param initialProps
  * @param identityGetters
  */
-// todo: figure out how to make TypeScript happy
+// TODO: figure out how to make TypeScript happy
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createMemo<T extends Record<string, any>>(
   initialProps: T,

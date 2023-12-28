@@ -7,7 +7,9 @@ interface UseActiveClocksProps {
   dataviewTasks: Readable<DataArray<STask>>;
 }
 
-export function useActiveClocks({ dataviewTasks }: UseActiveClocksProps) {
+export function useStasksWithActiveClockProps({
+  dataviewTasks,
+}: UseActiveClocksProps) {
   return derived([dataviewTasks], ([$dataviewTasks]) => {
     return $dataviewTasks.where(hasActiveClockProp).array();
   });

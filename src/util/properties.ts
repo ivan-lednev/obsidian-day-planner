@@ -8,7 +8,7 @@ export function updateProp(
   line: string,
   updateFn: (previous: string) => string,
 ) {
-  // todo: move out
+  // TODO: move out
   const [, key, previous] = propRegexp.exec(line);
 
   return `[${key}::${updateFn(previous)}]`;

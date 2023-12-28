@@ -24,7 +24,7 @@ export function useColor({ settings, task }: UseColorProps) {
         (task.startTime.hour() - $settings.startHour) /
         (24 - $settings.startHour);
 
-      // todo: remove startTime once task creation returns consistent tasks
+      // TODO: remove startTime once task creation returns consistent tasks
       return $settings.timelineColored && task.startTime
         ? $colorScale(scaleKey).hex()
         : "var(--background-primary)";
@@ -34,7 +34,7 @@ export function useColor({ settings, task }: UseColorProps) {
   const properContrastColors = derived(
     [settings, backgroundColor],
     ([$settings, $backgroundColor]) => {
-      // todo: remove startTime once task creation returns consistent tasks
+      // TODO: remove startTime once task creation returns consistent tasks
       return $settings.timelineColored && task.startTime
         ? getTextColorWithEnoughContrast($backgroundColor)
         : {

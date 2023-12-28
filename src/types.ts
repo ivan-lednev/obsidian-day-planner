@@ -25,7 +25,7 @@ export interface UnscheduledTask {
    */
   listTokens: string;
 
-  // todo: the distinction needs to be clearer
+  // TODO: the distinction needs to be clearer
   firstLineText: string;
   text: string;
 
@@ -48,7 +48,7 @@ export interface TasksForDay {
 
 export type Tasks = Record<string, TasksForDay>;
 
-// todo: we don't need this, since it's all optional
+// TODO: delete this type
 export interface PlacedTask extends Task {}
 
 export type RelationToNow = "past" | "present" | "future";

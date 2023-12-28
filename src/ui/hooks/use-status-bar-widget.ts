@@ -34,7 +34,6 @@ export function useStatusBarWidget({ tasksForToday }: UseStatusBarWidgetProps) {
   return derived(
     [tasksForToday, currentTime],
     ([$tasksForToday, $currentTime]) => {
-      // todo: what if there is no current item but next?
       const currentItem = $tasksForToday.withTime.find(
         (item) =>
           item.startTime.isBefore($currentTime) &&

@@ -34,7 +34,7 @@ export function useEditActions({
 
     const currentTasks = get(displayedTasks);
 
-    // todo: order matters! Make it more explicit
+    // TODO: order matters! Make it more explicit
     editOperation.set(undefined);
 
     const diff = getDiff(get(baselineTasks), currentTasks);

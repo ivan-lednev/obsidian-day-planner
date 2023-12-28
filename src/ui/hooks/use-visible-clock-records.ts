@@ -10,7 +10,7 @@ interface UseVisibleClockRecordsProps {
   dayToSTasksLookup: Readable<Record<string, STask[]>>;
 }
 
-// todo: remove duplication from Tasks
+// TODO: remove duplication from Tasks
 export function useVisibleClockRecords({
   dayToSTasksLookup,
 }: UseVisibleClockRecordsProps) {
@@ -20,12 +20,11 @@ export function useVisibleClockRecords({
       return $visibleDays.reduce<Record<string, TasksForDay>>((result, day) => {
         const key = getDayKey(day);
         const sTasksForDay = $dayToSTasksLookup[key];
-        // TODO: this may produce tasks for multiple days
 
         if (sTasksForDay) {
           result[key] = {
-            withTime: sTasksForDay.map(({ sTask, moments }) =>
-              createClockRecord(sTask, moments),
+            withTime: sTasksForDay.map(({ sTask, clockMoments }) =>
+              createClockRecord(sTask, clockMoments),
             ),
             noTime: [],
           };

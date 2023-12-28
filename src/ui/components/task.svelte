@@ -5,7 +5,7 @@ import type { UnscheduledTask } from "../../types";
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
   export let task: UnscheduledTask;
-  // todo: this should live in useTaskVisuals
+  // TODO: this should live in useTaskVisuals
   export let relationToNow = "";
 </script>
 

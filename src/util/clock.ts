@@ -1,15 +1,9 @@
-import { isString } from "lodash/fp";
 import { Moment } from "moment";
 import { STask } from "obsidian-dataview";
 
 import { clockFormat, clockKey, clockSeparator } from "../constants";
-import { toClockRecordOrRecords } from "../service/dataview-facade";
 
-import {
-  getDiffInMinutes,
-  getMinutesSinceMidnight,
-  splitByDay,
-} from "./moment";
+import { getDiffInMinutes, getMinutesSinceMidnight } from "./moment";
 import { createProp, updateProp } from "./properties";
 
 interface Time {
@@ -19,25 +13,17 @@ interface Time {
 
 export type ClockMoments = [Moment, Moment];
 
-// TODO: simplify
-export function toMoments(clockPropValue: string): [Moment, Moment] {
-  if (!isString(clockPropValue)) {
-    return null;
-  }
+export function toClockMoments(clockPropValue: string) {
+  return clockPropValue
+    .split(clockSeparator)
+    .map((value) => window.moment(value));
+}
 
-  const [rawStart, rawEnd] = clockPropValue.split(clockSeparator);
-
-  if (!rawStart || !rawEnd) {
-    return null;
-  }
-
-  const [start, end] = [rawStart, rawEnd].map((value) => window.moment(value));
-
-  if (!start.isValid() || !end.isValid()) {
-    return null;
-  }
-
-  return [start, end];
+export function areValidClockMoments(clockMoments: Moment[]) {
+  return (
+    clockMoments.length === 2 &&
+    clockMoments.every((clockMoment) => clockMoment.isValid())
+  );
 }
 
 export function toTime([start, end]: ClockMoments): Time {
@@ -110,30 +96,7 @@ export function withActiveClockCompleted(sTask: STask) {
   };
 }
 
-export function toClockRecords(sTasks: STask[]) {
-  return sTasks
-    .filter((task) => task.clocked)
-    .flatMap((sTask) => toClockRecordOrRecords(sTask, sTask.clocked))
-    .filter(Boolean);
-}
-
-// todo: use simpler lifting pattern
-// todo: improve name
-export function arrToClockMoments(clockPropValueOrValues: string | string[]) {
-  if (Array.isArray(clockPropValueOrValues)) {
-    return clockPropValueOrValues.flatMap(toClockMoments);
-  }
-
-  // todo: this may return an array
-  return toClockMoments(clockPropValueOrValues);
-}
-
-export function toClockMoments(clockPropValue: string) {
-  const clockMoments = toMoments(clockPropValue);
-
-  if (!clockMoments) {
-    return null;
-  }
-
-  return splitByDay(...clockMoments);
+// todo: out of place
+export function liftToArray<T>(value: T | T[]) {
+  return Array.isArray(value) ? value : [value];
 }

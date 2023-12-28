@@ -6,7 +6,7 @@ export const createRenderMarkdown =
 
     el.empty();
 
-    // todo: investigate why `await` doesn't work as expected here
+    // TODO: investigate why `await` doesn't work as expected here
     MarkdownRenderer.render(app, markdown, el, "", loader);
 
     loader.load();

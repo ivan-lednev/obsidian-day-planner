@@ -20,13 +20,11 @@ import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
-import { useActiveClocks } from "./ui/hooks/use-active-clocks";
-import {
-  useClockDayToStasksLookup,
-  useDayToStasksLookup,
-} from "./ui/hooks/use-day-to-stasks-lookup";
+import { useDayToScheduledStasks } from "./ui/hooks/use-day-to-scheduled-stasks";
+import { useDayToStasksWithClockMoments } from "./ui/hooks/use-day-to-stasks-with-clock-moments";
 import { useDebouncedDataviewTasks } from "./ui/hooks/use-debounced-dataview-tasks";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
+import { useStasksWithActiveClockProps } from "./ui/hooks/use-stasks-with-active-clock-props";
 import { useVisibleClockRecords } from "./ui/hooks/use-visible-clock-records";
 import { useVisibleTasks } from "./ui/hooks/use-visible-tasks";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
@@ -65,7 +63,7 @@ export default class DayPlanner extends Plugin {
 
     this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
 
-    // todo: check for memory leaks after plugin unloads
+    // TODO: check for memory leaks after plugin unloads
     this.app.workspace.on("editor-menu", (menu, editor, view) => {
       // TODO: get task under cursor
       // TODO: add items only if relevant
@@ -250,7 +248,7 @@ export default class DayPlanner extends Plugin {
         getAllTasks: this.getAllTasks,
       },
     );
-    const dayToSTasksLookup = useDayToStasksLookup({ dataviewTasks });
+    const dayToSTasksLookup = useDayToScheduledStasks({ dataviewTasks });
     const visibleTasks = useVisibleTasks({ dayToSTasksLookup });
     const tasksForToday = derived(
       [visibleTasks, currentTime],
@@ -259,14 +257,15 @@ export default class DayPlanner extends Plugin {
       },
     );
 
-    // todo: -> useTasksWithActiveClocks
-    const activeClocks = useActiveClocks({ dataviewTasks });
-    const clockDayToStasksLookup = useClockDayToStasksLookup({ dataviewTasks });
+    const activeClocks = useStasksWithActiveClockProps({ dataviewTasks });
+    const clockDayToStasksLookup = useDayToStasksWithClockMoments({
+      dataviewTasks,
+    });
     const visibleClockRecords = useVisibleClockRecords({
       dayToSTasksLookup: clockDayToStasksLookup,
     });
 
-    // todo: think of a way to unwrap the hook from the derived store
+    // TODO: unwrap the hook from the derived store to remove extra-indirection
     const editContext = derived(
       [this.settingsStore, visibleTasks],
       ([$settings, $visibleTasks]) => {
@@ -279,7 +278,7 @@ export default class DayPlanner extends Plugin {
       },
     );
 
-    // todo: remove duplication
+    // TODO: remove duplication
     const timeTrackerEditContext = derived(
       [this.settingsStore, visibleClockRecords],
       ([$settings, $visibleClockRecords]) => {
@@ -307,22 +306,21 @@ export default class DayPlanner extends Plugin {
     );
 
     // TODO: move out
-    // todo: split dataview/editor/workspace
-
+    // TODO: split dataview/editor/workspace
     function locToEditorPosition({ line, col }: Loc) {
       return { line, ch: col };
     }
 
     const dataview = getAPI(this.app);
 
-    // todo: fix inconsistent return points
+    // TODO: fix inconsistent return points
     const getTaskUnderCursor = () => {
       const view = this.app.workspace.getMostRecentLeaf()?.view;
 
       if (view instanceof MarkdownView) {
         const cursor = view.editor.getCursor();
 
-        // todo: hide dataview api
+        // TODO: hide dataview api
         const sTask = dataview
           .page(view.file.path)
           ?.file?.tasks?.find((sTask: STask) => sTask.line === cursor.line);
@@ -335,14 +333,14 @@ export default class DayPlanner extends Plugin {
       }
     };
 
-    // todo: remove duplication
+    // TODO: remove duplication
     const replaceTaskUnderCursor = (newMarkdown: string) => {
       const view = this.app.workspace.getMostRecentLeaf()?.view;
 
       if (view instanceof MarkdownView) {
         const cursor = view.editor.getCursor();
 
-        // todo: hide dataview api
+        // TODO: hide dataview api
         const sTask = dataview
           .page(view.file.path)
           ?.file?.tasks?.find((sTask: STask) => sTask.line === cursor.line);
@@ -405,7 +403,7 @@ export default class DayPlanner extends Plugin {
       ),
     );
 
-    // todo: out of place
+    // TODO: out of place
     this.addCommand({
       id: "clock-into-task-under-cursor",
       name: "Clock into task under cursor",

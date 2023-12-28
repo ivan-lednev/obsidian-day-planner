@@ -21,7 +21,7 @@
   import ScheduledTask from "./scheduled-task.svelte";
   import Scroller from "./scroller.svelte";
 
-  // todo: showRuler or add <slot name="left-gutter" />
+  // TODO: showRuler or add <slot name="left-gutter" />
   export let hideControls = false;
   export let readonly = false;
   export let day: Moment | undefined = undefined;
