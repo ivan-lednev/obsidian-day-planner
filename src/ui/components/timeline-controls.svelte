@@ -108,7 +108,7 @@
     <ControlButton
       --grid-column-start="4"
       --justify-self="flex-end"
-      label="Go to previous daily plan"
+      label="Go to previous day"
       on:click={goBack}
     >
       <ArrowLeft class="svg-icon" />
@@ -128,7 +128,7 @@
 
     <ControlButton
       --justify-self="flex-start"
-      label="Go to next daily plan"
+      label="Go to next day"
       on:click={goForward}
     >
       <ArrowRight class="svg-icon" />

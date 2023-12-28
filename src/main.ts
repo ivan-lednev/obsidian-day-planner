@@ -1,6 +1,11 @@
 import { flow, noop } from "lodash/fp";
 import { Moment } from "moment";
-import { FileView, MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
+import {
+  FileView,
+  MarkdownView,
+  Plugin,
+  WorkspaceLeaf,
+} from "obsidian";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
 import { DataArray, getAPI, STask } from "obsidian-dataview";
 import { derived, get, Readable, Writable, writable } from "svelte/store";
