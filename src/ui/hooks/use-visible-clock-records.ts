@@ -2,8 +2,8 @@ import { STask } from "obsidian-dataview";
 import { derived, Readable } from "svelte/store";
 
 import { visibleDays } from "../../global-store/visible-days";
+import { createClockRecord } from "../../service/dataview-facade";
 import { TasksForDay } from "../../types";
-import { toClockRecords } from "../../util/clock";
 import { getDayKey, getEmptyRecordsForDay } from "../../util/tasks-utils";
 
 interface UseVisibleClockRecordsProps {
@@ -20,10 +20,13 @@ export function useVisibleClockRecords({
       return $visibleDays.reduce<Record<string, TasksForDay>>((result, day) => {
         const key = getDayKey(day);
         const sTasksForDay = $dayToSTasksLookup[key];
+        // TODO: this may produce tasks for multiple days
 
         if (sTasksForDay) {
           result[key] = {
-            withTime: toClockRecords(sTasksForDay),
+            withTime: sTasksForDay.map(({ sTask, moments }) =>
+              createClockRecord(sTask, moments),
+            ),
             noTime: [],
           };
         } else {

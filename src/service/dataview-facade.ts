@@ -9,9 +9,13 @@ import {
 import { createTask } from "../parser/parser";
 import { timeFromStartRegExp } from "../regexp";
 import { Task } from "../types";
-import { toMoments, toTime } from "../util/clock";
+import { ClockMoments, toMoments, toTime } from "../util/clock";
 import { getId } from "../util/id";
-import { getDiffInMinutes, getMinutesSinceMidnight } from "../util/moment";
+import {
+  getDiffInMinutes,
+  getMinutesSinceMidnight,
+  splitByDay,
+} from "../util/moment";
 
 interface Node {
   text: string;
@@ -95,12 +99,13 @@ export function getScheduledDay(sTask: STask) {
 }
 
 // todo: separate notions of UI clock/property `clocked`/a pair of start-end
+// todo: fix nulls everywhere
 export function toClockRecordOrRecords(
   sTask: STask,
   clockPropValueOrValues: string | [],
-) {
+): Array<ReturnType<typeof createClockRecord> | null> | null {
   if (Array.isArray(clockPropValueOrValues)) {
-    return clockPropValueOrValues.map((clockPropValue: string) =>
+    return clockPropValueOrValues.flatMap((clockPropValue: string) =>
       toClockRecordOrRecords(sTask, clockPropValue),
     );
   }
@@ -112,10 +117,16 @@ export function toClockRecordOrRecords(
     return null;
   }
 
-  // todo: use factory
+  return splitByDay(...clockMoments).map((clockMoments) =>
+    createClockRecord(sTask, clockMoments),
+  );
+}
+
+export function createClockRecord(sTask: STask, clockMoments: ClockMoments) {
+  // TODO: remove duplication
   return {
     ...toTime(clockMoments),
-    startTime: clockMoments.start,
+    startTime: clockMoments[0],
     firstLineText: sTaskLineToString(sTask),
     text: sTaskToString(sTask),
     location: {

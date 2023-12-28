@@ -21,7 +21,10 @@ import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { useActiveClocks } from "./ui/hooks/use-active-clocks";
-import { useDayToStasksLookup } from "./ui/hooks/use-day-to-stasks-lookup";
+import {
+  useClockDayToStasksLookup,
+  useDayToStasksLookup,
+} from "./ui/hooks/use-day-to-stasks-lookup";
 import { useDebouncedDataviewTasks } from "./ui/hooks/use-debounced-dataview-tasks";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { useVisibleClockRecords } from "./ui/hooks/use-visible-clock-records";
@@ -31,7 +34,7 @@ import TimeTrackerView from "./ui/time-tracker-view";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import {
-  hasActiveClock,
+  hasActiveClockProp,
   withActiveClock,
   withActiveClockCompleted,
   withoutActiveClock,
@@ -255,8 +258,13 @@ export default class DayPlanner extends Plugin {
         return $visibleTasks[getDayKey($currentTime)];
       },
     );
+
+    // todo: -> useTasksWithActiveClocks
     const activeClocks = useActiveClocks({ dataviewTasks });
-    const visibleClockRecords = useVisibleClockRecords({ dayToSTasksLookup });
+    const clockDayToStasksLookup = useClockDayToStasksLookup({ dataviewTasks });
+    const visibleClockRecords = useVisibleClockRecords({
+      dayToSTasksLookup: clockDayToStasksLookup,
+    });
 
     // todo: think of a way to unwrap the hook from the derived store
     const editContext = derived(
@@ -271,6 +279,7 @@ export default class DayPlanner extends Plugin {
       },
     );
 
+    // todo: remove duplication
     const timeTrackerEditContext = derived(
       [this.settingsStore, visibleClockRecords],
       ([$settings, $visibleClockRecords]) => {
@@ -281,7 +290,7 @@ export default class DayPlanner extends Plugin {
           visibleTasks: $visibleClockRecords,
         });
 
-        function disableEditHandlers(day: Moment) {
+        function withDisabledEditHandlers(day: Moment) {
           return {
             ...base.getEditHandlers(day),
             handleGripMouseDown: noop,
@@ -292,7 +301,7 @@ export default class DayPlanner extends Plugin {
 
         return {
           ...base,
-          getEditHandlers: disableEditHandlers,
+          getEditHandlers: withDisabledEditHandlers,
         };
       },
     );
@@ -306,6 +315,7 @@ export default class DayPlanner extends Plugin {
 
     const dataview = getAPI(this.app);
 
+    // todo: fix inconsistent return points
     const getTaskUnderCursor = () => {
       const view = this.app.workspace.getMostRecentLeaf()?.view;
 
@@ -350,7 +360,7 @@ export default class DayPlanner extends Plugin {
     };
 
     const assertActiveClock = (sTask: STask) => {
-      if (!hasActiveClock(sTask)) {
+      if (!hasActiveClockProp(sTask)) {
         throw new Error("The task has no active clocks");
       }
 
@@ -358,7 +368,7 @@ export default class DayPlanner extends Plugin {
     };
 
     const assertNoActiveClock = (sTask: STask) => {
-      if (hasActiveClock(sTask)) {
+      if (hasActiveClockProp(sTask)) {
         throw new Error("The task already has an active clock");
       }
 

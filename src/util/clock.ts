@@ -5,7 +5,11 @@ import { STask } from "obsidian-dataview";
 import { clockFormat, clockKey, clockSeparator } from "../constants";
 import { toClockRecordOrRecords } from "../service/dataview-facade";
 
-import { getDiffInMinutes, getMinutesSinceMidnight } from "./moment";
+import {
+  getDiffInMinutes,
+  getMinutesSinceMidnight,
+  splitByDay,
+} from "./moment";
 import { createProp, updateProp } from "./properties";
 
 interface Time {
@@ -13,13 +17,10 @@ interface Time {
   durationMinutes: number;
 }
 
-interface ClockMoments {
-  start: Moment;
-  end: Moment;
-}
+export type ClockMoments = [Moment, Moment];
 
 // TODO: simplify
-export function toMoments(clockPropValue: string) {
+export function toMoments(clockPropValue: string): [Moment, Moment] {
   if (!isString(clockPropValue)) {
     return null;
   }
@@ -36,26 +37,30 @@ export function toMoments(clockPropValue: string) {
     return null;
   }
 
-  return { start, end };
+  return [start, end];
 }
 
-export function toTime({ start, end }: ClockMoments): Time {
+export function toTime([start, end]: ClockMoments): Time {
   return {
     startMinutes: getMinutesSinceMidnight(start),
     durationMinutes: getDiffInMinutes(end, start),
   };
 }
 
-export function hasActiveClock(sTask: STask) {
+export function hasActiveClockProp(sTask: STask) {
   if (!sTask.clocked) {
     return false;
   }
 
   if (Array.isArray(sTask.clocked)) {
-    return sTask.clocked.some((prop) => !String(prop).includes(clockSeparator));
+    return sTask.clocked.some(isActiveClockProp);
   }
 
-  return !String(sTask.clocked).includes(clockSeparator);
+  return isActiveClockProp(sTask.clocked);
+}
+
+function isActiveClockProp(clockPropValue: unknown) {
+  return !String(clockPropValue).includes(clockSeparator);
 }
 
 export function createClockTimestamp() {
@@ -110,4 +115,25 @@ export function toClockRecords(sTasks: STask[]) {
     .filter((task) => task.clocked)
     .flatMap((sTask) => toClockRecordOrRecords(sTask, sTask.clocked))
     .filter(Boolean);
+}
+
+// todo: use simpler lifting pattern
+// todo: improve name
+export function arrToClockMoments(clockPropValueOrValues: string | string[]) {
+  if (Array.isArray(clockPropValueOrValues)) {
+    return clockPropValueOrValues.flatMap(toClockMoments);
+  }
+
+  // todo: this may return an array
+  return toClockMoments(clockPropValueOrValues);
+}
+
+export function toClockMoments(clockPropValue: string) {
+  const clockMoments = toMoments(clockPropValue);
+
+  if (!clockMoments) {
+    return null;
+  }
+
+  return splitByDay(...clockMoments);
 }

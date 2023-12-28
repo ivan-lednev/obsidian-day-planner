@@ -78,12 +78,18 @@ export function isToday(moment: Moment) {
   return moment.isSame(window.moment(), "day");
 }
 
-export function splitByDay(start: Moment, end: Moment) {
-  // const chunks = [];
+export function splitByDay(
+  start: Moment,
+  end: Moment,
+  chunks: Array<[Moment, Moment]> = [],
+): Array<[Moment, Moment]> {
+  const endOfDayForStart = start.clone().endOf("day");
 
-  // if (start.isSame(end, "day")) {
-  //   return [[start, end]];
-  // }
-  //
-  // const daysBetween = start.diff(end, "days");
+  if (end.isBefore(endOfDayForStart)) {
+    return [...chunks, [start, end]];
+  }
+
+  const newStart = start.clone().add(1, "day").startOf("day");
+
+  return splitByDay(newStart, end, [...chunks, [start, endOfDayForStart]]);
 }
