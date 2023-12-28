@@ -1,5 +1,5 @@
 import type { Moment } from "moment";
-import { MetadataCache, Pos } from "obsidian";
+import { Pos } from "obsidian";
 import { STask } from "obsidian-dataview";
 import { Readable, Writable } from "svelte/store";
 
@@ -64,14 +64,10 @@ export interface Overlap {
 
 export type CleanUp = () => void;
 export type RenderMarkdown = (el: HTMLElement, markdown: string) => CleanUp;
-export type GetTasksForDay = (day: Moment) => TasksForDay;
 
 export interface ObsidianContext {
   obsidianFacade: ObsidianFacade;
-  metadataCache: MetadataCache;
-  onUpdate: OnUpdateFn;
   initWeeklyView: () => Promise<void>;
-  getTasksForDay: Readable<GetTasksForDay>;
   refreshTasks: (source: string) => void;
   dataviewLoaded: Writable<boolean>;
   renderMarkdown: RenderMarkdown;
@@ -79,6 +75,9 @@ export interface ObsidianContext {
   visibleTasks: Readable<Tasks>;
   clockOut: (sTask: STask) => void;
   cancelClock: (sTask: STask) => void;
+  clockInUnderCursor: () => void;
+  clockOutUnderCursor: () => void;
+  cancelClockUnderCursor: () => void;
   sTasksWithActiveClockProps: Readable<STask[]>;
 }
 

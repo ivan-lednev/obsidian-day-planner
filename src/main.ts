@@ -3,6 +3,7 @@ import { Moment } from "moment";
 import {
   FileView,
   MarkdownView,
+  Notice,
   Plugin,
   WorkspaceLeaf,
 } from "obsidian";
@@ -431,31 +432,40 @@ export default class DayPlanner extends Plugin {
       },
     });
 
+    const defaultObsidianContext: object = {
+      obsidianFacade: this.obsidianFacade,
+      initWeeklyView: this.initWeeklyLeaf,
+      refreshTasks: this.refreshTasks,
+      dataviewLoaded: this.dataviewLoaded,
+      renderMarkdown: createRenderMarkdown(this.app),
+      editContext,
+      visibleTasks,
+      sTasksWithActiveClockProps,
+      clockOut,
+      cancelClock,
+      clockOutUnderCursor: this.clockOutUnderCursor,
+      clockInUnderCursor: this.clockInUnderCursor,
+      cancelClockUnderCursor: this.cancelClockUnderCursor,
+    };
+
     // TODO: move out building context
     const componentContext = new Map([
-      [
-        obsidianContext,
-        {
-          obsidianFacade: this.obsidianFacade,
-          initWeeklyView: this.initWeeklyLeaf,
-          refreshTasks: this.refreshTasks,
-          dataviewLoaded: this.dataviewLoaded,
-          renderMarkdown: createRenderMarkdown(this.app),
-          editContext,
-          visibleTasks,
-          sTasksWithActiveClockProps,
-          clockOut,
-          cancelClock,
-          clockOutUnderCursor: this.clockOutUnderCursor,
-          clockInUnderCursor: this.clockInUnderCursor,
-          cancelClockUnderCursor: this.cancelClockUnderCursor,
-        },
-      ],
+      [obsidianContext, defaultObsidianContext],
       [editContextKey, { editContext }],
     ]);
 
     const timeTrackerContext = new Map([
       ...componentContext,
+      ...new Map([
+        [
+          obsidianContext,
+          {
+            ...defaultObsidianContext,
+            initWeeklyView: () =>
+              new Notice("Time tracker weekly view is not yet implemented"),
+          },
+        ],
+      ]),
       ...new Map([[editContextKey, { editContext: timeTrackerEditContext }]]),
     ]);
 
