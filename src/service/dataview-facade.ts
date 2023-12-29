@@ -13,12 +13,12 @@ export class DataviewFacade {
     private readonly settings: () => DayPlannerSettings,
   ) {}
 
-  getTasksFromConfiguredSource = () => {
+  getAllTasksFromConfiguredSource = () => {
     const source = this.settings().dataviewSource;
-    return this.getTasks(source);
+    return this.getAllTasks(source);
   };
 
-  getTasks = (source: string) => {
+  getAllTasks = (source: string) => {
     const dataview = getAPI(this.app);
 
     if (!dataview) {
@@ -34,5 +34,9 @@ export class DataviewFacade {
     console.debug(reportQueryPerformance(source, duration));
 
     return result;
+  };
+
+  getTasksFromPath = (path: string) => {
+    return getAPI(this.app)?.page(path)?.file?.tasks;
   };
 }

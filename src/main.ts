@@ -1,8 +1,14 @@
 import { flow } from "lodash/fp";
-import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
-import { getAPI, STask } from "obsidian-dataview";
+import {
+  MarkdownFileInfo,
+  MarkdownView,
+  Notice,
+  Plugin,
+  WorkspaceLeaf,
+} from "obsidian";
+import { STask } from "obsidian-dataview";
 import { get, Writable } from "svelte/store";
-import { isNotVoid } from "typed-assert";
+import { isInstanceOf, isNotVoid } from "typed-assert";
 
 import {
   editContextKey,
@@ -37,11 +43,11 @@ import { handleActiveLeafChange } from "./util/handle-active-leaf-change";
 import { withNotice } from "./util/with-notice";
 
 export default class DayPlanner extends Plugin {
-  settings: () => DayPlannerSettings;
-  private settingsStore: Writable<DayPlannerSettings>;
-  private obsidianFacade: ObsidianFacade;
-  private planEditor: PlanEditor;
-  private dataviewFacade: DataviewFacade;
+  settings!: () => DayPlannerSettings;
+  private settingsStore!: Writable<DayPlannerSettings>;
+  private obsidianFacade!: ObsidianFacade;
+  private planEditor!: PlanEditor;
+  private dataviewFacade!: DataviewFacade;
 
   async onload() {
     await this.initSettingsStore();
@@ -62,14 +68,9 @@ export default class DayPlanner extends Plugin {
 
     this.registerEvent(
       this.app.workspace.on("editor-menu", (menu, editor, view) => {
-        // todo: this is duplicated
-        const sTask = getAPI(this.app)
-          .page(view.file.path)
-          ?.file?.tasks?.find(
-            (sTask: STask) => sTask.line === view.editor.getCursor().line,
-          );
-
-        if (!sTask) {
+        try {
+          this.getSTaskUnderCursor(view);
+        } catch {
           return;
         }
 
@@ -204,16 +205,20 @@ export default class DayPlanner extends Plugin {
     await this.app.workspace.detachLeavesOfType(type);
   }
 
-  // todo: move out
-  private getSTaskUnderCursor = () => {
-    const view = this.obsidianFacade.getActiveMarkdownView();
+  private getSTaskUnderCursor = (view: MarkdownFileInfo) => {
+    isInstanceOf(
+      view,
+      MarkdownView,
+      "You can only get tasks from markdown editor views",
+    );
 
-    // TODO: hide dataview api
-    const sTask = getAPI(this.app)
-      .page(view.file.path)
-      ?.file?.tasks?.find(
-        (sTask: STask) => sTask.line === view.editor.getCursor().line,
-      );
+    const file = view.file;
+
+    isNotVoid(file, "There is no file for view");
+
+    const sTask = this.dataviewFacade
+      .getTasksFromPath(file.path)
+      .find((sTask: STask) => sTask.line === view.editor.getCursor().line);
 
     isNotVoid("There is no task under cursor");
 
@@ -221,9 +226,15 @@ export default class DayPlanner extends Plugin {
   };
 
   // todo: move out
+  private getSTaskUnderCursorFromLastView = () => {
+    const view = this.obsidianFacade.getActiveMarkdownView();
+    return this.getSTaskUnderCursor(view);
+  };
+
+  // todo: move out
   private replaceSTaskUnderCursor = (newMarkdown: string) => {
     const view = this.obsidianFacade.getActiveMarkdownView();
-    const sTask = this.getSTaskUnderCursor();
+    const sTask = this.getSTaskUnderCursorFromLastView();
 
     view.editor.replaceRange(
       newMarkdown,
@@ -235,7 +246,7 @@ export default class DayPlanner extends Plugin {
   // todo: move out
   private clockInUnderCursor = withNotice(
     flow(
-      this.getSTaskUnderCursor,
+      this.getSTaskUnderCursorFromLastView,
       assertNoActiveClock,
       withActiveClock,
       toMarkdown,
@@ -246,7 +257,7 @@ export default class DayPlanner extends Plugin {
   // todo: move out
   private clockOutUnderCursor = withNotice(
     flow(
-      this.getSTaskUnderCursor,
+      this.getSTaskUnderCursorFromLastView,
       assertActiveClock,
       withActiveClockCompleted,
       toMarkdown,
@@ -257,7 +268,7 @@ export default class DayPlanner extends Plugin {
   // todo: move out
   private cancelClockUnderCursor = withNotice(
     flow(
-      this.getSTaskUnderCursor,
+      this.getSTaskUnderCursorFromLastView,
       assertActiveClock,
       withoutActiveClock,
       toMarkdown,
@@ -265,8 +276,6 @@ export default class DayPlanner extends Plugin {
     ),
   );
 
-  // todo: split planner context from tracker context
-  // todo: initialize reactive graph separately?
   private registerViews() {
     const {
       timeTrackerEditContext,
@@ -313,7 +322,7 @@ export default class DayPlanner extends Plugin {
     const defaultObsidianContext: object = {
       obsidianFacade: this.obsidianFacade,
       initWeeklyView: this.initWeeklyLeaf,
-      refreshTasks: this.dataviewFacade.getTasks,
+      refreshTasks: this.dataviewFacade.getAllTasks,
       dataviewLoaded: this.dataviewFacade.dataviewLoaded,
       renderMarkdown: createRenderMarkdown(this.app),
       editContext,

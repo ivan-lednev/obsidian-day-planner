@@ -36,7 +36,7 @@ export function createHooks({
 }: CreateHooksProps) {
   const dataviewTasks: Readable<DataArray<STask>> = useDebouncedDataviewTasks({
     metadataCache: app.metadataCache,
-    getAllTasks: dataviewFacade.getTasksFromConfiguredSource,
+    getAllTasks: dataviewFacade.getAllTasksFromConfiguredSource,
   });
   const dayToSTasksLookup = useDayToScheduledStasks({ dataviewTasks });
   const visibleTasks = useVisibleTasks({ dayToSTasksLookup });
