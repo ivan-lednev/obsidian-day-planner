@@ -35,7 +35,7 @@
   } = useDataviewSource({ refreshTasks });
 
   const startHourOptions = range(0, 13).map(String);
-  const zoomLevelOptions = range(1, 5).map(String);
+  const zoomLevelOptions = range(1, 9).map(String);
 
   let settingsVisible = false;
   let helpVisible = false;
