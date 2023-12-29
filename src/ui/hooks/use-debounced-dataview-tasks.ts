@@ -36,6 +36,7 @@ export function useDebouncedDataviewTasks({
     });
 
     return () => {
+      // todo: this potentially creates a leak. try offref
       metadataCache.off("dataview:metadata-change", updateTasks);
       document.removeEventListener("keydown", delayUpdateTasks);
       unsubscribeFromSettings();

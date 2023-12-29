@@ -1,16 +1,9 @@
 import { flow, noop } from "lodash/fp";
 import { Moment } from "moment";
-import {
-  FileView,
-  MarkdownView,
-  Notice,
-  Plugin,
-  WorkspaceLeaf,
-} from "obsidian";
-import { getDateFromFile } from "obsidian-daily-notes-interface";
+import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
 import { DataArray, getAPI, STask } from "obsidian-dataview";
 import { derived, get, Readable, Writable, writable } from "svelte/store";
-import { isInstanceOf, isNotVoid } from "typed-assert";
+import { isNotVoid } from "typed-assert";
 
 import {
   editContextKey,
@@ -21,7 +14,6 @@ import {
 } from "./constants";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
-import { visibleDayInTimeline } from "./global-store/visible-day-in-timeline";
 import { replaceSTaskInFile, toMarkdown } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
@@ -48,7 +40,7 @@ import {
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { locToEditorPosition } from "./util/editor";
-import { isToday } from "./util/moment";
+import { handleActiveLeafChange } from "./util/handle-active-leaf-change";
 import { getDayKey } from "./util/tasks-utils";
 import { withNotice } from "./util/with-notice";
 
@@ -71,9 +63,9 @@ export default class DayPlanner extends Plugin {
 
     this.registerCommands();
 
-    this.app.workspace.on("active-leaf-change", this.handleActiveLeafChanged);
-
-    // TODO: check for memory leaks after plugin unloads
+    this.registerEvent(
+      this.app.workspace.on("active-leaf-change", handleActiveLeafChange),
+    );
     this.registerEvent(
       this.app.workspace.on("editor-menu", (menu, editor, view) => {
         // todo: this is duplicated
@@ -144,11 +136,13 @@ export default class DayPlanner extends Plugin {
     this.app.workspace.rightSplit.expand();
   };
 
+  // todo: move out
   getAllTasks = () => {
     const source = this.settings().dataviewSource;
     return this.refreshTasks(source);
   };
 
+  // todo: move out
   private refreshTasks = (source: string) => {
     const dataview = getAPI(this.app);
 
@@ -175,28 +169,6 @@ export default class DayPlanner extends Plugin {
     );
 
     return result;
-  };
-
-  private handleActiveLeafChanged = ({ view }: WorkspaceLeaf) => {
-    if (!(view instanceof FileView) || !view.file) {
-      return;
-    }
-
-    const dayUserSwitchedTo = getDateFromFile(view.file, "day");
-
-    if (dayUserSwitchedTo?.isSame(get(visibleDayInTimeline), "day")) {
-      return;
-    }
-
-    if (!dayUserSwitchedTo) {
-      if (isToday(get(visibleDayInTimeline))) {
-        visibleDayInTimeline.set(window.moment());
-      }
-
-      return;
-    }
-
-    visibleDayInTimeline.set(dayUserSwitchedTo);
   };
 
   private registerCommands() {
@@ -273,16 +245,10 @@ export default class DayPlanner extends Plugin {
     await this.app.workspace.detachLeavesOfType(type);
   }
 
-  private getActiveMarkdownView = () => {
-    const view = this.app.workspace.getMostRecentLeaf()?.view;
-
-    isInstanceOf(view, MarkdownView, "No markdown editor is active");
-
-    return view;
-  };
-
+  // todo: move out
+  // todo: move out
   private getSTaskUnderCursor = () => {
-    const view = this.getActiveMarkdownView();
+    const view = this.obsidianFacade.getActiveMarkdownView();
 
     // TODO: hide dataview api
     const sTask = getAPI(this.app)
@@ -296,8 +262,9 @@ export default class DayPlanner extends Plugin {
     return sTask;
   };
 
+  // todo: move out
   private replaceSTaskUnderCursor = (newMarkdown: string) => {
-    const view = this.getActiveMarkdownView();
+    const view = this.obsidianFacade.getActiveMarkdownView();
     const sTask = this.getSTaskUnderCursor();
 
     view.editor.replaceRange(
@@ -307,6 +274,7 @@ export default class DayPlanner extends Plugin {
     );
   };
 
+  // todo: move out
   private clockInUnderCursor = withNotice(
     flow(
       this.getSTaskUnderCursor,
@@ -317,6 +285,7 @@ export default class DayPlanner extends Plugin {
     ),
   );
 
+  // todo: move out
   private clockOutUnderCursor = withNotice(
     flow(
       this.getSTaskUnderCursor,
@@ -327,6 +296,7 @@ export default class DayPlanner extends Plugin {
     ),
   );
 
+  // todo: move out
   private cancelClockUnderCursor = withNotice(
     flow(
       this.getSTaskUnderCursor,
@@ -338,6 +308,7 @@ export default class DayPlanner extends Plugin {
   );
 
   // todo: split planner context from tracker context
+  // todo: initialize reactive graph separately?
   private registerViews() {
     const dataviewTasks: Readable<DataArray<STask>> = useDebouncedDataviewTasks(
       {
