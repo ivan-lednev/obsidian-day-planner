@@ -14,7 +14,7 @@ import {
 } from "./constants";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
-import { replaceSTaskInFile, toMarkdown } from "./service/dataview-facade";
+import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
@@ -39,6 +39,7 @@ import {
 } from "./util/clock";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
+import { replaceSTaskInFile, toMarkdown } from "./util/dataview";
 import { locToEditorPosition } from "./util/editor";
 import { handleActiveLeafChange } from "./util/handle-active-leaf-change";
 import { getDayKey } from "./util/tasks-utils";
@@ -49,12 +50,14 @@ export default class DayPlanner extends Plugin {
   private settingsStore: Writable<DayPlannerSettings>;
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
+  private dataviewFacade: DataviewFacade;
   private readonly dataviewLoaded = writable(false);
 
   async onload() {
     await this.initSettingsStore();
 
     this.obsidianFacade = new ObsidianFacade(this.app);
+    this.dataviewFacade = new DataviewFacade(this.app, this.settings);
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
 
     this.registerViews();
@@ -66,6 +69,7 @@ export default class DayPlanner extends Plugin {
     this.registerEvent(
       this.app.workspace.on("active-leaf-change", handleActiveLeafChange),
     );
+
     this.registerEvent(
       this.app.workspace.on("editor-menu", (menu, editor, view) => {
         // todo: this is duplicated
@@ -134,41 +138,6 @@ export default class DayPlanner extends Plugin {
       active: true,
     });
     this.app.workspace.rightSplit.expand();
-  };
-
-  // todo: move out
-  getAllTasks = () => {
-    const source = this.settings().dataviewSource;
-    return this.refreshTasks(source);
-  };
-
-  // todo: move out
-  private refreshTasks = (source: string) => {
-    const dataview = getAPI(this.app);
-
-    if (!dataview) {
-      return [];
-    }
-
-    this.dataviewLoaded.set(true);
-
-    performance.mark("query-start");
-    const result = dataview.pages(source).file.tasks;
-    performance.mark("query-end");
-
-    const measure = performance.measure(
-      "query-time",
-      "query-start",
-      "query-end",
-    );
-
-    console.debug(
-      `obsidian-day-planner:
-  source: "${source}"
-  took: ${measure.duration} ms`,
-    );
-
-    return result;
   };
 
   private registerCommands() {
@@ -246,7 +215,6 @@ export default class DayPlanner extends Plugin {
   }
 
   // todo: move out
-  // todo: move out
   private getSTaskUnderCursor = () => {
     const view = this.obsidianFacade.getActiveMarkdownView();
 
@@ -313,7 +281,7 @@ export default class DayPlanner extends Plugin {
     const dataviewTasks: Readable<DataArray<STask>> = useDebouncedDataviewTasks(
       {
         metadataCache: this.app.metadataCache,
-        getAllTasks: this.getAllTasks,
+        getAllTasks: this.dataviewFacade.getTasksFromConfiguredSource,
       },
     );
     const dayToSTasksLookup = useDayToScheduledStasks({ dataviewTasks });
@@ -406,7 +374,7 @@ export default class DayPlanner extends Plugin {
     const defaultObsidianContext: object = {
       obsidianFacade: this.obsidianFacade,
       initWeeklyView: this.initWeeklyLeaf,
-      refreshTasks: this.refreshTasks,
+      refreshTasks: this.dataviewFacade.getTasks,
       dataviewLoaded: this.dataviewLoaded,
       renderMarkdown: createRenderMarkdown(this.app),
       editContext,

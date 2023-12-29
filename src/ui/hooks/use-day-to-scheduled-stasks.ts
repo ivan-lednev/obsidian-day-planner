@@ -1,7 +1,7 @@
 import { DataArray, STask } from "obsidian-dataview";
 import { derived, Readable } from "svelte/store";
 
-import { getScheduledDay } from "../../service/dataview-facade";
+import { getScheduledDay } from "../../util/dataview";
 
 export interface UseDayToScheduledStasksProps {
   dataviewTasks: Readable<DataArray<STask>>;

@@ -2,8 +2,8 @@
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../../constants";
-  import { sTaskToUnscheduledTask } from "../../../service/dataview-facade";
   import { ObsidianContext } from "../../../types";
+  import { sTaskToUnscheduledTask } from "../../../util/dataview";
   import Tree from "../obsidian/tree.svelte";
   import Task from "../task.svelte";
 

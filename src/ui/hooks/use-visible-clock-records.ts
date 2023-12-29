@@ -2,8 +2,8 @@ import { STask } from "obsidian-dataview";
 import { derived, Readable } from "svelte/store";
 
 import { visibleDays } from "../../global-store/visible-days";
-import { createClockRecord } from "../../service/dataview-facade";
 import { TasksForDay } from "../../types";
+import { createClockRecord } from "../../util/dataview";
 import { getDayKey, getEmptyRecordsForDay } from "../../util/tasks-utils";
 
 interface UseVisibleClockRecordsProps {

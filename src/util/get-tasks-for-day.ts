@@ -5,12 +5,10 @@ import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { DataArray, STask } from "obsidian-dataview";
 
 import { timeFromStartRegExp } from "../regexp";
-import {
-  sTaskToTask,
-  sTaskToUnscheduledTask,
-} from "../service/dataview-facade";
 import { DayPlannerSettings } from "../settings";
 import { Task, TasksForDay } from "../types";
+
+import { sTaskToTask, sTaskToUnscheduledTask } from "./dataview";
 
 function isScheduledForThisDay(task: STask, day: Moment) {
   if (!task?.scheduled?.toMillis) {

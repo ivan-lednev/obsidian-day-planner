@@ -1,3 +1,4 @@
+import { filter, map } from "lodash/fp";
 import { Moment } from "moment";
 import { STask } from "obsidian-dataview";
 
@@ -79,20 +80,24 @@ ${createActiveClock()}`,
 export function withoutActiveClock(sTask: STask) {
   return {
     ...sTask,
-    text: sTask.text
-      .split("\n")
-      .filter((line) => !containsActiveClock(line))
-      .join("\n"),
+    text: lines(
+      filter((line) => !containsActiveClock(line)),
+      sTask.text,
+    ),
   };
+}
+
+export function lines(fn: (lines: string[]) => string[], text: string) {
+  return fn(text.split("\n")).join("\n");
 }
 
 export function withActiveClockCompleted(sTask: STask) {
   return {
     ...sTask,
-    text: sTask.text
-      .split("\n")
-      .map((line) => (containsActiveClock(line) ? clockOut(line) : line))
-      .join("\n"),
+    text: lines(
+      map((line) => (containsActiveClock(line) ? clockOut(line) : line)),
+      sTask.text,
+    ),
   };
 }
 
