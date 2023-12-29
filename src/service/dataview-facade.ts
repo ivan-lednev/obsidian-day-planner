@@ -6,7 +6,7 @@ import { DayPlannerSettings } from "../settings";
 import { reportQueryPerformance, withPerformance } from "../util/performance";
 
 export class DataviewFacade {
-  private readonly dataviewLoaded = writable(false);
+  readonly dataviewLoaded = writable(false);
 
   constructor(
     private readonly app: App,

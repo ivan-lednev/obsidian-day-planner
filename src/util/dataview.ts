@@ -15,8 +15,6 @@ import { getId } from "./id";
 import { getDiffInMinutes, getMinutesSinceMidnight } from "./moment";
 import { deleteProps } from "./properties";
 
-
-
 export function unwrap<T>(group: ReturnType<DataArray<T>["groupBy"]>) {
   return group.map(({ key, rows }) => [key, rows.array()]).array();
 }
@@ -30,31 +28,31 @@ interface Node {
 }
 
 // todo: stask can be multiline, bad name
-export function sTaskLineToString(node: Node) {
+export function textToString(node: Node) {
   const status = node.status ? `[${node.status}] ` : "";
   return `${node.symbol} ${status}${deleteProps(node.text)}\n`;
 }
 
 // todo: remove duplication: toMarkdown
-export function sTaskToString(node: Node, indentation = "") {
-  let result = `${indentation}${sTaskLineToString(node)}`;
+export function toString(node: Node, indentation = "") {
+  let result = `${indentation}${textToString(node)}`;
 
   for (const child of node.children) {
     if (!child.scheduled && !timeFromStartRegExp.test(child.text)) {
-      result += sTaskToString(child, `\t${indentation}`);
+      result += toString(child, `\t${indentation}`);
     }
   }
 
   return result;
 }
 
-export function sTaskToUnscheduledTask(sTask: STask, day: Moment) {
+export function toUnscheduledTask(sTask: STask, day: Moment) {
   return {
     durationMinutes: defaultDurationMinutes,
     // todo: bad abstraction
     listTokens: `${sTask.symbol} [${sTask.status}] `,
     firstLineText: sTask.text,
-    text: sTaskToString(sTask),
+    text: toString(sTask),
     location: {
       path: sTask.path,
       line: sTask.line,
@@ -64,10 +62,10 @@ export function sTaskToUnscheduledTask(sTask: STask, day: Moment) {
   };
 }
 
-export function sTaskToTask(sTask: STask, day: Moment): Task {
+export function toTask(sTask: STask, day: Moment): Task {
   const { startTime, endTime, firstLineText, text } = createTask({
-    line: sTaskLineToString(sTask),
-    completeContent: sTaskToString(sTask),
+    line: textToString(sTask),
+    completeContent: toString(sTask),
     day,
     location: {
       path: sTask.path,
@@ -105,13 +103,13 @@ export function getScheduledDay(sTask: STask) {
   return scheduledPropDay || dailyNoteDay;
 }
 
-export function createClockRecord(sTask: STask, clockMoments: ClockMoments) {
+export function toClockRecord(sTask: STask, clockMoments: ClockMoments) {
   // TODO: remove duplication
   return {
     ...toTime(clockMoments),
     startTime: clockMoments[0],
-    firstLineText: sTaskLineToString(sTask),
-    text: sTaskToString(sTask),
+    firstLineText: textToString(sTask),
+    text: toString(sTask),
     location: {
       path: sTask.path,
       line: sTask.line,

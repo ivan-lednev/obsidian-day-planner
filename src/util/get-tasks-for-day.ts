@@ -8,7 +8,7 @@ import { timeFromStartRegExp } from "../regexp";
 import { DayPlannerSettings } from "../settings";
 import { Task, TasksForDay } from "../types";
 
-import { sTaskToTask, sTaskToUnscheduledTask } from "./dataview";
+import { toTask, toUnscheduledTask } from "./dataview";
 
 function isScheduledForThisDay(task: STask, day: Moment) {
   if (!task?.scheduled?.toMillis) {
@@ -72,7 +72,7 @@ export function mapToTasksForDay(
   const tasksWithTime = withTime
     .reduce((result, sTask) => {
       try {
-        const task = sTaskToTask(sTask, day);
+        const task = toTask(sTask, day);
 
         result.push(task);
       } catch (error) {
@@ -88,7 +88,7 @@ export function mapToTasksForDay(
     .filter((sTask) =>
       settings.showUnscheduledNestedTasks ? true : !sTask.parent,
     )
-    .map((sTask: STask) => sTaskToUnscheduledTask(sTask, day));
+    .map((sTask: STask) => toUnscheduledTask(sTask, day));
 
   const withTimeAndDuration = calculateDuration(tasksWithTime, settings);
 

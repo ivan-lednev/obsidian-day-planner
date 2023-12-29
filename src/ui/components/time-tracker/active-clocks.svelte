@@ -3,7 +3,7 @@
 
   import { obsidianContext } from "../../../constants";
   import { ObsidianContext } from "../../../types";
-  import { sTaskToUnscheduledTask } from "../../../util/dataview";
+  import { toUnscheduledTask } from "../../../util/dataview";
   import Tree from "../obsidian/tree.svelte";
   import Task from "../task.svelte";
 
@@ -22,7 +22,7 @@
       {#each $sTasksWithActiveClockProps as sTask}
         <Task
           --task-background-color="var(--background-secondary)"
-          task={sTaskToUnscheduledTask(sTask, window.moment())}
+          task={toUnscheduledTask(sTask, window.moment())}
         >
           <div class="task-decorations">
             <ClockOutButton onClick={() => clockOut(sTask)} />

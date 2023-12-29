@@ -3,7 +3,7 @@ import { derived, Readable } from "svelte/store";
 
 import { visibleDays } from "../../global-store/visible-days";
 import { TasksForDay } from "../../types";
-import { createClockRecord } from "../../util/dataview";
+import { toClockRecord } from "../../util/dataview";
 import { getDayKey, getEmptyRecordsForDay } from "../../util/tasks-utils";
 
 interface UseVisibleClockRecordsProps {
@@ -24,7 +24,7 @@ export function useVisibleClockRecords({
         if (sTasksForDay) {
           result[key] = {
             withTime: sTasksForDay.map(({ sTask, clockMoments }) =>
-              createClockRecord(sTask, clockMoments),
+              toClockRecord(sTask, clockMoments),
             ),
             noTime: [],
           };

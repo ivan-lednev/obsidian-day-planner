@@ -2,7 +2,7 @@ import { flow, noop } from "lodash/fp";
 import { Moment } from "moment";
 import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
 import { DataArray, getAPI, STask } from "obsidian-dataview";
-import { derived, get, Readable, Writable, writable } from "svelte/store";
+import { derived, get, Readable, Writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
 import {
@@ -51,7 +51,6 @@ export default class DayPlanner extends Plugin {
   private obsidianFacade: ObsidianFacade;
   private planEditor: PlanEditor;
   private dataviewFacade: DataviewFacade;
-  private readonly dataviewLoaded = writable(false);
 
   async onload() {
     await this.initSettingsStore();
@@ -375,7 +374,7 @@ export default class DayPlanner extends Plugin {
       obsidianFacade: this.obsidianFacade,
       initWeeklyView: this.initWeeklyLeaf,
       refreshTasks: this.dataviewFacade.getTasks,
-      dataviewLoaded: this.dataviewLoaded,
+      dataviewLoaded: this.dataviewFacade.dataviewLoaded,
       renderMarkdown: createRenderMarkdown(this.app),
       editContext,
       visibleTasks,
