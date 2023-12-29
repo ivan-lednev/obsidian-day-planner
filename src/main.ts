@@ -1,8 +1,7 @@
-import { flow, noop } from "lodash/fp";
-import { Moment } from "moment";
+import { flow } from "lodash/fp";
 import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
-import { DataArray, getAPI, STask } from "obsidian-dataview";
-import { derived, get, Readable, Writable } from "svelte/store";
+import { getAPI, STask } from "obsidian-dataview";
+import { get, Writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
 import {
@@ -12,20 +11,12 @@ import {
   viewTypeTimeTracker,
   viewTypeWeekly,
 } from "./constants";
-import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
-import { useDayToScheduledStasks } from "./ui/hooks/use-day-to-scheduled-stasks";
-import { useDayToStasksWithClockMoments } from "./ui/hooks/use-day-to-stasks-with-clock-moments";
-import { useDebouncedDataviewTasks } from "./ui/hooks/use-debounced-dataview-tasks";
-import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
-import { useStasksWithActiveClockProps } from "./ui/hooks/use-stasks-with-active-clock-props";
-import { useVisibleClockRecords } from "./ui/hooks/use-visible-clock-records";
-import { useVisibleTasks } from "./ui/hooks/use-visible-tasks";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimeTrackerView from "./ui/time-tracker-view";
 import TimelineView from "./ui/timeline-view";
@@ -38,11 +29,11 @@ import {
   withoutActiveClock,
 } from "./util/clock";
 import { createRenderMarkdown } from "./util/create-render-markdown";
+import { createHooks } from "./util/createHooks";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { replaceSTaskInFile, toMarkdown } from "./util/dataview";
 import { locToEditorPosition } from "./util/editor";
 import { handleActiveLeafChange } from "./util/handle-active-leaf-change";
-import { getDayKey } from "./util/tasks-utils";
 import { withNotice } from "./util/with-notice";
 
 export default class DayPlanner extends Plugin {
@@ -277,70 +268,19 @@ export default class DayPlanner extends Plugin {
   // todo: split planner context from tracker context
   // todo: initialize reactive graph separately?
   private registerViews() {
-    const dataviewTasks: Readable<DataArray<STask>> = useDebouncedDataviewTasks(
-      {
-        metadataCache: this.app.metadataCache,
-        getAllTasks: this.dataviewFacade.getTasksFromConfiguredSource,
-      },
-    );
-    const dayToSTasksLookup = useDayToScheduledStasks({ dataviewTasks });
-    const visibleTasks = useVisibleTasks({ dayToSTasksLookup });
-    const tasksForToday = derived(
-      [visibleTasks, currentTime],
-      ([$visibleTasks, $currentTime]) => {
-        return $visibleTasks[getDayKey($currentTime)];
-      },
-    );
-
-    const sTasksWithActiveClockProps = useStasksWithActiveClockProps({
-      dataviewTasks,
+    const {
+      timeTrackerEditContext,
+      editContext,
+      tasksForToday,
+      sTasksWithActiveClockProps,
+      visibleTasks,
+    } = createHooks({
+      app: this.app,
+      dataviewFacade: this.dataviewFacade,
+      obsidianFacade: this.obsidianFacade,
+      settingsStore: this.settingsStore,
+      planEditor: this.planEditor,
     });
-    const dayToStasksWithClockMoments = useDayToStasksWithClockMoments({
-      dataviewTasks,
-    });
-    const visibleClockRecords = useVisibleClockRecords({
-      dayToSTasksLookup: dayToStasksWithClockMoments,
-    });
-
-    // TODO: unwrap the hook from the derived store to remove extra-indirection
-    const editContext = derived(
-      [this.settingsStore, visibleTasks],
-      ([$settings, $visibleTasks]) => {
-        return useEditContext({
-          obsidianFacade: this.obsidianFacade,
-          onUpdate: this.planEditor.syncTasksWithFile,
-          settings: $settings,
-          visibleTasks: $visibleTasks,
-        });
-      },
-    );
-
-    // TODO: remove duplication
-    const timeTrackerEditContext = derived(
-      [this.settingsStore, visibleClockRecords],
-      ([$settings, $visibleClockRecords]) => {
-        const base = useEditContext({
-          obsidianFacade: this.obsidianFacade,
-          onUpdate: this.planEditor.syncTasksWithFile,
-          settings: $settings,
-          visibleTasks: $visibleClockRecords,
-        });
-
-        function withDisabledEditHandlers(day: Moment) {
-          return {
-            ...base.getEditHandlers(day),
-            handleGripMouseDown: noop,
-            handleContainerMouseDown: noop,
-            handleResizerMouseDown: noop,
-          };
-        }
-
-        return {
-          ...base,
-          getEditHandlers: withDisabledEditHandlers,
-        };
-      },
-    );
 
     const clockOut = withNotice(async (sTask: STask) => {
       await this.obsidianFacade.editFile(sTask.path, (contents) =>
