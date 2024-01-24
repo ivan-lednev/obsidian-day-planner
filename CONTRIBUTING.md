@@ -3,7 +3,7 @@
 When contributing to this repository, please first discuss the change you wish to make via
 an [issue](https://github.com/ivan-lednev/obsidian-day-planner/issues).
 
-Be sure to read the [ARCHITECTURE.md](./ARCHITECTUR.md).
+Be sure to read the [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ## Development Process
 
