@@ -14,10 +14,8 @@
     getContext<ObsidianContext>(obsidianContext);
 </script>
 
-<Tree title="Active clocks">
-  {#if $sTasksWithActiveClockProps.length === 0}
-    <span class="message">No active clocks</span>
-  {:else}
+<Tree title="Active clocks ({$sTasksWithActiveClockProps.length})">
+  {#if $sTasksWithActiveClockProps.length > 0}
     <div class="active-clocks">
       {#each $sTasksWithActiveClockProps as sTask}
         <Task
@@ -49,11 +47,6 @@
     margin-left: var(--size-4-3);
     padding: var(--size-4-1) 0 var(--size-4-1) var(--size-4-3);
     border-left: 1px solid var(--background-modifier-border);
-  }
-
-  .message {
-    font-size: var(--font-ui-small);
-    color: var(--text-faint);
   }
 
   .active-clocks :global(svg.svg-icon) {

@@ -27,7 +27,6 @@ interface Node {
   scheduled?: DateTime;
 }
 
-// todo: stask can be multiline, bad name
 export function textToString(node: Node) {
   const status = node.status ? `[${node.status}] ` : "";
   return `${node.symbol} ${status}${deleteProps(node.text)}\n`;

@@ -1,6 +1,6 @@
 <script lang="ts">
   export let title: string;
-  import RightTriangle from "./right-triangle.svelte"
+  import RightTriangle from "./right-triangle.svelte";
 
   let isTreeVisible = true;
 
@@ -11,7 +11,7 @@
   }
 </script>
 
-<div class="container">
+<div class="tree-container">
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div class="tree-item-self is-clickable" on:click={toggleTree}>
     <div
@@ -29,6 +29,16 @@
 </div>
 
 <style>
+  .tree-container {
+    display: flex;
+    flex: var(--flex);
+    flex-direction: column;
+  }
+
+  .tree-item-self {
+    border-radius: 0;
+  }
+
   .tree-item-inner {
     font-weight: var(--font-medium);
   }

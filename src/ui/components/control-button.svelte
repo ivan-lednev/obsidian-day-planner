@@ -20,7 +20,9 @@
   .clickable-icon {
     grid-column-start: var(--grid-column-start, auto);
     flex-basis: var(--input-height);
-    align-self: center;
+
+    /* TODO: too restrictive; this is a terrible abstraction */
+    align-self: var(--align-self, center);
     justify-self: var(--justify-self, auto);
 
     color: var(--color, var(--icon-color));
