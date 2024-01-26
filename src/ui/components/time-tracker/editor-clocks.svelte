@@ -4,73 +4,35 @@
 
   import { obsidianContext } from "../../../constants";
   import { ObsidianContext } from "../../../types";
-  import ControlButton from "../control-button.svelte";
+  import AccordionButton from "../accordion-button.svelte";
 
   const { clockInUnderCursor, clockOutUnderCursor, cancelClockUnderCursor } =
     getContext<ObsidianContext>(obsidianContext);
 </script>
 
 <div class="control-buttons">
-  <ControlButton
-    --align-self="stretch"
-    label="Clock in"
-    on:click={clockInUnderCursor}
-  >
-    <div class="button-text">
-      <Play class="svg-icon" />
-      Clock in
-    </div>
-  </ControlButton>
+  <AccordionButton icon={Play} on:click={clockInUnderCursor}>
+    Clock in
+  </AccordionButton>
 
-  <!--    todo: fix duplicated props-->
-  <!--    todo: fix duplicated divs-->
-  <ControlButton
-    --align-self="stretch"
-    label="Clock in"
-    on:click={clockInUnderCursor}
-  >
-    <div class="button-text">
-      <Play class="svg-icon" />
-      Clock in
-    </div>
-  </ControlButton>
-  <ControlButton
-    --align-self="stretch"
-    label="Clock out"
-    on:click={clockOutUnderCursor}
-  >
-    <div class="button-text">
-      <Square class="svg-icon" />
-      Clock out
-    </div>
-  </ControlButton>
-  <ControlButton
-    --align-self="stretch"
-    label="Cancel clock"
-    on:click={cancelClockUnderCursor}
-  >
-    <div class="button-text">
-      <Trash2 class="svg-icon" />
-      Cancel clock
-    </div>
-  </ControlButton>
+  <AccordionButton icon={Square} on:click={clockOutUnderCursor}>
+    Clock out
+  </AccordionButton>
+
+  <AccordionButton icon={Trash2} on:click={cancelClockUnderCursor}>
+    Cancel clock
+  </AccordionButton>
 </div>
 
 <style>
   /* TODO: fix selector hacks */
   .control-buttons :global(.clickable-icon) {
-    padding-left: var(--size-4-6);
+    padding: var(--size-4-1) 0 var(--size-2-1) var(--size-4-4);
   }
 
   .control-buttons :global(svg.svg-icon) {
     width: calc(var(--icon-xs) - 2px);
     height: calc(var(--icon-xs) - 2px);
-  }
-
-  .button-text {
-    display: inline-flex;
-    gap: var(--size-4-1);
-    align-items: center;
   }
 
   .control-buttons {

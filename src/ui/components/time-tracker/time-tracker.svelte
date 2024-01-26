@@ -12,7 +12,6 @@
 </Tree>
 <ActiveClocks />
 <Tree --flex="1 0 0" title="Timeline">
-  <!--TODO: align padding with the upper one-->
   <TimelineControls />
   <TaskGrid readonly={true} />
 </Tree>
