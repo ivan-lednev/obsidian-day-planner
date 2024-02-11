@@ -1,11 +1,4 @@
-<script lang="ts">
-
-  import { settings } from "../../global-store/settings";
-
-</script>
-
 <div
-  style:max-height="{$settings.unscheduledTasksHeight}px"
   class="unscheduled-task-container"
 >
   <div class="tasks">
@@ -15,6 +8,7 @@
 
 <style>
   .unscheduled-task-container {
+    max-height: 30%;
     overflow: auto;
     display: flex;
     gap: var(--size-4-1);

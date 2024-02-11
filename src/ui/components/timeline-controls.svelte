@@ -84,11 +84,6 @@
     $settings.startHour = Number(event.currentTarget.value);
   }
 
-  function handleUnscheduledTasksHeightInput(event: Event) {
-    // @ts-expect-error
-    $settings.unscheduledTasksHeight = Number(event.currentTarget.value);
-  }
-
   function handleZoomLevelInput(event: Event) {
     // @ts-expect-error
     $settings.zoomLevel = Number(event.currentTarget.value);
@@ -288,18 +283,6 @@
           >
             <input tabindex="0" type="checkbox" />
           </div>
-        </SettingItem>
-
-        <SettingItem>
-          <svelte:fragment slot="name"
-            >Unscheduled tasks height limit
-          </svelte:fragment>
-          <Dropdown
-            slot="control"
-            value={String($settings.unscheduledTasksHeight)}
-            values={["50", "100", "150", "200", "250", "300", "350", "400"]}
-            on:input={handleUnscheduledTasksHeightInput}
-          />
         </SettingItem>
       {/if}
     </div>
