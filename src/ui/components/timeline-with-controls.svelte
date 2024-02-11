@@ -47,8 +47,6 @@
     <UnscheduledTaskContainer>
       {#each $displayedTasks.noTime as task}
         <Task
-          --task-height="{$settings.defaultDurationMinutes *
-            $settings.zoomLevel}px"
           {task}
           on:mouseup={() => handleTaskMouseUp(task)}
         >

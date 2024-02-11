@@ -34,7 +34,7 @@ import type { UnscheduledTask } from "../../types";
     display: flex;
 
     width: 100%;
-    height: var(--task-height);
+    height: var(--task-height, auto);
     padding: 0 1px 2px;
 
     transition: 0.05s linear;
