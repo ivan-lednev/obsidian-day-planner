@@ -1,6 +1,7 @@
 import { Plugin, WorkspaceLeaf } from "obsidian";
 import { get, writable, Writable } from "svelte/store";
 
+import ical from "node-ical"
 import {
   editContextKey,
   errorContextKey,
@@ -130,6 +131,15 @@ export default class DayPlanner extends Plugin {
       name: "Insert Planner Heading at Cursor",
       editorCallback: (editor) =>
         editor.replaceSelection(this.planEditor.createPlannerHeading()),
+    });
+
+    this.addCommand({
+      id: "re-sync",
+      name: "Re-sync tasks",
+      callback: async () => {
+        const response = await request({ url: "https://calendar.google.com/calendar/ical/bishop1860%40gmail.com/private-7cabed5aeb5efcfdef0c7454b862f875/basic.ics" })
+        console.log({ response: ical.parseICS(response) })
+      },
     });
   }
 
