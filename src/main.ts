@@ -34,8 +34,8 @@ import {
   withActiveClockCompleted,
   withoutActiveClock,
 } from "./util/clock";
+import { createHooks } from "./util/create-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
-import { createHooks } from "./util/createHooks";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { replaceSTaskInFile, toMarkdown } from "./util/dataview";
 import { locToEditorPosition } from "./util/editor";
@@ -322,7 +322,7 @@ export default class DayPlanner extends Plugin {
     const defaultObsidianContext: object = {
       obsidianFacade: this.obsidianFacade,
       initWeeklyView: this.initWeeklyLeaf,
-      refreshTasks: this.dataviewFacade.getAllTasks,
+      refreshTasks: this.dataviewFacade.getAllTasksFrom,
       dataviewLoaded: this.dataviewFacade.dataviewLoaded,
       renderMarkdown: createRenderMarkdown(this.app),
       editContext,

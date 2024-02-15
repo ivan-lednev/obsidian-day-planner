@@ -13,12 +13,8 @@ export class DataviewFacade {
     private readonly settings: () => DayPlannerSettings,
   ) {}
 
-  getAllTasksFromConfiguredSource = () => {
-    const source = this.settings().dataviewSource;
-    return this.getAllTasks(source);
-  };
-
-  getAllTasks = (source: string) => {
+  getAllTasksFrom = (source: string) => {
+    console.trace();
     const dataview = getAPI(this.app);
 
     if (!dataview) {
@@ -29,6 +25,25 @@ export class DataviewFacade {
 
     const { result, duration } = withPerformance(
       () => dataview.pages(source).file.tasks,
+    );
+
+    console.debug(reportQueryPerformance(source, duration));
+
+    return result;
+  };
+
+  getAllListsFrom = (source: string) => {
+    // todo: fix duplication
+    const dataview = getAPI(this.app);
+
+    if (!dataview) {
+      return [];
+    }
+
+    this.dataviewLoaded.set(true);
+
+    const { result, duration } = withPerformance(
+      () => dataview.pages(source).file.lists,
     );
 
     console.debug(reportQueryPerformance(source, duration));

@@ -1,10 +1,12 @@
 import { noop } from "lodash/fp";
 import { Moment } from "moment/moment";
 import { App } from "obsidian";
+import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { DataArray, STask } from "obsidian-dataview";
 import { Writable, derived, Readable } from "svelte/store";
 
 import { currentTime } from "../global-store/current-time";
+import { visibleDays } from "../global-store/visible-days";
 import { DataviewFacade } from "../service/dataview-facade";
 import { ObsidianFacade } from "../service/obsidian-facade";
 import { PlanEditor } from "../service/plan-editor";
@@ -27,6 +29,17 @@ interface CreateHooksProps {
   planEditor: PlanEditor;
 }
 
+// todo: move out
+export function useVisibleDailyNotes() {
+  return derived(visibleDays, ($visibleDays) => {
+    const allDailyNotes = getAllDailyNotes();
+
+    return $visibleDays
+      .map((day) => getDailyNote(day, allDailyNotes))
+      .filter(Boolean);
+  });
+}
+
 export function createHooks({
   app,
   dataviewFacade,
@@ -34,9 +47,13 @@ export function createHooks({
   settingsStore,
   planEditor,
 }: CreateHooksProps) {
+  const visibleDailyNotes = useVisibleDailyNotes();
   const dataviewTasks: Readable<DataArray<STask>> = useDebouncedDataviewTasks({
+    visibleDailyNotes,
+    settings: settingsStore,
     metadataCache: app.metadataCache,
-    getAllTasks: dataviewFacade.getAllTasksFromConfiguredSource,
+    getAllTasksFrom: dataviewFacade.getAllTasksFrom,
+    getAllListsFrom: dataviewFacade.getAllListsFrom,
   });
   const dayToSTasksLookup = useDayToScheduledStasks({ dataviewTasks });
   const visibleTasks = useVisibleTasks({ dayToSTasksLookup });

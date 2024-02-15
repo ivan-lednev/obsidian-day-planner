@@ -1,23 +1,51 @@
 import { MetadataCache } from "obsidian";
-import { derived, readable } from "svelte/store";
+import { DataArray, STask } from "obsidian-dataview";
+import { derived, get, Readable, readable } from "svelte/store";
 
-import { settings } from "../../global-store/settings";
 import { DataviewFacade } from "../../service/dataview-facade";
+import { DayPlannerSettings } from "../../settings";
+import { useVisibleDailyNotes } from "../../util/create-hooks";
 import { debounceWithDelay } from "../../util/debounce-with-delay";
 
 export interface UseDataviewTasksProps {
+  visibleDailyNotes: ReturnType<typeof useVisibleDailyNotes>;
+  settings: Readable<DayPlannerSettings>;
   metadataCache: MetadataCache;
-  getAllTasks: ReturnType<DataviewFacade["getAllTasks"]>;
+  getAllListsFrom: ReturnType<DataviewFacade["getAllListsFrom"]>;
+  getAllTasksFrom: ReturnType<DataviewFacade["getAllTasksFrom"]>;
 }
 
-// TODO: dataview logic can be split from this
+// TODO: split debouncing from the details of how different sources and task types get mixed
 export function useDebouncedDataviewTasks({
+  visibleDailyNotes,
+  settings,
   metadataCache,
-  getAllTasks,
+  getAllTasksFrom,
+  getAllListsFrom,
 }: UseDataviewTasksProps) {
-  return readable(getAllTasks(), (set) => {
+  function getTasksFromCombinedSources() {
+    const dailyNotePathsFragment = get(visibleDailyNotes)
+      .map((note) => `"${note.path}"`)
+      .join(" OR ");
+    const listsFromDailyNotes = getAllListsFrom(dailyNotePathsFragment);
+    const dataviewSource = get(settings).dataviewSource;
+
+    if (dataviewSource.trim().length === 0) {
+      return listsFromDailyNotes;
+    }
+
+    const extraSourcesFragment = `${dataviewSource} AND -(${dailyNotePathsFragment})`;
+
+    // TODO: fix type cast
+    //  note that SListItem still works fine. It has everything a task has
+    return listsFromDailyNotes.concat(
+      getAllTasksFrom(extraSourcesFragment),
+    ) as unknown as DataArray<STask>;
+  }
+
+  return readable(getTasksFromCombinedSources(), (set) => {
     const [updateTasks, delayUpdateTasks] = debounceWithDelay(() => {
-      set(getAllTasks());
+      set(getTasksFromCombinedSources());
     }, 1000);
 
     metadataCache.on(

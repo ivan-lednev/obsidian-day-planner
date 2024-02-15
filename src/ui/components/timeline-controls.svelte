@@ -180,6 +180,7 @@
   {/if}
   {#if filterVisible}
     <div class="stretcher">
+      Include additional files, folders and tags with a Dataview source:
       <input
         placeholder={`-#archived and -"notes/personal"`}
         spellcheck="false"
@@ -189,7 +190,7 @@
       {#if $sourceIsEmpty}
         <div class="info-container">
           <AlertTriangle class="svg-icon" />
-          Tasks are pulled from everywhere
+          Tasks are pulled only from daily notes
         </div>
       {/if}
       {#if $dataviewErrorMessage.length > 0}
