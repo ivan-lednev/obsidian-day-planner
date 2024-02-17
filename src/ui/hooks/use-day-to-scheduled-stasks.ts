@@ -11,7 +11,7 @@ export function useDayToScheduledStasks({
   dataviewTasks,
 }: UseDayToScheduledStasksProps) {
   return derived(dataviewTasks, ($dataviewTasks) => {
-    if (!$dataviewTasks) {
+    if (!$dataviewTasks || $dataviewTasks.length === 0) {
       return {};
     }
 

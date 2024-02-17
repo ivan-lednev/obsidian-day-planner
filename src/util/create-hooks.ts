@@ -2,7 +2,7 @@ import { noop } from "lodash/fp";
 import { Moment } from "moment/moment";
 import { App } from "obsidian";
 import { DataArray, STask } from "obsidian-dataview";
-import { derived, get, Readable, Writable } from "svelte/store";
+import { derived, get, readable, Readable, Writable } from "svelte/store";
 
 import { reQueryAfterMillis } from "../constants";
 import { currentTime } from "../global-store/current-time";
@@ -47,6 +47,9 @@ export function createHooks({
   const keyDown = useKeyDown();
   const dataviewChange = useDataviewChange(app.metadataCache);
   const dataviewLoaded = useDataviewLoaded(app);
+  const layoutReady = readable(false, (set) => {
+    app.workspace.onLayoutReady(() => set(true));
+  });
 
   const taskUpdateTrigger = derived(
     [dataviewChange, dataviewSource],
@@ -57,7 +60,7 @@ export function createHooks({
     keyDown,
     reQueryAfterMillis,
   );
-  const visibleDailyNotes = useVisibleDailyNotes(dataviewLoaded);
+  const visibleDailyNotes = useVisibleDailyNotes(layoutReady);
 
   const visibleDailyNotesQuery = derived(
     visibleDailyNotes,
@@ -69,7 +72,7 @@ export function createHooks({
   const listsFromVisibleDailyNotes = derived(
     [visibleDailyNotesQuery, dataviewLoaded, debouncedTaskUpdateTrigger],
     ([$visibleDailyNotesQuery, $dataviewLoaded]) => {
-      if (!$dataviewLoaded) {
+      if (!$dataviewLoaded || $visibleDailyNotesQuery.trim().length === 0) {
         return [];
       }
 
