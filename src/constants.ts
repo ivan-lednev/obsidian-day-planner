@@ -9,6 +9,7 @@ export const statusBarTextLimit = 15;
 export const indentBeforeTaskParagraph = 6;
 export const clockKey = "clocked";
 export const clockFormat = "YYYY-MM-DDTHH:mm:ss";
+export const reQueryAfterMillis = 200;
 
 export const icons = [
   "any-key",

@@ -2,56 +2,55 @@ import { App } from "obsidian";
 import { getAPI } from "obsidian-dataview";
 import { writable } from "svelte/store";
 
-import { DayPlannerSettings } from "../settings";
-import { reportQueryPerformance, withPerformance } from "../util/performance";
+import { withPerformanceReport } from "../util/performance";
 
 export class DataviewFacade {
+  // todo: there is a separate store for that, remove this
   readonly dataviewLoaded = writable(false);
 
-  constructor(
-    private readonly app: App,
-    private readonly settings: () => DayPlannerSettings,
-  ) {}
+  constructor(private readonly app: App) {}
 
   getAllTasksFrom = (source: string) => {
-    console.trace();
-    const dataview = getAPI(this.app);
-
-    if (!dataview) {
+    // todo: move this guard up the signal chain
+    // We can say: 'If Dv is not loaded, don't update this branch of signals'
+    if (!this.getDataview()) {
       return [];
     }
 
-    this.dataviewLoaded.set(true);
-
-    const { result, duration } = withPerformance(
-      () => dataview.pages(source).file.tasks,
+    return withPerformanceReport(
+      () => this.getDataview().pages(source).file.tasks,
+      {
+        source,
+      },
     );
-
-    console.debug(reportQueryPerformance(source, duration));
-
-    return result;
   };
 
   getAllListsFrom = (source: string) => {
-    // todo: fix duplication
-    const dataview = getAPI(this.app);
-
-    if (!dataview) {
+    // todo: move this guard up the signal chain
+    if (!this.getDataview()) {
       return [];
     }
 
-    this.dataviewLoaded.set(true);
-
-    const { result, duration } = withPerformance(
-      () => dataview.pages(source).file.lists,
+    return withPerformanceReport(
+      () => this.getDataview().pages(source).file.lists,
+      {
+        source,
+      },
     );
-
-    console.debug(reportQueryPerformance(source, duration));
-
-    return result;
   };
 
   getTasksFromPath = (path: string) => {
     return getAPI(this.app)?.page(path)?.file?.tasks;
   };
+
+  private getDataview() {
+    const dataview = getAPI(this.app);
+
+    if (dataview) {
+      this.dataviewLoaded.set(true);
+      return dataview;
+    }
+
+    return undefined;
+  }
 }

@@ -1,19 +1,21 @@
-export function withPerformance<T>(fn: () => T) {
-  performance.mark("query-start");
+export function withPerformanceReport<T>(
+  fn: () => T,
+  variables: Record<string, string>,
+) {
+  performance.mark("op-start");
   const result = fn();
-  performance.mark("query-end");
+  performance.mark("op-end");
 
-  const { duration } = performance.measure(
-    "query-time",
-    "query-start",
-    "query-end",
-  );
+  const { duration } = performance.measure("op-time", "op-start", "op-end");
 
-  return { result, duration };
-}
+  const formattedVariables = Object.entries(variables)
+    .map(([key, value]) => `${key}: ${value || "empty"}`)
+    .join("\n  ");
 
-export function reportQueryPerformance(source: string, duration: number) {
-  return `obsidian-day-planner:
-  source: "${source}"
-  took: ${duration.toFixed(2)} ms`;
+  console.debug(`obsidian-day-planner:
+  took: ${duration.toFixed(2)} ms
+  ${formattedVariables}
+  `);
+
+  return result;
 }

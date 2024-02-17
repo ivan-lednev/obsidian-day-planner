@@ -1,24 +1,28 @@
 import { noop } from "lodash/fp";
 import { Moment } from "moment/moment";
 import { App } from "obsidian";
-import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
-import { DataArray, STask } from "obsidian-dataview";
-import { Writable, derived, Readable } from "svelte/store";
+import { derived, Writable } from "svelte/store";
 
+import { reQueryAfterMillis } from "../constants";
 import { currentTime } from "../global-store/current-time";
-import { visibleDays } from "../global-store/visible-days";
 import { DataviewFacade } from "../service/dataview-facade";
 import { ObsidianFacade } from "../service/obsidian-facade";
 import { PlanEditor } from "../service/plan-editor";
 import { DayPlannerSettings } from "../settings";
+import { useDataviewChange } from "../ui/hooks/use-dataview-change";
+import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDayToScheduledStasks } from "../ui/hooks/use-day-to-scheduled-stasks";
 import { useDayToStasksWithClockMoments } from "../ui/hooks/use-day-to-stasks-with-clock-moments";
-import { useDebouncedDataviewTasks } from "../ui/hooks/use-debounced-dataview-tasks";
+import { useDebounceWithDelay } from "../ui/hooks/use-debounce-with-delay";
 import { useEditContext } from "../ui/hooks/use-edit/use-edit-context";
+import { useKeyDown } from "../ui/hooks/use-key-down";
 import { useStasksWithActiveClockProps } from "../ui/hooks/use-stasks-with-active-clock-props";
 import { useVisibleClockRecords } from "../ui/hooks/use-visible-clock-records";
+import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
 import { useVisibleTasks } from "../ui/hooks/use-visible-tasks";
 
+import * as query from "./dataview-query";
+import { getUpdateTrigger } from "./store";
 import { getDayKey } from "./tasks-utils";
 
 interface CreateHooksProps {
@@ -29,17 +33,6 @@ interface CreateHooksProps {
   planEditor: PlanEditor;
 }
 
-// todo: move out
-export function useVisibleDailyNotes() {
-  return derived(visibleDays, ($visibleDays) => {
-    const allDailyNotes = getAllDailyNotes();
-
-    return $visibleDays
-      .map((day) => getDailyNote(day, allDailyNotes))
-      .filter(Boolean);
-  });
-}
-
 export function createHooks({
   app,
   dataviewFacade,
@@ -47,15 +40,46 @@ export function createHooks({
   settingsStore,
   planEditor,
 }: CreateHooksProps) {
-  const visibleDailyNotes = useVisibleDailyNotes();
-  const dataviewTasks: Readable<DataArray<STask>> = useDebouncedDataviewTasks({
-    visibleDailyNotes,
-    settings: settingsStore,
-    metadataCache: app.metadataCache,
-    getAllTasksFrom: dataviewFacade.getAllTasksFrom,
-    getAllListsFrom: dataviewFacade.getAllListsFrom,
+  const dataviewSource = derived(settingsStore, ($settings) => {
+    return $settings.dataviewSource;
   });
+  const keyDown = useKeyDown();
+  const dataviewChange = useDataviewChange(app.metadataCache);
+  const dataviewLoaded = useDataviewLoaded(app);
+
+  const taskUpdateTrigger = derived(
+    [dataviewChange, dataviewSource],
+    getUpdateTrigger,
+  );
+  const debouncedTaskUpdateTrigger = useDebounceWithDelay(
+    taskUpdateTrigger,
+    keyDown,
+    reQueryAfterMillis,
+  );
+  const visibleDailyNotes = useVisibleDailyNotes(dataviewLoaded);
+
+  // const listsFromVisibleDailyNotes = derived(
+  const dataviewTasks = derived(
+    [visibleDailyNotes, dataviewLoaded, debouncedTaskUpdateTrigger],
+    ([$visibleDailyNotes, $dataviewLoaded]) => {
+      if (!$dataviewLoaded) {
+        return [];
+      }
+
+      return dataviewFacade.getAllListsFrom(query.anyOf($visibleDailyNotes));
+    },
+  );
+
+  // const dataviewTasks: Readable<DataArray<STask>> = useDebouncedDataviewTasks({
+  //   visibleDailyNotes,
+  //   settings: settingsStore,
+  //   metadataCache: app.metadataCache,
+  //   dataviewFacade,
+  // });
+
   const dayToSTasksLookup = useDayToScheduledStasks({ dataviewTasks });
+
+  // todo: we might not need this any longer
   const visibleTasks = useVisibleTasks({ dayToSTasksLookup });
   const tasksForToday = derived(
     [visibleTasks, currentTime],
@@ -120,5 +144,6 @@ export function createHooks({
     tasksForToday,
     sTasksWithActiveClockProps,
     visibleTasks,
+    dataviewLoaded,
   };
 }

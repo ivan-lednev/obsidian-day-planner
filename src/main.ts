@@ -53,7 +53,7 @@ export default class DayPlanner extends Plugin {
     await this.initSettingsStore();
 
     this.obsidianFacade = new ObsidianFacade(this.app);
-    this.dataviewFacade = new DataviewFacade(this.app, this.settings);
+    this.dataviewFacade = new DataviewFacade(this.app);
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
 
     this.registerViews();
@@ -283,6 +283,7 @@ export default class DayPlanner extends Plugin {
       tasksForToday,
       sTasksWithActiveClockProps,
       visibleTasks,
+      dataviewLoaded,
     } = createHooks({
       app: this.app,
       dataviewFacade: this.dataviewFacade,
@@ -319,11 +320,12 @@ export default class DayPlanner extends Plugin {
       },
     });
 
+    // todo: type this
     const defaultObsidianContext: object = {
       obsidianFacade: this.obsidianFacade,
       initWeeklyView: this.initWeeklyLeaf,
       refreshTasks: this.dataviewFacade.getAllTasksFrom,
-      dataviewLoaded: this.dataviewFacade.dataviewLoaded,
+      dataviewLoaded,
       renderMarkdown: createRenderMarkdown(this.app),
       editContext,
       visibleTasks,

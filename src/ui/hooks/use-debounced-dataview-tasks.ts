@@ -4,15 +4,16 @@ import { derived, get, Readable, readable } from "svelte/store";
 
 import { DataviewFacade } from "../../service/dataview-facade";
 import { DayPlannerSettings } from "../../settings";
-import { useVisibleDailyNotes } from "../../util/create-hooks";
+import * as query from "../../util/dataview-query";
 import { debounceWithDelay } from "../../util/debounce-with-delay";
+
+import { useVisibleDailyNotes } from "./use-visible-daily-notes";
 
 export interface UseDataviewTasksProps {
   visibleDailyNotes: ReturnType<typeof useVisibleDailyNotes>;
   settings: Readable<DayPlannerSettings>;
   metadataCache: MetadataCache;
-  getAllListsFrom: ReturnType<DataviewFacade["getAllListsFrom"]>;
-  getAllTasksFrom: ReturnType<DataviewFacade["getAllTasksFrom"]>;
+  dataviewFacade: DataviewFacade;
 }
 
 // TODO: split debouncing from the details of how different sources and task types get mixed
@@ -20,53 +21,67 @@ export function useDebouncedDataviewTasks({
   visibleDailyNotes,
   settings,
   metadataCache,
-  getAllTasksFrom,
-  getAllListsFrom,
+  dataviewFacade,
 }: UseDataviewTasksProps) {
   function getTasksFromCombinedSources() {
-    const dailyNotePathsFragment = get(visibleDailyNotes)
-      .map((note) => `"${note.path}"`)
-      .join(" OR ");
-    const listsFromDailyNotes = getAllListsFrom(dailyNotePathsFragment);
+    const dailyNotePathsFragment = query.anyOf(
+      // todo: we don't subscribe to it, so it's always empty
+      get(visibleDailyNotes),
+    );
+
+    const listsFromDailyNotes = dataviewFacade.getAllListsFrom(
+      dailyNotePathsFragment,
+    );
     const dataviewSource = get(settings).dataviewSource;
 
     if (dataviewSource.trim().length === 0) {
       return listsFromDailyNotes;
     }
 
-    const extraSourcesFragment = `${dataviewSource} AND -(${dailyNotePathsFragment})`;
+    const queryFromExtraSources = query.andNot(
+      dataviewSource,
+      dailyNotePathsFragment,
+    );
+    const tasksFromExtraSources = dataviewFacade.getAllTasksFrom(
+      queryFromExtraSources,
+    );
 
     // TODO: fix type cast
     //  note that SListItem still works fine. It has everything a task has
     return listsFromDailyNotes.concat(
-      getAllTasksFrom(extraSourcesFragment),
+      tasksFromExtraSources,
     ) as unknown as DataArray<STask>;
   }
 
   return readable(getTasksFromCombinedSources(), (set) => {
-    const [updateTasks, delayUpdateTasks] = debounceWithDelay(() => {
+    const [scheduleUpdate, delayUpdate] = debounceWithDelay(() => {
       set(getTasksFromCombinedSources());
-    }, 1000);
+      /* todo: this timeout might not be needed:
+        - a long value prevents consecutive drag and drop
+        - a short value - and there might be jank with typing if the user has too many files
+        - but actually
+      */
+    }, 200);
 
-    metadataCache.on(
+    const eventRef = metadataCache.on(
       // @ts-expect-error
       "dataview:metadata-change",
-      updateTasks,
+      scheduleUpdate,
     );
-    document.addEventListener("keydown", delayUpdateTasks);
+
+    document.addEventListener("keydown", delayUpdate);
 
     const source = derived(settings, ($settings) => {
       return $settings.dataviewSource;
     });
 
     const unsubscribeFromSettings = source.subscribe(() => {
-      updateTasks();
+      scheduleUpdate();
     });
 
     return () => {
-      // todo: this potentially creates a leak. try offref
-      metadataCache.off("dataview:metadata-change", updateTasks);
-      document.removeEventListener("keydown", delayUpdateTasks);
+      metadataCache.offref(eventRef);
+      document.removeEventListener("keydown", delayUpdate);
       unsubscribeFromSettings();
     };
   });
