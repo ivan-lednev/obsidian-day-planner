@@ -12,7 +12,7 @@
     display: flex;
     gap: var(--size-4-1);
 
-    max-height: 30%;
+    max-height: 25%;
     padding: var(--size-4-1);
 
     border-bottom: 1px solid var(--background-modifier-border);
