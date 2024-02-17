@@ -85,9 +85,17 @@ export function mapToTasksForDay(
     .sort((a, b) => a.startMinutes - b.startMinutes);
 
   const noTime = withoutTime
-    .filter((sTask) =>
-      settings.showUnscheduledNestedTasks ? true : !sTask.parent,
-    )
+    .filter((sTask) => {
+      if (!sTask.task) {
+        return false;
+      }
+
+      if (settings.showUnscheduledNestedTasks) {
+        return true;
+      }
+
+      return !sTask.parent;
+    })
     .map((sTask: STask) => toUnscheduledTask(sTask, day));
 
   const withTimeAndDuration = calculateDuration(tasksWithTime, settings);
