@@ -1,7 +1,8 @@
 import { noop } from "lodash/fp";
 import { Moment } from "moment/moment";
 import { App } from "obsidian";
-import { derived, Writable } from "svelte/store";
+import { DataArray, STask } from "obsidian-dataview";
+import { derived, get, Readable, Writable } from "svelte/store";
 
 import { reQueryAfterMillis } from "../constants";
 import { currentTime } from "../global-store/current-time";
@@ -58,28 +59,55 @@ export function createHooks({
   );
   const visibleDailyNotes = useVisibleDailyNotes(dataviewLoaded);
 
-  // const listsFromVisibleDailyNotes = derived(
-  const dataviewTasks = derived(
-    [visibleDailyNotes, dataviewLoaded, debouncedTaskUpdateTrigger],
-    ([$visibleDailyNotes, $dataviewLoaded]) => {
+  const visibleDailyNotesQuery = derived(
+    visibleDailyNotes,
+    ($visibleDailyNotes) => {
+      return query.anyOf($visibleDailyNotes);
+    },
+  );
+
+  const listsFromVisibleDailyNotes = derived(
+    [visibleDailyNotesQuery, dataviewLoaded, debouncedTaskUpdateTrigger],
+    ([$visibleDailyNotesQuery, $dataviewLoaded]) => {
       if (!$dataviewLoaded) {
         return [];
       }
 
-      return dataviewFacade.getAllListsFrom(query.anyOf($visibleDailyNotes));
+      return dataviewFacade.getAllListsFrom($visibleDailyNotesQuery);
     },
   );
 
-  // const dataviewTasks: Readable<DataArray<STask>> = useDebouncedDataviewTasks({
-  //   visibleDailyNotes,
-  //   settings: settingsStore,
-  //   metadataCache: app.metadataCache,
-  //   dataviewFacade,
-  // });
+  const tasksFromExtraSources = derived(
+    [dataviewSource, dataviewLoaded, debouncedTaskUpdateTrigger],
+    ([$dataviewSource, $dataviewLoaded]) => {
+      const noAdditionalSource = $dataviewSource.trim().length === 0;
+
+      if (noAdditionalSource || !$dataviewLoaded) {
+        return [];
+      }
+
+      const queryFromExtraSources = query.andNot(
+        $dataviewSource,
+        get(visibleDailyNotesQuery),
+      );
+
+      return dataviewFacade.getAllTasksFrom(queryFromExtraSources);
+    },
+  );
+
+  const dataviewTasks: Readable<DataArray<STask>> = derived(
+    [listsFromVisibleDailyNotes, tasksFromExtraSources],
+    ([$listsFromVisibleDailyNotes, $tasksFromExtraSources]) => {
+      if ($tasksFromExtraSources.length > 0) {
+        return $listsFromVisibleDailyNotes.concat($tasksFromExtraSources);
+      }
+
+      return $listsFromVisibleDailyNotes;
+    },
+  );
 
   const dayToSTasksLookup = useDayToScheduledStasks({ dataviewTasks });
 
-  // todo: we might not need this any longer
   const visibleTasks = useVisibleTasks({ dayToSTasksLookup });
   const tasksForToday = derived(
     [visibleTasks, currentTime],
