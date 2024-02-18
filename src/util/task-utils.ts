@@ -72,7 +72,6 @@ export function areValuesEmpty(record: Record<string, [] | object>) {
   return Object.values(record).every(isEmpty);
 }
 
-// TODO: broken?
 function taskLineToString(task: Task) {
   return `${task.listTokens}${createTimestamp(
     task.startMinutes,

@@ -1,10 +1,12 @@
 import { groupBy } from "lodash/fp";
 import type { CachedMetadata } from "obsidian";
+import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
-import type { Task } from "../types";
+import type { PlacedTask, Task } from "../types";
 import { createDailyNoteIfNeeded } from "../util/daily-notes";
+import { updateTaskText } from "../util/task-utils";
 
 import type { ObsidianFacade } from "./obsidian-facade";
 
@@ -27,30 +29,52 @@ export class PlanEditor {
     );
   }
 
+  // todo: all except this can be re-written to use mdast
   syncTasksWithFile = async ({
     updated,
     created,
+    moved,
   }: {
     updated: Task[];
     created: Task[];
+    moved: { dayKey: string; task: PlacedTask }[];
   }) => {
-    if (created.length > 1) {
-      throw new Error("Creating more than 1 task is not supported");
-    }
-
-    if (updated.length > 0 && created.length > 0) {
-      throw new Error(
-        "Creating and editing at the same time is not supported and might cause inconsistent behaviors due to race conditions",
-      );
-    }
-
     if (created.length > 0) {
       const [task] = await this.ensureFilesForTasks(created);
 
-      await this.obsidianFacade.editFile(task.location.path, (contents) => {
+      return this.obsidianFacade.editFile(task.location.path, (contents) => {
         // @ts-ignore
-        return this.writeTaskToFileContents(task, contents);
+        return this.writeTaskToFileContents(task, contents, task.location.path);
       });
+    }
+
+    if (moved.length > 0) {
+      // todo: dayKey is the new date, make files for those
+      const [task] = await this.ensureFilesForTasks(
+        moved.map(({ task }) => task),
+      );
+
+      const noteForFile = getDailyNote(
+        window.moment(moved[0].dayKey),
+        getAllDailyNotes(),
+      );
+
+      const updated = updateTaskText(task as Task);
+
+      return Promise.all([
+        this.obsidianFacade.editFile(noteForFile.path, (contents) => {
+          // @ts-ignore
+          return this.writeTaskToFileContents(
+            updated,
+            contents,
+            noteForFile.path,
+          );
+        }),
+        this.obsidianFacade.editFile(task.location.path, (contents) => {
+          // @ts-ignore
+          return this.removeTaskFromFileContents(task, contents);
+        }),
+      ]);
     }
 
     const pathToEditedTasksLookup = groupBy(
@@ -68,12 +92,12 @@ export class PlanEditor {
         ),
     );
 
-    await Promise.all(editPromises);
+    return Promise.all(editPromises);
   };
 
-  writeTaskToFileContents(task: Task, contents: string) {
-    const metadata =
-      this.obsidianFacade.getMetadataForPath(task.location.path) || {};
+  writeTaskToFileContents(task: Task, contents: string, path: string) {
+    // todo: we can use dataview
+    const metadata = this.obsidianFacade.getMetadataForPath(path) || {};
     const [planEndLine, splitContents] = this.getPlanEndLine(
       contents.split("\n"),
       metadata,
@@ -81,9 +105,22 @@ export class PlanEditor {
 
     const result = [...splitContents];
 
-    result.splice(planEndLine + 1, 0, task.firstLineText);
+    const newTaskText = [
+      task.firstLineText,
+      ...task.text.split("\n").slice(1),
+    ].join("\n");
+
+    result.splice(planEndLine + 1, 0, newTaskText);
 
     return result.join("\n");
+  }
+
+  removeTaskFromFileContents(task: Task, contents: string) {
+    const newContents = contents.split("\n");
+    const taskLinesCount = task.text.split("\n").length - 1;
+    newContents.splice(task.location.position.start.line, taskLinesCount);
+
+    return newContents.join("\n");
   }
 
   createPlannerHeading() {

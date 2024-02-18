@@ -36,6 +36,8 @@ export function useEditActions({
 
     editOperation.set(undefined);
 
+    // todo: diffing can be moved outside to separate concerns
+    //  but we need to know if something changed to not cause extra rewrites?
     const diff = getDiff(get(baselineTasks), currentTasks);
 
     if (areValuesEmpty(diff)) {
@@ -43,8 +45,9 @@ export function useEditActions({
     }
 
     baselineTasks.set(currentTasks);
+    console.log(diff);
 
-    await onUpdate(updateText(diff));
+    await onUpdate({ ...updateText(diff), moved: diff.moved });
   }
 
   return {

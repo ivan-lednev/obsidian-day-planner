@@ -1,6 +1,9 @@
 import { difference, differenceBy } from "lodash/fp";
 import { Moment } from "moment/moment";
-import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
+import {
+  DEFAULT_DAILY_NOTE_FORMAT,
+  getDateFromPath,
+} from "obsidian-daily-notes-interface";
 
 import {
   Diff,
@@ -82,15 +85,35 @@ export function moveTaskToColumn(day: Moment, task: Task, baseline: Tasks) {
   return moveTaskToDay(baseline, task, day);
 }
 
+// todo: don't get tasks in daily notes here
 export function getTasksWithUpdatedDay(tasks: Tasks) {
   return Object.entries(tasks)
     .flatMap(([dayKey, tasks]) =>
       tasks.withTime.map((task) => ({ dayKey, task })),
     )
-    .filter(
-      ({ dayKey, task }) =>
-        !task.isGhost && dayKey !== getDayKey(task.startTime),
-    );
+    .filter(({ dayKey, task }) => {
+      const dateFromPath = getDateFromPath(task.location.path, "day");
+
+      return (
+        !task.isGhost && dayKey !== getDayKey(task.startTime) && !dateFromPath
+      );
+    });
+}
+
+// TODO: remove duplication
+export function getTasksInDailyNotesWithUpdatedDay(tasks: Tasks) {
+  return Object.entries(tasks)
+    .flatMap(([dayKey, tasks]) =>
+      tasks.withTime.map((task) => ({ dayKey, task })),
+    )
+    .filter(({ dayKey, task }) => {
+      // TODO: this is crude, but will work in most cases
+      const dateFromPath = getDateFromPath(task.location.path, "day");
+
+      return (
+        !task.isGhost && dayKey !== getDayKey(task.startTime) && dateFromPath
+      );
+    });
 }
 
 function getPristine(flatBaseline: PlacedTask[], flatNext: PlacedTask[]) {
@@ -116,10 +139,12 @@ export function getDiff(base: Tasks, next: Tasks) {
       getTasksWithTime(next),
     ),
     updatedDay: getTasksWithUpdatedDay(next),
+    moved: getTasksInDailyNotesWithUpdatedDay(next),
     created: getCreatedTasks(getFlatTasks(base), getFlatTasks(next)),
   };
 }
 
+// todo: this syncs task state with text, it should be derived
 export function updateText(diff: Diff) {
   return {
     created: diff.created.map(updateTaskText),

@@ -142,6 +142,7 @@ export function replaceSTaskInFile(
   newText: string,
 ) {
   const lines = contents.split("\n");
+  // todo: this is not going to work: it doesn't consider sub-task lines
   const deleteCount = sTask.position.end.line - sTask.position.start.line + 1;
 
   lines.splice(sTask.position.start.line, deleteCount, newText);

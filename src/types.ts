@@ -15,7 +15,9 @@ export interface TaskLocation {
 }
 
 export type OnUpdateFn = (
-  taskUpdate: ReturnType<typeof updateText>,
+  taskUpdate: ReturnType<typeof updateText> & {
+    moved: { dayKey: string; task: PlacedTask }[];
+  },
 ) => Promise<void | void[]>;
 
 export type Diff = ReturnType<typeof getDiff>;
@@ -38,6 +40,7 @@ export interface UnscheduledTask {
 }
 
 export interface Task extends UnscheduledTask {
+  // todo: should be parsedStartTime to highlight that this doesn't change
   startTime: Moment;
   startMinutes: number;
 }
