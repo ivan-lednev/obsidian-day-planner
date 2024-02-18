@@ -33,6 +33,7 @@
     "builtin-modules": "^3.3.0",
     "cross-env": "^7.0.3",
     "esbuild": "^0.19.1",
+    "esbuild-plugin-replace": "^1.4.0",
     "esbuild-sass-plugin": "^2.10.0",
     "esbuild-svelte": "^0.7.4",
     "eslint": "^8.46.0",

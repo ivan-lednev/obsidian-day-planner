@@ -82,6 +82,12 @@ export interface ObsidianContext {
   clockOutUnderCursor: () => void;
   cancelClockUnderCursor: () => void;
   sTasksWithActiveClockProps: Readable<STask[]>;
+  showReleaseNotes: () => void;
 }
 
 export type ComponentContext = Map<string, unknown>;
+
+declare global {
+  const currentPluginVersion: string;
+  const changelogMd: string;
+}

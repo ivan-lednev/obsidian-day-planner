@@ -25,8 +25,13 @@
   import Dropdown from "./obsidian/dropdown.svelte";
   import SettingItem from "./obsidian/setting-item.svelte";
 
-  const { obsidianFacade, initWeeklyView, refreshTasks, dataviewLoaded } =
-    getContext<ObsidianContext>(obsidianContext);
+  const {
+    obsidianFacade,
+    initWeeklyView,
+    refreshTasks,
+    dataviewLoaded,
+    showReleaseNotes,
+  } = getContext<ObsidianContext>(obsidianContext);
 
   const {
     sourceIsEmpty,
@@ -208,11 +213,16 @@
     </div>
   {/if}
   {#if helpVisible}
-    <p class="help-item"><strong>Advanced editing:</strong></p>
-    <p class="help-item">Hold <strong>Shift</strong> and drag to copy</p>
-    <p class="help-item">
-      Hold <strong>Control</strong> and drag/resize to push neighboring tasks
-    </p>
+    <div class="help">
+      <p class="help-item"><strong>Advanced editing:</strong></p>
+      <p class="help-item">Hold <strong>Shift</strong> and drag to copy</p>
+      <p class="help-item">
+        Hold <strong>Control</strong> and drag/resize to push neighboring tasks
+      </p>
+      <button class="release-notes-button" on:click={showReleaseNotes}
+        >Show release notes</button
+      >
+    </div>
   {/if}
   {#if settingsVisible}
     <div class="settings">
@@ -270,8 +280,8 @@
       {#if $settings.showUncheduledTasks}
         <SettingItem>
           <svelte:fragment slot="name"
-            >Show unscheduled sub-tasks</svelte:fragment
-          >
+            >Show unscheduled sub-tasks
+          </svelte:fragment>
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
             slot="control"
@@ -347,7 +357,6 @@
   }
 
   .help-item {
-    margin: var(--size-2-3) var(--size-4-4);
     font-size: var(--font-ui-small);
     color: var(--text-muted);
   }
@@ -382,5 +391,11 @@
         var(--size-4-8)
       );
     margin: var(--size-4-2);
+  }
+
+  .help {
+    display: flex;
+    flex-direction: column;
+    margin: var(--size-2-3) var(--size-4-4);
   }
 </style>

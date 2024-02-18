@@ -110,3 +110,10 @@
   right: 0;
   left: 0;
 }
+
+.day-planner-release-notes-modal {
+  .modal-content {
+    height: 100%;
+    overflow: auto;
+  }
+}

@@ -1,3 +1,7 @@
+## Support the project
+
+I work on this plugin in my spare time, and your support is very motivating!
+
 - ✨ [Check out new features and other changes](https://github.com/ivan-lednev/obsidian-day-planner/releases)
 - 🪲 [Create issues](https://github.com/ivan-lednev/obsidian-day-planner/issues)
 - 🪛 [Submit pull-requests](./CONTRIBUTING.md)

@@ -17,6 +17,7 @@ import {
 } from "./constants";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
+import { ReleaseNotesModal } from "./release-notes-modal";
 import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
@@ -50,6 +51,14 @@ export default class DayPlanner extends Plugin {
 
   async onload() {
     await this.initSettingsStore();
+
+    if (this.settings().pluginVersion !== currentPluginVersion) {
+      this.settingsStore.update((previous) => ({
+        ...previous,
+        pluginVersion: currentPluginVersion,
+      }));
+      this.showReleaseNotes();
+    }
 
     this.obsidianFacade = new ObsidianFacade(this.app);
     this.dataviewFacade = new DataviewFacade(this.app);
@@ -229,6 +238,11 @@ export default class DayPlanner extends Plugin {
     ),
   );
 
+  private showReleaseNotes = () => {
+    const modal = new ReleaseNotesModal(this);
+    modal.open();
+  };
+
   private registerViews() {
     const { editContext, tasksForToday, visibleTasks, dataviewLoaded } =
       createHooks({
@@ -289,6 +303,7 @@ export default class DayPlanner extends Plugin {
       refreshTasks: this.dataviewFacade.getAllTasksFrom,
       dataviewLoaded,
       renderMarkdown: createRenderMarkdown(this.app),
+      showReleaseNotes: this.showReleaseNotes,
       editContext,
       visibleTasks,
       clockOut,

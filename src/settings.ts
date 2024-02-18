@@ -27,6 +27,7 @@ export interface DayPlannerSettings {
   showNow: boolean;
   showNext: boolean;
   snapStepMinutes: number;
+  pluginVersion: string;
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -55,6 +56,7 @@ export const defaultSettings: DayPlannerSettings = {
   showUnscheduledNestedTasks: true,
   showNow: true,
   showNext: true,
+  pluginVersion: "",
 };
 
 export const defaultSettingsForTests = {

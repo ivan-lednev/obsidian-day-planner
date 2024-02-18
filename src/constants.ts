@@ -10,6 +10,7 @@ export const indentBeforeTaskParagraph = 6;
 export const clockKey = "clocked";
 export const clockFormat = "YYYY-MM-DDTHH:mm:ss";
 export const reQueryAfterMillis = 200;
+export const supportLink = `<a href="https://github.com/ivan-lednev/obsidian-day-planner?tab=readme-ov-file#support-the-project">Support the project</a>`;
 
 export const icons = [
   "any-key",

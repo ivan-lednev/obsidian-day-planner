@@ -4,6 +4,8 @@ import builtins from "builtin-modules";
 import esbuildSvelte from "esbuild-svelte";
 import sveltePreprocess from "svelte-preprocess";
 import { sassPlugin } from "esbuild-sass-plugin";
+import { replace } from "esbuild-plugin-replace";
+import fs from "node:fs";
 
 const banner =
   `/*
@@ -46,6 +48,11 @@ const context = await esbuild.context({
     esbuildSvelte({
       compilerOptions: { css: true, dev: !prod },
       preprocess: sveltePreprocess()
+    }),
+    replace({
+      include: /release-notes-modal\.ts|main\.ts/,
+      changelogMd: JSON.stringify(fs.readFileSync("./CHANGELOG.md", "utf-8")),
+      currentPluginVersion: JSON.stringify(JSON.parse(fs.readFileSync("./package.json", "utf-8")).version)
     })
   ]
 });
