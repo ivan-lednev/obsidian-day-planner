@@ -1,5 +1,3 @@
-import { noop } from "lodash/fp";
-import { Moment } from "moment/moment";
 import { App } from "obsidian";
 import { DataArray, STask } from "obsidian-dataview";
 import { derived, get, readable, Readable, Writable } from "svelte/store";
@@ -13,12 +11,9 @@ import { DayPlannerSettings } from "../settings";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDayToScheduledStasks } from "../ui/hooks/use-day-to-scheduled-stasks";
-import { useDayToStasksWithClockMoments } from "../ui/hooks/use-day-to-stasks-with-clock-moments";
 import { useDebounceWithDelay } from "../ui/hooks/use-debounce-with-delay";
 import { useEditContext } from "../ui/hooks/use-edit/use-edit-context";
 import { useKeyDown } from "../ui/hooks/use-key-down";
-import { useStasksWithActiveClockProps } from "../ui/hooks/use-stasks-with-active-clock-props";
-import { useVisibleClockRecords } from "../ui/hooks/use-visible-clock-records";
 import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
 import { useVisibleTasks } from "../ui/hooks/use-visible-tasks";
 
@@ -119,16 +114,6 @@ export function createHooks({
     },
   );
 
-  const sTasksWithActiveClockProps = useStasksWithActiveClockProps({
-    dataviewTasks,
-  });
-  const dayToStasksWithClockMoments = useDayToStasksWithClockMoments({
-    dataviewTasks,
-  });
-  const visibleClockRecords = useVisibleClockRecords({
-    dayToSTasksLookup: dayToStasksWithClockMoments,
-  });
-
   // TODO: unwrap the hook from the derived store to remove extra-indirection
   const editContext = derived(
     [settingsStore, visibleTasks],
@@ -142,38 +127,9 @@ export function createHooks({
     },
   );
 
-  // TODO: remove duplication
-  const timeTrackerEditContext = derived(
-    [settingsStore, visibleClockRecords],
-    ([$settings, $visibleClockRecords]) => {
-      const base = useEditContext({
-        obsidianFacade,
-        onUpdate: planEditor.syncTasksWithFile,
-        settings: $settings,
-        visibleTasks: $visibleClockRecords,
-      });
-
-      function withDisabledEditHandlers(day: Moment) {
-        return {
-          ...base.getEditHandlers(day),
-          handleGripMouseDown: noop,
-          handleContainerMouseDown: noop,
-          handleResizerMouseDown: noop,
-        };
-      }
-
-      return {
-        ...base,
-        getEditHandlers: withDisabledEditHandlers,
-      };
-    },
-  );
-
   return {
-    timeTrackerEditContext,
     editContext,
     tasksForToday,
-    sTasksWithActiveClockProps,
     visibleTasks,
     dataviewLoaded,
   };

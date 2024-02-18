@@ -2,7 +2,6 @@ import { flow } from "lodash/fp";
 import {
   MarkdownFileInfo,
   MarkdownView,
-  Notice,
   Plugin,
   WorkspaceLeaf,
 } from "obsidian";
@@ -14,7 +13,6 @@ import {
   editContextKey,
   obsidianContext,
   viewTypeTimeline,
-  viewTypeTimeTracker,
   viewTypeWeekly,
 } from "./constants";
 import { currentTime } from "./global-store/current-time";
@@ -25,7 +23,6 @@ import { PlanEditor } from "./service/plan-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
-import TimeTrackerView from "./ui/time-tracker-view";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
 import { useNewlyStartedTasks } from "./use-newly-started-tasks";
@@ -67,37 +64,6 @@ export default class DayPlanner extends Plugin {
     this.registerEvent(
       this.app.workspace.on("active-leaf-change", handleActiveLeafChange),
     );
-
-    this.registerEvent(
-      this.app.workspace.on("editor-menu", (menu, editor, view) => {
-        try {
-          this.getSTaskUnderCursor(view);
-        } catch {
-          return;
-        }
-
-        menu.addItem((item) => {
-          item
-            .setTitle("Clock in")
-            .setIcon("play")
-            .onClick(this.clockInUnderCursor);
-        });
-
-        menu.addItem((item) => {
-          item
-            .setTitle("Clock out")
-            .setIcon("square")
-            .onClick(this.clockOutUnderCursor);
-        });
-
-        menu.addItem((item) => {
-          item
-            .setTitle("Cancel clock")
-            .setIcon("trash")
-            .onClick(this.cancelClockUnderCursor);
-        });
-      }),
-    );
   }
 
   async onunload() {
@@ -113,15 +79,6 @@ export default class DayPlanner extends Plugin {
       type: viewTypeWeekly,
       active: true,
     });
-  };
-
-  initTimeTrackerLeaf = async () => {
-    await this.detachLeavesOfType(viewTypeTimeTracker);
-    await this.app.workspace.getRightLeaf(false).setViewState({
-      type: viewTypeTimeTracker,
-      active: true,
-    });
-    this.app.workspace.rightSplit.expand();
   };
 
   initTimelineLeaf = async () => {
@@ -144,12 +101,6 @@ export default class DayPlanner extends Plugin {
       id: "show-weekly-view",
       name: "Show the Week Planner",
       callback: this.initWeeklyLeaf,
-    });
-
-    this.addCommand({
-      id: "show-time-tracker-view",
-      name: "Show Time Tracker",
-      callback: this.initTimeTrackerLeaf,
     });
 
     this.addCommand({
@@ -279,20 +230,14 @@ export default class DayPlanner extends Plugin {
   );
 
   private registerViews() {
-    const {
-      timeTrackerEditContext,
-      editContext,
-      tasksForToday,
-      sTasksWithActiveClockProps,
-      visibleTasks,
-      dataviewLoaded,
-    } = createHooks({
-      app: this.app,
-      dataviewFacade: this.dataviewFacade,
-      obsidianFacade: this.obsidianFacade,
-      settingsStore: this.settingsStore,
-      planEditor: this.planEditor,
-    });
+    const { editContext, tasksForToday, visibleTasks, dataviewLoaded } =
+      createHooks({
+        app: this.app,
+        dataviewFacade: this.dataviewFacade,
+        obsidianFacade: this.obsidianFacade,
+        settingsStore: this.settingsStore,
+        planEditor: this.planEditor,
+      });
 
     const clockOut = withNotice(async (sTask: STask) => {
       await this.obsidianFacade.editFile(sTask.path, (contents) =>
@@ -346,7 +291,6 @@ export default class DayPlanner extends Plugin {
       renderMarkdown: createRenderMarkdown(this.app),
       editContext,
       visibleTasks,
-      sTasksWithActiveClockProps,
       clockOut,
       cancelClock,
       clockOutUnderCursor: this.clockOutUnderCursor,
@@ -360,31 +304,10 @@ export default class DayPlanner extends Plugin {
       [editContextKey, { editContext }],
     ]);
 
-    const timeTrackerContext = new Map([
-      ...componentContext,
-      ...new Map([
-        [
-          obsidianContext,
-          {
-            ...defaultObsidianContext,
-            initWeeklyView: () =>
-              new Notice("Time tracker weekly view is not yet implemented"),
-          },
-        ],
-      ]),
-      ...new Map([[editContextKey, { editContext: timeTrackerEditContext }]]),
-    ]);
-
     this.registerView(
       viewTypeTimeline,
       (leaf: WorkspaceLeaf) =>
         new TimelineView(leaf, this.settings, componentContext),
-    );
-
-    this.registerView(
-      viewTypeTimeTracker,
-      (leaf: WorkspaceLeaf) =>
-        new TimeTrackerView(leaf, this.settings, timeTrackerContext),
     );
 
     this.registerView(
