@@ -45,7 +45,6 @@ export function useEditActions({
     }
 
     baselineTasks.set(currentTasks);
-    console.log(diff);
 
     await onUpdate({ ...updateText(diff), moved: diff.moved });
   }

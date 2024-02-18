@@ -92,7 +92,7 @@ export function getTasksWithUpdatedDay(tasks: Tasks) {
       tasks.withTime.map((task) => ({ dayKey, task })),
     )
     .filter(({ dayKey, task }) => {
-      const dateFromPath = getDateFromPath(task.location.path, "day");
+      const dateFromPath = getDateFromPath(task.location?.path, "day");
 
       return (
         !task.isGhost && dayKey !== getDayKey(task.startTime) && !dateFromPath
@@ -108,7 +108,7 @@ export function getTasksInDailyNotesWithUpdatedDay(tasks: Tasks) {
     )
     .filter(({ dayKey, task }) => {
       // TODO: this is crude, but will work in most cases
-      const dateFromPath = getDateFromPath(task.location.path, "day");
+      const dateFromPath = getDateFromPath(task.location?.path, "day");
 
       return (
         !task.isGhost && dayKey !== getDayKey(task.startTime) && dateFromPath

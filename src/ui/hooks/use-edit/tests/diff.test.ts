@@ -4,6 +4,13 @@ import { baseTask } from "../../test-utils";
 import { emptyTasks, nextDayKey, unscheduledTask } from "./util/fixtures";
 import { setUp } from "./util/setup";
 
+jest.mock("obsidian-daily-notes-interface", () => ({
+  ...jest.requireActual("obsidian-daily-notes-interface"),
+  getDateFromPath(): null {
+    return null;
+  },
+}));
+
 describe("Finding diff before writing updates to files", () => {
   test("Finds tasks moved between days", async () => {
     const { todayControls, nextDayControls, confirmEdit, props } = setUp();

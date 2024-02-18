@@ -6,6 +6,14 @@ import { baseTask } from "../../test-utils";
 import { dayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
 
+// todo: remove duplication, ideally this check should be pulled out of the diffing logic
+jest.mock("obsidian-daily-notes-interface", () => ({
+  ...jest.requireActual("obsidian-daily-notes-interface"),
+  getDateFromPath(): null {
+    return null;
+  },
+}));
+
 describe("drag one & common edit mechanics", () => {
   test("after edit confirmation, tasks freeze and stop reacting to cursor", async () => {
     const {
