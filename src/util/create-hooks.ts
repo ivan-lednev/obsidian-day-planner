@@ -94,13 +94,19 @@ export function createHooks({
   );
 
   const dataviewTasks: Readable<DataArray<STask>> = derived(
-    [listsFromVisibleDailyNotes, tasksFromExtraSources],
-    ([$listsFromVisibleDailyNotes, $tasksFromExtraSources]) => {
-      if ($tasksFromExtraSources.length > 0) {
-        return $listsFromVisibleDailyNotes.concat($tasksFromExtraSources);
+    [listsFromVisibleDailyNotes, tasksFromExtraSources, settingsStore],
+    ([$listsFromVisibleDailyNotes, $tasksFromExtraSources, $settingsStore]) => {
+      const allTasks =
+        $tasksFromExtraSources.length > 0
+          ? // todo: this looks silly
+            $listsFromVisibleDailyNotes.concat($tasksFromExtraSources)
+          : $listsFromVisibleDailyNotes;
+
+      if ($settingsStore.hideCompletedTasks) {
+        return allTasks.filter((sTask: STask) => !sTask.completed);
       }
 
-      return $listsFromVisibleDailyNotes;
+      return allTasks;
     },
   );
 

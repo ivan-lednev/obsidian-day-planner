@@ -260,6 +260,21 @@
         </div>
       </SettingItem>
 
+      <SettingItem>
+        <svelte:fragment slot="name">Hide completed tasks</svelte:fragment>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div
+          slot="control"
+          class="checkbox-container mod-small"
+          class:is-enabled={$settings.hideCompletedTasks}
+          on:click={() => {
+            $settings.hideCompletedTasks = !$settings.hideCompletedTasks;
+          }}
+        >
+          <input tabindex="0" type="checkbox" />
+        </div>
+      </SettingItem>
+
       <div class="controls-section">Unscheduled tasks</div>
 
       <SettingItem>

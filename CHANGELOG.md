@@ -9,6 +9,7 @@
 ### ✨ New features
 
 - When dragging tasks from daily notes across days in the weekly view, they now get moved across files
+- There is now an option to hide completed tasks from timeline
 
 ### 🐞 Fixed issues
 

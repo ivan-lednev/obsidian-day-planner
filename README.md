@@ -72,7 +72,9 @@ Everything Dataview recognizes as a task is shown in the timeline, including:
 
 #### How to schedule a task anywhere in the vault
 
-To schedule a task add time and a date that Dataview recognizes: `⏳ 2021-08-29` or `[scheduled:: 2021-08-29]` or `(scheduled:: 2021-08-29)`.
+To schedule a task:
+1. Include its folder or tag into the Dataview filter
+1. Add time and a date that Dataview recognizes: `⏳ 2021-08-29` or `[scheduled:: 2021-08-29]` or `(scheduled:: 2021-08-29)`.
 
 Full examples:
 
@@ -85,7 +87,7 @@ Full examples:
 
 #### Dataview source filter
 
-You can set up Dataview to search for tasks only in specific folders or tags. This improves performance on large vaults. [Here are the docs on how to use the syntax](https://blacksmithgu.github.io/obsidian-dataview/reference/sources/).
+You can set up Dataview to search for tasks in additional folders or tags. [Here are the docs on how to use the syntax](https://blacksmithgu.github.io/obsidian-dataview/reference/sources/).
 
 ## What else you can do
 
