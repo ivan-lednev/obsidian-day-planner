@@ -43,6 +43,10 @@ export function getRenderKey(task: PlacedTask) {
   }`;
 }
 
+export function getNotificationKey(task: PlacedTask) {
+  return `${task.location.path}::${task.startMinutes}::${task.durationMinutes}::${task.text}`;
+}
+
 export function copy(task: Task): Task {
   return {
     ...task,

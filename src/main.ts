@@ -17,6 +17,7 @@ import {
   viewTypeTimeTracker,
   viewTypeWeekly,
 } from "./constants";
+import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
@@ -27,6 +28,7 @@ import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimeTrackerView from "./ui/time-tracker-view";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
+import { useNewlyStartedTasks } from "./use-newly-started-tasks";
 import {
   assertActiveClock,
   assertNoActiveClock,
@@ -320,6 +322,21 @@ export default class DayPlanner extends Plugin {
       },
     });
 
+    const newlyStartedTasks = useNewlyStartedTasks({
+      settings,
+      tasksForToday,
+      currentTime,
+    });
+
+    this.register(
+      newlyStartedTasks.subscribe((tasks) => {
+        if (tasks.length > 0) {
+          new Notification(`Task started: ${tasks[0].firstLineText}`);
+        }
+      }),
+    );
+
+    // todo: make it dependent on config
     // todo: type this
     const defaultObsidianContext: object = {
       obsidianFacade: this.obsidianFacade,
