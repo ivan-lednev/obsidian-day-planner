@@ -14,6 +14,7 @@
 
 ### 🐞 Fixed issues
 
+- New drag-and-drop operations can now be started immediately after previous ones
 - The plugin is much faster in the default use case (daily notes only)
 - You can use plain list items in daily notes again
 - Notifications work again

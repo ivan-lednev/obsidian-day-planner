@@ -28,8 +28,8 @@ export interface DayPlannerSettings {
   showNext: boolean;
   snapStepMinutes: number;
   pluginVersion: string;
-  hideCompletedTasks: boolean;
-  hideSubtasksInTaskBlocks: boolean;
+  showCompletedTasks: boolean;
+  showSubtasksInTaskBlocks: boolean;
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -59,8 +59,8 @@ export const defaultSettings: DayPlannerSettings = {
   showNow: true,
   showNext: true,
   pluginVersion: "",
-  hideCompletedTasks: false,
-  hideSubtasksInTaskBlocks: false,
+  showCompletedTasks: true,
+  showSubtasksInTaskBlocks: true,
 };
 
 export const defaultSettingsForTests = {

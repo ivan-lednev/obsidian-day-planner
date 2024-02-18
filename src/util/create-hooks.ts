@@ -102,11 +102,11 @@ export function createHooks({
             $listsFromVisibleDailyNotes.concat($tasksFromExtraSources)
           : $listsFromVisibleDailyNotes;
 
-      if ($settingsStore.hideCompletedTasks) {
-        return allTasks.filter((sTask: STask) => !sTask.completed);
+      if ($settingsStore.showCompletedTasks) {
+        return allTasks;
       }
 
-      return allTasks;
+      return allTasks.filter((sTask: STask) => !sTask.completed);
     },
   );
 

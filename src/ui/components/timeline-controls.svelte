@@ -261,14 +261,14 @@
       </SettingItem>
 
       <SettingItem>
-        <svelte:fragment slot="name">Hide completed tasks</svelte:fragment>
+        <svelte:fragment slot="name">Show completed tasks</svelte:fragment>
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
           slot="control"
           class="checkbox-container mod-small"
-          class:is-enabled={$settings.hideCompletedTasks}
+          class:is-enabled={$settings.showCompletedTasks}
           on:click={() => {
-            $settings.hideCompletedTasks = !$settings.hideCompletedTasks;
+            $settings.showCompletedTasks = !$settings.showCompletedTasks;
           }}
         >
           <input tabindex="0" type="checkbox" />
@@ -277,18 +277,18 @@
 
       <SettingItem>
         <svelte:fragment slot="name"
-          >Hide subtasks in task blocks
+          >Show subtasks in task blocks
         </svelte:fragment>
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
           slot="control"
           class="checkbox-container mod-small"
-          class:is-enabled={$settings.hideSubtasksInTaskBlocks}
+          class:is-enabled={$settings.showSubtasksInTaskBlocks}
           on:click={() => {
             // We create a new object to trigger immediate update in the timeline view
             settings.update((previous) => ({
               ...previous,
-              hideSubtasksInTaskBlocks: !previous.hideSubtasksInTaskBlocks,
+              showSubtasksInTaskBlocks: !previous.showSubtasksInTaskBlocks,
             }));
           }}
         >
@@ -316,7 +316,7 @@
       {#if $settings.showUncheduledTasks}
         <SettingItem>
           <svelte:fragment slot="name"
-            >Show unscheduled sub-tasks
+            >Show unscheduled sub-tasks as separate blocks
           </svelte:fragment>
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div

@@ -24,11 +24,9 @@ export function renderTaskMarkdown(
   function refresh({ task, settings, renderMarkdown }: RenderedMarkdownProps) {
     onDestroy?.();
 
-    let text = task.text;
-
-    if (settings.hideSubtasksInTaskBlocks) {
-      text = task.text.split("\n")[0];
-    }
+    const text = settings.showSubtasksInTaskBlocks
+      ? task.text
+      : task.text.split("\n")[0];
 
     onDestroy = renderMarkdown(el, text);
 
