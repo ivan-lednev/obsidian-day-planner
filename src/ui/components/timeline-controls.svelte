@@ -220,8 +220,8 @@
         Hold <strong>Control</strong> and drag/resize to push neighboring tasks
       </p>
       <button class="release-notes-button" on:click={showReleaseNotes}
-        >Show release notes</button
-      >
+        >Show release notes
+      </button>
     </div>
   {/if}
   {#if settingsVisible}
@@ -269,6 +269,27 @@
           class:is-enabled={$settings.hideCompletedTasks}
           on:click={() => {
             $settings.hideCompletedTasks = !$settings.hideCompletedTasks;
+          }}
+        >
+          <input tabindex="0" type="checkbox" />
+        </div>
+      </SettingItem>
+
+      <SettingItem>
+        <svelte:fragment slot="name"
+          >Hide subtasks in task blocks
+        </svelte:fragment>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div
+          slot="control"
+          class="checkbox-container mod-small"
+          class:is-enabled={$settings.hideSubtasksInTaskBlocks}
+          on:click={() => {
+            // We create a new object to trigger immediate update in the timeline view
+            settings.update((previous) => ({
+              ...previous,
+              hideSubtasksInTaskBlocks: !previous.hideSubtasksInTaskBlocks,
+            }));
           }}
         >
           <input tabindex="0" type="checkbox" />

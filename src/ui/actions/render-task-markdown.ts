@@ -23,7 +23,14 @@ export function renderTaskMarkdown(
 
   function refresh({ task, settings, renderMarkdown }: RenderedMarkdownProps) {
     onDestroy?.();
-    onDestroy = renderMarkdown(el, task.text);
+
+    let text = task.text;
+
+    if (settings.hideSubtasksInTaskBlocks) {
+      text = task.text.split("\n")[0];
+    }
+
+    onDestroy = renderMarkdown(el, text);
 
     disableCheckBoxes(el);
     decorate(el, task, settings);
