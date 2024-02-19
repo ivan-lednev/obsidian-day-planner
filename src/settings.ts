@@ -18,7 +18,6 @@ export interface DayPlannerSettings {
   timestampFormat: string;
   hourFormat: string;
   dataviewSource: string;
-  showDataviewMigrationWarning: boolean;
   extendDurationUntilNext: boolean;
   defaultDurationMinutes: number;
   showTimestampInTaskBlock: boolean;
@@ -50,7 +49,6 @@ export const defaultSettings: DayPlannerSettings = {
   timestampFormat: "HH:mm",
   hourFormat: "H",
   dataviewSource: "",
-  showDataviewMigrationWarning: true,
   extendDurationUntilNext: false,
   defaultDurationMinutes: 30,
   showTimestampInTaskBlock: false,
