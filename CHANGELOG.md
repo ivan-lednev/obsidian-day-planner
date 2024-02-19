@@ -1,3 +1,9 @@
+## 0.17.2
+
+### 🐞 Fixed issues
+
+- Fix creating tasks with drag-and-drop
+
 ## 0.17.0
 
 ### 💥 Breaking changes
