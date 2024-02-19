@@ -74,6 +74,8 @@ export default class DayPlanner extends Plugin {
     this.registerEvent(
       this.app.workspace.on("active-leaf-change", handleActiveLeafChange),
     );
+
+    await this.initTimelineLeafSilently();
   }
 
   async onunload() {
@@ -88,6 +90,13 @@ export default class DayPlanner extends Plugin {
     await this.app.workspace.getLeaf(false).setViewState({
       type: viewTypeWeekly,
       active: true,
+    });
+  };
+
+  initTimelineLeafSilently = async () => {
+    await this.detachLeavesOfType(viewTypeTimeline);
+    await this.app.workspace.getRightLeaf(false).setViewState({
+      type: viewTypeTimeline,
     });
   };
 
