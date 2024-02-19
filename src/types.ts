@@ -3,6 +3,7 @@ import { Pos } from "obsidian";
 import { STask } from "obsidian-dataview";
 import { Readable, Writable } from "svelte/store";
 
+import DayPlanner from "./main";
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import type { ObsidianFacade } from "./service/obsidian-facade";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
@@ -83,6 +84,8 @@ export interface ObsidianContext {
   cancelClockUnderCursor: () => void;
   sTasksWithActiveClockProps: Readable<STask[]>;
   showReleaseNotes: () => void;
+  handleMouseEnter: DayPlanner["handleMouseEnter"];
+  isModPressed: Readable<boolean>;
 }
 
 export type ComponentContext = Map<string, unknown>;

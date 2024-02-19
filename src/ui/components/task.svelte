@@ -1,12 +1,31 @@
 <script lang="ts">
-  
-import type { UnscheduledTask } from "../../types";
+  import { getContext } from "svelte";
+
+  import { obsidianContext } from "../../constants";
+  import type { ObsidianContext, UnscheduledTask } from "../../types";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
 
   export let task: UnscheduledTask;
   // TODO: this should live in useTaskVisuals
   export let relationToNow = "";
+
+  const { handleMouseEnter: baseHandleMouseEnter, isModPressed } =
+    getContext<ObsidianContext>(obsidianContext);
+  let el: HTMLDivElement;
+  let hovering = false;
+
+  function handleMouseEnter() {
+    hovering = true;
+  }
+
+  function handleMouseLeave() {
+    hovering = false;
+  }
+
+  $: if ($isModPressed && hovering && task.location.path) {
+    baseHandleMouseEnter(el, task.location.path, task.location.line);
+  }
 </script>
 
 <div
@@ -15,9 +34,12 @@ import type { UnscheduledTask } from "../../types";
   class="task-padding-box"
 >
   <div
+    bind:this={el}
     class="task-block {relationToNow}"
     class:is-ghost={task.isGhost}
     on:mousedown={(event) => event.stopPropagation()}
+    on:mouseenter={handleMouseEnter}
+    on:mouseleave={handleMouseLeave}
     on:mouseup
   >
     <RenderedMarkdown {task} />

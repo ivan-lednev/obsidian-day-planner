@@ -1,12 +1,13 @@
 import { flow } from "lodash/fp";
 import {
+  Keymap,
   MarkdownFileInfo,
   MarkdownView,
   Plugin,
   WorkspaceLeaf,
 } from "obsidian";
 import { STask } from "obsidian-dataview";
-import { get, Writable } from "svelte/store";
+import { get, readable, Writable } from "svelte/store";
 import { isInstanceOf, isNotVoid } from "typed-assert";
 
 import {
@@ -97,6 +98,21 @@ export default class DayPlanner extends Plugin {
       active: true,
     });
     this.app.workspace.rightSplit.expand();
+  };
+
+  // todo: move out
+  // todo: use a more descriptive name
+  handleMouseEnter = (el: HTMLElement, path: string, line = 0) => {
+    // @ts-ignore
+    if (!this.app.internalPlugins.plugins["page-preview"].enabled) {
+      return;
+    }
+
+    const previewLocation = {
+      scroll: line,
+    };
+
+    this.app.workspace.trigger("link-hover", {}, el, path, "", previewLocation);
   };
 
   private registerCommands() {
@@ -197,7 +213,6 @@ export default class DayPlanner extends Plugin {
       this.replaceSTaskUnderCursor,
     ),
   );
-
   // todo: move out
   private clockOutUnderCursor = withNotice(
     flow(
@@ -208,7 +223,6 @@ export default class DayPlanner extends Plugin {
       this.replaceSTaskUnderCursor,
     ),
   );
-
   // todo: move out
   private cancelClockUnderCursor = withNotice(
     flow(
@@ -277,6 +291,29 @@ export default class DayPlanner extends Plugin {
       }),
     );
 
+    // todo: move out
+    const isModPressed = readable(false, (set) => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (Keymap.isModifier(event, "Mod")) {
+          set(true);
+        }
+      };
+
+      const handleKeyUp = (event: KeyboardEvent) => {
+        if (!Keymap.isModifier(event, "Mod")) {
+          set(false);
+        }
+      };
+
+      document.addEventListener("keydown", handleKeyDown);
+      document.addEventListener("keyup", handleKeyUp);
+
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+        document.removeEventListener("keyup", handleKeyUp);
+      };
+    });
+
     // todo: make it dependent on config
     // todo: type this
     const defaultObsidianContext: object = {
@@ -293,6 +330,8 @@ export default class DayPlanner extends Plugin {
       clockOutUnderCursor: this.clockOutUnderCursor,
       clockInUnderCursor: this.clockInUnderCursor,
       cancelClockUnderCursor: this.cancelClockUnderCursor,
+      handleMouseEnter: this.handleMouseEnter,
+      isModPressed,
     };
 
     // TODO: move out building context
