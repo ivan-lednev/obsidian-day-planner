@@ -37,6 +37,7 @@ import {
 } from "./util/clock";
 import { createHooks } from "./util/create-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
+import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { replaceSTaskInFile, toMarkdown } from "./util/dataview";
 import { locToEditorPosition } from "./util/editor";
@@ -107,21 +108,6 @@ export default class DayPlanner extends Plugin {
       active: true,
     });
     this.app.workspace.rightSplit.expand();
-  };
-
-  // todo: move out
-  // todo: use a more descriptive name
-  handleMouseEnter = (el: HTMLElement, path: string, line = 0) => {
-    // @ts-ignore
-    if (!this.app.internalPlugins.plugins["page-preview"].enabled) {
-      return;
-    }
-
-    const previewLocation = {
-      scroll: line,
-    };
-
-    this.app.workspace.trigger("link-hover", {}, el, path, "", previewLocation);
   };
 
   private registerCommands() {
@@ -339,7 +325,7 @@ export default class DayPlanner extends Plugin {
       clockOutUnderCursor: this.clockOutUnderCursor,
       clockInUnderCursor: this.clockInUnderCursor,
       cancelClockUnderCursor: this.cancelClockUnderCursor,
-      handleMouseEnter: this.handleMouseEnter,
+      showPreview: createShowPreview(this.app),
       isModPressed,
     };
 

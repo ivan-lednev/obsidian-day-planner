@@ -10,7 +10,7 @@
   // TODO: this should live in useTaskVisuals
   export let relationToNow = "";
 
-  const { handleMouseEnter: baseHandleMouseEnter, isModPressed } =
+  const { showPreview, isModPressed } =
     getContext<ObsidianContext>(obsidianContext);
   let el: HTMLDivElement;
   let hovering = false;
@@ -24,7 +24,7 @@
   }
 
   $: if ($isModPressed && hovering && task.location.path) {
-    baseHandleMouseEnter(el, task.location.path, task.location.line);
+    showPreview(el, task.location.path, task.location.line);
   }
 </script>
 
