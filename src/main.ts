@@ -127,24 +127,6 @@ export default class DayPlanner extends Plugin {
       editorCallback: (editor) =>
         editor.replaceSelection(this.planEditor.createPlannerHeading()),
     });
-
-    this.addCommand({
-      id: "clock-into-task-under-cursor",
-      name: "Clock into task under cursor",
-      callback: this.clockInUnderCursor,
-    });
-
-    this.addCommand({
-      id: "clock-out-of-task-under-cursor",
-      name: "Clock out of task under cursor",
-      callback: this.clockOutUnderCursor,
-    });
-
-    this.addCommand({
-      id: "cancel-clock-under-cursor",
-      name: "Cancel clock on task under cursor",
-      callback: this.clockOutUnderCursor,
-    });
   }
 
   private async initSettingsStore() {
