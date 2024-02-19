@@ -1,6 +1,5 @@
 import type { Moment } from "moment/moment";
-import type { App } from "obsidian";
-import { MarkdownView, TFile } from "obsidian";
+import { App, FileView, MarkdownView, TFile, WorkspaceLeaf } from "obsidian";
 import {
   createDailyNote,
   getAllDailyNotes,
@@ -8,15 +7,36 @@ import {
 } from "obsidian-daily-notes-interface";
 import { isInstanceOf } from "typed-assert";
 
+function doesLeafContainFile(leaf: WorkspaceLeaf, file: TFile) {
+  const { view } = leaf;
+
+  return view instanceof FileView && view.file === file;
+}
+
 export class ObsidianFacade {
   constructor(readonly app: App) {}
 
   async openFileInEditor(file: TFile) {
-    const leaf = this.app.workspace.getLeaf(false);
+    const leafWithThisFile = this.app.workspace
+      .getLeavesOfType("markdown")
+      .find((leaf) => doesLeafContainFile(leaf, file));
 
-    await leaf.openFile(file);
+    if (leafWithThisFile) {
+      // this.app.workspace.revealLeaf(leafWithThisFile);
+      this.app.workspace.setActiveLeaf(leafWithThisFile, { focus: true });
 
-    return this.app.workspace.activeEditor?.editor;
+      if (leafWithThisFile.view instanceof MarkdownView) {
+        return leafWithThisFile.view.editor;
+      }
+    } else {
+      const newLeaf = this.app.workspace.getLeaf(false);
+
+      await newLeaf.openFile(file);
+
+      if (newLeaf.view instanceof MarkdownView) {
+        return newLeaf.view.editor;
+      }
+    }
   }
 
   async openFileForDay(moment: Moment) {
@@ -25,14 +45,6 @@ export class ObsidianFacade {
       (await createDailyNote(moment));
 
     return this.openFileInEditor(dailyNote);
-  }
-
-  private getFileByPath(path: string) {
-    const file = this.app.vault.getAbstractFileByPath(path);
-
-    isInstanceOf(file, TFile, `Unable to open file: ${path}`);
-
-    return file;
   }
 
   getActiveMarkdownView = () => {
@@ -70,5 +82,13 @@ export class ObsidianFacade {
     const newContents = editFn(contents);
 
     await this.app.vault.modify(file, newContents);
+  }
+
+  private getFileByPath(path: string) {
+    const file = this.app.vault.getAbstractFileByPath(path);
+
+    isInstanceOf(file, TFile, `Unable to open file: ${path}`);
+
+    return file;
   }
 }
