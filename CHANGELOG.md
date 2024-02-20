@@ -1,3 +1,10 @@
+## 0.18.0
+
+### ✨ New features
+
+- Now hovering over a task with `Control` pressed will trigger a preview pop-up. This works great with the awesome [Hover Editor plugin](https://github.com/nothingislost/obsidian-hover-editor)
+- Now when you click on a task, if there is an open tab for that file, the plugin is going to reuse it
+
 ## 0.17.2
 
 ### 🐞 Fixed issues
