@@ -61,22 +61,15 @@ export function createHooks({
   );
   const visibleDailyNotes = useVisibleDailyNotes(layoutReady);
 
-  const visibleDailyNotesQuery = derived(
-    visibleDailyNotes,
-    ($visibleDailyNotes) => {
-      return query.anyOf($visibleDailyNotes);
-    },
-  );
-
   // todo: move out
   const listsFromVisibleDailyNotes = derived(
-    [visibleDailyNotesQuery, dataviewLoaded, debouncedTaskUpdateTrigger],
-    ([$visibleDailyNotesQuery, $dataviewLoaded]) => {
-      if (!$dataviewLoaded || $visibleDailyNotesQuery.trim().length === 0) {
+    [visibleDailyNotes, dataviewLoaded, debouncedTaskUpdateTrigger],
+    ([$visibleDailyNotes, $dataviewLoaded]) => {
+      if (!$dataviewLoaded || $visibleDailyNotes.length === 0) {
         return [];
       }
 
-      return dataviewFacade.getAllListsFrom($visibleDailyNotesQuery);
+      return dataviewFacade.getAllListsFrom(query.anyOf($visibleDailyNotes));
     },
   );
 
@@ -92,7 +85,7 @@ export function createHooks({
 
       const queryFromExtraSources = query.andNot(
         $dataviewSource,
-        get(visibleDailyNotesQuery),
+        query.anyOf(get(visibleDailyNotes)),
       );
 
       return dataviewFacade.getAllTasksFrom(queryFromExtraSources);

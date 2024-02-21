@@ -1,3 +1,4 @@
+import { groupBy } from "lodash/fp";
 import { DataArray, STask } from "obsidian-dataview";
 import { derived, Readable } from "svelte/store";
 
@@ -11,15 +12,6 @@ export function useDayToScheduledStasks({
   dataviewTasks,
 }: UseDayToScheduledStasksProps) {
   return derived(dataviewTasks, ($dataviewTasks) => {
-    if (!$dataviewTasks || $dataviewTasks.length === 0) {
-      return {};
-    }
-
-    return Object.fromEntries(
-      $dataviewTasks
-        .groupBy(getScheduledDay)
-        .map(({ key, rows }) => [key, rows.array()])
-        .array(),
-    );
+    return groupBy(getScheduledDay, $dataviewTasks);
   });
 }
