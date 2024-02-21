@@ -1,8 +1,9 @@
 import { Plugin, WorkspaceLeaf } from "obsidian";
-import { get, Writable } from "svelte/store";
+import { get, writable, Writable } from "svelte/store";
 
 import {
   editContextKey,
+  errorContextKey,
   obsidianContext,
   viewTypeTimeline,
   viewTypeWeekly,
@@ -175,12 +176,15 @@ export default class DayPlanner extends Plugin {
       planEditor: this.planEditor,
     });
 
+    const errorStore = writable<Error | undefined>();
+
     // todo: move out
     new StatusBarWidget({
       target: this.addStatusBarItem(),
       props: {
         onClick: this.initTimelineLeaf,
         tasksForToday,
+        errorStore,
       },
     });
 
@@ -210,6 +214,7 @@ export default class DayPlanner extends Plugin {
     const componentContext = new Map([
       [obsidianContext, defaultObsidianContext],
       [editContextKey, { editContext }],
+      [errorContextKey, errorStore],
     ]);
 
     this.registerView(

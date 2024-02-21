@@ -7,6 +7,7 @@
 
   export let onClick: () => Promise<void>;
   export let tasksForToday: Readable<TasksForDay>;
+  export let errorStore: Readable<Error>;
 
   const statusBarProps = useStatusBarWidget({ tasksForToday });
 
@@ -16,7 +17,9 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="root" on:click={onClick}>
-  {#if !current && !next}
+  {#if $errorStore}
+    😵 Error in Day Planner (click to see)
+  {:else if !current && !next}
     <span class="status-bar-item-segment">All done</span>
   {:else}
     {#if showNow && current}

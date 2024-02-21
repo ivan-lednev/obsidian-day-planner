@@ -22,6 +22,7 @@
   import { useDataviewSource } from "../hooks/use-dataview-source";
 
   import ControlButton from "./control-button.svelte";
+  import ErrorReport from "./error-report.svelte"
   import Dropdown from "./obsidian/dropdown.svelte";
   import SettingItem from "./obsidian/setting-item.svelte";
 
@@ -62,7 +63,6 @@
     const previousDay = $visibleDayInTimeline.clone().subtract(1, "day");
 
     const previousNote = await createDailyNoteIfNeeded(previousDay);
-
     await obsidianFacade.openFileInEditor(previousNote);
 
     $visibleDayInTimeline = previousDay;
@@ -72,7 +72,6 @@
     const nextDay = $visibleDayInTimeline.clone().add(1, "day");
 
     const nextNote = await createDailyNoteIfNeeded(nextDay);
-
     await obsidianFacade.openFileInEditor(nextNote);
 
     $visibleDayInTimeline = nextDay;
@@ -80,7 +79,6 @@
 
   async function goToToday() {
     const noteForToday = await createDailyNoteIfNeeded(window.moment());
-
     await obsidianFacade.openFileInEditor(noteForToday);
   }
 
@@ -96,6 +94,7 @@
 </script>
 
 <div class="controls">
+  <ErrorReport />
   <div class="header">
     <ControlButton label="Open today's daily note" on:click={goToToday}>
       <FileInput class="svg-icon" />
@@ -183,6 +182,7 @@
       {/if}
       {#if $dataviewErrorMessage.length > 0}
         <div class="info-container">
+<!--          TODO: move out -->
           <pre class="error-message">{$dataviewErrorMessage}</pre>
         </div>
       {/if}
@@ -329,8 +329,6 @@
     flex-direction: column;
     gap: var(--size-4-2);
 
-    margin: var(--size-4-2);
-
     font-size: var(--font-ui-small);
     color: var(--text-muted);
   }
@@ -382,7 +380,7 @@
   }
 
   .settings {
-    margin: var(--size-4-1) var(--size-4-4);
+    margin: var(--size-4-1) 0;
   }
 
   .controls {
@@ -390,6 +388,8 @@
     display: flex;
     flex: 0 0 auto;
     flex-direction: column;
+
+    padding: var(--size-4-2);
 
     border-bottom: 1px solid var(--background-modifier-border);
   }
@@ -400,12 +400,11 @@
         3,
         var(--size-4-8)
       );
-    margin: var(--size-4-2);
   }
 
   .help {
     display: flex;
     flex-direction: column;
-    margin: var(--size-2-3) var(--size-4-4);
+    margin: var(--size-2-3) 0;
   }
 </style>
