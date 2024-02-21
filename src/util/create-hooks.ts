@@ -14,6 +14,8 @@ import { useDayToScheduledStasks } from "../ui/hooks/use-day-to-scheduled-stasks
 import { useDebounceWithDelay } from "../ui/hooks/use-debounce-with-delay";
 import { useEditContext } from "../ui/hooks/use-edit/use-edit-context";
 import { useKeyDown } from "../ui/hooks/use-key-down";
+import { useModPressed } from "../ui/hooks/use-mod-pressed";
+import { useNewlyStartedTasks } from "../ui/hooks/use-newly-started-tasks";
 import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
 import { useVisibleTasks } from "../ui/hooks/use-visible-tasks";
 
@@ -40,8 +42,10 @@ export function createHooks({
     return $settings.dataviewSource;
   });
   const keyDown = useKeyDown();
+  const isModPressed = useModPressed();
   const dataviewChange = useDataviewChange(app.metadataCache);
   const dataviewLoaded = useDataviewLoaded(app);
+  // todo: move out
   const layoutReady = readable(false, (set) => {
     app.workspace.onLayoutReady(() => set(true));
   });
@@ -64,6 +68,7 @@ export function createHooks({
     },
   );
 
+  // todo: move out
   const listsFromVisibleDailyNotes = derived(
     [visibleDailyNotesQuery, dataviewLoaded, debouncedTaskUpdateTrigger],
     ([$visibleDailyNotesQuery, $dataviewLoaded]) => {
@@ -75,6 +80,7 @@ export function createHooks({
     },
   );
 
+  // todo: move out
   const tasksFromExtraSources = derived(
     [dataviewSource, dataviewLoaded, debouncedTaskUpdateTrigger],
     ([$dataviewSource, $dataviewLoaded]) => {
@@ -93,6 +99,7 @@ export function createHooks({
     },
   );
 
+  // todo: move out
   const dataviewTasks: Readable<DataArray<STask>> = derived(
     [listsFromVisibleDailyNotes, tasksFromExtraSources, settingsStore],
     ([$listsFromVisibleDailyNotes, $tasksFromExtraSources, $settingsStore]) => {
@@ -133,10 +140,18 @@ export function createHooks({
     },
   );
 
+  const newlyStartedTasks = useNewlyStartedTasks({
+    settings: settingsStore,
+    tasksForToday,
+    currentTime,
+  });
+
   return {
     editContext,
     tasksForToday,
     visibleTasks,
     dataviewLoaded,
+    newlyStartedTasks,
+    isModPressed,
   };
 }

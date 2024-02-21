@@ -1,5 +1,5 @@
 import { App } from "obsidian";
-import { getAPI } from "obsidian-dataview";
+import { getAPI, STask } from "obsidian-dataview";
 import { writable } from "svelte/store";
 
 import { withPerformanceReport } from "../util/performance";
@@ -39,7 +39,13 @@ export class DataviewFacade {
     );
   };
 
-  getTasksFromPath = (path: string) => {
+  getTaskFromCaretLocation({ path, line }: { path: string; line: number }) {
+    return this.getTasksFromPath(path).find(
+      (sTask: STask) => sTask.line === line,
+    );
+  }
+
+  private getTasksFromPath = (path: string): STask[] => {
     return getAPI(this.app)?.page(path)?.file?.tasks;
   };
 

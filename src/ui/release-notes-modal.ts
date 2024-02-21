@@ -1,6 +1,6 @@
 import { MarkdownRenderer, Modal, Plugin } from "obsidian";
 
-import { supportLink } from "./constants";
+import { supportLink } from "../constants";
 
 export class ReleaseNotesModal extends Modal {
   constructor(private readonly plugin: Plugin) {

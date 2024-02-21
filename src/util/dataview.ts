@@ -3,6 +3,8 @@ import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { DataArray, DateTime, STask } from "obsidian-dataview";
 
 import {
+  defaultDayFormat,
+  defaultDayFormatForLuxon,
   defaultDurationMinutes,
   indentBeforeTaskParagraph,
 } from "../constants";
@@ -94,9 +96,11 @@ export function toTask(sTask: STask, day: Moment): Task {
 }
 
 export function getScheduledDay(sTask: STask) {
-  const scheduledPropDay = sTask.scheduled?.toFormat?.("yyyy-MM-dd"); // luxon
+  const scheduledPropDay = sTask.scheduled?.toFormat?.(
+    defaultDayFormatForLuxon,
+  );
   const dailyNoteDay = getDateFromPath(sTask.path, "day")?.format(
-    "YYYY-MM-DD", // moment
+    defaultDayFormat,
   );
 
   return scheduledPropDay || dailyNoteDay;

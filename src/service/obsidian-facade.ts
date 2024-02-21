@@ -5,7 +5,7 @@ import {
   getAllDailyNotes,
   getDailyNote,
 } from "obsidian-daily-notes-interface";
-import { isInstanceOf } from "typed-assert";
+import { isInstanceOf, isNotVoid } from "typed-assert";
 
 function doesLeafContainFile(leaf: WorkspaceLeaf, file: TFile) {
   const { view } = leaf;
@@ -38,6 +38,19 @@ export class ObsidianFacade {
       }
     }
   }
+
+  getLastCaretLocation = () => {
+    const view = this.getActiveMarkdownView();
+
+    const file = view.file;
+
+    isNotVoid(file, "There is no file in view");
+
+    const path = file.path;
+    const line = view.editor.getCursor().line;
+
+    return { path, line };
+  };
 
   async openFileForDay(moment: Moment) {
     const dailyNote =

@@ -2,9 +2,9 @@ import { differenceBy } from "lodash/fp";
 import { Moment } from "moment";
 import { derived, get, Readable } from "svelte/store";
 
-import { DayPlannerSettings } from "./settings";
-import { PlacedTask, TasksForDay } from "./types";
-import { getEndTime, getNotificationKey } from "./util/task-utils";
+import { DayPlannerSettings } from "../../settings";
+import { PlacedTask, TasksForDay } from "../../types";
+import { getEndTime, getNotificationKey } from "../../util/task-utils";
 
 interface UseNewlyStartedTasksProps {
   settings: Readable<DayPlannerSettings>;
@@ -12,7 +12,7 @@ interface UseNewlyStartedTasksProps {
   tasksForToday: Readable<TasksForDay>;
 }
 
-// todo: move
+// todo: move file
 export function useNewlyStartedTasks(props: UseNewlyStartedTasksProps) {
   const { settings, currentTime, tasksForToday } = props;
   let previousTasksInProgress: PlacedTask[] = [];

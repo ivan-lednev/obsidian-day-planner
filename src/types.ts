@@ -51,6 +51,7 @@ export interface TasksForDay {
   noTime: UnscheduledTask[];
 }
 
+// todo: rename to DayToTasks
 export type Tasks = Record<string, TasksForDay>;
 
 // TODO: delete this type
