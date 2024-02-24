@@ -6,7 +6,7 @@ All the logic should be pulled from Svelte components into hooks to make testing
 
 ### E2E tests
 
-There is no easy way to write E2E tests for an Obsidian plugin.
+There is no easy way to write E2E tests for an Obsidian plugin, so we don't do those.
 
 ## UI, Svelte
 

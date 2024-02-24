@@ -167,6 +167,7 @@ export default class DayPlanner extends Plugin {
       visibleTasks,
       dataviewLoaded,
       isModPressed,
+      // todo: this doesn't fit method name, move out
       newlyStartedTasks,
     } = createHooks({
       app: this.app,
@@ -201,11 +202,13 @@ export default class DayPlanner extends Plugin {
       showReleaseNotes: this.showReleaseNotes,
       editContext,
       visibleTasks,
+      // TODO: just pass the damn sTaskEditor
       clockOut: this.sTaskEditor.clockOut,
       cancelClock: this.sTaskEditor.cancelClock,
       clockOutUnderCursor: this.sTaskEditor.clockOutUnderCursor,
       clockInUnderCursor: this.sTaskEditor.clockInUnderCursor,
       cancelClockUnderCursor: this.sTaskEditor.cancelClockUnderCursor,
+      // ---
       showPreview: createShowPreview(this.app),
       isModPressed,
     };

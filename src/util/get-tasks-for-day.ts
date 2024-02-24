@@ -1,35 +1,15 @@
 import { partition } from "lodash/fp";
 import { Moment } from "moment/moment";
-import { TFile } from "obsidian";
-import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
-import { DataArray, STask } from "obsidian-dataview";
+import { STask } from "obsidian-dataview";
 
 import { timeFromStartRegExp } from "../regexp";
 import { DayPlannerSettings } from "../settings";
-import { Task, TasksForDay } from "../types";
+import { Task } from "../types";
 
 import { toTask, toUnscheduledTask } from "./dataview";
 
-function isScheduledForThisDay(task: STask, day: Moment) {
-  if (!task?.scheduled?.toMillis) {
-    return false;
-  }
-
-  const scheduledMoment = window.moment(task.scheduled.toMillis());
-
-  return scheduledMoment.isSame(day, "day");
-}
-
 function isTimeSetOnTask(task: STask) {
   return timeFromStartRegExp.test(task.text);
-}
-
-function isTaskInFile(task: STask, file?: TFile) {
-  return task.path === file?.path;
-}
-
-function isScheduledForAnotherDay(task: STask, day: Moment) {
-  return task.scheduled && !isScheduledForThisDay(task, day);
 }
 
 type DurationOptions = Pick<
@@ -69,22 +49,27 @@ export function mapToTasksForDay(
 ) {
   const [withTime, withoutTime] = partition(isTimeSetOnTask, tasksForDay);
 
-  const tasksWithTime = withTime
-    .reduce((result, sTask) => {
+  const { parsed: tasksWithTime, errors } = withTime.reduce(
+    (result, sTask) => {
+      // todo: remove once proper handling is in place
       try {
         const task = toTask(sTask, day);
 
-        result.push(task);
+        result.parsed.push(task);
       } catch (error) {
-        console.error(`Could not parse Dataview task: ${error}`);
+        result.errors.push(error);
       }
 
       return result;
-    }, [])
-    // TODO: sortByStartMinutes()
-    .sort((a, b) => a.startMinutes - b.startMinutes);
+    },
+    { parsed: [], errors: [] },
+  );
+  // TODO: sortByStartMinutes()
+
+  tasksWithTime.sort((a, b) => a.startMinutes - b.startMinutes);
 
   const noTime = withoutTime
+    // todo: move out
     .filter((sTask) => {
       if (!sTask.task) {
         return false;
@@ -100,28 +85,5 @@ export function mapToTasksForDay(
 
   const withTimeAndDuration = calculateDuration(tasksWithTime, settings);
 
-  return { withTime: withTimeAndDuration, noTime };
-}
-
-export function getTasksForDay(
-  day: Moment,
-  dataviewTasks: DataArray<STask>,
-  settings: DayPlannerSettings,
-): TasksForDay {
-  if (dataviewTasks.length === 0) {
-    return { withTime: [], noTime: [] };
-  }
-
-  const noteForThisDay = getDailyNote(day, getAllDailyNotes());
-
-  const sTasksForDay = dataviewTasks
-    .where(
-      (task: STask) =>
-        !isScheduledForAnotherDay(task, day) &&
-        (isScheduledForThisDay(task, day) ||
-          isTaskInFile(task, noteForThisDay)),
-    )
-    .array();
-
-  return mapToTasksForDay(day, sTasksForDay, settings);
+  return { withTime: withTimeAndDuration, noTime, errors };
 }

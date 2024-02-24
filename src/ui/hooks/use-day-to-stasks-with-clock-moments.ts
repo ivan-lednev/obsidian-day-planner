@@ -1,14 +1,12 @@
 import { isString } from "lodash/fp";
-import { STask } from "obsidian-dataview";
-import { derived } from "svelte/store";
+import { DataArray, STask } from "obsidian-dataview";
+import { derived, Readable } from "svelte/store";
 
 import { areValidClockMoments, toClockMoments } from "../../util/clock";
 import { unwrap } from "../../util/dataview";
 import { liftToArray } from "../../util/lift";
 import { splitMultiday } from "../../util/moment";
 import { getDayKey } from "../../util/tasks-utils";
-
-import { UseDayToScheduledStasksProps } from "./use-day-to-scheduled-stasks";
 
 function withClockMoments(sTask: STask) {
   return liftToArray(sTask.clocked)
@@ -22,9 +20,9 @@ function withClockMoments(sTask: STask) {
     }));
 }
 
-export function useDayToStasksWithClockMoments({
-  dataviewTasks,
-}: UseDayToScheduledStasksProps) {
+export function useDayToStasksWithClockMoments(
+  dataviewTasks: Readable<DataArray<STask>>,
+) {
   return derived(dataviewTasks, ($dataviewTasks) => {
     if (!$dataviewTasks) {
       return {};
