@@ -2,6 +2,7 @@ import { Moment } from "moment/moment";
 import { get, Readable, Writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
+import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { PlacedTask, UnscheduledTask } from "../../../types";
 import { copy, createTask } from "../../../util/task-utils";
 
@@ -63,7 +64,7 @@ export function useEditHandlers({
     const withAddedTime = {
       ...task,
       startMinutes: get(cursorMinutes),
-      startTime: window.moment(),
+      startTime: getDateFromPath(task.location.path, "day"),
     };
 
     startEdit({ task: withAddedTime, mode: EditMode.DRAG, day });
