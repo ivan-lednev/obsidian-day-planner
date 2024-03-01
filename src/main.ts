@@ -1,7 +1,6 @@
 import { Plugin, WorkspaceLeaf } from "obsidian";
 import { get, writable, Writable } from "svelte/store";
 
-import ical from "node-ical"
 import {
   editContextKey,
   errorContextKey,
@@ -26,6 +25,7 @@ import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { handleActiveLeafChange } from "./util/handle-active-leaf-change";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
+import { getUpdateTrigger } from "./util/store";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -132,15 +132,6 @@ export default class DayPlanner extends Plugin {
       editorCallback: (editor) =>
         editor.replaceSelection(this.planEditor.createPlannerHeading()),
     });
-
-    this.addCommand({
-      id: "re-sync",
-      name: "Re-sync tasks",
-      callback: async () => {
-        const response = await request({ url: "https://calendar.google.com/calendar/ical/bishop1860%40gmail.com/private-7cabed5aeb5efcfdef0c7454b862f875/basic.ics" })
-        console.log({ response: ical.parseICS(response) })
-      },
-    });
   }
 
   private async initSettingsStore() {
@@ -179,6 +170,7 @@ export default class DayPlanner extends Plugin {
       isModPressed,
       // todo: this doesn't fit method name, move out
       newlyStartedTasks,
+      icalSyncTrigger,
     } = createHooks({
       app: this.app,
       dataviewFacade: this.dataviewFacade,
@@ -200,6 +192,13 @@ export default class DayPlanner extends Plugin {
     });
 
     this.register(newlyStartedTasks.subscribe(notifyAboutStartedTasks));
+    this.addCommand({
+      id: "re-sync",
+      name: "Re-sync tasks",
+      callback: async () => {
+        icalSyncTrigger.set(getUpdateTrigger());
+      },
+    });
 
     // todo: make it dependent on config
     // todo: type this

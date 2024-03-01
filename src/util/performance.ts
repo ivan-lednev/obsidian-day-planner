@@ -1,6 +1,6 @@
 export function withPerformanceReport<T>(
   fn: () => T,
-  variables: Record<string, string>,
+  variables: Record<string, string> = {},
 ) {
   performance.mark("op-start");
   const result = fn();

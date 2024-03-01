@@ -9,7 +9,9 @@ import { getScheduledDay } from "../../util/dataview";
 import { mapToTasksForDay } from "../../util/get-tasks-for-day";
 import { getDayKey, getEmptyRecordsForDay } from "../../util/tasks-utils";
 
-export function useVisibleTasks(dataviewTasks: Readable<DataArray<STask>>) {
+export function useVisibleDataviewTasks(
+  dataviewTasks: Readable<DataArray<STask>>,
+) {
   return derived(
     [visibleDays, dataviewTasks, settings],
     ([$visibleDays, $dataviewTasks, $settings]) => {

@@ -1,12 +1,22 @@
+import {
+  filter,
+  flatten,
+  flow,
+  groupBy,
+  mapValues,
+  partition,
+} from "lodash/fp";
 import { App } from "obsidian";
-import { derived, readable, Writable } from "svelte/store";
+import { derived, readable, writable, Writable } from "svelte/store";
 
-import { reQueryAfterMillis } from "../constants";
+import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
 import { currentTime } from "../global-store/current-time";
+import { visibleDays } from "../global-store/visible-days";
 import { DataviewFacade } from "../service/dataview-facade";
 import { ObsidianFacade } from "../service/obsidian-facade";
 import { PlanEditor } from "../service/plan-editor";
 import { DayPlannerSettings } from "../settings";
+import { Task, UnscheduledTask } from "../types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
@@ -18,10 +28,13 @@ import { useModPressed } from "../ui/hooks/use-mod-pressed";
 import { useNewlyStartedTasks } from "../ui/hooks/use-newly-started-tasks";
 import { useTasksFromExtraSources } from "../ui/hooks/use-tasks-from-extra-sources";
 import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
-import { useVisibleTasks } from "../ui/hooks/use-visible-tasks";
+import { useVisibleDataviewTasks } from "../ui/hooks/use-visible-dataview-tasks";
 
+import { icalEventToTasks } from "./ical";
+import { createBackgroundBatchScheduler } from "./scheduler";
 import { getUpdateTrigger } from "./store";
-import { getDayKey } from "./tasks-utils";
+import { getDayKey, mergeTasks } from "./tasks-utils";
+import { useIcalEvents } from "./use-ical-events";
 
 interface CreateHooksProps {
   app: App;
@@ -53,6 +66,65 @@ export function createHooks({
   const dataviewChange = useDataviewChange(app.metadataCache);
   const dataviewLoaded = useDataviewLoaded(app);
 
+  const icalRefreshTimer = readable(getUpdateTrigger(), (set) => {
+    const interval = setInterval(() => {
+      set(getUpdateTrigger());
+    }, icalRefreshIntervalMillis);
+
+    return () => {
+      clearInterval(interval);
+    };
+  });
+
+  const icalSyncTrigger = writable();
+  const combinedIcalSyncTrigger = derived(
+    [icalRefreshTimer, icalSyncTrigger],
+    getUpdateTrigger,
+  );
+
+  const icalEvents = useIcalEvents(settingsStore, combinedIcalSyncTrigger);
+
+  // todo: improve naming
+  const schedulerQueue = derived(
+    [icalEvents, visibleDays],
+    ([$icalEvents, $visibleDays]) => {
+      return (
+        $icalEvents?.map(
+          (event) => () => icalEventToTasks(event, $visibleDays),
+        ) || []
+      );
+    },
+  );
+
+  const tasksFromEvents = readable<Array<ReturnType<typeof icalEventToTasks>>>(
+    [],
+    (set) => {
+      const scheduler =
+        createBackgroundBatchScheduler<ReturnType<typeof icalEventToTasks>>(
+          set,
+        );
+
+      return schedulerQueue.subscribe(scheduler.enqueueTasks);
+    },
+  );
+
+  const visibleDayToEventOccurences = derived(
+    tasksFromEvents,
+    flow(
+      filter(Boolean),
+      flatten,
+      groupBy((task: Task) => getDayKey(task.startTime)),
+      mapValues((tasks) => {
+        const [withTime, noTime]: [Task[], UnscheduledTask[]] = partition(
+          (task) => task.startMinutes !== undefined,
+          tasks,
+        );
+
+        return { withTime, noTime };
+      }),
+    ),
+  );
+
   const taskUpdateTrigger = derived(
     [dataviewChange, dataviewSource],
     getUpdateTrigger,
@@ -79,7 +151,16 @@ export function createHooks({
     tasksFromExtraSources,
     settingsStore,
   });
-  const visibleTasks = useVisibleTasks(dataviewTasks);
+  const visibleDataviewTasks = useVisibleDataviewTasks(dataviewTasks);
+
+  const visibleTasks = derived(
+    [visibleDataviewTasks, visibleDayToEventOccurences],
+    ([$visibleDataviewTasks, $visibleDayToEventOccurences]) =>
+      mergeTasks($visibleDataviewTasks, $visibleDayToEventOccurences),
+  );
+
+  visibleTasks.subscribe(console.log);
+
   const tasksForToday = derived(
     [visibleTasks, currentTime],
     ([$visibleTasks, $currentTime]) => {
@@ -113,5 +194,6 @@ export function createHooks({
     dataviewLoaded,
     newlyStartedTasks,
     isModPressed,
+    icalSyncTrigger,
   };
 }

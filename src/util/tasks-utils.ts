@@ -1,4 +1,4 @@
-import { difference, differenceBy } from "lodash/fp";
+import { difference, differenceBy, mergeWith } from "lodash/fp";
 import { Moment } from "moment/moment";
 import {
   DEFAULT_DAILY_NOTE_FORMAT,
@@ -160,3 +160,7 @@ export function updateText(diff: Diff) {
     ],
   };
 }
+
+export const mergeTasks = mergeWith((value, sourceValue) => {
+  return Array.isArray(value) ? value.concat(sourceValue) : undefined;
+});

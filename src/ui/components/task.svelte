@@ -23,6 +23,7 @@
     hovering = false;
   }
 
+  // todo: hide this in action
   $: if ($isModPressed && hovering && task.location.path) {
     showPreview(el, task.location.path, task.location.line);
   }

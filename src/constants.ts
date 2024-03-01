@@ -14,6 +14,7 @@ export const clockKey = "clocked";
 export const clockFormat = "YYYY-MM-DDTHH:mm:ss";
 export const reQueryAfterMillis = 200;
 export const supportLink = `<a href="https://github.com/ivan-lednev/obsidian-day-planner?tab=readme-ov-file#support-the-project">Support the project</a>`;
+export const icalRefreshIntervalMillis = 5 * 60 * 1000;
 
 export const icons = [
   "any-key",
