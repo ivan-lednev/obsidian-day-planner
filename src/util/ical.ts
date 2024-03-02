@@ -6,14 +6,23 @@ import { defaultDurationMinutes } from "../constants";
 import { getId } from "./id";
 import { getMinutesSinceMidnight } from "./moment";
 
+export function canHappenAfter(icalEvent: ical.VEvent, date: Date) {
+  if (!icalEvent.rrule) {
+    return icalEvent.end > date;
+  }
+
+  return (
+    icalEvent.rrule.options.until === null ||
+    icalEvent.rrule.options.until > date
+  );
+}
+
 export function icalEventToTasks(icalEvent: ical.VEvent, days: Moment[]) {
   if (icalEvent.rrule) {
     return days.flatMap((day) => {
       // todo: don't clone and modify them every single time
       const startOfDay = day.clone().startOf("day").toDate();
       const endOfDay = day.clone().endOf("day").toDate();
-
-      // icalEvent.recurrences
 
       return icalEvent.rrule
         ?.between(startOfDay, endOfDay)

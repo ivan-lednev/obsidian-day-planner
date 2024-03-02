@@ -30,7 +30,8 @@ import { useTasksFromExtraSources } from "../ui/hooks/use-tasks-from-extra-sourc
 import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "../ui/hooks/use-visible-dataview-tasks";
 
-import { icalEventToTasks } from "./ical";
+import { canHappenAfter, icalEventToTasks } from "./ical";
+import { getEarliestMoment } from "./moment";
 import { createBackgroundBatchScheduler } from "./scheduler";
 import { getUpdateTrigger } from "./store";
 import { getDayKey, mergeTasks } from "./tasks-utils";
@@ -88,10 +89,18 @@ export function createHooks({
   const schedulerQueue = derived(
     [icalEvents, visibleDays],
     ([$icalEvents, $visibleDays]) => {
-      return (
-        $icalEvents?.map(
-          (event) => () => icalEventToTasks(event, $visibleDays),
-        ) || []
+      if (!$icalEvents) {
+        return [];
+      }
+
+      const earliestDay = getEarliestMoment($visibleDays);
+      const startOfEarliestDay = earliestDay.clone().startOf("day").toDate();
+      const relevantIcalEvents = $icalEvents.filter((icalEvent) =>
+        canHappenAfter(icalEvent, startOfEarliestDay),
+      );
+
+      return relevantIcalEvents.map(
+        (event) => () => icalEventToTasks(event, $visibleDays),
       );
     },
   );
@@ -110,6 +119,7 @@ export function createHooks({
 
   const visibleDayToEventOccurences = derived(
     tasksFromEvents,
+    // todo: move out
     flow(
       filter(Boolean),
       flatten,

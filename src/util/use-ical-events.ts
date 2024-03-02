@@ -26,6 +26,7 @@ export function useIcalEvents(
             op: "parseICS",
           });
           const events = Object.values(parsed).filter(isVEvent);
+          // window.lastEvents = events;
 
           set(events);
         })

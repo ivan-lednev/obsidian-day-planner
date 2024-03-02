@@ -93,3 +93,13 @@ export function splitMultiday(
 
   return splitMultiday(newStart, end, [...chunks, [start, endOfDayForStart]]);
 }
+
+export function getEarliestMoment(moments: Moment[]) {
+  return moments.reduce((result, current) => {
+    if (current.isBefore(result)) {
+      return current;
+    }
+
+    return result;
+  });
+}
