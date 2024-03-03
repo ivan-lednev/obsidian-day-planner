@@ -114,6 +114,74 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           });
       });
 
+    containerEl.createEl("h2", { text: "Remote calendars" });
+
+    this.plugin.settings().icals.map((ical, index) =>
+      new Setting(containerEl)
+        .setName(`Calendar ${index + 1}`)
+        .addText((el) =>
+          el
+            .setPlaceholder("Displayed name")
+            .setValue(ical.name)
+            .onChange((value: string) => {
+              this.settingsStore.update((previous) => ({
+                ...previous,
+                icals: previous.icals.map((editedIcal, editedIndex) =>
+                  editedIndex === index
+                    ? { ...editedIcal, name: value }
+                    : editedIcal,
+                ),
+              }));
+            }),
+        )
+        .addText((el) =>
+          el
+            .setPlaceholder("URL")
+            .setValue(ical.url)
+            .onChange((value: string) => {
+              this.settingsStore.update((previous) => ({
+                ...previous,
+                icals: previous.icals.map((editedIcal, editedIndex) =>
+                  editedIndex === index
+                    ? { ...editedIcal, url: value }
+                    : editedIcal,
+                ),
+              }));
+            }),
+        )
+        .addExtraButton((el) =>
+          el
+            .setIcon("trash")
+            .setTooltip("Delete calendar")
+            .onClick(() => {
+              this.settingsStore.update((previous) => ({
+                ...previous,
+                icals: previous.icals.filter(
+                  (editedIcal, editedIndex) => editedIndex !== index,
+                ),
+              }));
+
+              this.display();
+            }),
+        ),
+    );
+
+    new Setting(containerEl).addButton((el) =>
+      el.setButtonText("Add remote calendar").onClick(() => {
+        const newIcal = {
+          name: "",
+          url: "",
+        };
+
+        this.settingsStore.update((previous) => ({
+          ...previous,
+          icals: [...previous.icals, newIcal],
+        }));
+
+        this.display();
+      }),
+    );
+
     containerEl.createEl("h2", { text: "Date & Time Formats" });
 
     new Setting(containerEl).setName("Hour format").then((component) => {

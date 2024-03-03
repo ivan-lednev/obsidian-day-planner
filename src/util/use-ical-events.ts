@@ -17,27 +17,37 @@ export function useIcalEvents(
     [settings, syncTrigger],
     ([$settings], set: (events: ical.VEvent[]) => void) => {
       const allCalendarsParsed = Promise.all(
-        $settings.icalUrls.map((url) =>
-          request({
-            url,
-          })
-            .then((response) => {
-              const parsed = ical.parseICS(response);
-
-              return Object.values(parsed).filter(isVEvent);
+        $settings.icals
+          .filter((ical) => ical.url.trim().length > 0)
+          .map(({ name, url }) =>
+            request({
+              url,
             })
-            .catch((error) => {
-              // todo: handle errors: collect them, don't stop filtering because of a single error
-              new Notice(error);
-              console.error(error);
+              .then((response) => {
+                const parsed = ical.parseICS(response);
+                const icalEvents = Object.values(parsed).filter(isVEvent);
 
-              return [];
-            }),
-        ),
+                icalEvents.forEach((icalEvent) => {
+                  // @ts-ignore
+                  icalEvent.calendar = name;
+                });
+
+                return icalEvents;
+              })
+              .catch((error) => {
+                new Notice(
+                  `See console for details. Could not fetch calendar from ${url}`,
+                );
+                console.error(error);
+
+                return [];
+              }),
+          ),
       );
 
       allCalendarsParsed.then((calendars) => {
         const allEvents = calendars.flat();
+        // window.allEvents = allEvents;
 
         set(allEvents);
       });

@@ -1,4 +1,5 @@
-import { Moment } from "moment";
+import moment, { Moment } from "moment";
+import { tz } from "moment-timezone";
 import ical from "node-ical";
 
 import { defaultDurationMinutes } from "../constants";
@@ -47,12 +48,23 @@ function icalEventToTask(
   date: Date,
 ): Task | UnscheduledTask {
   const startTime = window.moment(date);
+
+  let startTimeAdjusted = startTime;
+  const tzid = icalEvent.rrule?.origOptions?.tzid;
+
+  if (tzid) {
+    startTimeAdjusted = adjustForDst(tzid, icalEvent.start, date);
+  }
+
   const isAllDayEvent = icalEvent.datetype === "date";
+
   const base = {
+    // @ts-ignore
+    calendar: icalEvent.calendar,
     id: getId(),
     text: icalEvent.summary,
     firstLineText: icalEvent.summary,
-    startTime,
+    startTime: startTimeAdjusted,
     readonly: true,
     listTokens: "- ",
   };
@@ -66,8 +78,22 @@ function icalEventToTask(
 
   return {
     ...base,
-    startMinutes: getMinutesSinceMidnight(startTime),
+    startMinutes: getMinutesSinceMidnight(startTimeAdjusted),
     durationMinutes:
       (icalEvent.end.getTime() - icalEvent.start.getTime()) / 1000 / 60,
   };
+}
+
+function adjustForDst(tzid: string, originalDate: Date, currentDate: Date) {
+  const timezone = tz.zone(tzid);
+
+  if (!timezone) {
+    return moment(currentDate);
+  }
+
+  const offset =
+    timezone.utcOffset(currentDate.getTime()) -
+    timezone.utcOffset(originalDate.getTime());
+
+  return moment(currentDate).add(offset, "minutes");
 }

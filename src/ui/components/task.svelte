@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Lock } from "lucide-svelte";
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../constants";
@@ -30,21 +31,32 @@
 </script>
 
 <div
-  style:width="{task?.placing?.widthPercent || 100}%"
   style:left="{task?.placing?.xOffsetPercent || 0}%"
+  style:width="{task?.placing?.widthPercent || 100}%"
   class="task-padding-box"
 >
   <div
     bind:this={el}
     class="task-block {relationToNow}"
     class:is-ghost={task.isGhost}
+    class:readonly={task.calendar}
     on:mousedown={(event) => event.stopPropagation()}
     on:mouseenter={handleMouseEnter}
     on:mouseleave={handleMouseLeave}
     on:mouseup
   >
-    <RenderedMarkdown {task} />
-    <slot />
+    <div class="text">
+      {#if task.calendar}
+        <div class="calendar">
+          <Lock class="svg-icon lock-icon" />
+          {task.calendar}
+        </div>
+      {/if}
+      <RenderedMarkdown {task} />
+    </div>
+    {#if !task.calendar}
+      <slot />
+    {/if}
   </div>
 </div>
 
@@ -61,6 +73,36 @@
     padding: 0 1px 2px;
 
     transition: 0.05s linear;
+  }
+
+  .task-padding-box :global(svg.lock-icon) {
+    width: var(--icon-xs);
+    height: var(--icon-xs);
+  }
+
+  .calendar {
+    display: flex;
+    gap: var(--size-4-1);
+    align-items: center;
+
+    font-size: var(--font-ui-smaller);
+    color: var(--text-muted);
+  }
+
+  .text {
+    display: flex;
+    flex: 1 0 0;
+    flex-direction: column;
+  }
+
+  .readonly {
+    background: repeating-linear-gradient(
+      45deg,
+      var(--background-secondary),
+      var(--background-secondary) 10px,
+      var(--background-modifier-border) 10px,
+      var(--background-modifier-border) 20px
+    );
   }
 
   .task-block {

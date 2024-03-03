@@ -29,7 +29,7 @@ export interface DayPlannerSettings {
   pluginVersion: string;
   showCompletedTasks: boolean;
   showSubtasksInTaskBlocks: boolean;
-  icalUrls: string[];
+  icals: Array<{ name: string; url: string }>;
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -60,7 +60,7 @@ export const defaultSettings: DayPlannerSettings = {
   pluginVersion: "",
   showCompletedTasks: true,
   showSubtasksInTaskBlocks: true,
-  icalUrls: [],
+  icals: [],
 };
 
 export const defaultSettingsForTests = {

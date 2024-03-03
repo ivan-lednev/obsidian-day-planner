@@ -37,6 +37,7 @@ export interface UnscheduledTask {
   location?: TaskLocation;
   placing?: ReturnType<typeof getHorizontalPlacing>;
   isGhost?: boolean;
+  calendar?: string;
   durationMinutes: number;
 }
 
