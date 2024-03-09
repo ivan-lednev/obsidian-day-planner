@@ -11,6 +11,7 @@ interface UseColorProps {
 }
 
 export function useColor({ settings, task }: UseColorProps) {
+  // todo: move out. We only need one for all tasks
   const colorScale = derived(settings, ($settings) => {
     return chroma
       .scale([$settings.timelineStartColor, $settings.timelineEndColor])
@@ -20,14 +21,16 @@ export function useColor({ settings, task }: UseColorProps) {
   const backgroundColor = derived(
     [settings, colorScale],
     ([$settings, $colorScale]) => {
-      const scaleKey =
-        (task.startTime.hour() - $settings.startHour) /
-        (24 - $settings.startHour);
-
       // TODO: remove startTime once task creation returns consistent tasks
-      return $settings.timelineColored && task.startTime
-        ? $colorScale(scaleKey).hex()
-        : "var(--background-primary)";
+      if ($settings.timelineColored && task.startTime) {
+        const scaleKey =
+          (task.startTime.hour() - $settings.startHour) /
+          (24 - $settings.startHour);
+
+        return $colorScale(scaleKey).hex();
+      }
+
+      return "var(--background-primary)";
     },
   );
 
@@ -35,13 +38,11 @@ export function useColor({ settings, task }: UseColorProps) {
     [settings, backgroundColor],
     ([$settings, $backgroundColor]) => {
       // TODO: remove startTime once task creation returns consistent tasks
-      return $settings.timelineColored && task.startTime
-        ? getTextColorWithEnoughContrast($backgroundColor)
-        : {
-            normal: "inherit",
-            muted: "inherit",
-            faint: "inherit",
-          };
+      if ($settings.timelineColored && task.startTime) {
+        return getTextColorWithEnoughContrast($backgroundColor);
+      }
+
+      return { normal: "inherit", muted: "inherit", faint: "inherit" };
     },
   );
 

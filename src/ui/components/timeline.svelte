@@ -2,7 +2,6 @@
   import { Moment } from "moment";
   import { getContext } from "svelte";
 
-
   import { editContextKey } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
@@ -13,18 +12,17 @@
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
 
+
   import Column from "./column.svelte";
-  import Grip from "./grip.svelte";
+  import LocalTimeBlock from "./local-time-block.svelte";
   import Needle from "./needle.svelte";
-  import ResizeHandle from "./resize-handle.svelte";
+  import RemoteTimeBlock from "./remote-time-block.svelte";
   import Ruler from "./ruler.svelte";
   import ScheduledTaskContainer from "./scheduled-task-container.svelte";
-  import ScheduledTask from "./scheduled-task.svelte";
   import Scroller from "./scroller.svelte";
-
-  // TODO: showRuler or add <slot name="left-gutter" />
+  
+// TODO: showRuler or add <slot name="left-gutter" />
   export let hideControls = false;
-  export let readonly = false;
   export let day: Moment | undefined = undefined;
 
   $: actualDay = day || $visibleDayInTimeline;
@@ -65,22 +63,22 @@
     <ScheduledTaskContainer
       {pointerOffsetY}
       on:mousedown={handleContainerMouseDown}
-      on:mouseup={confirmEdit}
       on:mouseenter={handleMouseEnter}
+      on:mouseup={confirmEdit}
     >
       {#each $displayedTasks.withTime as task (getRenderKey(task))}
-        <ScheduledTask {task} on:mouseup={() => handleTaskMouseUp(task)}>
-          {#if !readonly }
-            <Grip
-              cursor={gripCursor}
-              on:mousedown={(event) => handleGripMouseDown(event, task)}
-            />
-            <ResizeHandle
-              visible={!$editOperation}
-              on:mousedown={(event) => handleResizerMouseDown(event, task)}
-            />
-          {/if}
-        </ScheduledTask>
+        {#if task.calendar}
+          <RemoteTimeBlock {task} />
+        {:else}
+          <LocalTimeBlock
+            {gripCursor}
+            isResizeHandleVisible={!$editOperation}
+            onGripMouseDown={(event) => handleGripMouseDown(event, task)}
+            onResizerMouseDown={(event) => handleResizerMouseDown(event, task)}
+            {task}
+            on:mouseup={() => handleTaskMouseUp(task)}
+          />
+        {/if}
       {/each}
     </ScheduledTaskContainer>
   </Column>

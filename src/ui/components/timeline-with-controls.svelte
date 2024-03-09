@@ -2,7 +2,6 @@
   import { Moment } from "moment";
   import { getContext } from "svelte";
 
-
   import { obsidianContext } from "../../constants";
   import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
@@ -10,11 +9,10 @@
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
 
-  import Grip from "./grip.svelte";
-  import Task from "./task.svelte";
   import TimelineControls from "./timeline-controls.svelte";
-  import Timeline from "./timeline.svelte"
+  import Timeline from "./timeline.svelte";
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
+  import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   export let hideControls = false;
   export let day: Moment | undefined = undefined;
@@ -46,15 +44,12 @@
   {#if $displayedTasks.noTime.length > 0 && $settings.showUncheduledTasks}
     <UnscheduledTaskContainer>
       {#each $displayedTasks.noTime as task}
-        <Task
+        <UnscheduledTimeBlock
+          {gripCursor}
+          onGripMouseDown={() => handleUnscheduledTaskGripMouseDown(task)}
           {task}
           on:mouseup={() => handleTaskMouseUp(task)}
-        >
-          <Grip
-            cursor={gripCursor}
-            on:mousedown={() => handleUnscheduledTaskGripMouseDown(task)}
-          />
-        </Task>
+        />
       {/each}
     </UnscheduledTaskContainer>
   {/if}

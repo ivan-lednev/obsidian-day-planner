@@ -1,0 +1,50 @@
+<div
+  class="padding"
+>
+  <div
+    class="content"
+    on:mousedown={(event) => event.stopPropagation()}
+    on:mouseup
+  >
+    <slot />
+  </div>
+</div>
+
+<style>
+  .padding {
+    position: var(--time-block-position, static);
+    top: var(--time-block-top, 0);
+    left: var(--time-block-left, 0);
+
+    display: flex;
+
+    width: var(--time-block-width, 100%);
+    height: var(--time-block-height, auto);
+    padding: 0 1px 2px;
+
+    transition: 0.05s linear;
+  }
+
+  /* TODO: Move out */
+  .padding :global(svg.lock-icon) {
+    width: var(--icon-xs);
+    height: var(--icon-xs);
+  }
+
+  .content {
+    position: relative;
+
+    overflow: hidden;
+    display: flex;
+    flex: 1 0 0;
+
+    font-size: var(--font-ui-small);
+    text-align: left;
+    overflow-wrap: anywhere;
+    white-space: normal;
+
+    background-color: var(--time-block-bg-color, var(--background-primary));
+    border: 1px solid var(--time-block-border-color, var(--color-base-50));
+    border-radius: var(--radius-s);
+  }
+</style>
