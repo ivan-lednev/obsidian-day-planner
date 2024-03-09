@@ -1,8 +1,3 @@
 node_modules/
 
 main.js
-
-# ignore time tracker stuff for now
-src/ui/components/time-tracker/active-clocks.svelte
-src/ui/components/time-tracker/time-tracker.svelte
-src/ui/components/time-tracker/active-clocks.svelte
