@@ -88,6 +88,7 @@ export interface ObsidianContext {
   showReleaseNotes: () => void;
   showPreview: ReturnType<typeof createShowPreview>;
   isModPressed: Readable<boolean>;
+  reSync: () => void;
 }
 
 export type ComponentContext = Map<string, unknown>;

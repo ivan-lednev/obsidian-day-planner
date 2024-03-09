@@ -195,6 +195,7 @@ export default class DayPlanner extends Plugin {
     this.addCommand({
       id: "re-sync",
       name: "Re-sync tasks",
+      // todo: hide inside store
       callback: async () => {
         icalSyncTrigger.set(getUpdateTrigger());
       },
@@ -220,6 +221,7 @@ export default class DayPlanner extends Plugin {
       // ---
       showPreview: createShowPreview(this.app),
       isModPressed,
+      reSync: () => icalSyncTrigger.set(getUpdateTrigger()),
     };
 
     // TODO: move out building context

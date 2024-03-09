@@ -11,6 +11,7 @@
     FilterX,
     AlertTriangle,
     Info,
+    RefreshCw,
   } from "lucide-svelte";
   import { getContext } from "svelte";
 
@@ -22,7 +23,7 @@
   import { useDataviewSource } from "../hooks/use-dataview-source";
 
   import ControlButton from "./control-button.svelte";
-  import ErrorReport from "./error-report.svelte"
+  import ErrorReport from "./error-report.svelte";
   import Dropdown from "./obsidian/dropdown.svelte";
   import SettingItem from "./obsidian/setting-item.svelte";
 
@@ -32,6 +33,7 @@
     refreshTasks,
     dataviewLoaded,
     showReleaseNotes,
+    reSync,
   } = getContext<ObsidianContext>(obsidianContext);
 
   const {
@@ -105,7 +107,13 @@
     </ControlButton>
 
     <ControlButton
-      --grid-column-start="4"
+      label="Manually sync with all remote calendars"
+      on:click={reSync}
+    >
+      <RefreshCw class="svg-icon" />
+    </ControlButton>
+
+    <ControlButton
       --justify-self="flex-end"
       label="Go to previous day"
       on:click={goBack}
@@ -182,7 +190,7 @@
       {/if}
       {#if $dataviewErrorMessage.length > 0}
         <div class="info-container">
-<!--          TODO: move out -->
+          <!--          TODO: move out -->
           <pre class="error-message">{$dataviewErrorMessage}</pre>
         </div>
       {/if}
