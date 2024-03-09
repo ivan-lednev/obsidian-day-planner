@@ -5,6 +5,7 @@ import { Readable, Writable } from "svelte/store";
 
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import type { ObsidianFacade } from "./service/obsidian-facade";
+import { IcalConfig } from "./settings";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { createShowPreview } from "./util/create-show-preview";
 import { getDiff, updateText } from "./util/tasks-utils";
@@ -37,7 +38,7 @@ export interface UnscheduledTask {
   location?: TaskLocation;
   placing?: ReturnType<typeof getHorizontalPlacing>;
   isGhost?: boolean;
-  calendar?: string;
+  calendar?: IcalConfig;
   durationMinutes: number;
 }
 
@@ -97,3 +98,5 @@ declare global {
   const currentPluginVersion: string;
   const changelogMd: string;
 }
+
+export type WithIcalConfig<T> = T & { calendar: IcalConfig };

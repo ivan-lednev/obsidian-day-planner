@@ -6,7 +6,7 @@ import {
   defaultDurationMinutes,
   originalRecurrenceDayKeyFormat,
 } from "../constants";
-import { Task, UnscheduledTask } from "../types";
+import { Task, UnscheduledTask, WithIcalConfig } from "../types";
 
 import { getId } from "./id";
 import { getMinutesSinceMidnight } from "./moment";
@@ -32,20 +32,21 @@ function hasRecurrenceOverride(icalEvent: ical.VEvent, date: Date) {
   return Object.hasOwn(icalEvent.recurrences, dateKey);
 }
 
-export function icalEventToTasks(icalEvent: ical.VEvent, day: Moment) {
+export function icalEventToTasks(
+  icalEvent: WithIcalConfig<ical.VEvent>,
+  day: Moment,
+) {
   if (icalEvent.rrule) {
     // todo: don't clone and modify them every single time
     const startOfDay = day.clone().startOf("day").toDate();
     const endOfDay = day.clone().endOf("day").toDate();
 
     const recurrenceOverrides = Object.values(icalEvent?.recurrences || {}).map(
-      (recurrence) => {
-        // todo: fix
-        // @ts-ignore
-        recurrence.calendar = icalEvent.calendar;
-
-        return icalEventToTask(recurrence, recurrence.start);
-      },
+      (recurrence) =>
+        icalEventToTask(
+          { ...recurrence, calendar: icalEvent.calendar },
+          recurrence.start,
+        ),
     );
 
     const recurrences = icalEvent.rrule
@@ -66,7 +67,7 @@ export function icalEventToTasks(icalEvent: ical.VEvent, day: Moment) {
 }
 
 function icalEventToTask(
-  icalEvent: ical.VEvent,
+  icalEvent: WithIcalConfig<ical.VEvent>,
   date: Date,
 ): Task | UnscheduledTask {
   let startTimeAdjusted = window.moment(date);
@@ -80,7 +81,6 @@ function icalEventToTask(
   const isAllDayEvent = icalEvent.datetype === "date";
 
   const base = {
-    // @ts-ignore
     calendar: icalEvent.calendar,
     id: getId(),
     text: icalEvent.summary,

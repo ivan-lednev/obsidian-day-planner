@@ -1,7 +1,7 @@
 import type { HexString } from "obsidian";
 import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
-interface IcalConfig {
+export interface IcalConfig {
   name: string;
   url: string;
   color: string;

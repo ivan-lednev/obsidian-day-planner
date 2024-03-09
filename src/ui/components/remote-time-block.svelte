@@ -10,9 +10,10 @@
 
 <ScheduledTimeBlock {task}>
   <div class="remote-task-content">
+    <div style:background-color={task.calendar.color} class="ribbon" />
     <div class="calendar">
       <Lock class="svg-icon lock-icon" />
-      {task.calendar}
+      {task.calendar.name}
     </div>
     {task.text}
   </div>
@@ -37,22 +38,12 @@
     padding-left: calc(4px + var(--size-4-2));
   }
 
-  .remote-task-content::before {
-    content: " ";
-
+  .ribbon {
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
 
     width: var(--size-4-2);
-
-    background: repeating-linear-gradient(
-      45deg,
-      var(--background-secondary),
-      var(--background-secondary) 5px,
-      var(--color-accent) 5px,
-      var(--color-accent) 10px
-    );
   }
 </style>

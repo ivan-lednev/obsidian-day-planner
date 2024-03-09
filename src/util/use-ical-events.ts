@@ -3,6 +3,7 @@ import { Notice, request } from "obsidian";
 import { derived, Readable } from "svelte/store";
 
 import { DayPlannerSettings } from "../settings";
+import { WithIcalConfig } from "../types";
 
 function isVEvent(event: ical.CalendarComponent): event is ical.VEvent {
   return event.type === "VEVENT";
@@ -15,28 +16,30 @@ export function useIcalEvents(
   // todo: [minor] derive only from relevant setting
   return derived(
     [settings, syncTrigger],
-    ([$settings], set: (events: ical.VEvent[]) => void) => {
+    (
+      [$settings],
+      set: (events: Array<WithIcalConfig<ical.VEvent>>) => void,
+    ) => {
       const allCalendarsParsed = Promise.all(
         $settings.icals
           .filter((ical) => ical.url.trim().length > 0)
-          .map(({ name, url }) =>
+          .map((calendar) =>
             request({
-              url,
+              url: calendar.url,
             })
               .then((response) => {
                 const parsed = ical.parseICS(response);
-                const icalEvents = Object.values(parsed).filter(isVEvent);
 
-                icalEvents.forEach((icalEvent) => {
-                  // @ts-ignore
-                  icalEvent.calendar = name;
-                });
-
-                return icalEvents;
+                return Object.values(parsed)
+                  .filter(isVEvent)
+                  .map((icalEvent) => ({
+                    ...icalEvent,
+                    calendar,
+                  }));
               })
               .catch((error) => {
                 new Notice(
-                  `See console for details. Could not fetch calendar from ${url}`,
+                  `See console for details. Could not fetch calendar from ${calendar.url}`,
                 );
                 console.error(error);
 
