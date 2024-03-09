@@ -121,7 +121,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
         .setName(`Calendar ${index + 1}`)
         .addColorPicker((el) =>
           // todo: replace with immer
-          el.setValue("#ffffff").onChange((value: string) => {
+          el.setValue(ical.color).onChange((value: string) => {
             this.settingsStore.update((previous) => ({
               ...previous,
               icals: previous.icals.map((editedIcal, editedIndex) =>

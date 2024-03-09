@@ -1,23 +1,24 @@
 ## Support the project
 
-I work on this plugin in my spare time, and your support is very motivating!
+I work on this plugin in my spare time, and any kind of support is very valuable.
 
 - ✨ [Check out new features and other changes](https://github.com/ivan-lednev/obsidian-day-planner/releases)
-- 🪲 [Create issues](https://github.com/ivan-lednev/obsidian-day-planner/issues)
+- 🪲 [Create issues and improvement suggestions](https://github.com/ivan-lednev/obsidian-day-planner/issues)
 - 🪛 [Submit pull-requests](./CONTRIBUTING.md)
-- ❤️ Support directly:
+- ❤️ Support the project directly:
 
   <a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
 ## Table of contents
 
+- [Support the project](#support-the-project)
 - [Table of contents](#table-of-contents)
 - [What it looks like](#what-it-looks-like)
 - [Drag-and-drop demos](#drag-and-drop-demos)
 - [How to use it](#how-to-use-it)
-  - [Dataview integration](#dataview-integration)
-    - [How to schedule a task anywhere in the vault](#how-to-schedule-a-task-anywhere-in-the-vault)
-    - [Dataview source filter](#dataview-source-filter)
+  - [Showing events from your daily notes](#showing-events-from-your-daily-notes)
+  - [Showing internet calendars](#showing-internet-calendars)
+  - [Showing events from other files in your vault](#showing-events-from-other-files-in-your-vault)
 - [What else you can do](#what-else-you-can-do)
 - [Commands](#commands)
 - [Note on the old plugin version](#note-on-the-old-plugin-version)
@@ -53,26 +54,29 @@ I work on this plugin in my spare time, and your support is very motivating!
 
 ## How to use it
 
+### Showing events from your daily notes
+
 1. **Either the core 'Daily Notes' or the 'Periodic Notes' plugins should be enabled**
 1. **The Dataview plugin should be enabled**
-1. Install the plugin
-1. Open timeline view to monitor your progress with the command: `Show the day planner timeline` or by clicking on the ribbon icon
-
-### Dataview integration
-
-A task is going to show up in the timeline for a given day
-
-- If it's inside a daily note for the day
-- Or if it's scheduled for the day
+1. Open timeline view the following command: `Show the day planner timeline`
 
 Everything Dataview recognizes as a task is shown in the timeline, including:
 
 - Tasks inside callouts
 - Nested tasks. If a nested task has a timestamp, it'll show up as a separate block, and will be excluded from its parent's unscheduled sub-items list
 
-#### How to schedule a task anywhere in the vault
+### Showing internet calendars
 
-To schedule a task:
+- To show events from internet calendars like **Google Calendar, iCloud Calendar and Outlook** you only need to add an ICS link in the plugin settings. See where to get this link:
+  - [Google Calendar instructions](https://support.google.com/calendar/answer/37648?hl=en#zippy=%2Csync-your-google-calendar-view-edit%2Cget-your-calendar-view-only)
+  - [Outlook Calendar instructions](https://support.microsoft.com/en-us/office/introduction-to-publishing-internet-calendars-a25e68d6-695a-41c6-a701-103d44ba151d?ui=en-us&rs=en-us&ad=us)
+  - [iCloud Calendar instructions](https://www.souladvisor.com/help-centre/how-to-get-icloud-calendar-address-on-mac-in-ical-format)
+
+![](./assets/ical-settings-demo.png)
+![](./assets/ical-timeline-demo.png)
+
+### Showing events from other files in your vault
+
 1. Include its folder or tag into the Dataview filter
 1. Add time and a date that Dataview recognizes: `⏳ 2021-08-29` or `[scheduled:: 2021-08-29]` or `(scheduled:: 2021-08-29)`.
 
@@ -84,10 +88,6 @@ Full examples:
 ```
 
 [obsidian-tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) adds a modal with some handy shortcuts for adding dates like these.
-
-#### Dataview source filter
-
-You can set up Dataview to search for tasks in additional folders or tags. [Here are the docs on how to use the syntax](https://blacksmithgu.github.io/obsidian-dataview/reference/sources/).
 
 ## What else you can do
 
