@@ -5,7 +5,7 @@
 - This lets you display events from calendars like Google Calendar, iCloud Calendar, Outlook Calendar
 - You only need to add a link in the plugin settings to start displaying events from that calendar
 
-See README for details.
+See [README](https://github.com/ivan-lednev/obsidian-day-planner?tab=readme-ov-file#showing-internet-calendars) for details.
 
 ## 0.18.0
 
