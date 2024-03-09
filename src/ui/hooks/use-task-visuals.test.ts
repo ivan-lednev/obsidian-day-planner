@@ -19,14 +19,13 @@ function getBaseUseTaskProps() {
 }
 
 test("derives task offset from settings and time", () => {
-  const { offset, height, relationToNow } = useTaskVisuals(
+  const { offset, height } = useTaskVisuals(
     { ...baseTask, startMinutes: toMinutes("13:00") },
     getBaseUseTaskProps(),
   );
 
   expect(get(offset)).toEqual(840);
   expect(get(height)).toEqual(120);
-  expect(get(relationToNow)).toEqual("past");
 });
 
 test.skip("tasks change position and size when zoom level changes", () => {

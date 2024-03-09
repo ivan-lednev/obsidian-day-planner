@@ -13,5 +13,5 @@
 <ActiveClocks />
 <Tree --flex="1 0 0" title="Timeline">
   <TimelineControls />
-  <Timeline readonly={true} />
+  <Timeline />
 </Tree>
