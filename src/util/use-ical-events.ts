@@ -12,14 +12,19 @@ function isVEvent(event: ical.CalendarComponent): event is ical.VEvent {
 export function useIcalEvents(
   settings: Readable<DayPlannerSettings>,
   syncTrigger: Readable<unknown>,
+  isOnline: Readable<boolean>,
 ) {
   // todo: [minor] derive only from relevant setting
   return derived(
-    [settings, syncTrigger],
+    [settings, isOnline, syncTrigger],
     (
-      [$settings],
+      [$settings, $isOnline],
       set: (events: Array<WithIcalConfig<ical.VEvent>>) => void,
     ) => {
+      if (!$isOnline) {
+        return;
+      }
+
       const allCalendarsParsed = Promise.all(
         $settings.icals
           .filter((ical) => ical.url.trim().length > 0)

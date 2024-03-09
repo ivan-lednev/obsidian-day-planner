@@ -12,6 +12,7 @@
     AlertTriangle,
     Info,
     RefreshCw,
+    RefreshCwOff,
   } from "lucide-svelte";
   import { getContext } from "svelte";
 
@@ -34,6 +35,7 @@
     dataviewLoaded,
     showReleaseNotes,
     reSync,
+    isOnline,
   } = getContext<ObsidianContext>(obsidianContext);
 
   const {
@@ -106,12 +108,18 @@
       <Table2 class="svg-icon" />
     </ControlButton>
 
-    <ControlButton
-      label="Manually sync with all remote calendars"
-      on:click={reSync}
-    >
-      <RefreshCw class="svg-icon" />
-    </ControlButton>
+    {#if $isOnline}
+      <ControlButton
+        label="Manually sync with all remote calendars"
+        on:click={reSync}
+      >
+        <RefreshCw class="svg-icon" />
+      </ControlButton>
+    {:else}
+      <ControlButton disabled label="Can't sync, you're offline!"
+        ><RefreshCwOff class="svg-icon" /></ControlButton
+      >
+    {/if}
 
     <ControlButton
       --justify-self="flex-end"

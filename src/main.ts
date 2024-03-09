@@ -171,6 +171,7 @@ export default class DayPlanner extends Plugin {
       // todo: this doesn't fit method name, move out
       newlyStartedTasks,
       icalSyncTrigger,
+      isOnline,
     } = createHooks({
       app: this.app,
       dataviewFacade: this.dataviewFacade,
@@ -222,6 +223,7 @@ export default class DayPlanner extends Plugin {
       showPreview: createShowPreview(this.app),
       isModPressed,
       reSync: () => icalSyncTrigger.set(getUpdateTrigger()),
+      isOnline,
     };
 
     // TODO: move out building context

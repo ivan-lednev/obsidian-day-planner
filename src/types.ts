@@ -90,6 +90,7 @@ export interface ObsidianContext {
   showPreview: ReturnType<typeof createShowPreview>;
   isModPressed: Readable<boolean>;
   reSync: () => void;
+  isOnline: Readable<boolean>;
 }
 
 export type ComponentContext = Map<string, unknown>;

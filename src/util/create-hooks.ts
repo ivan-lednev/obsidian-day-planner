@@ -22,6 +22,7 @@ import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
 import { useDebounceWithDelay } from "../ui/hooks/use-debounce-with-delay";
 import { useEditContext } from "../ui/hooks/use-edit/use-edit-context";
+import { useIsOnline } from "../ui/hooks/use-is-online";
 import { useKeyDown } from "../ui/hooks/use-key-down";
 import { useListsFromVisibleDailyNotes } from "../ui/hooks/use-lists-from-visible-daily-notes";
 import { useModPressed } from "../ui/hooks/use-mod-pressed";
@@ -62,6 +63,7 @@ export function createHooks({
   // todo: these can be global stores
   const keyDown = useKeyDown();
   const isModPressed = useModPressed();
+  const isOnline = useIsOnline();
   // ---
 
   const dataviewChange = useDataviewChange(app.metadataCache);
@@ -83,7 +85,11 @@ export function createHooks({
     getUpdateTrigger,
   );
 
-  const icalEvents = useIcalEvents(settingsStore, combinedIcalSyncTrigger);
+  const icalEvents = useIcalEvents(
+    settingsStore,
+    combinedIcalSyncTrigger,
+    isOnline,
+  );
 
   // todo: improve naming
   const schedulerQueue = derived(
@@ -208,5 +214,6 @@ export function createHooks({
     newlyStartedTasks,
     isModPressed,
     icalSyncTrigger,
+    isOnline,
   };
 }
