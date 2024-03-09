@@ -1,4 +1,5 @@
 import { produce } from "immer";
+import { partition } from "lodash/fp";
 import { isNotVoid } from "typed-assert";
 
 import type { Task, Tasks } from "../../../../types";
@@ -54,15 +55,26 @@ export function transform(
 
   const destTasks = withTaskInRightColumn[destKey];
   const transformFn = transformers[operation.mode];
-  const withTimeSorted = sortByStartMinutes(destTasks.withTime);
 
   isNotVoid(transformFn, `No transformer for operation: ${operation.mode}`);
+
+  const [readonly, editable] = partition(
+    (task) => task.calendar,
+    destTasks.withTime,
+  );
+  const withTimeSorted = sortByStartMinutes(editable);
+  const transformed = transformFn(
+    withTimeSorted,
+    operation.task,
+    cursorMinutes,
+  );
+  const merged = [...readonly, ...transformed];
 
   return {
     ...withTaskInRightColumn,
     [destKey]: {
       ...destTasks,
-      withTime: transformFn(withTimeSorted, operation.task, cursorMinutes),
+      withTime: merged,
     },
   };
 }
