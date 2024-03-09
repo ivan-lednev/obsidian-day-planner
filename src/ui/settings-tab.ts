@@ -119,6 +119,19 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
     this.plugin.settings().icals.map((ical, index) =>
       new Setting(containerEl)
         .setName(`Calendar ${index + 1}`)
+        .addColorPicker((el) =>
+          // todo: replace with immer
+          el.setValue("#ffffff").onChange((value: string) => {
+            this.settingsStore.update((previous) => ({
+              ...previous,
+              icals: previous.icals.map((editedIcal, editedIndex) =>
+                editedIndex === index
+                  ? { ...editedIcal, color: value }
+                  : editedIcal,
+              ),
+            }));
+          }),
+        )
         .addText((el) =>
           el
             .setPlaceholder("Displayed name")
@@ -171,6 +184,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
         const newIcal = {
           name: "",
           url: "",
+          color: "#ffffff"
         };
 
         this.settingsStore.update((previous) => ({

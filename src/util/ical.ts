@@ -2,7 +2,10 @@ import moment, { Moment } from "moment";
 import { tz } from "moment-timezone";
 import ical from "node-ical";
 
-import { defaultDurationMinutes } from "../constants";
+import {
+  defaultDurationMinutes,
+  originalRecurrenceDayKeyFormat,
+} from "../constants";
 import { Task, UnscheduledTask } from "../types";
 
 import { getId } from "./id";
@@ -19,26 +22,45 @@ export function canHappenAfter(icalEvent: ical.VEvent, date: Date) {
   );
 }
 
+function hasRecurrenceOverride(icalEvent: ical.VEvent, date: Date) {
+  if (!icalEvent.recurrences) {
+    return false;
+  }
+
+  const dateKey = moment(date).format(originalRecurrenceDayKeyFormat);
+
+  return Object.hasOwn(icalEvent.recurrences, dateKey);
+}
+
 export function icalEventToTasks(icalEvent: ical.VEvent, day: Moment) {
   if (icalEvent.rrule) {
     // todo: don't clone and modify them every single time
     const startOfDay = day.clone().startOf("day").toDate();
     const endOfDay = day.clone().endOf("day").toDate();
 
-    return icalEvent.rrule
-      ?.between(startOfDay, endOfDay)
-      .map((date) => icalEventToTask(icalEvent, date));
-  }
+    const recurrenceOverrides = Object.values(icalEvent?.recurrences || {}).map(
+      (recurrence) => {
+        // todo: fix
+        // @ts-ignore
+        recurrence.calendar = icalEvent.calendar;
 
-  // todo: handle recurrences
-  //  why does muness ignore rrule if tasks have recurrences?
+        return icalEventToTask(recurrence, recurrence.start);
+      },
+    );
+
+    const recurrences = icalEvent.rrule
+      ?.between(startOfDay, endOfDay)
+      .filter((date) => !hasRecurrenceOverride(icalEvent, date))
+      .map((date) => icalEventToTask(icalEvent, date));
+
+    return [...recurrences, ...recurrenceOverrides];
+  }
 
   // todo: do this once
   const eventStart = window.moment(icalEvent.start);
   const startsOnVisibleDay = day.isSame(eventStart, "day");
 
   if (startsOnVisibleDay) {
-    // todo: default to .start inside function
     return icalEventToTask(icalEvent, icalEvent.start);
   }
 }
@@ -47,13 +69,12 @@ function icalEventToTask(
   icalEvent: ical.VEvent,
   date: Date,
 ): Task | UnscheduledTask {
-  const startTime = window.moment(date);
-
-  let startTimeAdjusted = startTime;
+  let startTimeAdjusted = window.moment(date);
   const tzid = icalEvent.rrule?.origOptions?.tzid;
 
   if (tzid) {
     startTimeAdjusted = adjustForDst(tzid, icalEvent.start, date);
+    startTimeAdjusted = adjustForOtherZones(tzid, startTimeAdjusted.toDate());
   }
 
   const isAllDayEvent = icalEvent.datetype === "date";
@@ -82,6 +103,27 @@ function icalEventToTask(
     durationMinutes:
       (icalEvent.end.getTime() - icalEvent.start.getTime()) / 1000 / 60,
   };
+}
+
+function adjustForOtherZones(tzid: string, currentDate: Date) {
+  const localTzid = tz.guess();
+
+  if (tzid === localTzid) {
+    return moment(currentDate);
+  }
+
+  const localTimezone = tz.zone(localTzid);
+  const originalTimezone = tz.zone(tzid);
+
+  if (!localTimezone || !originalTimezone) {
+    return moment(currentDate);
+  }
+
+  const offset =
+    localTimezone.utcOffset(currentDate.getTime()) -
+    originalTimezone.utcOffset(currentDate.getTime());
+
+  return moment(currentDate).add(offset, "minutes");
 }
 
 function adjustForDst(tzid: string, originalDate: Date, currentDate: Date) {

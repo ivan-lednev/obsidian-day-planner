@@ -5,6 +5,7 @@ export const obsidianContext = "obsidian";
 export const editContextKey = "editContext";
 export const errorContextKey = "errorContext";
 export const defaultDayFormat = "YYYY-MM-DD";
+export const originalRecurrenceDayKeyFormat = "YYYY-MM-DD";
 export const defaultDayFormatForLuxon = "yyyy-MM-dd";
 export const clockSeparator = "--";
 export const defaultDurationMinutes = 30;

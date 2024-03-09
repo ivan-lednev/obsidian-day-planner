@@ -1,6 +1,12 @@
 import type { HexString } from "obsidian";
 import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
+interface IcalConfig {
+  name: string;
+  url: string;
+  color: string;
+}
+
 export interface DayPlannerSettings {
   progressIndicator: "pie" | "bar" | "none";
   showTaskNotification: boolean;
@@ -29,7 +35,7 @@ export interface DayPlannerSettings {
   pluginVersion: string;
   showCompletedTasks: boolean;
   showSubtasksInTaskBlocks: boolean;
-  icals: Array<{ name: string; url: string }>;
+  icals: Array<IcalConfig>;
 }
 
 export const defaultSettings: DayPlannerSettings = {
