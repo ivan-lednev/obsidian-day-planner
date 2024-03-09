@@ -1,4 +1,4 @@
-import { uniqBy } from "lodash/fp";
+import { flow, uniqBy } from "lodash/fp";
 import { Moment } from "moment/moment";
 import { derived, Readable } from "svelte/store";
 
@@ -18,11 +18,15 @@ export function useDisplayedTasksForDay(
       return getEmptyRecordsForDay();
     }
 
+    const withTime = flow(
+      uniqBy(getRenderKey),
+      (task) => task,
+      addHorizontalPlacing,
+    )(tasksForDay.withTime);
+
     return {
       ...tasksForDay,
-      withTime: addHorizontalPlacing(
-        uniqBy(getRenderKey, tasksForDay.withTime),
-      ),
+      withTime,
     };
   });
 }

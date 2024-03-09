@@ -47,7 +47,6 @@ export function useIcalEvents(
 
       allCalendarsParsed.then((calendars) => {
         const allEvents = calendars.flat();
-        // window.allEvents = allEvents;
 
         set(allEvents);
       });

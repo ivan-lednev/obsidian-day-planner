@@ -8,6 +8,7 @@
 
   export let task: UnscheduledTask;
 
+  // todo: use context inside action
   const { renderMarkdown } = getContext<ObsidianContext>(obsidianContext);
 </script>
 

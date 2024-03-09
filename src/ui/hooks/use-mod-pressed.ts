@@ -1,6 +1,7 @@
 import { Keymap } from "obsidian";
 import { readable } from "svelte/store";
 
+// todo: also track 'blur'
 export function useModPressed() {
   return readable(false, (set) => {
     const handleKeyDown = (event: KeyboardEvent) => {

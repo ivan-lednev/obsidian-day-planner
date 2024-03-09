@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "build": "node esbuild.config.mjs production",
-    "format": "prettier --write src && eslint --fix src && stylelint --fix src/**/*.svelte",
+    "format": "eslint --fix src && stylelint --fix src/**/*.svelte && prettier --write src",
     "lint": "prettier --check src && eslint src && stylelint src/**/*.svelte && tsc --noEmit && svelte-check src/",
     "typescript": "tsc --noEmit",
     "test": "jest src/",
