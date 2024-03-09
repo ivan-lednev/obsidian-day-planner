@@ -2,6 +2,7 @@
   import { Task } from "../../types";
 
   import Grip from "./grip.svelte";
+  import MarkdownBlockContent from "./markdown-block-content.svelte";
   import RenderedMarkdown from "./rendered-markdown.svelte";
   import ResizeHandle from "./resize-handle.svelte";
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
@@ -14,20 +15,12 @@
 </script>
 
 <ScheduledTimeBlock {task} on:mouseup>
-  <div class="md-task-content">
+  <MarkdownBlockContent>
     <RenderedMarkdown {task} />
     <Grip cursor={gripCursor} on:mousedown={onGripMouseDown} />
     <ResizeHandle
       visible={isResizeHandleVisible}
       on:mousedown={onResizerMouseDown}
     />
-  </div>
+  </MarkdownBlockContent>
 </ScheduledTimeBlock>
-
-<style>
-  .md-task-content {
-    display: flex;
-    flex: 1 0 0;
-    padding: 4px 6px 6px;
-  }
-</style>

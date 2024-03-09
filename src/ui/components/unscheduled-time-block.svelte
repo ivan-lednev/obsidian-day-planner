@@ -2,6 +2,7 @@
   import { UnscheduledTask } from "../../types";
 
   import Grip from "./grip.svelte";
+  import MarkdownBlockContent from "./markdown-block-content.svelte";
   import RenderedMarkdown from "./rendered-markdown.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
 
@@ -11,6 +12,8 @@
 </script>
 
 <TimeBlockBase on:mouseup>
-  <RenderedMarkdown {task} />
-  <Grip cursor={gripCursor} on:mousedown={onGripMouseDown} />
+  <MarkdownBlockContent>
+    <RenderedMarkdown {task} />
+    <Grip cursor={gripCursor} on:mousedown={onGripMouseDown} />
+  </MarkdownBlockContent>
 </TimeBlockBase>

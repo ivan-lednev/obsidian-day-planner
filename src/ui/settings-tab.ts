@@ -184,7 +184,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
         const newIcal = {
           name: "",
           url: "",
-          color: "#ffffff"
+          color: "#ffffff",
         };
 
         this.settingsStore.update((previous) => ({
