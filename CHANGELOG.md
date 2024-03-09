@@ -1,3 +1,12 @@
+## 0.19.0
+
+### ✨ New Feature: Internet Calendar Sync (Google, Outlook, iCloud)
+
+- This lets you display events from calendars like Google Calendar, iCloud Calendar, Outlook Calendar
+- You only need to add a link in the plugin settings to start displaying events from that calendar
+
+See README for details.
+
 ## 0.18.0
 
 ### ✨ New features

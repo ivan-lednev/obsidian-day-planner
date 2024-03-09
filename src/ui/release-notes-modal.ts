@@ -1,6 +1,6 @@
 import { MarkdownRenderer, Modal, Plugin } from "obsidian";
 
-import { supportLink } from "../constants";
+import { supportBanner } from "../constants";
 
 export class ReleaseNotesModal extends Modal {
   constructor(private readonly plugin: Plugin) {
@@ -13,7 +13,7 @@ export class ReleaseNotesModal extends Modal {
     this.contentEl.createDiv({ cls: "support" }, async (el) => {
       await MarkdownRenderer.render(
         this.plugin.app,
-        supportLink,
+        supportBanner,
         el,
         "/",
         this.plugin,

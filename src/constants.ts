@@ -14,8 +14,14 @@ export const indentBeforeTaskParagraph = 6;
 export const clockKey = "clocked";
 export const clockFormat = "YYYY-MM-DDTHH:mm:ss";
 export const reQueryAfterMillis = 200;
-export const supportLink = `<a href="https://github.com/ivan-lednev/obsidian-day-planner?tab=readme-ov-file#support-the-project">Support the project</a>`;
 export const icalRefreshIntervalMillis = 5 * 60 * 1000;
+export const supportBanner = `Support the project:
+- 🪲 [Create issues and improvement suggestions](https://github.com/ivan-lednev/obsidian-day-planner/issues)
+- 🪛 [Submit pull-requests](./CONTRIBUTING.md)
+- ❤️ Support the project directly:
+
+  <a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+`;
 
 export const icons = [
   "any-key",
