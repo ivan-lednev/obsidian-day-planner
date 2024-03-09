@@ -24,8 +24,8 @@ test("derives task offset from settings and time", () => {
     getBaseUseTaskProps(),
   );
 
-  expect(get(offset)).toEqual(840);
-  expect(get(height)).toEqual(120);
+  expect(get(offset)).toEqual("840px");
+  expect(get(height)).toEqual("120px");
 });
 
 test.skip("tasks change position and size when zoom level changes", () => {
@@ -37,6 +37,6 @@ test.skip("tasks change position and size when zoom level changes", () => {
     zoomLevel: 1,
   }));
 
-  expect(get(offset)).toEqual(4 * 60);
-  expect(get(height)).toEqual(60);
+  expect(get(offset)).toEqual(`${4 * 60}px`);
+  expect(get(height)).toEqual("60px");
 });
