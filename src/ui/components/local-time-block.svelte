@@ -15,7 +15,7 @@
 </script>
 
 <ScheduledTimeBlock {task} on:mouseup>
-  <MarkdownBlockContent>
+  <MarkdownBlockContent {task}>
     <RenderedMarkdown {task} />
     <Grip cursor={gripCursor} on:mousedown={onGripMouseDown} />
     <ResizeHandle

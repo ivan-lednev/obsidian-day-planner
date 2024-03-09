@@ -1,4 +1,11 @@
-<div class="markdown-block-content">
+<script lang="ts">
+  import { UnscheduledTask } from "../../types";
+  import { hoverPreview } from "../actions/hover-preview";
+
+  export let task: UnscheduledTask
+</script>
+
+<div class="markdown-block-content" use:hoverPreview={task}>
   <slot />
 </div>
 

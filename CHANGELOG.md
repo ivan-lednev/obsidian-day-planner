@@ -1,3 +1,9 @@
+## 0.19.1
+
+### 🐞 Fixed issues
+
+- Fix displaying hover preview
+
 ## 0.19.0
 
 ### ✨ New Feature: Internet Calendar Sync (Google, Outlook, iCloud)
