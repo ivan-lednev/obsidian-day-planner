@@ -6,14 +6,14 @@ import { visibleDays } from "../../global-store/visible-days";
 /**
  *
  * @param layoutReady used as a proxy that lets us know when the vault is ready to be queried for daily notes
- * @param dataviewChange lets us know when some files changed, and we need to re-run
+ * @param debouncedTaskUpdateTrigger lets us know when some files changed, and we need to re-run
  */
 export function useVisibleDailyNotes(
   layoutReady: Readable<boolean>,
-  dataviewChange: Readable<unknown>,
+  debouncedTaskUpdateTrigger: Readable<unknown>,
 ) {
   return derived(
-    [layoutReady, visibleDays, dataviewChange],
+    [layoutReady, visibleDays, debouncedTaskUpdateTrigger],
     ([$layoutReady, $visibleDays]) => {
       if (!$layoutReady) {
         return [];

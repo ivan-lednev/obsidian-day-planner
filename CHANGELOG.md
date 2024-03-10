@@ -1,3 +1,7 @@
+## 0.19.5
+
+- 🐞 Fix performance on startup
+
 ## 0.19.4
 
 - 🐞 Fix colorful timeline both for local & remote calendars

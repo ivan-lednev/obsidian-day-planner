@@ -153,7 +153,10 @@ export function createHooks({
     keyDown,
     reQueryAfterMillis,
   );
-  const visibleDailyNotes = useVisibleDailyNotes(layoutReady, dataviewChange);
+  const visibleDailyNotes = useVisibleDailyNotes(
+    layoutReady,
+    debouncedTaskUpdateTrigger,
+  );
   const listsFromVisibleDailyNotes = useListsFromVisibleDailyNotes(
     visibleDailyNotes,
     debouncedTaskUpdateTrigger,
