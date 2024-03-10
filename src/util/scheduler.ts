@@ -1,3 +1,25 @@
+// @ts-expect-error
+window.requestIdleCallback =
+  requestIdleCallback ||
+  ((handler) => {
+    const startTime = Date.now();
+
+    return setTimeout(() => {
+      handler({
+        didTimeout: false,
+        timeRemaining() {
+          return Math.max(0, 50.0 - (Date.now() - startTime));
+        },
+      });
+    }, 1);
+  });
+
+window.cancelIdleCallback =
+  cancelIdleCallback ||
+  ((id) => {
+    clearTimeout(id);
+  });
+
 // todo: handle errors
 // todo: name: idleCallbackQueue
 export function createBackgroundBatchScheduler<T>(
