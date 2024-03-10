@@ -3,17 +3,27 @@ import { derived, Readable } from "svelte/store";
 
 import { visibleDays } from "../../global-store/visible-days";
 
-// We use layoutReady as a proxy to know when the vault is ready to be queried for daily nots
-export function useVisibleDailyNotes(layoutReady: Readable<boolean>) {
-  return derived([layoutReady, visibleDays], ([$layoutReady, $visibleDays]) => {
-    if (!$layoutReady) {
-      return [];
-    }
+/**
+ *
+ * @param layoutReady used as a proxy that lets us know when the vault is ready to be queried for daily notes
+ * @param dataviewChange lets us know when some files changed, and we need to re-run
+ */
+export function useVisibleDailyNotes(
+  layoutReady: Readable<boolean>,
+  dataviewChange: Readable<unknown>,
+) {
+  return derived(
+    [layoutReady, visibleDays, dataviewChange],
+    ([$layoutReady, $visibleDays]) => {
+      if (!$layoutReady) {
+        return [];
+      }
 
-    const allDailyNotes = getAllDailyNotes();
+      const allDailyNotes = getAllDailyNotes();
 
-    return $visibleDays
-      .map((day) => getDailyNote(day, allDailyNotes))
-      .filter(Boolean);
-  });
+      return $visibleDays
+        .map((day) => getDailyNote(day, allDailyNotes))
+        .filter(Boolean);
+    },
+  );
 }
