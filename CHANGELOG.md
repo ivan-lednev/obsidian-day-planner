@@ -1,3 +1,9 @@
+## 0.19.3
+
+### 🐞 Fixed issues
+
+- Fix planner not reacting to daily note creation
+
 ## 0.19.1
 
 ### 🐞 Fixed issues
