@@ -26,7 +26,7 @@ I work on this plugin in my spare time, and any kind of support is very valuable
 
 ## What it looks like
 
-![](assets/main-demo.png)
+![](assets/ical-timeline-demo.png)
 ![](assets/week.png)
 
 ## Drag-and-drop demos
@@ -73,7 +73,6 @@ Everything Dataview recognizes as a task is shown in the timeline, including:
   - [iCloud Calendar instructions](https://www.souladvisor.com/help-centre/how-to-get-icloud-calendar-address-on-mac-in-ical-format)
 
 ![](./assets/ical-settings-demo.png)
-![](./assets/ical-timeline-demo.png)
 
 ### Showing events from other files in your vault
 
