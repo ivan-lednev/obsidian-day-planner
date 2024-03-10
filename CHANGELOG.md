@@ -1,14 +1,14 @@
+## 0.19.4
+
+- 🐞 Fix colorful timeline both for local & remote calendars
+
 ## 0.19.3
 
-### 🐞 Fixed issues
-
-- Fix planner not reacting to daily note creation
+- 🐞 Fix planner not reacting to daily note creation
 
 ## 0.19.1
 
-### 🐞 Fixed issues
-
-- Fix displaying hover preview
+- 🐞 Fix displaying hover preview
 
 ## 0.19.0
 
