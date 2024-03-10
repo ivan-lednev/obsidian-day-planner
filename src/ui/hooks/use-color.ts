@@ -1,16 +1,19 @@
 import chroma from "chroma-js";
-import { derived } from "svelte/store";
+import { Readable, derived } from "svelte/store";
 
 import type { settings } from "../../global-store/settings";
-import type { Task } from "../../types";
+import type { RelationToNow, Task } from "../../types";
 import { getTextColorWithEnoughContrast } from "../../util/color";
 
 interface UseColorProps {
   settings: typeof settings;
   task: Task;
+  relationToNow: Readable<RelationToNow>;
 }
 
-export function useColor({ settings, task }: UseColorProps) {
+const defaultBorderColor = "var(--color-base-50)";
+
+export function useColor({ settings, task, relationToNow }: UseColorProps) {
   // todo: move out. We only need one for all tasks
   const colorScale = derived(settings, ($settings) => {
     return chroma
@@ -19,10 +22,9 @@ export function useColor({ settings, task }: UseColorProps) {
   });
 
   const backgroundColor = derived(
-    [settings, colorScale],
-    ([$settings, $colorScale]) => {
-      // TODO: remove startTime once task creation returns consistent tasks
-      if ($settings.timelineColored && task.startTime) {
+    [settings, colorScale, relationToNow],
+    ([$settings, $colorScale, $relationToNow]) => {
+      if ($settings.timelineColored) {
         const scaleKey =
           (task.startTime.hour() - $settings.startHour) /
           (24 - $settings.startHour);
@@ -30,15 +32,24 @@ export function useColor({ settings, task }: UseColorProps) {
         return $colorScale(scaleKey).hex();
       }
 
+      if ($relationToNow === "past") {
+        return "var(--background-secondary)";
+      }
+
       return "var(--background-primary)";
     },
   );
 
+  const borderColor = derived(relationToNow, ($relationToNow) => {
+    return $relationToNow === "present"
+      ? "var(--color-accent)"
+      : defaultBorderColor;
+  });
+
   const properContrastColors = derived(
     [settings, backgroundColor],
     ([$settings, $backgroundColor]) => {
-      // TODO: remove startTime once task creation returns consistent tasks
-      if ($settings.timelineColored && task.startTime) {
+      if ($settings.timelineColored) {
         return getTextColorWithEnoughContrast($backgroundColor);
       }
 
@@ -46,5 +57,5 @@ export function useColor({ settings, task }: UseColorProps) {
     },
   );
 
-  return { properContrastColors, backgroundColor };
+  return { properContrastColors, backgroundColor, borderColor };
 }

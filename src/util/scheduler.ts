@@ -1,3 +1,4 @@
+// todo: delete once iOS bug is fixed. Obsidian adds this shim anyway
 // @ts-expect-error
 window.requestIdleCallback =
   requestIdleCallback ||

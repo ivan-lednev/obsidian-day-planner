@@ -36,6 +36,8 @@
 
     padding: 4px 6px 6px;
     padding-left: calc(4px + var(--size-4-2));
+
+    color: var(--text-normal);
   }
 
   .ribbon {

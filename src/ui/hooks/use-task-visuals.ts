@@ -14,13 +14,16 @@ interface UseTaskVisualsProps {
   currentTime: Readable<Moment>;
 }
 
-const defaultBorderColor = "var(--color-base-50)";
-
 export function useTaskVisuals(
   task: Task,
   { settings, currentTime }: UseTaskVisualsProps,
 ) {
-  const useColorValues = useColor({ settings, task });
+  const relationToNow = derived(currentTime, ($currentTime) => {
+    return getRelationToNow($currentTime, task.startTime, getEndTime(task));
+  });
+
+  const color = useColor({ settings, task, relationToNow });
+
   const width = `${task.placing?.widthPercent || 100}%`;
   const left = `${task.placing?.xOffsetPercent || 0}%`;
 
@@ -35,29 +38,11 @@ export function useTaskVisuals(
     return `${task.durationMinutes * $settings.zoomLevel}px`;
   });
 
-  const relationToNow = derived(currentTime, ($currentTime) => {
-    return getRelationToNow($currentTime, task.startTime, getEndTime(task));
-  });
-
-  const backgroundColor = derived(relationToNow, ($relationToNow) => {
-    return $relationToNow === "past"
-      ? "var(--background-secondary)"
-      : "var(--background-primary)";
-  });
-
-  const borderColor = derived(relationToNow, ($relationToNow) => {
-    return $relationToNow === "present"
-      ? "var(--color-accent)"
-      : defaultBorderColor;
-  });
-
   return {
-    ...useColorValues,
+    ...color,
     width,
     left,
     offset,
     height,
-    borderColor,
-    backgroundColor,
   };
 }
