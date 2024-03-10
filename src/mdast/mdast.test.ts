@@ -1,6 +1,4 @@
-import { fromMarkdown } from "mdast-util-from-markdown";
-
-import { toMarkdown } from "./mdast";
+import { fromMarkdown, toMarkdown } from "./mdast";
 
 test("roundtripping doesn't mess up Obsidian-styled markdown", () => {
   const input = `# [[Heading]]
