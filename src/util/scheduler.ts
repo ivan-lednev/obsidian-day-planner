@@ -1,22 +1,30 @@
-// todo: delete once iOS bug is fixed. Obsidian adds this shim anyway
-// @ts-expect-error
-window.requestIdleCallback =
-  requestIdleCallback ||
-  ((handler) => {
-    const startTime = Date.now();
+/**
+ * This is needed for iOS Safari. Obsidian might add its own shims. We don't want to mess with those.
+ */
+const enqueueJob =
+  window.requestIdleCallback ||
+  ((callback, options) => {
+    const optionsWithDefaults = options || {};
+    const relaxation = 1;
+    const timeout = optionsWithDefaults.timeout || relaxation;
+    const start = performance.now();
 
-    return setTimeout(() => {
-      handler({
-        didTimeout: false,
-        timeRemaining() {
-          return Math.max(0, 50.0 - (Date.now() - startTime));
+    return window.setTimeout(() => {
+      callback({
+        get didTimeout() {
+          return optionsWithDefaults.timeout
+            ? false
+            : performance.now() - start - relaxation > timeout;
+        },
+        timeRemaining: function () {
+          return Math.max(0, relaxation + (performance.now() - start));
         },
       });
-    }, 1);
+    }, relaxation);
   });
 
-window.cancelIdleCallback =
-  cancelIdleCallback ||
+const cancelJob =
+  window.cancelIdleCallback ||
   ((id) => {
     clearTimeout(id);
   });
@@ -47,16 +55,14 @@ export function createBackgroundBatchScheduler<T>(
     }
 
     if (tasks.length > 0) {
-      currentTaskHandle = requestIdleCallback(runTaskQueue);
+      currentTaskHandle = enqueueJob(runTaskQueue);
     } else {
       performance.mark("batch-end");
-      const { duration } = performance.measure(
-        "batch",
-        "batch-start",
-        "batch-end",
-      );
-      // todo: move out
-      console.log("Batch duration: ", duration);
+      // const { duration } = performance.measure(
+      //   "batch",
+      //   "batch-start",
+      //   "batch-end",
+      // );
 
       onFinish(results);
       currentTaskHandle = null;
@@ -66,13 +72,13 @@ export function createBackgroundBatchScheduler<T>(
   function enqueueTasks(newTasks: Array<() => T>) {
     performance.mark("batch-start");
     if (currentTaskHandle) {
-      cancelIdleCallback(currentTaskHandle);
+      cancelJob(currentTaskHandle);
       currentTaskHandle = null;
     }
 
     tasks = newTasks;
     results = [];
-    currentTaskHandle = requestIdleCallback(runTaskQueue);
+    currentTaskHandle = enqueueJob(runTaskQueue);
   }
 
   return { enqueueTasks };
