@@ -1,17 +1,9 @@
-## 0.19.5
+## 0.19.1 - 0.19.6
 
+- 🐞 Fix iOS crash
 - 🐞 Fix performance on startup
-
-## 0.19.4
-
 - 🐞 Fix colorful timeline both for local & remote calendars
-
-## 0.19.3
-
 - 🐞 Fix planner not reacting to daily note creation
-
-## 0.19.1
-
 - 🐞 Fix displaying hover preview
 
 ## 0.19.0
