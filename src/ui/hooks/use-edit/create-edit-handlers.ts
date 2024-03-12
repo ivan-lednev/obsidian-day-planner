@@ -9,13 +9,15 @@ import { EditMode, EditOperation } from "./types";
 
 export interface UseEditHandlersProps {
   startEdit: (operation: EditOperation) => void;
+  // todo: make dynamic, since it can change?
   day: Moment;
   obsidianFacade: ObsidianFacade;
   cursorMinutes: Readable<number>;
   editOperation: Writable<EditOperation>;
 }
 
-export function useEditHandlers({
+// todo: rename without `use`, there are no custom stores here
+export function createEditHandlers({
   day,
   obsidianFacade,
   startEdit,
@@ -69,7 +71,18 @@ export function useEditHandlers({
     startEdit({ task: withAddedTime, mode: EditMode.DRAG, day });
   }
 
+  function handleMouseEnter() {
+    editOperation.update(
+      (previous) =>
+        previous && {
+          ...previous,
+          day,
+        },
+    );
+  }
+
   return {
+    handleMouseEnter,
     handleGripMouseDown,
     handleContainerMouseDown,
     handleResizerMouseDown,

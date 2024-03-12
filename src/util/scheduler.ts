@@ -30,7 +30,6 @@ const cancelJob =
   });
 
 // todo: handle errors
-// todo: name: idleCallbackQueue
 export function createBackgroundBatchScheduler<T>(
   onFinish: (results: T[]) => void,
 ) {

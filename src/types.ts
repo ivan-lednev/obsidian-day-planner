@@ -78,7 +78,7 @@ export interface ObsidianContext {
   refreshTasks: (source: string) => void;
   dataviewLoaded: Writable<boolean>;
   renderMarkdown: RenderMarkdown;
-  editContext: Readable<ReturnType<typeof useEditContext>>;
+  editContext: ReturnType<typeof useEditContext>;
   visibleTasks: Readable<Tasks>;
   clockOut: (sTask: STask) => void;
   cancelClock: (sTask: STask) => void;

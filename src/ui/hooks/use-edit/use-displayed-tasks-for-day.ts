@@ -12,6 +12,7 @@ export function useDisplayedTasksForDay(
   day: Moment,
 ) {
   return derived(displayedTasks, ($displayedTasks) => {
+    // todo: displayedTasks may be empty
     const tasksForDay = $displayedTasks[getDayKey(day)];
 
     if (!tasksForDay) {

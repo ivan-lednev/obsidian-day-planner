@@ -1,26 +1,25 @@
 import { Moment } from "moment";
-import { writable } from "svelte/store";
+import { Readable, writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
 import { DayPlannerSettings } from "../../../settings";
 import { OnUpdateFn, TasksForDay } from "../../../types";
 
+import { createEditHandlers } from "./create-edit-handlers";
 import { EditOperation } from "./types";
 import { useCursorMinutes } from "./use-cursor-minutes";
 import { useDisplayedTasks } from "./use-displayed-tasks";
 import { useDisplayedTasksForDay } from "./use-displayed-tasks-for-day";
 import { useEditActions } from "./use-edit-actions";
-import { useEditHandlers } from "./use-edit-handlers";
 
 export interface UseEditContextProps {
   obsidianFacade: ObsidianFacade;
   onUpdate: OnUpdateFn;
-  settings: DayPlannerSettings;
-  visibleTasks: Record<string, TasksForDay>;
+  settings: Readable<DayPlannerSettings>;
+  visibleTasks: Readable<Record<string, TasksForDay>>;
 }
 
-export type EditContext = ReturnType<typeof useEditContext>;
-
+// todo: the name is misleading
 export function useEditContext({
   obsidianFacade,
   onUpdate,
@@ -31,7 +30,11 @@ export function useEditContext({
   const pointerOffsetY = writable(0);
   const cursorMinutes = useCursorMinutes(pointerOffsetY, settings);
 
-  const baselineTasks = writable(visibleTasks);
+  // todo: change misleading name
+  const baselineTasks = writable(undefined, (set) => {
+    return visibleTasks.subscribe(set);
+  });
+
   const displayedTasks = useDisplayedTasks({
     baselineTasks,
     editOperation,
@@ -46,7 +49,7 @@ export function useEditContext({
   });
 
   function getEditHandlers(day: Moment) {
-    const handlers = useEditHandlers({
+    const handlers = createEditHandlers({
       day,
       obsidianFacade,
       startEdit,
@@ -54,19 +57,8 @@ export function useEditContext({
       editOperation,
     });
 
-    function handleMouseEnter() {
-      editOperation.update(
-        (previous) =>
-          previous && {
-            ...previous,
-            day,
-          },
-      );
-    }
-
     return {
       ...handlers,
-      handleMouseEnter,
       cancelEdit,
       pointerOffsetY,
       displayedTasks: useDisplayedTasksForDay(displayedTasks, day),

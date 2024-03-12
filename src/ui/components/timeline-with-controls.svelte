@@ -17,11 +17,11 @@
   export let hideControls = false;
   export let day: Moment | undefined = undefined;
 
+  const {
+    editContext: { editOperation, getEditHandlers },
+  } = getContext<ObsidianContext>(obsidianContext);
+
   $: actualDay = day || $visibleDayInTimeline;
-
-  const { editContext } = getContext<ObsidianContext>(obsidianContext);
-
-  $: ({ editOperation, getEditHandlers } = $editContext);
   $: ({
     displayedTasks,
     cancelEdit,
@@ -29,6 +29,7 @@
     handleUnscheduledTaskGripMouseDown,
   } = getEditHandlers(actualDay));
 
+  // todo: move out
   $: ({ bodyCursor, gripCursor } = useCursor({
     editMode: $editOperation?.mode,
   }));
@@ -54,4 +55,4 @@
     </UnscheduledTaskContainer>
   {/if}
 {/if}
-<Timeline {day} {hideControls} />
+<Timeline day={actualDay} {hideControls} />

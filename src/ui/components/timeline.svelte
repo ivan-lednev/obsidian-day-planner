@@ -12,7 +12,6 @@
   import { styledCursor } from "../actions/styled-cursor";
   import { useCursor } from "../hooks/use-edit/cursor";
 
-
   import Column from "./column.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Needle from "./needle.svelte";
@@ -20,16 +19,16 @@
   import Ruler from "./ruler.svelte";
   import ScheduledTaskContainer from "./scheduled-task-container.svelte";
   import Scroller from "./scroller.svelte";
-  
-// TODO: showRuler or add <slot name="left-gutter" />
+
+  // TODO: showRuler or add <slot name="left-gutter" />
   export let hideControls = false;
   export let day: Moment | undefined = undefined;
 
+  const {
+    editContext: { confirmEdit, editOperation, getEditHandlers },
+  } = getContext<ObsidianContext>(editContextKey);
+
   $: actualDay = day || $visibleDayInTimeline;
-
-  const { editContext } = getContext<ObsidianContext>(editContextKey);
-
-  $: ({ confirmEdit, editOperation, getEditHandlers } = $editContext);
   $: ({
     displayedTasks,
     cancelEdit,
@@ -41,6 +40,7 @@
     pointerOffsetY,
   } = getEditHandlers(actualDay));
 
+  // todo: move out of component
   $: ({ bodyCursor, gripCursor } = useCursor({
     editMode: $editOperation?.mode,
   }));

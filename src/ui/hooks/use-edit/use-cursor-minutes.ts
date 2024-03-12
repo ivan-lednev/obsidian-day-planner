@@ -5,9 +5,9 @@ import { offsetYToMinutes } from "../../../util/task-utils";
 
 export function useCursorMinutes(
   pointerOffsetY: Readable<number>,
-  settings: DayPlannerSettings,
+  settings: Readable<DayPlannerSettings>,
 ) {
-  return derived(pointerOffsetY, ($pointerOffsetY) =>
-    offsetYToMinutes($pointerOffsetY, settings.zoomLevel, settings.startHour),
+  return derived([pointerOffsetY, settings], ([$pointerOffsetY, $settings]) =>
+    offsetYToMinutes($pointerOffsetY, $settings.zoomLevel, $settings.startHour),
   );
 }

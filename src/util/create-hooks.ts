@@ -181,8 +181,6 @@ export function createHooks({
       mergeTasks($visibleDataviewTasks, $visibleDayToEventOccurences),
   );
 
-  visibleTasks.subscribe(console.log);
-
   const tasksForToday = derived(
     [visibleTasks, currentTime],
     ([$visibleTasks, $currentTime]) => {
@@ -190,18 +188,12 @@ export function createHooks({
     },
   );
 
-  // TODO: unwrap the hook from the derived store to remove extra-indirection
-  const editContext = derived(
-    [settingsStore, visibleTasks],
-    ([$settings, $visibleTasks]) => {
-      return useEditContext({
-        obsidianFacade,
-        onUpdate: planEditor.syncTasksWithFile,
-        settings: $settings,
-        visibleTasks: $visibleTasks,
-      });
-    },
-  );
+  const editContext = useEditContext({
+    obsidianFacade,
+    onUpdate: planEditor.syncTasksWithFile,
+    settings: settingsStore,
+    visibleTasks,
+  });
 
   const newlyStartedTasks = useNewlyStartedTasks({
     settings: settingsStore,
