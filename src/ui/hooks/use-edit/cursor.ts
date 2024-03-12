@@ -1,30 +1,29 @@
-import { EditMode } from "./types";
+import { derived, Readable } from "svelte/store";
 
-interface UseCursorProps {
-  editMode: EditMode;
-}
+import { EditMode, EditOperation } from "./types";
 
-export function useCursor({ editMode }: UseCursorProps) {
-  if (
-    editMode === EditMode.CREATE ||
-    editMode === EditMode.DRAG ||
-    editMode === EditMode.DRAG_AND_SHIFT_OTHERS
-  ) {
+export function useCursor(editOperation: Readable<EditOperation>) {
+  return derived(editOperation, ($editOperation) => {
+    const { mode } = $editOperation;
+
+    if (
+      mode === EditMode.CREATE ||
+      mode === EditMode.DRAG ||
+      mode === EditMode.DRAG_AND_SHIFT_OTHERS
+    ) {
+      return {
+        bodyCursor: "grabbing",
+        gripCursor: "grabbing",
+      };
+    }
+
+    if (mode === EditMode.RESIZE || mode === EditMode.RESIZE_AND_SHIFT_OTHERS) {
+      return { bodyCursor: "row-resize", gripCursor: "grab" };
+    }
+
     return {
-      bodyCursor: "grabbing",
-      gripCursor: "grabbing",
+      bodyCursor: "unset",
+      gripCursor: "grab",
     };
-  }
-
-  if (
-    editMode === EditMode.RESIZE ||
-    editMode === EditMode.RESIZE_AND_SHIFT_OTHERS
-  ) {
-    return { bodyCursor: "row-resize", gripCursor: "grab" };
-  }
-
-  return {
-    bodyCursor: "unset",
-    gripCursor: "grab",
-  };
+  });
 }

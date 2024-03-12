@@ -6,6 +6,7 @@ import { DayPlannerSettings } from "../../../settings";
 import { OnUpdateFn, TasksForDay } from "../../../types";
 
 import { createEditHandlers } from "./create-edit-handlers";
+import { useCursor } from "./cursor";
 import { EditOperation } from "./types";
 import { useCursorMinutes } from "./use-cursor-minutes";
 import { useDisplayedTasks } from "./use-displayed-tasks";
@@ -27,6 +28,7 @@ export function useEditContext({
   visibleTasks,
 }: UseEditContextProps) {
   const editOperation = writable<EditOperation | undefined>();
+  const cursor = useCursor(editOperation);
   const pointerOffsetY = writable(0);
   const cursorMinutes = useCursorMinutes(pointerOffsetY, settings);
 
@@ -59,6 +61,7 @@ export function useEditContext({
 
     return {
       ...handlers,
+      cursor,
       cancelEdit,
       pointerOffsetY,
       displayedTasks: useDisplayedTasksForDay(displayedTasks, day),

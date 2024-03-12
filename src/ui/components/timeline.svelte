@@ -10,7 +10,6 @@
   import { isToday } from "../../util/moment";
   import { getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
-  import { useCursor } from "../hooks/use-edit/cursor";
 
   import Column from "./column.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
@@ -38,16 +37,12 @@
     handleGripMouseDown,
     handleMouseEnter,
     pointerOffsetY,
+    cursor,
   } = getEditHandlers(actualDay));
-
-  // todo: move out of component
-  $: ({ bodyCursor, gripCursor } = useCursor({
-    editMode: $editOperation?.mode,
-  }));
 </script>
 
 <svelte:window on:blur={cancelEdit} />
-<svelte:body use:styledCursor={bodyCursor} />
+<svelte:body use:styledCursor={$cursor.bodyCursor} />
 <svelte:document on:mouseup={cancelEdit} />
 
 <Scroller let:hovering={autoScrollBlocked}>
@@ -71,7 +66,7 @@
           <RemoteTimeBlock {task} />
         {:else}
           <LocalTimeBlock
-            {gripCursor}
+            gripCursor={$cursor.gripCursor}
             isResizeHandleVisible={!$editOperation}
             onGripMouseDown={(event) => handleGripMouseDown(event, task)}
             onResizerMouseDown={(event) => handleResizerMouseDown(event, task)}

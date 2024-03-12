@@ -7,36 +7,33 @@
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import type { ObsidianContext } from "../../types";
   import { styledCursor } from "../actions/styled-cursor";
-  import { useCursor } from "../hooks/use-edit/cursor";
 
   import TimelineControls from "./timeline-controls.svelte";
   import Timeline from "./timeline.svelte";
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
+  // todo: refactor to remove this one
   export let hideControls = false;
   export let day: Moment | undefined = undefined;
 
   const {
-    editContext: { editOperation, getEditHandlers },
+    editContext: { getEditHandlers },
   } = getContext<ObsidianContext>(obsidianContext);
 
+  // todo: refactor to remove this one
   $: actualDay = day || $visibleDayInTimeline;
   $: ({
     displayedTasks,
     cancelEdit,
+    cursor,
     handleTaskMouseUp,
     handleUnscheduledTaskGripMouseDown,
   } = getEditHandlers(actualDay));
-
-  // todo: move out
-  $: ({ bodyCursor, gripCursor } = useCursor({
-    editMode: $editOperation?.mode,
-  }));
 </script>
 
 <svelte:window on:blur={cancelEdit} />
-<svelte:body use:styledCursor={bodyCursor} />
+<svelte:body use:styledCursor={$cursor.bodyCursor} />
 <svelte:document on:mouseup={cancelEdit} />
 
 {#if !hideControls}
@@ -46,7 +43,7 @@
     <UnscheduledTaskContainer>
       {#each $displayedTasks.noTime as task}
         <UnscheduledTimeBlock
-          {gripCursor}
+          gripCursor={$cursor.gripCursor}
           onGripMouseDown={() => handleUnscheduledTaskGripMouseDown(task)}
           {task}
           on:mouseup={() => handleTaskMouseUp(task)}
