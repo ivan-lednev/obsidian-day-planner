@@ -99,6 +99,7 @@
 [data-type="weekly"] .view-content,
 [data-type="timeTracker"] .view-content {
   --time-ruler-width: 30px;
+  --scrollbar-width: 12px;
 
   display: flex;
   flex-direction: column;

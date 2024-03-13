@@ -7,6 +7,7 @@
   import type { ObsidianContext } from "../../types";
   import { styledCursor } from "../actions/styled-cursor";
 
+  import Scroller from "./scroller.svelte";
   import TimelineControls from "./timeline-controls.svelte";
   import Timeline from "./timeline.svelte";
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
@@ -33,8 +34,13 @@
     <TimelineControls />
     <UnscheduledTaskContainer day={actualDay} />
   </div>
+  <Scroller let:hovering={autoScrollBlocked}>
+    <Timeline day={actualDay} {hideControls} />
+  </Scroller>
+  <!--  todo; clean up-->
+{:else}
+  <Timeline day={actualDay} {hideControls} />
 {/if}
-<Timeline day={actualDay} {hideControls} />
 
 <style>
   .controls {

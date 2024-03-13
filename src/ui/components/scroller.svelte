@@ -14,6 +14,7 @@
   class="scroller"
   on:mouseenter={handleMouseEnter}
   on:mouseleave={handleMouseLeave}
+  on:scroll
 >
   <div class="stretcher">
     <slot {hovering} />

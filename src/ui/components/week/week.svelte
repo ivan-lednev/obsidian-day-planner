@@ -9,13 +9,23 @@
   import { isToday } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
   import Ruler from "../ruler.svelte";
+  import Scroller from "../scroller.svelte";
   import TimelineWithControls from "../timeline-with-controls.svelte";
   import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
 
   const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
+
+  let weekHeaderRef: HTMLDivElement | undefined;
+
+  function handleScroll(event: Event) {
+    if (weekHeaderRef) {
+      // @ts-expect-error
+      weekHeaderRef.scrollLeft = event.target?.scrollLeft
+    }
+  }
 </script>
 
-<div class="week-header">
+<div bind:this={weekHeaderRef} class="week-header">
   <div class="header-row day-buttons">
     <div class="corner"></div>
     {#each $visibleDateRange as day}
@@ -34,26 +44,27 @@
   <div class="header-row">
     <div class="corner"></div>
     {#each $visibleDateRange as day}
-      <div class="header-cell">
+      <div class="header-cell unscheduled-tasks">
         <UnscheduledTaskContainer {day} />
       </div>
     {/each}
   </div>
 </div>
 
-<div class="day-columns">
+<Scroller on:scroll={handleScroll} let:hovering={autoScrollBlocked}>
   <Ruler visibleHours={getVisibleHours($settings)} />
   {#each $visibleDateRange as day}
     <div class="day-column">
-      <div class="stretcher">
-        <!--    TODO: remove the wrapper    -->
-        <TimelineWithControls {day} hideControls />
-      </div>
+      <TimelineWithControls {day} hideControls />
     </div>
   {/each}
-</div>
+</Scroller>
 
 <style>
+  .unscheduled-tasks:last-child {
+    flex: 1 0 calc(200px + var(--scrollbar-width));
+  }
+
   .header-row {
     display: flex;
   }
@@ -76,10 +87,6 @@
     border-left: none;
   }
 
-  .day-columns {
-    display: flex;
-  }
-
   .day-column {
     display: flex;
     flex: 1 0 200px;
@@ -90,10 +97,7 @@
   }
 
   .week-header {
-    position: sticky;
-    z-index: 10;
-    top: 0;
-
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
   }
@@ -110,9 +114,5 @@
   .today {
     color: white;
     background-color: var(--color-accent);
-  }
-
-  .stretcher {
-    display: flex;
   }
 </style>

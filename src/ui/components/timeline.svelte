@@ -13,11 +13,9 @@
 
   import Column from "./column.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
-  import Needle from "./needle.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
   import Ruler from "./ruler.svelte";
   import ScheduledTaskContainer from "./scheduled-task-container.svelte";
-  import Scroller from "./scroller.svelte";
 
   // TODO: showRuler or add <slot name="left-gutter" />
   export let hideControls = false;
@@ -45,36 +43,35 @@
 <svelte:body use:styledCursor={$cursor.bodyCursor} />
 <svelte:document on:mouseup={cancelEdit} />
 
-<Scroller let:hovering={autoScrollBlocked}>
-  {#if !hideControls}
-    <Ruler visibleHours={getVisibleHours($settings)} />
+{#if !hideControls}
+  <Ruler visibleHours={getVisibleHours($settings)} />
+{/if}
+
+<Column visibleHours={getVisibleHours($settings)}>
+  {#if isToday(actualDay)}
+    <!--      todo: pass variable through props -->
+    <!--      <Needle {autoScrollBlocked} />-->
   {/if}
 
-  <Column visibleHours={getVisibleHours($settings)}>
-    {#if isToday(actualDay)}
-      <Needle {autoScrollBlocked} />
-    {/if}
-
-    <ScheduledTaskContainer
-      {pointerOffsetY}
-      on:mousedown={handleContainerMouseDown}
-      on:mouseenter={handleMouseEnter}
-      on:mouseup={confirmEdit}
-    >
-      {#each $displayedTasks.withTime as task (getRenderKey(task))}
-        {#if task.calendar}
-          <RemoteTimeBlock {task} />
-        {:else}
-          <LocalTimeBlock
-            gripCursor={$cursor.gripCursor}
-            isResizeHandleVisible={!$editOperation}
-            onGripMouseDown={(event) => handleGripMouseDown(event, task)}
-            onResizerMouseDown={(event) => handleResizerMouseDown(event, task)}
-            {task}
-            on:mouseup={() => handleTaskMouseUp(task)}
-          />
-        {/if}
-      {/each}
-    </ScheduledTaskContainer>
-  </Column>
-</Scroller>
+  <ScheduledTaskContainer
+    {pointerOffsetY}
+    on:mousedown={handleContainerMouseDown}
+    on:mouseenter={handleMouseEnter}
+    on:mouseup={confirmEdit}
+  >
+    {#each $displayedTasks.withTime as task (getRenderKey(task))}
+      {#if task.calendar}
+        <RemoteTimeBlock {task} />
+      {:else}
+        <LocalTimeBlock
+          gripCursor={$cursor.gripCursor}
+          isResizeHandleVisible={!$editOperation}
+          onGripMouseDown={(event) => handleGripMouseDown(event, task)}
+          onResizerMouseDown={(event) => handleResizerMouseDown(event, task)}
+          {task}
+          on:mouseup={() => handleTaskMouseUp(task)}
+        />
+      {/if}
+    {/each}
+  </ScheduledTaskContainer>
+</Column>
