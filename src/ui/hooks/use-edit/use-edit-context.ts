@@ -68,9 +68,12 @@ export function useEditContext({
     };
   }
 
+  // todo: return stuff only once
   return {
+    cursor,
     displayedTasks,
     confirmEdit,
+    cancelEdit,
     getEditHandlers,
     editOperation,
   };

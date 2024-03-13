@@ -8,9 +8,10 @@
   import type { ObsidianContext } from "../../../types";
   import { isToday } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
+  import GlobalHandlers from "../global-handlers.svelte"
   import Ruler from "../ruler.svelte";
   import Scroller from "../scroller.svelte";
-  import TimelineWithControls from "../timeline-with-controls.svelte";
+  import Timeline from "../timeline.svelte";
   import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
 
   const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
@@ -24,6 +25,8 @@
     }
   }
 </script>
+
+<GlobalHandlers />
 
 <div bind:this={weekHeaderRef} class="week-header">
   <div class="header-row day-buttons">
@@ -55,7 +58,7 @@
   <Ruler visibleHours={getVisibleHours($settings)} />
   {#each $visibleDateRange as day}
     <div class="day-column">
-      <TimelineWithControls {day} hideControls />
+      <Timeline {day} />
     </div>
   {/each}
 </Scroller>

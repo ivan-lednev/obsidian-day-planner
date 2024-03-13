@@ -13,13 +13,13 @@
 
   import Column from "./column.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
+  import Needle from "./needle.svelte"
   import RemoteTimeBlock from "./remote-time-block.svelte";
-  import Ruler from "./ruler.svelte";
   import ScheduledTaskContainer from "./scheduled-task-container.svelte";
 
   // TODO: showRuler or add <slot name="left-gutter" />
-  export let hideControls = false;
   export let day: Moment | undefined = undefined;
+  export let isUnderCursor = false;
 
   const {
     editContext: { confirmEdit, editOperation, getEditHandlers },
@@ -43,14 +43,9 @@
 <svelte:body use:styledCursor={$cursor.bodyCursor} />
 <svelte:document on:mouseup={cancelEdit} />
 
-{#if !hideControls}
-  <Ruler visibleHours={getVisibleHours($settings)} />
-{/if}
-
 <Column visibleHours={getVisibleHours($settings)}>
   {#if isToday(actualDay)}
-    <!--      todo: pass variable through props -->
-    <!--      <Needle {autoScrollBlocked} />-->
+      <Needle autoScrollBlocked={isUnderCursor} />
   {/if}
 
   <ScheduledTaskContainer
