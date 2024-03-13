@@ -2,14 +2,12 @@ import { derived, Readable } from "svelte/store";
 
 import { EditMode, EditOperation } from "./types";
 
-export function useCursor(editOperation: Readable<EditOperation>) {
+export function useCursor(editOperation: Readable<EditOperation | undefined>) {
   return derived(editOperation, ($editOperation) => {
-    const { mode } = $editOperation;
-
     if (
-      mode === EditMode.CREATE ||
-      mode === EditMode.DRAG ||
-      mode === EditMode.DRAG_AND_SHIFT_OTHERS
+      $editOperation?.mode === EditMode.CREATE ||
+      $editOperation?.mode === EditMode.DRAG ||
+      $editOperation?.mode === EditMode.DRAG_AND_SHIFT_OTHERS
     ) {
       return {
         bodyCursor: "grabbing",
@@ -17,7 +15,10 @@ export function useCursor(editOperation: Readable<EditOperation>) {
       };
     }
 
-    if (mode === EditMode.RESIZE || mode === EditMode.RESIZE_AND_SHIFT_OTHERS) {
+    if (
+      $editOperation?.mode === EditMode.RESIZE ||
+      $editOperation?.mode === EditMode.RESIZE_AND_SHIFT_OTHERS
+    ) {
       return { bodyCursor: "row-resize", gripCursor: "grab" };
     }
 

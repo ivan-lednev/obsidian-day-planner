@@ -33,7 +33,7 @@ export function useEditContext({
   const cursorMinutes = useCursorMinutes(pointerOffsetY, settings);
 
   // todo: change misleading name
-  const baselineTasks = writable(undefined, (set) => {
+  const baselineTasks = writable({}, (set) => {
     return visibleTasks.subscribe(set);
   });
 
