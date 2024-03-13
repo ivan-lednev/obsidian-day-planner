@@ -34,7 +34,7 @@
     flex: 1 0 0;
     flex-direction: column;
 
-    padding: 4px 6px 6px;
+    padding: var(--size-2-1) var(--size-4-1);
     padding-left: calc(4px + var(--size-4-2));
 
     color: var(--text-normal);

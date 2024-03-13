@@ -20,7 +20,7 @@
   function handleScroll(event: Event) {
     if (weekHeaderRef) {
       // @ts-expect-error
-      weekHeaderRef.scrollLeft = event.target?.scrollLeft
+      weekHeaderRef.scrollLeft = event.target?.scrollLeft;
     }
   }
 </script>
@@ -44,7 +44,7 @@
   <div class="header-row">
     <div class="corner"></div>
     {#each $visibleDateRange as day}
-      <div class="header-cell unscheduled-tasks">
+      <div class="header-cell">
         <UnscheduledTaskContainer {day} />
       </div>
     {/each}
@@ -61,10 +61,6 @@
 </Scroller>
 
 <style>
-  .unscheduled-tasks:last-child {
-    flex: 1 0 calc(200px + var(--scrollbar-width));
-  }
-
   .header-row {
     display: flex;
   }
@@ -96,6 +92,10 @@
     border-right: 1px solid var(--background-modifier-border);
   }
 
+  .day-column:last-child {
+    border-right: none;
+  }
+
   .week-header {
     overflow-x: hidden;
     display: flex;
@@ -109,6 +109,11 @@
     background-color: var(--background-primary);
     border-right: 1px solid var(--background-modifier-border);
     border-bottom: 1px solid var(--background-modifier-border);
+  }
+
+  .header-cell:last-child {
+    flex: 1 0 calc(200px + var(--scrollbar-width));
+    border-right: none;
   }
 
   .today {
