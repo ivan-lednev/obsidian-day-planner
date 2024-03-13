@@ -21,6 +21,7 @@ I work on this plugin in my spare time, and any kind of support is very valuable
     - [Where to get a Google Calendar link](#where-to-get-a-google-calendar-link)
     - [Where to get an iCloud link](#where-to-get-an-icloud-link)
     - [Where to get an Outlook link](#where-to-get-an-outlook-link)
+      - [Alternative](#alternative)
   - [Showing events from other files in your vault](#showing-events-from-other-files-in-your-vault)
 - [What else you can do](#what-else-you-can-do)
 - [Commands](#commands)
@@ -91,6 +92,10 @@ Here's the relevant part:
 
 Here's how the settings look on the web version:
 ![](./assets/outlook-guide-1.png)
+
+##### Alternative
+
+If your organization doesn't let you share your calendar this way, you might try [a different way described in this issue](https://github.com/ivan-lednev/obsidian-day-planner/issues/395).
 
 ### Showing events from other files in your vault
 
