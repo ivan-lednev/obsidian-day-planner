@@ -18,6 +18,9 @@ I work on this plugin in my spare time, and any kind of support is very valuable
 - [How to use it](#how-to-use-it)
   - [Showing events from your daily notes](#showing-events-from-your-daily-notes)
   - [Showing internet calendars](#showing-internet-calendars)
+    - [Where to get a Google Calendar link](#where-to-get-a-google-calendar-link)
+    - [Where to get an iCloud link](#where-to-get-an-icloud-link)
+    - [Where to get an Outlook link](#where-to-get-an-outlook-link)
   - [Showing events from other files in your vault](#showing-events-from-other-files-in-your-vault)
 - [What else you can do](#what-else-you-can-do)
 - [Commands](#commands)
@@ -67,12 +70,27 @@ Everything Dataview recognizes as a task is shown in the timeline, including:
 
 ### Showing internet calendars
 
-- To show events from internet calendars like **Google Calendar, iCloud Calendar and Outlook** you only need to add an ICS link in the plugin settings. See where to get this link:
-  - [Google Calendar instructions](https://support.google.com/calendar/answer/37648?hl=en#zippy=%2Csync-your-google-calendar-view-edit%2Cget-your-calendar-view-only)
-  - [Outlook Calendar instructions](https://support.microsoft.com/en-us/office/introduction-to-publishing-internet-calendars-a25e68d6-695a-41c6-a701-103d44ba151d?ui=en-us&rs=en-us&ad=us)
-  - [iCloud Calendar instructions](https://www.souladvisor.com/help-centre/how-to-get-icloud-calendar-address-on-mac-in-ical-format)
+To show events from internet calendars like **Google Calendar, iCloud Calendar and Outlook** you only need to add an ICS link in the plugin settings.
 
 ![](./assets/ical-settings-demo.png)
+
+#### Where to get a Google Calendar link
+
+[Google Calendar instructions](https://support.google.com/calendar/answer/37648?hl=en#zippy=%2Csync-your-google-calendar-view-edit%2Cget-your-calendar-view-only)
+
+#### Where to get an iCloud link
+
+[iCloud Calendar instructions](https://www.souladvisor.com/help-centre/how-to-get-icloud-calendar-address-on-mac-in-ical-format)
+
+#### Where to get an Outlook link
+
+[Outlook Calendar instructions](https://support.microsoft.com/en-us/office/introduction-to-publishing-internet-calendars-a25e68d6-695a-41c6-a701-103d44ba151d?ui=en-us&rs=en-us&ad=us)
+
+Here's the relevant part:
+> Under the settings in Outlook **on the web**, go to Calendar > Shared calendars. Choose the calendar you wish to publish and the level of details that you want others to see.
+
+Here's how the settings look on the web version:
+![](./assets/outlook-guide-1.png)
 
 ### Showing events from other files in your vault
 
