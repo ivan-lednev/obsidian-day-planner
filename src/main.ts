@@ -2,7 +2,6 @@ import { Plugin, WorkspaceLeaf } from "obsidian";
 import { get, writable, Writable } from "svelte/store";
 
 import {
-  editContextKey,
   errorContextKey,
   obsidianContext,
   viewTypeTimeline,
@@ -14,6 +13,7 @@ import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { STaskEditor } from "./service/stask-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
+import { ObsidianContext } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { ReleaseNotesModal } from "./ui/release-notes-modal";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
@@ -196,15 +196,13 @@ export default class DayPlanner extends Plugin {
     this.addCommand({
       id: "re-sync",
       name: "Re-sync tasks",
-      // todo: hide inside store
       callback: async () => {
         icalSyncTrigger.set(getUpdateTrigger());
       },
     });
 
     // todo: make it dependent on config
-    // todo: type this
-    const defaultObsidianContext: object = {
+    const defaultObsidianContext: ObsidianContext = {
       obsidianFacade: this.obsidianFacade,
       initWeeklyView: this.initWeeklyLeaf,
       refreshTasks: this.dataviewFacade.getAllTasksFrom,
@@ -213,23 +211,17 @@ export default class DayPlanner extends Plugin {
       showReleaseNotes: this.showReleaseNotes,
       editContext,
       visibleTasks,
-      // TODO: just pass the damn sTaskEditor
-      clockOut: this.sTaskEditor.clockOut,
-      cancelClock: this.sTaskEditor.cancelClock,
-      clockOutUnderCursor: this.sTaskEditor.clockOutUnderCursor,
-      clockInUnderCursor: this.sTaskEditor.clockInUnderCursor,
-      cancelClockUnderCursor: this.sTaskEditor.cancelClockUnderCursor,
-      // ---
       showPreview: createShowPreview(this.app),
       isModPressed,
       reSync: () => icalSyncTrigger.set(getUpdateTrigger()),
       isOnline,
     };
 
-    // TODO: move out building context
-    const componentContext = new Map([
+    const componentContext = new Map<
+      string,
+      ObsidianContext | typeof errorStore
+    >([
       [obsidianContext, defaultObsidianContext],
-      [editContextKey, { editContext }],
       [errorContextKey, errorStore],
     ]);
 

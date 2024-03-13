@@ -1,7 +1,6 @@
 import type { Moment } from "moment";
 import { Pos } from "obsidian";
-import { STask } from "obsidian-dataview";
-import { Readable, Writable } from "svelte/store";
+import { Readable } from "svelte/store";
 
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import type { ObsidianFacade } from "./service/obsidian-facade";
@@ -76,16 +75,10 @@ export interface ObsidianContext {
   obsidianFacade: ObsidianFacade;
   initWeeklyView: () => Promise<void>;
   refreshTasks: (source: string) => void;
-  dataviewLoaded: Writable<boolean>;
+  dataviewLoaded: Readable<boolean>;
   renderMarkdown: RenderMarkdown;
   editContext: ReturnType<typeof useEditContext>;
   visibleTasks: Readable<Tasks>;
-  clockOut: (sTask: STask) => void;
-  cancelClock: (sTask: STask) => void;
-  clockInUnderCursor: () => void;
-  clockOutUnderCursor: () => void;
-  cancelClockUnderCursor: () => void;
-  sTasksWithActiveClockProps: Readable<STask[]>;
   showReleaseNotes: () => void;
   showPreview: ReturnType<typeof createShowPreview>;
   isModPressed: Readable<boolean>;

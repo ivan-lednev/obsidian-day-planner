@@ -2,7 +2,7 @@
   import { Moment } from "moment";
   import { getContext } from "svelte";
 
-  import { editContextKey } from "../../constants";
+  import { obsidianContext } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
@@ -25,7 +25,7 @@
 
   const {
     editContext: { confirmEdit, editOperation, getEditHandlers },
-  } = getContext<ObsidianContext>(editContextKey);
+  } = getContext<ObsidianContext>(obsidianContext);
 
   $: actualDay = day || $visibleDayInTimeline;
   $: ({
