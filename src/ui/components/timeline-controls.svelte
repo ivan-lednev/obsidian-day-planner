@@ -5,7 +5,6 @@
     ArrowLeft,
     ArrowRight,
     FileInput,
-    HelpCircle,
     Table2,
     Filter,
     FilterX,
@@ -48,15 +47,10 @@
   const zoomLevelOptions = range(1, 9).map(String);
 
   let settingsVisible = false;
-  let helpVisible = false;
   let filterVisible = false;
 
   function toggleSettings() {
     settingsVisible = !settingsVisible;
-  }
-
-  function toggleHelp() {
-    helpVisible = !helpVisible;
   }
 
   function toggleFilter() {
@@ -150,6 +144,7 @@
     </ControlButton>
 
     <ControlButton
+      --grid-column-start="8"
       isActive={filterVisible}
       label="Dataview source"
       on:click={toggleFilter}
@@ -159,9 +154,6 @@
       {:else}
         <Filter class="svg-icon active-filter" />
       {/if}
-    </ControlButton>
-    <ControlButton isActive={helpVisible} label="Help" on:click={toggleHelp}>
-      <HelpCircle class="svg-icon" />
     </ControlButton>
     <ControlButton
       isActive={settingsVisible}
@@ -209,18 +201,6 @@
           >Dataview source reference</a
         >
       </div>
-    </div>
-  {/if}
-  {#if helpVisible}
-    <div class="help">
-      <p class="help-item"><strong>Advanced editing:</strong></p>
-      <p class="help-item">Hold <strong>Shift</strong> and drag to copy</p>
-      <p class="help-item">
-        Hold <strong>Control</strong> and drag/resize to push neighboring tasks
-      </p>
-      <button class="release-notes-button" on:click={showReleaseNotes}
-        >Show release notes
-      </button>
     </div>
   {/if}
   {#if settingsVisible}
@@ -332,6 +312,9 @@
         </SettingItem>
       {/if}
     </div>
+    <button class="release-notes-button" on:click={showReleaseNotes}
+      >Show release notes
+    </button>
   {/if}
 </div>
 
@@ -380,10 +363,6 @@
     font-weight: var(--font-medium);
   }
 
-  .help-item {
-    font-size: var(--font-ui-small);
-    color: var(--text-muted);
-  }
 
   .date {
     display: flex;
@@ -416,9 +395,4 @@
       );
   }
 
-  .help {
-    display: flex;
-    flex-direction: column;
-    margin: var(--size-2-3) 0;
-  }
 </style>
