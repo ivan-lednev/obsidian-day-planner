@@ -30,7 +30,7 @@
 </Scroller>
 
 <style>
-  .controls {
+  .controls > :global(*) {
     border-bottom: 1px solid var(--background-modifier-border);
   }
 </style>

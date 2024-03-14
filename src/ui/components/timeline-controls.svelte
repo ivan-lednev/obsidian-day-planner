@@ -406,8 +406,6 @@
     flex-direction: column;
 
     padding: var(--size-4-2);
-
-    border-bottom: 1px solid var(--background-modifier-border);
   }
 
   .header {
