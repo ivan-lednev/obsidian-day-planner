@@ -8,7 +8,7 @@
   import type { ObsidianContext } from "../../../types";
   import { isToday } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
-  import GlobalHandlers from "../global-handlers.svelte"
+  import GlobalHandlers from "../global-handlers.svelte";
   import Ruler from "../ruler.svelte";
   import Scroller from "../scroller.svelte";
   import Timeline from "../timeline.svelte";
