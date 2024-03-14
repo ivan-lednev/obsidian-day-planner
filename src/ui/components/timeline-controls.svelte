@@ -177,38 +177,46 @@
     </ControlButton>
   </div>
   {#if editControlsVisible}
-    <div class="button-group">
-      <div class="button-box">
-        <ControlButton
-          isActive={$settings.editMode === "simple"}
-          label="Other time blocks will not be changed"
-          on:click={() => {
-            $settings.editMode = "simple";
-          }}
-        >
-          Simple edit
-        </ControlButton>
-        <ControlButton
-          isActive={$settings.editMode === "push"}
-          label="Other time blocks are going to shift as you move a block"
-          on:click={() => {
-            $settings.editMode = "push";
-          }}
-        >
-          Push other blocks
-        </ControlButton>
-      </div>
-      <div class="button-box">
-        <ControlButton
-          isActive={$settings.copyOnDrag}
-          label="Copy instead of rescheduling"
-          on:click={() => {
-            $settings.copyOnDrag = !$settings.copyOnDrag;
-          }}
-        >
-          Copy on drag
-        </ControlButton>
-      </div>
+    <div class="button-box">
+      <ControlButton
+        isActive={$settings.editMode === "simple"}
+        label="Other time blocks will not be changed"
+        on:click={() => {
+          $settings.editMode = "simple";
+        }}
+      >
+        Simple edit
+      </ControlButton>
+      <ControlButton
+        isActive={$settings.editMode === "push"}
+        label="Other time blocks are going to shift as you move a block"
+        on:click={() => {
+          $settings.editMode = "push";
+        }}
+      >
+        Push other blocks
+      </ControlButton>
+    </div>
+
+    <div class="button-box">
+      <ControlButton
+        isActive={$settings.copyOnDrag === false}
+        label="Move a task when dragging"
+        on:click={() => {
+          $settings.copyOnDrag = false;
+        }}
+      >
+        Move on drag
+      </ControlButton>
+      <ControlButton
+        isActive={$settings.copyOnDrag}
+        label="Copy a task when dragging"
+        on:click={() => {
+          $settings.copyOnDrag = true;
+        }}
+      >
+        Copy on drag
+      </ControlButton>
     </div>
   {/if}
 
@@ -385,22 +393,9 @@
     color: var(--text-error);
   }
 
-  .button-group {
-    display: flex;
-    gap: 4px;
-  }
-
-  .button-group :global(.clickable-icon.is-active) {
+  .button-box :global(.clickable-icon.is-active) {
     color: var(--text-on-accent);
     background-color: var(--interactive-accent);
-  }
-
-  .button-group > :global(:first-child) {
-    flex: 2 0 0;
-  }
-
-  .button-group > :global(*) {
-    flex: 1 0 0;
   }
 
   .button-box {
