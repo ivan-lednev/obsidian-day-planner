@@ -390,6 +390,11 @@
     gap: 4px;
   }
 
+  .button-group :global(.clickable-icon.is-active) {
+    color: var(--text-on-accent);
+    background-color: var(--interactive-accent);
+  }
+
   .button-group > :global(:first-child) {
     flex: 2 0 0;
   }
