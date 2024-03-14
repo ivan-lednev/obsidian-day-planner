@@ -36,6 +36,8 @@ export interface DayPlannerSettings {
   showCompletedTasks: boolean;
   showSubtasksInTaskBlocks: boolean;
   icals: Array<IcalConfig>;
+  editMode: "simple" | "push" | "shrink";
+  copyOnDrag: boolean;
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -67,6 +69,8 @@ export const defaultSettings: DayPlannerSettings = {
   showCompletedTasks: true,
   showSubtasksInTaskBlocks: true,
   icals: [],
+  editMode: "simple",
+  copyOnDrag: false,
 };
 
 export const defaultSettingsForTests = {

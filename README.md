@@ -118,8 +118,8 @@ Full examples:
 - Color tasks based on time
 - Click on the timeline to create tasks
 - Drag tasks to re-schedule
-- Copy tasks by holding <code>Shift</code> while dragging (<strong>note: right now, only single line tasks are supported</strong>)
-- Move multiple tasks by holding <code>Control</code> while dragging/resizing
+- Copy tasks
+- Move multiple tasks at once
 
 ## Commands
 

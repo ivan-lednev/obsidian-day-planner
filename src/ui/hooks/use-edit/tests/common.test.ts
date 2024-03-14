@@ -24,7 +24,7 @@ describe("drag one & common edit mechanics", () => {
       confirmEdit,
     } = setUp();
 
-    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    todayControls.handleGripMouseDown(baseTask);
     moveCursorTo("01:00");
     await confirmEdit();
     nextDayControls.handleMouseEnter();
@@ -40,7 +40,7 @@ describe("drag one & common edit mechanics", () => {
   test("when a task is set to its current time, nothing happens", async () => {
     const { todayControls, confirmEdit, props } = setUp();
 
-    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    todayControls.handleGripMouseDown(baseTask);
     await confirmEdit();
 
     expect(props.onUpdate).not.toHaveBeenCalled();

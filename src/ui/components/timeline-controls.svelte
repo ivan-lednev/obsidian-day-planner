@@ -12,6 +12,7 @@
     Info,
     RefreshCw,
     RefreshCwOff,
+    Pencil,
   } from "lucide-svelte";
   import { getContext } from "svelte";
 
@@ -48,6 +49,7 @@
 
   let settingsVisible = false;
   let filterVisible = false;
+  let editControlsVisible = false;
 
   function toggleSettings() {
     settingsVisible = !settingsVisible;
@@ -55,6 +57,10 @@
 
   function toggleFilter() {
     filterVisible = !filterVisible;
+  }
+
+  function toggleEditControls() {
+    editControlsVisible = !editControlsVisible;
   }
 
   async function goBack() {
@@ -144,7 +150,14 @@
     </ControlButton>
 
     <ControlButton
-      --grid-column-start="8"
+      isActive={editControlsVisible}
+      label="Show time block edit controls"
+      on:click={toggleEditControls}
+    >
+      <Pencil class="svg-icon" />
+    </ControlButton>
+
+    <ControlButton
       isActive={filterVisible}
       label="Dataview source"
       on:click={toggleFilter}
@@ -163,6 +176,42 @@
       <Settings class="svg-icon" />
     </ControlButton>
   </div>
+  {#if editControlsVisible}
+    <div class="button-group">
+      <div class="button-box">
+        <ControlButton
+          isActive={$settings.editMode === "simple"}
+          label="Other time blocks will not be changed"
+          on:click={() => {
+            $settings.editMode = "simple";
+          }}
+        >
+          Simple edit
+        </ControlButton>
+        <ControlButton
+          isActive={$settings.editMode === "push"}
+          label="Other time blocks are going to shift as you move a block"
+          on:click={() => {
+            $settings.editMode = "push";
+          }}
+        >
+          Push other blocks
+        </ControlButton>
+      </div>
+      <div class="button-box">
+        <ControlButton
+          isActive={$settings.copyOnDrag}
+          label="Copy instead of rescheduling"
+          on:click={() => {
+            $settings.copyOnDrag = !$settings.copyOnDrag;
+          }}
+        >
+          Copy on drag
+        </ControlButton>
+      </div>
+    </div>
+  {/if}
+
   {#if !$dataviewLoaded}
     <div class="info-container">
       <AlertTriangle class="svg-icon mod-error" />
@@ -336,6 +385,34 @@
     color: var(--text-error);
   }
 
+  .button-group {
+    display: flex;
+    gap: 4px;
+  }
+
+  .button-group > :global(:first-child) {
+    flex: 2 0 0;
+  }
+
+  .button-group > :global(*) {
+    flex: 1 0 0;
+  }
+
+  .button-box {
+    overflow: hidden;
+    display: flex;
+
+    font-size: var(--font-ui-small);
+
+    border: 1px solid var(--color-base-40);
+    border-radius: var(--clickable-icon-radius);
+  }
+
+  .button-box > :global(*) {
+    flex: 1 0 0;
+    border-radius: 0;
+  }
+
   .stretcher input {
     font-family: var(--font-monospace);
   }
@@ -363,7 +440,6 @@
     font-weight: var(--font-medium);
   }
 
-
   .date {
     display: flex;
     align-items: center;
@@ -383,6 +459,7 @@
     display: flex;
     flex: 0 0 auto;
     flex-direction: column;
+    gap: var(--size-4-1);
 
     padding: var(--size-4-2);
   }
@@ -394,5 +471,4 @@
         var(--size-4-8)
       );
   }
-
 </style>

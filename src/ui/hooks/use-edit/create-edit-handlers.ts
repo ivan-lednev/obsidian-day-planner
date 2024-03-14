@@ -3,6 +3,7 @@ import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { get, Readable, Writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
+import { DayPlannerSettings } from "../../../settings";
 import { PlacedTask, UnscheduledTask } from "../../../types";
 import { copy, createTask } from "../../../util/task-utils";
 
@@ -15,6 +16,7 @@ export interface UseEditHandlersProps {
   obsidianFacade: ObsidianFacade;
   cursorMinutes: Readable<number>;
   editOperation: Writable<EditOperation>;
+  settings: Readable<DayPlannerSettings>;
 }
 
 // todo: rename without `use`, there are no custom stores here
@@ -24,6 +26,7 @@ export function createEditHandlers({
   startEdit,
   cursorMinutes,
   editOperation,
+  settings,
 }: UseEditHandlersProps) {
   function handleContainerMouseDown() {
     const newTask = createTask(day, get(cursorMinutes));
@@ -35,10 +38,11 @@ export function createEditHandlers({
     });
   }
 
-  function handleResizerMouseDown(event: MouseEvent, task: PlacedTask) {
-    const mode = event.ctrlKey
-      ? EditMode.RESIZE_AND_SHIFT_OTHERS
-      : EditMode.RESIZE;
+  function handleResizerMouseDown(task: PlacedTask) {
+    const mode =
+      get(settings).editMode === "push"
+        ? EditMode.RESIZE_AND_SHIFT_OTHERS
+        : EditMode.RESIZE;
 
     startEdit({ task, mode, day });
   }
@@ -52,11 +56,14 @@ export function createEditHandlers({
     await obsidianFacade.revealLineInFile(path, line);
   }
 
-  function handleGripMouseDown(event: MouseEvent, task: PlacedTask) {
-    if (event.ctrlKey) {
-      startEdit({ task, mode: EditMode.DRAG_AND_SHIFT_OTHERS, day });
-    } else if (event.shiftKey) {
+  function handleGripMouseDown(task: PlacedTask) {
+    // todo: edit mode in settings is different from the enum. The names should also be different
+    const { copyOnDrag, editMode } = get(settings);
+
+    if (copyOnDrag) {
       startEdit({ task: copy(task), mode: EditMode.CREATE, day });
+    } else if (editMode === "push") {
+      startEdit({ task, mode: EditMode.DRAG_AND_SHIFT_OTHERS, day });
     } else {
       startEdit({ task, mode: EditMode.DRAG, day });
     }

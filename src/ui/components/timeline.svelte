@@ -61,8 +61,8 @@
         <LocalTimeBlock
           gripCursor={$cursor.gripCursor}
           isResizeHandleVisible={!$editOperation}
-          onGripMouseDown={(event) => handleGripMouseDown(event, task)}
-          onResizerMouseDown={(event) => handleResizerMouseDown(event, task)}
+          onGripMouseDown={() => handleGripMouseDown(task)}
+          onResizerMouseDown={() => handleResizerMouseDown(task)}
           {task}
           on:mouseup={() => handleTaskMouseUp(task)}
         />

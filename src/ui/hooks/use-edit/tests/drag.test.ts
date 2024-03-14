@@ -11,7 +11,7 @@ describe("drag", () => {
   test("when drag starts, target task reacts to cursor", () => {
     const { todayControls, moveCursorTo, displayedTasks } = setUp();
 
-    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    todayControls.handleGripMouseDown(baseTask);
     moveCursorTo("01:00");
 
     expect(get(displayedTasks)).toMatchObject({
@@ -44,10 +44,7 @@ describe("drag", () => {
         tasks,
       });
 
-      todayControls.handleGripMouseDown(
-        { ctrlKey: true } as MouseEvent,
-        middleTask,
-      );
+      todayControls.handleGripMouseDown(middleTask);
       moveCursorTo("03:00");
 
       expect(get(displayedTasks)).toMatchObject({
@@ -83,10 +80,7 @@ describe("drag", () => {
         tasks,
       });
 
-      todayControls.handleGripMouseDown(
-        { ctrlKey: true } as MouseEvent,
-        middleTask,
-      );
+      todayControls.handleGripMouseDown(middleTask);
       moveCursorTo("03:00");
       moveCursorTo("01:00");
 
@@ -116,10 +110,7 @@ describe("drag", () => {
         tasks,
       });
 
-      todayControls.handleGripMouseDown(
-        { ctrlKey: true } as MouseEvent,
-        baseTask,
-      );
+      todayControls.handleGripMouseDown(baseTask);
       moveCursorTo("21:00");
 
       expect(get(displayedTasks)).toMatchObject({

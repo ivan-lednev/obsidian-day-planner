@@ -15,7 +15,7 @@ describe("Finding diff before writing updates to files", () => {
   test("Finds tasks moved between days", async () => {
     const { todayControls, nextDayControls, confirmEdit, props } = setUp();
 
-    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    todayControls.handleGripMouseDown(baseTask);
     nextDayControls.handleMouseEnter();
 
     await confirmEdit();
@@ -52,7 +52,7 @@ describe("Finding diff before writing updates to files", () => {
   test("Finds tasks moved within one day", async () => {
     const { todayControls, confirmEdit, props, moveCursorTo } = setUp();
 
-    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    todayControls.handleGripMouseDown(baseTask);
     moveCursorTo("2:00");
 
     await confirmEdit();
@@ -74,7 +74,7 @@ describe("Finding diff before writing updates to files", () => {
       tasks: unscheduledTask,
     });
 
-    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    todayControls.handleGripMouseDown(baseTask);
     moveCursorTo("2:00");
 
     await confirmEdit();
