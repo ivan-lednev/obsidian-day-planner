@@ -101,13 +101,13 @@
   --time-ruler-width: 30px;
   --scrollbar-width: 12px;
 
+  --shadow-color: #00000010;
+  --shadow-right: 2px 0px 2px var(--shadow-color);
+  --shadow-bottom: 0px 2px 2px var(--shadow-color);
+
   display: flex;
   flex-direction: column;
   padding: 0;
-}
-
-[data-type="weekly"] .view-content {
-  background-color: var(--background-secondary);
 }
 
 .absolute-stretch-x {

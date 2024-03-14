@@ -55,7 +55,10 @@
 </div>
 
 <Scroller on:scroll={handleScroll} let:hovering={autoScrollBlocked}>
-  <Ruler visibleHours={getVisibleHours($settings)} />
+  <Ruler
+    --ruler-box-shadow="var(--shadow-right)"
+    visibleHours={getVisibleHours($settings)}
+  />
   {#each $visibleDateRange as day}
     <div class="day-column">
       <Timeline {day} />
@@ -100,9 +103,14 @@
   }
 
   .week-header {
+    position: relative;
+    z-index: 1000;
+
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
+
+    box-shadow: var(--shadow-bottom);
   }
 
   .header-cell {
