@@ -30,6 +30,12 @@
 </Scroller>
 
 <style>
+  .controls {
+    position: relative;
+    z-index: 1000;
+    box-shadow: var(--shadow-bottom);
+  }
+
   .controls > :global(*) {
     border-bottom: 1px solid var(--background-modifier-border);
   }
