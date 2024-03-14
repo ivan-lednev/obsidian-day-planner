@@ -34,13 +34,29 @@
 
 <div
   bind:this={el}
-  style:transform="translateY({coords}px)"
+  style:top="{coords}px"
   class="needle absolute-stretch-x"
 ></div>
+<div
+  style:top="{coords}px"
+  class="ball"></div>
 
 <style>
   .needle {
     height: 2px;
     background-color: var(--color-accent);
+  }
+
+  .ball {
+    position: absolute;
+    z-index: 1000;
+
+    width: 12px;
+    height: 12px;
+    margin-top: -5px;
+    margin-left: -6px;
+
+    background: var(--color-accent);
+    border-radius: 50%;
   }
 </style>
