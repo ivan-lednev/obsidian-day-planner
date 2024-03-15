@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { Lock } from "lucide-svelte";
-
   import { Task } from "../../types";
 
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
@@ -11,21 +9,19 @@
 <ScheduledTimeBlock {task}>
   <div class="remote-task-content">
     <div style:background-color={task.calendar.color} class="ribbon" />
-    <div class="calendar">
-      <Lock class="svg-icon lock-icon" />
-      {task.calendar.name}
+    <div class="text">
+      <span class="calendar-name">
+        {task.calendar.name}
+      </span>
+      <span class="summary">
+        {task.text}
+      </span>
     </div>
-    {task.text}
   </div>
 </ScheduledTimeBlock>
 
 <style>
-  .calendar {
-    display: flex;
-    gap: var(--size-4-1);
-    align-items: center;
-
-    font-size: var(--font-ui-smaller);
+  .calendar-name {
     color: var(--text-muted);
   }
 
