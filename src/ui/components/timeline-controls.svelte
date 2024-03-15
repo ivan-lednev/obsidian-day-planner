@@ -398,6 +398,10 @@
     background-color: var(--interactive-accent);
   }
 
+  .button-box :global(.clickable-icon:not(.is-active)) {
+    background-color: var(--background-primary);
+  }
+
   .button-box {
     overflow: hidden;
     display: flex;
