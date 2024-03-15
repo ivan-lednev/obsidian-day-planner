@@ -17,7 +17,7 @@ export const reQueryAfterMillis = 200;
 export const icalRefreshIntervalMillis = 5 * 60 * 1000;
 export const supportBanner = `Support the project:
 - 🪲 [Create issues and improvement suggestions](https://github.com/ivan-lednev/obsidian-day-planner/issues)
-- 🪛 [Submit pull-requests](./CONTRIBUTING.md)
+- 🪛 [Submit pull-requests](./CONTRIBUTING.md). If you don't know how to code, you can improve CSS or the docs!
 - ❤️ Support the project directly:
 
   <a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>

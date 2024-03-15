@@ -1,3 +1,17 @@
+## 0.20.0
+
+### New features
+
+- ✨ Color coding: you can define background color for blocks containing certain text in first line
+- ✨ Weekly view now displays unscheduled tasks on top
+- ✨ Advanced drag-and-drop editing does not require modifier keys any more, you pick current edit mode in timeline controls 
+
+### Fixed issues
+
+- 🐞 Fixed scheduling tasks for other days than today (by @Lunkle)
+- 🐞 Pointer to current time is now more visible 
+- 🐞 Task summary in internet calendars is now displayed next to calendar name, to make it visible in short blocks
+
 ## 0.19.1 - 0.19.6
 
 - 🐞 Fix iOS crash
