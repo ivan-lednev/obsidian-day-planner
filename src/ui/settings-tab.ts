@@ -401,10 +401,78 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           }),
       );
 
-    containerEl.createEl("h2", { text: "Colors" });
+    containerEl.createEl("h2", { text: "Color blocking" });
+
+    this.plugin.settings().colorOverrides.map((colorOverride, index) =>
+      new Setting(containerEl)
+        .setName(`Color ${index + 1}`)
+        .addColorPicker((el) =>
+          // todo: replace with immer
+          el.setValue(colorOverride.color).onChange((value: string) => {
+            this.settingsStore.update((previous) => ({
+              ...previous,
+              colorOverrides: previous.colorOverrides.map(
+                (editedOverride, editedIndex) =>
+                  editedIndex === index
+                    ? { ...editedOverride, color: value }
+                    : editedOverride,
+              ),
+            }));
+          }),
+        )
+        .addText((el) =>
+          el
+            .setPlaceholder("Text")
+            .setValue(colorOverride.text)
+            .onChange((value: string) => {
+              this.settingsStore.update((previous) => ({
+                ...previous,
+                colorOverrides: previous.colorOverrides.map(
+                  (editedOverride, editedIndex) =>
+                    editedIndex === index
+                      ? { ...editedOverride, text: value }
+                      : editedOverride,
+                ),
+              }));
+            }),
+        )
+        .addExtraButton((el) =>
+          el
+            .setIcon("trash")
+            .setTooltip("Delete color override")
+            .onClick(() => {
+              this.settingsStore.update((previous) => ({
+                ...previous,
+                colorOverrides: previous.colorOverrides.filter(
+                  (editedOverride, editedIndex) => editedIndex !== index,
+                ),
+              }));
+
+              this.display();
+            }),
+        ),
+    );
+
+    new Setting(containerEl).addButton((el) =>
+      el.setButtonText("Add color override").onClick(() => {
+        const newOverride = {
+          text: "#important",
+          color: "#ffa1a1",
+        };
+
+        this.settingsStore.update((previous) => ({
+          ...previous,
+          colorOverrides: [...previous.colorOverrides, newOverride],
+        }));
+
+        this.display();
+      }),
+    );
+
+    containerEl.createEl("h2", { text: "Colorful Timeline" });
 
     new Setting(containerEl)
-      .setName("Colorful Timeline")
+      .setName("Enable Colorful Timeline")
       .setDesc(
         "If the planner timeline should be monochrome or color tasks based on time of day",
       )

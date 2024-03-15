@@ -33,6 +33,7 @@
   --time-block-position="absolute"
   --time-block-top={$offset}
   --time-block-width={width}
+  {task}
   on:mouseup
 >
   <slot/>

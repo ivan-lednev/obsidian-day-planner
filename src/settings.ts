@@ -7,6 +7,11 @@ export interface IcalConfig {
   color: string;
 }
 
+export interface ColorOverride {
+  text: string;
+  color: string;
+}
+
 export interface DayPlannerSettings {
   progressIndicator: "pie" | "bar" | "none";
   showTaskNotification: boolean;
@@ -38,6 +43,7 @@ export interface DayPlannerSettings {
   icals: Array<IcalConfig>;
   editMode: "simple" | "push" | "shrink";
   copyOnDrag: boolean;
+  colorOverrides: Array<ColorOverride>;
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -69,6 +75,7 @@ export const defaultSettings: DayPlannerSettings = {
   showCompletedTasks: true,
   showSubtasksInTaskBlocks: true,
   icals: [],
+  colorOverrides: [],
   editMode: "simple",
   copyOnDrag: false,
 };

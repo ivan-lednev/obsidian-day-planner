@@ -11,7 +11,7 @@
   export let onGripMouseDown: () => void;
 </script>
 
-<TimeBlockBase on:mouseup>
+<TimeBlockBase {task} on:mouseup>
   <MarkdownBlockContent {task}>
     <RenderedMarkdown {task} />
     <Grip cursor={gripCursor} on:mousedown={onGripMouseDown} />

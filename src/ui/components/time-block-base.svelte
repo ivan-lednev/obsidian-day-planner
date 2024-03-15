@@ -1,7 +1,17 @@
-<div
-  class="padding"
->
+<script lang="ts">
+  import { Task } from "../../types";
+  import { useColorOverride } from "../hooks/use-color-override";
+
+  export let task: Task;
+
+  $: override = useColorOverride(task);
+  $: backgroundColor =
+    $override || "var(--time-block-bg-color, var(--background-primary))";
+</script>
+
+<div class="padding">
   <div
+    style:background-color={backgroundColor}
     class="content"
     on:mousedown={(event) => event.stopPropagation()}
     on:mouseup
@@ -43,9 +53,8 @@
     overflow-wrap: anywhere;
     white-space: normal;
 
-    background-color: var(--time-block-bg-color, var(--background-primary));
     border: 1px solid var(--time-block-border-color, var(--color-base-50));
     border-radius: var(--radius-s);
-    box-shadow: 1px 1px 2px 0 #0000001f
+    box-shadow: 1px 1px 2px 0 #0000001f;
   }
 </style>
