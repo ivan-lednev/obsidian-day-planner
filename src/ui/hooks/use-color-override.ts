@@ -1,14 +1,20 @@
+import { getContext } from "svelte";
 import { derived } from "svelte/store";
 
+import { obsidianContext } from "../../constants";
 import { settings } from "../../global-store/settings";
-import type { UnscheduledTask } from "../../types";
+import { ObsidianContext, UnscheduledTask } from "../../types";
 
 export function useColorOverride(task: UnscheduledTask) {
-  return derived(settings, ($settings) => {
+  const { isDarkMode } = getContext<ObsidianContext>(obsidianContext);
+
+  return derived([settings, isDarkMode], ([$settings, $isDarkMode]) => {
     const colorOverride = $settings.colorOverrides.find((override) =>
       task.firstLineText.includes(override.text),
     );
 
-    return colorOverride?.color;
+    if (colorOverride) {
+      return $isDarkMode ? colorOverride?.darkModeColor : colorOverride?.color;
+    }
   });
 }

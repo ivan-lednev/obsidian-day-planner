@@ -84,6 +84,7 @@ export interface ObsidianContext {
   isModPressed: Readable<boolean>;
   reSync: () => void;
   isOnline: Readable<boolean>;
+  isDarkMode: Readable<boolean>;
 }
 
 export type ComponentContext = Map<string, unknown>;

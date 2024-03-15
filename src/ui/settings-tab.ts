@@ -402,6 +402,9 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       );
 
     containerEl.createEl("h2", { text: "Color blocking" });
+    containerEl.createEl("p", {
+      text: `Define a background color for a block containing some text (it might be a tag, like '#important'). The first color is for light mode, the second is for dark mode.`,
+    });
 
     this.plugin.settings().colorOverrides.map((colorOverride, index) =>
       new Setting(containerEl)
@@ -415,6 +418,20 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
                 (editedOverride, editedIndex) =>
                   editedIndex === index
                     ? { ...editedOverride, color: value }
+                    : editedOverride,
+              ),
+            }));
+          }),
+        )
+        .addColorPicker((el) =>
+          // todo: replace with immer
+          el.setValue(colorOverride.darkModeColor).onChange((value: string) => {
+            this.settingsStore.update((previous) => ({
+              ...previous,
+              colorOverrides: previous.colorOverrides.map(
+                (editedOverride, editedIndex) =>
+                  editedIndex === index
+                    ? { ...editedOverride, darkModeColor: value }
                     : editedOverride,
               ),
             }));
@@ -457,6 +474,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       el.setButtonText("Add color override").onClick(() => {
         const newOverride = {
           text: "#important",
+          darkModeColor: "#6e3737",
           color: "#ffa1a1",
         };
 

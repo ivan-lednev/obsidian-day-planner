@@ -172,6 +172,7 @@ export default class DayPlanner extends Plugin {
       newlyStartedTasks,
       icalSyncTrigger,
       isOnline,
+      isDarkMode,
     } = createHooks({
       app: this.app,
       dataviewFacade: this.dataviewFacade,
@@ -215,6 +216,7 @@ export default class DayPlanner extends Plugin {
       isModPressed,
       reSync: () => icalSyncTrigger.set(getUpdateTrigger()),
       isOnline,
+      isDarkMode,
     };
 
     const componentContext = new Map<

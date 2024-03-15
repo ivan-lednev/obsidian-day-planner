@@ -10,6 +10,7 @@ export interface IcalConfig {
 export interface ColorOverride {
   text: string;
   color: string;
+  darkModeColor: string;
 }
 
 export interface DayPlannerSettings {

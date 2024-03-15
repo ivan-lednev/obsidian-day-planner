@@ -46,6 +46,10 @@ interface CreateHooksProps {
   planEditor: PlanEditor;
 }
 
+function getDarkModeFlag() {
+  return document.body.hasClass("theme-dark");
+}
+
 export function createHooks({
   app,
   dataviewFacade,
@@ -58,6 +62,16 @@ export function createHooks({
   });
   const layoutReady = readable(false, (set) => {
     app.workspace.onLayoutReady(() => set(true));
+  });
+
+  const isDarkMode = readable(getDarkModeFlag(), (set) => {
+    const eventRef = app.workspace.on("css-change", () => {
+      set(getDarkModeFlag());
+    });
+
+    return () => {
+      app.workspace.offref(eventRef);
+    };
   });
 
   // todo: these can be global stores
@@ -210,5 +224,6 @@ export function createHooks({
     isModPressed,
     icalSyncTrigger,
     isOnline,
+    isDarkMode,
   };
 }
