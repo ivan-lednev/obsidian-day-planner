@@ -11,7 +11,6 @@ I work on the plugin in my spare time, and I appreciate any kind of support!
 
 ## Table of contents
 
-- [Support the project](#support-the-project)
 - [Table of contents](#table-of-contents)
 - [What it looks like](#what-it-looks-like)
 - [Drag-and-drop demos](#drag-and-drop-demos)
