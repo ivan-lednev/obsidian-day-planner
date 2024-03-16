@@ -1,13 +1,13 @@
-## Support the project
+I work on the plugin in my spare time, and I appreciate any kind of support!
 
-I work on this plugin in my spare time, and any kind of support is very valuable.
+✨ [Check out latest updates](https://github.com/ivan-lednev/obsidian-day-planner/releases)<br>
+🪲 [Report bugs and suggest features. Vote with a 👍 on issues that are important for you](https://github.com/ivan-lednev/obsidian-day-planner/issues)<br>
+❓ [Ask questions](https://github.com/ivan-lednev/obsidian-day-planner/discussions/new?category=q-a)<br>
+🪛 [Submit pull-requests](./CONTRIBUTING.md)<br>
+📧 <a href="mailto:bishop1860@gmail.com">Say thank you</a><br>
+❤️ Support the project directly:
 
-- ✨ [Check out new features and other changes](https://github.com/ivan-lednev/obsidian-day-planner/releases)
-- 🪲 [Create issues and improvement suggestions](https://github.com/ivan-lednev/obsidian-day-planner/issues)
-- 🪛 [Submit pull-requests](./CONTRIBUTING.md)
-- ❤️ Support the project directly:
-
-  <a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+<a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
 ## Table of contents
 
