@@ -17,12 +17,7 @@ export class DataviewFacade {
       return [];
     }
 
-    return withPerformanceReport(
-      () => this.getDataview().pages(source).file.tasks,
-      {
-        source,
-      },
-    );
+    return this.getDataview().pages(source).file.tasks
   };
 
   getAllListsFrom = (source: string) => {
@@ -31,12 +26,7 @@ export class DataviewFacade {
       return [];
     }
 
-    return withPerformanceReport(
-      () => this.getDataview().pages(source).file.lists,
-      {
-        source,
-      },
-    );
+    return this.getDataview().pages(source).file.lists
   };
 
   getTaskFromCaretLocation({ path, line }: { path: string; line: number }) {
