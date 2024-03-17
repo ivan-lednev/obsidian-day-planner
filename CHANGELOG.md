@@ -1,5 +1,6 @@
-## 0.21.0
+## 0.20.1 - 0.20.2
 
+- 🐞 Move task on copy, instead of changing its size
 - 🐞 Fix different hourglass emoji breaking task movement
 
 ## 0.20.0

@@ -15,13 +15,10 @@ export const clockKey = "clocked";
 export const clockFormat = "YYYY-MM-DDTHH:mm:ss";
 export const reQueryAfterMillis = 200;
 export const icalRefreshIntervalMillis = 5 * 60 * 1000;
-export const supportBanner = `I work on the plugin in my spare time, and I appreciate any kind of support!
-
-✨ [Check out latest updates](https://github.com/ivan-lednev/obsidian-day-planner/releases)<br>
-🪲 [Report bugs and suggest features. Vote with a 👍 on issues that are important for you](https://github.com/ivan-lednev/obsidian-day-planner/issues)<br>
+export const supportBanner = `🪲 [Report bugs and suggest features](https://github.com/ivan-lednev/obsidian-day-planner/issues)<br>
 ❓ [Ask questions](https://github.com/ivan-lednev/obsidian-day-planner/discussions/new?category=q-a)<br>
+👍 [Give thumbs up to issues important to you](https://github.com/ivan-lednev/obsidian-day-planner/issues)<br>
 🪛 [Submit pull-requests](./CONTRIBUTING.md)<br>
-📧 <a href="mailto:bishop1860@gmail.com">Say thank you</a><br>
 ❤️ Support the project directly:
 
 <a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
