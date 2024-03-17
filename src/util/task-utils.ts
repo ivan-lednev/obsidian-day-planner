@@ -90,7 +90,7 @@ export function updateScheduledPropInText(text: string, dayKey: string) {
     return updated;
   }
 
-  return `${text} ⌛ ${dayKey}`;
+  return `${text} ⏳ ${dayKey}`;
 }
 
 export function updateTaskText(task: Task) {

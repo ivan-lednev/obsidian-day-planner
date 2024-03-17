@@ -25,7 +25,7 @@ describe("Finding diff before writing updates to files", () => {
         updated: [
           expect.objectContaining({
             id: baseTask.id,
-            firstLineText: expect.stringContaining(`⌛ ${nextDayKey}`),
+            firstLineText: expect.stringContaining(`⏳ ${nextDayKey}`),
           }),
         ],
       }),
