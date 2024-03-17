@@ -1,5 +1,6 @@
 import { get } from "svelte/store";
 
+import { defaultSettingsForTests } from "../../../../settings";
 import { Tasks } from "../../../../types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
@@ -42,12 +43,10 @@ describe("resize", () => {
 
       const { todayControls, moveCursorTo, displayedTasks } = setUp({
         tasks,
+        settings: { ...defaultSettingsForTests, editMode: "push" },
       });
 
-      todayControls.handleResizerMouseDown(
-        { ctrlKey: true } as MouseEvent,
-        middleTask,
-      );
+      todayControls.handleResizerMouseDown(middleTask);
       moveCursorTo("04:00");
 
       expect(get(displayedTasks)).toMatchObject({

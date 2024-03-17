@@ -12,7 +12,6 @@ interface UseNewlyStartedTasksProps {
   tasksForToday: Readable<TasksForDay>;
 }
 
-// todo: move file
 export function useNewlyStartedTasks(props: UseNewlyStartedTasksProps) {
   const { settings, currentTime, tasksForToday } = props;
   let previousTasksInProgress: PlacedTask[] = [];

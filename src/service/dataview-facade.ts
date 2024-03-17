@@ -2,8 +2,6 @@ import { App } from "obsidian";
 import { getAPI, STask } from "obsidian-dataview";
 import { writable } from "svelte/store";
 
-import { withPerformanceReport } from "../util/performance";
-
 export class DataviewFacade {
   // todo: there is a separate store for that, remove this
   readonly dataviewLoaded = writable(false);
@@ -17,7 +15,7 @@ export class DataviewFacade {
       return [];
     }
 
-    return this.getDataview().pages(source).file.tasks
+    return this.getDataview().pages(source).file.tasks;
   };
 
   getAllListsFrom = (source: string) => {
@@ -26,7 +24,7 @@ export class DataviewFacade {
       return [];
     }
 
-    return this.getDataview().pages(source).file.lists
+    return this.getDataview().pages(source).file.lists;
   };
 
   getTaskFromCaretLocation({ path, line }: { path: string; line: number }) {

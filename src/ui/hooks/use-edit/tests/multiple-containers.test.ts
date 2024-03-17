@@ -1,5 +1,6 @@
 import { get } from "svelte/store";
 
+import { defaultSettingsForTests } from "../../../../settings";
 import { Tasks } from "../../../../types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
@@ -33,7 +34,7 @@ describe("moving tasks between containers", () => {
         tasks: unscheduledTask,
       });
 
-    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    todayControls.handleGripMouseDown(baseTask);
     nextDayControls.handleMouseEnter();
     moveCursorTo("01:00");
 
@@ -68,7 +69,7 @@ describe("moving tasks between containers", () => {
         tasks,
       });
 
-    todayControls.handleGripMouseDown({} as MouseEvent, baseTask);
+    todayControls.handleGripMouseDown(baseTask);
     nextDayControls.handleMouseEnter();
     moveCursorTo("01:00");
 
@@ -103,12 +104,10 @@ describe("moving tasks between containers", () => {
     const { todayControls, nextDayControls, moveCursorTo, displayedTasks } =
       setUp({
         tasks,
+        settings: { ...defaultSettingsForTests, editMode: "push" },
       });
 
-    todayControls.handleGripMouseDown(
-      { ctrlKey: true } as MouseEvent,
-      baseTask,
-    );
+    todayControls.handleGripMouseDown(baseTask);
     nextDayControls.handleMouseEnter();
     moveCursorTo("01:00");
 

@@ -1,5 +1,6 @@
 import { get } from "svelte/store";
 
+import { defaultSettingsForTests } from "../../../../settings";
 import { Tasks } from "../../../../types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
@@ -42,6 +43,7 @@ describe("drag", () => {
 
       const { todayControls, moveCursorTo, displayedTasks } = setUp({
         tasks,
+        settings: { ...defaultSettingsForTests, editMode: "push" },
       });
 
       todayControls.handleGripMouseDown(middleTask);
@@ -78,6 +80,7 @@ describe("drag", () => {
 
       const { todayControls, moveCursorTo, displayedTasks } = setUp({
         tasks,
+        settings: { ...defaultSettingsForTests, editMode: "push" },
       });
 
       todayControls.handleGripMouseDown(middleTask);

@@ -14,6 +14,7 @@ interface UseTaskVisualsProps {
   currentTime: Readable<Moment>;
 }
 
+// todo: useTaskPosition, move to one of stores, don't call inside component
 export function useTaskVisuals(
   task: Task,
   { settings, currentTime }: UseTaskVisualsProps,
