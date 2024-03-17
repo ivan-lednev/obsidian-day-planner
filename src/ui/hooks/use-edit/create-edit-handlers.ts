@@ -59,13 +59,16 @@ export function createEditHandlers({
   function handleGripMouseDown(task: PlacedTask) {
     // todo: edit mode in settings is different from the enum. The names should also be different
     const { copyOnDrag, editMode } = get(settings);
+    const taskOrCopy = copyOnDrag ? copy(task) : task;
 
-    if (copyOnDrag) {
-      startEdit({ task: copy(task), mode: EditMode.CREATE, day });
-    } else if (editMode === "push") {
-      startEdit({ task, mode: EditMode.DRAG_AND_SHIFT_OTHERS, day });
+    if (editMode === "push") {
+      startEdit({
+        task: taskOrCopy,
+        mode: EditMode.DRAG_AND_SHIFT_OTHERS,
+        day,
+      });
     } else {
-      startEdit({ task, mode: EditMode.DRAG, day });
+      startEdit({ task: taskOrCopy, mode: EditMode.DRAG, day });
     }
   }
 
