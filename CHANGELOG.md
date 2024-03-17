@@ -1,3 +1,7 @@
+## 0.21.0
+
+- 🐞 Fix different hourglass emoji breaking task movement
+
 ## 0.20.0
 
 ### New features
