@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { Task } from "../../types";
+  import { UnscheduledTask } from "../../types";
   import { useColorOverride } from "../hooks/use-color-override";
 
-  export let task: Task;
+  export let task: UnscheduledTask;
 
   $: override = useColorOverride(task);
   // todo: hide in hook
