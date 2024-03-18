@@ -19,6 +19,16 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
+      .setName("Show release notes after update")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings().releaseNotes)
+          .onChange((value: boolean) => {
+            this.update({ releaseNotes: value });
+          }),
+      );
+
+    new Setting(containerEl)
       .setName("Round time to minutes")
       .setDesc("While editing, tasks are going to get rounded to this number")
       .addSlider((slider) =>

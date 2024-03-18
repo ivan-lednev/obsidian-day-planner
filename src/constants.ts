@@ -22,6 +22,8 @@ export const supportBanner = `🪲 [Report bugs and suggest features](https://gi
 ❤️ Support the project directly:
 
 <a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+You can disable these release notes in the settings tab.
 `;
 
 export const icons = [

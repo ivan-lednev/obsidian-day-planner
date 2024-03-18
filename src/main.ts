@@ -108,7 +108,10 @@ export default class DayPlanner extends Plugin {
       ...previous,
       pluginVersion: currentPluginVersion,
     }));
-    this.showReleaseNotes();
+
+    if (this.settings().releaseNotes) {
+      this.showReleaseNotes();
+    }
   }
 
   private registerCommands() {
