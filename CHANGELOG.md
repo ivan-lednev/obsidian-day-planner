@@ -1,5 +1,9 @@
-## 0.20.1 - 0.20.2
+## 0.20.1 - 0.20.3
 
+- 🐞 add toggle to disable release notes (#399)
+- 🐞 do not reset timeline position when it's already open (#289)
+- 🐞 do not replace tab content when opening weekly view (#313)
+- 🐞 fix status bar error breaking plugin
 - 🐞 Move task on copy, instead of changing its size
 - 🐞 Fix different hourglass emoji breaking task movement
 
