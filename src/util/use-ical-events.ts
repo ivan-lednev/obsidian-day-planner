@@ -1,5 +1,5 @@
 import ical from "node-ical";
-import { Notice, request } from "obsidian";
+import { request } from "obsidian";
 import { derived, Readable } from "svelte/store";
 
 import { DayPlannerSettings } from "../settings";
@@ -14,6 +14,8 @@ export function useIcalEvents(
   syncTrigger: Readable<unknown>,
   isOnline: Readable<boolean>,
 ) {
+  const previousFetches = new Map<string, Array<WithIcalConfig<ical.VEvent>>>();
+
   // todo: [minor] derive only from relevant setting
   return derived(
     [settings, isOnline, syncTrigger],
@@ -25,35 +27,33 @@ export function useIcalEvents(
         return;
       }
 
-      const allCalendarsParsed = Promise.all(
-        $settings.icals
-          .filter((ical) => ical.url.trim().length > 0)
-          .map((calendar) =>
-            request({
-              url: calendar.url,
+      const calendarPromises = $settings.icals
+        .filter((ical) => ical.url.trim().length > 0)
+        .map((calendar) =>
+          request({
+            url: calendar.url,
+          })
+            .then((response) => {
+              const parsed = ical.parseICS(response);
+              const veventsWithCalendar = Object.values(parsed)
+                .filter(isVEvent)
+                .map((icalEvent) => ({
+                  ...icalEvent,
+                  calendar,
+                }));
+
+              previousFetches.set(calendar.url, veventsWithCalendar);
+
+              return veventsWithCalendar;
             })
-              .then((response) => {
-                const parsed = ical.parseICS(response);
+            .catch((error) => {
+              console.error(error);
 
-                return Object.values(parsed)
-                  .filter(isVEvent)
-                  .map((icalEvent) => ({
-                    ...icalEvent,
-                    calendar,
-                  }));
-              })
-              .catch((error) => {
-                new Notice(
-                  `See console for details. Could not fetch calendar from ${calendar.url}`,
-                );
-                console.error(error);
+              return previousFetches.get(calendar.url) || [];
+            }),
+        );
 
-                return [];
-              }),
-          ),
-      );
-
-      allCalendarsParsed.then((calendars) => {
+      Promise.all(calendarPromises).then((calendars) => {
         const allEvents = calendars.flat();
 
         set(allEvents);
