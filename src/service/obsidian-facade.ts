@@ -22,7 +22,6 @@ export class ObsidianFacade {
       .find((leaf) => doesLeafContainFile(leaf, file));
 
     if (leafWithThisFile) {
-      // this.app.workspace.revealLeaf(leafWithThisFile);
       this.app.workspace.setActiveLeaf(leafWithThisFile, { focus: true });
 
       if (leafWithThisFile.view instanceof MarkdownView) {
