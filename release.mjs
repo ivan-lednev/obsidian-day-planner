@@ -49,7 +49,7 @@ const git = simpleGit();
 
 git
   .add(["manifest.json", "package-lock.json", "package.json", "versions.json"])
-  .commit(versionString)
+  .commit(versionString, { "--no-verify": null })
   .tag([versionString])
   .push()
   .pushTags();
