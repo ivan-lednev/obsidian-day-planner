@@ -69,7 +69,7 @@ export default class DayPlanner extends Plugin {
 
   initWeeklyLeaf = async () => {
     await this.detachLeavesOfType(viewTypeWeekly);
-    await this.app.workspace.getLeaf(false).setViewState({
+    await this.app.workspace.getLeaf("tab").setViewState({
       type: viewTypeWeekly,
       active: true,
     });
