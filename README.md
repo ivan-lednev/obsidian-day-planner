@@ -1,10 +1,10 @@
 I work on the plugin in my spare time, and I appreciate any kind of support!
 
 ✨ [Check out latest updates](https://github.com/ivan-lednev/obsidian-day-planner/releases)<br>
-🪲 [Report bugs and suggest features. Vote with a 👍 on issues that are important for you](https://github.com/ivan-lednev/obsidian-day-planner/issues)<br>
+🪲 [Report bugs and suggest features](https://github.com/ivan-lednev/obsidian-day-planner/issues)<br>
 ❓ [Ask questions](https://github.com/ivan-lednev/obsidian-day-planner/discussions/new?category=q-a)<br>
-🪛 [Submit pull-requests](./CONTRIBUTING.md)<br>
-📧 Say thank you: bishop1860@gmail.com<br>
+👍 [Give thumbs up to issues important to you](https://github.com/ivan-lednev/obsidian-day-planner/issues)<br>
+🪛 [Submit pull-requests](./CONTRIBUTING.md). If you don't know where to start, create an issue and I'll gladly give you some directions<br>
 ❤️ Support the project directly:
 
 <a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
@@ -87,6 +87,7 @@ To show events from internet calendars like **Google Calendar, iCloud Calendar a
 [Outlook Calendar instructions](https://support.microsoft.com/en-us/office/introduction-to-publishing-internet-calendars-a25e68d6-695a-41c6-a701-103d44ba151d?ui=en-us&rs=en-us&ad=us)
 
 Here's the relevant part:
+
 > Under the settings in Outlook **on the web**, go to Calendar > Shared calendars. Choose the calendar you wish to publish and the level of details that you want others to see.
 
 Here's how the settings look on the web version:
