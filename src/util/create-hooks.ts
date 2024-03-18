@@ -35,7 +35,7 @@ import { canHappenAfter, icalEventToTasks } from "./ical";
 import { getEarliestMoment } from "./moment";
 import { createBackgroundBatchScheduler } from "./scheduler";
 import { getUpdateTrigger } from "./store";
-import { getDayKey, mergeTasks } from "./tasks-utils";
+import { getDayKey, getEmptyRecordsForDay, mergeTasks } from "./tasks-utils";
 import { useIcalEvents } from "./use-ical-events";
 
 interface CreateHooksProps {
@@ -198,7 +198,7 @@ export function createHooks({
   const tasksForToday = derived(
     [visibleTasks, currentTime],
     ([$visibleTasks, $currentTime]) => {
-      return $visibleTasks[getDayKey($currentTime)];
+      return $visibleTasks[getDayKey($currentTime)] || getEmptyRecordsForDay();
     },
   );
 
