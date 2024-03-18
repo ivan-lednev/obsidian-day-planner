@@ -21,6 +21,7 @@
   import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import type { ObsidianContext } from "../../types";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
+  import { isToday } from "../../util/moment";
   import { useDataviewSource } from "../hooks/use-dataview-source";
 
   import ControlButton from "./control-button.svelte";
@@ -116,9 +117,9 @@
         <RefreshCw class="svg-icon" />
       </ControlButton>
     {:else}
-      <ControlButton disabled label="Can't sync, you're offline!"
-        ><RefreshCwOff class="svg-icon" /></ControlButton
-      >
+      <ControlButton disabled label="Can't sync, you're offline!">
+        <RefreshCwOff class="svg-icon" />
+      </ControlButton>
     {/if}
 
     <ControlButton
@@ -130,6 +131,9 @@
     </ControlButton>
 
     <ControlButton
+      --control-button-border={isToday($visibleDayInTimeline)
+        ? "1px solid var(--color-accent)"
+        : "none"}
       label="Go to file"
       on:click={async () => {
         const note = await createDailyNoteIfNeeded($visibleDayInTimeline);

@@ -122,3 +122,9 @@
     overflow: auto;
   }
 }
+
+.day-planner-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--size-4-2);
+}

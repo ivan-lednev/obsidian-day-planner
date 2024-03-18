@@ -5,6 +5,7 @@ import { Readable } from "svelte/store";
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import type { ObsidianFacade } from "./service/obsidian-facade";
 import { IcalConfig } from "./settings";
+import { ConfirmationModalProps } from "./ui/confirmation-modal";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { createShowPreview } from "./util/create-show-preview";
 import { getDiff, updateText } from "./util/tasks-utils";
@@ -85,6 +86,7 @@ export interface ObsidianContext {
   reSync: () => void;
   isOnline: Readable<boolean>;
   isDarkMode: Readable<boolean>;
+  showConfirmationModal: (props: ConfirmationModalProps) => void;
 }
 
 export type ComponentContext = Map<string, unknown>;

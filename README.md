@@ -140,3 +140,4 @@ If for some reason you still want to use the old version, there are community fo
 - Thanks to [replete](https://github.com/replete), whose fork I initially forked
 - Thanks to [Michael Brenan](https://github.com/blacksmithgu) for Dataview
 - Thanks to [Joshua Tazman Reinier](https://github.com/joshuatazrein) for his plugin, which gave me an idea of how to integrate with Dataview
+- Thanks to @liamcain for creating daily note utilities and a helpful calendar plugin

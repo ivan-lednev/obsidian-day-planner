@@ -15,6 +15,7 @@ import { STaskEditor } from "./service/stask-editor";
 import { DayPlannerSettings, defaultSettings } from "./settings";
 import { ObsidianContext } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
+import { ConfirmationModal } from "./ui/confirmation-modal";
 import { ReleaseNotesModal } from "./ui/release-notes-modal";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimelineView from "./ui/timeline-view";
@@ -228,6 +229,9 @@ export default class DayPlanner extends Plugin {
       reSync: () => icalSyncTrigger.set(getUpdateTrigger()),
       isOnline,
       isDarkMode,
+      showConfirmationModal: (props) => {
+        new ConfirmationModal(this.app, props).open();
+      },
     };
 
     const componentContext = new Map<
