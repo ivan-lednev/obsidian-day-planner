@@ -4,14 +4,20 @@
     ArrowRightToLine,
     CircleDotIcon,
   } from "lucide-svelte";
+  import { Moment } from "moment";
+  import { getContext } from "svelte";
+  import { Writable } from "svelte/store";
 
-  import { visibleDateRange } from "../../../global-store/visible-date-range";
+  import { dateRangeContextKey } from "../../../constants";
   import { getDaysOfCurrentWeek, getDaysOfWeek } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
 
-  $: firstDayOfShownWeek = $visibleDateRange[0];
+
+  const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
+
+  $: firstDayOfShownWeek = $dateRange[0];
   $: startOfRange = firstDayOfShownWeek.format("MMM, D");
-  $: endOfRange = $visibleDateRange.at(-1).format("MMM, D");
+  $: endOfRange = $dateRange.at(-1).format("MMM, D");
 
   function handleShowPrevious() {
     const firstDayOfPreviousWeek = firstDayOfShownWeek
@@ -19,18 +25,18 @@
       .subtract(1, "week");
     const daysOfPreviousWeek = getDaysOfWeek(firstDayOfPreviousWeek);
 
-    visibleDateRange.set(daysOfPreviousWeek);
+    dateRange.set(daysOfPreviousWeek);
   }
 
   function handleShowCurrent() {
-    visibleDateRange.set(getDaysOfCurrentWeek());
+    dateRange.set(getDaysOfCurrentWeek());
   }
 
   function handleShowNext() {
     const firstDayOfNextWeek = firstDayOfShownWeek.clone().add(1, "week");
     const daysOfNextWeek = getDaysOfWeek(firstDayOfNextWeek);
 
-    visibleDateRange.set(daysOfNextWeek);
+    dateRange.set(daysOfNextWeek);
   }
 </script>
 

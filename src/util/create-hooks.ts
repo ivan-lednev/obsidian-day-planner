@@ -3,6 +3,7 @@ import {
   flatten,
   flow,
   groupBy,
+  isEmpty,
   mapValues,
   partition,
 } from "lodash/fp";
@@ -11,7 +12,6 @@ import { derived, readable, writable, Writable } from "svelte/store";
 
 import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
 import { currentTime } from "../global-store/current-time";
-import { visibleDays } from "../global-store/visible-days";
 import { DataviewFacade } from "../service/dataview-facade";
 import { ObsidianFacade } from "../service/obsidian-facade";
 import { PlanEditor } from "../service/plan-editor";
@@ -20,6 +20,7 @@ import { Task, UnscheduledTask } from "../types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
+import { useDateRanges } from "../ui/hooks/use-date-ranges";
 import { useDebounceWithDelay } from "../ui/hooks/use-debounce-with-delay";
 import { useEditContext } from "../ui/hooks/use-edit/use-edit-context";
 import { useIsOnline } from "../ui/hooks/use-is-online";
@@ -30,6 +31,7 @@ import { useNewlyStartedTasks } from "../ui/hooks/use-newly-started-tasks";
 import { useTasksFromExtraSources } from "../ui/hooks/use-tasks-from-extra-sources";
 import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "../ui/hooks/use-visible-dataview-tasks";
+import { useVisibleDays } from "../ui/hooks/use-visible-days";
 
 import { canHappenAfter, icalEventToTasks } from "./ical";
 import { getEarliestMoment } from "./moment";
@@ -105,11 +107,14 @@ export function createHooks({
     isOnline,
   );
 
+  const dateRanges = useDateRanges();
+  const visibleDays = useVisibleDays(dateRanges.ranges);
+
   // todo: improve naming
   const schedulerQueue = derived(
     [icalEvents, visibleDays],
     ([$icalEvents, $visibleDays]) => {
-      if (!$icalEvents) {
+      if (isEmpty($icalEvents) || isEmpty($visibleDays)) {
         return [];
       }
 
@@ -170,6 +175,7 @@ export function createHooks({
   const visibleDailyNotes = useVisibleDailyNotes(
     layoutReady,
     debouncedTaskUpdateTrigger,
+    visibleDays,
   );
   const listsFromVisibleDailyNotes = useListsFromVisibleDailyNotes(
     visibleDailyNotes,
@@ -187,7 +193,10 @@ export function createHooks({
     tasksFromExtraSources,
     settingsStore,
   });
-  const visibleDataviewTasks = useVisibleDataviewTasks(dataviewTasks);
+  const visibleDataviewTasks = useVisibleDataviewTasks(
+    dataviewTasks,
+    visibleDays,
+  );
 
   const visibleTasks = derived(
     [visibleDataviewTasks, visibleDayToEventOccurences],
@@ -225,5 +234,6 @@ export function createHooks({
     icalSyncTrigger,
     isOnline,
     isDarkMode,
+    dateRanges,
   };
 }

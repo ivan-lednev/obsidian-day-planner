@@ -1,9 +1,11 @@
 <script lang="ts">
   import { Moment } from "moment";
+  import { getContext } from "svelte";
+  import { Writable } from "svelte/store";
 
+  import { dateRangeContextKey } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
-  import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
 
   import GlobalHandlers from "./global-handlers.svelte";
   import Ruler from "./ruler.svelte";
@@ -14,8 +16,10 @@
 
   export let day: Moment | undefined = undefined;
 
+  const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
+
   // todo: refactor to remove this one
-  $: actualDay = day || $visibleDayInTimeline;
+  $: actualDay = day || $dateRange[0];
 </script>
 
 <GlobalHandlers />

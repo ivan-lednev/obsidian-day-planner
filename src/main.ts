@@ -24,7 +24,6 @@ import { createHooks } from "./util/create-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
-import { handleActiveLeafChange } from "./util/handle-active-leaf-change";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { getUpdateTrigger } from "./util/store";
 
@@ -52,9 +51,6 @@ export default class DayPlanner extends Plugin {
 
     this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
-    this.registerEvent(
-      this.app.workspace.on("active-leaf-change", handleActiveLeafChange),
-    );
 
     this.handleNewPluginVersion();
 
@@ -69,7 +65,6 @@ export default class DayPlanner extends Plugin {
   }
 
   initWeeklyLeaf = async () => {
-    await this.detachLeavesOfType(viewTypeWeekly);
     await this.app.workspace.getLeaf("tab").setViewState({
       type: viewTypeWeekly,
       active: true,
@@ -185,6 +180,7 @@ export default class DayPlanner extends Plugin {
       icalSyncTrigger,
       isOnline,
       isDarkMode,
+      dateRanges,
     } = createHooks({
       app: this.app,
       dataviewFacade: this.dataviewFacade,
@@ -245,13 +241,13 @@ export default class DayPlanner extends Plugin {
     this.registerView(
       viewTypeTimeline,
       (leaf: WorkspaceLeaf) =>
-        new TimelineView(leaf, this.settings, componentContext),
+        new TimelineView(leaf, this.settings, componentContext, dateRanges),
     );
 
     this.registerView(
       viewTypeWeekly,
       (leaf: WorkspaceLeaf) =>
-        new WeeklyView(leaf, this.settings, componentContext),
+        new WeeklyView(leaf, this.settings, componentContext, dateRanges),
     );
   }
 }

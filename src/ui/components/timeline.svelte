@@ -1,11 +1,11 @@
 <script lang="ts">
   import { Moment } from "moment";
   import { getContext } from "svelte";
+  import { Writable } from "svelte/store";
 
-  import { obsidianContext } from "../../constants";
+  import { dateRangeContextKey, obsidianContext } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
-  import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import { ObsidianContext } from "../../types";
   import { isToday } from "../../util/moment";
   import { getRenderKey } from "../../util/task-utils";
@@ -13,7 +13,7 @@
 
   import Column from "./column.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
-  import Needle from "./needle.svelte"
+  import Needle from "./needle.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
   import ScheduledTaskContainer from "./scheduled-task-container.svelte";
 
@@ -24,8 +24,9 @@
   const {
     editContext: { confirmEdit, editOperation, getEditHandlers },
   } = getContext<ObsidianContext>(obsidianContext);
+  const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
-  $: actualDay = day || $visibleDayInTimeline;
+  $: actualDay = day || $dateRange[0];
   $: ({
     displayedTasks,
     cancelEdit,
@@ -45,7 +46,7 @@
 
 <Column visibleHours={getVisibleHours($settings)}>
   {#if isToday(actualDay)}
-      <Needle autoScrollBlocked={isUnderCursor} />
+    <Needle autoScrollBlocked={isUnderCursor} />
   {/if}
 
   <ScheduledTaskContainer

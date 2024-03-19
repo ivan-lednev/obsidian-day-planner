@@ -1,18 +1,20 @@
+import { Moment } from "moment";
 import { STask } from "obsidian-dataview";
 import { derived, Readable } from "svelte/store";
 
-import { visibleDays } from "../../global-store/visible-days";
 import { TasksForDay } from "../../types";
 import { toClockRecord } from "../../util/dataview";
 import { getDayKey, getEmptyRecordsForDay } from "../../util/tasks-utils";
 
 interface UseVisibleClockRecordsProps {
   dayToSTasksLookup: Readable<Record<string, STask[]>>;
+  visibleDays: Readable<Moment[]>;
 }
 
 // TODO: remove duplication from Tasks
 export function useVisibleClockRecords({
   dayToSTasksLookup,
+  visibleDays,
 }: UseVisibleClockRecordsProps) {
   return derived(
     [visibleDays, dayToSTasksLookup],

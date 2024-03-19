@@ -3,6 +3,7 @@ export const viewTypeWeekly = "weekly";
 export const viewTypeTimeTracker = "timeTracker";
 export const obsidianContext = "obsidian";
 export const editContextKey = "editContext";
+export const dateRangeContextKey = "dateRangeContext";
 export const errorContextKey = "errorContext";
 export const defaultDayFormat = "YYYY-MM-DD";
 export const originalRecurrenceDayKeyFormat = "YYYY-MM-DD";

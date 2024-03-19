@@ -14,11 +14,12 @@
     RefreshCwOff,
     Pencil,
   } from "lucide-svelte";
+  import { Moment } from "moment";
   import { getContext } from "svelte";
+  import { Writable } from "svelte/store";
 
-  import { obsidianContext } from "../../constants";
+  import { dateRangeContextKey, obsidianContext } from "../../constants";
   import { settings } from "../../global-store/settings";
-  import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
   import type { ObsidianContext } from "../../types";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
   import { isToday } from "../../util/moment";
@@ -29,6 +30,7 @@
   import Dropdown from "./obsidian/dropdown.svelte";
   import SettingItem from "./obsidian/setting-item.svelte";
 
+
   const {
     obsidianFacade,
     initWeeklyView,
@@ -38,6 +40,7 @@
     reSync,
     isOnline,
   } = getContext<ObsidianContext>(obsidianContext);
+  const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
   const {
     sourceIsEmpty,
@@ -65,21 +68,21 @@
   }
 
   async function goBack() {
-    const previousDay = $visibleDayInTimeline.clone().subtract(1, "day");
+    const previousDay = $dateRange[0].clone().subtract(1, "day");
 
     const previousNote = await createDailyNoteIfNeeded(previousDay);
     await obsidianFacade.openFileInEditor(previousNote);
 
-    $visibleDayInTimeline = previousDay;
+    $dateRange = [previousDay];
   }
 
   async function goForward() {
-    const nextDay = $visibleDayInTimeline.clone().add(1, "day");
+    const nextDay = $dateRange[0].clone().add(1, "day");
 
     const nextNote = await createDailyNoteIfNeeded(nextDay);
     await obsidianFacade.openFileInEditor(nextNote);
 
-    $visibleDayInTimeline = nextDay;
+    $dateRange = [nextDay];
   }
 
   async function goToToday() {
@@ -131,17 +134,17 @@
     </ControlButton>
 
     <ControlButton
-      --control-button-border={isToday($visibleDayInTimeline)
+      --control-button-border={isToday($dateRange[0])
         ? "1px solid var(--color-accent)"
         : "none"}
       label="Go to file"
       on:click={async () => {
-        const note = await createDailyNoteIfNeeded($visibleDayInTimeline);
+        const note = await createDailyNoteIfNeeded($dateRange[0]);
         await obsidianFacade.openFileInEditor(note);
       }}
     >
       <span class="date"
-        >{$visibleDayInTimeline.format($settings.timelineDateFormat)}</span
+        >{$dateRange[0].format($settings.timelineDateFormat)}</span
       >
     </ControlButton>
 

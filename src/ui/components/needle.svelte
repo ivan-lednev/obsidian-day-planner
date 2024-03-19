@@ -2,8 +2,7 @@
   import { currentTime } from "../../global-store/current-time";
   import { timeToTimelineOffset } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
-  import { visibleDayInTimeline } from "../../global-store/visible-day-in-timeline";
-  import { getMinutesSinceMidnight, isToday } from "../../util/moment";
+  import { getMinutesSinceMidnight } from "../../util/moment";
 
   export let autoScrollBlocked = false;
 
@@ -14,11 +13,7 @@
   );
 
   function scrollIntoView() {
-    if (
-      $settings.centerNeedle &&
-      !autoScrollBlocked &&
-      isToday($visibleDayInTimeline)
-    ) {
+    if ($settings.centerNeedle && !autoScrollBlocked) {
       el?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }
@@ -37,9 +32,7 @@
   style:top="{coords}px"
   class="needle absolute-stretch-x"
 ></div>
-<div
-  style:top="{coords}px"
-  class="ball"></div>
+<div style:top="{coords}px" class="ball"></div>
 
 <style>
   .needle {

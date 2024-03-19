@@ -1,6 +1,6 @@
 import type { Moment } from "moment";
 import { Pos } from "obsidian";
-import { Readable } from "svelte/store";
+import { Readable, Writable } from "svelte/store";
 
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import type { ObsidianFacade } from "./service/obsidian-facade";
@@ -97,3 +97,5 @@ declare global {
 }
 
 export type WithIcalConfig<T> = T & { calendar: IcalConfig };
+
+export type DateRange = Writable<Moment[]> & { untrack: () => void };

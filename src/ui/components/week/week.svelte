@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { Moment } from "moment";
   import { getContext } from "svelte";
+  import { Writable } from "svelte/store";
 
-  import { obsidianContext } from "../../../constants";
+  import { dateRangeContextKey, obsidianContext } from "../../../constants";
   import { getVisibleHours } from "../../../global-store/derived-settings";
   import { settings } from "../../../global-store/settings";
-  import { visibleDateRange } from "../../../global-store/visible-date-range";
   import type { ObsidianContext } from "../../../types";
   import { isToday } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
@@ -14,7 +15,9 @@
   import Timeline from "../timeline.svelte";
   import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
 
+
   const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
+  const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
   let weekHeaderRef: HTMLDivElement | undefined;
 
@@ -31,7 +34,7 @@
 <div bind:this={weekHeaderRef} class="week-header">
   <div class="header-row day-buttons">
     <div class="corner"></div>
-    {#each $visibleDateRange as day}
+    {#each $dateRange as day}
       <div class="header-cell" class:today={isToday(day)}>
         <ControlButton
           --color={isToday(day) ? "white" : "var(--icon-color)"}
@@ -46,7 +49,7 @@
 
   <div class="header-row">
     <div class="corner"></div>
-    {#each $visibleDateRange as day}
+    {#each $dateRange as day}
       <div class="header-cell">
         <UnscheduledTaskContainer {day} />
       </div>
@@ -54,14 +57,14 @@
   </div>
 </div>
 
-<Scroller on:scroll={handleScroll} let:hovering={autoScrollBlocked}>
+<Scroller on:scroll={handleScroll}>
   <Ruler
     --ruler-box-shadow="var(--shadow-right)"
     visibleHours={getVisibleHours($settings)}
   />
-  {#each $visibleDateRange as day}
+  {#each $dateRange as day}
     <div class="day-column">
-      <Timeline {day} />
+      <Timeline {day} isUnderCursor={true} />
     </div>
   {/each}
 </Scroller>

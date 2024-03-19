@@ -1,29 +1,24 @@
+import { Moment } from "moment";
 import { FileView, WorkspaceLeaf } from "obsidian";
 import { getDateFromFile } from "obsidian-daily-notes-interface";
-import { get } from "svelte/store";
+import { get, Writable } from "svelte/store";
 
-import { visibleDayInTimeline } from "../global-store/visible-day-in-timeline";
-
-import { isToday } from "./moment";
-
-export function handleActiveLeafChange({ view }: WorkspaceLeaf) {
-  if (!(view instanceof FileView) || !view.file) {
+export function handleActiveLeafChange(
+  leaf: WorkspaceLeaf | null,
+  timelineDateRange: Writable<Moment[]>,
+) {
+  if (!(leaf?.view instanceof FileView) || !leaf?.view.file) {
     return;
   }
 
-  const dayUserSwitchedTo = getDateFromFile(view.file, "day");
+  const dayUserSwitchedTo = getDateFromFile(leaf.view.file, "day");
 
-  if (dayUserSwitchedTo?.isSame(get(visibleDayInTimeline), "day")) {
+  if (
+    dayUserSwitchedTo?.isSame(get(timelineDateRange)?.[0], "day") ||
+    !dayUserSwitchedTo
+  ) {
     return;
   }
 
-  if (!dayUserSwitchedTo) {
-    if (isToday(get(visibleDayInTimeline))) {
-      visibleDayInTimeline.set(window.moment());
-    }
-
-    return;
-  }
-
-  visibleDayInTimeline.set(dayUserSwitchedTo);
+  timelineDateRange.set([dayUserSwitchedTo]);
 }

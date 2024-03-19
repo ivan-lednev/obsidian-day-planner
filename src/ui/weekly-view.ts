@@ -1,20 +1,24 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 
-import { viewTypeWeekly } from "../constants";
+import { dateRangeContextKey, viewTypeWeekly } from "../constants";
 import type { DayPlannerSettings } from "../settings";
-import { ComponentContext } from "../types";
+import type { ComponentContext, DateRange } from "../types";
+import { getDaysOfCurrentWeek } from "../util/moment";
 
 import HeaderActions from "./components/week/header-actions.svelte";
 import Week from "./components/week/week.svelte";
+import { useDateRanges } from "./hooks/use-date-ranges";
 
 export default class WeeklyView extends ItemView {
   private weekComponent: Week;
   private headerActionsComponent: HeaderActions;
+  private dateRange: DateRange;
 
   constructor(
     leaf: WorkspaceLeaf,
     private readonly settings: () => DayPlannerSettings,
     private readonly componentContext: ComponentContext,
+    private readonly dateRanges: ReturnType<typeof useDateRanges>,
   ) {
     super(leaf);
   }
@@ -40,17 +44,26 @@ export default class WeeklyView extends ItemView {
     const customActionsEl = createDiv();
     viewActionsEl.prepend(customActionsEl);
 
+    this.dateRange = this.dateRanges.trackRange(getDaysOfCurrentWeek());
+
+    const context = new Map([
+      ...this.componentContext,
+      [dateRangeContextKey, this.dateRange],
+    ]);
+
     this.headerActionsComponent = new HeaderActions({
       target: customActionsEl,
+      context,
     });
 
     this.weekComponent = new Week({
       target: contentEl,
-      context: this.componentContext,
+      context,
     });
   }
 
   async onClose() {
+    this.dateRange.untrack();
     this.weekComponent?.$destroy();
     this.headerActionsComponent?.$destroy();
   }
