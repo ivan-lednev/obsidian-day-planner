@@ -15,7 +15,7 @@ export class DataviewFacade {
       return [];
     }
 
-    return this.getDataview().pages(source).file.tasks;
+    return this.getDataview().pages(source).file.tasks.array();
   };
 
   getAllListsFrom = (source: string) => {
@@ -24,7 +24,7 @@ export class DataviewFacade {
       return [];
     }
 
-    return this.getDataview().pages(source).file.lists;
+    return this.getDataview().pages(source).file.lists.array();
   };
 
   getTaskFromCaretLocation({ path, line }: { path: string; line: number }) {

@@ -192,6 +192,7 @@ export default class DayPlanner extends Plugin {
     const errorStore = writable<Error | undefined>();
 
     // todo: move out
+    // todo: pass context with day
     new StatusBarWidget({
       target: this.addStatusBarItem(),
       props: {

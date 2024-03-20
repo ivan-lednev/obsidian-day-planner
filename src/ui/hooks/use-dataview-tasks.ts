@@ -17,17 +17,14 @@ export function useDataviewTasks({
   return derived(
     [listsFromVisibleDailyNotes, tasksFromExtraSources, settingsStore],
     ([$listsFromVisibleDailyNotes, $tasksFromExtraSources, $settingsStore]) => {
-      const allTasks =
-        $tasksFromExtraSources.length > 0
-          ? // todo: this looks silly
-            $listsFromVisibleDailyNotes.concat($tasksFromExtraSources)
-          : $listsFromVisibleDailyNotes;
+      const allTasks = [
+        ...$listsFromVisibleDailyNotes,
+        ...$tasksFromExtraSources,
+      ];
 
-      if ($settingsStore.showCompletedTasks) {
-        return allTasks;
-      }
-
-      return allTasks.filter((sTask: STask) => !sTask.completed);
+      return $settingsStore.showCompletedTasks
+        ? allTasks
+        : allTasks.filter((sTask: STask) => !sTask.completed);
     },
   );
 }

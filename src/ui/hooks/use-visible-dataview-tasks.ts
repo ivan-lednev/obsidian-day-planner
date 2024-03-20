@@ -1,6 +1,6 @@
 import { groupBy } from "lodash/fp";
 import { Moment } from "moment";
-import { DataArray, STask } from "obsidian-dataview";
+import { STask } from "obsidian-dataview";
 import { derived, Readable } from "svelte/store";
 
 import { settings } from "../../global-store/settings";
@@ -10,7 +10,7 @@ import { mapToTasksForDay } from "../../util/get-tasks-for-day";
 import { getDayKey, getEmptyRecordsForDay } from "../../util/tasks-utils";
 
 export function useVisibleDataviewTasks(
-  dataviewTasks: Readable<DataArray<STask>>,
+  dataviewTasks: Readable<STask[]>,
   visibleDays: Readable<Moment[]>,
 ) {
   return derived(
