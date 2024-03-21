@@ -12,7 +12,7 @@
     Info,
     RefreshCw,
     RefreshCwOff,
-    Pencil,
+    Move,
   } from "lucide-svelte";
   import { Moment } from "moment";
   import { getContext } from "svelte";
@@ -29,7 +29,7 @@
   import ErrorReport from "./error-report.svelte";
   import Dropdown from "./obsidian/dropdown.svelte";
   import SettingItem from "./obsidian/setting-item.svelte";
-
+  import Pill from "./pill.svelte";
 
   const {
     obsidianFacade,
@@ -161,7 +161,7 @@
       label="Show time block edit controls"
       on:click={toggleEditControls}
     >
-      <Pencil class="svg-icon" />
+      <Move class="svg-icon" />
     </ControlButton>
 
     <ControlButton
@@ -183,7 +183,11 @@
       <Settings class="svg-icon" />
     </ControlButton>
   </div>
+  <div>
+    <Pill key="filter" value={$settings.dataviewSource} />
+  </div>
   {#if editControlsVisible}
+    Drag mode:
     <div class="button-box">
       <ControlButton
         isActive={$settings.editMode === "simple"}
@@ -205,6 +209,7 @@
       </ControlButton>
     </div>
 
+    Drag action:
     <div class="button-box">
       <ControlButton
         isActive={$settings.copyOnDrag === false}
@@ -473,6 +478,8 @@
     gap: var(--size-4-1);
 
     padding: var(--size-4-2);
+
+    font-size: var(--font-ui-small);
   }
 
   .header {
