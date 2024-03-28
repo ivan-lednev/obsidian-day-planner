@@ -26,6 +26,9 @@ import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { getUpdateTrigger } from "./util/store";
+import { mount, unmount } from "svelte";
+
+const currentPluginVersion = "TODO: replace with real";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -102,7 +105,8 @@ export default class DayPlanner extends Plugin {
 
     this.settingsStore.update((previous) => ({
       ...previous,
-      pluginVersion: currentPluginVersion,
+      pluginVersion: "TODO: replace esbuild",
+      // pluginVersion: currentPluginVersion,
     }));
 
     if (this.settings().releaseNotes) {
@@ -193,7 +197,7 @@ export default class DayPlanner extends Plugin {
 
     // todo: move out
     // todo: pass context with day
-    new StatusBarWidget({
+    const statusBarWidget = mount(StatusBarWidget, {
       target: this.addStatusBarItem(),
       props: {
         onClick: this.initTimelineLeaf,
@@ -201,6 +205,9 @@ export default class DayPlanner extends Plugin {
         errorStore,
       },
     });
+
+    this.register(() => unmount(statusBarWidget));
+    // ---
 
     this.register(newlyStartedTasks.subscribe(notifyAboutStartedTasks));
     this.addCommand({

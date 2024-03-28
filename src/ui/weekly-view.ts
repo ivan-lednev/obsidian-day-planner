@@ -8,6 +8,7 @@ import { getDaysOfCurrentWeek } from "../util/moment";
 import HeaderActions from "./components/week/header-actions.svelte";
 import Week from "./components/week/week.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
+import { mount, unmount } from "svelte";
 
 export default class WeeklyView extends ItemView {
   private weekComponent: Week;
@@ -51,12 +52,12 @@ export default class WeeklyView extends ItemView {
       [dateRangeContextKey, this.dateRange],
     ]);
 
-    this.headerActionsComponent = new HeaderActions({
+    this.headerActionsComponent = mount(HeaderActions, {
       target: customActionsEl,
       context,
     });
 
-    this.weekComponent = new Week({
+    this.weekComponent = mount(Week, {
       target: contentEl,
       context,
     });
@@ -64,7 +65,7 @@ export default class WeeklyView extends ItemView {
 
   async onClose() {
     this.dateRange.untrack();
-    this.weekComponent?.$destroy();
-    this.headerActionsComponent?.$destroy();
+    unmount(this.weekComponent);
+    unmount(this.headerActionsComponent);
   }
 }

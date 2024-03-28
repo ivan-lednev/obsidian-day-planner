@@ -2,6 +2,8 @@ import { MarkdownRenderer, Modal, Plugin } from "obsidian";
 
 import { supportBanner } from "../constants";
 
+const changelogMd = "TODO: replace with real";
+
 export class ReleaseNotesModal extends Modal {
   constructor(private readonly plugin: Plugin) {
     super(plugin.app);

@@ -1,4 +1,5 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
+import { mount, unmount } from "svelte";
 
 import { dateRangeContextKey, viewTypeTimeline } from "../constants";
 import type { DayPlannerSettings } from "../settings";
@@ -48,7 +49,7 @@ export default class TimelineView extends ItemView {
       [dateRangeContextKey, this.dateRange],
     ]);
 
-    this.timeline = new TimelineWithControls({
+    this.timeline = mount(TimelineWithControls, {
       target: contentEl,
       context,
     });
@@ -56,6 +57,6 @@ export default class TimelineView extends ItemView {
 
   async onClose() {
     this.dateRange.untrack();
-    this.timeline?.$destroy();
+    unmount(this.timeline);
   }
 }

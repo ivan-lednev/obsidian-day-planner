@@ -6,9 +6,8 @@
 
   import TimeBlockBase from "./time-block-base.svelte";
 
-  export let task: Task;
-
-  $: ({
+  const { task, children } = $props();
+  const {
     height,
     offset,
     width,
@@ -16,10 +15,12 @@
     backgroundColor,
     borderColor,
     properContrastColors,
-  } = useTaskVisuals(task, {
-    settings,
-    currentTime,
-  }));
+  } = $derived(
+    useTaskVisuals(task, {
+      settings,
+      currentTime,
+    })
+  )
 </script>
 
 <TimeBlockBase
@@ -36,5 +37,5 @@
   {task}
   on:mouseup
 >
-  <slot/>
+  {@render children()}
 </TimeBlockBase>

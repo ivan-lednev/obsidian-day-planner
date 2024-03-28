@@ -23,7 +23,7 @@ const context = await esbuild.context({
   outdir: ".",
   entryPoints: ["src/main.ts", "src/styles.scss"],
   bundle: true,
-  external: [
+    external: [
     "obsidian",
     "electron",
     "@codemirror/autocomplete",
@@ -46,8 +46,7 @@ const context = await esbuild.context({
   plugins: [
     sassPlugin(),
     esbuildSvelte({
-      compilerOptions: { css: true, dev: !prod },
-      preprocess: sveltePreprocess()
+      compilerOptions: { css: "injected", dev: !prod },
     }),
     replace({
       include: /release-notes-modal\.ts|main\.ts/,
