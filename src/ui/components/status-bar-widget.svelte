@@ -9,40 +9,37 @@
   export let tasksForToday: Readable<TasksForDay>;
   export let errorStore: Readable<Error>;
 
-  const statusBarProps = useStatusBarWidget({ tasksForToday });
-
-  $: ({ showNow, showNext, progressIndicator } = $settings);
-  $: ({ current, next } = $statusBarProps);
+  const statusBar = useStatusBarWidget({ tasksForToday });
+  const { showNow, showNext, progressIndicator } = $derived($settings);
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="root" on:click={onClick}>
   {#if $errorStore}
     😵 Error in Day Planner (click to see)
-  {:else if !current && !next}
+  {:else if !statusBar.current && !statusBar.next}
     <span class="status-bar-item-segment">All done</span>
   {:else}
-    {#if showNow && current}
+    {#if showNow && statusBar.current}
       <span class="status-bar-item-segment"
-        >Now: {current.text} (-{current.timeLeft})</span
+        >Now: {statusBar.current.text} (-{statusBar.current.timeLeft})</span
       >
       {#if progressIndicator === "pie"}
         <div
           class="status-bar-item-segment progress-pie day-planner"
-          data-value={current.percentageComplete}
+          data-value={statusBar.current.percentageComplete}
         ></div>
       {:else if progressIndicator === "bar"}
         <div class="status-bar-item-segment day-planner-progress-bar">
           <div
-            style="width: {current.percentageComplete}%;"
+            style="width: {statusBar.current.percentageComplete}%;"
             class="day-planner-progress-value"
           ></div>
         </div>
       {/if}
     {/if}
-    {#if showNext && next}
+    {#if showNext && statusBar.next}
       <span class="status-bar-item-segment"
-        >Next: {next.text} (in {next.timeToNext})</span
+        >Next: {statusBar.next.text} (in {statusBar.next.timeToNext})</span
       >
     {/if}
   {/if}
