@@ -1,7 +1,10 @@
 import { get, Readable, Writable } from "svelte/store";
 
 import { OnUpdateFn, Tasks } from "../../../types";
-import { areValuesEmpty } from "../../../util/task-utils";
+import {
+  adjustZeroDurationTask,
+  areValuesEmpty,
+} from "../../../util/task-utils";
 import { getDiff, updateText } from "../../../util/tasks-utils";
 
 import { EditOperation } from "./types";
@@ -34,11 +37,15 @@ export function useEditActions({
 
     const currentTasks = get(displayedTasks);
 
+    // call adjustZeroDurationTask to ensure that tasks with 0 duration are adjusted
+    //  to the default duration
+    const currentTasksAdjusted = adjustZeroDurationTask(currentTasks);
+
     editOperation.set(undefined);
 
     // todo: diffing can be moved outside to separate concerns
     //  but we need to know if something changed to not cause extra rewrites?
-    const diff = getDiff(get(baselineTasks), currentTasks);
+    const diff = getDiff(get(baselineTasks), currentTasksAdjusted);
 
     if (areValuesEmpty(diff)) {
       return;

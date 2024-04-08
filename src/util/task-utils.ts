@@ -9,7 +9,7 @@ import {
   scheduledPropRegExp,
   shortScheduledPropRegExp,
 } from "../regexp";
-import type { Task } from "../types";
+import type { Task, Tasks } from "../types";
 import { PlacedTask } from "../types";
 
 import { getId } from "./id";
@@ -70,6 +70,21 @@ export function createTimestamp(
 
 export function areValuesEmpty(record: Record<string, [] | object>) {
   return Object.values(record).every(isEmpty);
+}
+
+export function adjustZeroDurationTask(tasks: Tasks) {
+  return Object.fromEntries(
+    Object.entries(tasks).map(([key, tasks]) => [
+      key,
+      {
+        withTime: tasks.withTime.map((task) => ({
+          ...task,
+          durationMinutes: task.durationMinutes || defaultDurationMinutes,
+        })),
+        noTime: tasks.noTime,
+      },
+    ]),
+  );
 }
 
 function taskLineToString(task: Task) {
