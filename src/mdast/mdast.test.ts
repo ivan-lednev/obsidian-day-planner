@@ -1,4 +1,4 @@
-import { fromMarkdown, toMarkdown } from "./mdast";
+import { findNodeAtPoint, fromMarkdown, toMarkdown } from "./mdast";
 
 test("roundtripping doesn't mess up Obsidian-styled markdown", () => {
   const input = `# [[Heading]]
@@ -19,7 +19,28 @@ test("roundtripping doesn't mess up Obsidian-styled markdown", () => {
   expect(toMarkdown(parsed)).toEqual(input);
 });
 
-test.todo("extract a task");
+test("find the list at a point", () => {
+  const listInput = `- [ ] 10:00 - 11:00 Wake up
+- [ ] 11:00 - 12:00 Eat breakfast`;
+
+  const input = `# 2024-04-13
+
+## Plan
+
+${listInput}`;
+
+  const listNode = findNodeAtPoint({
+    tree: fromMarkdown(input),
+    point: {
+      line: 5,
+      column: 8,
+    },
+    searchedNodeType: "list",
+  });
+
+  expect(listNode).toBeDefined();
+  expect(toMarkdown(listNode)).toBe(listInput + "\n");
+});
 
 // function addTaskUnderHeading(root: Root, addition: Root) {}
 //
