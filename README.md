@@ -127,6 +127,7 @@ Full examples:
 - Open today's Day Planner
 - Show the Week Planner
 - Insert Planner Heading at Cursor
+- Reorder tasks by time
 
 ## Note on the old plugin version
 
