@@ -51,7 +51,7 @@ export function toUnscheduledTask(sTask: STask, day: Moment) {
   return {
     durationMinutes: defaultDurationMinutes,
     // todo: bad abstraction
-    listTokens: `${sTask.symbol} [${sTask.status}] `,
+    listTokens: getListTokens(sTask),
     firstLineText: sTask.text,
     text: toString(sTask),
     location: {
@@ -81,7 +81,7 @@ export function toTask(sTask: STask, day: Moment): Task {
 
   return {
     startTime,
-    listTokens: `${sTask.symbol} [${sTask.status}] `,
+    listTokens: getListTokens(sTask),
     firstLineText,
     text,
     durationMinutes,
@@ -132,12 +132,17 @@ export function toMarkdown(sTask: STask) {
     .map((line, i) => {
       if (i === 0) {
         // TODO: remove duplication
-        return `${baseIndent}${sTask.symbol} [${sTask.status}] ${line}`;
+        return `${baseIndent}${getListTokens(sTask)}${line}`;
       }
 
       return `${baseIndent}${extraIndent}${line}`;
     })
     .join("\n");
+}
+
+function getListTokens(sTask: STask) {
+  const maybeCheckbox = sTask.status === undefined ? "" : `[${sTask.status}] `;
+  return `${sTask.symbol} ${maybeCheckbox}`;
 }
 
 export function replaceSTaskInFile(
