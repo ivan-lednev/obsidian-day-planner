@@ -6,8 +6,8 @@ import {
   compareTaskStartEndTime,
   getFirstText,
   getTaskStartEndTime,
-  orderListByTime,
-  orderListItemByTime,
+  reorderListByTime,
+  reorderListItemByTime,
   TaskStartEndTime,
 } from "./mdast-task";
 
@@ -61,7 +61,7 @@ With more information.`;
   });
 });
 
-describe(`${orderListItemByTime.name}`, () => {
+describe(`${reorderListItemByTime.name}`, () => {
   test("moves the task to the correct location", () => {
     const input = `- 10:00 - 11:00 Wake up
 - Item without time
@@ -111,7 +111,7 @@ describe(`${orderListItemByTime.name}`, () => {
 
     attachTaskStartEndTimes(list);
 
-    orderListItemByTime({
+    reorderListItemByTime({
       list,
       listItem: misplacedListItem,
     });
@@ -120,7 +120,7 @@ describe(`${orderListItemByTime.name}`, () => {
   });
 });
 
-describe(`${orderListByTime.name}`, () => {
+describe(`${reorderListByTime.name}`, () => {
   test("orders the list by time", () => {
     const input = `- 10:00 - 11:00 Wake up
 - Item without time
@@ -163,7 +163,7 @@ describe(`${orderListByTime.name}`, () => {
     expect(list).toBeDefined();
 
     attachTaskStartEndTimes(list);
-    orderListByTime(list);
+    reorderListByTime(list);
     expect(toMarkdown(root).trim()).toBe(expectedOutput.trim());
   });
 });

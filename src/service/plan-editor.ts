@@ -5,7 +5,7 @@ import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { findNodeAtPoint, fromMarkdown, toMarkdown } from "../mdast/mdast";
 import {
   attachTaskStartEndTimes,
-  orderListItemByTime,
+  reorderListItemByTime,
 } from "../mdast/mdast-task";
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
@@ -95,7 +95,7 @@ export class PlanEditor {
             contents,
           );
 
-          return orderTasksInFileContents(updatedContents, tasks);
+          return reorderTasksInFileContents(updatedContents, tasks);
         }),
     );
 
@@ -184,7 +184,10 @@ export class PlanEditor {
   }
 }
 
-function orderTasksInFileContents(fileContents: string, tasks: Task[]): string {
+function reorderTasksInFileContents(
+  fileContents: string,
+  tasks: Task[],
+): string {
   const mdastRoot = fromMarkdown(fileContents);
   const parsedLists = new Set<unknown>();
 
@@ -211,7 +214,7 @@ function orderTasksInFileContents(fileContents: string, tasks: Task[]): string {
       searchedNodeType: "listItem",
     });
 
-    orderListItemByTime({ list, listItem });
+    reorderListItemByTime({ list, listItem });
   }
 
   return toMarkdown(mdastRoot);

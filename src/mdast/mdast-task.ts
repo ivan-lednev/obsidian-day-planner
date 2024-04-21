@@ -112,7 +112,7 @@ export function attachTaskStartEndTimes(list: List): void {
  *
  * The task order is defined by {@link compareTaskStartEndTime}.
  */
-export function orderListItemByTime({
+export function reorderListItemByTime({
   list,
   listItem,
 
@@ -125,7 +125,7 @@ export function orderListItemByTime({
    * If true, the {@link listItem} could be moved only to appear earlier in the list
    * (its index can only get smaller).
    *
-   * This is useful when {@link orderListItemByTime} is called on all the list
+   * This is useful when {@link reorderListItemByTime} is called on all the list
    * as a step of the insertion sort algorithm. It makes the algorithm output
    * more stable when some items do not have a time set.
    */
@@ -202,13 +202,13 @@ export function orderListItemByTime({
  * Does not require that {@link attachTaskStartEndTimes} had already been
  * called before calling this function.
  */
-export function orderListByTime(list: List): void {
+export function reorderListByTime(list: List): void {
   attachTaskStartEndTimes(list);
 
   // Manual insertion sort
   for (let index = 0; index < list.children.length; index++) {
     const listItem = list.children[index];
-    orderListItemByTime({
+    reorderListItemByTime({
       list,
       listItem,
       onlyConsiderItemsBeforeCurrentListItem: true,
