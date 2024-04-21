@@ -2,6 +2,11 @@ import { groupBy } from "lodash/fp";
 import type { CachedMetadata } from "obsidian";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 
+import { findNodeAtPoint, fromMarkdown, toMarkdown } from "../mdast/mdast";
+import {
+  attachTaskStartEndTimes,
+  orderListItemByTime,
+} from "../mdast/mdast-task";
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
 import type { PlacedTask, Task } from "../types";
@@ -82,14 +87,16 @@ export class PlanEditor {
       updated,
     );
 
-    const editPromises = Object.keys(pathToEditedTasksLookup).map(
-      async (path) =>
-        await this.obsidianFacade.editFile(path, (contents) =>
-          pathToEditedTasksLookup[path].reduce(
+    const editPromises = Object.entries(pathToEditedTasksLookup).map(
+      async ([path, tasks]) =>
+        await this.obsidianFacade.editFile(path, (contents) => {
+          const updatedContents = tasks.reduce(
             (result, current) => this.updateTaskInFileContents(result, current),
             contents,
-          ),
-        ),
+          );
+
+          return orderTasksInFileContents(updatedContents, tasks);
+        }),
     );
 
     return Promise.all(editPromises);
@@ -175,4 +182,37 @@ export class PlanEditor {
 
     return [withNewPlan.length, withNewPlan];
   }
+}
+
+function orderTasksInFileContents(fileContents: string, tasks: Task[]): string {
+  const mdastRoot = fromMarkdown(fileContents);
+  const parsedLists = new Set<unknown>();
+
+  for (const task of tasks) {
+    const list = findNodeAtPoint({
+      tree: mdastRoot,
+      point: {
+        line: task.location.position.start.line + 1,
+        column: task.location.position.start.col + 1,
+      },
+      searchedNodeType: "list",
+    });
+    if (!parsedLists.has(list)) {
+      attachTaskStartEndTimes(list);
+      parsedLists.add(list);
+    }
+
+    const listItem = findNodeAtPoint({
+      tree: list,
+      point: {
+        line: task.location.position.start.line + 1,
+        column: task.location.position.start.col + 1,
+      },
+      searchedNodeType: "listItem",
+    });
+
+    orderListItemByTime({ list, listItem });
+  }
+
+  return toMarkdown(mdastRoot);
 }
