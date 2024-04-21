@@ -95,7 +95,11 @@ export class PlanEditor {
             contents,
           );
 
-          return reorderTasksInFileContents(updatedContents, tasks);
+          if (this.settings().reorderTasksAfterMoving) {
+            return reorderTasksInFileContents(updatedContents, tasks);
+          } else {
+            return updatedContents;
+          }
         }),
     );
 
