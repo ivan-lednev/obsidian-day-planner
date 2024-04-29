@@ -1,4 +1,4 @@
-## 0.20.1 - 0.20.3
+## 0.20.1 - 0.20.4
 
 - 🐞 add toggle to disable release notes (#399)
 - 🐞 do not reset timeline position when it's already open (#289)
@@ -6,6 +6,9 @@
 - 🐞 fix status bar error breaking plugin
 - 🐞 Move task on copy, instead of changing its size
 - 🐞 Fix different hourglass emoji breaking task movement
+- 🐞 Fix calendar events without a location crashes plugin (#438, thanks, @sepatel)
+- 🐞 Do not print undefined inside checkbox when list item is not a task (#368, thanks, @Gelio)
+- 🐞 AM/PM doesn't match unexpectedly anymore (#312, thanks, @teisermann)
 
 ## 0.20.0
 
