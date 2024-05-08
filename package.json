@@ -68,6 +68,7 @@
   "dependencies": {
     "@babel/preset-env": "^7.22.9",
     "@babel/preset-typescript": "^7.22.5",
+    "@reduxjs/toolkit": "^2.2.3",
     "@testing-library/svelte": "^4.0.3",
     "@types/jest": "^29.5.3",
     "@types/lodash": "^4.14.197",

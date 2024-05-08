@@ -1,6 +1,5 @@
 import { Plugin, WorkspaceLeaf } from "obsidian";
 import { get, writable, Writable } from "svelte/store";
-
 import {
   errorContextKey,
   obsidianContext,
@@ -26,6 +25,24 @@ import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { getUpdateTrigger } from "./util/store";
+import { RootState, store } from "./store";
+import { clearAllListeners, isAnyOf } from "@reduxjs/toolkit";
+import {
+  dateRangeClosed,
+  dateRangeOpened,
+  icalEventsUpdated,
+  icalRefreshRequested,
+  online,
+  selectSettings,
+  selectVisibleDays,
+  settingsLoaded,
+  settingsUpdated,
+} from "./obsidianSlice";
+import { listenerMiddleware } from "./listenerMiddleware";
+import { refreshIcalEvents } from "./util/use-ical-events";
+import { getEarliestMoment } from "./util/moment";
+import { canHappenAfter, icalEventToTasks } from "./util/ical";
+import { createBackgroundBatchScheduler } from "./util/scheduler";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -37,6 +54,63 @@ export default class DayPlanner extends Plugin {
 
   async onload() {
     await this.initSettingsStore();
+    store.dispatch(settingsLoaded(this.settings()));
+
+    listenerMiddleware.startListening({
+      actionCreator: settingsUpdated,
+      effect: async (action, listenerApi) => {
+        // todo: fix types
+        // @ts-ignore
+        await this.saveData(selectSettings(listenerApi.getState()));
+      },
+    });
+
+    listenerMiddleware.startListening({
+      matcher: isAnyOf(online, settingsUpdated, icalRefreshRequested),
+      effect: async (action, listenerApi) => {
+        const events = await refreshIcalEvents(
+          selectSettings(listenerApi.getState() as RootState),
+        );
+
+        // todo: fix types
+        // @ts-ignore
+        listenerApi.dispatch(icalEventsUpdated(events));
+      },
+    });
+
+    const scheduler = createBackgroundBatchScheduler();
+
+    listenerMiddleware.startListening({
+      matcher: isAnyOf(icalEventsUpdated, dateRangeOpened, dateRangeClosed),
+      effect: (action, listenerApi) => {
+        // todo:
+        // @ts-ignore
+        const icalEvents = listenerApi.getState().obsidian.icalEvents;
+        // todo
+        // @ts-ignore
+        const visibleDays = selectVisibleDays(listenerApi.getState());
+
+        const earliestDay = getEarliestMoment(visibleDays);
+        const startOfEarliestDay = earliestDay.clone().startOf("day").toDate();
+        const relevantIcalEvents = icalEvents.filter((icalEvent) =>
+          canHappenAfter(icalEvent, startOfEarliestDay),
+        );
+
+        const tasks = relevantIcalEvents.flatMap((icalEvent) => {
+          return visibleDays.map(
+            (day) => () => icalEventToTasks(icalEvent, day),
+          );
+        });
+      },
+    });
+
+    // todo: delete
+    listenerMiddleware.startListening({
+      predicate: () => true,
+      effect: (action, listenerApi) => {
+        console.log({ action, state: listenerApi.getState() });
+      },
+    });
 
     this.obsidianFacade = new ObsidianFacade(this.app);
     this.dataviewFacade = new DataviewFacade(this.app);
@@ -58,6 +132,9 @@ export default class DayPlanner extends Plugin {
   }
 
   async onunload() {
+    // todo: might clear static listeners, don't want that
+    store.dispatch(clearAllListeners());
+
     return Promise.all([
       this.detachLeavesOfType(viewTypeTimeline),
       this.detachLeavesOfType(viewTypeWeekly),
@@ -182,6 +259,7 @@ export default class DayPlanner extends Plugin {
       isDarkMode,
       dateRanges,
     } = createHooks({
+      plugin: this,
       app: this.app,
       dataviewFacade: this.dataviewFacade,
       obsidianFacade: this.obsidianFacade,

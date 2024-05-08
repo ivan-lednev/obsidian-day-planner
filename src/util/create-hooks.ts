@@ -7,7 +7,7 @@ import {
   mapValues,
   partition,
 } from "lodash/fp";
-import { App } from "obsidian";
+import { App, Keymap } from "obsidian";
 import { derived, readable, writable, Writable } from "svelte/store";
 
 import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
@@ -39,6 +39,19 @@ import { createBackgroundBatchScheduler } from "./scheduler";
 import { getUpdateTrigger } from "./store";
 import { getDayKey, getEmptyRecordsForDay, mergeTasks } from "./tasks-utils";
 import { useIcalEvents } from "./use-ical-events";
+import { store } from "../store";
+import {
+  darkModeUpdated,
+  dataviewChange as dataviewChangeAction,
+  icalRefreshRequested,
+  keyDown as keyDownAction,
+  layoutReady as layoutReadyAction,
+  modDown,
+  modUp,
+  offline,
+  online,
+} from "../obsidianSlice";
+import DayPlanner from "../main";
 
 interface CreateHooksProps {
   app: App;
@@ -46,6 +59,7 @@ interface CreateHooksProps {
   obsidianFacade: ObsidianFacade;
   settingsStore: Writable<DayPlannerSettings>;
   planEditor: PlanEditor;
+  plugin: DayPlanner;
 }
 
 function getDarkModeFlag() {
@@ -53,6 +67,7 @@ function getDarkModeFlag() {
 }
 
 export function createHooks({
+  plugin,
   app,
   dataviewFacade,
   obsidianFacade,
@@ -65,6 +80,8 @@ export function createHooks({
   const layoutReady = readable(false, (set) => {
     app.workspace.onLayoutReady(() => set(true));
   });
+  // todo: unsub
+  app.workspace.onLayoutReady(() => store.dispatch(layoutReadyAction()));
 
   const isDarkMode = readable(getDarkModeFlag(), (set) => {
     const eventRef = app.workspace.on("css-change", () => {
@@ -76,13 +93,49 @@ export function createHooks({
     };
   });
 
+  // todo: unsub
+  app.workspace.on("css-change", () => {
+    store.dispatch(darkModeUpdated(getDarkModeFlag()));
+  });
+
   // todo: these can be global stores
   const keyDown = useKeyDown();
+
+  // todo: unsub
+  const trigger = (event: KeyboardEvent) => store.dispatch(keyDownAction());
+  document.addEventListener("keydown", trigger);
+
   const isModPressed = useModPressed();
+
+  plugin.registerDomEvent(document, "keydown", (event: KeyboardEvent) => {
+    if (Keymap.isModifier(event, "Mod")) {
+      store.dispatch(modDown());
+    }
+  });
+
+  plugin.registerDomEvent(document, "keyup", (event: KeyboardEvent) => {
+    if (!Keymap.isModifier(event, "Mod")) {
+      store.dispatch(modUp());
+    }
+  });
+
   const isOnline = useIsOnline();
+
+  plugin.registerDomEvent(window, "online", () => store.dispatch(online()));
+  plugin.registerDomEvent(window, "offline", () => store.dispatch(offline()));
+
   // ---
 
   const dataviewChange = useDataviewChange(app.metadataCache);
+
+  plugin.registerEvent(
+    app.metadataCache.on(
+      // @ts-expect-error
+      "dataview:metadata-change",
+      () => store.dispatch(dataviewChangeAction()),
+    ),
+  );
+
   const dataviewLoaded = useDataviewLoaded(app);
 
   const icalRefreshTimer = readable(getUpdateTrigger(), (set) => {
@@ -94,6 +147,14 @@ export function createHooks({
       clearInterval(interval);
     };
   });
+
+  plugin.registerInterval(
+    window.setInterval(() => {
+      store.dispatch(icalRefreshRequested());
+    }, icalRefreshIntervalMillis),
+  );
+
+  // ---
 
   const icalSyncTrigger = writable();
   const combinedIcalSyncTrigger = derived(

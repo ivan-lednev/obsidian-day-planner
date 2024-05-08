@@ -7,10 +7,15 @@ import { handleActiveLeafChange } from "../util/handle-active-leaf-change";
 
 import TimelineWithControls from "./components/timeline-with-controls.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
+import { getId } from "../util/id";
+import { store } from "../store";
+import { dateRangeClosed, dateRangeOpened } from "../obsidianSlice";
+import { getDayKey } from "../util/tasks-utils";
 
 export default class TimelineView extends ItemView {
   private timeline: TimelineWithControls;
   private dateRange: DateRange;
+  private dateRangeKey: string;
 
   constructor(
     leaf: WorkspaceLeaf,
@@ -37,6 +42,14 @@ export default class TimelineView extends ItemView {
     const contentEl = this.containerEl.children[1];
 
     this.dateRange = this.dateRanges.trackRange([window.moment()]);
+    this.dateRangeKey = getId();
+    store.dispatch(
+      dateRangeOpened({
+        id: this.dateRangeKey,
+        range: [getDayKey(window.moment())],
+      }),
+    );
+
     this.registerEvent(
       this.app.workspace.on("active-leaf-change", (leaf) =>
         handleActiveLeafChange(leaf, this.dateRange),
@@ -56,6 +69,8 @@ export default class TimelineView extends ItemView {
 
   async onClose() {
     this.dateRange.untrack();
+    store.dispatch(dateRangeClosed(this.dateRangeKey));
+
     this.timeline?.$destroy();
   }
 }

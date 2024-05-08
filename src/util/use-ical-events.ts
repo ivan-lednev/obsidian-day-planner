@@ -61,3 +61,37 @@ export function useIcalEvents(
     },
   );
 }
+
+export async function refreshIcalEvents(settings: DayPlannerSettings) {
+  const previousFetches = new Map<string, Array<WithIcalConfig<ical.VEvent>>>();
+
+  const calendarPromises = settings.icals
+    .filter((ical) => ical.url.trim().length > 0)
+    .map((calendar) =>
+      request({
+        url: calendar.url,
+      })
+        .then((response) => {
+          const parsed = ical.parseICS(response);
+          const veventsWithCalendar = Object.values(parsed)
+            .filter(isVEvent)
+            .map((icalEvent) => ({
+              ...icalEvent,
+              calendar,
+            }));
+
+          previousFetches.set(calendar.url, veventsWithCalendar);
+
+          return veventsWithCalendar;
+        })
+        .catch((error) => {
+          console.error(error);
+
+          return previousFetches.get(calendar.url) || [];
+        }),
+    );
+
+  const calendars = await Promise.all(calendarPromises);
+
+  return calendars.flat();
+}

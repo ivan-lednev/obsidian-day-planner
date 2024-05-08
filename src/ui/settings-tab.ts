@@ -1,9 +1,11 @@
 import { PluginSettingTab, Setting } from "obsidian";
-import type { Writable } from "svelte/store";
+import { Writable } from "svelte/store";
 
 import { icons } from "../constants";
 import type DayPlanner from "../main";
 import type { DayPlannerSettings } from "../settings";
+import { store } from "../store";
+import { settingsUpdated } from "../obsidianSlice";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   constructor(
@@ -534,6 +536,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
   }
 
   private update(patch: Partial<DayPlannerSettings>) {
+    store.dispatch(settingsUpdated(patch));
     this.settingsStore.update((previous) => ({ ...previous, ...patch }));
   }
 }
