@@ -48,13 +48,6 @@ I work on the plugin in my spare time, and I appreciate any kind of support!
 
 </details>
 
-<details>
-<summary>Advanced editing: copy, move/resize with neighbors (click to expand)</summary>
-
-![](assets/advanced-edit.gif)
-
-</details>
-
 ## How to use it
 
 ### Showing events from your daily notes
