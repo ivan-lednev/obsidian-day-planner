@@ -1,11 +1,13 @@
 # Contributing
 
+This document describes how to make a code contribution to the repo.
+
 ## Before development
 
 1. When contributing, please first discuss the change via an [issue](https://github.com/ivan-lednev/obsidian-day-planner/issues).
-2. Read the [ARCHITECTURE.md](./ARCHITECTURE.md).
+2. Read the [ARCHITECTURE.md](./ARCHITECTURE.md). It contains an overview of the code, as well as some useful guidelines.
 
-## Development Process
+## How to set up a development environment
 
 1. Fork the repo: https://github.com/ivan-lednev/obsidian-day-planner
 1. Create a test vault and go to the plugins directory: `cd <your-vault>/.obsidian/plugins`
@@ -19,7 +21,7 @@
    1. Before committing, format your code with `npm run format`. If you don't, the PR pipeline is going to mark the PR as failed once the maintainer triggers the PR workflow
    1. Once you're ready to commit, make sure your commit message conforms to the [conventional commits spec](https://www.conventionalcommits.org/en/v1.0.0/) (pre-commit hook is going to fail otherwise)
 
-## Pull Request Process
+## Submitting a pull-request
 
 1. Avoid noisy changes like formatting or refactoring that's unrelated to your change. It makes review harder
 1. Where appropriate, update the README.md with details of changes to the plugin, this includes additions and changes to configuration settings, plugin commands, useful file locations and additional installation instructions.

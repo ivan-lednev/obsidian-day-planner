@@ -15,13 +15,13 @@ I work on the plugin in my spare time, and I appreciate any kind of support!
 - [What it looks like](#what-it-looks-like)
 - [Drag-and-drop demos](#drag-and-drop-demos)
 - [How to use it](#how-to-use-it)
-  - [Showing events from your daily notes](#showing-events-from-your-daily-notes)
-  - [Showing internet calendars](#showing-internet-calendars)
+  - [1. Showing events from your daily notes](#1-showing-events-from-your-daily-notes)
+  - [2. tasks community plugin integration, showing events from other files in your vault](#2-tasks-community-plugin-integration-showing-events-from-other-files-in-your-vault)
+  - [3. Showing internet calendars](#3-showing-internet-calendars)
     - [Where to get a Google Calendar link](#where-to-get-a-google-calendar-link)
     - [Where to get an iCloud link](#where-to-get-an-icloud-link)
     - [Where to get an Outlook link](#where-to-get-an-outlook-link)
       - [Alternative](#alternative)
-  - [Showing events from other files in your vault](#showing-events-from-other-files-in-your-vault)
 - [What else you can do](#what-else-you-can-do)
 - [Commands](#commands)
 - [Note on the old plugin version](#note-on-the-old-plugin-version)
@@ -50,18 +50,59 @@ I work on the plugin in my spare time, and I appreciate any kind of support!
 
 ## How to use it
 
-### Showing events from your daily notes
+> [!Warning]
+> Dataview (community plugin, [see in Obsidian](obsidian://show-plugin?id=dataview)) should be installed and enabled for the plugin to work.
 
-1. **Either the core 'Daily Notes' or the 'Periodic Notes' plugins should be enabled**
-1. **The Dataview plugin should be enabled**
-1. Open timeline view the following command: `Show the day planner timeline`
+To see the sidebar with a timeline, run the following command: `Show the day planner timeline`
 
-Everything Dataview recognizes as a task is shown in the timeline, including:
+The plugin has 3 distinct 'modes'. That is, it can display tasks from different sources:
 
-- Tasks inside callouts
-- Nested tasks. If a nested task has a timestamp, it'll show up as a separate block, and will be excluded from its parent's unscheduled sub-items list
+1. Daily notes
+1. Obsidian-tasks
+1. Online calendars
 
-### Showing internet calendars
+Let's go over each one of them.
+
+### 1. Showing events from your daily notes
+
+> [!Warning]
+> Either the core 'Daily Notes' (core plugin) or the 'Periodic Notes' (community plugin, [see in Obsidian](obsidian://show-plugin?id=periodic-notes)) should be enabled. This is what allows day-planner to 'see' and interact with your daily notes.
+
+This is the most straightforward case that works out of the box: you write your tasks in a daily note and they show up on the timeline:
+
+```md
+# Day planner
+
+- [ ] 10:00 - 10:30 Wake up
+- [ ] 11:00 - 12:30 Grab a brush and put a little make-up
+```
+
+### 2. [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin) integration, showing events from other files in your vault
+
+This mode allows you to see tasks anywhere in the vault with dates added by the [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin). With this, day-planner serves as a kind of calendar for the [tasks plugin](obsidian://show-plugin?id=obsidian-tasks-plugin).
+
+To make this work,
+1. Add a tag like `#task` or a folder to the Dataview source field. This is how the plugin knows which files it should monitor:
+   ![](./assets/dv-source.png)
+1. Add the tag (`#task` in this example) to the file with some tasks
+1. Add the `scheduled` property to a task in one of the formats:
+   - Shorthand, added by [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin): `⏳ 2021-08-29`
+     - Note that this plugin has a handy modal for adding these properties
+   - Full Dataview-like property: `[scheduled:: 2021-08-29]`
+   - Another Dataview format: `(scheduled:: 2021-08-29)`.
+
+Full examples:
+
+```md
+---
+tags: "#task"
+---
+
+- [ ] 08:00 - 10:00 This task uses the shorthand format ⏳ 2021-08-29
+- [ ] 11:00 - 13:00 This task uses the Dataview property format [scheduled:: 2021-08-29]
+```
+
+### 3. Showing internet calendars
 
 To show events from internet calendars like **Google Calendar, iCloud Calendar and Outlook** you only need to add an ICS link in the plugin settings.
 
@@ -89,20 +130,6 @@ Here's how the settings look on the web version:
 ##### Alternative
 
 If your organization doesn't let you share your calendar this way, you might try [a different way described in this issue](https://github.com/ivan-lednev/obsidian-day-planner/issues/395).
-
-### Showing events from other files in your vault
-
-1. Include its folder or tag into the Dataview filter
-1. Add time and a date that Dataview recognizes: `⏳ 2021-08-29` or `[scheduled:: 2021-08-29]` or `(scheduled:: 2021-08-29)`.
-
-Full examples:
-
-```md
-- [ ] 08:00 - 10:00 This task uses the shorthand format (used by obsidian-tasks) ⏳ 2021-08-29
-- [ ] 11:00 - 13:00 This task uses the Dataview property format [scheduled:: 2021-08-29]
-```
-
-[obsidian-tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) adds a modal with some handy shortcuts for adding dates like these.
 
 ## What else you can do
 
