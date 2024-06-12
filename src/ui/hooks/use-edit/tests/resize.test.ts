@@ -1,11 +1,12 @@
 import { get } from "svelte/store";
+
 import { Tasks } from "../../../../types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
+import { EditMode } from "../types";
 
 import { dayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
-import { EditMode } from "../types";
 
 describe("resize", () => {
   test("resizing changes duration", () => {

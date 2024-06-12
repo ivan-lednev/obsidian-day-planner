@@ -1,4 +1,10 @@
 <script lang="ts">
+  import {
+    ArrowDownToLine,
+    Copy,
+    GripVertical,
+    MoveVertical,
+  } from "lucide-svelte";
   import { Moment } from "moment";
   import { getContext } from "svelte";
   import { Writable } from "svelte/store";
@@ -10,21 +16,15 @@
   import { isToday } from "../../util/moment";
   import { copy, getRenderKey } from "../../util/task-utils";
   import { styledCursor } from "../actions/styled-cursor";
+  import { EditMode } from "../hooks/use-edit/types";
 
+  import BlockControlButton from "./block-control-button.svelte";
   import Column from "./column.svelte";
+  import ExpandingControls from "./expanding-controls.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Needle from "./needle.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
   import ScheduledTaskContainer from "./scheduled-task-container.svelte";
-  import ExpandingControls from "./expanding-controls.svelte";
-  import BlockControlButton from "./block-control-button.svelte";
-  import {
-    ArrowDownToLine,
-    Copy,
-    GripVertical,
-    MoveVertical,
-  } from "lucide-svelte";
-  import { EditMode } from "../hooks/use-edit/types";
 
   // TODO: showRuler or add <slot name="left-gutter" />
   export let day: Moment | undefined = undefined;
@@ -59,10 +59,10 @@
   {/if}
 
   <ScheduledTaskContainer
+    {pointerOffsetY}
     on:mousedown={handleContainerMouseDown}
     on:mouseenter={handleMouseEnter}
     on:mouseup={confirmEdit}
-    {pointerOffsetY}
   >
     {#each $displayedTasks.withTime as task (getRenderKey(task))}
       {#if task.calendar}
@@ -70,27 +70,27 @@
       {:else}
         <LocalTimeBlock {task} on:mouseup={() => handleTaskMouseUp(task)}>
           {#if !$editOperation}
-            <ExpandingControls --top="4px" --right="4px">
+            <ExpandingControls --right="4px" --top="4px">
               <BlockControlButton
                 slot="visible"
-                label="Start moving"
                 cursor="grab"
+                label="Start moving"
                 on:mousedown={() => handleGripMouseDown(task, EditMode.DRAG)}
               >
                 <GripVertical class="svg-icon" />
               </BlockControlButton>
               <svelte:fragment slot="hidden">
                 <BlockControlButton
-                  label="Start copying"
                   cursor="grab"
+                  label="Start copying"
                   on:mousedown={() =>
                     handleGripMouseDown(copy(task), EditMode.DRAG)}
                 >
                   <Copy class="svg-icon" />
                 </BlockControlButton>
                 <BlockControlButton
-                  label="Move block and push neighboring blocks"
                   cursor="grab"
+                  label="Move block and push neighboring blocks"
                   on:mousedown={() =>
                     handleGripMouseDown(task, EditMode.DRAG_AND_SHIFT_OTHERS)}
                 >
@@ -98,11 +98,11 @@
                 </BlockControlButton>
               </svelte:fragment>
             </ExpandingControls>
-            <ExpandingControls --bottom="-12px" --right="16px">
+            <ExpandingControls --bottom="-12px" --right="48px">
               <BlockControlButton
                 slot="visible"
-                label="Start resizing"
                 cursor="grab"
+                label="Start resizing"
                 on:mousedown={() =>
                   handleResizerMouseDown(task, EditMode.RESIZE)}
               >
@@ -110,8 +110,8 @@
               </BlockControlButton>
               <svelte:fragment slot="hidden">
                 <BlockControlButton
-                  label="Move block and push neighboring blocks"
                   cursor="grab"
+                  label="Resize block and push neighboring blocks"
                   on:mousedown={() =>
                     handleResizerMouseDown(
                       task,

@@ -4,10 +4,10 @@ import { defaultSettingsForTests } from "../../../../settings";
 import { Tasks } from "../../../../types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
+import { EditMode } from "../types";
 
 import { dayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
-import { EditMode } from "../types";
 
 describe("drag", () => {
   test("when drag starts, target task reacts to cursor", () => {

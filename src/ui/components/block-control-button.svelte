@@ -4,22 +4,16 @@
 </script>
 
 <div
-  aria-label={label}
   style:cursor
-  class="grip clickable-icon"
+  class="clickable-icon"
+  aria-label={label}
   on:mousedown|stopPropagation
 >
   <slot />
 </div>
 
 <style>
-  /* todo: rename */
-  .grip {
-    color: var(--text-faint);
-    display: flex;
-  }
-
-  .grip:hover {
-    color: var(--text-muted);
+  .clickable-icon {
+    padding: var(--size-2-1) var(--size-2-2);
   }
 </style>

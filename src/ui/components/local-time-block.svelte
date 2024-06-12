@@ -1,20 +1,20 @@
 <script lang="ts">
   import { Task } from "../../types";
 
+  import Hoverable from "./hoverable.svelte";
   import MarkdownBlockContent from "./markdown-block-content.svelte";
   import RenderedMarkdown from "./rendered-markdown.svelte";
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
-  import Hoverable from "./hoverable.svelte";
 
   export let task: Task;
 </script>
 
 <Hoverable let:hovering>
-  <ScheduledTimeBlock on:mouseup {task}>
+  <ScheduledTimeBlock {task} on:mouseup>
     <MarkdownBlockContent {task}>
       <RenderedMarkdown {task} />
     </MarkdownBlockContent>
-    {#if hovering}
+    {#if true}
       <slot />
     {/if}
   </ScheduledTimeBlock>

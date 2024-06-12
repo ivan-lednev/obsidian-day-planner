@@ -1,9 +1,9 @@
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
+import { EditMode } from "../types";
 
 import { emptyTasks, nextDayKey, unscheduledTask } from "./util/fixtures";
 import { setUp } from "./util/setup";
-import { EditMode } from "../types";
 
 jest.mock("obsidian-daily-notes-interface", () => ({
   ...jest.requireActual("obsidian-daily-notes-interface"),

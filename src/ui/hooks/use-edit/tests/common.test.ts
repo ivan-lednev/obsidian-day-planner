@@ -2,10 +2,10 @@ import { get } from "svelte/store";
 
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
+import { EditMode } from "../types";
 
 import { dayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
-import { EditMode } from "../types";
 
 // todo: remove duplication, ideally this check should be pulled out of the diffing logic
 jest.mock("obsidian-daily-notes-interface", () => ({

@@ -4,6 +4,7 @@ import { defaultSettingsForTests } from "../../../../settings";
 import { Tasks } from "../../../../types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
+import { EditMode } from "../types";
 
 import {
   baseTasks,
@@ -13,7 +14,6 @@ import {
   unscheduledTask,
 } from "./util/fixtures";
 import { setUp } from "./util/setup";
-import { EditMode } from "../types";
 
 describe("moving tasks between containers", () => {
   test("with no edit operation in progress, nothing happens on mouse move", () => {
