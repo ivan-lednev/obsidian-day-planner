@@ -147,6 +147,7 @@ If your organization doesn't let you share your calendar this way, you might try
 - Open today's Day Planner
 - Show the Week Planner
 - Insert Planner Heading at Cursor
+- Reorder tasks by time
 
 ## Note on the old plugin version
 

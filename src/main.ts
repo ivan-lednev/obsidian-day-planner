@@ -8,6 +8,9 @@ import {
   viewTypeWeekly,
 } from "./constants";
 import { settings } from "./global-store/settings";
+import { findNodeAtPoint, fromMarkdown, toMarkdown } from "./mdast/mdast";
+import { reorderListByTime } from "./mdast/mdast-task";
+import { getListItemsUnderHeading } from "./parser/parser";
 import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
@@ -138,6 +141,39 @@ export default class DayPlanner extends Plugin {
       name: "Insert Planner Heading at Cursor",
       editorCallback: (editor) =>
         editor.replaceSelection(this.planEditor.createPlannerHeading()),
+    });
+
+    this.addCommand({
+      id: "reorder-tasks-by-time",
+      name: "Reorder tasks by time",
+      editorCallback: (editor) => {
+        const metadata = this.app.metadataCache.getFileCache(
+          this.obsidianFacade.getActiveMarkdownView().file,
+        );
+        const listItems = getListItemsUnderHeading(
+          metadata,
+          this.settings().plannerHeading,
+        );
+        if (listItems.length === 0) {
+          return;
+        }
+
+        const mdastRoot = fromMarkdown(editor.getValue());
+        const list = findNodeAtPoint({
+          searchedNodeType: "list",
+          tree: mdastRoot,
+          point: {
+            line: listItems[0].position.start.line + 1,
+            column: listItems[0].position.start.col + 1,
+          },
+        });
+
+        if (!list) {
+          return;
+        }
+        reorderListByTime(list);
+        editor.setValue(toMarkdown(mdastRoot));
+      },
     });
   }
 
