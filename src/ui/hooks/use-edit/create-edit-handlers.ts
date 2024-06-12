@@ -38,12 +38,7 @@ export function createEditHandlers({
     });
   }
 
-  function handleResizerMouseDown(task: PlacedTask) {
-    const mode =
-      get(settings).editMode === "push"
-        ? EditMode.RESIZE_AND_SHIFT_OTHERS
-        : EditMode.RESIZE;
-
+  function handleResizerMouseDown(task: PlacedTask, mode: EditMode) {
     startEdit({ task, mode, day });
   }
 
@@ -56,20 +51,8 @@ export function createEditHandlers({
     await obsidianFacade.revealLineInFile(path, line);
   }
 
-  function handleGripMouseDown(task: PlacedTask) {
-    // todo: edit mode in settings is different from the enum. The names should also be different
-    const { copyOnDrag, editMode } = get(settings);
-    const taskOrCopy = copyOnDrag ? copy(task) : task;
-
-    if (editMode === "push") {
-      startEdit({
-        task: taskOrCopy,
-        mode: EditMode.DRAG_AND_SHIFT_OTHERS,
-        day,
-      });
-    } else {
-      startEdit({ task: taskOrCopy, mode: EditMode.DRAG, day });
-    }
+  function handleGripMouseDown(task: PlacedTask, mode: EditMode) {
+    startEdit({ task, mode, day });
   }
 
   function handleUnscheduledTaskGripMouseDown(task: UnscheduledTask) {

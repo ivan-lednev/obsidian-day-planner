@@ -1,7 +1,7 @@
 <script lang="ts">
   import { UnscheduledTask } from "../../types";
 
-  import Grip from "./grip.svelte";
+  import Grip from "./block-control-button.svelte";
   import MarkdownBlockContent from "./markdown-block-content.svelte";
   import RenderedMarkdown from "./rendered-markdown.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
