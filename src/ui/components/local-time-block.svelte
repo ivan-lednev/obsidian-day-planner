@@ -14,7 +14,7 @@
     <MarkdownBlockContent {task}>
       <RenderedMarkdown {task} />
     </MarkdownBlockContent>
-    {#if true}
+    {#if hovering}
       <slot />
     {/if}
   </ScheduledTimeBlock>

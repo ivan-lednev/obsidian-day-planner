@@ -26,6 +26,7 @@
   }
 
   .remote-task-content {
+    overflow: hidden;
     display: flex;
     flex: 1 0 0;
     flex-direction: column;
