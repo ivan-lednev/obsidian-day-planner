@@ -1,19 +1,21 @@
 <script lang="ts">
   import { UnscheduledTask } from "../../types";
 
-  import Grip from "./block-control-button.svelte";
+  import Hoverable from "./hoverable.svelte";
   import MarkdownBlockContent from "./markdown-block-content.svelte";
   import RenderedMarkdown from "./rendered-markdown.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
 
   export let task: UnscheduledTask;
-  export let gripCursor: string;
-  export let onGripMouseDown: () => void;
 </script>
 
-<TimeBlockBase {task} on:mouseup>
-  <MarkdownBlockContent {task}>
-    <RenderedMarkdown {task} />
-    <Grip cursor={gripCursor} on:mousedown={onGripMouseDown} />
-  </MarkdownBlockContent>
-</TimeBlockBase>
+<Hoverable let:hovering>
+  <TimeBlockBase {task} on:mouseup>
+    <MarkdownBlockContent {task}>
+      <RenderedMarkdown {task} />
+    </MarkdownBlockContent>
+    {#if hovering}
+      <slot />
+    {/if}
+  </TimeBlockBase>
+</Hoverable>

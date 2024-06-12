@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { GripVertical } from "lucide-svelte";
   import { Moment } from "moment";
   import { getContext } from "svelte";
 
@@ -6,6 +7,8 @@
   import { settings } from "../../global-store/settings";
   import type { ObsidianContext } from "../../types";
 
+  import BlockControlButton from "./block-control-button.svelte";
+  import ExpandingControls from "./expanding-controls.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   export let day: Moment;
@@ -16,7 +19,6 @@
 
   $: ({
     displayedTasks,
-    cursor,
     handleTaskMouseUp,
     handleUnscheduledTaskGripMouseDown,
   } = getEditHandlers(day));
@@ -25,12 +27,18 @@
 {#if $displayedTasks.noTime.length > 0 && $settings.showUncheduledTasks}
   <div class="unscheduled-task-container">
     {#each $displayedTasks.noTime as task}
-      <UnscheduledTimeBlock
-        gripCursor={$cursor.gripCursor}
-        onGripMouseDown={() => handleUnscheduledTaskGripMouseDown(task)}
-        {task}
-        on:mouseup={() => handleTaskMouseUp(task)}
-      />
+      <UnscheduledTimeBlock {task} on:mouseup={() => handleTaskMouseUp(task)}>
+        <ExpandingControls --right="4px" --top="4px">
+          <BlockControlButton
+            slot="visible"
+            cursor="grab"
+            label="Start moving"
+            on:mousedown={() => handleUnscheduledTaskGripMouseDown(task)}
+          >
+            <GripVertical class="svg-icon" />
+          </BlockControlButton>
+        </ExpandingControls>
+      </UnscheduledTimeBlock>
     {/each}
   </div>
 {/if}
