@@ -12,7 +12,6 @@
     Info,
     RefreshCw,
     RefreshCwOff,
-    Move,
   } from "lucide-svelte";
   import { Moment } from "moment";
   import { getContext } from "svelte";
@@ -53,7 +52,6 @@
 
   let settingsVisible = false;
   let filterVisible = false;
-  let editControlsVisible = false;
 
   function toggleSettings() {
     settingsVisible = !settingsVisible;
@@ -61,10 +59,6 @@
 
   function toggleFilter() {
     filterVisible = !filterVisible;
-  }
-
-  function toggleEditControls() {
-    editControlsVisible = !editControlsVisible;
   }
 
   async function goBack() {
@@ -157,14 +151,7 @@
     </ControlButton>
 
     <ControlButton
-      isActive={editControlsVisible}
-      label="Show time block edit controls"
-      on:click={toggleEditControls}
-    >
-      <Move class="svg-icon" />
-    </ControlButton>
-
-    <ControlButton
+      --grid-column-start="8"
       isActive={filterVisible}
       label="Dataview source"
       on:click={toggleFilter}
@@ -186,51 +173,6 @@
   <div>
     <Pill key="filter" value={$settings.dataviewSource} />
   </div>
-  {#if editControlsVisible}
-    Drag mode:
-    <div class="button-box">
-      <ControlButton
-        isActive={$settings.editMode === "simple"}
-        label="Other time blocks will not be changed"
-        on:click={() => {
-          $settings.editMode = "simple";
-        }}
-      >
-        Simple edit
-      </ControlButton>
-      <ControlButton
-        isActive={$settings.editMode === "push"}
-        label="Other time blocks are going to shift as you move a block"
-        on:click={() => {
-          $settings.editMode = "push";
-        }}
-      >
-        Push other blocks
-      </ControlButton>
-    </div>
-
-    Drag action:
-    <div class="button-box">
-      <ControlButton
-        isActive={$settings.copyOnDrag === false}
-        label="Move a task when dragging"
-        on:click={() => {
-          $settings.copyOnDrag = false;
-        }}
-      >
-        Move on drag
-      </ControlButton>
-      <ControlButton
-        isActive={$settings.copyOnDrag}
-        label="Copy a task when dragging"
-        on:click={() => {
-          $settings.copyOnDrag = true;
-        }}
-      >
-        Copy on drag
-      </ControlButton>
-    </div>
-  {/if}
 
   {#if !$dataviewLoaded}
     <div class="info-container">
@@ -403,30 +345,6 @@
 
   :global(.mod-error) {
     color: var(--text-error);
-  }
-
-  .button-box :global(.clickable-icon.is-active) {
-    color: var(--text-on-accent);
-    background-color: var(--interactive-accent);
-  }
-
-  .button-box :global(.clickable-icon:not(.is-active)) {
-    background-color: var(--background-primary);
-  }
-
-  .button-box {
-    overflow: hidden;
-    display: flex;
-
-    font-size: var(--font-ui-small);
-
-    border: 1px solid var(--color-base-40);
-    border-radius: var(--clickable-icon-radius);
-  }
-
-  .button-box > :global(*) {
-    flex: 1 0 0;
-    border-radius: 0;
   }
 
   .stretcher input {

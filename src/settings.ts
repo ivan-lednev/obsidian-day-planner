@@ -42,8 +42,6 @@ export interface DayPlannerSettings {
   showCompletedTasks: boolean;
   showSubtasksInTaskBlocks: boolean;
   icals: Array<IcalConfig>;
-  editMode: "simple" | "push" | "shrink";
-  copyOnDrag: boolean;
   colorOverrides: Array<ColorOverride>;
   releaseNotes: boolean;
 }
@@ -78,8 +76,6 @@ export const defaultSettings: DayPlannerSettings = {
   showSubtasksInTaskBlocks: true,
   icals: [],
   colorOverrides: [],
-  editMode: "simple",
-  copyOnDrag: false,
   releaseNotes: true,
 };
 

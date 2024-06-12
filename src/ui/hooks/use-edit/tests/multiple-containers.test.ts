@@ -13,6 +13,7 @@ import {
   unscheduledTask,
 } from "./util/fixtures";
 import { setUp } from "./util/setup";
+import { EditMode } from "../types";
 
 describe("moving tasks between containers", () => {
   test("with no edit operation in progress, nothing happens on mouse move", () => {
@@ -34,7 +35,7 @@ describe("moving tasks between containers", () => {
         tasks: unscheduledTask,
       });
 
-    todayControls.handleGripMouseDown(baseTask);
+    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
     nextDayControls.handleMouseEnter();
     moveCursorTo("01:00");
 
@@ -69,7 +70,7 @@ describe("moving tasks between containers", () => {
         tasks,
       });
 
-    todayControls.handleGripMouseDown(baseTask);
+    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
     nextDayControls.handleMouseEnter();
     moveCursorTo("01:00");
 
@@ -104,10 +105,10 @@ describe("moving tasks between containers", () => {
     const { todayControls, nextDayControls, moveCursorTo, displayedTasks } =
       setUp({
         tasks,
-        settings: { ...defaultSettingsForTests, editMode: "push" },
+        settings: { ...defaultSettingsForTests },
       });
 
-    todayControls.handleGripMouseDown(baseTask);
+    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG_AND_SHIFT_OTHERS);
     nextDayControls.handleMouseEnter();
     moveCursorTo("01:00");
 
@@ -148,7 +149,7 @@ describe("moving tasks between containers", () => {
   test("resize doesn't work between days", () => {
     const { todayControls, nextDayControls, displayedTasks } = setUp();
 
-    todayControls.handleResizerMouseDown(baseTask);
+    todayControls.handleResizerMouseDown(baseTask, EditMode.RESIZE);
     nextDayControls.handleMouseEnter();
 
     expect(get(displayedTasks)).toMatchObject({
