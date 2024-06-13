@@ -61,22 +61,3 @@
     </BlockControlButton>
   </svelte:fragment>
 </ExpandingControls>
-<ExpandingControls --left="4px" --top="-14px">
-  <BlockControlButton
-    slot="visible"
-    cursor="grab"
-    label="Start resizing"
-    on:mousedown={onResize}
-  >
-    <MoveVertical class="svg-icon" />
-  </BlockControlButton>
-  <svelte:fragment slot="hidden">
-    <BlockControlButton
-      cursor="grab"
-      label="Resize block and push neighboring blocks"
-      on:mousedown={onResizeWithNeighbors}
-    >
-      <ArrowDownToLine class="svg-icon" />
-    </BlockControlButton>
-  </svelte:fragment>
-</ExpandingControls>
