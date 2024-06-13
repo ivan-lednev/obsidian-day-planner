@@ -36,12 +36,6 @@
     transition: 0.05s linear;
   }
 
-  /* TODO: Move out */
-  .padding :global(svg.lock-icon) {
-    width: var(--icon-xs);
-    height: var(--icon-xs);
-  }
-
   .content {
     position: relative;
 

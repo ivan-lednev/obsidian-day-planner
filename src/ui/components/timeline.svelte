@@ -1,10 +1,4 @@
 <script lang="ts">
-  import {
-    ArrowDownToLine,
-    Copy,
-    GripVertical,
-    MoveVertical,
-  } from "lucide-svelte";
   import { Moment } from "moment";
   import { getContext } from "svelte";
   import { Writable } from "svelte/store";
@@ -18,9 +12,8 @@
   import { styledCursor } from "../actions/styled-cursor";
   import { EditMode } from "../hooks/use-edit/types";
 
-  import BlockControlButton from "./block-control-button.svelte";
   import Column from "./column.svelte";
-  import ExpandingControls from "./expanding-controls.svelte";
+  import LocalTimeBlockControls from "./local-time-block-controls.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Needle from "./needle.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
@@ -70,58 +63,15 @@
       {:else}
         <LocalTimeBlock {task} on:mouseup={() => handleTaskMouseUp(task)}>
           {#if !$editOperation}
-            <ExpandingControls --right="4px" --top="4px">
-              <BlockControlButton
-                slot="visible"
-                cursor="grab"
-                label="Start moving"
-                on:mousedown={() => handleGripMouseDown(task, EditMode.DRAG)}
-              >
-                <GripVertical class="svg-icon" />
-              </BlockControlButton>
-              <svelte:fragment slot="hidden">
-                <BlockControlButton
-                  cursor="grab"
-                  label="Start copying"
-                  on:mousedown={() =>
-                    handleGripMouseDown(copy(task), EditMode.DRAG)}
-                >
-                  <Copy class="svg-icon" />
-                </BlockControlButton>
-                <BlockControlButton
-                  cursor="grab"
-                  label="Move block and push neighboring blocks"
-                  on:mousedown={() =>
-                    handleGripMouseDown(task, EditMode.DRAG_AND_SHIFT_OTHERS)}
-                >
-                  <ArrowDownToLine class="svg-icon" />
-                </BlockControlButton>
-              </svelte:fragment>
-            </ExpandingControls>
-            <ExpandingControls --bottom="-12px" --right="48px">
-              <BlockControlButton
-                slot="visible"
-                cursor="grab"
-                label="Start resizing"
-                on:mousedown={() =>
-                  handleResizerMouseDown(task, EditMode.RESIZE)}
-              >
-                <MoveVertical class="svg-icon" />
-              </BlockControlButton>
-              <svelte:fragment slot="hidden">
-                <BlockControlButton
-                  cursor="grab"
-                  label="Resize block and push neighboring blocks"
-                  on:mousedown={() =>
-                    handleResizerMouseDown(
-                      task,
-                      EditMode.RESIZE_AND_SHIFT_OTHERS,
-                    )}
-                >
-                  <ArrowDownToLine class="svg-icon" />
-                </BlockControlButton>
-              </svelte:fragment>
-            </ExpandingControls>
+            <LocalTimeBlockControls
+              onCopy={() => handleGripMouseDown(copy(task), EditMode.DRAG)}
+              onMove={() => handleGripMouseDown(task, EditMode.DRAG)}
+              onMoveWithNeighbors={() =>
+                handleGripMouseDown(task, EditMode.DRAG_AND_SHIFT_OTHERS)}
+              onResize={() => handleResizerMouseDown(task, EditMode.RESIZE)}
+              onResizeWithNeighbors={() =>
+                handleResizerMouseDown(task, EditMode.RESIZE_AND_SHIFT_OTHERS)}
+            />
           {/if}
         </LocalTimeBlock>
       {/if}

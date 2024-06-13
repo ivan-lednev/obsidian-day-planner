@@ -9,13 +9,13 @@
   export let task: UnscheduledTask;
 </script>
 
-<Hoverable let:hovering>
-  <TimeBlockBase {task} on:mouseup>
+<TimeBlockBase {task} on:mouseup>
+  <Hoverable let:hovering>
     <MarkdownBlockContent {task}>
       <RenderedMarkdown {task} />
     </MarkdownBlockContent>
     {#if hovering}
       <slot />
     {/if}
-  </TimeBlockBase>
-</Hoverable>
+  </Hoverable>
+</TimeBlockBase>

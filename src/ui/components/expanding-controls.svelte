@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Hoverable from "./hoverable.svelte";
 </script>
 
