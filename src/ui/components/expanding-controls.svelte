@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script context="module" lang="ts">
   import { writable } from "svelte/store";
 
   const isSomeInstanceUnderCursor = writable(false);
@@ -10,36 +10,33 @@
   const isThisUnderCursor = writable(false);
 </script>
 
-{#if $isThisUnderCursor || !$isSomeInstanceUnderCursor}
-  <Hoverable
-    onMouseEnter={() => {
-      isSomeInstanceUnderCursor.set(true);
-      isThisUnderCursor.set(true);
-    }}
-    onMouseLeave={() => {
-      isSomeInstanceUnderCursor.set(false);
-      isThisUnderCursor.set(false);
-    }}
-    let:hovering
-  >
+<Hoverable
+  onMouseEnter={() => {
+    isSomeInstanceUnderCursor.set(true);
+    isThisUnderCursor.set(true);
+  }}
+  onMouseLeave={() => {
+    isSomeInstanceUnderCursor.set(false);
+    isThisUnderCursor.set(false);
+  }}
+  let:hovering
+>
+  {#if $isThisUnderCursor || !$isSomeInstanceUnderCursor}
     <div class="expanding-controls">
       {#if hovering}
         <slot name="hidden" />
       {/if}
       <slot name="visible" />
     </div>
-  </Hoverable>
-{/if}
+  {/if}
+</Hoverable>
 
 <style>
   /*  TODO: add variables */
   .expanding-controls {
     position: absolute;
     z-index: 99;
-    top: var(--top, initial);
-    right: var(--right, initial);
-    left: var(--left, initial);
-    bottom: var(--bottom, initial);
+    inset: var(--top, initial) var(--right, initial) var(--bottom, initial) var(--left, initial);
 
     display: flex;
     gap: 2px;

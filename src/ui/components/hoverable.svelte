@@ -1,8 +1,13 @@
 <script lang="ts">
+  import { onDestroy } from "svelte";
   export let onMouseEnter: () => void | undefined = () => {};
   export let onMouseLeave: () => void | undefined = () => {};
 
   let hovering = false;
+
+  onDestroy(() => {
+    onMouseLeave();
+  });
 </script>
 
 <div

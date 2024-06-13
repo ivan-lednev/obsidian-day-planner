@@ -61,7 +61,7 @@
     </BlockControlButton>
   </svelte:fragment>
 </ExpandingControls>
-<ExpandingControls --top="-14px" --left="4px">
+<ExpandingControls --left="4px" --top="-14px">
   <BlockControlButton
     slot="visible"
     cursor="grab"
