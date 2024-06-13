@@ -36,7 +36,7 @@
   .expanding-controls {
     position: absolute;
     z-index: 99;
-    inset: var(--top, initial) var(--right, initial) var(--bottom, initial) var(--left, initial);
+    inset: var(--top, auto) var(--right, auto) var(--bottom, auto) var(--left, auto);
 
     display: flex;
     gap: 2px;
