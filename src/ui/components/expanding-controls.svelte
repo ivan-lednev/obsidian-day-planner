@@ -1,14 +1,32 @@
-<script lang="ts">
-  import Hoverable from "./hoverable.svelte";
+<script lang="ts" context="module">
+  let isSomeInstanceUnderCursor = true;
 </script>
 
-<Hoverable let:hovering>
-  <div class="expanding-controls">
-    {#if hovering}
-      <slot name="hidden" />
-    {/if}
-    <slot name="visible" />
-  </div>
+<script lang="ts">
+  import Hoverable from "./hoverable.svelte";
+
+  let isThisUnderCursor = true;
+</script>
+
+<Hoverable
+  onMouseEnter={() => {
+    isSomeInstanceUnderCursor = true;
+    isThisUnderCursor = true;
+  }}
+  onMouseLeave={() => {
+    isSomeInstanceUnderCursor = false;
+    isThisUnderCursor = false;
+  }}
+  let:hovering
+>
+  {#if isThisUnderCursor || !isSomeInstanceUnderCursor}
+    <div class="expanding-controls">
+      {#if hovering}
+        <slot name="hidden" />
+      {/if}
+      <slot name="visible" />
+    </div>
+  {/if}
 </Hoverable>
 
 <style>
@@ -18,6 +36,7 @@
     z-index: 99;
     top: var(--top, initial);
     right: var(--right, initial);
+    left: var(--left, initial);
     bottom: var(--bottom, initial);
 
     display: flex;

@@ -151,7 +151,7 @@
     </ControlButton>
 
     <ControlButton
-      --grid-column-start="8"
+      --grid-column-start="7"
       isActive={filterVisible}
       label="Dataview source"
       on:click={toggleFilter}

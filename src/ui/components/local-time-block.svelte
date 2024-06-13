@@ -10,6 +10,7 @@
 </script>
 
 <ScheduledTimeBlock {task} on:mouseup>
+  <!-- TODO: move it out -->
   <Hoverable let:hovering>
     <MarkdownBlockContent {task}>
       <RenderedMarkdown {task} />
