@@ -1,33 +1,35 @@
 <script lang="ts" context="module">
-  let isSomeInstanceUnderCursor = true;
+  import { writable } from "svelte/store";
+
+  const isSomeInstanceUnderCursor = writable(false);
 </script>
 
 <script lang="ts">
   import Hoverable from "./hoverable.svelte";
 
-  let isThisUnderCursor = true;
+  const isThisUnderCursor = writable(false);
 </script>
 
-<Hoverable
-  onMouseEnter={() => {
-    isSomeInstanceUnderCursor = true;
-    isThisUnderCursor = true;
-  }}
-  onMouseLeave={() => {
-    isSomeInstanceUnderCursor = false;
-    isThisUnderCursor = false;
-  }}
-  let:hovering
->
-  {#if isThisUnderCursor || !isSomeInstanceUnderCursor}
+{#if $isThisUnderCursor || !$isSomeInstanceUnderCursor}
+  <Hoverable
+    onMouseEnter={() => {
+      isSomeInstanceUnderCursor.set(true);
+      isThisUnderCursor.set(true);
+    }}
+    onMouseLeave={() => {
+      isSomeInstanceUnderCursor.set(false);
+      isThisUnderCursor.set(false);
+    }}
+    let:hovering
+  >
     <div class="expanding-controls">
       {#if hovering}
         <slot name="hidden" />
       {/if}
       <slot name="visible" />
     </div>
-  {/if}
-</Hoverable>
+  </Hoverable>
+{/if}
 
 <style>
   /*  TODO: add variables */
