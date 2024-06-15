@@ -419,6 +419,26 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
     this.plugin.settings().colorOverrides.map((colorOverride, index) =>
       new Setting(containerEl)
         .setName(`Color ${index + 1}`)
+
+        // light mode text color
+        .addColorPicker((el) =>
+          // todo: replace with immer
+          el
+            .setValue(colorOverride.lightModeTextColor)
+            .onChange((value: string) => {
+              this.settingsStore.update((previous) => ({
+                ...previous,
+                colorOverrides: previous.colorOverrides.map(
+                  (editedOverride, editedIndex) =>
+                    editedIndex === index
+                      ? { ...editedOverride, lightModeTextColor: value }
+                      : editedOverride,
+                ),
+              }));
+            }),
+        )
+
+        // light mode background color
         .addColorPicker((el) =>
           // todo: replace with immer
           el.setValue(colorOverride.color).onChange((value: string) => {
@@ -433,6 +453,26 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             }));
           }),
         )
+
+        // dark mode text color
+        .addColorPicker((el) =>
+          // todo: replace with immer
+          el
+            .setValue(colorOverride.darkModeTextColor)
+            .onChange((value: string) => {
+              this.settingsStore.update((previous) => ({
+                ...previous,
+                colorOverrides: previous.colorOverrides.map(
+                  (editedOverride, editedIndex) =>
+                    editedIndex === index
+                      ? { ...editedOverride, darkModeTextColor: value }
+                      : editedOverride,
+                ),
+              }));
+            }),
+        )
+
+        // dark mode background color
         .addColorPicker((el) =>
           // todo: replace with immer
           el.setValue(colorOverride.darkModeColor).onChange((value: string) => {
@@ -486,6 +526,8 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           text: "#important",
           darkModeColor: "#6e3737",
           color: "#ffa1a1",
+          lightModeTextColor: "#000000",
+          darkModeTextColor: "#ffffff",
         };
 
         this.settingsStore.update((previous) => ({

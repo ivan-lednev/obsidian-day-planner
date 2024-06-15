@@ -5,14 +5,21 @@
   import { settings } from "../../global-store/settings";
   import type { ObsidianContext, UnscheduledTask } from "../../types";
   import { renderTaskMarkdown } from "../actions/render-task-markdown";
+  import { useTextColorOverride } from "../hooks/use-color-override";
 
   export let task: UnscheduledTask;
 
   // todo: use context inside action
   const { renderMarkdown } = getContext<ObsidianContext>(obsidianContext);
+
+  $: textColorOverride = useTextColorOverride(task);
+  // todo: hide in hook
+  $: textColor =
+      $textColorOverride || "var(--text-normal)";
 </script>
 
 <div
+  style:--overriden-text-color={textColor}
   class="rendered-markdown"
   use:renderTaskMarkdown={{ task, settings: $settings, renderMarkdown }}
 ></div>
@@ -36,7 +43,7 @@
     --checkbox-size: var(--font-ui-small);
 
     flex: 1 0 0;
-    color: var(--text-normal);
+    color: var(--overriden-text-color);
   }
 
   .rendered-markdown :global(p),
@@ -57,7 +64,7 @@
   }
 
   .rendered-markdown :global(li) {
-    color: var(--text-normal);
+    color: var(--overriden-text-color);
   }
 
   .rendered-markdown :global(li.task-list-item[data-task="x"]),
