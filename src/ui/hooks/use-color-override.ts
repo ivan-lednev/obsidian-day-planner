@@ -18,3 +18,19 @@ export function useColorOverride(task: UnscheduledTask) {
     }
   });
 }
+
+export function useTextColorOverride(task: UnscheduledTask) {
+  const { isDarkMode } = getContext<ObsidianContext>(obsidianContext);
+
+  return derived([settings, isDarkMode], ([$settings, $isDarkMode]) => {
+    const colorOverride = $settings.colorOverrides.find((override) =>
+      task.firstLineText.includes(override.text),
+    );
+
+    if (colorOverride) {
+      return $isDarkMode
+        ? colorOverride?.darkModeTextColor
+        : colorOverride?.lightModeTextColor;
+    }
+  });
+}
