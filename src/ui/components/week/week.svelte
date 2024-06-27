@@ -2,8 +2,14 @@
   import { Moment } from "moment";
   import { getContext } from "svelte";
   import { Writable } from "svelte/store";
+  import ResizeHandle from "../resize-handle.svelte";
 
-  import { dateRangeContextKey, obsidianContext } from "../../../constants";
+  import {
+    dateRangeContextKey,
+    obsidianContext,
+    unscheduledTasksMaxHeight,
+    unscheduledTasksMinHeight,
+  } from "../../../constants";
   import { getVisibleHours } from "../../../global-store/derived-settings";
   import { settings } from "../../../global-store/settings";
   import type { ObsidianContext } from "../../../types";
@@ -14,12 +20,13 @@
   import Scroller from "../scroller.svelte";
   import Timeline from "../timeline.svelte";
   import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
-
+  import { clamp } from "lodash/fp";
 
   const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
   let weekHeaderRef: HTMLDivElement | undefined;
+  let el: HTMLDivElement | undefined;
 
   function handleScroll(event: Event) {
     if (weekHeaderRef) {
@@ -27,9 +34,41 @@
       weekHeaderRef.scrollLeft = event.target?.scrollLeft;
     }
   }
+
+  let height = $settings.weekUnscheduledTasksHeight;
+  let editingHeight = false;
+
+  function startEdit() {
+    editingHeight = true;
+  }
+
+  function stopEdit() {
+    editingHeight = false;
+    $settings.weekUnscheduledTasksHeight = height;
+  }
+
+  function handleMouseMove(event: MouseEvent) {
+    if (!editingHeight) {
+      return;
+    }
+
+    const viewportToElOffsetY = el.getBoundingClientRect().top;
+
+    height = clamp(
+      unscheduledTasksMinHeight,
+      unscheduledTasksMaxHeight,
+      event.clientY - viewportToElOffsetY,
+    );
+  }
 </script>
 
 <GlobalHandlers />
+
+<svelte:document
+  on:mousemove={handleMouseMove}
+  on:mouseup|capture|stopPropagation={stopEdit}
+/>
+<svelte:window on:blur={stopEdit} />
 
 <div bind:this={weekHeaderRef} class="week-header">
   <div class="header-row day-buttons">
@@ -47,13 +86,14 @@
     {/each}
   </div>
 
-  <div class="header-row">
+  <div bind:this={el} class="header-row" style:height="{height}px">
     <div class="corner"></div>
     {#each $dateRange as day}
       <div class="header-cell">
         <UnscheduledTaskContainer {day} />
       </div>
     {/each}
+    <ResizeHandle on:mousedown={startEdit} />
   </div>
 </div>
 
@@ -71,6 +111,7 @@
 
 <style>
   .header-row {
+    position: relative;
     display: flex;
   }
 

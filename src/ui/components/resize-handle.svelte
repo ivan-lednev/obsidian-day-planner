@@ -16,7 +16,7 @@
     bottom: 0;
     left: 0;
 
-    height: calc(var(--divider-width-hover) * 2);
+    height: var(--divider-width-hover);
 
     border-bottom-width: var(--divider-width);
   }
