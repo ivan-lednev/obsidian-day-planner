@@ -35,7 +35,10 @@
     }
   }
 
-  let height = $settings.weekUnscheduledTasksHeight;
+  let customHeight = 0;
+
+  $: height = customHeight === 0 ? "auto" : `${customHeight}px`;
+
   let editingHeight = false;
 
   function startEdit() {
@@ -44,7 +47,6 @@
 
   function stopEdit() {
     editingHeight = false;
-    $settings.weekUnscheduledTasksHeight = height;
   }
 
   function handleMouseMove(event: MouseEvent) {
@@ -54,7 +56,7 @@
 
     const viewportToElOffsetY = el.getBoundingClientRect().top;
 
-    height = clamp(
+    customHeight = clamp(
       unscheduledTasksMinHeight,
       unscheduledTasksMaxHeight,
       event.clientY - viewportToElOffsetY,
@@ -86,11 +88,12 @@
     {/each}
   </div>
 
-  <div bind:this={el} class="header-row" style:height="{height}px">
+  <div bind:this={el} class="header-row" style:height>
     <div class="corner"></div>
     {#each $dateRange as day}
       <div class="header-cell">
         <UnscheduledTaskContainer {day} />
+        <!--        <div class="intersection-sentinel"></div>-->
       </div>
     {/each}
     <ResizeHandle on:mousedown={startEdit} />
