@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { clamp } from "lodash/fp";
   import { Moment } from "moment";
   import { getContext } from "svelte";
   import { Writable } from "svelte/store";
-  import ResizeHandle from "../resize-handle.svelte";
 
   import {
     dateRangeContextKey,
@@ -16,11 +16,11 @@
   import { isToday } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
   import GlobalHandlers from "../global-handlers.svelte";
+  import ResizeHandle from "../resize-handle.svelte";
   import Ruler from "../ruler.svelte";
   import Scroller from "../scroller.svelte";
   import Timeline from "../timeline.svelte";
   import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
-  import { clamp } from "lodash/fp";
 
   const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
@@ -45,7 +45,16 @@
     editingHeight = true;
   }
 
-  function stopEdit() {
+  function stopEdit(event: MouseEvent) {
+    if (!editingHeight) {
+      return;
+    }
+
+    event.stopPropagation();
+    editingHeight = false;
+  }
+
+  function handleBlur(event: FocusEvent) {
     editingHeight = false;
   }
 
@@ -66,11 +75,8 @@
 
 <GlobalHandlers />
 
-<svelte:document
-  on:mousemove={handleMouseMove}
-  on:mouseup|capture|stopPropagation={stopEdit}
-/>
-<svelte:window on:blur={stopEdit} />
+<svelte:document on:mousemove={handleMouseMove} on:mouseup|capture={stopEdit} />
+<svelte:window on:blur={handleBlur} />
 
 <div bind:this={weekHeaderRef} class="week-header">
   <div class="header-row day-buttons">
@@ -88,12 +94,16 @@
     {/each}
   </div>
 
-  <div bind:this={el} class="header-row" style:height>
+  <div
+    bind:this={el}
+    style:height
+    style:max-height="{unscheduledTasksMaxHeight}px"
+    class="header-row"
+  >
     <div class="corner"></div>
     {#each $dateRange as day}
       <div class="header-cell">
         <UnscheduledTaskContainer {day} />
-        <!--        <div class="intersection-sentinel"></div>-->
       </div>
     {/each}
     <ResizeHandle on:mousedown={startEdit} />
