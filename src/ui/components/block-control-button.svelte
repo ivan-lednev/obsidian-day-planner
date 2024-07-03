@@ -14,6 +14,7 @@
 
 <style>
   .clickable-icon {
-    padding: var(--size-2-1) var(--size-2-2);
+    padding: var(--size-2-2) var(--size-4-2);
+    border-radius: 0;
   }
 </style>

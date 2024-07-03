@@ -1,4 +1,7 @@
 <script lang="ts">
+  import {
+    offset,
+  } from "@floating-ui/dom";
   import { Moment } from "moment";
   import { getContext } from "svelte";
   import { Writable } from "svelte/store";
@@ -9,14 +12,16 @@
   import { ObsidianContext } from "../../types";
   import { isToday } from "../../util/moment";
   import { copy, getRenderKey } from "../../util/task-utils";
+  import { floatingUi } from "../actions/floating-ui";
   import { styledCursor } from "../actions/styled-cursor";
   import { EditMode } from "../hooks/use-edit/types";
 
   import Column from "./column.svelte";
-  import LocalTimeBlockControls from "./local-time-block-controls.svelte";
+  import DragControls from "./drag-controls.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Needle from "./needle.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
+  import ResizeControls from "./resize-controls.svelte";
   import ScheduledTaskContainer from "./scheduled-task-container.svelte";
 
   // TODO: showRuler or add <slot name="left-gutter" />
@@ -61,19 +66,48 @@
       {#if task.calendar}
         <RemoteTimeBlock {task} />
       {:else}
-        <LocalTimeBlock {task} on:mouseup={() => handleTaskMouseUp(task)}>
-          {#if !$editOperation}
-            <LocalTimeBlockControls
-              onCopy={() => handleGripMouseDown(copy(task), EditMode.DRAG)}
-              onMove={() => handleGripMouseDown(task, EditMode.DRAG)}
-              onMoveWithNeighbors={() =>
-                handleGripMouseDown(task, EditMode.DRAG_AND_SHIFT_OTHERS)}
-              onResize={() => handleResizerMouseDown(task, EditMode.RESIZE)}
-              onResizeWithNeighbors={() =>
-                handleResizerMouseDown(task, EditMode.RESIZE_AND_SHIFT_OTHERS)}
-            />
-          {/if}
-        </LocalTimeBlock>
+        <LocalTimeBlock
+          {task}
+          use={[
+            [
+              floatingUi,
+              {
+                when: !$editOperation,
+                Component: ResizeControls,
+                props: {
+                  onResize: () => handleResizerMouseDown(task, EditMode.RESIZE),
+                  onResizeWithNeighbors: () =>
+                    handleResizerMouseDown(
+                      task,
+                      EditMode.RESIZE_AND_SHIFT_OTHERS,
+                    ),
+                },
+                options: {
+                  middleware: [offset({ mainAxis: -14, crossAxis: -40 })],
+                  placement: "bottom-end",
+                },
+              },
+            ],
+            [
+              floatingUi,
+              {
+                when: !$editOperation,
+                Component: DragControls,
+                props: {
+                  onCopy: () => handleGripMouseDown(copy(task), EditMode.DRAG),
+                  onMove: () => handleGripMouseDown(task, EditMode.DRAG),
+                  onMoveWithNeighbors: () =>
+                    handleGripMouseDown(task, EditMode.DRAG_AND_SHIFT_OTHERS),
+                },
+                options: {
+                  middleware: [offset({ mainAxis: -32, crossAxis: -4 })],
+                  placement: "top-end",
+                },
+              },
+            ],
+          ]}
+          on:mouseup={() => handleTaskMouseUp(task)}
+        />
       {/if}
     {/each}
   </ScheduledTaskContainer>

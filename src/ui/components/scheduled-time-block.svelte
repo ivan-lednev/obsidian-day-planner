@@ -2,11 +2,13 @@
   import { currentTime } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
   import { Task } from "../../types";
+  import { ActionArray } from "../actions/use-actions";
   import { useTaskVisuals } from "../hooks/use-task-visuals";
 
   import TimeBlockBase from "./time-block-base.svelte";
 
   export let task: Task;
+  export let use: ActionArray = [];
 
   $: ({
     height,
@@ -34,7 +36,8 @@
   --time-block-top={$offset}
   --time-block-width={width}
   {task}
+  {use}
   on:mouseup
 >
-  <slot/>
+  <slot />
 </TimeBlockBase>

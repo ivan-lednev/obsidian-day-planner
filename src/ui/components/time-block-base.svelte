@@ -1,8 +1,10 @@
 <script lang="ts">
   import { UnscheduledTask } from "../../types";
+  import { ActionArray, useActions } from "../actions/use-actions";
   import { useColorOverride } from "../hooks/use-color-override";
 
   export let task: UnscheduledTask;
+  export let use: ActionArray = [] ;
 
   $: override = useColorOverride(task);
   // todo: hide in hook
@@ -16,6 +18,7 @@
     class="content"
     on:mousedown={(event) => event.stopPropagation()}
     on:mouseup
+    use:useActions={use}
   >
     <slot />
   </div>
