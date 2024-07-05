@@ -1,21 +1,17 @@
 <script lang="ts">
   import { UnscheduledTask } from "../../types";
+  import { ActionArray } from "../actions/use-actions";
 
-  import Hoverable from "./hoverable.svelte";
   import MarkdownBlockContent from "./markdown-block-content.svelte";
   import RenderedMarkdown from "./rendered-markdown.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
 
   export let task: UnscheduledTask;
+  export let use: ActionArray = [];
 </script>
 
-<TimeBlockBase {task} on:mouseup>
-  <Hoverable let:hovering>
-    <MarkdownBlockContent {task}>
-      <RenderedMarkdown {task} />
-    </MarkdownBlockContent>
-    {#if hovering}
-      <slot />
-    {/if}
-  </Hoverable>
+<TimeBlockBase {task} {use} on:mouseup>
+  <MarkdownBlockContent {task}>
+    <RenderedMarkdown {task} />
+  </MarkdownBlockContent>
 </TimeBlockBase>

@@ -4,6 +4,7 @@ import {
   ComputePositionConfig,
 } from "@floating-ui/dom";
 import type { SvelteComponentTyped } from "svelte";
+import { get, writable } from "svelte/store";
 
 export type SvelteActionReturnType<P> = {
   update?: (newParams?: P) => void;
@@ -17,6 +18,15 @@ interface FloatingUiOptions<Props> {
   options: Partial<ComputePositionConfig>;
 }
 
+function isEventRelated(event: MouseEvent, otherNode: HTMLElement) {
+  return (
+    event.relatedTarget &&
+    (event.relatedTarget === otherNode ||
+      (event.relatedTarget instanceof Node &&
+        otherNode.contains(event.relatedTarget)))
+  );
+}
+
 export function floatingUi<Props>(
   anchor: HTMLElement,
   options: FloatingUiOptions<Props>,
@@ -26,24 +36,7 @@ export function floatingUi<Props>(
   let cleanUpAutoUpdate: () => void;
   let initialized = false;
 
-  let hoveringOverAnchor = false;
-  let hoveringOverFloatingUi = false;
-
-  function handleAnchorMouseEnter() {
-    hoveringOverAnchor = true;
-  }
-
-  function handleAnchorMouseLeave() {
-    hoveringOverAnchor = false;
-  }
-
-  function handleFloatingUiMouseEnter() {
-    hoveringOverFloatingUi = true;
-  }
-
-  function handleFloatingUiMouseLeave() {
-    hoveringOverFloatingUi = false;
-  }
+  const hoveringOverUi = writable(false);
 
   function init(props: Props) {
     if (initialized || !options.when) {
@@ -108,21 +101,43 @@ export function floatingUi<Props>(
     );
 
     document.body.removeChild(floatingUiWrapper);
+  }
 
-    instance = null;
-    cleanUpAutoUpdate = null;
-    floatingUiWrapper = null;
+  function handleFloatingUiMouseEnter() {
+    hoveringOverUi.set(true);
+  }
+
+  function handleFloatingUiMouseLeave(event: MouseEvent) {
+    if (anchor && !isEventRelated(event, anchor)) {
+      hoveringOverUi.set(false);
+    }
+  }
+
+  function handleAnchorMouseEnter() {
+    hoveringOverUi.set(true);
+    init(options.props);
+  }
+
+  function handleAnchorMouseLeave(event: MouseEvent) {
+    if (floatingUiWrapper && !isEventRelated(event, floatingUiWrapper)) {
+      hoveringOverUi.set(false);
+    }
   }
 
   anchor.addEventListener("mouseenter", handleAnchorMouseEnter);
   anchor.addEventListener("mouseleave", handleAnchorMouseLeave);
   window.addEventListener("blur", handleAnchorMouseLeave);
 
-  init(options.props);
+  const unsubscribe = hoveringOverUi.subscribe((value) => {
+    if (!value) {
+      onDestroy();
+    }
+  });
 
   return {
     destroy() {
       onDestroy();
+      unsubscribe();
 
       anchor.removeEventListener("mouseenter", handleAnchorMouseEnter);
       anchor.removeEventListener("mouseleave", handleAnchorMouseLeave);
@@ -131,15 +146,10 @@ export function floatingUi<Props>(
     update(options: FloatingUiOptions<Props>) {
       const { props, when } = options;
 
-      if (!when || (!hoveringOverAnchor && !hoveringOverFloatingUi)) {
+      if (when && get(hoveringOverUi)) {
+        instance?.$set(props);
+      } else {
         onDestroy();
-        return;
-      }
-
-      instance?.$set(props);
-
-      if (hoveringOverAnchor && !initialized) {
-        init(props);
       }
     },
   };

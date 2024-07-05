@@ -5,8 +5,8 @@
   import ExpandingControls from "./expanding-controls.svelte";
 
   export let onMove: () => void;
-  export let onMoveWithNeighbors: () => void;
-  export let onCopy: () => void;
+  export let onMoveWithNeighbors: () => void | undefined = undefined;
+  export let onCopy: () => void | undefined = undefined;
 </script>
 
 <ExpandingControls --right="4px" --top="4px">

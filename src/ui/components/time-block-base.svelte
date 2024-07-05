@@ -42,6 +42,7 @@
   .content {
     position: relative;
 
+    overflow: hidden;
     display: flex;
     flex: 1 0 0;
 
