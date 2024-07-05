@@ -82,25 +82,25 @@ export function floatingUi<Props>(
       return;
     }
 
-    initialized = false;
-
-    cleanUpAutoUpdate();
-
-    floatingUiWrapper.removeEventListener(
-      "mouseenter",
-      handleFloatingUiMouseEnter,
-    );
-    floatingUiWrapper.removeEventListener(
-      "mouseleave",
-      handleFloatingUiMouseLeave,
-    );
-
     Object.assign(floatingUiWrapper.style, {
       transition: "opacity 200ms",
       opacity: 0,
     });
 
     floatingUiWrapper.addEventListener("transitionend", () => {
+      initialized = false;
+
+      cleanUpAutoUpdate();
+
+      floatingUiWrapper.removeEventListener(
+        "mouseenter",
+        handleFloatingUiMouseEnter,
+      );
+      floatingUiWrapper.removeEventListener(
+        "mouseleave",
+        handleFloatingUiMouseLeave,
+      );
+
       componentInstance.$destroy();
       document.body.removeChild(floatingUiWrapper);
     });
@@ -118,6 +118,7 @@ export function floatingUi<Props>(
 
   function handleAnchorMouseEnter() {
     hoveringOverUi.set(true);
+    // todo: read 'when' on init
     init(options.props);
   }
 
@@ -131,8 +132,15 @@ export function floatingUi<Props>(
   anchor.addEventListener("mouseleave", handleAnchorMouseLeave);
   window.addEventListener("blur", handleAnchorMouseLeave);
 
-  const unsubscribe = hoveringOverUi.subscribe((value) => {
-    if (!value) {
+  const unsubscribe = hoveringOverUi.subscribe((isHovering) => {
+    if (isHovering) {
+      if (floatingUiWrapper) {
+        Object.assign(floatingUiWrapper.style, {
+          transition: "none",
+          opacity: 1,
+        });
+      }
+    } else {
       onDestroy();
     }
   });
