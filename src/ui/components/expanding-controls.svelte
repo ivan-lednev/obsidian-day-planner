@@ -1,18 +1,25 @@
 <script lang="ts">
+  import { fade, slide } from "svelte/transition";
+
   import Hoverable from "./hoverable.svelte";
 </script>
 
 <Hoverable let:hovering>
-  <div class="expanding-controls">
+  <div class="expanding-controls" transition:fade={{ duration: 200 }}>
     {#if hovering}
-      <slot name="hidden" />
+      <!--TODO: clean up styles-->
+      <div
+        style="display: flex"
+        transition:slide={{ duration: 200, axis: "x" }}
+      >
+        <slot name="hidden" />
+      </div>
     {/if}
     <slot name="visible" />
   </div>
 </Hoverable>
 
 <style>
-  /*  TODO: add variables */
   .expanding-controls {
     overflow: hidden;
     display: flex;

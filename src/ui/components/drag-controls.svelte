@@ -11,10 +11,10 @@
 
 <ExpandingControls --right="4px" --top="4px">
   <BlockControlButton
+    slot="visible"
     cursor="grab"
     label="Start moving"
     on:mousedown={onMove}
-    slot="visible"
   >
     <GripVertical class="svg-icon" />
   </BlockControlButton>

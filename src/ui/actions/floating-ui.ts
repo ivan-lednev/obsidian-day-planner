@@ -62,6 +62,7 @@ export function floatingUi<Props>(
     componentInstance = new options.Component({
       target: floatingUiWrapper,
       props,
+      intro: true,
     });
 
     cleanUpAutoUpdate = autoUpdate(anchor, floatingUiWrapper, () => {
@@ -83,7 +84,6 @@ export function floatingUi<Props>(
 
     initialized = false;
 
-    componentInstance.$destroy();
     cleanUpAutoUpdate();
 
     floatingUiWrapper.removeEventListener(
@@ -95,7 +95,15 @@ export function floatingUi<Props>(
       handleFloatingUiMouseLeave,
     );
 
-    document.body.removeChild(floatingUiWrapper);
+    Object.assign(floatingUiWrapper.style, {
+      transition: "opacity 200ms",
+      opacity: 0,
+    });
+
+    floatingUiWrapper.addEventListener("transitionend", () => {
+      componentInstance.$destroy();
+      document.body.removeChild(floatingUiWrapper);
+    });
   }
 
   function handleFloatingUiMouseEnter() {
