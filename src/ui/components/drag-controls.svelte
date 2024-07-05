@@ -11,27 +11,31 @@
 
 <ExpandingControls --right="4px" --top="4px">
   <BlockControlButton
-    slot="visible"
     cursor="grab"
     label="Start moving"
     on:mousedown={onMove}
+    slot="visible"
   >
     <GripVertical class="svg-icon" />
   </BlockControlButton>
   <svelte:fragment slot="hidden">
-    <BlockControlButton
-      cursor="grab"
-      label="Start copying"
-      on:mousedown={onCopy}
-    >
-      <Copy class="svg-icon" />
-    </BlockControlButton>
-    <BlockControlButton
-      cursor="grab"
-      label="Move block and push neighboring blocks"
-      on:mousedown={onMoveWithNeighbors}
-    >
-      <ArrowDownToLine class="svg-icon" />
-    </BlockControlButton>
+    {#if onCopy}
+      <BlockControlButton
+        cursor="grab"
+        label="Start copying"
+        on:mousedown={onCopy}
+      >
+        <Copy class="svg-icon" />
+      </BlockControlButton>
+    {/if}
+    {#if onMoveWithNeighbors}
+      <BlockControlButton
+        cursor="grab"
+        label="Move block and push neighboring blocks"
+        on:mousedown={onMoveWithNeighbors}
+      >
+        <ArrowDownToLine class="svg-icon" />
+      </BlockControlButton>
+    {/if}
   </svelte:fragment>
 </ExpandingControls>

@@ -6,11 +6,6 @@ import {
 import type { SvelteComponentTyped } from "svelte";
 import { get, writable } from "svelte/store";
 
-export type SvelteActionReturnType<P> = {
-  update?: (newParams?: P) => void;
-  destroy?: () => void;
-} | void;
-
 interface FloatingUiOptions<Props> {
   when: boolean;
   Component: typeof SvelteComponentTyped<Props>;
@@ -32,7 +27,7 @@ export function floatingUi<Props>(
   options: FloatingUiOptions<Props>,
 ) {
   let floatingUiWrapper: HTMLDivElement;
-  let instance: SvelteComponentTyped<Props>;
+  let componentInstance: SvelteComponentTyped<Props>;
   let cleanUpAutoUpdate: () => void;
   let initialized = false;
 
@@ -64,7 +59,7 @@ export function floatingUi<Props>(
       left: 0,
     });
 
-    instance = new options.Component({
+    componentInstance = new options.Component({
       target: floatingUiWrapper,
       props,
     });
@@ -88,7 +83,7 @@ export function floatingUi<Props>(
 
     initialized = false;
 
-    instance.$destroy();
+    componentInstance.$destroy();
     cleanUpAutoUpdate();
 
     floatingUiWrapper.removeEventListener(
@@ -147,7 +142,7 @@ export function floatingUi<Props>(
       const { props, when } = options;
 
       if (when && get(hoveringOverUi)) {
-        instance?.$set(props);
+        componentInstance?.$set(props);
       } else {
         onDestroy();
       }
