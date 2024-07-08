@@ -3,11 +3,17 @@
   import { getContext } from "svelte";
   import { Writable } from "svelte/store";
 
-  import { dateRangeContextKey } from "../../constants";
+  import {
+    dateRangeContextKey,
+    unscheduledTasksMaxHeight,
+    unscheduledTasksMinHeight,
+  } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
 
   import GlobalHandlers from "./global-handlers.svelte";
+  import ResizeHandle from "./resize-handle.svelte";
+  import ResizeableBox from "./resizeable-box.svelte";
   import Ruler from "./ruler.svelte";
   import Scroller from "./scroller.svelte";
   import TimelineControls from "./timeline-controls.svelte";
@@ -26,7 +32,14 @@
 
 <div class="controls">
   <TimelineControls />
-  <UnscheduledTaskContainer day={actualDay} />
+  <ResizeableBox
+    maxHeight={unscheduledTasksMaxHeight}
+    minHeight={unscheduledTasksMinHeight}
+    let:startEdit
+  >
+    <UnscheduledTaskContainer day={actualDay} />
+    <ResizeHandle on:mousedown={startEdit} />
+  </ResizeableBox>
 </div>
 <Scroller let:hovering={autoScrollBlocked}>
   <Ruler visibleHours={getVisibleHours($settings)} />

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { offset } from "@floating-ui/dom";
   import { Moment } from "moment";
+  import { OverlayScrollbarsComponent } from "overlayscrollbars-svelte";
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../constants";
@@ -10,7 +11,6 @@
 
   import DragControls from "./drag-controls.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
-
 
   export let day: Moment;
 
@@ -26,7 +26,10 @@
 </script>
 
 {#if $displayedTasks.noTime.length > 0 && $settings.showUncheduledTasks}
-  <div class="unscheduled-task-container">
+  <OverlayScrollbarsComponent
+    class="unscheduled-task-container overlayscrollbars-svelte"
+    defer
+  >
     {#each $displayedTasks.noTime as task}
       <UnscheduledTimeBlock
         {task}
@@ -49,14 +52,11 @@
         on:mouseup={() => handleTaskMouseUp(task)}
       />
     {/each}
-  </div>
+  </OverlayScrollbarsComponent>
 {/if}
 
 <style>
-  .unscheduled-task-container {
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
+  :global(.unscheduled-task-container) {
     padding: var(--size-2-1) var(--size-4-1);
   }
 </style>

@@ -3,7 +3,6 @@ import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { get, Readable, Writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
-import { DayPlannerSettings } from "../../../settings";
 import { PlacedTask, UnscheduledTask } from "../../../types";
 import { createTask } from "../../../util/task-utils";
 
@@ -16,17 +15,14 @@ export interface UseEditHandlersProps {
   obsidianFacade: ObsidianFacade;
   cursorMinutes: Readable<number>;
   editOperation: Writable<EditOperation>;
-  settings: Readable<DayPlannerSettings>;
 }
 
-// todo: rename without `use`, there are no custom stores here
 export function createEditHandlers({
   day,
   obsidianFacade,
   startEdit,
   cursorMinutes,
   editOperation,
-  settings,
 }: UseEditHandlersProps) {
   function handleContainerMouseDown() {
     const newTask = createTask(day, get(cursorMinutes));

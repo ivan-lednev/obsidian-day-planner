@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { clamp } from "lodash/fp";
   import { Moment } from "moment";
   import { getContext } from "svelte";
   import { Writable } from "svelte/store";
@@ -17,6 +16,7 @@
   import ControlButton from "../control-button.svelte";
   import GlobalHandlers from "../global-handlers.svelte";
   import ResizeHandle from "../resize-handle.svelte";
+  import ResizeableBox from "../resizeable-box.svelte";
   import Ruler from "../ruler.svelte";
   import Scroller from "../scroller.svelte";
   import Timeline from "../timeline.svelte";
@@ -26,7 +26,6 @@
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
   let weekHeaderRef: HTMLDivElement | undefined;
-  let el: HTMLDivElement | undefined;
 
   function handleScroll(event: Event) {
     if (weekHeaderRef) {
@@ -34,49 +33,9 @@
       weekHeaderRef.scrollLeft = event.target?.scrollLeft;
     }
   }
-
-  let customHeight = 0;
-
-  $: height = customHeight === 0 ? "auto" : `${customHeight}px`;
-
-  let editingHeight = false;
-
-  function startEdit() {
-    editingHeight = true;
-  }
-
-  function stopEdit(event: MouseEvent) {
-    if (!editingHeight) {
-      return;
-    }
-
-    event.stopPropagation();
-    editingHeight = false;
-  }
-
-  function handleBlur(event: FocusEvent) {
-    editingHeight = false;
-  }
-
-  function handleMouseMove(event: MouseEvent) {
-    if (!editingHeight) {
-      return;
-    }
-
-    const viewportToElOffsetY = el.getBoundingClientRect().top;
-
-    customHeight = clamp(
-      unscheduledTasksMinHeight,
-      unscheduledTasksMaxHeight,
-      event.clientY - viewportToElOffsetY,
-    );
-  }
 </script>
 
 <GlobalHandlers />
-
-<svelte:document on:mousemove={handleMouseMove} on:mouseup|capture={stopEdit} />
-<svelte:window on:blur={handleBlur} />
 
 <div bind:this={weekHeaderRef} class="week-header">
   <div class="header-row day-buttons">
@@ -94,11 +53,11 @@
     {/each}
   </div>
 
-  <div
-    bind:this={el}
-    style:height
-    style:max-height="{unscheduledTasksMaxHeight}px"
-    class="header-row"
+  <ResizeableBox
+    classNames="header-row"
+    maxHeight={unscheduledTasksMaxHeight}
+    minHeight={unscheduledTasksMinHeight}
+    let:startEdit
   >
     <div class="corner"></div>
     {#each $dateRange as day}
@@ -107,7 +66,7 @@
       </div>
     {/each}
     <ResizeHandle on:mousedown={startEdit} />
-  </div>
+  </ResizeableBox>
 </div>
 
 <Scroller on:scroll={handleScroll}>
@@ -123,7 +82,7 @@
 </Scroller>
 
 <style>
-  .header-row {
+  :global(.header-row) {
     position: relative;
     display: flex;
   }

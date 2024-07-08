@@ -1,4 +1,5 @@
 @use "../vendor/progress_pie_scss";
+@use "overlayscrollbars/styles/overlayscrollbars";
 
 @keyframes pulse {
   from {
@@ -127,4 +128,9 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--size-4-2);
+}
+
+.overlayscrollbars-svelte {
+  width: 100%;
+  height: 100%;
 }
