@@ -107,6 +107,7 @@ export function floatingUi<Props>(
       );
 
       componentInstance.$destroy();
+      document.body.removeChild(floatingUiWrapper);
     });
   }
 
