@@ -88,6 +88,10 @@ export function floatingUi<Props>(
     });
 
     floatingUiWrapper.addEventListener("transitionend", () => {
+      if (!initialized) {
+        return;
+      }
+
       initialized = false;
 
       cleanUpAutoUpdate();
