@@ -20,7 +20,6 @@ export interface UseEditContextProps {
   visibleTasks: Readable<Record<string, TasksForDay>>;
 }
 
-// todo: the name is misleading
 export function useEditContext({
   obsidianFacade,
   onUpdate,
@@ -32,7 +31,6 @@ export function useEditContext({
   const pointerOffsetY = writable(0);
   const cursorMinutes = useCursorMinutes(pointerOffsetY, settings);
 
-  // todo: change misleading name
   const baselineTasks = writable({}, (set) => {
     return visibleTasks.subscribe(set);
   });

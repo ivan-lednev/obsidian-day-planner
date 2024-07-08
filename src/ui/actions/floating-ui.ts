@@ -30,11 +30,12 @@ export function floatingUi<Props>(
   let componentInstance: SvelteComponentTyped<Props>;
   let cleanUpAutoUpdate: () => void;
   let initialized = false;
+  let currentOptions = options;
 
   const hoveringOverUi = writable(false);
 
-  function init(props: Props) {
-    if (initialized || !options.when) {
+  function init() {
+    if (initialized || !currentOptions.when) {
       return;
     }
 
@@ -59,14 +60,14 @@ export function floatingUi<Props>(
       left: 0,
     });
 
-    componentInstance = new options.Component({
+    componentInstance = new currentOptions.Component({
       target: floatingUiWrapper,
-      props,
+      props: currentOptions.props,
       intro: true,
     });
 
     cleanUpAutoUpdate = autoUpdate(anchor, floatingUiWrapper, () => {
-      computePosition(anchor, floatingUiWrapper, options.options).then(
+      computePosition(anchor, floatingUiWrapper, currentOptions.options).then(
         ({ x, y }) => {
           Object.assign(floatingUiWrapper.style, {
             left: `${x}px`,
@@ -121,8 +122,7 @@ export function floatingUi<Props>(
 
   function handleAnchorMouseEnter() {
     hoveringOverUi.set(true);
-    // todo: read 'when' on init
-    init(options.props);
+    init();
   }
 
   function handleAnchorMouseLeave(event: MouseEvent) {
@@ -158,10 +158,14 @@ export function floatingUi<Props>(
       window.removeEventListener("blur", handleAnchorMouseLeave);
     },
     update(options: FloatingUiOptions<Props>) {
-      const { props, when } = options;
+      currentOptions = options;
 
-      if (when && get(hoveringOverUi)) {
-        componentInstance?.$set(props);
+      if (currentOptions.when && get(hoveringOverUi)) {
+        if (initialized) {
+          componentInstance?.$set(currentOptions.props);
+        } else {
+          init();
+        }
       } else {
         onDestroy();
       }
