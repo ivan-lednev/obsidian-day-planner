@@ -37,3 +37,43 @@ export function resizeAndShiftOthers(
 
   return [...preceding, updated, ...updatedFollowing];
 }
+
+export function resizeFromTopAndShiftOthers(
+  baseline: PlacedTask[],
+  editTarget: PlacedTask,
+  cursorTime: number,
+): PlacedTask[] {
+  const index = baseline.findIndex((task) => task.id === editTarget.id);
+  const preceding = baseline.slice(0, index);
+  const following = baseline.slice(index + 1);
+
+  const durationMinutes =
+    editTarget.startMinutes + editTarget.durationMinutes - cursorTime;
+
+  const updated = {
+    ...editTarget,
+    startMinutes: cursorTime,
+    durationMinutes,
+  };
+
+  const updatedPreceding = preceding
+    .reverse()
+    .reduce((result, current) => {
+      const nextInTimeline = last(result) || updated;
+
+      if (nextInTimeline.startMinutes < getEndMinutes(current)) {
+        return [
+          ...result,
+          {
+            ...current,
+            startMinutes: nextInTimeline.startMinutes - current.durationMinutes,
+          },
+        ];
+      }
+
+      return [...result, current];
+    }, [])
+    .reverse();
+
+  return [...updatedPreceding, updated, ...following];
+}

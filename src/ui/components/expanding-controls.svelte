@@ -2,10 +2,16 @@
   import { fade, slide } from "svelte/transition";
 
   import Hoverable from "./hoverable.svelte";
+
+  export let reverse: boolean | undefined = false;
 </script>
 
 <Hoverable let:hovering>
-  <div class="expanding-controls" transition:fade={{ duration: 200 }}>
+  <div
+    style:flex-direction={reverse ? "row-reverse" : "row"}
+    class="expanding-controls"
+    transition:fade={{ duration: 200 }}
+  >
     {#if hovering}
       <!--TODO: clean up styles-->
       <div
@@ -23,6 +29,7 @@
   .expanding-controls {
     overflow: hidden;
     display: flex;
+    flex-direction: var(--expanding-controls-flex-direction, row);
 
     background-color: var(--background-primary);
     border: 1px solid var(--background-modifier-border);

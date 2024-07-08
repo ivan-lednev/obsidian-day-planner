@@ -1,7 +1,5 @@
 <script lang="ts">
-  import {
-    offset,
-  } from "@floating-ui/dom";
+  import { offset } from "@floating-ui/dom";
   import { Moment } from "moment";
   import { getContext } from "svelte";
   import { Writable } from "svelte/store";
@@ -69,6 +67,26 @@
         <LocalTimeBlock
           {task}
           use={[
+            [
+              floatingUi,
+              {
+                when: !$editOperation,
+                Component: ResizeControls,
+                props: {
+                  reverse: true,
+                  onResize: () => handleResizerMouseDown(task, EditMode.RESIZE_FROM_TOP),
+                  onResizeWithNeighbors: () =>
+                    handleResizerMouseDown(
+                      task,
+                      EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS,
+                    ),
+                },
+                options: {
+                  middleware: [offset({ mainAxis: -12, crossAxis: 40 })],
+                  placement: "top-start",
+                },
+              },
+            ],
             [
               floatingUi,
               {
