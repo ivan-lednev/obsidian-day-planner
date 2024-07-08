@@ -138,7 +138,7 @@
     border-bottom: 1px solid var(--background-modifier-border);
   }
 
-  .header-cell:last-child {
+  .header-cell:last-of-type {
     flex: 1 0 calc(200px + var(--scrollbar-width));
     border-right: none;
   }
