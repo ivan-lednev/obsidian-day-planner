@@ -111,6 +111,20 @@
   padding: 0;
 }
 
+.os-scrollbar {
+  box-sizing: border-box;
+  --os-size: var(--scrollbar-width);
+  --os-padding-perpendicular: 2px;
+  --os-padding-axis: 2px;
+  --os-track-border-radius: 10px;
+  --os-handle-interactive-area-offset: 4px;
+  --os-handle-border-radius: 10px;
+
+  --os-handle-bg: var(--scrollbar-thumb-bg);
+  --os-handle-bg-hover: var(--scrollbar-active-thumb-bg);
+  --os-handle-bg-active: var(--scrollbar-active-thumb-bg);
+}
+
 .absolute-stretch-x {
   position: absolute;
   right: 0;
