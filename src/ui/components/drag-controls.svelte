@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { ArrowDownToLine, GripVertical, Copy } from "lucide-svelte";
+  import {
+    FoldVertical,
+    ArrowDownToLine,
+    GripVertical,
+    Copy,
+  } from "lucide-svelte";
 
   import BlockControlButton from "./block-control-button.svelte";
   import ExpandingControls from "./expanding-controls.svelte";
@@ -7,6 +12,7 @@
   export let onMove: () => void;
   export let onMoveWithNeighbors: () => void | undefined = undefined;
   export let onCopy: () => void | undefined = undefined;
+  export let onMoveWithShrink: () => void | undefined = undefined;
 </script>
 
 <ExpandingControls --right="4px" --top="4px">
@@ -35,6 +41,15 @@
         on:mousedown={onMoveWithNeighbors}
       >
         <ArrowDownToLine class="svg-icon" />
+      </BlockControlButton>
+    {/if}
+    {#if onMoveWithShrink}
+      <BlockControlButton
+        cursor="grab"
+        label="Move block and shrink neighboring blocks"
+        on:mousedown={onMoveWithShrink}
+      >
+        <FoldVertical class="svg-icon" />
       </BlockControlButton>
     {/if}
   </svelte:fragment>

@@ -9,11 +9,16 @@ import { EditMode, EditOperation } from "../types";
 import { create } from "./create";
 import { drag } from "./drag";
 import { dragAndShiftOthers } from "./drag-and-shift-others";
+import { dragAndShrinkOthers } from "./drag-and-shrink-others";
 import { resize, resizeFromTop } from "./resize";
 import {
   resizeAndShiftOthers,
   resizeFromTopAndShiftOthers,
 } from "./resize-and-shift-others";
+import {
+  resizeAndShrinkOthers,
+  resizeFromTopAndShrinkOthers,
+} from "./resize-and-shrink-others";
 
 const transformers: Record<EditMode, typeof drag> = {
   [EditMode.DRAG]: drag,
@@ -23,6 +28,9 @@ const transformers: Record<EditMode, typeof drag> = {
   [EditMode.RESIZE_AND_SHIFT_OTHERS]: resizeAndShiftOthers,
   [EditMode.RESIZE_FROM_TOP]: resizeFromTop,
   [EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS]: resizeFromTopAndShiftOthers,
+  [EditMode.DRAG_AND_SHRINK_OTHERS]: dragAndShrinkOthers,
+  [EditMode.RESIZE_AND_SHRINK_OTHERS]: resizeAndShrinkOthers,
+  [EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS]: resizeFromTopAndShrinkOthers,
 };
 
 const multidayModes: Partial<EditMode[]> = [

@@ -74,11 +74,17 @@
                 Component: ResizeControls,
                 props: {
                   reverse: true,
-                  onResize: () => handleResizerMouseDown(task, EditMode.RESIZE_FROM_TOP),
+                  onResize: () =>
+                    handleResizerMouseDown(task, EditMode.RESIZE_FROM_TOP),
                   onResizeWithNeighbors: () =>
                     handleResizerMouseDown(
                       task,
                       EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS,
+                    ),
+                  onResizeWithShrink: () =>
+                    handleResizerMouseDown(
+                      task,
+                      EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS,
                     ),
                 },
                 options: {
@@ -99,6 +105,11 @@
                       task,
                       EditMode.RESIZE_AND_SHIFT_OTHERS,
                     ),
+                  onResizeWithShrink: () =>
+                    handleResizerMouseDown(
+                      task,
+                      EditMode.RESIZE_AND_SHRINK_OTHERS,
+                    ),
                 },
                 options: {
                   middleware: [offset({ mainAxis: -14, crossAxis: -40 })],
@@ -116,6 +127,8 @@
                   onMove: () => handleGripMouseDown(task, EditMode.DRAG),
                   onMoveWithNeighbors: () =>
                     handleGripMouseDown(task, EditMode.DRAG_AND_SHIFT_OTHERS),
+                  onMoveWithShrink: () =>
+                    handleGripMouseDown(task, EditMode.DRAG_AND_SHRINK_OTHERS),
                 },
                 options: {
                   middleware: [offset({ mainAxis: -32, crossAxis: -4 })],
