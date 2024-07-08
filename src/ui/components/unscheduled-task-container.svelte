@@ -27,9 +27,9 @@
 
 {#if $displayedTasks.noTime.length > 0 && $settings.showUncheduledTasks}
   <OverlayScrollbarsComponent
-    options={{ scrollbars: { theme: "os-theme-custom" } }}
     class="unscheduled-task-container overlayscrollbars-svelte"
     defer
+    options={{ scrollbars: { theme: "os-theme-custom" } }}
   >
     {#each $displayedTasks.noTime as task}
       <UnscheduledTimeBlock
