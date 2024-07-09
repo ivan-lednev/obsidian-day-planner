@@ -113,13 +113,13 @@ export default class DayPlanner extends Plugin {
   private registerCommands() {
     this.addCommand({
       id: "show-day-planner-timeline",
-      name: "Show the Day Planner Timeline",
+      name: "Show timeline",
       callback: async () => await this.initTimelineLeaf(),
     });
 
     this.addCommand({
       id: "show-weekly-view",
-      name: "Show the Week Planner",
+      name: "Show week planner",
       callback: this.initWeeklyLeaf,
     });
 
