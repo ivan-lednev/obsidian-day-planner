@@ -19,7 +19,7 @@
   <BlockControlButton
     slot="visible"
     cursor="grab"
-    label="Start moving"
+    label="Move block"
     on:mousedown={onMove}
   >
     <GripVertical class="svg-icon" />
@@ -28,7 +28,7 @@
     {#if onCopy}
       <BlockControlButton
         cursor="grab"
-        label="Start copying"
+        label="Copy block"
         on:mousedown={onCopy}
       >
         <Copy class="svg-icon" />
