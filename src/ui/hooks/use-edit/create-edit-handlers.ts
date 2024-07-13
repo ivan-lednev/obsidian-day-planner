@@ -4,7 +4,7 @@ import { get, Readable, Writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
 import { PlacedTask, UnscheduledTask } from "../../../types";
-import { createTask } from "../../../util/task-utils";
+import { createTask, getSchedueldDayFromText } from "../../../util/task-utils";
 
 import { EditMode, EditOperation } from "./types";
 
@@ -55,11 +55,16 @@ export function createEditHandlers({
     const withAddedTime = {
       ...task,
       startMinutes: get(cursorMinutes),
-      // todo: add a proper fix
-      startTime: task.location
-        ? getDateFromPath(task.location.path, "day") || window.moment()
-        : window.moment(),
+      startTime:
+        getSchedueldDayFromText(task) ||
+        getDateFromPath(task.location.path, "day"),
     };
+
+    if (!withAddedTime.startTime) {
+      throw new Error(
+        "Could not get the day of the task. It should be provided through the Tasks Plugins schduled feature, or the path of the daily note. If you did provide the day through one of these options, please report the issue at https://github.com/ivan-lednev/obsidian-day-planner/issues",
+      );
+    }
 
     startEdit({ task: withAddedTime, mode: EditMode.DRAG, day });
   }
