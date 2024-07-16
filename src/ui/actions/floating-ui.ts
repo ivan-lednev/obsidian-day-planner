@@ -63,7 +63,6 @@ export function floatingUi<Props>(
     }
   }
 
-
   function initFloatingUi() {
     if (initialized || !currentOptions.when) {
       return;
@@ -156,7 +155,7 @@ export function floatingUi<Props>(
   const unsubscribe = hoveringOverUi.subscribe((isHovering) => {
     if (isHovering) {
       if (initialized) {
-        cancelFadeTransition(floatingUiWrapper)
+        cancelFadeTransition(floatingUiWrapper);
       } else {
         initFloatingUi();
       }

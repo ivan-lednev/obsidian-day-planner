@@ -10,6 +10,7 @@
   import { ObsidianContext } from "../../types";
   import { isToday } from "../../util/moment";
   import { copy, getRenderKey } from "../../util/task-utils";
+  import { isTouchEvent } from "../../util/util";
   import { floatingUi } from "../actions/floating-ui";
   import { styledCursor } from "../actions/styled-cursor";
   import { EditMode } from "../hooks/use-edit/types";
@@ -43,10 +44,6 @@
     pointerOffsetY,
     cursor,
   } = getEditHandlers(actualDay));
-
-  function isTouchEvent(event: PointerEvent) {
-    return ["pen", "touch"].includes(event.pointerType);
-  }
 </script>
 
 <svelte:window on:blur={cancelEdit} />
@@ -61,9 +58,11 @@
   <ScheduledTaskContainer
     {pointerOffsetY}
     on:pointerdown={(event) => {
-      if (!isTouchEvent(event)) {
-        handleContainerMouseDown();
+      if (isTouchEvent(event)) {
+        return;
       }
+
+      handleContainerMouseDown();
     }}
     on:mouseenter={handleMouseEnter}
     on:pointerup={confirmEdit}

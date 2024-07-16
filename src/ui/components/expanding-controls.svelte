@@ -1,31 +1,30 @@
 <script lang="ts">
   import { fade, slide } from "svelte/transition";
 
-  import Hoverable from "./hoverable.svelte";
+  import { useHoverOrTap } from "../hooks/useHoverOrTap";
 
   export let reverse: boolean | undefined = false;
+
+  const { isActive, handlePointerDown, handlePointerEnter } = useHoverOrTap();
 </script>
 
-<Hoverable let:hovering>
-  <div
-    style:flex-direction={reverse ? "row-reverse" : "row"}
-    style:touch-action="none"
-    class="expanding-controls"
-    on:pointermove|preventDefault
-    transition:fade={{ duration: 200 }}
-  >
-    {#if hovering}
-      <!--TODO: clean up styles-->
-      <div
-        style="display: flex"
-        transition:slide={{ duration: 200, axis: "x" }}
-      >
-        <slot name="hidden" />
-      </div>
-    {/if}
-    <slot name="visible" />
-  </div>
-</Hoverable>
+<div
+  style:flex-direction={reverse ? "row-reverse" : "row"}
+  style:touch-action="none"
+  class="expanding-controls"
+  on:pointermove|preventDefault
+  on:pointerdown|capture={handlePointerDown}
+  on:pointerenter={handlePointerEnter}
+  transition:fade={{ duration: 200 }}
+>
+  {#if $isActive}
+    <!--TODO: clean up styles-->
+    <div style="display: flex" transition:slide={{ duration: 200, axis: "x" }}>
+      <slot name="hidden" />
+    </div>
+  {/if}
+  <slot name="visible" />
+</div>
 
 <style>
   .expanding-controls {
