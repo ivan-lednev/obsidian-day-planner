@@ -20,7 +20,7 @@
     slot="visible"
     cursor="grab"
     label="Move block"
-    on:mousedown={onMove}
+    on:pointerdown={onMove}
   >
     <GripVertical class="svg-icon" />
   </BlockControlButton>
@@ -29,7 +29,7 @@
       <BlockControlButton
         cursor="grab"
         label="Copy block"
-        on:mousedown={onCopy}
+        on:pointerdown={onCopy}
       >
         <Copy class="svg-icon" />
       </BlockControlButton>
@@ -38,7 +38,7 @@
       <BlockControlButton
         cursor="grab"
         label="Move block and push neighboring blocks"
-        on:mousedown={onMoveWithNeighbors}
+        on:pointerdown={onMoveWithNeighbors}
       >
         <ArrowDownToLine class="svg-icon" />
       </BlockControlButton>
@@ -47,7 +47,7 @@
       <BlockControlButton
         cursor="grab"
         label="Move block and shrink neighboring blocks"
-        on:mousedown={onMoveWithShrink}
+        on:pointerdown={onMoveWithShrink}
       >
         <FoldVertical class="svg-icon" />
       </BlockControlButton>

@@ -9,7 +9,9 @@
 <Hoverable let:hovering>
   <div
     style:flex-direction={reverse ? "row-reverse" : "row"}
+    style:touch-action="none"
     class="expanding-controls"
+    on:pointermove|preventDefault
     transition:fade={{ duration: 200 }}
   >
     {#if hovering}

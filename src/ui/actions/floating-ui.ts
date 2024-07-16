@@ -5,6 +5,7 @@ import {
 } from "@floating-ui/dom";
 import type { SvelteComponentTyped } from "svelte";
 import { get, writable } from "svelte/store";
+import TinyGesture from "tinygesture";
 
 interface FloatingUiOptions<Props> {
   when: boolean;
@@ -22,6 +23,13 @@ function isEventRelated(event: MouseEvent, otherNode: HTMLElement) {
   );
 }
 
+function cancelFadeTransition(el: HTMLElement) {
+  Object.assign(el.style, {
+    transition: "none",
+    opacity: 1,
+  });
+}
+
 export function floatingUi<Props>(
   anchor: HTMLElement,
   options: FloatingUiOptions<Props>,
@@ -34,7 +42,29 @@ export function floatingUi<Props>(
 
   const hoveringOverUi = writable(false);
 
-  function init() {
+  function handleFloatingUiMouseEnter() {
+    hoveringOverUi.set(true);
+  }
+
+  function handleFloatingUiMouseLeave(event: MouseEvent) {
+    if (anchor && !isEventRelated(event, anchor)) {
+      hoveringOverUi.set(false);
+    }
+  }
+
+  function handleAnchorMouseEnter() {
+    hoveringOverUi.set(true);
+    initFloatingUi();
+  }
+
+  function handleAnchorMouseLeave(event: MouseEvent) {
+    if (floatingUiWrapper && !isEventRelated(event, floatingUiWrapper)) {
+      hoveringOverUi.set(false);
+    }
+  }
+
+
+  function initFloatingUi() {
     if (initialized || !currentOptions.when) {
       return;
     }
@@ -58,6 +88,7 @@ export function floatingUi<Props>(
       width: "max-content",
       top: 0,
       left: 0,
+      "z-index": 9999,
     });
 
     componentInstance = new currentOptions.Component({
@@ -111,26 +142,12 @@ export function floatingUi<Props>(
     });
   }
 
-  function handleFloatingUiMouseEnter() {
+  const gesture = new TinyGesture(anchor);
+
+  gesture.on("longpress", () => {
+    navigator.vibrate(100);
     hoveringOverUi.set(true);
-  }
-
-  function handleFloatingUiMouseLeave(event: MouseEvent) {
-    if (anchor && !isEventRelated(event, anchor)) {
-      hoveringOverUi.set(false);
-    }
-  }
-
-  function handleAnchorMouseEnter() {
-    hoveringOverUi.set(true);
-    init();
-  }
-
-  function handleAnchorMouseLeave(event: MouseEvent) {
-    if (floatingUiWrapper && !isEventRelated(event, floatingUiWrapper)) {
-      hoveringOverUi.set(false);
-    }
-  }
+  });
 
   anchor.addEventListener("mouseenter", handleAnchorMouseEnter);
   anchor.addEventListener("mouseleave", handleAnchorMouseLeave);
@@ -138,11 +155,10 @@ export function floatingUi<Props>(
 
   const unsubscribe = hoveringOverUi.subscribe((isHovering) => {
     if (isHovering) {
-      if (floatingUiWrapper) {
-        Object.assign(floatingUiWrapper.style, {
-          transition: "none",
-          opacity: 1,
-        });
+      if (initialized) {
+        cancelFadeTransition(floatingUiWrapper)
+      } else {
+        initFloatingUi();
       }
     } else {
       onDestroy();
@@ -153,6 +169,7 @@ export function floatingUi<Props>(
     destroy() {
       onDestroy();
       unsubscribe();
+      gesture.destroy();
 
       anchor.removeEventListener("mouseenter", handleAnchorMouseEnter);
       anchor.removeEventListener("mouseleave", handleAnchorMouseLeave);
@@ -165,7 +182,7 @@ export function floatingUi<Props>(
         if (initialized) {
           componentInstance?.$set(currentOptions.props);
         } else {
-          init();
+          initFloatingUi();
         }
       } else {
         onDestroy();

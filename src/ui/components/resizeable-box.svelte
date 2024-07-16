@@ -45,7 +45,7 @@
   }
 </script>
 
-<svelte:document on:mousemove={handleMouseMove} on:mouseup|capture={stopEdit} />
+<svelte:document on:mousemove={handleMouseMove} on:pointerup|capture={stopEdit} />
 <svelte:window on:blur={handleBlur} />
 
 <div

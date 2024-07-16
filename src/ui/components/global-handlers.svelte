@@ -14,4 +14,4 @@
 <!--TODO: this should be attached only once for all views-->
 <svelte:window on:blur={cancelEdit} />
 <svelte:body use:styledCursor={$cursor.bodyCursor} />
-<svelte:document on:mouseup={cancelEdit} />
+<svelte:document on:pointerup={cancelEdit} />

@@ -10,7 +10,7 @@
   export let use: ActionArray = [];
 </script>
 
-<TimeBlockBase {task} {use} on:mouseup>
+<TimeBlockBase {task} {use} on:pointerup>
   <MarkdownBlockContent {task}>
     <RenderedMarkdown {task} />
   </MarkdownBlockContent>

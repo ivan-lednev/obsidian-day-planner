@@ -7,7 +7,7 @@
   style:cursor
   class="clickable-icon"
   aria-label={label}
-  on:mousedown|stopPropagation
+  on:pointerdown|stopPropagation
 >
   <slot />
 </div>

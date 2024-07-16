@@ -50,7 +50,7 @@
             },
           ],
         ]}
-        on:mouseup={() => handleTaskMouseUp(task)}
+        on:pointerup={() => handleTaskMouseUp(task)}
       />
     {/each}
   </OverlayScrollbarsComponent>

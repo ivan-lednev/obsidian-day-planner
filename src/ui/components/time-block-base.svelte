@@ -4,7 +4,7 @@
   import { useColorOverride } from "../hooks/use-color-override";
 
   export let task: UnscheduledTask;
-  export let use: ActionArray = [] ;
+  export let use: ActionArray = [];
 
   $: override = useColorOverride(task);
   // todo: hide in hook
@@ -16,8 +16,8 @@
   <div
     style:background-color={backgroundColor}
     class="content"
-    on:mousedown={(event) => event.stopPropagation()}
-    on:mouseup
+    on:pointerdown={(event) => event.stopPropagation()}
+    on:pointerup
     use:useActions={use}
   >
     <slot />
