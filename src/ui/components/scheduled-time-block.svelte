@@ -37,7 +37,7 @@
   --time-block-width={width}
   {task}
   {use}
-  on:mouseup
+  on:pointerup
 >
   <slot />
 </TimeBlockBase>

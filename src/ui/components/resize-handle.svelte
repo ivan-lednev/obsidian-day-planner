@@ -5,7 +5,7 @@
 <hr
   style:display={visible ? "block" : "none"}
   class="workspace-leaf-resize-handle"
-  on:mousedown|stopPropagation
+  on:mousedown
 />
 
 <style>

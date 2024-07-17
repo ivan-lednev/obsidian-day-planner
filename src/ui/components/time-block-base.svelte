@@ -16,7 +16,6 @@
   <div
     style:background-color={backgroundColor}
     class="content"
-    on:pointerdown={(event) => event.stopPropagation()}
     on:pointerup
     use:useActions={use}
   >

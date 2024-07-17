@@ -7,8 +7,6 @@ export function useHoverOrTap() {
 
   function handlePointerDown(event: PointerEvent) {
     if (isTouchEvent(event) && !get(isActive)) {
-      event.stopPropagation();
-
       isActive.set(true);
     }
   }
@@ -21,9 +19,18 @@ export function useHoverOrTap() {
     isActive.set(true);
   }
 
+  function handlePointerLeave(event: PointerEvent) {
+    if (isTouchEvent(event)) {
+      return;
+    }
+
+    isActive.set(false);
+  }
+
   return {
     isActive,
     handlePointerDown,
     handlePointerEnter,
+    handlePointerLeave,
   };
 }

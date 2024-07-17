@@ -4,9 +4,9 @@
   import BlockControlButton from "./block-control-button.svelte";
   import ExpandingControls from "./expanding-controls.svelte";
 
-  export let onResize: () => void;
-  export let onResizeWithNeighbors: () => void;
-  export let onResizeWithShrink: () => void;
+  export let onResize: (event: PointerEvent) => void;
+  export let onResizeWithNeighbors: (event: PointerEvent) => void;
+  export let onResizeWithShrink: (event: PointerEvent) => void;
   export let reverse: boolean | undefined = false;
 </script>
 

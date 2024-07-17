@@ -5,7 +5,7 @@
   import { Writable } from "svelte/store";
 
   import { dateRangeContextKey, obsidianContext } from "../../constants";
-  import { getVisibleHours } from "../../global-store/derived-settings";
+  import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import { ObsidianContext } from "../../types";
   import { isToday } from "../../util/moment";
@@ -21,7 +21,6 @@
   import Needle from "./needle.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
   import ResizeControls from "./resize-controls.svelte";
-  import ScheduledTaskContainer from "./scheduled-task-container.svelte";
 
   // TODO: showRuler or add <slot name="left-gutter" />
   export let day: Moment | undefined = undefined;
@@ -37,15 +36,35 @@
     displayedTasks,
     cancelEdit,
     handleContainerMouseDown,
-    handleResizerMouseDown,
+    handleResizerMouseDown: handleResizerMouseDownBase,
     handleTaskMouseUp,
-    handleGripMouseDown,
+    handleGripMouseDown: handleGripMouseDownBase,
     handleMouseEnter,
     pointerOffsetY,
     cursor,
   } = getEditHandlers(actualDay));
+
+  let el: HTMLElement | undefined;
+
+  function setPointerOffsetY(event: PointerEvent) {
+    const viewportToElOffsetY = el.getBoundingClientRect().top;
+    const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
+
+    pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings));
+  }
+
+  function withPointerReset<T>(original: (...args: T[]) => void) {
+    return (event: PointerEvent, ...args: T[]) => {
+      setPointerOffsetY(event);
+      original(...args);
+    };
+  }
+
+  $: handleGripMouseDown = withPointerReset(handleGripMouseDownBase);
+  $: handleResizerMouseDown = withPointerReset(handleResizerMouseDownBase);
 </script>
 
+<!--TODO: duplicate of <GlobalHandlers />-->
 <svelte:window on:blur={cancelEdit} />
 <svelte:body use:styledCursor={$cursor.bodyCursor} />
 <svelte:document on:pointerup={cancelEdit} />
@@ -55,17 +74,20 @@
     <Needle autoScrollBlocked={isUnderCursor} />
   {/if}
 
-  <ScheduledTaskContainer
-    {pointerOffsetY}
+  <div
+    bind:this={el}
+    class="tasks absolute-stretch-x"
     on:pointerdown={(event) => {
-      if (isTouchEvent(event)) {
+      if (isTouchEvent(event) || event.target !== el) {
         return;
       }
 
       handleContainerMouseDown();
     }}
-    on:mouseenter={handleMouseEnter}
     on:pointerup={confirmEdit}
+    on:mouseenter={handleMouseEnter}
+    on:pointermove={setPointerOffsetY}
+    on:pointerup|stopPropagation
   >
     {#each $displayedTasks.withTime as task (getRenderKey(task))}
       {#if task.calendar}
@@ -81,18 +103,27 @@
                 Component: ResizeControls,
                 props: {
                   reverse: true,
-                  onResize: () =>
-                    handleResizerMouseDown(task, EditMode.RESIZE_FROM_TOP),
-                  onResizeWithNeighbors: () =>
+                  onResize: (event) => {
                     handleResizerMouseDown(
+                      event,
+                      task,
+                      EditMode.RESIZE_FROM_TOP,
+                    );
+                  },
+                  onResizeWithNeighbors: (event) => {
+                    handleResizerMouseDown(
+                      event,
                       task,
                       EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS,
-                    ),
-                  onResizeWithShrink: () =>
+                    );
+                  },
+                  onResizeWithShrink: (event) => {
                     handleResizerMouseDown(
+                      event,
                       task,
                       EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS,
-                    ),
+                    );
+                  },
                 },
                 options: {
                   middleware: [offset({ mainAxis: -12, crossAxis: 40 })],
@@ -106,17 +137,23 @@
                 when: !$editOperation,
                 Component: ResizeControls,
                 props: {
-                  onResize: () => handleResizerMouseDown(task, EditMode.RESIZE),
-                  onResizeWithNeighbors: () =>
+                  onResize: (event) => {
+                    handleResizerMouseDown(event, task, EditMode.RESIZE);
+                  },
+                  onResizeWithNeighbors: (event) => {
                     handleResizerMouseDown(
+                      event,
                       task,
                       EditMode.RESIZE_AND_SHIFT_OTHERS,
-                    ),
-                  onResizeWithShrink: () =>
+                    );
+                  },
+                  onResizeWithShrink: (event) => {
                     handleResizerMouseDown(
+                      event,
                       task,
                       EditMode.RESIZE_AND_SHRINK_OTHERS,
-                    ),
+                    );
+                  },
                 },
                 options: {
                   middleware: [offset({ mainAxis: -14, crossAxis: -40 })],
@@ -130,12 +167,26 @@
                 when: !$editOperation,
                 Component: DragControls,
                 props: {
-                  onCopy: () => handleGripMouseDown(copy(task), EditMode.DRAG),
-                  onMove: () => handleGripMouseDown(task, EditMode.DRAG),
-                  onMoveWithNeighbors: () =>
-                    handleGripMouseDown(task, EditMode.DRAG_AND_SHIFT_OTHERS),
-                  onMoveWithShrink: () =>
-                    handleGripMouseDown(task, EditMode.DRAG_AND_SHRINK_OTHERS),
+                  onCopy: (event) => {
+                    handleGripMouseDown(event, copy(task), EditMode.DRAG);
+                  },
+                  onMove: (event) => {
+                    handleGripMouseDown(event, task, EditMode.DRAG);
+                  },
+                  onMoveWithNeighbors: (event) => {
+                    handleGripMouseDown(
+                      event,
+                      task,
+                      EditMode.DRAG_AND_SHIFT_OTHERS,
+                    );
+                  },
+                  onMoveWithShrink: (event) => {
+                    handleGripMouseDown(
+                      event,
+                      task,
+                      EditMode.DRAG_AND_SHRINK_OTHERS,
+                    );
+                  },
                 },
                 options: {
                   middleware: [offset({ mainAxis: -32, crossAxis: -4 })],
@@ -144,9 +195,26 @@
               },
             ],
           ]}
-          on:pointerup={() => handleTaskMouseUp(task)}
+          on:pointerup={(event) => {
+            if (!isTouchEvent(event)) {
+              handleTaskMouseUp(task);
+            }
+          }}
         />
       {/if}
     {/each}
-  </ScheduledTaskContainer>
+  </div>
 </Column>
+
+<style>
+  .tasks {
+    top: 0;
+    bottom: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    margin-right: 10px;
+    margin-left: 10px;
+  }
+</style>

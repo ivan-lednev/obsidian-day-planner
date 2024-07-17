@@ -9,10 +9,12 @@
   import BlockControlButton from "./block-control-button.svelte";
   import ExpandingControls from "./expanding-controls.svelte";
 
-  export let onMove: () => void;
-  export let onMoveWithNeighbors: () => void | undefined = undefined;
-  export let onCopy: () => void | undefined = undefined;
-  export let onMoveWithShrink: () => void | undefined = undefined;
+  export let onMove: (event: PointerEvent) => void;
+  export let onMoveWithNeighbors: (event: PointerEvent) => void | undefined =
+    undefined;
+  export let onCopy: (event: PointerEvent) => void | undefined = undefined;
+  export let onMoveWithShrink: (event: PointerEvent) => void | undefined =
+    undefined;
 </script>
 
 <ExpandingControls --right="4px" --top="4px">
@@ -20,7 +22,12 @@
     slot="visible"
     cursor="grab"
     label="Move block"
-    on:pointerdown={onMove}
+    on:pointerdown={(event) => {
+      if (isActive) {
+        onMove(event);
+      }
+    }}
+    let:isActive
   >
     <GripVertical class="svg-icon" />
   </BlockControlButton>

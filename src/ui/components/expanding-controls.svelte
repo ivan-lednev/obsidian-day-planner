@@ -5,7 +5,12 @@
 
   export let reverse: boolean | undefined = false;
 
-  const { isActive, handlePointerDown, handlePointerEnter } = useHoverOrTap();
+  const {
+    isActive,
+    handlePointerDown,
+    handlePointerEnter,
+    handlePointerLeave,
+  } = useHoverOrTap();
 </script>
 
 <div
@@ -13,8 +18,9 @@
   style:touch-action="none"
   class="expanding-controls"
   on:pointermove|preventDefault
-  on:pointerdown|capture={handlePointerDown}
+  on:pointerdown={handlePointerDown}
   on:pointerenter={handlePointerEnter}
+  on:pointerleave={handlePointerLeave}
   transition:fade={{ duration: 200 }}
 >
   {#if $isActive}
@@ -23,7 +29,7 @@
       <slot name="hidden" />
     </div>
   {/if}
-  <slot name="visible" />
+  <slot name="visible" isActive={$isActive} />
 </div>
 
 <style>
