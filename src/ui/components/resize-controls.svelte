@@ -15,7 +15,12 @@
     slot="visible"
     cursor="grab"
     label="Resize block"
-    on:pointerdown={onResize}
+    on:pointerdown={(event) => {
+      if (isActive) {
+        onResize(event);
+      }
+    }}
+    let:isActive
   >
     <MoveVertical class="svg-icon" />
   </BlockControlButton>

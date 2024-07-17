@@ -24,7 +24,6 @@
   transition:fade={{ duration: 200 }}
 >
   {#if $isActive}
-    <!--TODO: clean up styles-->
     <div style="display: flex" transition:slide={{ duration: 200, axis: "x" }}>
       <slot name="hidden" />
     </div>

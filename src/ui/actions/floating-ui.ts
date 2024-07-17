@@ -7,29 +7,19 @@ import type { SvelteComponentTyped } from "svelte";
 import { get, writable } from "svelte/store";
 import TinyGesture from "tinygesture";
 
-import { isTouchEvent } from "../../util/util";
+import {
+  addFadeTransition,
+  cancelFadeTransition,
+  isEventRelated,
+  isTapOutside,
+  isTouchEvent,
+} from "../../util/util";
 
 interface FloatingUiOptions<Props> {
   when: boolean;
   Component: typeof SvelteComponentTyped<Props>;
   props: Props;
   options: Partial<ComputePositionConfig>;
-}
-
-function isEventRelated(event: PointerEvent, otherNode: HTMLElement) {
-  return (
-    event.relatedTarget &&
-    (event.relatedTarget === otherNode ||
-      (event.relatedTarget instanceof Node &&
-        otherNode.contains(event.relatedTarget)))
-  );
-}
-
-function cancelFadeTransition(el: HTMLElement) {
-  Object.assign(el.style, {
-    transition: "none",
-    opacity: 1,
-  });
 }
 
 export function floatingUi<Props>(
@@ -39,7 +29,7 @@ export function floatingUi<Props>(
   let floatingUiWrapper: HTMLDivElement;
   let componentInstance: SvelteComponentTyped<Props>;
   let cleanUpAutoUpdate: () => void;
-  let initialized = false;
+  let isFloatingUiInitialized = false;
   let currentOptions = options;
 
   const isActive = writable(false);
@@ -49,7 +39,7 @@ export function floatingUi<Props>(
       return;
     }
 
-    if (anchor && !isEventRelated(event, anchor)) {
+    if (!isEventRelated(event, anchor)) {
       isActive.set(false);
     }
   }
@@ -68,28 +58,23 @@ export function floatingUi<Props>(
       return;
     }
 
-    if (floatingUiWrapper && !isEventRelated(event, floatingUiWrapper)) {
+    if (!isEventRelated(event, floatingUiWrapper)) {
       isActive.set(false);
     }
   }
 
   function handleTapOutsideFloatingUi(event: PointerEvent) {
-    if (
-      isTouchEvent(event) &&
-      event.target !== floatingUiWrapper &&
-      event.target instanceof Node &&
-      !floatingUiWrapper.contains(event.target)
-    ) {
+    if (isTapOutside(event, floatingUiWrapper)) {
       isActive.set(false);
     }
   }
 
   function initFloatingUi() {
-    if (initialized || !currentOptions.when) {
+    if (isFloatingUiInitialized || !currentOptions.when) {
       return;
     }
 
-    initialized = true;
+    isFloatingUiInitialized = true;
 
     floatingUiWrapper = document.createElement("div");
 
@@ -128,36 +113,38 @@ export function floatingUi<Props>(
   }
 
   function destroyFloatingUi() {
-    if (!initialized) {
+    if (!isFloatingUiInitialized) {
       return;
     }
 
-    Object.assign(floatingUiWrapper.style, {
-      transition: "opacity 200ms",
-      opacity: 0,
-    });
+    addFadeTransition(floatingUiWrapper);
 
-    floatingUiWrapper.addEventListener("transitionend", () => {
-      if (!initialized) {
-        return;
-      }
+    floatingUiWrapper.addEventListener(
+      "transitionend",
+      () => {
+        if (!isFloatingUiInitialized) {
+          return;
+        }
 
-      initialized = false;
+        isFloatingUiInitialized = false;
 
-      cleanUpAutoUpdate();
+        cleanUpAutoUpdate();
 
-      floatingUiWrapper.removeEventListener(
-        "pointerleave",
-        handleFloatingUiPointerLeave,
-      );
+        floatingUiWrapper.removeEventListener(
+          "pointerleave",
+          handleFloatingUiPointerLeave,
+        );
 
-      componentInstance.$destroy();
-      document.body.removeChild(floatingUiWrapper);
-      document.body.removeEventListener(
-        "pointerdown",
-        handleTapOutsideFloatingUi,
-      );
-    });
+        componentInstance.$destroy();
+
+        document.body.removeChild(floatingUiWrapper);
+        document.body.removeEventListener(
+          "pointerdown",
+          handleTapOutsideFloatingUi,
+        );
+      },
+      { once: true },
+    );
   }
 
   const anchorGesture = new TinyGesture(anchor);
@@ -169,12 +156,12 @@ export function floatingUi<Props>(
 
   anchor.addEventListener("pointerenter", handleAnchorPointerEnter);
   anchor.addEventListener("pointerleave", handleAnchorPointerLeave);
+
   window.addEventListener("blur", handleAnchorPointerLeave);
 
   const unsubscribe = isActive.subscribe((newValue) => {
-    // todo: remove duplication
     if (newValue) {
-      if (initialized) {
+      if (isFloatingUiInitialized) {
         cancelFadeTransition(floatingUiWrapper);
       } else {
         initFloatingUi();
@@ -192,13 +179,14 @@ export function floatingUi<Props>(
 
       anchor.removeEventListener("pointerenter", handleAnchorPointerEnter);
       anchor.removeEventListener("pointerleave", handleAnchorPointerLeave);
+
       window.removeEventListener("blur", handleAnchorPointerLeave);
     },
     update(options: FloatingUiOptions<Props>) {
       currentOptions = options;
 
       if (currentOptions.when && get(isActive)) {
-        if (initialized) {
+        if (isFloatingUiInitialized) {
           componentInstance?.$set(currentOptions.props);
         } else {
           initFloatingUi();
