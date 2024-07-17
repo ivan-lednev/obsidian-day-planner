@@ -70,7 +70,7 @@ export function floatingUi<Props>(
   }
 
   function initFloatingUi() {
-    if (isFloatingUiInitialized || !currentOptions.when) {
+    if (isFloatingUiInitialized) {
       return;
     }
 
@@ -159,7 +159,7 @@ export function floatingUi<Props>(
 
   window.addEventListener("blur", handleAnchorPointerLeave);
 
-  const unsubscribe = isActive.subscribe((newValue) => {
+  const unsubscribeFromIsActiveStore = isActive.subscribe((newValue) => {
     if (newValue) {
       if (isFloatingUiInitialized) {
         cancelFadeTransition(floatingUiWrapper);
@@ -174,7 +174,7 @@ export function floatingUi<Props>(
   return {
     destroy() {
       destroyFloatingUi();
-      unsubscribe();
+      unsubscribeFromIsActiveStore();
       anchorGesture.destroy();
 
       anchor.removeEventListener("pointerenter", handleAnchorPointerEnter);

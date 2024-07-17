@@ -15,9 +15,11 @@
   export let onCopy: (event: PointerEvent) => void | undefined = undefined;
   export let onMoveWithShrink: (event: PointerEvent) => void | undefined =
     undefined;
+  export let onPointerDown: (event: PointerEvent) => void | undefined =
+    undefined;
 </script>
 
-<ExpandingControls --right="4px" --top="4px">
+<ExpandingControls --right="4px" --top="4px" on:pointerdown={onPointerDown}>
   <BlockControlButton
     slot="visible"
     cursor="grab"

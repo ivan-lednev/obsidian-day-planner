@@ -7,10 +7,12 @@
   export let onResize: (event: PointerEvent) => void;
   export let onResizeWithNeighbors: (event: PointerEvent) => void;
   export let onResizeWithShrink: (event: PointerEvent) => void;
+  export let onPointerDown: (event: PointerEvent) => void | undefined =
+    undefined;
   export let reverse: boolean | undefined = false;
 </script>
 
-<ExpandingControls {reverse}>
+<ExpandingControls {reverse} on:pointerdown={onPointerDown}>
   <BlockControlButton
     slot="visible"
     cursor="grab"

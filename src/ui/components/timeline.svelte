@@ -7,7 +7,7 @@
   import { dateRangeContextKey, obsidianContext } from "../../constants";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
-  import { ObsidianContext } from "../../types";
+  import { ObsidianContext, Task } from "../../types";
   import { isToday } from "../../util/moment";
   import { copy, getRenderKey } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
@@ -36,9 +36,9 @@
     displayedTasks,
     cancelEdit,
     handleContainerMouseDown,
-    handleResizerMouseDown: handleResizerMouseDownBase,
+    handleResizerMouseDown,
     handleTaskMouseUp,
-    handleGripMouseDown: handleGripMouseDownBase,
+    handleGripMouseDown,
     handleMouseEnter,
     pointerOffsetY,
     cursor,
@@ -46,22 +46,96 @@
 
   let el: HTMLElement | undefined;
 
-  function setPointerOffsetY(event: PointerEvent) {
+  function updatePointerOffsetY(event: PointerEvent) {
     const viewportToElOffsetY = el.getBoundingClientRect().top;
     const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
 
     pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings));
   }
 
-  function withPointerReset<T>(original: (...args: T[]) => void) {
-    return (event: PointerEvent, ...args: T[]) => {
-      setPointerOffsetY(event);
-      original(...args);
-    };
+  function createFloatingUiActions(task: Task) {
+    return [
+      [
+        floatingUi,
+        {
+          when: !$editOperation,
+          Component: ResizeControls,
+          props: {
+            reverse: true,
+            onPointerDown: updatePointerOffsetY,
+            onResize: () => {
+              handleResizerMouseDown(task, EditMode.RESIZE_FROM_TOP);
+            },
+            onResizeWithNeighbors: () => {
+              handleResizerMouseDown(
+                task,
+                EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS,
+              );
+            },
+            onResizeWithShrink: () => {
+              handleResizerMouseDown(
+                task,
+                EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS,
+              );
+            },
+          },
+          options: {
+            middleware: [offset({ mainAxis: -12, crossAxis: 40 })],
+            placement: "top-start",
+          },
+        },
+      ],
+      [
+        floatingUi,
+        {
+          when: !$editOperation,
+          Component: ResizeControls,
+          props: {
+            onPointerDown: updatePointerOffsetY,
+            onResize: () => {
+              handleResizerMouseDown(task, EditMode.RESIZE);
+            },
+            onResizeWithNeighbors: () => {
+              handleResizerMouseDown(task, EditMode.RESIZE_AND_SHIFT_OTHERS);
+            },
+            onResizeWithShrink: () => {
+              handleResizerMouseDown(task, EditMode.RESIZE_AND_SHRINK_OTHERS);
+            },
+          },
+          options: {
+            middleware: [offset({ mainAxis: -14, crossAxis: -40 })],
+            placement: "bottom-end",
+          },
+        },
+      ],
+      [
+        floatingUi,
+        {
+          when: !$editOperation,
+          Component: DragControls,
+          props: {
+            onPointerDown: updatePointerOffsetY,
+            onCopy: () => {
+              handleGripMouseDown(copy(task), EditMode.DRAG);
+            },
+            onMove: () => {
+              handleGripMouseDown(task, EditMode.DRAG);
+            },
+            onMoveWithNeighbors: () => {
+              handleGripMouseDown(task, EditMode.DRAG_AND_SHIFT_OTHERS);
+            },
+            onMoveWithShrink: () => {
+              handleGripMouseDown(task, EditMode.DRAG_AND_SHRINK_OTHERS);
+            },
+          },
+          options: {
+            middleware: [offset({ mainAxis: -32, crossAxis: -4 })],
+            placement: "top-end",
+          },
+        },
+      ],
+    ];
   }
-
-  $: handleGripMouseDown = withPointerReset(handleGripMouseDownBase);
-  $: handleResizerMouseDown = withPointerReset(handleResizerMouseDownBase);
 </script>
 
 <!--TODO: duplicate of <GlobalHandlers />-->
@@ -77,6 +151,7 @@
   <div
     bind:this={el}
     class="tasks absolute-stretch-x"
+    on:mouseenter={handleMouseEnter}
     on:pointerdown={(event) => {
       if (isTouchEvent(event) || event.target !== el) {
         return;
@@ -84,9 +159,8 @@
 
       handleContainerMouseDown();
     }}
+    on:pointermove={updatePointerOffsetY}
     on:pointerup={confirmEdit}
-    on:mouseenter={handleMouseEnter}
-    on:pointermove={setPointerOffsetY}
     on:pointerup|stopPropagation
   >
     {#each $displayedTasks.withTime as task (getRenderKey(task))}
@@ -95,106 +169,7 @@
       {:else}
         <LocalTimeBlock
           {task}
-          use={[
-            [
-              floatingUi,
-              {
-                when: !$editOperation,
-                Component: ResizeControls,
-                props: {
-                  reverse: true,
-                  onResize: (event) => {
-                    handleResizerMouseDown(
-                      event,
-                      task,
-                      EditMode.RESIZE_FROM_TOP,
-                    );
-                  },
-                  onResizeWithNeighbors: (event) => {
-                    handleResizerMouseDown(
-                      event,
-                      task,
-                      EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS,
-                    );
-                  },
-                  onResizeWithShrink: (event) => {
-                    handleResizerMouseDown(
-                      event,
-                      task,
-                      EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS,
-                    );
-                  },
-                },
-                options: {
-                  middleware: [offset({ mainAxis: -12, crossAxis: 40 })],
-                  placement: "top-start",
-                },
-              },
-            ],
-            [
-              floatingUi,
-              {
-                when: !$editOperation,
-                Component: ResizeControls,
-                props: {
-                  onResize: (event) => {
-                    handleResizerMouseDown(event, task, EditMode.RESIZE);
-                  },
-                  onResizeWithNeighbors: (event) => {
-                    handleResizerMouseDown(
-                      event,
-                      task,
-                      EditMode.RESIZE_AND_SHIFT_OTHERS,
-                    );
-                  },
-                  onResizeWithShrink: (event) => {
-                    handleResizerMouseDown(
-                      event,
-                      task,
-                      EditMode.RESIZE_AND_SHRINK_OTHERS,
-                    );
-                  },
-                },
-                options: {
-                  middleware: [offset({ mainAxis: -14, crossAxis: -40 })],
-                  placement: "bottom-end",
-                },
-              },
-            ],
-            [
-              floatingUi,
-              {
-                when: !$editOperation,
-                Component: DragControls,
-                props: {
-                  onCopy: (event) => {
-                    handleGripMouseDown(event, copy(task), EditMode.DRAG);
-                  },
-                  onMove: (event) => {
-                    handleGripMouseDown(event, task, EditMode.DRAG);
-                  },
-                  onMoveWithNeighbors: (event) => {
-                    handleGripMouseDown(
-                      event,
-                      task,
-                      EditMode.DRAG_AND_SHIFT_OTHERS,
-                    );
-                  },
-                  onMoveWithShrink: (event) => {
-                    handleGripMouseDown(
-                      event,
-                      task,
-                      EditMode.DRAG_AND_SHRINK_OTHERS,
-                    );
-                  },
-                },
-                options: {
-                  middleware: [offset({ mainAxis: -32, crossAxis: -4 })],
-                  placement: "top-end",
-                },
-              },
-            ],
-          ]}
+          use={createFloatingUiActions(task)}
           on:pointerup={(event) => {
             if (!isTouchEvent(event)) {
               handleTaskMouseUp(task);

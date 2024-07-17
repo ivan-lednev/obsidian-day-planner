@@ -18,6 +18,7 @@
   style:touch-action="none"
   class="expanding-controls"
   on:pointermove|preventDefault
+  on:pointerdown
   on:pointerdown={handlePointerDown}
   on:pointerenter={handlePointerEnter}
   on:pointerleave={handlePointerLeave}
