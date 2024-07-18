@@ -121,6 +121,7 @@
           when: !$editOperation,
           Component: DragControls,
           props: {
+            isExpandable: true,
             onPointerDown: updatePointerOffsetY,
             onCopy: () => {
               handleGripMouseDown(copy(task), EditMode.DRAG);
@@ -178,6 +179,7 @@
           {task}
           use={createFloatingUiActions(task)}
           on:pointerup={(event) => {
+            // todo: remove duplication
             if (!isTouchEvent(event)) {
               handleTaskMouseUp(task);
             }

@@ -7,6 +7,7 @@
   import { obsidianContext } from "../../constants";
   import { settings } from "../../global-store/settings";
   import type { ObsidianContext } from "../../types";
+  import { isTouchEvent } from "../../util/util";
   import { floatingUi } from "../actions/floating-ui";
 
   import DragControls from "./drag-controls.svelte";
@@ -50,7 +51,11 @@
             },
           ],
         ]}
-        on:pointerup={() => handleTaskMouseUp(task)}
+        on:pointerup={(event) => {
+          if (!isTouchEvent(event)) {
+            handleTaskMouseUp(task);
+          }
+        }}
       />
     {/each}
   </OverlayScrollbarsComponent>

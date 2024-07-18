@@ -17,6 +17,7 @@
     undefined;
   export let onPointerDown: (event: PointerEvent) => void | undefined =
     undefined;
+  export let isExpandable = false;
 </script>
 
 <ExpandingControls --right="4px" --top="4px" on:pointerdown={onPointerDown}>
@@ -25,7 +26,7 @@
     cursor="grab"
     label="Move block"
     on:pointerdown={(event) => {
-      if (isActive) {
+      if (isActive || !isExpandable) {
         onMove(event);
       }
     }}
