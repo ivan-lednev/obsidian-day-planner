@@ -70,7 +70,7 @@ export function floatingUi<Props>(
   }
 
   function initFloatingUi() {
-    if (isFloatingUiInitialized) {
+    if (isFloatingUiInitialized || !currentOptions.when) {
       return;
     }
 
