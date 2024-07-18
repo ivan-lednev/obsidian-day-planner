@@ -84,3 +84,5 @@ export function createEditHandlers({
     handleUnscheduledTaskGripMouseDown,
   };
 }
+
+export type EditHandlers = ReturnType<typeof createEditHandlers>;

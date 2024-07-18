@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { offset } from "@floating-ui/dom";
   import { Moment } from "moment";
   import { OverlayScrollbarsComponent } from "overlayscrollbars-svelte";
   import { getContext } from "svelte";
@@ -8,15 +7,13 @@
   import { settings } from "../../global-store/settings";
   import type { ObsidianContext } from "../../types";
   import { isTouchEvent } from "../../util/util";
-  import { floatingUi } from "../actions/floating-ui";
 
-  import DragControls from "./drag-controls.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   export let day: Moment;
 
   const {
-    editContext: { getEditHandlers, editOperation },
+    editContext: { getEditHandlers },
   } = getContext<ObsidianContext>(obsidianContext);
 
   $: ({
@@ -34,23 +31,8 @@
   >
     {#each $displayedTasks.noTime as task}
       <UnscheduledTimeBlock
+        onGripMouseDown={handleUnscheduledTaskGripMouseDown}
         {task}
-        use={[
-          [
-            floatingUi,
-            {
-              when: !$editOperation,
-              Component: DragControls,
-              props: {
-                onMove: () => handleUnscheduledTaskGripMouseDown(task),
-              },
-              options: {
-                middleware: [offset({ mainAxis: -32, crossAxis: -4 })],
-                placement: "top-end",
-              },
-            },
-          ],
-        ]}
         on:pointerup={(event) => {
           if (!isTouchEvent(event)) {
             handleTaskMouseUp(task);

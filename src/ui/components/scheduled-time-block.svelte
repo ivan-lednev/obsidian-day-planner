@@ -38,6 +38,8 @@
   {task}
   {use}
   on:pointerup
+  on:pointerenter
+  on:pointerleave
 >
   <slot />
 </TimeBlockBase>

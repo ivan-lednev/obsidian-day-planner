@@ -17,6 +17,8 @@
     style:background-color={backgroundColor}
     class="content"
     on:pointerup
+    on:pointerenter
+    on:pointerleave
     use:useActions={use}
   >
     <slot />
