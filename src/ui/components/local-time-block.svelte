@@ -16,9 +16,6 @@
   import ResizeControls from "./resize-controls.svelte";
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
 
-
-
-
   export let task: Task;
   export let onGripMouseDown: EditHandlers['handleGripMouseDown'];
   export let onResizerMouseDown: EditHandlers['handleResizerMouseDown'];

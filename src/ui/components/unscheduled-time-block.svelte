@@ -4,7 +4,6 @@
 
   import { obsidianContext } from "../../constants";
   import { ObsidianContext, UnscheduledTask } from "../../types";
-  import { ActionArray } from "../actions/use-actions";
   import { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
   import { useFloatingUi } from "../hooks/use-floating-ui";
 
@@ -14,10 +13,7 @@
   import RenderedMarkdown from "./rendered-markdown.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
 
-
-
   export let task: UnscheduledTask;
-  export let use: ActionArray = [];
   export let onGripMouseDown: EditHandlers["handleUnscheduledTaskGripMouseDown"];
 
   const {
@@ -32,7 +28,13 @@
   const { isActive } = drag;
 </script>
 
-<TimeBlockBase {task} {use} on:pointerup>
+<TimeBlockBase
+  {task}
+  use={[drag.anchorSetup]}
+  on:pointerup
+  on:pointerenter={drag.handleAnchorPointerEnter}
+  on:pointerleave={drag.handleAnchorPointerLeave}
+>
   <MarkdownBlockContent {task}>
     <RenderedMarkdown {task} />
   </MarkdownBlockContent>
