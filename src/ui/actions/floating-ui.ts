@@ -50,7 +50,6 @@ export function floatingUi<Props>(
     }
 
     isActive.set(true);
-    initFloatingUi();
   }
 
   function handleAnchorPointerLeave(event: PointerEvent) {
@@ -112,6 +111,31 @@ export function floatingUi<Props>(
     });
   }
 
+  function handleTransitionEnd() {
+    if (!isFloatingUiInitialized) {
+      return;
+    }
+
+    isFloatingUiInitialized = false;
+
+    cleanUpAutoUpdate();
+
+    floatingUiWrapper.removeEventListener(
+      "pointerleave",
+      handleFloatingUiPointerLeave,
+    );
+
+    componentInstance.$destroy();
+
+    document.body.removeEventListener(
+      "pointerdown",
+      handleTapOutsideFloatingUi,
+    );
+
+    floatingUiWrapper.removeEventListener("transitionend", handleTransitionEnd);
+    floatingUiWrapper.remove();
+  }
+
   function destroyFloatingUi() {
     if (!isFloatingUiInitialized) {
       return;
@@ -119,32 +143,7 @@ export function floatingUi<Props>(
 
     addFadeTransition(floatingUiWrapper);
 
-    floatingUiWrapper.addEventListener(
-      "transitionend",
-      () => {
-        if (!isFloatingUiInitialized) {
-          return;
-        }
-
-        isFloatingUiInitialized = false;
-
-        cleanUpAutoUpdate();
-
-        floatingUiWrapper.removeEventListener(
-          "pointerleave",
-          handleFloatingUiPointerLeave,
-        );
-
-        componentInstance.$destroy();
-
-        document.body.removeChild(floatingUiWrapper);
-        document.body.removeEventListener(
-          "pointerdown",
-          handleTapOutsideFloatingUi,
-        );
-      },
-      { once: true },
-    );
+    floatingUiWrapper.addEventListener("transitionend", handleTransitionEnd);
   }
 
   const anchorGesture = new TinyGesture(anchor);
@@ -160,9 +159,13 @@ export function floatingUi<Props>(
   window.addEventListener("blur", handleAnchorPointerLeave);
 
   const unsubscribeFromIsActiveStore = isActive.subscribe((newValue) => {
-    if (newValue) {
+    if (currentOptions.when && newValue) {
       if (isFloatingUiInitialized) {
         cancelFadeTransition(floatingUiWrapper);
+        floatingUiWrapper.removeEventListener(
+          "transitionend",
+          handleTransitionEnd,
+        );
       } else {
         initFloatingUi();
       }

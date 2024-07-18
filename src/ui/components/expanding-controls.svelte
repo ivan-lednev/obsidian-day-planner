@@ -16,6 +16,7 @@
 <div
   style:flex-direction={reverse ? "row-reverse" : "row"}
   style:touch-action="none"
+  style:opacity={$isActive ? 1 : 0.5}
   class="expanding-controls"
   on:pointermove|preventDefault
   on:pointerdown
