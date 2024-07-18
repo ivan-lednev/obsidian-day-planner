@@ -15,7 +15,7 @@ import {
   isTouchEvent,
 } from "../../util/util";
 
-interface FloatingUiOptions<Props> {
+export interface FloatingUiOptions<Props> {
   when: boolean;
   Component: typeof SvelteComponentTyped<Props>;
   props: Props;

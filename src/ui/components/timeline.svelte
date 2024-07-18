@@ -1,7 +1,7 @@
 <script lang="ts">
   import { offset } from "@floating-ui/dom";
   import { Moment } from "moment";
-  import { getContext } from "svelte";
+  import { getContext, ComponentProps } from "svelte";
   import { Writable } from "svelte/store";
 
   import { dateRangeContextKey, obsidianContext } from "../../constants";
@@ -11,7 +11,7 @@
   import { isToday } from "../../util/moment";
   import { copy, getRenderKey } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
-  import { floatingUi } from "../actions/floating-ui";
+  import { floatingUi, FloatingUiOptions } from "../actions/floating-ui";
   import { styledCursor } from "../actions/styled-cursor";
   import { EditMode } from "../hooks/use-edit/types";
 
@@ -53,7 +53,14 @@
     pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings));
   }
 
-  function createFloatingUiActions(task: Task) {
+  function createFloatingUiActions(
+    task: Task,
+  ): Array<
+    [
+      typeof floatingUi,
+      FloatingUiOptions<ComponentProps<ResizeControls | DragControls>>,
+    ]
+  > {
     return [
       [
         floatingUi,
