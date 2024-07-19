@@ -4,6 +4,7 @@ import ical from "node-ical";
 
 import {
   defaultDurationMinutes,
+  noTitle,
   originalRecurrenceDayKeyFormat,
 } from "../constants";
 import { Task, UnscheduledTask, WithIcalConfig } from "../types";
@@ -83,8 +84,8 @@ function icalEventToTask(
   const base = {
     calendar: icalEvent.calendar,
     id: getId(),
-    text: icalEvent.summary,
-    firstLineText: icalEvent.summary,
+    text: icalEvent.summary || noTitle,
+    firstLineText: icalEvent.summary || noTitle,
     startTime: startTimeAdjusted,
     readonly: true,
     listTokens: "- ",

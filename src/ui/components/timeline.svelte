@@ -11,8 +11,8 @@
   import { getRenderKey } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
   import { styledCursor } from "../actions/styled-cursor";
-  
-import Column from "./column.svelte";
+
+  import Column from "./column.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Needle from "./needle.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
