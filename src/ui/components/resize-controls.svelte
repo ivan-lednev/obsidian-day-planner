@@ -14,32 +14,24 @@
 
 <ExpandingControls {reverse} on:pointerdown={onPointerDown}>
   <BlockControlButton
-    slot="visible"
     cursor="grab"
     label="Resize block"
-    on:pointerdown={(event) => {
-      if (isActive) {
-        onResize(event);
-      }
-    }}
-    let:isActive
+    on:pointerdown={onResize}
   >
     <MoveVertical class="svg-icon" />
   </BlockControlButton>
-  <svelte:fragment slot="hidden">
-    <BlockControlButton
-      cursor="grab"
-      label="Resize block and push neighboring blocks"
-      on:pointerdown={onResizeWithNeighbors}
-    >
-      <ArrowDownToLine class="svg-icon" />
-    </BlockControlButton>
-    <BlockControlButton
-      cursor="grab"
-      label="Resize block and shrink neighboring blocks"
-      on:pointerdown={onResizeWithShrink}
-    >
-      <FoldVertical class="svg-icon" />
-    </BlockControlButton>
-  </svelte:fragment>
+  <BlockControlButton
+    cursor="grab"
+    label="Resize block and push neighboring blocks"
+    on:pointerdown={onResizeWithNeighbors}
+  >
+    <ArrowDownToLine class="svg-icon" />
+  </BlockControlButton>
+  <BlockControlButton
+    cursor="grab"
+    label="Resize block and shrink neighboring blocks"
+    on:pointerdown={onResizeWithShrink}
+  >
+    <FoldVertical class="svg-icon" />
+  </BlockControlButton>
 </ExpandingControls>

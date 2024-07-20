@@ -17,8 +17,8 @@
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
 
   export let task: Task;
-  export let onGripMouseDown: EditHandlers['handleGripMouseDown'];
-  export let onResizerMouseDown: EditHandlers['handleResizerMouseDown'];
+  export let onGripMouseDown: EditHandlers["handleGripMouseDown"];
+  export let onResizerMouseDown: EditHandlers["handleResizerMouseDown"];
   export let onFloatingUiPointerDown: (event: PointerEvent) => void;
 
   const {
@@ -26,22 +26,22 @@
   } = getContext<ObsidianContext>(obsidianContext);
 
   const drag = useFloatingUi({
-    middleware: [offset({ mainAxis: -32, crossAxis: -4 })],
+    middleware: [offset({ mainAxis: -32 })],
     placement: "top-end",
   });
 
   const { isActive: isDragActive } = drag;
 
   const resize = useFloatingUi({
-    middleware: [offset({ mainAxis: -14, crossAxis: -40 })],
-    placement: "bottom-end",
+    middleware: [offset({ mainAxis: -4 })],
+    placement: "bottom",
   });
 
   const { isActive: isResizeActive } = resize;
 
   const resizeFromTop = useFloatingUi({
-    middleware: [offset({ mainAxis: -12, crossAxis: 40 })],
-    placement: "top-start",
+    middleware: [offset({ mainAxis: -4 })],
+    placement: "top",
   });
 
   const { isActive: isResizeFromTopActive } = resizeFromTop;
@@ -76,7 +76,6 @@
       use={[drag.floatingUiSetup]}
     >
       <DragControls
-        isExpandable
         onCopy={() => {
           onGripMouseDown(copy(task), EditMode.DRAG);
         }}
