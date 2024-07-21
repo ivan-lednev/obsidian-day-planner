@@ -6,9 +6,8 @@
   import { obsidianContext } from "../../constants";
   import { settings } from "../../global-store/settings";
   import type { ObsidianContext } from "../../types";
-  import { isTouchEvent } from "../../util/util";
-
-  import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
+  
+import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   export let day: Moment;
 
@@ -32,12 +31,10 @@
     {#each $displayedTasks.noTime as task}
       <UnscheduledTimeBlock
         onGripMouseDown={handleUnscheduledTaskGripMouseDown}
-        {task}
-        on:pointerup={(event) => {
-          if (!isTouchEvent(event)) {
-            handleTaskMouseUp(task);
-          }
+        onMouseUp={() => {
+          handleTaskMouseUp(task);
         }}
+        {task}
       />
     {/each}
   </OverlayScrollbarsComponent>
