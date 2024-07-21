@@ -1,3 +1,18 @@
+## 0.21.1
+
+### ✨ New features
+
+- Drag-and-drop edits are now working on mobile: long-press on a task block to see the controls, tap on the control and start dragging to change task time
+- Added floating edit controls on top of task blocks. All the edit modes are now easily available
+- Now you can change task start time
+- There is now a new edit mode: move block and shrink neighboring blocks
+- Now you can manually adjust the height of the unscheduled tasks section through drag-and-drop
+
+### 🐞 Fixed issues
+
+- Fixed empty remote event names breaking the plugin (#430)
+- Fixed advanced editing with Ctrl/Shift not working (#462). To do advanced edits, simply hover over the block, then over the edit controls
+
 ## 0.20.1 - 0.20.4
 
 - 🐞 add toggle to disable release notes (#399)
