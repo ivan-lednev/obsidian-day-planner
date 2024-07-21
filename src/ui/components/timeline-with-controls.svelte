@@ -5,8 +5,6 @@
 
   import {
     dateRangeContextKey,
-    unscheduledTasksMaxHeight,
-    unscheduledTasksMinHeight,
   } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
@@ -33,8 +31,7 @@
 <div class="controls">
   <TimelineControls />
   <ResizeableBox
-    maxHeight={unscheduledTasksMaxHeight}
-    minHeight={unscheduledTasksMinHeight}
+    classNames="timeline-box"
     let:startEdit
   >
     <UnscheduledTaskContainer day={actualDay} />
@@ -55,5 +52,10 @@
 
   .controls > :global(*) {
     border-bottom: 1px solid var(--background-modifier-border);
+  }
+
+  :global(.timeline-box) {
+    display: flex;
+    flex-direction: column;
   }
 </style>

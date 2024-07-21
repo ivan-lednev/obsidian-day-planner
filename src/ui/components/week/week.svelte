@@ -6,8 +6,6 @@
   import {
     dateRangeContextKey,
     obsidianContext,
-    unscheduledTasksMaxHeight,
-    unscheduledTasksMinHeight,
   } from "../../../constants";
   import { getVisibleHours } from "../../../global-store/derived-settings";
   import { settings } from "../../../global-store/settings";
@@ -55,8 +53,6 @@
 
   <ResizeableBox
     classNames="header-row"
-    maxHeight={unscheduledTasksMaxHeight}
-    minHeight={unscheduledTasksMinHeight}
     let:startEdit
   >
     <div class="corner"></div>

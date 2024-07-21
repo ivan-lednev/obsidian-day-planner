@@ -1,8 +1,4 @@
 <script lang="ts">
-  import { clamp } from "lodash/fp";
-
-  export let maxHeight: number;
-  export let minHeight: number;
   export let classNames: string | undefined = "";
 
   let el: HTMLDivElement | undefined;
@@ -37,22 +33,16 @@
 
     const viewportToElOffsetY = el.getBoundingClientRect().top;
 
-    customHeight = clamp(
-      minHeight,
-      maxHeight,
-      event.clientY - viewportToElOffsetY,
-    );
+    customHeight = event.clientY - viewportToElOffsetY;
   }
 </script>
 
-<svelte:document on:mousemove={handleMouseMove} on:pointerup|capture={stopEdit} />
+<svelte:document
+  on:mousemove={handleMouseMove}
+  on:pointerup|capture={stopEdit}
+/>
 <svelte:window on:blur={handleBlur} />
 
-<div
-  bind:this={el}
-  style:height
-  style:max-height="{maxHeight}px"
-  class={classNames}
->
+<div bind:this={el} style:height style:max-height="25vh" class={classNames}>
   <slot {startEdit} />
 </div>

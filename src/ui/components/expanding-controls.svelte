@@ -28,9 +28,12 @@
     <div style="display: flex" in:fade={{ duration: 300 }}>
       <slot />
     </div>
-  {:else}
-    <div class="circle" in:fade={{ duration: 300 }}></div>
   {/if}
+  <div
+    style:display={$isActive ? "none" : "block"}
+    class="circle"
+    in:fade={{ duration: 300 }}
+  ></div>
 </div>
 
 <style>
