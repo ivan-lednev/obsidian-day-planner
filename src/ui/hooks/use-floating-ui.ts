@@ -5,7 +5,6 @@ import {
 } from "@floating-ui/dom";
 import type { SvelteComponentTyped } from "svelte";
 import { writable } from "svelte/store";
-import TinyGesture from "tinygesture";
 
 import { isEventRelated, isTapOutside, isTouchEvent } from "../../util/util";
 
@@ -55,16 +54,8 @@ export function useFloatingUi(options: Partial<ComputePositionConfig>) {
   function anchorSetup(el: HTMLElement) {
     anchor = el;
 
-    const gesture = new TinyGesture(el);
-
-    gesture.on("longpress", () => {
-      navigator.vibrate(100);
-      isActive.set(true);
-    });
-
     return {
       destroy() {
-        gesture.destroy();
         anchor = null;
       },
     };

@@ -1,10 +1,14 @@
 <script lang="ts">
   import { offset } from "@floating-ui/dom";
   import { getContext } from "svelte";
+  // TODO: fix eslint error
+  // eslint-disable-next-line import/default
+  import TinyGesture from "tinygesture";
 
   import { obsidianContext } from "../../constants";
   import { ObsidianContext, Task } from "../../types";
   import { copy } from "../../util/task-utils";
+  import { isTouchEvent } from "../../util/util";
   import { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
   import { EditMode } from "../hooks/use-edit/types";
   import { useFloatingUi } from "../hooks/use-floating-ui";
@@ -20,6 +24,7 @@
   export let onGripMouseDown: EditHandlers["handleGripMouseDown"];
   export let onResizerMouseDown: EditHandlers["handleResizerMouseDown"];
   export let onFloatingUiPointerDown: (event: PointerEvent) => void;
+  export let onMouseUp: () => void;
 
   const {
     editContext: { editOperation },
@@ -45,12 +50,56 @@
   });
 
   const { isActive: isResizeFromTopActive } = resizeFromTop;
+
+  // todo: fix naming
+  // todo: hide in file
+  function tap(el: HTMLElement) {
+    const gesture = new TinyGesture(el);
+
+    let pressed = false;
+
+    gesture.on("tap", () => {
+      if (pressed) {
+        return;
+      }
+
+      onMouseUp();
+    });
+
+    gesture.on("longpress", () => {
+      pressed = true;
+
+      // todo: handle desktop warning
+      navigator.vibrate(100);
+      isDragActive.set(true);
+      isResizeActive.set(true);
+      isResizeFromTopActive.set(true);
+    });
+
+    gesture.on("panend", () => {
+      if (pressed) {
+        setTimeout(() => {
+          pressed = false;
+        }, 0);
+      }
+    });
+
+    return {
+      destroy() {
+        gesture.destroy();
+      },
+    };
+  }
 </script>
 
 <ScheduledTimeBlock
   {task}
-  use={[drag.anchorSetup, resize.anchorSetup, resizeFromTop.anchorSetup]}
-  on:pointerup
+  use={[drag.anchorSetup, resize.anchorSetup, resizeFromTop.anchorSetup, tap]}
+  on:pointerup={(event) => {
+    if (!isTouchEvent(event)) {
+      onMouseUp();
+    }
+  }}
   on:pointerenter={(event) => {
     drag.handleAnchorPointerEnter(event);
     resize.handleAnchorPointerEnter(event);
