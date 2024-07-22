@@ -1,9 +1,6 @@
 <script lang="ts">
   import { offset } from "@floating-ui/dom";
   import { getContext } from "svelte";
-  // TODO: fix eslint error
-  // eslint-disable-next-line import/default
-  import TinyGesture from "tinygesture";
 
   import { obsidianContext } from "../../constants";
   import { ObsidianContext, Task } from "../../types";
@@ -50,51 +47,18 @@
   });
 
   const { isActive: isResizeFromTopActive } = resizeFromTop;
-
-  // todo: fix naming
-  // todo: hide in file
-  function tap(el: HTMLElement) {
-    const gesture = new TinyGesture(el);
-
-    let pressed = false;
-
-    gesture.on("tap", () => {
-      if (pressed) {
-        return;
-      }
-
-      onMouseUp();
-    });
-
-    gesture.on("longpress", () => {
-      pressed = true;
-
-      // todo: handle desktop warning
-      navigator.vibrate(100);
-      isDragActive.set(true);
-      isResizeActive.set(true);
-      isResizeFromTopActive.set(true);
-    });
-
-    gesture.on("panend", () => {
-      if (pressed) {
-        setTimeout(() => {
-          pressed = false;
-        }, 0);
-      }
-    });
-
-    return {
-      destroy() {
-        gesture.destroy();
-      },
-    };
-  }
 </script>
 
 <ScheduledTimeBlock
   {task}
-  use={[drag.anchorSetup, resize.anchorSetup, resizeFromTop.anchorSetup, tap]}
+  use={[drag.anchorSetup, resize.anchorSetup, resizeFromTop.anchorSetup]}
+  on:tap={onMouseUp}
+  on:longpress={() => {
+    navigator.vibrate(100);
+    isDragActive.set(true);
+    isResizeActive.set(true);
+    isResizeFromTopActive.set(true);
+  }}
   on:pointerup={(event) => {
     if (!isTouchEvent(event)) {
       onMouseUp();

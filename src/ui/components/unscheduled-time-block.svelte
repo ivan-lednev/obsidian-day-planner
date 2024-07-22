@@ -1,9 +1,6 @@
 <script lang="ts">
   import { offset } from "@floating-ui/dom";
   import { getContext } from "svelte";
-  // TODO: fix eslint error
-  // eslint-disable-next-line import/default
-  import TinyGesture from "tinygesture";
 
   import { obsidianContext } from "../../constants";
   import { ObsidianContext, UnscheduledTask } from "../../types";
@@ -31,48 +28,16 @@
   });
 
   const { isActive } = drag;
-
-  // todo: remove duplication
-  function tap(el: HTMLElement) {
-    const gesture = new TinyGesture(el);
-
-    let pressed = false;
-
-    gesture.on("tap", () => {
-      if (pressed) {
-        return;
-      }
-
-      onMouseUp();
-    });
-
-    gesture.on("longpress", () => {
-      pressed = true;
-
-      // todo: handle desktop warning
-      navigator.vibrate(100);
-      isActive.set(true);
-    });
-
-    gesture.on("panend", () => {
-      if (pressed) {
-        setTimeout(() => {
-          pressed = false;
-        }, 0);
-      }
-    });
-
-    return {
-      destroy() {
-        gesture.destroy();
-      },
-    };
-  }
 </script>
 
 <TimeBlockBase
   {task}
-  use={[drag.anchorSetup, tap]}
+  use={[drag.anchorSetup]}
+  on:tap={onMouseUp}
+  on:longpress={() => {
+    navigator.vibrate(100);
+    isActive.set(true);
+  }}
   on:pointerup={(event) => {
     if (!isTouchEvent(event)) {
       onMouseUp();

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { UnscheduledTask } from "../../types";
+  import { tappable } from "../actions/tappable";
   import { ActionArray, useActions } from "../actions/use-actions";
   import { useColorOverride } from "../hooks/use-color-override";
 
@@ -16,9 +17,12 @@
   <div
     style:background-color={backgroundColor}
     class="content"
+    on:tap
+    on:longpress
     on:pointerup
     on:pointerenter
     on:pointerleave
+    use:tappable
     use:useActions={use}
   >
     <slot />
