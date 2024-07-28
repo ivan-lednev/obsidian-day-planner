@@ -74,10 +74,6 @@ export function getRelationToNow(
   return "present";
 }
 
-export function isToday(moment: Moment) {
-  return moment.isSame(window.moment(), "day");
-}
-
 export function splitMultiday(
   start: Moment,
   end: Moment,

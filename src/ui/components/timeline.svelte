@@ -4,10 +4,10 @@
   import { Writable } from "svelte/store";
 
   import { dateRangeContextKey, obsidianContext } from "../../constants";
+  import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import { ObsidianContext } from "../../types";
-  import { isToday } from "../../util/moment";
   import { getRenderKey } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
   import { styledCursor } from "../actions/styled-cursor";
@@ -55,7 +55,7 @@
 <svelte:document on:pointerup={cancelEdit} />
 
 <Column visibleHours={getVisibleHours($settings)}>
-  {#if isToday(actualDay)}
+  {#if $isToday(actualDay)}
     <Needle autoScrollBlocked={isUnderCursor} />
   {/if}
 

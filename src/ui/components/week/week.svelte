@@ -7,10 +7,10 @@
     dateRangeContextKey,
     obsidianContext,
   } from "../../../constants";
+  import { isToday } from "../../../global-store/current-time";
   import { getVisibleHours } from "../../../global-store/derived-settings";
   import { settings } from "../../../global-store/settings";
   import type { ObsidianContext } from "../../../types";
-  import { isToday } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
   import GlobalHandlers from "../global-handlers.svelte";
   import ResizeHandle from "../resize-handle.svelte";
@@ -39,9 +39,9 @@
   <div class="header-row day-buttons">
     <div class="corner"></div>
     {#each $dateRange as day}
-      <div class="header-cell" class:today={isToday(day)}>
+      <div class="header-cell" class:today={$isToday(day)}>
         <ControlButton
-          --color={isToday(day) ? "white" : "var(--icon-color)"}
+          --color={$isToday(day) ? "white" : "var(--icon-color)"}
           label="Open note for day"
           on:click={async () => await obsidianFacade.openFileForDay(day)}
         >

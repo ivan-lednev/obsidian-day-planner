@@ -18,10 +18,10 @@
   import { Writable } from "svelte/store";
 
   import { dateRangeContextKey, obsidianContext } from "../../constants";
+  import { isToday } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
   import type { ObsidianContext } from "../../types";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
-  import { isToday } from "../../util/moment";
   import { useDataviewSource } from "../hooks/use-dataview-source";
 
   import ControlButton from "./control-button.svelte";
@@ -128,7 +128,7 @@
     </ControlButton>
 
     <ControlButton
-      --control-button-border={isToday($dateRange[0])
+      --control-button-border={$isToday($dateRange[0])
         ? "1px solid var(--color-accent)"
         : "none"}
       label="Go to file"
