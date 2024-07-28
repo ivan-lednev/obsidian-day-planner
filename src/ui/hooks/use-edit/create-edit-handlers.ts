@@ -43,8 +43,8 @@ export function createEditHandlers({
       return;
     }
 
-    const { path, line } = task.location;
-    await obsidianFacade.revealLineInFile(path, line);
+    const { path, position } = task.location;
+    await obsidianFacade.revealLineInFile(path, position?.start?.line);
   }
 
   // todo: remove

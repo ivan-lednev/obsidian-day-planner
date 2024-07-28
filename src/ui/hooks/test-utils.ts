@@ -15,7 +15,6 @@ export const baseTask: Task = {
   },
   location: {
     path: "path",
-    line: 0,
     position: {
       start: {
         line: 0,

@@ -147,7 +147,7 @@ export class PlanEditor {
     return contents
       .split("\n")
       .map((line, index) => {
-        if (index === task.location?.line) {
+        if (index === task.location?.position?.start?.line) {
           return (
             line.substring(0, task.location.position.start.col) +
             task.firstLineText

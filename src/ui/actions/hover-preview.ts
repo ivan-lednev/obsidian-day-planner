@@ -30,7 +30,7 @@ export function hoverPreview(el: HTMLElement, task: UnscheduledTask) {
 
   const unsubscribe = shouldShowPreview.subscribe((newValue) => {
     if (newValue && task.location?.path) {
-      showPreview(el, task.location.path, task.location.line);
+      showPreview(el, task.location.path, task.location.position?.start?.line);
     }
   });
 

@@ -12,7 +12,6 @@ import { getDiff, updateText } from "./util/tasks-utils";
 
 export interface TaskLocation {
   path: string;
-  line: number;
   position: Pos;
 }
 

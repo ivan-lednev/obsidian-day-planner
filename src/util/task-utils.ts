@@ -53,8 +53,7 @@ export function copy(task: Task): Task {
     ...task,
     id: getId(),
     isGhost: true,
-    // TODO: there should be a better way to track which tasks are new
-    location: { ...task.location, line: undefined },
+    location: { ...task.location },
   };
 }
 

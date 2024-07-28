@@ -70,7 +70,6 @@ export function toTask(sTask: STask, day: Moment): Task {
     day,
     location: {
       path: sTask.path,
-      line: sTask.line,
       position: sTask.position,
     },
   });
@@ -88,7 +87,6 @@ export function toTask(sTask: STask, day: Moment): Task {
     startMinutes: getMinutesSinceMidnight(startTime),
     location: {
       path: sTask.path,
-      line: sTask.line,
       position: sTask.position,
     },
     id: getId(),
