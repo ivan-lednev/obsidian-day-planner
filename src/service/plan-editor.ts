@@ -1,4 +1,5 @@
 import { groupBy } from "lodash/fp";
+import { Moment } from "moment";
 import type { CachedMetadata } from "obsidian";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 
@@ -16,15 +17,12 @@ export class PlanEditor {
     private readonly obsidianFacade: ObsidianFacade,
   ) {}
 
-  async ensureFilesForTasks(tasks: Task[]) {
+  private async ensureFilesForTasks(tasks: Task[]) {
     return Promise.all(
       tasks.map(async (task) => {
-        if (task.location?.path) {
-          return task;
-        }
-
         const { path } = await createDailyNoteIfNeeded(task.startTime);
-        return { ...task, location: { path } };
+
+        return { ...task, location: { ...task.location, path } };
       }),
     );
   }
@@ -49,32 +47,45 @@ export class PlanEditor {
     }
 
     if (moved.length > 0) {
-      // todo: dayKey is the new date, make files for those
-      const [task] = await this.ensureFilesForTasks(
-        moved.map(({ task }) => task),
+      // only one at a time is supported
+      const movedTask = moved[0];
+
+      await this.obsidianFacade.editFile(
+        movedTask.task.location.path,
+        (contents) => {
+          // @ts-ignore
+          return this.removeTaskFromFileContents(movedTask.task, contents);
+        },
       );
 
+      const withNewDates = moved.map(({ dayKey, task }) => {
+        const parsedDay: Moment = window.moment(dayKey);
+        const newStartTime = task.startTime
+          .clone()
+          .year(parsedDay.year())
+          .month(parsedDay.month())
+          .date(parsedDay.date());
+
+        return { ...task, startTime: newStartTime };
+      });
+
+      const [task] = await this.ensureFilesForTasks(withNewDates);
+
       const noteForFile = getDailyNote(
-        window.moment(moved[0].dayKey),
+        window.moment(task.startTime),
         getAllDailyNotes(),
       );
 
       const updated = updateTaskText(task as Task);
 
-      return Promise.all([
-        this.obsidianFacade.editFile(noteForFile.path, (contents) => {
-          // @ts-ignore
-          return this.writeTaskToFileContents(
-            updated,
-            contents,
-            noteForFile.path,
-          );
-        }),
-        this.obsidianFacade.editFile(task.location.path, (contents) => {
-          // @ts-ignore
-          return this.removeTaskFromFileContents(task, contents);
-        }),
-      ]);
+      return this.obsidianFacade.editFile(noteForFile.path, (contents) => {
+        // @ts-ignore
+        return this.writeTaskToFileContents(
+          updated,
+          contents,
+          noteForFile.path,
+        );
+      });
     }
 
     const pathToEditedTasksLookup = groupBy(
@@ -95,7 +106,7 @@ export class PlanEditor {
     return Promise.all(editPromises);
   };
 
-  writeTaskToFileContents(task: Task, contents: string, path: string) {
+  private writeTaskToFileContents(task: Task, contents: string, path: string) {
     // todo: we can use dataview
     const metadata = this.obsidianFacade.getMetadataForPath(path) || {};
     const [planEndLine, splitContents] = this.getPlanEndLine(
@@ -115,7 +126,7 @@ export class PlanEditor {
     return result.join("\n");
   }
 
-  removeTaskFromFileContents(task: Task, contents: string) {
+  private removeTaskFromFileContents(task: Task, contents: string) {
     const newContents = contents.split("\n");
     const taskLinesCount = task.text.split("\n").length - 1;
     newContents.splice(task.location.position.start.line, taskLinesCount);
