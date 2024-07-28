@@ -7,7 +7,6 @@ import { getDayKey } from "../../util/tasks-utils";
 export function useVisibleDays(
   ranges: Readable<Record<string, Array<Moment>>>,
 ) {
-  // todo [minor] encapsulate this 'previous' logic
   let previousDayKeys: string[];
 
   return derived(ranges, ($ranges, set: (days: Moment[]) => void) => {
