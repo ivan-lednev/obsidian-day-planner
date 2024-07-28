@@ -196,7 +196,6 @@
       {/if}
       {#if $dataviewErrorMessage.length > 0}
         <div class="info-container">
-          <!--          TODO: move out -->
           <pre class="error-message">{$dataviewErrorMessage}</pre>
         </div>
       {/if}

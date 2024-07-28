@@ -8,7 +8,6 @@
   export let use: ActionArray = [];
 
   $: override = useColorOverride(task);
-  // todo: hide in hook
   $: backgroundColor =
     $override || "var(--time-block-bg-color, var(--background-primary))";
 </script>

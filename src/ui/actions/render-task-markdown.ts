@@ -4,7 +4,7 @@ import type { RenderMarkdown, UnscheduledTask } from "../../types";
 import { getFirstLine, getRenderKey } from "../../util/task-utils";
 
 import { createMemo } from "./memoize-props";
-import { decorate, disableCheckBoxes } from "./post-process-task-markdown";
+import { disableCheckBoxes } from "./post-process-task-markdown";
 
 interface RenderedMarkdownProps {
   task: UnscheduledTask;
@@ -33,7 +33,6 @@ export function renderTaskMarkdown(
     onDestroy = renderMarkdown(el, onlyFirstLineIfNeeded);
 
     disableCheckBoxes(el);
-    decorate(el, task, settings);
   }
 
   refresh(initial);
