@@ -1,6 +1,7 @@
+import { getDisplayedText } from "../../parser/parser";
 import { DayPlannerSettings } from "../../settings";
 import type { RenderMarkdown, UnscheduledTask } from "../../types";
-import { getRenderKey } from "../../util/task-utils";
+import { getFirstLine, getRenderKey } from "../../util/task-utils";
 
 import { createMemo } from "./memoize-props";
 import { decorate, disableCheckBoxes } from "./post-process-task-markdown";
@@ -24,11 +25,12 @@ export function renderTaskMarkdown(
   function refresh({ task, settings, renderMarkdown }: RenderedMarkdownProps) {
     onDestroy?.();
 
-    const text = settings.showSubtasksInTaskBlocks
-      ? task.text
-      : task.text.split("\n")[0];
+    const displayedText = getDisplayedText(task);
+    const onlyFirstLineIfNeeded = settings.showSubtasksInTaskBlocks
+      ? displayedText
+      : getFirstLine(displayedText);
 
-    onDestroy = renderMarkdown(el, text);
+    onDestroy = renderMarkdown(el, onlyFirstLineIfNeeded);
 
     disableCheckBoxes(el);
     decorate(el, task, settings);

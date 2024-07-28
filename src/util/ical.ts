@@ -85,7 +85,6 @@ function icalEventToTask(
     calendar: icalEvent.calendar,
     id: getId(),
     text: icalEvent.summary || noTitle,
-    firstLineText: icalEvent.summary || noTitle,
     startTime: startTimeAdjusted,
     readonly: true,
     symbol: "-",

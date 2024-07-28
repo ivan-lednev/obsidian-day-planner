@@ -7,7 +7,7 @@ import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
 import type { Task } from "../types";
 import { createDailyNoteIfNeeded } from "../util/daily-notes";
-import { updateTaskText } from "../util/task-utils";
+import { getFirstLine, updateTaskText } from "../util/task-utils";
 
 import type { ObsidianFacade } from "./obsidian-facade";
 
@@ -117,12 +117,7 @@ export class PlanEditor {
 
     const result = [...splitContents];
 
-    const newTaskText = [
-      task.firstLineText,
-      ...task.text.split("\n").slice(1),
-    ].join("\n");
-
-    result.splice(planEndLine + 1, 0, newTaskText);
+    result.splice(planEndLine + 1, 0, task.text);
 
     return result.join("\n");
   }
@@ -150,7 +145,7 @@ export class PlanEditor {
         if (index === task.location?.position?.start?.line) {
           return (
             line.substring(0, task.location.position.start.col) +
-            task.firstLineText
+            getFirstLine(task.text)
           );
         }
 

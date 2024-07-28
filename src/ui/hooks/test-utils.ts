@@ -9,7 +9,6 @@ export const baseTask: Task = {
   startMinutes: 0,
   durationMinutes: 60,
   text: "",
-  firstLineText: "",
   placing: {
     xOffsetPercent: 0,
     widthPercent: 100,

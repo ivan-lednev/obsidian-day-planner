@@ -8,13 +8,13 @@ import {
   defaultDurationMinutes,
   indentBeforeTaskParagraph,
 } from "../constants";
-import { createTask } from "../parser/parser";
+import { getTimeFromSTask } from "../parser/parser";
 import { timeFromStartRegExp } from "../regexp";
 import { Task, TaskTokens } from "../types";
 
 import { ClockMoments, toTime } from "./clock";
 import { getId } from "./id";
-import { getDiffInMinutes, getMinutesSinceMidnight } from "./moment";
+import { getMinutesSinceMidnight } from "./moment";
 import { deleteProps } from "./properties";
 
 export function unwrap<T>(group: ReturnType<DataArray<T>["groupBy"]>) {
@@ -40,6 +40,7 @@ export function toString(node: Node, indentation = "") {
 
   for (const child of node.children) {
     if (!child.scheduled && !timeFromStartRegExp.test(child.text)) {
+      // todo (minor): handle custom indentation (spaces of differing lengths)
       result += toString(child, `\t${indentation}`);
     }
   }
@@ -52,7 +53,6 @@ export function toUnscheduledTask(sTask: STask, day: Moment) {
     durationMinutes: defaultDurationMinutes,
     symbol: sTask.symbol,
     status: sTask.status,
-    firstLineText: sTask.text,
     text: toString(sTask),
     location: {
       path: sTask.path,
@@ -64,27 +64,18 @@ export function toUnscheduledTask(sTask: STask, day: Moment) {
 }
 
 export function toTask(sTask: STask, day: Moment): Task {
-  const { startTime, endTime, firstLineText, text } = createTask({
-    line: textToString(sTask),
-    completeContent: toString(sTask),
+  const { startTime, durationMinutes } = getTimeFromSTask({
+    line: sTask.text,
     day,
-    location: {
-      path: sTask.path,
-      position: sTask.position,
-    },
   });
-
-  const durationMinutes = endTime?.isAfter(startTime)
-    ? getDiffInMinutes(endTime, startTime)
-    : undefined;
 
   return {
     startTime,
     symbol: sTask.symbol,
     status: sTask.status,
-    firstLineText,
-    text,
+    text: toString(sTask),
     durationMinutes,
+    // todo: delete
     startMinutes: getMinutesSinceMidnight(startTime),
     location: {
       path: sTask.path,
@@ -110,7 +101,6 @@ export function toClockRecord(sTask: STask, clockMoments: ClockMoments) {
   return {
     ...toTime(clockMoments),
     startTime: clockMoments[0],
-    firstLineText: textToString(sTask),
     text: toString(sTask),
     symbol: "-",
     location: {

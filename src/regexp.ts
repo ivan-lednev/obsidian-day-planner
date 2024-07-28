@@ -1,9 +1,8 @@
 const ulToken = `[-*+]`;
 const olToken = `\\d+\\.`;
-const listToken = `(${ulToken}|${olToken})\\s+`;
+const listToken = `\\s*(${ulToken}|${olToken})\\s+`;
 
-const checkbox = `\\[(?<completion>[^\\]])]\\s+`;
-const checkboxOrNothing = `(${checkbox})?`;
+const checkbox = `\\s*\\[(?<completion>[^\\]])]\\s+`;
 
 const durationSeparator = `\\s*-{1,2}\\s*`;
 
@@ -15,10 +14,12 @@ const date = "\\d{4}-\\d{2}-\\d{2}";
 
 const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))?\\s*([apAP][mM](?!\\w))?`;
 
+export const listTokenRegExp = new RegExp(listToken);
+export const checkboxRegExp = new RegExp(checkbox);
 export const timeRegExp = new RegExp(time);
 export const timeFromStartRegExp = new RegExp(`^${time}`);
 export const timestampRegExp = new RegExp(
-  `^(?<listTokens>${listToken}${checkboxOrNothing})(?<times>(?<start>${time})(?:${durationSeparator}(?<end>${time}))?)(?<text>.+)$`,
+  `(?<times>(?<start>${time})(?:${durationSeparator}(?<end>${time}))?)(?<text>.+)$`,
   "im",
 );
 

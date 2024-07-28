@@ -3,8 +3,13 @@ import type { CachedMetadata } from "obsidian";
 import { dedent } from "ts-dedent";
 
 import { timestampRegExp } from "../regexp";
-import type { TaskLocation } from "../types";
-import { getId } from "../util/id";
+import { UnscheduledTask } from "../types";
+import { getDiffInMinutes } from "../util/moment";
+import {
+  getFirstLine,
+  getLinesAfterFirst,
+  removeListTokens,
+} from "../util/task-utils";
 
 import { parseTimestamp } from "./timestamp/timestamp";
 
@@ -46,17 +51,7 @@ export function getHeadingByText(metadata: CachedMetadata, text: string) {
   return headings?.find((h) => h.heading === text);
 }
 
-export function createTask({
-  line,
-  completeContent,
-  location,
-  day,
-}: {
-  line: string;
-  completeContent: string;
-  location: TaskLocation;
-  day: Moment;
-}) {
+export function getTimeFromSTask({ line, day }: { line: string; day: Moment }) {
   const match = timestampRegExp.exec(line.trim());
 
   if (!match) {
@@ -64,44 +59,26 @@ export function createTask({
   }
 
   const {
-    groups: { start, end, text },
+    groups: { start, end },
   } = match;
-
   const startTime = parseTimestamp(start, day);
+  const endTime = parseTimestamp(end, day);
+
+  const durationMinutes = endTime?.isAfter(startTime)
+    ? getDiffInMinutes(endTime, startTime)
+    : undefined;
 
   return {
     startTime,
-    endTime: parseTimestamp(end, day),
-    text: getDisplayedText(match, completeContent),
-    firstLineText: text.trim(),
-    location,
-    id: getId(),
+    durationMinutes,
   };
 }
 
-function getDisplayedText(
-  { groups: { text, listTokens, completion } }: RegExpExecArray,
-  completeContent: string,
-) {
-  const isTask = completion?.length > 0;
-
-  const indexOfFirstNewline = completeContent.indexOf("\n");
-  const indexAfterFirstNewline = indexOfFirstNewline + 1;
-  const linesAfterFirst = completeContent.substring(indexAfterFirstNewline);
-
-  if (indexOfFirstNewline < 0) {
-    if (isTask) {
-      return `${listTokens}${text}`;
-    }
-
-    return text;
+export function getDisplayedText(task: UnscheduledTask) {
+  if (task.status) {
+    return task.text;
   }
 
-  if (isTask) {
-    return `${listTokens}${text}\n${linesAfterFirst}`;
-  }
-
-  const formattedLinesAfterFirst = dedent(linesAfterFirst).trimStart();
-
-  return `${text}\n${formattedLinesAfterFirst}`;
+  return `${removeListTokens(getFirstLine(task.text))}
+${dedent(getLinesAfterFirst(task.text)).trimStart()}`;
 }

@@ -29,10 +29,6 @@ export interface TaskTokens {
 }
 
 export interface UnscheduledTask extends TaskTokens {
-  /**
-   * @deprecated TODO: replace with derived functions
-   */
-  firstLineText: string;
   text: string;
 
   id: string;

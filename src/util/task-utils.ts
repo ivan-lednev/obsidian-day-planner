@@ -5,9 +5,12 @@ import { get } from "svelte/store";
 import { defaultDurationMinutes } from "../constants";
 import { settings } from "../global-store/settings";
 import {
+  checkboxRegExp,
   keylessScheduledPropRegExp,
+  listTokenRegExp,
   scheduledPropRegExp,
   shortScheduledPropRegExp,
+  timestampRegExp,
 } from "../regexp";
 import { Task } from "../types";
 
@@ -73,12 +76,17 @@ export function areValuesEmpty(record: Record<string, [] | object>) {
   return Object.values(record).every(isEmpty);
 }
 
+// todo: confusing. Do not mix up parsed and updated props
+// todo: add replaceTimestamp()
 function taskLineToString(task: Task) {
+  const firstLineText = removeListTokens(
+    removeTimestamp(getFirstLine(task.text)),
+  );
   return `${getListTokens(task)} ${createTimestamp(
     task.startMinutes,
     task.durationMinutes,
     get(settings).timestampFormat,
-  )} ${task.firstLineText}`;
+  )} ${firstLineText}\n${getLinesAfterFirst(task.text)}`;
 }
 
 export function updateScheduledPropInText(text: string, dayKey: string) {
@@ -95,13 +103,14 @@ export function updateScheduledPropInText(text: string, dayKey: string) {
 }
 
 export function updateTaskText(task: Task) {
-  return { ...task, firstLineText: taskLineToString(task) };
+  return { ...task, text: taskLineToString(task) };
 }
 
 export function updateTaskScheduledDay(task: Task, dayKey: string) {
   return {
     ...task,
-    firstLineText: updateScheduledPropInText(task.firstLineText, dayKey),
+    text: `${updateScheduledPropInText(getFirstLine(task.text), dayKey)}
+${getLinesAfterFirst(task.text)}`,
   };
 }
 
@@ -120,7 +129,6 @@ export function createTask(day: Moment, startMinutes: number): Task {
     id: getId(),
     startMinutes,
     durationMinutes: defaultDurationMinutes,
-    firstLineText: "New item",
     text: "New item",
     startTime: minutesToMomentOfDay(startMinutes, day),
     symbol: "-",
@@ -130,4 +138,30 @@ export function createTask(day: Moment, startMinutes: number): Task {
       xOffsetPercent: 0,
     },
   };
+}
+
+export function getFirstLine(text: string) {
+  return text.split("\n")[0];
+}
+
+export function getLinesAfterFirst(text: string) {
+  return text.split("\n").slice(1).join("\n");
+}
+
+export function removeTimestamp(text: string) {
+  const match = timestampRegExp.exec(text.trim());
+
+  if (!match) {
+    return text;
+  }
+
+  const {
+    groups: { text: textWithoutTimestamp },
+  } = match;
+
+  return textWithoutTimestamp;
+}
+
+export function removeListTokens(text: string) {
+  return text.replace(listTokenRegExp, "").replace(checkboxRegExp, "");
 }
