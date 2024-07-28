@@ -11,6 +11,7 @@ import {
 } from "../regexp";
 import { Task } from "../types";
 
+import { getListTokens } from "./dataview";
 import { getId } from "./id";
 import { addMinutes, minutesToMoment, minutesToMomentOfDay } from "./moment";
 
@@ -73,7 +74,7 @@ export function areValuesEmpty(record: Record<string, [] | object>) {
 }
 
 function taskLineToString(task: Task) {
-  return `${task.listTokens}${createTimestamp(
+  return `${getListTokens(task)} ${createTimestamp(
     task.startMinutes,
     task.durationMinutes,
     get(settings).timestampFormat,
@@ -122,7 +123,8 @@ export function createTask(day: Moment, startMinutes: number): Task {
     firstLineText: "New item",
     text: "New item",
     startTime: minutesToMomentOfDay(startMinutes, day),
-    listTokens: "- [ ] ",
+    symbol: "-",
+    status: " ",
     placing: {
       widthPercent: 100,
       xOffsetPercent: 0,

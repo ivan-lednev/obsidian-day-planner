@@ -64,13 +64,12 @@ export function createTask({
   }
 
   const {
-    groups: { listTokens, start, end, text },
+    groups: { start, end, text },
   } = match;
 
   const startTime = parseTimestamp(start, day);
 
   return {
-    listTokens,
     startTime,
     endTime: parseTimestamp(end, day),
     text: getDisplayedText(match, completeContent),

@@ -3,7 +3,8 @@ import moment from "moment/moment";
 import type { Task } from "../../types";
 
 export const baseTask: Task = {
-  listTokens: "- ",
+  symbol: "-",
+  status: " ",
   startTime: moment("2023-01-01"),
   startMinutes: 0,
   durationMinutes: 60,

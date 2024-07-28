@@ -88,7 +88,7 @@ function icalEventToTask(
     firstLineText: icalEvent.summary || noTitle,
     startTime: startTimeAdjusted,
     readonly: true,
-    listTokens: "- ",
+    symbol: "-",
   };
 
   if (isAllDayEvent) {

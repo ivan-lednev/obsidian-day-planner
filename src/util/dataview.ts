@@ -10,7 +10,7 @@ import {
 } from "../constants";
 import { createTask } from "../parser/parser";
 import { timeFromStartRegExp } from "../regexp";
-import { Task } from "../types";
+import { Task, TaskTokens } from "../types";
 
 import { ClockMoments, toTime } from "./clock";
 import { getId } from "./id";
@@ -50,8 +50,8 @@ export function toString(node: Node, indentation = "") {
 export function toUnscheduledTask(sTask: STask, day: Moment) {
   return {
     durationMinutes: defaultDurationMinutes,
-    // todo: bad abstraction
-    listTokens: getListTokens(sTask),
+    symbol: sTask.symbol,
+    status: sTask.status,
     firstLineText: sTask.text,
     text: toString(sTask),
     location: {
@@ -80,7 +80,8 @@ export function toTask(sTask: STask, day: Moment): Task {
 
   return {
     startTime,
-    listTokens: getListTokens(sTask),
+    symbol: sTask.symbol,
+    status: sTask.status,
     firstLineText,
     text,
     durationMinutes,
@@ -111,10 +112,9 @@ export function toClockRecord(sTask: STask, clockMoments: ClockMoments) {
     startTime: clockMoments[0],
     firstLineText: textToString(sTask),
     text: toString(sTask),
-    listTokens: "",
+    symbol: "-",
     location: {
       path: sTask.path,
-      line: sTask.line,
       position: sTask.position,
     },
     id: getId(),
@@ -130,7 +130,7 @@ export function toMarkdown(sTask: STask) {
     .map((line, i) => {
       if (i === 0) {
         // TODO: remove duplication
-        return `${baseIndent}${getListTokens(sTask)}${line}`;
+        return `${baseIndent}${getListTokens(sTask)} ${line}`;
       }
 
       return `${baseIndent}${extraIndent}${line}`;
@@ -138,9 +138,9 @@ export function toMarkdown(sTask: STask) {
     .join("\n");
 }
 
-function getListTokens(sTask: STask) {
-  const maybeCheckbox = sTask.status === undefined ? "" : `[${sTask.status}] `;
-  return `${sTask.symbol} ${maybeCheckbox}`;
+export function getListTokens(task: TaskTokens) {
+  const maybeCheckbox = task.status === undefined ? "" : `[${task.status}]`;
+  return `${task.symbol} ${maybeCheckbox}`.trim();
 }
 
 export function replaceSTaskInFile(

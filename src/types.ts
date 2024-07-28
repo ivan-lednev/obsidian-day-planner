@@ -23,12 +23,12 @@ export type OnUpdateFn = (
 
 export type Diff = ReturnType<typeof getDiff>;
 
-export interface UnscheduledTask {
-  /**
-   * @deprecated this will be replaced with dataview `symbol` and `status`
-   */
-  listTokens: string;
+export interface TaskTokens {
+  symbol: string;
+  status?: string;
+}
 
+export interface UnscheduledTask extends TaskTokens {
   /**
    * @deprecated TODO: replace with derived functions
    */
