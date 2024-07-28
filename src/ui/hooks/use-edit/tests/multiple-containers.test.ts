@@ -1,7 +1,7 @@
 import { get } from "svelte/store";
 
 import { defaultSettingsForTests } from "../../../../settings";
-import { Tasks } from "../../../../types";
+import { DayToTasks } from "../../../../types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 import { EditMode } from "../types";
@@ -51,7 +51,7 @@ describe("moving tasks between containers", () => {
   });
 
   test("drag works between days", () => {
-    const tasks: Tasks = {
+    const tasks: DayToTasks = {
       [dayKey]: {
         withTime: [
           baseTask,
@@ -88,7 +88,7 @@ describe("moving tasks between containers", () => {
   });
 
   test("drag many works between days", () => {
-    const tasks: Tasks = {
+    const tasks: DayToTasks = {
       [dayKey]: {
         withTime: [
           baseTask,

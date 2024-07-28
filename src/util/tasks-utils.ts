@@ -5,14 +5,7 @@ import {
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
 
-import {
-  Diff,
-  PlacedTask,
-  Task,
-  Tasks,
-  TasksForDay,
-  UnscheduledTask,
-} from "../types";
+import { Diff, Task, DayToTasks, TasksForDay, UnscheduledTask } from "../types";
 
 import {
   isEqualTask,
@@ -24,11 +17,11 @@ export function getEmptyRecordsForDay(): TasksForDay {
   return { withTime: [], noTime: [] };
 }
 
-export function getTasksWithTime(tasks: Tasks) {
+export function getTasksWithTime(tasks: DayToTasks) {
   return Object.values(tasks).flatMap(({ withTime }) => withTime);
 }
 
-export function getFlatTasks(tasks: Tasks) {
+export function getFlatTasks(tasks: DayToTasks) {
   return Object.values(tasks).flatMap(({ withTime, noTime }) => [
     ...withTime,
     ...noTime,
@@ -59,7 +52,7 @@ export function getDayKey(day: Moment) {
   return day.format(DEFAULT_DAILY_NOTE_FORMAT);
 }
 
-export function moveTaskToDay(baseline: Tasks, task: Task, day: Moment) {
+export function moveTaskToDay(baseline: DayToTasks, task: Task, day: Moment) {
   const sourceKey = getDayKey(task.startTime);
   const destKey = getDayKey(day);
   const source = baseline[sourceKey];
@@ -72,7 +65,11 @@ export function moveTaskToDay(baseline: Tasks, task: Task, day: Moment) {
   };
 }
 
-export function moveTaskToColumn(day: Moment, task: Task, baseline: Tasks) {
+export function moveTaskToColumn(
+  day: Moment,
+  task: Task,
+  baseline: DayToTasks,
+) {
   if (day.isSame(task.startTime, "day")) {
     const key = getDayKey(task.startTime);
 
@@ -85,8 +82,7 @@ export function moveTaskToColumn(day: Moment, task: Task, baseline: Tasks) {
   return moveTaskToDay(baseline, task, day);
 }
 
-// todo: don't get tasks in daily notes here
-export function getTasksWithUpdatedDay(tasks: Tasks) {
+export function getTasksWithUpdatedDayProp(tasks: DayToTasks) {
   return Object.entries(tasks)
     .flatMap(([dayKey, tasks]) =>
       tasks.withTime.map((task) => ({ dayKey, task })),
@@ -96,6 +92,8 @@ export function getTasksWithUpdatedDay(tasks: Tasks) {
         ? getDateFromPath(task.location?.path, "day")
         : null;
 
+      // todo: remove path from comparison, only take into account the prop
+      // todo: this is not going to work for obsidian-tasks if the task is inside a daily note
       return (
         !task.isGhost && dayKey !== getDayKey(task.startTime) && !dateFromPath
       );
@@ -103,13 +101,12 @@ export function getTasksWithUpdatedDay(tasks: Tasks) {
 }
 
 // TODO: remove duplication
-export function getTasksInDailyNotesWithUpdatedDay(tasks: Tasks) {
+export function getTasksInDailyNotesWithUpdatedDay(tasks: DayToTasks) {
   return Object.entries(tasks)
     .flatMap(([dayKey, tasks]) =>
       tasks.withTime.map((task) => ({ dayKey, task })),
     )
     .filter(({ dayKey, task }) => {
-      // TODO: remove this. It creates a dep on another plugin
       const dateFromPath = task.location?.path
         ? getDateFromPath(task.location?.path, "day")
         : null;
@@ -120,7 +117,7 @@ export function getTasksInDailyNotesWithUpdatedDay(tasks: Tasks) {
     });
 }
 
-function getPristine(flatBaseline: PlacedTask[], flatNext: PlacedTask[]) {
+function getPristine(flatBaseline: Task[], flatNext: Task[]) {
   return flatNext.filter((task) =>
     flatBaseline.find((baselineTask) => isEqualTask(task, baselineTask)),
   );
@@ -130,19 +127,19 @@ function getCreatedTasks(base: UnscheduledTask[], next: UnscheduledTask[]) {
   return differenceBy((task) => task.id, next, base);
 }
 
-function getTasksWithUpdatedTime(base: PlacedTask[], next: PlacedTask[]) {
+function getTasksWithUpdatedTime(base: Task[], next: Task[]) {
   const pristine = getPristine(base, next);
 
   return difference(next, pristine).filter((task) => !task.isGhost);
 }
 
-export function getDiff(base: Tasks, next: Tasks) {
+export function getDiff(base: DayToTasks, next: DayToTasks) {
   return {
     updatedTime: getTasksWithUpdatedTime(
       getTasksWithTime(base),
       getTasksWithTime(next),
     ),
-    updatedDay: getTasksWithUpdatedDay(next),
+    updatedDay: getTasksWithUpdatedDayProp(next),
     moved: getTasksInDailyNotesWithUpdatedDay(next),
     created: getCreatedTasks(getFlatTasks(base), getFlatTasks(next)),
   };

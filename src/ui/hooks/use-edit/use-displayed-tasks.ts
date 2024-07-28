@@ -1,6 +1,6 @@
 import { derived, Readable } from "svelte/store";
 
-import { Tasks } from "../../../types";
+import { DayToTasks } from "../../../types";
 
 import { transform } from "./transform/transform";
 import { EditOperation } from "./types";
@@ -8,7 +8,7 @@ import { EditOperation } from "./types";
 export interface UseDisplayedTasksProps {
   editOperation: Readable<EditOperation>;
   cursorMinutes: Readable<number>;
-  baselineTasks: Readable<Tasks>;
+  baselineTasks: Readable<DayToTasks>;
 }
 
 export function useDisplayedTasks({

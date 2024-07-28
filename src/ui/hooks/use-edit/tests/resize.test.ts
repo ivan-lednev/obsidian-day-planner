@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 
-import { Tasks } from "../../../../types";
+import { DayToTasks } from "../../../../types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 import { EditMode } from "../types";
@@ -30,7 +30,7 @@ describe("resize", () => {
         startMinutes: toMinutes("02:00"),
       };
 
-      const tasks: Tasks = {
+      const tasks: DayToTasks = {
         [dayKey]: {
           withTime: [
             { ...baseTask, id: "1", startMinutes: toMinutes("01:00") },

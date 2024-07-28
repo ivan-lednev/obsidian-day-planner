@@ -1,15 +1,15 @@
 import { get, Readable, Writable } from "svelte/store";
 
-import { OnUpdateFn, Tasks } from "../../../types";
+import { OnUpdateFn, DayToTasks } from "../../../types";
 import { areValuesEmpty } from "../../../util/task-utils";
 import { getDiff, updateText } from "../../../util/tasks-utils";
 
 import { EditOperation } from "./types";
 
 interface UseEditActionsProps {
-  baselineTasks: Writable<Tasks>;
+  baselineTasks: Writable<DayToTasks>;
   editOperation: Writable<EditOperation>;
-  displayedTasks: Readable<Tasks>;
+  displayedTasks: Readable<DayToTasks>;
   onUpdate: OnUpdateFn;
 }
 

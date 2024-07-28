@@ -2,7 +2,7 @@ import { produce } from "immer";
 import { partition } from "lodash/fp";
 import { isNotVoid } from "typed-assert";
 
-import type { Task, Tasks } from "../../../../types";
+import type { Task, DayToTasks } from "../../../../types";
 import { getDayKey, moveTaskToColumn } from "../../../../util/tasks-utils";
 import { EditMode, EditOperation } from "../types";
 
@@ -53,7 +53,7 @@ function sortByStartMinutes(tasks: Task[]) {
 }
 
 export function transform(
-  baseline: Tasks,
+  baseline: DayToTasks,
   cursorMinutes: number,
   operation: EditOperation,
 ) {

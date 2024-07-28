@@ -1,12 +1,12 @@
-import type { PlacedTask } from "../../../../types";
+import type { Task } from "../../../../types";
 import { getEndMinutes } from "../../../../util/task-utils";
 import { toSpliced } from "../../../../util/to-spliced";
 
 export function resize(
-  baseline: PlacedTask[],
-  editTarget: PlacedTask,
+  baseline: Task[],
+  editTarget: Task,
   cursorTime: number,
-): PlacedTask[] {
+): Task[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
   const durationMinutes = cursorTime - editTarget.startMinutes;
   const updated = {
@@ -18,10 +18,10 @@ export function resize(
 }
 
 export function resizeFromTop(
-  baseline: PlacedTask[],
-  editTarget: PlacedTask,
+  baseline: Task[],
+  editTarget: Task,
   cursorTime: number,
-): PlacedTask[] {
+): Task[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
   const durationMinutes = getEndMinutes(editTarget) - cursorTime;
 

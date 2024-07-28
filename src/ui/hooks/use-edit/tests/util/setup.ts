@@ -7,7 +7,7 @@ import {
   DayPlannerSettings,
   defaultSettingsForTests,
 } from "../../../../../settings";
-import { Tasks } from "../../../../../types";
+import { DayToTasks } from "../../../../../types";
 import { toMinutes } from "../../../../../util/moment";
 import { useEditContext } from "../../use-edit-context";
 
@@ -17,7 +17,7 @@ function createProps({
   tasks,
   settings,
 }: {
-  tasks: Tasks;
+  tasks: DayToTasks;
   settings: DayPlannerSettings;
 }) {
   const onUpdate = jest.fn();

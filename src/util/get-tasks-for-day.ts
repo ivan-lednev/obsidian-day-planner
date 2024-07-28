@@ -64,7 +64,6 @@ export function mapToTasksForDay(
     },
     { parsed: [], errors: [] },
   );
-  // TODO: sortByStartMinutes()
 
   tasksWithTime.sort((a, b) => a.startMinutes - b.startMinutes);
 

@@ -1,10 +1,10 @@
-import type { PlacedTask } from "../../../../types";
+import type { Task } from "../../../../types";
 
 export function create(
-  baseline: PlacedTask[],
-  editTarget: PlacedTask,
+  baseline: Task[],
+  editTarget: Task,
   cursorTime: number,
-): PlacedTask[] {
+): Task[] {
   return baseline.map((task) => {
     if (task.id === editTarget.id) {
       return {

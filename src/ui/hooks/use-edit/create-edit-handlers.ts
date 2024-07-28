@@ -3,7 +3,7 @@ import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { get, Readable, Writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
-import { PlacedTask, UnscheduledTask } from "../../../types";
+import { Task, UnscheduledTask } from "../../../types";
 import { createTask } from "../../../util/task-utils";
 
 import { EditMode, EditOperation } from "./types";
@@ -34,7 +34,7 @@ export function createEditHandlers({
     });
   }
 
-  function handleResizerMouseDown(task: PlacedTask, mode: EditMode) {
+  function handleResizerMouseDown(task: Task, mode: EditMode) {
     startEdit({ task, mode, day });
   }
 
@@ -48,10 +48,11 @@ export function createEditHandlers({
   }
 
   // todo: remove
-  function handleGripMouseDown(task: PlacedTask, mode: EditMode) {
+  function handleGripMouseDown(task: Task, mode: EditMode) {
     startEdit({ task, mode, day });
   }
 
+  // todo: fix
   function handleUnscheduledTaskGripMouseDown(task: UnscheduledTask) {
     const withAddedTime = {
       ...task,

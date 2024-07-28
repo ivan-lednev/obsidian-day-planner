@@ -18,7 +18,7 @@ export interface TaskLocation {
 
 export type OnUpdateFn = (
   taskUpdate: ReturnType<typeof updateText> & {
-    moved: { dayKey: string; task: PlacedTask }[];
+    moved: { dayKey: string; task: Task }[];
   },
 ) => Promise<void | void[]>;
 
@@ -30,7 +30,9 @@ export interface UnscheduledTask {
    */
   listTokens: string;
 
-  // TODO: the distinction needs to be clearer
+  /**
+   * @deprecated TODO: replace with derived functions
+   */
   firstLineText: string;
   text: string;
 
@@ -49,15 +51,11 @@ export interface Task extends UnscheduledTask {
 }
 
 export interface TasksForDay {
-  withTime: PlacedTask[];
+  withTime: Task[];
   noTime: UnscheduledTask[];
 }
 
-// todo: rename to DayToTasks
-export type Tasks = Record<string, TasksForDay>;
-
-// TODO: delete this type
-export interface PlacedTask extends Task {}
+export type DayToTasks = Record<string, TasksForDay>;
 
 export type RelationToNow = "past" | "present" | "future";
 
@@ -79,7 +77,7 @@ export interface ObsidianContext {
   dataviewLoaded: Readable<boolean>;
   renderMarkdown: RenderMarkdown;
   editContext: ReturnType<typeof useEditContext>;
-  visibleTasks: Readable<Tasks>;
+  visibleTasks: Readable<DayToTasks>;
   showReleaseNotes: () => void;
   showPreview: ReturnType<typeof createShowPreview>;
   isModPressed: Readable<boolean>;
