@@ -64,23 +64,18 @@
   async function goBack() {
     const previousDay = $dateRange[0].clone().subtract(1, "day");
 
-    const previousNote = await createDailyNoteIfNeeded(previousDay);
-    await obsidianFacade.openFileInEditor(previousNote);
-
     $dateRange = [previousDay];
   }
 
   async function goForward() {
     const nextDay = $dateRange[0].clone().add(1, "day");
 
-    const nextNote = await createDailyNoteIfNeeded(nextDay);
-    await obsidianFacade.openFileInEditor(nextNote);
-
     $dateRange = [nextDay];
   }
 
   async function goToToday() {
     const noteForToday = await createDailyNoteIfNeeded(window.moment());
+
     await obsidianFacade.openFileInEditor(noteForToday);
   }
 
