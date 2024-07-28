@@ -9,7 +9,7 @@ import {
   scheduledPropRegExp,
   shortScheduledPropRegExp,
 } from "../regexp";
-import type { Task } from "../types";
+import type { Task, UnscheduledTask } from "../types";
 import { PlacedTask } from "../types";
 
 import { getId } from "./id";
@@ -130,4 +130,19 @@ export function createTask(day: Moment, startMinutes: number): PlacedTask {
       xOffsetPercent: 0,
     },
   };
+}
+
+export function getSchedueldDayFromText(task: UnscheduledTask) {
+  const matches =
+    scheduledPropRegExp.exec(task.text) ||
+    keylessScheduledPropRegExp.exec(task.text) ||
+    shortScheduledPropRegExp.exec(task.text);
+
+  if (!matches) {
+    return undefined;
+  }
+  const [fullMatch, preFix] = matches;
+  const scheduledDay = fullMatch.replace(preFix, "");
+
+  return window.moment(scheduledDay);
 }
