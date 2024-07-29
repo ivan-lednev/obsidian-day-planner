@@ -124,6 +124,29 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           });
       });
 
+    new Setting(containerEl)
+      .setName("Reorder tasks in the list after moving")
+      .setDesc(
+        createFragment((fragment) => {
+          fragment.appendText(
+            "Should the Markdown file be updated after moving the task in the timeline, so the tasks are in chronological order in the list.",
+          );
+          fragment.append(createEl("br"));
+          fragment.appendText(
+            "Warning: this can change the formatting of the file.",
+          );
+          fragment.append(createEl("br"));
+          fragment.appendText("Experimental!");
+        }),
+      )
+      .addToggle((component) => {
+        component
+          .setValue(this.plugin.settings().reorderTasksAfterMoving)
+          .onChange((value) => {
+            this.update({ reorderTasksAfterMoving: value });
+          });
+      });
+
     containerEl.createEl("h2", { text: "Remote calendars" });
 
     this.plugin.settings().icals.map((ical, index) =>

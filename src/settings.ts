@@ -44,6 +44,7 @@ export interface DayPlannerSettings {
   icals: Array<IcalConfig>;
   colorOverrides: Array<ColorOverride>;
   releaseNotes: boolean;
+  reorderTasksAfterMoving: boolean;
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -77,6 +78,8 @@ export const defaultSettings: DayPlannerSettings = {
   icals: [],
   colorOverrides: [],
   releaseNotes: true,
+  // `false` by default while it is being tested
+  reorderTasksAfterMoving: false,
 };
 
 export const defaultSettingsForTests = {
