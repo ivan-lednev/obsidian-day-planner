@@ -9,6 +9,8 @@ export interface IcalConfig {
 
 export interface ColorOverride {
   text: string;
+  lightModeTextColor: string;
+  darkModeTextColor: string;
   color: string;
   darkModeColor: string;
 }
