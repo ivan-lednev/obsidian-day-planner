@@ -9,6 +9,8 @@
   import { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
   import { EditMode } from "../hooks/use-edit/types";
   import { useFloatingUi } from "../hooks/use-floating-ui";
+  import { useColorOverride } from "../hooks/use-color-override";
+  import { getTextColorWithEnoughContrast } from "../../util/color";
 
   import DragControls from "./drag-controls.svelte";
   import FloatingUi from "./floating-ui.svelte";
@@ -47,6 +49,21 @@
   });
 
   const { isActive: isResizeFromTopActive } = resizeFromTop;
+
+  $: override = useColorOverride(task);
+  // todo: hide in hook
+  $: backgroundColor =
+    $override || "var(--time-block-bg-color, var(--background-primary))";
+
+  $: ({
+    faint,
+    muted,
+    normal,
+  } = $override 
+    ? getTextColorWithEnoughContrast(backgroundColor)
+    : { faint: "", muted: "", normal: "" }
+  );
+
 </script>
 
 <ScheduledTimeBlock
@@ -76,7 +93,12 @@
   }}
 >
   <MarkdownBlockContent {task}>
-    <RenderedMarkdown {task} />
+    <RenderedMarkdown
+      --text-faint={faint}
+      --text-muted={muted}
+      --text-normal={normal}
+      {task}
+    />
   </MarkdownBlockContent>
 </ScheduledTimeBlock>
 
