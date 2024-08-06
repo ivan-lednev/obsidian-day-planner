@@ -40,6 +40,8 @@ export interface UnscheduledTask {
   isGhost?: boolean;
   calendar?: IcalConfig;
   durationMinutes: number;
+  // Add the RSVP status property
+  rsvpStatus?: string;
 }
 
 export interface Task extends UnscheduledTask {

@@ -4,11 +4,20 @@
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
 
   export let task: Task;
+
+  // Determine if the task is tentative
+  const isTentative = task.rsvpStatus === "TENTATIVE";
 </script>
 
 <ScheduledTimeBlock {task}>
-  <div class="remote-task-content">
-    <div style:background-color={task.calendar.color} class="ribbon" />
+  <div
+    class="remote-task-content"
+    class:striped={isTentative}
+  >
+    <div
+      style:background-color={task.calendar.color}
+      class="ribbon"
+    />
     <div class="text">
       <span class="calendar-name">
         {task.calendar.name}
@@ -26,6 +35,8 @@
   }
 
   .remote-task-content {
+    position: relative;
+
     overflow: hidden;
     display: flex;
     flex: 1 0 0;
@@ -35,6 +46,8 @@
     padding-left: calc(4px + var(--size-4-2));
 
     color: var(--text-normal);
+
+    background-color: white; /* Default background color */
   }
 
   .ribbon {
@@ -44,5 +57,22 @@
     left: 0;
 
     width: var(--size-4-2);
+
+    background-size: 10px 10px;
+  }
+
+  .striped {
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgb(0 0 0 / 5%),
+      rgb(0 0 0 / 5%) 5px,
+      rgb(255 255 255 / 0%) 5px,
+      rgb(255 255 255 / 0%) 10px
+    );
+  }
+
+  .text {
+    z-index: 1;
+    padding-left: var(--size-4-2);
   }
 </style>
