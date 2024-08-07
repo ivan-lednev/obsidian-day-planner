@@ -92,12 +92,42 @@ function icalEventToTask(
 
   const isAllDayEvent = icalEvent.datetype === "date";
 
+  // Extract RSVP status using the helper function
+  const rsvpStatus = getRsvpStatus(icalEvent);
+
+  const base = {
+    calendar: icalEvent.calendar,
+    id: getId(),
+    text: icalEvent.summary || noTitle,
+    firstLineText: icalEvent.summary || noTitle,
+    startTime: startTimeAdjusted,
+    readonly: true,
+    listTokens: "- ",
+    rsvpStatus: rsvpStatus,
+  };
+
+  if (isAllDayEvent) {
+    return {
+      ...base,
+      durationMinutes: defaultDurationMinutes,
+    };
+  }
+
+  return {
+    ...base,
+    startMinutes: getMinutesSinceMidnight(startTimeAdjusted),
+    durationMinutes:
+      (icalEvent.end.getTime() - icalEvent.start.getTime()) / 1000 / 60,
+  };
+}
+
+// Helper function to determine RSVP status
+function getRsvpStatus(icalEvent: WithIcalConfig<ical.VEvent>): string {
   // Decode the URL to handle %40 and other encoded characters
   const decodedUrl = decodeURIComponent(icalEvent.calendar.url);
 
   // Check if the calendar URL matches the Google Calendar URL pattern and extract the email address
-  const googleCalendarUrlPattern =
-    /https:\/\/calendar\.google\.com\/calendar\/ical\/([^@]+@[^.]+\.[^/]+)\/private-.*/;
+  const googleCalendarUrlPattern = /https:\/\/calendar\.google\.com\/calendar\/ical\/([^@]+@[^.]+\.[^/]+)\/private-.*/;
   let rsvpStatus = "No RSVP";
   let emailFromUrl = "";
 
@@ -125,32 +155,9 @@ function icalEventToTask(
     }
   }
 
-
-  const base = {
-    calendar: icalEvent.calendar,
-    id: getId(),
-    text: icalEvent.summary || noTitle,
-    firstLineText: icalEvent.summary || noTitle,
-    startTime: startTimeAdjusted,
-    readonly: true,
-    listTokens: "- ",
-    rsvpStatus: rsvpStatus,
-  };
-
-  if (isAllDayEvent) {
-    return {
-      ...base,
-      durationMinutes: defaultDurationMinutes,
-    };
-  }
-
-  return {
-    ...base,
-    startMinutes: getMinutesSinceMidnight(startTimeAdjusted),
-    durationMinutes:
-      (icalEvent.end.getTime() - icalEvent.start.getTime()) / 1000 / 60,
-  };
+  return rsvpStatus;
 }
+
 
 function adjustForOtherZones(tzid: string, currentDate: Date) {
   const localTzid = tz.guess();
