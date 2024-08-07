@@ -12,6 +12,17 @@ import { Task, UnscheduledTask, WithIcalConfig } from "../types";
 import { getId } from "./id";
 import { getMinutesSinceMidnight } from "./moment";
 
+// Assuming the structure of an Attendee based on your usage
+type AttendeeObject = {
+  val: string;
+  params: {
+    PARTSTAT?: string;
+  };
+};
+
+// Attendee can be either an object or a string
+type Attendee = AttendeeObject | string;
+
 export function canHappenAfter(icalEvent: ical.VEvent, date: Date) {
   if (!icalEvent.rrule) {
     return icalEvent.end > date;
@@ -81,6 +92,9 @@ function icalEventToTask(
 
   const isAllDayEvent = icalEvent.datetype === "date";
 
+  // Extract RSVP status using the helper function
+  const rsvpStatus = getRsvpStatus(icalEvent);
+
   const base = {
     calendar: icalEvent.calendar,
     id: getId(),
@@ -89,6 +103,7 @@ function icalEventToTask(
     startTime: startTimeAdjusted,
     readonly: true,
     listTokens: "- ",
+    rsvpStatus: rsvpStatus,
   };
 
   if (isAllDayEvent) {
@@ -105,6 +120,44 @@ function icalEventToTask(
       (icalEvent.end.getTime() - icalEvent.start.getTime()) / 1000 / 60,
   };
 }
+
+// Helper function to determine RSVP status
+function getRsvpStatus(icalEvent: WithIcalConfig<ical.VEvent>): string {
+  // Decode the URL to handle %40 and other encoded characters
+  const decodedUrl = decodeURIComponent(icalEvent.calendar.url);
+
+  // Check if the calendar URL matches the Google Calendar URL pattern and extract the email address
+  const googleCalendarUrlPattern = /https:\/\/calendar\.google\.com\/calendar\/ical\/([^@]+@[^.]+\.[^/]+)\/private-.*/;
+  let rsvpStatus = "No RSVP";
+  let emailFromUrl = "";
+
+  const match = googleCalendarUrlPattern.exec(decodedUrl);
+  if (match) {
+    emailFromUrl = `mailto:${match[1]}`;
+  }
+
+  // Type guard to check if an attendee is an object
+  const isAttendeeObject = (attendee: Attendee): attendee is AttendeeObject => {
+    return typeof attendee === 'object' && 'val' in attendee && 'params' in attendee;
+  };
+
+  // If we have an email from the URL, find its RSVP status
+  if (emailFromUrl && icalEvent.attendee) {
+    const attendees = Array.isArray(icalEvent.attendee)
+      ? icalEvent.attendee
+      : [icalEvent.attendee];
+
+    for (const attendee of attendees) {
+      if (isAttendeeObject(attendee) && attendee.val === emailFromUrl) {
+        rsvpStatus = attendee.params.PARTSTAT || "No RSVP";
+        break;
+      }
+    }
+  }
+
+  return rsvpStatus;
+}
+
 
 function adjustForOtherZones(tzid: string, currentDate: Date) {
   const localTzid = tz.guess();
