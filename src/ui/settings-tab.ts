@@ -124,6 +124,23 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           });
       });
 
+    new Setting(containerEl)
+      .setName("Event Format")
+      .setDesc("Event format when new event added via calendar interaction.")
+      .addDropdown((component) =>
+        component
+          .addOptions({
+            bullet: 'Bullet "- "',
+            task: 'Task "- [ ] "',
+          })
+          .setValue(this.plugin.settings().eventFormat)
+          .onChange((value) => {
+            this.update({
+              eventFormat: value as DayPlannerSettings["eventFormat"],
+            });
+          }),
+      );
+
     containerEl.createEl("h2", { text: "Remote calendars" });
 
     this.plugin.settings().icals.map((ical, index) =>

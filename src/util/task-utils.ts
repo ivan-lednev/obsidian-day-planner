@@ -117,6 +117,8 @@ export function offsetYToMinutes(
 }
 
 export function createTask(day: Moment, startMinutes: number): PlacedTask {
+  const eventFormat = get(settings).eventFormat;
+
   return {
     id: getId(),
     startMinutes,
@@ -124,7 +126,7 @@ export function createTask(day: Moment, startMinutes: number): PlacedTask {
     firstLineText: "New item",
     text: "New item",
     startTime: minutesToMomentOfDay(startMinutes, day),
-    listTokens: "- [ ] ",
+    listTokens: eventFormat === "bullet" ? "- " : "- [ ] ",
     placing: {
       widthPercent: 100,
       xOffsetPercent: 0,
