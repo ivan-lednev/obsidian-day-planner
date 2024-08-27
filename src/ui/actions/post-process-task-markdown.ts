@@ -1,6 +1,6 @@
 import { DayPlannerSettings } from "../../settings";
 import { UnscheduledTask } from "../../types";
-import { createTimestamp } from "../../util/task-utils";
+import { createTimestamp, formatDuration } from "../../util/task-utils";
 
 export function decorate(
   el: HTMLElement,
@@ -8,6 +8,23 @@ export function decorate(
   settings: DayPlannerSettings,
 ) {
   const checkBox = el.querySelector('input[type="checkbox"]');
+
+  if (
+    checkBox &&
+    settings.showDurationInTaskBlock &&
+    // @ts-expect-error
+    task.startMinutes &&
+    task.durationMinutes >= 0
+  ) {
+    const durationFormated = formatDuration(task.durationMinutes);
+
+    checkBox.after(
+      createSpan({
+        text: durationFormated,
+        cls: "day-planner-task-decoration",
+      }),
+    );
+  }
 
   // TODO: fix this forking
   // TODO: should work with list items

@@ -381,6 +381,16 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           });
       });
 
+    new Setting(containerEl)
+      .setName("Show duration next to task text in timeline")
+      .addToggle((component) => {
+        component
+          .setValue(this.plugin.settings().showDurationInTaskBlock)
+          .onChange((value) => {
+            this.update({ showDurationInTaskBlock: value });
+          });
+      });
+
     containerEl.createEl("h2", { text: "Duration" });
 
     new Setting(containerEl)

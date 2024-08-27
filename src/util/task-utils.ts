@@ -13,7 +13,12 @@ import type { Task } from "../types";
 import { PlacedTask } from "../types";
 
 import { getId } from "./id";
-import { addMinutes, minutesToMoment, minutesToMomentOfDay } from "./moment";
+import {
+  addMinutes,
+  minutesToDuration,
+  minutesToMoment,
+  minutesToMomentOfDay,
+} from "./moment";
 
 export function isEqualTask(a: Task, b: Task) {
   return (
@@ -68,6 +73,15 @@ export function createTimestamp(
   const end = addMinutes(start, durationMinutes);
 
   return `${start.format(format)} - ${end.format(format)}`;
+}
+
+export function formatDuration(durationInMinutes: number): string {
+  const duration = minutesToDuration(durationInMinutes);
+
+  const hours = duration.hours();
+  const minutes = duration.minutes();
+
+  return `${hours}h ${minutes}m`;
 }
 
 export function areValuesEmpty(record: Record<string, [] | object>) {

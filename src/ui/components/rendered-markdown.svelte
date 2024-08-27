@@ -25,11 +25,17 @@
     font-size: var(--tag-size);
     font-weight: var(--tag-weight);
     line-height: 1;
+    color: var(--tag-color-hover);
+    text-decoration: var(--tag-decoration-hover);
+
+    background-color: var(--tag-background-hover);
+    border-radius: var(--radius-s);
+  }
+
+  :global(.day-planner-task-decoration:nth-of-type(2)) {
     color: var(--tag-color);
     text-decoration: var(--tag-decoration);
-
     background-color: var(--tag-background);
-    border-radius: var(--radius-s);
   }
 
   .rendered-markdown {

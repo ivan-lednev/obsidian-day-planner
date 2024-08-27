@@ -54,6 +54,10 @@ export function hoursToMoment(hoursSinceMidnight: number) {
   return moment().startOf("day").add(hoursSinceMidnight, "hours");
 }
 
+export function minutesToDuration(minutes: number) {
+  return moment.duration(minutes, "minutes");
+}
+
 export function addMinutes(moment: Moment, minutes: number) {
   return moment.clone().add(minutes, "minutes");
 }

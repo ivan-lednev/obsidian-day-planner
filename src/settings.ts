@@ -33,6 +33,7 @@ export interface DayPlannerSettings {
   extendDurationUntilNext: boolean;
   defaultDurationMinutes: number;
   showTimestampInTaskBlock: boolean;
+  showDurationInTaskBlock: boolean;
   showUncheduledTasks: boolean;
   showUnscheduledNestedTasks: boolean;
   showNow: boolean;
@@ -67,6 +68,7 @@ export const defaultSettings: DayPlannerSettings = {
   extendDurationUntilNext: false,
   defaultDurationMinutes: 30,
   showTimestampInTaskBlock: false,
+  showDurationInTaskBlock: false,
   showUncheduledTasks: true,
   showUnscheduledNestedTasks: true,
   showNow: true,
