@@ -19,7 +19,7 @@ export const checkboxRegExp = new RegExp(checkbox);
 export const timeRegExp = new RegExp(time);
 export const timeFromStartRegExp = new RegExp(`^${time}`);
 export const timestampRegExp = new RegExp(
-  `(?<times>(?<start>${time})(?:${durationSeparator}(?<end>${time}))?)(?<text>.+)$`,
+  `^(?<times>(?<start>${time})(?:${durationSeparator}(?<end>${time}))?)(?<text>.+)$`,
   "im",
 );
 

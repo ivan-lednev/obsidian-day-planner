@@ -79,14 +79,16 @@ export function areValuesEmpty(record: Record<string, [] | object>) {
 // todo: confusing. Do not mix up parsed and updated props
 // todo: add replaceTimestamp()
 function taskLineToString(task: Task) {
-  const firstLineText = removeListTokens(
-    removeTimestamp(getFirstLine(task.text)),
+  const firstLineText = removeTimestamp(
+    removeListTokens(getFirstLine(task.text)),
   );
+
   return `${getListTokens(task)} ${createTimestamp(
     task.startMinutes,
     task.durationMinutes,
     get(settings).timestampFormat,
-  )} ${firstLineText}\n${getLinesAfterFirst(task.text)}`;
+  )} ${firstLineText}
+${getLinesAfterFirst(task.text)}`;
 }
 
 export function updateScheduledPropInText(text: string, dayKey: string) {
