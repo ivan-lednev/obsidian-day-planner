@@ -1,3 +1,10 @@
+## 0.21.1.1
+
+### New features
+
+A Makefile and Docker-Compose file has been added to the project to easily build the day-planner plugin in a
+Linux context with the command "make run".
+
 ## 0.21.1
 
 ### ✨ New features

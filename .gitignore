@@ -2,6 +2,12 @@
 # npm
 node_modules
 
+# package directory
+obsidian-day-planner
+
+# Docker-Compose
+.tools
+
 # build
 main.js
 styles.css
