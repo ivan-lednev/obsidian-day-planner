@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
 
-  import { useHoverOrTap } from "../hooks/useHoverOrTap";
+  import { useHoverOrTap } from "../hooks/use-hover-or-tap";
 
   export let reverse: boolean | undefined = false;
 

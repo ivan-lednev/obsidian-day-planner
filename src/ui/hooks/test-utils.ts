@@ -8,7 +8,7 @@ export const baseTask: Task = {
   startTime: moment("2023-01-01"),
   startMinutes: 0,
   durationMinutes: 60,
-  text: "",
+  text: "text",
   placing: {
     xOffsetPercent: 0,
     widthPercent: 100,

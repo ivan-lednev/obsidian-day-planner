@@ -76,11 +76,9 @@ export function createHooks({
     };
   });
 
-  // todo: these can be global stores
   const keyDown = useKeyDown();
   const isModPressed = useModPressed();
   const isOnline = useIsOnline();
-  // ---
 
   const dataviewChange = useDataviewChange(app.metadataCache);
   const dataviewLoaded = useDataviewLoaded(app);
