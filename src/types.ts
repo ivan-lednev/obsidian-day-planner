@@ -40,7 +40,6 @@ export interface UnscheduledTask extends TaskTokens {
 }
 
 export interface Task extends UnscheduledTask {
-  // todo: should be parsedStartTime to highlight that this doesn't change
   startTime: Moment;
   /**
    * @deprecated Should be derived from startTime
