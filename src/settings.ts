@@ -44,6 +44,7 @@ export interface DayPlannerSettings {
   icals: Array<IcalConfig>;
   colorOverrides: Array<ColorOverride>;
   releaseNotes: boolean;
+  taskStatusOnCreation: string;
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -77,6 +78,7 @@ export const defaultSettings: DayPlannerSettings = {
   icals: [],
   colorOverrides: [],
   releaseNotes: true,
+  taskStatusOnCreation: " ",
 };
 
 export const defaultSettingsForTests = {

@@ -126,7 +126,11 @@ export function offsetYToMinutes(
   return (offsetY + hiddenHoursSize) / zoomLevel;
 }
 
-export function createTask(day: Moment, startMinutes: number): Task {
+export function createTask(
+  day: Moment,
+  startMinutes: number,
+  status: string,
+): Task {
   return {
     id: getId(),
     startMinutes,
@@ -134,7 +138,7 @@ export function createTask(day: Moment, startMinutes: number): Task {
     text: "New item",
     startTime: minutesToMomentOfDay(startMinutes, day),
     symbol: "-",
-    status: " ",
+    status,
     placing: {
       widthPercent: 100,
       xOffsetPercent: 0,

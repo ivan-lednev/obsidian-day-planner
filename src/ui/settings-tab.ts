@@ -29,6 +29,27 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
+      .setName("Default task status on creation")
+      .setDesc(
+        "You can use custom statuses for more advanced workflows. E.g.: '- [>] Task'",
+      )
+      .addText((el) =>
+        el
+          .setPlaceholder("Empty")
+          .setValue(this.plugin.settings().taskStatusOnCreation)
+          .onChange((value: string) => {
+            this.settingsStore.update((previous) => {
+              const newValue = value.length > 0 ? value.substring(0, 1) : " ";
+
+              return {
+                ...previous,
+                taskStatusOnCreation: newValue,
+              };
+            });
+          }),
+      );
+
+    new Setting(containerEl)
       .setName("Round time to minutes")
       .setDesc("While editing, tasks are going to get rounded to this number")
       .addSlider((slider) =>

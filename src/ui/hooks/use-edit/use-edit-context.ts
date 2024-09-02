@@ -55,6 +55,7 @@ export function useEditContext({
       startEdit,
       cursorMinutes,
       editOperation,
+      settings,
     });
 
     return {
