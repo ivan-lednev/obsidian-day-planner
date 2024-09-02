@@ -1,3 +1,17 @@
+## 0.22.0
+
+### ✨ New features
+
+- Default task status on creation is now configurable
+
+### 🐞 Fixed issues
+
+- Fixed load failure when unable to read daily notes
+- Fixed console error on plugin load
+- Fixed moving tasks to non-existent daily notes
+- Fixed active day in week not changing on next day
+- No more note switching when navigating between days from timeline view
+
 ## 0.21.1
 
 ### ✨ New features
