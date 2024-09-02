@@ -1,6 +1,21 @@
 import { Moment } from "moment";
+import { Notice } from "obsidian";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { derived, Readable } from "svelte/store";
+
+function getAllDailyNotesSafely() {
+  try {
+    return getAllDailyNotes();
+  } catch (error) {
+    console.error(error);
+
+    new Notice(
+      `Could not read daily notes. Reason: ${error?.message || error}`,
+    );
+
+    return {};
+  }
+}
 
 /**
  *
@@ -20,10 +35,8 @@ export function useVisibleDailyNotes(
         return [];
       }
 
-      const allDailyNotes = getAllDailyNotes();
-
       return $visibleDays
-        .map((day) => getDailyNote(day, allDailyNotes))
+        .map((day) => getDailyNote(day, getAllDailyNotesSafely()))
         .filter(Boolean);
     },
   );
