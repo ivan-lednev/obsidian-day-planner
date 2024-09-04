@@ -14,7 +14,10 @@ export function resizeAndShrinkOthers(
   const preceding = baseline.slice(0, index);
   const following = baseline.slice(index + 1);
 
-  const durationMinutes = cursorTime - editTarget.startMinutes;
+  const durationMinutes = Math.max(
+    cursorTime - editTarget.startMinutes,
+    settings.minimalDurationMinutes,
+  );
 
   const updated = {
     ...editTarget,
@@ -59,8 +62,10 @@ export function resizeFromTopAndShrinkOthers(
   const preceding = baseline.slice(0, index);
   const following = baseline.slice(index + 1);
 
-  const durationMinutes =
-    editTarget.startMinutes + editTarget.durationMinutes - cursorTime;
+  const durationMinutes = Math.max(
+    getEndMinutes(editTarget) - cursorTime,
+    settings.minimalDurationMinutes,
+  );
 
   const updated = {
     ...editTarget,

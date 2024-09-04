@@ -26,5 +26,5 @@ export type TaskTransformer = (
   baseline: Task[],
   editTarget: Task,
   cursorTime: number,
-  settings?: DayPlannerSettings,
+  settings: DayPlannerSettings,
 ) => Task[];
