@@ -6,8 +6,8 @@
   import { obsidianContext } from "../../constants";
   import { settings } from "../../global-store/settings";
   import type { ObsidianContext } from "../../types";
-  
-import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
+
+  import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   export let day: Moment;
 

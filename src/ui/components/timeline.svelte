@@ -1,9 +1,8 @@
 <script lang="ts">
   import { Moment } from "moment";
   import { getContext } from "svelte";
-  import { Writable } from "svelte/store";
-
-  import { dateRangeContextKey, obsidianContext } from "../../constants";
+  
+import { obsidianContext } from "../../constants";
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
@@ -16,16 +15,13 @@
   import Needle from "./needle.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
 
-  // TODO: showRuler or add <slot name="left-gutter" />
   export let day: Moment | undefined = undefined;
   export let isUnderCursor = false;
 
   const {
     editContext: { confirmEdit, getEditHandlers },
   } = getContext<ObsidianContext>(obsidianContext);
-  const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
-  $: actualDay = day || $dateRange[0];
   $: ({
     displayedTasks,
     handleContainerMouseDown,
@@ -34,7 +30,7 @@
     handleGripMouseDown,
     handleMouseEnter,
     pointerOffsetY,
-  } = getEditHandlers(actualDay));
+  } = getEditHandlers(day));
 
   let el: HTMLElement | undefined;
 
@@ -47,7 +43,7 @@
 </script>
 
 <Column visibleHours={getVisibleHours($settings)}>
-  {#if $isToday(actualDay)}
+  {#if $isToday(day)}
     <Needle autoScrollBlocked={isUnderCursor} />
   {/if}
 

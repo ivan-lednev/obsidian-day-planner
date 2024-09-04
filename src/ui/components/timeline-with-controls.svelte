@@ -3,9 +3,7 @@
   import { getContext } from "svelte";
   import { Writable } from "svelte/store";
 
-  import {
-    dateRangeContextKey,
-  } from "../../constants";
+  import { dateRangeContextKey } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
 
@@ -17,27 +15,20 @@
   import Timeline from "./timeline.svelte";
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
 
-  export let day: Moment | undefined = undefined;
-
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
-
-  // todo: refactor to remove this one
-  $: actualDay = day || $dateRange[0];
+  $: firstDayInRange = $dateRange[0]
 </script>
 
 <div class="controls">
   <TimelineControls />
-  <ResizeableBox
-    classNames="timeline-box"
-    let:startEdit
-  >
-    <UnscheduledTaskContainer day={actualDay} />
+  <ResizeableBox classNames="timeline-box" let:startEdit>
+    <UnscheduledTaskContainer day={firstDayInRange} />
     <ResizeHandle on:mousedown={startEdit} />
   </ResizeableBox>
 </div>
 <Scroller let:hovering={autoScrollBlocked}>
   <Ruler visibleHours={getVisibleHours($settings)} />
-  <Timeline day={actualDay} isUnderCursor={autoScrollBlocked} />
+  <Timeline day={firstDayInRange} isUnderCursor={autoScrollBlocked} />
 </Scroller>
 
 <style>
