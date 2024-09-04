@@ -39,6 +39,7 @@ export function useEditContext({
     baselineTasks,
     editOperation,
     cursorMinutes,
+    settings,
   });
 
   const { startEdit, confirmEdit, cancelEdit } = useEditActions({

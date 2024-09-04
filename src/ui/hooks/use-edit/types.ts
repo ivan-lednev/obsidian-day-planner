@@ -1,5 +1,6 @@
 import { Moment } from "moment";
 
+import { DayPlannerSettings } from "../../../settings";
 import type { Task } from "../../../types";
 
 export enum EditMode {
@@ -20,3 +21,10 @@ export interface EditOperation {
   mode: EditMode;
   day: Moment;
 }
+
+export type TaskTransformer = (
+  baseline: Task[],
+  editTarget: Task,
+  cursorTime: number,
+  settings?: DayPlannerSettings,
+) => Task[];

@@ -2,9 +2,10 @@ import { produce } from "immer";
 import { partition } from "lodash/fp";
 import { isNotVoid } from "typed-assert";
 
-import type { Task, DayToTasks } from "../../../../types";
+import { DayPlannerSettings } from "../../../../settings";
+import type { DayToTasks, Task } from "../../../../types";
 import { getDayKey, moveTaskToColumn } from "../../../../util/tasks-utils";
-import { EditMode, EditOperation } from "../types";
+import { EditMode, EditOperation, TaskTransformer } from "../types";
 
 import { create } from "./create";
 import { drag } from "./drag";
@@ -20,7 +21,7 @@ import {
   resizeFromTopAndShrinkOthers,
 } from "./resize-and-shrink-others";
 
-const transformers: Record<EditMode, typeof drag> = {
+const transformers: Record<EditMode, TaskTransformer> = {
   [EditMode.DRAG]: drag,
   [EditMode.DRAG_AND_SHIFT_OTHERS]: dragAndShiftOthers,
   [EditMode.CREATE]: create,
@@ -56,6 +57,7 @@ export function transform(
   baseline: DayToTasks,
   cursorMinutes: number,
   operation: EditOperation,
+  settings: DayPlannerSettings,
 ) {
   const destDay = getDestDay(operation);
   const destKey = getDayKey(destDay);
@@ -80,6 +82,7 @@ export function transform(
     withTimeSorted,
     operation.task,
     cursorMinutes,
+    settings,
   );
   const merged = [...readonly, ...transformed];
 

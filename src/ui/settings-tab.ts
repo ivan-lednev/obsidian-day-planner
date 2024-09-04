@@ -432,6 +432,19 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           }),
       );
 
+    new Setting(containerEl)
+      .setName("Minimal task duration")
+      .setDesc("Used when you create a task with drag-and-drop")
+      .addSlider((slider) =>
+        slider
+          .setLimits(5, 15, 5)
+          .setValue(Number(this.plugin.settings().minimalDurationMinutes))
+          .setDynamicTooltip()
+          .onChange((value: number) => {
+            this.update({ minimalDurationMinutes: value });
+          }),
+      );
+
     containerEl.createEl("h2", { text: "Color blocking" });
     containerEl.createEl("p", {
       text: `Define a background color for a block containing some text (it might be a tag, like '#important'). The first color is for light mode, the second is for dark mode.`,

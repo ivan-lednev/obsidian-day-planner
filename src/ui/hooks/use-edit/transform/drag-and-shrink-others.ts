@@ -1,15 +1,14 @@
 import { last } from "lodash";
 
+import { DayPlannerSettings } from "../../../../settings";
 import type { Task } from "../../../../types";
 import { getEndMinutes } from "../../../../util/task-utils";
-
-// todo: use constant from settings
-const minimalDurationMinutes = 10;
 
 export function dragAndShrinkOthers(
   baseline: Task[],
   editTarget: Task,
   cursorTime: number,
+  settings: DayPlannerSettings,
 ): Task[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
   const preceding = baseline.slice(0, index);
@@ -36,7 +35,7 @@ export function dragAndShrinkOthers(
           startMinutes: newCurrentStartMinutes,
           durationMinutes: Math.max(
             newCurrentDurationMinutes,
-            minimalDurationMinutes,
+            settings.minimalDurationMinutes,
           ),
         },
       ];
@@ -55,10 +54,10 @@ export function dragAndShrinkOthers(
       if (currentNeedsToShrink) {
         const currentNeedsToMove =
           nextInTimeline.startMinutes - current.startMinutes <
-          minimalDurationMinutes;
+          settings.minimalDurationMinutes;
 
         const newCurrentStartMinutes = currentNeedsToMove
-          ? nextInTimeline.startMinutes - minimalDurationMinutes
+          ? nextInTimeline.startMinutes - settings.minimalDurationMinutes
           : current.startMinutes;
 
         return [
