@@ -12,7 +12,6 @@
   import { settings } from "../../../global-store/settings";
   import type { ObsidianContext } from "../../../types";
   import ControlButton from "../control-button.svelte";
-  import GlobalHandlers from "../global-handlers.svelte";
   import ResizeHandle from "../resize-handle.svelte";
   import ResizeableBox from "../resizeable-box.svelte";
   import Ruler from "../ruler.svelte";
@@ -32,8 +31,6 @@
     }
   }
 </script>
-
-<GlobalHandlers />
 
 <div bind:this={weekHeaderRef} class="week-header">
   <div class="header-row day-buttons">

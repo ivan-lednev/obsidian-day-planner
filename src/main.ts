@@ -192,6 +192,14 @@ export default class DayPlanner extends Plugin {
       planEditor: this.planEditor,
     });
 
+    this.registerDomEvent(window, "blur", editContext.cancelEdit);
+    this.registerDomEvent(document, "pointerup", editContext.cancelEdit);
+    this.register(
+      editContext.cursor.subscribe(({ bodyCursor }) => {
+        document.body.style.cursor = bodyCursor;
+      }),
+    );
+
     const errorStore = writable<Error | undefined>();
 
     // todo: move out

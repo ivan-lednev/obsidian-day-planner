@@ -9,7 +9,6 @@
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
 
-  import GlobalHandlers from "./global-handlers.svelte";
   import ResizeHandle from "./resize-handle.svelte";
   import ResizeableBox from "./resizeable-box.svelte";
   import Ruler from "./ruler.svelte";
@@ -25,8 +24,6 @@
   // todo: refactor to remove this one
   $: actualDay = day || $dateRange[0];
 </script>
-
-<GlobalHandlers />
 
 <div class="controls">
   <TimelineControls />

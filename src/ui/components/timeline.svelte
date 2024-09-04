@@ -10,7 +10,6 @@
   import { ObsidianContext } from "../../types";
   import { getRenderKey } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
-  import { styledCursor } from "../actions/styled-cursor";
 
   import Column from "./column.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
@@ -29,14 +28,12 @@
   $: actualDay = day || $dateRange[0];
   $: ({
     displayedTasks,
-    cancelEdit,
     handleContainerMouseDown,
     handleResizerMouseDown,
     handleTaskMouseUp,
     handleGripMouseDown,
     handleMouseEnter,
     pointerOffsetY,
-    cursor,
   } = getEditHandlers(actualDay));
 
   let el: HTMLElement | undefined;
@@ -48,11 +45,6 @@
     pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings));
   }
 </script>
-
-<!--TODO: duplicate of <GlobalHandlers />-->
-<svelte:window on:blur={cancelEdit} />
-<svelte:body use:styledCursor={$cursor.bodyCursor} />
-<svelte:document on:pointerup={cancelEdit} />
 
 <Column visibleHours={getVisibleHours($settings)}>
   {#if $isToday(actualDay)}
@@ -82,7 +74,7 @@
           onFloatingUiPointerDown={updatePointerOffsetY}
           onGripMouseDown={handleGripMouseDown}
           onMouseUp={() => {
-              handleTaskMouseUp(task);
+            handleTaskMouseUp(task);
           }}
           onResizerMouseDown={handleResizerMouseDown}
           {task}
