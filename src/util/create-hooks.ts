@@ -122,7 +122,6 @@ export function createHooks({
         canHappenAfter(icalEvent, startOfEarliestDay),
       );
 
-      // todo: make it easier to understand
       return relevantIcalEvents.flatMap((icalEvent) => {
         return $visibleDays.map(
           (day) => () => icalEventToTasks(icalEvent, day),

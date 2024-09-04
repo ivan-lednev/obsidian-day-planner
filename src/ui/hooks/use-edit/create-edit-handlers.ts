@@ -54,7 +54,6 @@ export function createEditHandlers({
     await obsidianFacade.revealLineInFile(path, position?.start?.line);
   }
 
-  // todo: remove
   function handleGripMouseDown(task: Task, mode: EditMode) {
     startEdit({ task, mode, day });
   }

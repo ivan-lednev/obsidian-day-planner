@@ -1,3 +1,4 @@
+import { produce } from "immer";
 import { PluginSettingTab, Setting } from "obsidian";
 import type { Writable } from "svelte/store";
 
@@ -151,16 +152,12 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName(`Calendar ${index + 1}`)
         .addColorPicker((el) =>
-          // todo: replace with immer
           el.setValue(ical.color).onChange((value: string) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              icals: previous.icals.map((editedIcal, editedIndex) =>
-                editedIndex === index
-                  ? { ...editedIcal, color: value }
-                  : editedIcal,
-              ),
-            }));
+            this.settingsStore.update(
+              produce((draft) => {
+                draft.icals[index].color = value;
+              }),
+            );
           }),
         )
         .addText((el) =>
@@ -168,14 +165,11 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             .setPlaceholder("Displayed name")
             .setValue(ical.name)
             .onChange((value: string) => {
-              this.settingsStore.update((previous) => ({
-                ...previous,
-                icals: previous.icals.map((editedIcal, editedIndex) =>
-                  editedIndex === index
-                    ? { ...editedIcal, name: value }
-                    : editedIcal,
-                ),
-              }));
+              this.settingsStore.update(
+                produce((draft) => {
+                  draft.icals[index].name = value;
+                }),
+              );
             }),
         )
         .addText((el) =>
@@ -183,14 +177,11 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             .setPlaceholder("URL")
             .setValue(ical.url)
             .onChange((value: string) => {
-              this.settingsStore.update((previous) => ({
-                ...previous,
-                icals: previous.icals.map((editedIcal, editedIndex) =>
-                  editedIndex === index
-                    ? { ...editedIcal, url: value }
-                    : editedIcal,
-                ),
-              }));
+              this.settingsStore.update(
+                produce((draft) => {
+                  draft.icals[index].url = value;
+                }),
+              );
             }),
         )
         .addExtraButton((el) =>
@@ -454,31 +445,21 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName(`Color ${index + 1}`)
         .addColorPicker((el) =>
-          // todo: replace with immer
           el.setValue(colorOverride.color).onChange((value: string) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              colorOverrides: previous.colorOverrides.map(
-                (editedOverride, editedIndex) =>
-                  editedIndex === index
-                    ? { ...editedOverride, color: value }
-                    : editedOverride,
-              ),
-            }));
+            this.settingsStore.update(
+              produce((draft) => {
+                draft.colorOverrides[index].color = value;
+              }),
+            );
           }),
         )
         .addColorPicker((el) =>
-          // todo: replace with immer
           el.setValue(colorOverride.darkModeColor).onChange((value: string) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              colorOverrides: previous.colorOverrides.map(
-                (editedOverride, editedIndex) =>
-                  editedIndex === index
-                    ? { ...editedOverride, darkModeColor: value }
-                    : editedOverride,
-              ),
-            }));
+            this.settingsStore.update(
+              produce((draft) => {
+                draft.colorOverrides[index].darkModeColor = value;
+              }),
+            );
           }),
         )
         .addText((el) =>

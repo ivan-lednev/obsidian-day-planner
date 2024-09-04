@@ -38,7 +38,6 @@ export function icalEventToTasks(
   day: Moment,
 ) {
   if (icalEvent.rrule) {
-    // todo: don't clone and modify them every single time
     const startOfDay = day.clone().startOf("day").toDate();
     const endOfDay = day.clone().endOf("day").toDate();
 
@@ -58,7 +57,6 @@ export function icalEventToTasks(
     return [...recurrences, ...recurrenceOverrides];
   }
 
-  // todo: do this once
   const eventStart = window.moment(icalEvent.start);
   const startsOnVisibleDay = day.isSame(eventStart, "day");
 
