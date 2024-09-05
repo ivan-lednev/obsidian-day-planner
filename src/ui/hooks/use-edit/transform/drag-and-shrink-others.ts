@@ -19,7 +19,7 @@ export function dragAndShrinkOthers(
     startMinutes: cursorTime,
   };
 
-  const updatedFollowing = following.reduce((result, current) => {
+  const updatedFollowing = following.reduce<Task[]>((result, current) => {
     const previous = last(result) || updated;
     const currentNeedsToShrink = getEndMinutes(previous) > current.startMinutes;
 
@@ -46,7 +46,7 @@ export function dragAndShrinkOthers(
 
   const updatedPreceding = preceding
     .reverse()
-    .reduce((result, current) => {
+    .reduce<Task[]>((result, current) => {
       const nextInTimeline = last(result) || updated;
       const currentNeedsToShrink =
         nextInTimeline.startMinutes < getEndMinutes(current);

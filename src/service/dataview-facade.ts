@@ -5,19 +5,11 @@ export class DataviewFacade {
   constructor(private readonly app: App) {}
 
   getAllTasksFrom = (source: string) => {
-    if (!getAPI(this.app)) {
-      return [];
-    }
-
-    return getAPI(this.app).pages(source).file.tasks.array();
+    return getAPI(this.app)?.pages(source).file.tasks.array() || [];
   };
 
   getAllListsFrom = (source: string) => {
-    if (!getAPI(this.app)) {
-      return [];
-    }
-
-    return getAPI(this.app).pages(source).file.lists.array();
+    return getAPI(this.app)?.pages(source).file.lists.array() || [];
   };
 
   getTaskFromCaretLocation({ path, line }: { path: string; line: number }) {
@@ -27,6 +19,6 @@ export class DataviewFacade {
   }
 
   private getTasksFromPath = (path: string): STask[] => {
-    return getAPI(this.app)?.page(path)?.file?.tasks;
+    return getAPI(this.app)?.page(path)?.file.tasks || [];
   };
 }

@@ -17,7 +17,7 @@ export function dragAndShiftOthers(
     startMinutes: cursorTime,
   };
 
-  const updatedFollowing = following.reduce((result, current) => {
+  const updatedFollowing = following.reduce<Task[]>((result, current) => {
     const previous = last(result) || updated;
 
     if (getEndMinutes(previous) > current.startMinutes) {
@@ -35,7 +35,7 @@ export function dragAndShiftOthers(
 
   const updatedPreceding = preceding
     .reverse()
-    .reduce((result, current) => {
+    .reduce<Task[]>((result, current) => {
       const nextInTimeline = last(result) || updated;
 
       if (nextInTimeline.startMinutes < getEndMinutes(current)) {

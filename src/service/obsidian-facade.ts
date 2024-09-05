@@ -78,6 +78,10 @@ export class ObsidianFacade {
 
     const editor = await this.openFileInEditor(file);
 
+    if (!editor) {
+      return;
+    }
+
     this.app.workspace
       .getActiveViewOfType(MarkdownView)
       ?.setEphemeralState({ line });

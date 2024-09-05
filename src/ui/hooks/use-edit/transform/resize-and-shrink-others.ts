@@ -24,7 +24,7 @@ export function resizeAndShrinkOthers(
     durationMinutes,
   };
 
-  const updatedFollowing = following.reduce((result, current) => {
+  const updatedFollowing = following.reduce<Task[]>((result, current) => {
     const previous = last(result) || updated;
     const currentNeedsToShrink = getEndMinutes(previous) > current.startMinutes;
 
@@ -75,7 +75,7 @@ export function resizeFromTopAndShrinkOthers(
 
   const updatedPreceding = preceding
     .reverse()
-    .reduce((result, current) => {
+    .reduce<Task[]>((result, current) => {
       const nextInTimeline = last(result) || updated;
       const currentNeedsToShrink =
         nextInTimeline.startMinutes < getEndMinutes(current);

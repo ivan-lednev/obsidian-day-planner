@@ -69,7 +69,7 @@ export function copy(task: Task): Task {
     ...task,
     id: getId(),
     isGhost: true,
-    location: { ...task.location },
+    location: task.location && { ...task.location },
   };
 }
 

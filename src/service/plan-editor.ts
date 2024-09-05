@@ -17,17 +17,6 @@ export class PlanEditor {
     private readonly obsidianFacade: ObsidianFacade,
   ) {}
 
-  // todo: rework to ensure files for dates
-  private async ensureFilesForTasks(tasks: Task[]) {
-    return Promise.all(
-      tasks.map(async (task) => {
-        const { path } = await createDailyNoteIfNeeded(task.startTime);
-
-        return { ...task, location: { ...task.location, path } };
-      }),
-    );
-  }
-
   // todo: all except this can be re-written to use mdast
   syncTasksWithFile = async ({
     updated,
@@ -51,13 +40,15 @@ export class PlanEditor {
       // only one at a time is supported
       const movedTask = moved[0];
 
-      await this.obsidianFacade.editFile(
-        movedTask.task.location.path,
-        (contents) => {
-          // @ts-ignore
-          return this.removeTaskFromFileContents(movedTask.task, contents);
-        },
-      );
+      if (movedTask.task.location) {
+        await this.obsidianFacade.editFile(
+          movedTask.task.location.path,
+          (contents) => {
+            // @ts-ignore
+            return this.removeTaskFromFileContents(movedTask.task, contents);
+          },
+        );
+      }
 
       const withNewDates = moved.map(({ dayKey, task }) => {
         const parsedDay: Moment = window.moment(dayKey);
@@ -90,7 +81,7 @@ export class PlanEditor {
     }
 
     const pathToEditedTasksLookup = groupBy(
-      (task) => task.location.path,
+      (task) => task.location?.path,
       updated,
     );
 
@@ -106,6 +97,25 @@ export class PlanEditor {
 
     return Promise.all(editPromises);
   };
+
+  createPlannerHeading() {
+    const { plannerHeading, plannerHeadingLevel } = this.settings();
+
+    const headingTokens = "#".repeat(plannerHeadingLevel);
+
+    return `${headingTokens} ${plannerHeading}`;
+  }
+
+  // todo: rework to ensure files for dates
+  private async ensureFilesForTasks(tasks: Task[]) {
+    return Promise.all(
+      tasks.map(async (task) => {
+        const { path } = await createDailyNoteIfNeeded(task.startTime);
+
+        return { ...task, location: { ...task.location, path } };
+      }),
+    );
+  }
 
   private writeTaskToFileContents(task: Task, contents: string, path: string) {
     // todo: we can use dataview
@@ -125,17 +135,12 @@ export class PlanEditor {
   private removeTaskFromFileContents(task: Task, contents: string) {
     const newContents = contents.split("\n");
     const taskLinesCount = task.text.split("\n").length - 1;
-    newContents.splice(task.location.position.start.line, taskLinesCount);
+
+    if (task.location?.position) {
+      newContents.splice(task.location.position.start.line, taskLinesCount);
+    }
 
     return newContents.join("\n");
-  }
-
-  createPlannerHeading() {
-    const { plannerHeading, plannerHeadingLevel } = this.settings();
-
-    const headingTokens = "#".repeat(plannerHeadingLevel);
-
-    return `${headingTokens} ${plannerHeading}`;
   }
 
   private updateTaskInFileContents(contents: string, task: Task) {
@@ -168,7 +173,7 @@ export class PlanEditor {
       this.settings().plannerHeading,
     );
 
-    if (planListItems?.length > 0) {
+    if (planListItems && planListItems?.length > 0) {
       const lastListItem = planListItems[planListItems.length - 1];
 
       return [lastListItem.position.start.line, contents];

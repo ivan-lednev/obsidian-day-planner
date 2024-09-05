@@ -22,6 +22,7 @@ export function createMemo<PropsType>(
 
   function shouldUpdate(newProps: PropsType) {
     for (const [propKey, propValue] of Object.entries(
+      // @ts-ignore
       newProps,
     ) as Entries<PropsType>) {
       const previousValue = previousProps[propKey];
