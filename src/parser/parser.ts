@@ -54,7 +54,7 @@ export function getHeadingByText(metadata: CachedMetadata, text: string) {
 export function getTimeFromSTask({ line, day }: { line: string; day: Moment }) {
   const match = timestampRegExp.exec(line.trim());
 
-  if (!match) {
+  if (!match?.groups) {
     return null;
   }
 

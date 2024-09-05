@@ -1,6 +1,7 @@
 import { Moment } from "moment/moment";
 import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { DataArray, DateTime, STask } from "obsidian-dataview";
+import { isNotVoid } from "typed-assert";
 
 import {
   defaultDayFormat,
@@ -64,10 +65,17 @@ export function toUnscheduledTask(sTask: STask, day: Moment) {
 }
 
 export function toTask(sTask: STask, day: Moment): Task {
-  const { startTime, durationMinutes } = getTimeFromSTask({
+  const parsedTime = getTimeFromSTask({
     line: sTask.text,
     day,
   });
+
+  isNotVoid(
+    parsedTime,
+    `Unexpectedly received an STask without a timestamp: ${sTask.text}`,
+  );
+
+  const { startTime, durationMinutes } = parsedTime;
 
   return {
     startTime,

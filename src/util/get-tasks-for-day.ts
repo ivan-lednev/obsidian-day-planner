@@ -49,7 +49,10 @@ export function mapToTasksForDay(
 ) {
   const [withTime, withoutTime] = partition(isTimeSetOnTask, tasksForDay);
 
-  const { parsed: tasksWithTime, errors } = withTime.reduce(
+  const { parsed: tasksWithTime, errors } = withTime.reduce<{
+    parsed: Task[];
+    errors: unknown[];
+  }>(
     (result, sTask) => {
       // todo: remove once proper handling is in place
       try {

@@ -2,7 +2,6 @@ import { isEmpty } from "lodash/fp";
 import type { Moment } from "moment";
 import { get } from "svelte/store";
 
-import { defaultDurationMinutes } from "../constants";
 import { settings } from "../global-store/settings";
 import {
   checkboxRegExp,
@@ -12,6 +11,7 @@ import {
   shortScheduledPropRegExp,
   timestampRegExp,
 } from "../regexp";
+import { DayPlannerSettings } from "../settings";
 import { Task, UnscheduledTask } from "../types";
 
 import { getListTokens } from "./dataview";
@@ -141,16 +141,16 @@ export function offsetYToMinutes(
 export function createTask(
   day: Moment,
   startMinutes: number,
-  status: string,
+  settings: DayPlannerSettings,
 ): Task {
   return {
     id: getId(),
     startMinutes,
-    durationMinutes: defaultDurationMinutes,
+    durationMinutes: settings.defaultDurationMinutes,
     text: "New item",
     startTime: minutesToMomentOfDay(startMinutes, day),
     symbol: "-",
-    status,
+    status: settings.taskStatusOnCreation,
     placing: {
       widthPercent: 100,
       xOffsetPercent: 0,
@@ -169,7 +169,7 @@ export function getLinesAfterFirst(text: string) {
 export function removeTimestamp(text: string) {
   const match = timestampRegExp.exec(text.trim());
 
-  if (!match) {
+  if (!match?.groups) {
     return text;
   }
 
