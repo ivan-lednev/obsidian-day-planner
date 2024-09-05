@@ -2,7 +2,10 @@ export function isTouchEvent(event: PointerEvent) {
   return ["pen", "touch"].includes(event.pointerType);
 }
 
-export function isEventRelated(event: PointerEvent, otherNode?: HTMLElement) {
+export function isEventRelated(
+  event: PointerEvent,
+  otherNode: HTMLElement | null,
+) {
   if (!otherNode) {
     return false;
   }
@@ -15,7 +18,14 @@ export function isEventRelated(event: PointerEvent, otherNode?: HTMLElement) {
   );
 }
 
-export function isTapOutside(event: PointerEvent, container: HTMLElement) {
+export function isTapOutside(
+  event: PointerEvent,
+  container: HTMLElement | null,
+) {
+  if (!container) {
+    return false;
+  }
+
   return (
     isTouchEvent(event) &&
     event.target !== container &&

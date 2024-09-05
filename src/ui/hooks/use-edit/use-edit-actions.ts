@@ -8,7 +8,7 @@ import { EditOperation } from "./types";
 
 interface UseEditActionsProps {
   baselineTasks: Writable<DayToTasks>;
-  editOperation: Writable<EditOperation>;
+  editOperation: Writable<EditOperation | undefined>;
   displayedTasks: Readable<DayToTasks>;
   onUpdate: OnUpdateFn;
 }

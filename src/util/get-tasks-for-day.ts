@@ -56,7 +56,7 @@ export function mapToTasksForDay(
     (result, sTask) => {
       // todo: remove once proper handling is in place
       try {
-        const task = toTask(sTask, day);
+        const task = toTask(sTask, day, settings);
 
         result.parsed.push(task);
       } catch (error) {

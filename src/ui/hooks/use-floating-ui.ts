@@ -5,10 +5,11 @@ import {
 } from "@floating-ui/dom";
 import type { SvelteComponentTyped } from "svelte";
 import { writable } from "svelte/store";
+import { isNotVoid } from "typed-assert";
 
 import { isEventRelated, isTapOutside, isTouchEvent } from "../../util/util";
 
-export interface FloatingUiOptions<Props> {
+export interface FloatingUiOptions<Props extends Record<string, unknown>> {
   when: boolean;
   Component: typeof SvelteComponentTyped<Props>;
   props: Props;
@@ -64,14 +65,18 @@ export function useFloatingUi(options: Partial<ComputePositionConfig>) {
   function floatingUiSetup(el: HTMLElement) {
     floatingUi = el;
 
-    if (!anchor) {
-      throw new Error(
-        "Cannot initialize floating UI before obtaining a reference to anchor.",
-      );
-    }
+    isNotVoid(
+      anchor,
+      "Cannot initialize floating UI before obtaining a reference to anchor.",
+    );
 
     const cleanUpAutoUpdate = autoUpdate(anchor, floatingUi, () => {
+      isNotVoid(anchor);
+      isNotVoid(floatingUi);
+
       computePosition(anchor, floatingUi, options).then(({ x, y }) => {
+        isNotVoid(floatingUi);
+
         Object.assign(floatingUi.style, {
           left: `${x}px`,
           top: `${y}px`,

@@ -11,6 +11,7 @@ import {
 } from "../constants";
 import { getTimeFromSTask } from "../parser/parser";
 import { timeFromStartRegExp } from "../regexp";
+import { DayPlannerSettings } from "../settings";
 import { Task, TaskTokens } from "../types";
 
 import { ClockMoments, toTime } from "./clock";
@@ -64,7 +65,11 @@ export function toUnscheduledTask(sTask: STask, day: Moment) {
   };
 }
 
-export function toTask(sTask: STask, day: Moment): Task {
+export function toTask(
+  sTask: STask,
+  day: Moment,
+  settings: DayPlannerSettings,
+): Task {
   const parsedTime = getTimeFromSTask({
     line: sTask.text,
     day,
@@ -75,7 +80,8 @@ export function toTask(sTask: STask, day: Moment): Task {
     `Unexpectedly received an STask without a timestamp: ${sTask.text}`,
   );
 
-  const { startTime, durationMinutes } = parsedTime;
+  const { startTime, durationMinutes = settings.defaultDurationMinutes } =
+    parsedTime;
 
   return {
     startTime,
@@ -83,7 +89,6 @@ export function toTask(sTask: STask, day: Moment): Task {
     status: sTask.status,
     text: toString(sTask),
     durationMinutes,
-    // todo: delete
     startMinutes: getMinutesSinceMidnight(startTime),
     location: {
       path: sTask.path,

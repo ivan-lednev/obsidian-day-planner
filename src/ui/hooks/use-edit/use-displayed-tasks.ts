@@ -7,7 +7,7 @@ import { transform } from "./transform/transform";
 import { EditOperation } from "./types";
 
 export interface UseDisplayedTasksProps {
-  editOperation: Readable<EditOperation>;
+  editOperation: Readable<EditOperation | undefined>;
   cursorMinutes: Readable<number>;
   baselineTasks: Readable<DayToTasks>;
   settings: Readable<DayPlannerSettings>;

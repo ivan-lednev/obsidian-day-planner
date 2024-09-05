@@ -9,8 +9,8 @@ import TimelineWithControls from "./components/timeline-with-controls.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
 
 export default class TimelineView extends ItemView {
-  private timeline: TimelineWithControls;
-  private dateRange: DateRange;
+  private timeline?: TimelineWithControls;
+  private dateRange?: DateRange;
 
   constructor(
     leaf: WorkspaceLeaf,
@@ -38,9 +38,13 @@ export default class TimelineView extends ItemView {
 
     this.dateRange = this.dateRanges.trackRange([window.moment()]);
     this.registerEvent(
-      this.app.workspace.on("active-leaf-change", (leaf) =>
-        handleActiveLeafChange(leaf, this.dateRange),
-      ),
+      this.app.workspace.on("active-leaf-change", (leaf) => {
+        if (!this.dateRange) {
+          return;
+        }
+
+        handleActiveLeafChange(leaf, this.dateRange);
+      }),
     );
 
     const context = new Map([
@@ -55,7 +59,7 @@ export default class TimelineView extends ItemView {
   }
 
   async onClose() {
-    this.dateRange.untrack();
+    this.dateRange?.untrack();
     this.timeline?.$destroy();
   }
 }

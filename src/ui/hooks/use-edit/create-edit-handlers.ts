@@ -15,7 +15,7 @@ export interface UseEditHandlersProps {
   day: Moment;
   obsidianFacade: ObsidianFacade;
   cursorMinutes: Readable<number>;
-  editOperation: Writable<EditOperation>;
+  editOperation: Writable<EditOperation | undefined>;
   settings: Readable<DayPlannerSettings>;
 }
 
@@ -42,7 +42,7 @@ export function createEditHandlers({
   }
 
   async function handleTaskMouseUp(task: UnscheduledTask) {
-    if (get(editOperation)) {
+    if (get(editOperation) || !task.location) {
       return;
     }
 
