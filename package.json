@@ -8,7 +8,7 @@
     "build": "node esbuild.config.mjs production",
     "format": "eslint --fix src && stylelint --fix src/**/*.svelte && prettier --write src",
     "lint": "prettier --check src && eslint src && stylelint src/**/*.svelte && npm run typescript && svelte-check src/ --tsconfig ./tsconfig-pre-commit.json",
-    "typescript": "tsc --noEmit --project ./tsconfig-pre-commit.json",
+    "typescript": "tsc --noEmit",
     "test": "jest src/",
     "test:coverage": "jest src/ --collectCoverage",
     "prepare": "husky install",
