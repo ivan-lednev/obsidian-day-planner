@@ -5,7 +5,7 @@ import {
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
 
-import { Diff, Task, DayToTasks, TasksForDay, UnscheduledTask } from "../types";
+import { DayToTasks, Diff, Task, TasksForDay } from "../types";
 
 import {
   isEqualTask,
@@ -22,10 +22,7 @@ export function getTasksWithTime(tasks: DayToTasks) {
 }
 
 export function getFlatTasks(tasks: DayToTasks) {
-  return Object.values(tasks).flatMap(({ withTime, noTime }) => [
-    ...withTime,
-    ...noTime,
-  ]);
+  return Object.values(tasks).flatMap(({ withTime }) => withTime);
 }
 
 export function removeTask(task: Task, tasks: TasksForDay) {
@@ -123,7 +120,7 @@ function getPristine(flatBaseline: Task[], flatNext: Task[]) {
   );
 }
 
-function getCreatedTasks(base: UnscheduledTask[], next: UnscheduledTask[]) {
+function getCreatedTasks(base: Task[], next: Task[]) {
   return differenceBy((task) => task.id, next, base);
 }
 

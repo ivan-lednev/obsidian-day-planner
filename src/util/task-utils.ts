@@ -12,7 +12,7 @@ import {
   shortScheduledPropRegExp,
   timestampRegExp,
 } from "../regexp";
-import { Task } from "../types";
+import { Task, UnscheduledTask } from "../types";
 
 import { getListTokens } from "./dataview";
 import { getId } from "./id";
@@ -40,10 +40,22 @@ export function getEndTime(task: {
   return task.startTime.clone().add(task.durationMinutes, "minutes");
 }
 
-export function getRenderKey(task: Task) {
-  return `${task.startMinutes} ${getEndMinutes(task)} ${task.text} ${
-    task.isGhost ?? ""
-  }`;
+function isScheduled(task: UnscheduledTask): task is Task {
+  return Object.hasOwn(task, "startMinutes");
+}
+
+function getUnscheduledTaskRenderKey(task: UnscheduledTask) {
+  return `${task.text} ${task.isGhost ?? ""}`;
+}
+
+export function getRenderKey(task: Task | UnscheduledTask) {
+  if (isScheduled(task)) {
+    return `${task.startMinutes} ${getEndMinutes(
+      task,
+    )} ${getUnscheduledTaskRenderKey(task)}`;
+  }
+
+  return getUnscheduledTaskRenderKey(task);
 }
 
 export function getNotificationKey(task: Task) {

@@ -9,9 +9,9 @@ function getAllDailyNotesSafely() {
   } catch (error) {
     console.error(error);
 
-    new Notice(
-      `Could not read daily notes. Reason: ${error?.message || error}`,
-    );
+    const errorMessage = error instanceof Error ? error.message : error;
+
+    new Notice(`Could not read daily notes. Reason: ${errorMessage}`);
 
     return {};
   }
