@@ -20,7 +20,7 @@
   export let isUnderCursor = false;
 
   const {
-    editContext: { confirmEdit, getEditHandlers },
+    editContext: { confirmEdit, getEditHandlers, pointerOffsetY },
   } = getContext<ObsidianContext>(obsidianContext);
 
   $: ({
@@ -30,7 +30,6 @@
     handleTaskMouseUp,
     handleGripMouseDown,
     handleMouseEnter,
-    pointerOffsetY,
   } = getEditHandlers(day));
 
   let el: HTMLElement | undefined;

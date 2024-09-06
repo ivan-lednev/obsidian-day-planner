@@ -36,11 +36,10 @@ export function setUp({
   settings = defaultSettingsForTests,
 } = {}) {
   const props = createProps({ tasks, settings });
-  const { getEditHandlers, displayedTasks, confirmEdit } =
+  const { getEditHandlers, displayedTasks, confirmEdit, pointerOffsetY } =
     useEditContext(props);
 
   const todayControls = getEditHandlers(day);
-  const { pointerOffsetY } = todayControls;
   const nextDayControls = getEditHandlers(nextDay);
 
   // this prevents the store from resetting;

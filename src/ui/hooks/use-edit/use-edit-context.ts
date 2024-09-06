@@ -61,16 +61,13 @@ export function useEditContext({
 
     return {
       ...handlers,
-      cursor,
-      cancelEdit,
-      pointerOffsetY,
       displayedTasks: useDisplayedTasksForDay(displayedTasks, day),
     };
   }
 
-  // todo: return stuff only once
   return {
     cursor,
+    pointerOffsetY,
     displayedTasks,
     confirmEdit,
     cancelEdit,
