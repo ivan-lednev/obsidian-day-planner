@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { isNotVoid } from "typed-assert";
   export let classNames: string | undefined = "";
 
   let el: HTMLDivElement | undefined;
@@ -30,6 +31,8 @@
     if (!editingHeight) {
       return;
     }
+
+    isNotVoid(el);
 
     const viewportToElOffsetY = el.getBoundingClientRect().top;
 

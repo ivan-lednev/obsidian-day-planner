@@ -8,7 +8,6 @@
   import { getContext } from "svelte";
   import { Writable } from "svelte/store";
 
-
   import { dateRangeContextKey } from "../../../constants";
   import { settings } from "../../../global-store/settings";
   import { getDaysOfCurrentWeek, getDaysOfWeek } from "../../../util/moment";
@@ -19,7 +18,7 @@
 
   $: firstDayOfShownWeek = $dateRange[0];
   $: startOfRange = firstDayOfShownWeek.format("MMM, D");
-  $: endOfRange = $dateRange.at(-1).format("MMM, D");
+  $: endOfRange = $dateRange.at(-1)?.format("MMM, D") ?? "N/A";
 
   function handleShowPrevious() {
     const firstDayOfPreviousWeek = firstDayOfShownWeek

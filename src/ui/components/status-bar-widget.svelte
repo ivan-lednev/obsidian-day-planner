@@ -7,7 +7,7 @@
 
   export let onClick: () => Promise<void>;
   export let tasksForToday: Readable<TasksForDay>;
-  export let errorStore: Readable<Error>;
+  export let errorStore: Readable<Error | undefined>;
 
   const statusBarProps = useStatusBarWidget({ tasksForToday });
 

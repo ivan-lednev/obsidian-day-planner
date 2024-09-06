@@ -6,8 +6,8 @@
   export let use: ActionArray = [];
   export let onPointerLeave: (event: PointerEvent) => void;
   export let onTapOutside: (event: PointerEvent) => void;
-  export let onPointerDown: (event: PointerEvent) => void | undefined =
-    undefined;
+  export let onPointerDown: (event: PointerEvent) => void =
+    () => {};
 </script>
 
 <svelte:body on:pointerdown={onTapOutside} />

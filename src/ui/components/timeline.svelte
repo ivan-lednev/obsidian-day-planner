@@ -1,21 +1,22 @@
 <script lang="ts">
   import { Moment } from "moment";
   import { getContext } from "svelte";
-  
-import { obsidianContext } from "../../constants";
+
+  import { obsidianContext } from "../../constants";
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import { ObsidianContext } from "../../types";
   import { getRenderKey } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
+  import { isNotVoid } from "typed-assert";
 
   import Column from "./column.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Needle from "./needle.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
 
-  export let day: Moment | undefined = undefined;
+  export let day: Moment;
   export let isUnderCursor = false;
 
   const {
@@ -35,6 +36,8 @@ import { obsidianContext } from "../../constants";
   let el: HTMLElement | undefined;
 
   function updatePointerOffsetY(event: PointerEvent) {
+    isNotVoid(el);
+
     const viewportToElOffsetY = el.getBoundingClientRect().top;
     const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
 

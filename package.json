@@ -7,7 +7,7 @@
     "dev": "node esbuild.config.mjs",
     "build": "node esbuild.config.mjs production",
     "format": "eslint --fix src && stylelint --fix src/**/*.svelte && prettier --write src",
-    "lint": "prettier --check src && eslint src && stylelint src/**/*.svelte && npm run typescript && svelte-check src/ --tsconfig ./tsconfig-pre-commit.json",
+    "lint": "prettier --check src && eslint src && stylelint src/**/*.svelte && npm run typescript && svelte-check src/",
     "typescript": "tsc --noEmit",
     "test": "jest src/",
     "test:coverage": "jest src/ --collectCoverage",
