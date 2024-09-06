@@ -3,10 +3,10 @@
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../constants";
-  import { ObsidianContext, Task } from "../../types";
+  import type { ObsidianContext, Task } from "../../types";
   import { copy } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
-  import { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
+  import type { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
   import { EditMode } from "../hooks/use-edit/types";
   import { useFloatingUi } from "../hooks/use-floating-ui";
 

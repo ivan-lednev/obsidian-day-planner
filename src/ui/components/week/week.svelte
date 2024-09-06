@@ -1,12 +1,9 @@
 <script lang="ts">
-  import { Moment } from "moment";
+  import type { Moment } from "moment";
   import { getContext } from "svelte";
-  import { Writable } from "svelte/store";
+  import type { Writable } from "svelte/store";
 
-  import {
-    dateRangeContextKey,
-    obsidianContext,
-  } from "../../../constants";
+  import { dateRangeContextKey, obsidianContext } from "../../../constants";
   import { isToday } from "../../../global-store/current-time";
   import { getVisibleHours } from "../../../global-store/derived-settings";
   import { settings } from "../../../global-store/settings";
@@ -48,10 +45,7 @@
     {/each}
   </div>
 
-  <ResizeableBox
-    classNames="header-row"
-    let:startEdit
-  >
+  <ResizeableBox classNames="header-row" let:startEdit>
     <div class="corner"></div>
     {#each $dateRange as day}
       <div class="header-cell">

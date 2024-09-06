@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Task, WithIcalConfig } from "../../types";
+  import type { Task, WithIcalConfig } from "../../types";
 
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
 

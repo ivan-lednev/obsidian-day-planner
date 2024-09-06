@@ -13,9 +13,9 @@
     RefreshCw,
     RefreshCwOff,
   } from "lucide-svelte";
-  import { Moment } from "moment";
+  import type { Moment } from "moment";
   import { getContext } from "svelte";
-  import { Writable } from "svelte/store";
+  import type { Writable } from "svelte/store";
 
   import { dateRangeContextKey, obsidianContext } from "../../constants";
   import { isToday } from "../../global-store/current-time";

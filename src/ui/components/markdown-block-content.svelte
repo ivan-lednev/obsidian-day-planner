@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { UnscheduledTask } from "../../types";
+  import type { UnscheduledTask } from "../../types";
   import { hoverPreview } from "../actions/hover-preview";
 
-  export let task: UnscheduledTask
+  export let task: UnscheduledTask;
 </script>
 
 <div class="markdown-block-content" use:hoverPreview={task}>

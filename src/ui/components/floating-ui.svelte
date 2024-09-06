@@ -1,13 +1,13 @@
 <script lang="ts">
   import { portal } from "svelte-portal";
 
-  import { ActionArray, useActions } from "../actions/use-actions";
+  import type { ActionArray } from "../actions/use-actions";
+  import { useActions } from "../actions/use-actions";
 
   export let use: ActionArray = [];
   export let onPointerLeave: (event: PointerEvent) => void;
   export let onTapOutside: (event: PointerEvent) => void;
-  export let onPointerDown: (event: PointerEvent) => void =
-    () => {};
+  export let onPointerDown: (event: PointerEvent) => void = () => {};
 </script>
 
 <svelte:body on:pointerdown={onTapOutside} />

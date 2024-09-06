@@ -1,7 +1,8 @@
-import { Moment } from "moment";
+import type { Moment } from "moment";
 import { Notice } from "obsidian";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
-import { derived, Readable } from "svelte/store";
+import type { Readable } from "svelte/store";
+import { derived } from "svelte/store";
 
 function getAllDailyNotesSafely() {
   try {

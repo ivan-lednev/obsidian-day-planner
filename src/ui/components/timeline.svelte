@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Moment } from "moment";
+  import type { Moment } from "moment";
   import { getContext } from "svelte";
   import { isNotVoid } from "typed-assert";
 
@@ -7,7 +7,7 @@
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
-  import { ObsidianContext } from "../../types";
+  import type { ObsidianContext } from "../../types";
   import { getRenderKey } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
 

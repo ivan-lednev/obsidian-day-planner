@@ -3,9 +3,9 @@
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../constants";
-  import { ObsidianContext, UnscheduledTask } from "../../types";
+  import type { ObsidianContext, UnscheduledTask } from "../../types";
   import { isTouchEvent } from "../../util/util";
-  import { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
+  import type { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
   import { useFloatingUi } from "../hooks/use-floating-ui";
 
   import DragControls from "./drag-controls.svelte";

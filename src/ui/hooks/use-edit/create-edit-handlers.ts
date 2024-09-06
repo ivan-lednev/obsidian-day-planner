@@ -1,13 +1,15 @@
-import { Moment } from "moment/moment";
+import type { Moment } from "moment/moment";
 import { getDateFromPath } from "obsidian-daily-notes-interface";
-import { get, Readable, Writable } from "svelte/store";
+import type { Readable, Writable } from "svelte/store";
+import { get } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
-import { DayPlannerSettings } from "../../../settings";
-import { Task, UnscheduledTask } from "../../../types";
+import type { DayPlannerSettings } from "../../../settings";
+import type { Task, UnscheduledTask } from "../../../types";
 import { createTask } from "../../../util/task-utils";
 
-import { EditMode, EditOperation } from "./types";
+import type { EditOperation } from "./types";
+import { EditMode } from "./types";
 
 export interface UseEditHandlersProps {
   startEdit: (operation: EditOperation) => void;

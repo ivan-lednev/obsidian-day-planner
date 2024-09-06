@@ -3,12 +3,7 @@
   export let label: string;
 </script>
 
-<div
-  style:cursor
-  class="clickable-icon"
-  aria-label={label}
-  on:pointerdown
->
+<div style:cursor class="clickable-icon" aria-label={label} on:pointerdown>
   <slot />
 </div>
 

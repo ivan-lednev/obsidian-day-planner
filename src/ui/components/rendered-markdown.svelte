@@ -40,8 +40,7 @@
 
   .rendered-markdown :global(p),
   .rendered-markdown :global(ul) {
-    margin-block-start: 0;
-    margin-block-end: 0;
+    margin-block: 0;
   }
 
   .rendered-markdown :global(ul),

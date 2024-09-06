@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { UnscheduledTask } from "../../types";
+  import type { UnscheduledTask } from "../../types";
   import { tappable } from "../actions/tappable";
-  import { ActionArray, useActions } from "../actions/use-actions";
+  import type { ActionArray } from "../actions/use-actions";
+  import { useActions } from "../actions/use-actions";
   import { useColorOverride } from "../hooks/use-color-override";
 
   export let task: UnscheduledTask;

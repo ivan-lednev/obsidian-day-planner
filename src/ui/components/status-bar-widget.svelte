@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { Readable } from "svelte/store";
+  import type { Readable } from "svelte/store";
 
   import { settings } from "../../global-store/settings";
-  import { TasksForDay } from "../../types";
+  import type { TasksForDay } from "../../types";
   import { useStatusBarWidget } from "../hooks/use-status-bar-widget";
 
   export let onClick: () => Promise<void>;

@@ -20,9 +20,8 @@
   .clickable-icon {
     grid-column-start: var(--grid-column-start, auto);
     flex-basis: var(--flex-basis, var(--input-height));
-    align-self: var(--align-self, center);
+    place-self: var(--align-self, center) var(--justify-self, auto);
     justify-content: var(--justify-content, center);
-    justify-self: var(--justify-self, auto);
 
     color: var(--color, var(--icon-color));
     white-space: nowrap;
