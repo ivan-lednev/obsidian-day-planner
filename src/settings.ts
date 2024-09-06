@@ -13,6 +13,8 @@ export interface ColorOverride {
   darkModeColor: string;
 }
 
+export const eventFormats = ["task", "bullet"] as const;
+
 export interface DayPlannerSettings {
   progressIndicator: "pie" | "bar" | "none";
   showTaskNotification: boolean;
@@ -46,6 +48,7 @@ export interface DayPlannerSettings {
   colorOverrides: Array<ColorOverride>;
   releaseNotes: boolean;
   taskStatusOnCreation: string;
+  eventFormatOnCreation: (typeof eventFormats)[number];
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -81,6 +84,7 @@ export const defaultSettings: DayPlannerSettings = {
   colorOverrides: [],
   releaseNotes: true,
   taskStatusOnCreation: " ",
+  eventFormatOnCreation: "task",
 };
 
 export const defaultSettingsForTests = {

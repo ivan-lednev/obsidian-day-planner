@@ -150,7 +150,10 @@ export function createTask(
     text: "New item",
     startTime: minutesToMomentOfDay(startMinutes, day),
     symbol: "-",
-    status: settings.taskStatusOnCreation,
+    status:
+      settings.eventFormatOnCreation === "task"
+        ? settings.taskStatusOnCreation
+        : undefined,
     placing: {
       widthPercent: 100,
       xOffsetPercent: 0,

@@ -1,10 +1,11 @@
 import { produce } from "immer";
 import { PluginSettingTab, Setting } from "obsidian";
 import type { Writable } from "svelte/store";
+import { isOneOf } from "typed-assert";
 
 import { icons } from "../constants";
 import type DayPlanner from "../main";
-import type { DayPlannerSettings } from "../settings";
+import { DayPlannerSettings, eventFormats } from "../settings";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   constructor(
@@ -30,25 +31,44 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Default task status on creation")
-      .setDesc(
-        "You can use custom statuses for more advanced workflows. E.g.: '- [>] Task'",
-      )
-      .addText((el) =>
-        el
-          .setPlaceholder("Empty")
-          .setValue(this.plugin.settings().taskStatusOnCreation)
-          .onChange((value: string) => {
-            this.settingsStore.update((previous) => {
-              const newValue = value.length > 0 ? value.substring(0, 1) : " ";
+      .setName("Event format on creation")
+      .addDropdown((dropdown) => {
+        dropdown.addOptions({
+          bullet: `Bullet (- New item)`,
+          task: `Task (- [ ] New item)`,
+        });
+        return dropdown
+          .setValue(this.plugin.settings().eventFormatOnCreation)
+          .onChange((value) => {
+            isOneOf(value, eventFormats);
 
-              return {
-                ...previous,
-                taskStatusOnCreation: newValue,
-              };
-            });
-          }),
-      );
+            this.update({ eventFormatOnCreation: value });
+            this.display();
+          });
+      });
+
+    if (this.plugin.settings().eventFormatOnCreation === "task") {
+      new Setting(containerEl)
+        .setName("Default task status on creation")
+        .setDesc(
+          "You can use custom statuses for more advanced workflows. E.g.: '- [>] Task'",
+        )
+        .addText((el) =>
+          el
+            .setPlaceholder("Empty")
+            .setValue(this.plugin.settings().taskStatusOnCreation)
+            .onChange((value: string) => {
+              this.settingsStore.update((previous) => {
+                const newValue = value.length > 0 ? value.substring(0, 1) : " ";
+
+                return {
+                  ...previous,
+                  taskStatusOnCreation: newValue,
+                };
+              });
+            }),
+        );
+    }
 
     new Setting(containerEl)
       .setName("Round time to minutes")

@@ -142,7 +142,6 @@ export function getDiff(base: DayToTasks, next: DayToTasks) {
   };
 }
 
-// todo: this syncs task state with text, it should be derived
 export function updateText(diff: Diff) {
   return {
     created: diff.created.map(updateTaskText),

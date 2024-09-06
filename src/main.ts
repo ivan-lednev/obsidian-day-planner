@@ -178,7 +178,6 @@ export default class DayPlanner extends Plugin {
       visibleTasks,
       dataviewLoaded,
       isModPressed,
-      // todo: this doesn't fit method name, move out
       newlyStartedTasks,
       icalSyncTrigger,
       isOnline,
