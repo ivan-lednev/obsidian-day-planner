@@ -108,7 +108,6 @@ export function createHooks({
   const dateRanges = useDateRanges();
   const visibleDays = useVisibleDays(dateRanges.ranges);
 
-  // todo: improve naming
   const schedulerQueue = derived(
     [icalEvents, visibleDays],
     ([$icalEvents, $visibleDays]) => {
@@ -144,7 +143,6 @@ export function createHooks({
 
   const visibleDayToEventOccurences = derived(
     tasksFromEvents,
-    // todo: move out
     flow(
       filter(Boolean),
       flatten,

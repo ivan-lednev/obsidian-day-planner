@@ -29,11 +29,9 @@ const cancelJob =
     clearTimeout(id);
   });
 
-// todo: handle errors
 export function createBackgroundBatchScheduler<T>(
   onFinish: (results: T[]) => void,
 ) {
-  // todo: move out
   const timeRemainingLowerLimit = 10;
 
   let results: T[] = [];

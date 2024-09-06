@@ -23,13 +23,13 @@ export function useVisibleDataviewTasks(
         const sTasksForDay = dayToSTasks[key];
 
         if (sTasksForDay) {
-          // todo: process errors
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { errors, ...tasks } = mapToTasksForDay(
             day,
             sTasksForDay,
             $settings,
           );
+
+          errors.forEach(console.log);
 
           result[key] = tasks;
         } else {

@@ -14,7 +14,6 @@ export function updateProp(
 
   isNotVoid(match);
 
-  // TODO: move out
   const [, key, previous] = match;
 
   return `[${key}::${updateFn(previous)}]`;
