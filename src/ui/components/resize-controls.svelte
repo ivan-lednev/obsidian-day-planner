@@ -11,7 +11,7 @@
   export let reverse: boolean | undefined = false;
 </script>
 
-<ExpandingControls on:pointerdown={onPointerDown} {reverse}>
+<ExpandingControls {reverse} on:pointerdown={onPointerDown}>
   <BlockControlButton
     cursor="grab"
     label="Resize block"

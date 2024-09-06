@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Moment } from "moment";
   import { getContext } from "svelte";
+  import { isNotVoid } from "typed-assert";
 
   import { obsidianContext } from "../../constants";
   import { isToday } from "../../global-store/current-time";
@@ -9,7 +10,6 @@
   import { ObsidianContext } from "../../types";
   import { getRenderKey } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
-  import { isNotVoid } from "typed-assert";
 
   import Column from "./column.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
