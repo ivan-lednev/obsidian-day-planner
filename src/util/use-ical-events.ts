@@ -15,19 +15,19 @@ export function useIcalEvents(
   isOnline: Readable<boolean>,
 ) {
   const previousFetches = new Map<string, Array<WithIcalConfig<ical.VEvent>>>();
+  const icals = derived(settings, ($settings) => $settings.icals);
 
-  // todo: [minor] derive only from relevant setting
   return derived(
-    [settings, isOnline, syncTrigger],
+    [icals, isOnline, syncTrigger],
     (
-      [$settings, $isOnline],
+      [$icals, $isOnline],
       set: (events: Array<WithIcalConfig<ical.VEvent>>) => void,
     ) => {
       if (!$isOnline) {
         return;
       }
 
-      const calendarPromises = $settings.icals
+      const calendarPromises = $icals
         .filter((ical) => ical.url.trim().length > 0)
         .map((calendar) =>
           request({
