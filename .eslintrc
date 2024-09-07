@@ -51,6 +51,8 @@
     }
   ],
   "rules": {
+    // todo: Reenable once https://github.com/import-js/eslint-plugin-import/issues/1479 is fixed.
+    "import/no-duplicates": "off",
     "svelte/valid-compile": "off",
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": [

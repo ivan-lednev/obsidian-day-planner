@@ -1,4 +1,5 @@
-import { getContext, derived, writable } from "svelte";
+import { getContext } from "svelte";
+import { derived, writable } from "svelte/store";
 
 import { obsidianContext } from "../../constants";
 import type { ObsidianContext, UnscheduledTask } from "../../types";

@@ -1,5 +1,5 @@
 import { Plugin, WorkspaceLeaf } from "obsidian";
-import { get, writable, Writable } from "svelte/store";
+import { get, writable, type Writable } from "svelte/store";
 
 import {
   errorContextKey,
@@ -12,8 +12,8 @@ import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { STaskEditor } from "./service/stask-editor";
-import { DayPlannerSettings, defaultSettings } from "./settings";
-import { ObsidianContext } from "./types";
+import { type DayPlannerSettings, defaultSettings } from "./settings";
+import type { ObsidianContext } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { ConfirmationModal } from "./ui/confirmation-modal";
 import { ReleaseNotesModal } from "./ui/release-notes-modal";
@@ -75,7 +75,7 @@ export default class DayPlanner extends Plugin {
     this.app.workspace.onLayoutReady(async () => {
       await this.detachLeavesOfType(viewTypeTimeline);
 
-      await this.app.workspace.getRightLeaf(false).setViewState({
+      await this.app.workspace.getRightLeaf(false)?.setViewState({
         type: viewTypeTimeline,
       });
     });
@@ -91,7 +91,7 @@ export default class DayPlanner extends Plugin {
     }
 
     await this.detachLeavesOfType(viewTypeTimeline);
-    await this.app.workspace.getRightLeaf(false).setViewState({
+    await this.app.workspace.getRightLeaf(false)?.setViewState({
       type: viewTypeTimeline,
       active: true,
     });

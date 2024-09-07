@@ -1,4 +1,5 @@
-import { getContext, derived } from "svelte";
+import { getContext } from "svelte";
+import { derived } from "svelte/store";
 
 import { obsidianContext } from "../../constants";
 import { settings } from "../../global-store/settings";

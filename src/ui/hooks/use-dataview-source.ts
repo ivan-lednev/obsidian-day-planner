@@ -1,5 +1,6 @@
 import { debounce } from "obsidian";
-import { onDestroy, derived, get, writable } from "svelte";
+import { onDestroy } from "svelte";
+import { derived, get, writable } from "svelte/store";
 
 import { settings } from "../../global-store/settings";
 

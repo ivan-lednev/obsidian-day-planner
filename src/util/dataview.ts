@@ -1,4 +1,4 @@
-import type { Moment } from "moment/moment";
+import type { Moment } from "moment";
 import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { DataArray, DateTime, STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
