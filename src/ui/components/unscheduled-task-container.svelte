@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Moment } from "moment";
+  import type { Moment } from "moment";
   import { OverlayScrollbarsComponent } from "overlayscrollbars-svelte";
   import { getContext } from "svelte";
 
