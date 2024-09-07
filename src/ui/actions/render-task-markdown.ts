@@ -1,5 +1,5 @@
 import { getDisplayedText } from "../../parser/parser";
-import { DayPlannerSettings } from "../../settings";
+import type { DayPlannerSettings } from "../../settings";
 import type { RenderMarkdown, UnscheduledTask } from "../../types";
 import { getFirstLine, getRenderKey } from "../../util/task-utils";
 

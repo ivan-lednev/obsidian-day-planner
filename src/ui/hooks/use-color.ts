@@ -1,5 +1,5 @@
 import chroma from "chroma-js";
-import { Readable, derived } from "svelte/store";
+import { type Readable, derived } from "svelte/store";
 
 import type { settings } from "../../global-store/settings";
 import type { RelationToNow, Task } from "../../types";

@@ -1,7 +1,7 @@
 import {
   autoUpdate,
   computePosition,
-  ComputePositionConfig,
+  type ComputePositionConfig,
 } from "@floating-ui/dom";
 import type { SvelteComponentTyped } from "svelte";
 import { writable } from "svelte/store";

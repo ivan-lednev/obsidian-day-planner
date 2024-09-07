@@ -1,9 +1,9 @@
 import { differenceBy } from "lodash/fp";
-import { Moment } from "moment";
-import { derived, get, Readable } from "svelte/store";
+import type { Moment } from "moment";
+import { derived, get, type Readable } from "svelte/store";
 
-import { DayPlannerSettings } from "../../settings";
-import { Task, TasksForDay } from "../../types";
+import type { DayPlannerSettings } from "../../settings";
+import type { Task, TasksForDay } from "../../types";
 import { getEndTime, getNotificationKey } from "../../util/task-utils";
 
 interface UseNewlyStartedTasksProps {

@@ -1,4 +1,4 @@
-import moment, { Moment } from "moment";
+import moment, { type Moment } from "moment";
 import { tz } from "moment-timezone";
 import ical from "node-ical";
 
@@ -7,7 +7,7 @@ import {
   noTitle,
   originalRecurrenceDayKeyFormat,
 } from "../constants";
-import { Task, UnscheduledTask, WithIcalConfig } from "../types";
+import type { Task, UnscheduledTask, WithIcalConfig } from "../types";
 
 import { getId } from "./id";
 import { getMinutesSinceMidnight } from "./moment";

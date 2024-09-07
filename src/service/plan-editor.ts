@@ -1,5 +1,5 @@
 import { groupBy } from "lodash/fp";
-import { Moment } from "moment";
+import type { Moment } from "moment";
 import type { CachedMetadata } from "obsidian";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 

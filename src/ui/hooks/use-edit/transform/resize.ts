@@ -1,4 +1,4 @@
-import { DayPlannerSettings } from "../../../../settings";
+import type { DayPlannerSettings } from "../../../../settings";
 import type { Task } from "../../../../types";
 import { getEndMinutes } from "../../../../util/task-utils";
 import { toSpliced } from "../../../../util/to-spliced";

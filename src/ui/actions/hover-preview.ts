@@ -1,8 +1,7 @@
-import { getContext } from "svelte";
-import { derived, writable } from "svelte/store";
+import { getContext, derived, writable } from "svelte";
 
 import { obsidianContext } from "../../constants";
-import { ObsidianContext, UnscheduledTask } from "../../types";
+import type { ObsidianContext, UnscheduledTask } from "../../types";
 
 export function hoverPreview(el: HTMLElement, task: UnscheduledTask) {
   const { isModPressed, showPreview } =

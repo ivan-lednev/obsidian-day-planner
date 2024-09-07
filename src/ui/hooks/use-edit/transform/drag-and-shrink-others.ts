@@ -1,6 +1,6 @@
 import { last } from "lodash";
 
-import { DayPlannerSettings } from "../../../../settings";
+import type { DayPlannerSettings } from "../../../../settings";
 import type { Task } from "../../../../types";
 import { getEndMinutes } from "../../../../util/task-utils";
 

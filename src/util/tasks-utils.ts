@@ -1,11 +1,11 @@
 import { difference, differenceBy, mergeWith } from "lodash/fp";
-import { Moment } from "moment/moment";
+import type { Moment } from "moment/moment";
 import {
   DEFAULT_DAILY_NOTE_FORMAT,
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
 
-import { DayToTasks, Diff, Task, TasksForDay } from "../types";
+import type { DayToTasks, Diff, Task, TasksForDay } from "../types";
 
 import {
   isEqualTask,

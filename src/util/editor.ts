@@ -1,5 +1,4 @@
-import type { Editor } from "obsidian";
-import { Loc } from "obsidian";
+import type { Editor, Loc } from "obsidian";
 
 export function selectText(editor: Editor, text: string) {
   const startOffset = editor.getValue().lastIndexOf(text);

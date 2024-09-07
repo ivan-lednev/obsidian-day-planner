@@ -1,6 +1,6 @@
-import { Moment } from "moment";
+import type { Moment } from "moment";
 
-import { DayPlannerSettings } from "../../../settings";
+import type { DayPlannerSettings } from "../../../settings";
 import type { Task } from "../../../types";
 
 export enum EditMode {

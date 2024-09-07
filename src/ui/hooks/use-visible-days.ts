@@ -1,6 +1,6 @@
 import { isEqual, uniqBy } from "lodash/fp";
-import { Moment } from "moment";
-import { derived, Readable } from "svelte/store";
+import type { Moment } from "moment";
+import { derived, type Readable } from "svelte/store";
 
 import { getDayKey } from "../../util/tasks-utils";
 

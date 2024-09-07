@@ -1,11 +1,11 @@
 import type { Moment } from "moment";
-import { Pos } from "obsidian";
-import { Readable, Writable } from "svelte/store";
+import type { Pos } from "obsidian";
+import type { Readable, Writable } from "svelte/store";
 
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import type { ObsidianFacade } from "./service/obsidian-facade";
-import { IcalConfig } from "./settings";
-import { ConfirmationModalProps } from "./ui/confirmation-modal";
+import type { IcalConfig } from "./settings";
+import type { ConfirmationModalProps } from "./ui/confirmation-modal";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { createShowPreview } from "./util/create-show-preview";
 import { getDiff, updateText } from "./util/tasks-utils";

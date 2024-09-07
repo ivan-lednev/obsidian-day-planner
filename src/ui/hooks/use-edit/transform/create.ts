@@ -1,4 +1,4 @@
-import { DayPlannerSettings } from "../../../../settings";
+import type { DayPlannerSettings } from "../../../../settings";
 import type { Task } from "../../../../types";
 
 export function create(

@@ -8,15 +8,15 @@ import {
   partition,
 } from "lodash/fp";
 import { App } from "obsidian";
-import { derived, readable, writable, Writable } from "svelte/store";
+import { derived, readable, writable, type Writable } from "svelte/store";
 
 import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
 import { currentTime } from "../global-store/current-time";
 import { DataviewFacade } from "../service/dataview-facade";
 import { ObsidianFacade } from "../service/obsidian-facade";
 import { PlanEditor } from "../service/plan-editor";
-import { DayPlannerSettings } from "../settings";
-import { Task, UnscheduledTask } from "../types";
+import type { DayPlannerSettings } from "../settings";
+import type { Task, UnscheduledTask } from "../types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";

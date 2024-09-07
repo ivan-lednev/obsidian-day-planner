@@ -11,8 +11,8 @@ import {
   shortScheduledPropRegExp,
   timestampRegExp,
 } from "../regexp";
-import { DayPlannerSettings } from "../settings";
-import { Task, UnscheduledTask } from "../types";
+import type { DayPlannerSettings } from "../settings";
+import type { Task, UnscheduledTask } from "../types";
 
 import { getListTokens } from "./dataview";
 import { getId } from "./id";

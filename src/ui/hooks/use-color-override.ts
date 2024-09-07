@@ -1,9 +1,8 @@
-import { getContext } from "svelte";
-import { derived } from "svelte/store";
+import { getContext, derived } from "svelte";
 
 import { obsidianContext } from "../../constants";
 import { settings } from "../../global-store/settings";
-import { ObsidianContext, UnscheduledTask } from "../../types";
+import type { ObsidianContext, UnscheduledTask } from "../../types";
 import { getFirstLine } from "../../util/task-utils";
 
 export function useColorOverride(task: UnscheduledTask) {

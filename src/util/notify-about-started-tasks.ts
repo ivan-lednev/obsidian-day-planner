@@ -1,4 +1,4 @@
-import { Task } from "../types";
+import type { Task } from "../types";
 
 import { getFirstLine } from "./task-utils";
 

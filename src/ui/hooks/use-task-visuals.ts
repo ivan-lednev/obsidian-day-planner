@@ -1,8 +1,8 @@
 import type { Moment } from "moment";
-import { derived, Readable, Writable } from "svelte/store";
+import { derived, type Readable, type Writable } from "svelte/store";
 
 import { getHiddenHoursSize } from "../../global-store/derived-settings";
-import { DayPlannerSettings } from "../../settings";
+import type { DayPlannerSettings } from "../../settings";
 import type { Task } from "../../types";
 import { getRelationToNow } from "../../util/moment";
 import { getEndTime } from "../../util/task-utils";

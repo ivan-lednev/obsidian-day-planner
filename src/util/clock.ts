@@ -1,5 +1,5 @@
 import { filter, map } from "lodash/fp";
-import { Moment } from "moment";
+import type { Moment } from "moment";
 import { STask } from "obsidian-dataview";
 
 import { clockFormat, clockKey, clockSeparator } from "../constants";

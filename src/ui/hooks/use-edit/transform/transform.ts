@@ -2,10 +2,10 @@ import { produce } from "immer";
 import { partition } from "lodash/fp";
 import { isNotVoid } from "typed-assert";
 
-import { DayPlannerSettings } from "../../../../settings";
+import type { DayPlannerSettings } from "../../../../settings";
 import type { DayToTasks, Task } from "../../../../types";
 import { getDayKey, moveTaskToColumn } from "../../../../util/tasks-utils";
-import { EditMode, EditOperation, TaskTransformer } from "../types";
+import { EditMode, type EditOperation, type TaskTransformer } from "../types";
 
 import { create } from "./create";
 import { drag } from "./drag";

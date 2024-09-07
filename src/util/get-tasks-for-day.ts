@@ -1,10 +1,10 @@
 import { partition } from "lodash/fp";
-import { Moment } from "moment/moment";
+import type { Moment } from "moment/moment";
 import { STask } from "obsidian-dataview";
 
 import { timeFromStartRegExp } from "../regexp";
-import { DayPlannerSettings } from "../settings";
-import { Task } from "../types";
+import type { DayPlannerSettings } from "../settings";
+import type { Task } from "../types";
 
 import { toTask, toUnscheduledTask } from "./dataview";
 

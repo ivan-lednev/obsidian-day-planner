@@ -1,9 +1,9 @@
 import ical from "node-ical";
 import { request } from "obsidian";
-import { derived, Readable } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
-import { DayPlannerSettings } from "../settings";
-import { WithIcalConfig } from "../types";
+import type { DayPlannerSettings } from "../settings";
+import type { WithIcalConfig } from "../types";
 
 function isVEvent(event: ical.CalendarComponent): event is ical.VEvent {
   return event.type === "VEVENT";

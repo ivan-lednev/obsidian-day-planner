@@ -1,9 +1,9 @@
 import { flow, uniqBy } from "lodash/fp";
-import { Moment } from "moment/moment";
-import { derived, Readable } from "svelte/store";
+import type { Moment } from "moment/moment";
+import { derived, type Readable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../../overlap/overlap";
-import { DayToTasks } from "../../../types";
+import type { DayToTasks } from "../../../types";
 import { getRenderKey } from "../../../util/task-utils";
 import { getDayKey, getEmptyRecordsForDay } from "../../../util/tasks-utils";
 

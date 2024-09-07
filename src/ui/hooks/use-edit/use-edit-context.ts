@@ -1,13 +1,13 @@
-import { Moment } from "moment";
-import { Readable, writable } from "svelte/store";
+import type { Moment } from "moment";
+import { type Readable, writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
-import { DayPlannerSettings } from "../../../settings";
-import { OnUpdateFn, TasksForDay } from "../../../types";
+import type { DayPlannerSettings } from "../../../settings";
+import type { OnUpdateFn, TasksForDay } from "../../../types";
 
 import { createEditHandlers } from "./create-edit-handlers";
 import { useCursor } from "./cursor";
-import { EditOperation } from "./types";
+import type { EditOperation } from "./types";
 import { useCursorMinutes } from "./use-cursor-minutes";
 import { useDisplayedTasks } from "./use-displayed-tasks";
 import { useDisplayedTasksForDay } from "./use-displayed-tasks-for-day";

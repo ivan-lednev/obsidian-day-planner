@@ -1,4 +1,4 @@
-import { Moment } from "moment";
+import type { Moment } from "moment";
 import { derived, readable } from "svelte/store";
 
 export const currentTime = readable<Moment>(window.moment(), (set) => {

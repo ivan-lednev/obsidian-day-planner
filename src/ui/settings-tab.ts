@@ -5,7 +5,7 @@ import { isOneOf } from "typed-assert";
 
 import { icons } from "../constants";
 import type DayPlanner from "../main";
-import { DayPlannerSettings, eventFormats } from "../settings";
+import { type DayPlannerSettings, eventFormats } from "../settings";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   constructor(

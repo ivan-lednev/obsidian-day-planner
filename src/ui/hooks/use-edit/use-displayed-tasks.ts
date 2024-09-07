@@ -1,10 +1,10 @@
-import { derived, Readable } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
-import { DayPlannerSettings } from "../../../settings";
-import { DayToTasks } from "../../../types";
+import type { DayPlannerSettings } from "../../../settings";
+import type { DayToTasks } from "../../../types";
 
 import { transform } from "./transform/transform";
-import { EditOperation } from "./types";
+import type { EditOperation } from "./types";
 
 export interface UseDisplayedTasksProps {
   editOperation: Readable<EditOperation | undefined>;

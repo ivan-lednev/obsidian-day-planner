@@ -1,5 +1,5 @@
 import { TFile } from "obsidian";
-import { derived, Readable } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
 import { DataviewFacade } from "../../service/dataview-facade";
 import * as query from "../../util/dataview-query";

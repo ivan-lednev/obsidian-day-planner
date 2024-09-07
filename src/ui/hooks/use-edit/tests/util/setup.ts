@@ -1,13 +1,13 @@
 import { noop } from "lodash/fp";
-import { Moment } from "moment/moment";
+import type { Moment } from "moment/moment";
 import { writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../../../service/obsidian-facade";
 import {
-  DayPlannerSettings,
+  type DayPlannerSettings,
   defaultSettingsForTests,
 } from "../../../../../settings";
-import { DayToTasks } from "../../../../../types";
+import type { DayToTasks } from "../../../../../types";
 import { toMinutes } from "../../../../../util/moment";
 import { useEditContext } from "../../use-edit-context";
 

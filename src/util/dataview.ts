@@ -1,4 +1,4 @@
-import { Moment } from "moment/moment";
+import type { Moment } from "moment/moment";
 import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { DataArray, DateTime, STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
@@ -11,10 +11,10 @@ import {
 } from "../constants";
 import { getTimeFromSTask } from "../parser/parser";
 import { timeFromStartRegExp } from "../regexp";
-import { DayPlannerSettings } from "../settings";
-import { Task, TaskTokens } from "../types";
+import type { DayPlannerSettings } from "../settings";
+import type { Task, TaskTokens } from "../types";
 
-import { ClockMoments, toTime } from "./clock";
+import { type ClockMoments, toTime } from "./clock";
 import { getId } from "./id";
 import { getMinutesSinceMidnight } from "./moment";
 import { deleteProps } from "./properties";

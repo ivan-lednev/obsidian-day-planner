@@ -1,9 +1,9 @@
 import { sortBy } from "lodash/fp";
-import { derived, Readable } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
 import { statusBarTextLimit } from "../../constants";
 import { currentTime } from "../../global-store/current-time";
-import { TasksForDay } from "../../types";
+import type { TasksForDay } from "../../types";
 import { ellipsis } from "../../util/ellipsis";
 import { getDiffInMinutes } from "../../util/moment";
 import { getEndTime, getFirstLine } from "../../util/task-utils";

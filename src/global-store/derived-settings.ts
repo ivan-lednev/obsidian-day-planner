@@ -1,4 +1,4 @@
-import { DayPlannerSettings } from "../settings";
+import type { DayPlannerSettings } from "../settings";
 
 export function getHourSize(settings: DayPlannerSettings) {
   return settings.zoomLevel * 60;
