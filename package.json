@@ -56,13 +56,15 @@
     "stylelint": "^16.9.0",
     "stylelint-config-html": "^1.1.0",
     "stylelint-config-standard": "^36.0.1",
-    "svelte": "^5.0.0-next.244",
     "svelte-check": "^4.0.1",
     "svelte-preprocess": "^6.0.2",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "tslib": "^2.7.0",
     "typescript": "^5.5.4"
+  },
+  "overrides": {
+    "svelte": "$svelte"
   },
   "dependencies": {
     "@babel/preset-env": "^7.25.4",
@@ -88,6 +90,7 @@
     "overlayscrollbars-svelte": "^0.5.4",
     "prettier-plugin-svelte": "^3.2.6",
     "stylelint-config-clean-order": "^6.1.0",
+    "svelte": "^5.0.0-next.244",
     "svelte-portal": "^2.2.1",
     "tinygesture": "^3.0.0",
     "ts-dedent": "^2.2.0",
