@@ -1,16 +1,25 @@
 <script lang="ts">
-  import type { UnscheduledTask } from "../../types";
+  import { getContext, type Snippet } from "svelte";
+
+  import type { ObsidianContext, UnscheduledTask } from "../../types";
   import { tappable } from "../actions/tappable";
   import type { ActionArray } from "../actions/use-actions";
   import { useActions } from "../actions/use-actions";
   import { useColorOverride } from "../hooks/use-color-override";
 
-  export let task: UnscheduledTask;
-  export let use: ActionArray = [];
+  import { obsidianContext } from "./../../constants";
 
-  $: override = useColorOverride(task);
-  $: backgroundColor =
-    $override || "var(--time-block-bg-color, var(--background-primary))";
+  const {
+    children,
+    task,
+    use = [],
+  }: { children: Snippet; task: UnscheduledTask; use: ActionArray } = $props();
+
+  const { isDarkMode } = getContext<ObsidianContext>(obsidianContext);
+  const override = $derived(useColorOverride(task, isDarkMode));
+  const backgroundColor = $derived(
+    $override || "var(--time-block-bg-color, var(--background-primary))",
+  );
 </script>
 
 <div class="padding">
@@ -25,7 +34,7 @@
     use:tappable
     use:useActions={use}
   >
-    <slot />
+    {@render children()}
   </div>
 </div>
 

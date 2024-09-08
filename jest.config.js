@@ -4,15 +4,9 @@ module.exports = {
   testEnvironment: "jsdom",
   transform: {
     "^.+\\.[tj]s$": "@swc/jest",
-    "^.+\\.svelte$": [
-      "./node_modules/svelte-jester/dist/transformer.cjs",
-      {
-        preprocess: true,
-      },
-    ],
   },
   transformIgnorePatterns: [
-    "/node_modules/(?!(@testing-library/svelte|mdast.*|micromark.*|zwitch|longest-streak|unist-util.*|decode-named-character-reference))",
+    "/node_modules/(?!(svelte.*|esm-env.*|mdast.*|micromark.*|zwitch|longest-streak|unist-util.*|decode-named-character-reference))",
   ],
-  moduleFileExtensions: ["js", "ts", "svelte"],
+  moduleFileExtensions: ["js", "ts"],
 };
