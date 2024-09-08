@@ -21,14 +21,18 @@
 
 <div class="controls">
   <TimelineControls />
-  <ResizeableBox classNames="timeline-box" let:startEdit>
-    <UnscheduledTaskContainer day={firstDayInRange} />
-    <ResizeHandle on:mousedown={startEdit} />
+  <ResizeableBox classNames="timeline-box">
+    {#snippet children(startEdit)}
+      <UnscheduledTaskContainer day={firstDayInRange} />
+      <ResizeHandle on:mousedown={startEdit} />
+    {/snippet}
   </ResizeableBox>
 </div>
-<Scroller let:hovering={autoScrollBlocked}>
-  <Ruler visibleHours={getVisibleHours($settings)} />
-  <Timeline day={firstDayInRange} isUnderCursor={autoScrollBlocked} />
+<Scroller>
+  {#snippet children(isUnderCursor)}
+    <Ruler visibleHours={getVisibleHours($settings)} />
+    <Timeline day={firstDayInRange} {isUnderCursor} />
+  {/snippet}
 </Scroller>
 
 <style>

@@ -48,7 +48,8 @@ const context = await esbuild.context({
     sassPlugin(),
     esbuildSvelte({
       compilerOptions: { css: "injected", dev: !prod },
-      preprocess: sveltePreprocess()
+      preprocess: sveltePreprocess(),
+      include: /\.svelte(\.ts)?$/,
     }),
     replace({
       include: /release-notes-modal\.ts|main\.ts/,

@@ -1,23 +1,23 @@
 <script lang="ts">
-  let hovering = false;
+  import type { Snippet } from "svelte";
 
-  function handleMouseEnter() {
-    hovering = true;
-  }
+  const { children }: { children: Snippet<[boolean]> } = $props();
 
-  function handleMouseLeave() {
-    hovering = false;
-  }
+  let isUnderCursor = $state(false);
 </script>
 
 <div
   class="scroller"
-  on:mouseenter={handleMouseEnter}
-  on:mouseleave={handleMouseLeave}
+  on:mouseenter={() => {
+    isUnderCursor = true;
+  }}
+  on:mouseleave={() => {
+    isUnderCursor = false;
+  }}
   on:scroll
 >
   <div class="stretcher">
-    <slot {hovering} />
+    {@render children(isUnderCursor)}
   </div>
 </div>
 

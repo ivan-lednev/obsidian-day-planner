@@ -45,14 +45,16 @@
     {/each}
   </div>
 
-  <ResizeableBox classNames="header-row" let:startEdit>
-    <div class="corner"></div>
-    {#each $dateRange as day}
-      <div class="header-cell">
-        <UnscheduledTaskContainer {day} />
-      </div>
-    {/each}
-    <ResizeHandle on:mousedown={startEdit} />
+  <ResizeableBox classNames="header-row">
+    {#snippet children(startEdit)}
+      <div class="corner"></div>
+      {#each $dateRange as day}
+        <div class="header-cell">
+          <UnscheduledTaskContainer {day} />
+        </div>
+      {/each}
+      <ResizeHandle on:mousedown={startEdit} />
+    {/snippet}
   </ResizeableBox>
 </div>
 
