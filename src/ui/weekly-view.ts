@@ -1,4 +1,5 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
+import { mount, unmount } from "svelte";
 
 import { dateRangeContextKey, viewTypeWeekly } from "../constants";
 import type { DayPlannerSettings } from "../settings";
@@ -46,7 +47,8 @@ export default class WeeklyView extends ItemView {
       [dateRangeContextKey, this.dateRange],
     ]);
 
-    this.weekComponent = new Week({
+    // @ts-expect-error
+    this.weekComponent = mount(Week, {
       target: contentEl,
       context,
     });
@@ -57,7 +59,8 @@ export default class WeeklyView extends ItemView {
       const customActionsEl = createDiv();
 
       viewActionsEl.prepend(customActionsEl);
-      this.headerActionsComponent = new HeaderActions({
+      // @ts-expect-error
+      this.headerActionsComponent = mount(HeaderActions, {
         target: customActionsEl,
         context,
       });
@@ -66,7 +69,13 @@ export default class WeeklyView extends ItemView {
 
   async onClose() {
     this.dateRange?.untrack();
-    this.weekComponent?.$destroy();
-    this.headerActionsComponent?.$destroy();
+
+    if (this.weekComponent) {
+      unmount(this.weekComponent);
+    }
+
+    if (this.headerActionsComponent) {
+      unmount(this.headerActionsComponent);
+    }
   }
 }

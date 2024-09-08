@@ -2,7 +2,7 @@ import esbuild from "esbuild";
 import process from "process";
 import builtins from "builtin-modules";
 import esbuildSvelte from "esbuild-svelte";
-import sveltePreprocess from "svelte-preprocess";
+import {sveltePreprocess} from "svelte-preprocess";
 import { sassPlugin } from "esbuild-sass-plugin";
 import { replace } from "esbuild-plugin-replace";
 import fs from "node:fs";
@@ -47,7 +47,7 @@ const context = await esbuild.context({
   plugins: [
     sassPlugin(),
     esbuildSvelte({
-      compilerOptions: { css: true, dev: !prod },
+      compilerOptions: { css: "injected", dev: !prod },
       preprocess: sveltePreprocess()
     }),
     replace({

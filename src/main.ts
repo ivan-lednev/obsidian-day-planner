@@ -1,4 +1,5 @@
 import { Plugin, WorkspaceLeaf } from "obsidian";
+import { mount } from "svelte";
 import { get, writable, type Writable } from "svelte/store";
 
 import {
@@ -203,7 +204,7 @@ export default class DayPlanner extends Plugin {
 
     // todo: move out
     // todo: pass context with day
-    new StatusBarWidget({
+    mount(StatusBarWidget, {
       target: this.addStatusBarItem(),
       props: {
         onClick: this.initTimelineLeaf,
