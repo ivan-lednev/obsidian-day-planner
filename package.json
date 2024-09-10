@@ -4,8 +4,8 @@
   "description": "A plugin to help you plan your day and setup pomodoro timers",
   "main": "main.js",
   "scripts": {
-    "build": "vite build --mode development",
-    "dev": "vite dev",
+    "build": "vite build --mode production",
+    "dev": "vite build --mode development",
     "format": "eslint --fix src && stylelint --fix src/**/*.svelte && prettier --write src",
     "lint": "prettier --check src && eslint src && stylelint src/**/*.svelte && npm run typescript && svelte-check src/",
     "typescript": "tsc --noEmit",

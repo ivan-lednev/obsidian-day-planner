@@ -5,6 +5,9 @@ import replace from "vite-plugin-filter-replace";
 import fs from "node:fs";
 
 export default defineConfig({
+  define: {
+    "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || 'development')
+  },
   plugins: [
     replace([
       {
