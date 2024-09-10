@@ -87,8 +87,12 @@ export interface ObsidianContext {
 export type ComponentContext = Map<string, unknown>;
 
 declare global {
+  /**
+   * Placeholders expanded at build-time
+   */
   const currentPluginVersion: string;
   const changelogMd: string;
+  const supportBanner: string;
 }
 
 export type WithIcalConfig<T> = T & { calendar: IcalConfig };

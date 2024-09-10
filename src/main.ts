@@ -5,6 +5,7 @@ import { get, writable, type Writable } from "svelte/store";
 import {
   errorContextKey,
   obsidianContext,
+  viewTypeReleaseNotes,
   viewTypeTimeline,
   viewTypeWeekly,
 } from "./constants";
@@ -17,7 +18,7 @@ import { type DayPlannerSettings, defaultSettings } from "./settings";
 import type { ObsidianContext } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { ConfirmationModal } from "./ui/confirmation-modal";
-import { ReleaseNotesModal } from "./ui/release-notes-modal";
+import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
@@ -53,8 +54,7 @@ export default class DayPlanner extends Plugin {
     this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
 
-    this.handleNewPluginVersion();
-
+    await this.handleNewPluginVersion();
     await this.initTimelineLeafSilently();
   }
 
@@ -99,7 +99,7 @@ export default class DayPlanner extends Plugin {
     this.app.workspace.rightSplit.expand();
   };
 
-  private handleNewPluginVersion() {
+  private async handleNewPluginVersion() {
     if (this.settings().pluginVersion === currentPluginVersion) {
       return;
     }
@@ -110,7 +110,9 @@ export default class DayPlanner extends Plugin {
     }));
 
     if (this.settings().releaseNotes) {
-      this.showReleaseNotes();
+      this.app.workspace.onLayoutReady(async () => {
+        await this.showReleaseNotes();
+      });
     }
   }
 
@@ -167,9 +169,11 @@ export default class DayPlanner extends Plugin {
     await this.app.workspace.detachLeavesOfType(type);
   }
 
-  private showReleaseNotes = () => {
-    const modal = new ReleaseNotesModal(this);
-    modal.open();
+  private showReleaseNotes = async () => {
+    await this.app.workspace.getLeaf("tab").setViewState({
+      type: viewTypeReleaseNotes,
+      active: true,
+    });
   };
 
   private registerViews() {
@@ -260,6 +264,11 @@ export default class DayPlanner extends Plugin {
       viewTypeWeekly,
       (leaf: WorkspaceLeaf) =>
         new WeeklyView(leaf, this.settings, componentContext, dateRanges),
+    );
+
+    this.registerView(
+      viewTypeReleaseNotes,
+      (leaf: WorkspaceLeaf) => new DayPlannerReleaseNotesView(leaf),
     );
   }
 }
