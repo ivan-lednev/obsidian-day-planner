@@ -1,17 +1,20 @@
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { defineConfig } from "vite";
+import { isNotVoid } from "typed-assert";
 
 export default defineConfig({
-  plugins: [svelte({
-    compilerOptions: {
-      dev: true
-    }
-  })],
+  plugins: [
+    svelte({
+      compilerOptions: {
+        dev: true,
+      },
+    }),
+  ],
   mode: "development",
   css: {
     preprocessorOptions: {
-      scss: { includePaths: ["node_modules"] }
-    }
+      scss: { includePaths: ["node_modules"] },
+    },
   },
   build: {
     watch: { include: "src/**/*" },
@@ -19,7 +22,7 @@ export default defineConfig({
       entry: ["src/main.ts", "src/styles.scss"],
       name: "main",
       fileName: () => "main.js",
-      formats: ["cjs" as const]
+      formats: ["cjs" as const],
     },
     minify: false,
     outDir: ".",
@@ -31,10 +34,12 @@ export default defineConfig({
             return "styles.css";
           }
 
+          isNotVoid(assetInfo.name);
+
           return assetInfo.name;
-        }
+        },
       },
-      external: ["obsidian", "electron"]
-    }
-  }
+      external: ["obsidian", "electron"],
+    },
+  },
 });

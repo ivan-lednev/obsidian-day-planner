@@ -7,7 +7,7 @@
   import { tappable } from "../actions/tappable";
   import type { ActionArray } from "../actions/use-actions";
   import { useActions } from "../actions/use-actions";
-  import { getColorOverride } from "../hooks/get-color-override";
+  import { getColorOverride } from "../hooks/get-color-override.svelte";
 
   import { obsidianContext } from "./../../constants";
 
