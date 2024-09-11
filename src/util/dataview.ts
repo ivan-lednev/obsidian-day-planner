@@ -10,9 +10,8 @@ import {
   indentBeforeTaskParagraph,
 } from "../constants";
 import { getTimeFromSTask } from "../parser/parser";
-import { timeFromStartRegExp } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
-import type { Task, TaskTokens } from "../types";
+import type { FileLine, Task, TaskTokens } from "../types";
 
 import { type ClockMoments, toTime } from "./clock";
 import { getId } from "./id";
@@ -36,15 +35,22 @@ export function textToString(node: Node) {
   return `${node.symbol} ${status}${deleteProps(node.text)}\n`;
 }
 
-// todo: remove duplication: toMarkdown
 export function toString(node: Node, indentation = "") {
   let result = `${indentation}${textToString(node)}`;
 
   for (const child of node.children) {
-    if (!child.scheduled && !timeFromStartRegExp.test(child.text)) {
-      // todo (minor): handle custom indentation (spaces of differing lengths)
-      result += toString(child, `\t${indentation}`);
-    }
+    // todo (minor): handle custom indentation (spaces of differing lengths)
+    result += toString(child, `\t${indentation}`);
+  }
+
+  return result;
+}
+
+export function getLines(node, result: Array<FileLine> = []) {
+  result.push({ text: node.text, line: node.line, task: node.task });
+
+  for (const child of node.children) {
+    getLines(child, result);
   }
 
   return result;
@@ -56,6 +62,7 @@ export function toUnscheduledTask(sTask: STask, day: Moment) {
     symbol: sTask.symbol,
     status: sTask.status,
     text: toString(sTask),
+    lines: getLines(sTask),
     location: {
       path: sTask.path,
       line: sTask.line,
@@ -88,6 +95,7 @@ export function toTask(
     symbol: sTask.symbol,
     status: sTask.status,
     text: toString(sTask),
+    lines: getLines(sTask),
     durationMinutes,
     startMinutes: getMinutesSinceMidnight(startTime),
     location: {

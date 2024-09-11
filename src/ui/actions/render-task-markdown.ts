@@ -1,38 +1,72 @@
 import { getDisplayedText } from "../../parser/parser";
+import type { ObsidianFacade } from "../../service/obsidian-facade";
 import type { DayPlannerSettings } from "../../settings";
 import type { RenderMarkdown, UnscheduledTask } from "../../types";
 import { getFirstLine, getRenderKey } from "../../util/task-utils";
 
 import { createMemo } from "./memoize-props";
-import { disableCheckBoxes } from "./post-process-task-markdown";
 
 interface RenderedMarkdownProps {
   task: UnscheduledTask;
   settings: DayPlannerSettings;
   renderMarkdown: RenderMarkdown;
+  toggleCheckboxInFile: ObsidianFacade["toggleCheckboxInFile"];
 }
 
 export function renderTaskMarkdown(
   el: HTMLElement,
   initial: RenderedMarkdownProps,
 ) {
-  let onDestroy: () => void;
+  let onDestroy: Array<() => void> = [];
+
+  function cleanUp() {
+    onDestroy.forEach((callback) => callback());
+    onDestroy = [];
+  }
 
   const shouldUpdate = createMemo(initial, {
     task: getRenderKey,
   });
 
   function refresh({ task, settings, renderMarkdown }: RenderedMarkdownProps) {
-    onDestroy?.();
+    cleanUp();
 
     const displayedText = getDisplayedText(task);
     const onlyFirstLineIfNeeded = settings.showSubtasksInTaskBlocks
       ? displayedText
       : getFirstLine(displayedText);
 
-    onDestroy = renderMarkdown(el, onlyFirstLineIfNeeded);
+    onDestroy.push(renderMarkdown(el, onlyFirstLineIfNeeded));
 
-    disableCheckBoxes(el);
+    // todo: this is throwing on new tasks
+    const linesWithTasks = task.lines.filter((line) => line.task);
+
+    el.querySelectorAll('[data-task] input[type="checkbox"]').forEach(
+      (checkbox, i) => {
+        if (!(checkbox instanceof HTMLElement) || !task.location) {
+          return;
+        }
+
+        checkbox.dataset.line = String(linesWithTasks[i].line);
+      },
+    );
+
+    async function handlePointerUp(event: PointerEvent) {
+      if (!(event.target instanceof HTMLElement) || !task.location) {
+        return;
+      }
+
+      const line = event.target.dataset.line;
+
+      if (!line) {
+        return;
+      }
+
+      await initial.toggleCheckboxInFile(task.location.path, Number(line));
+    }
+
+    el.addEventListener("pointerup", handlePointerUp);
+    onDestroy.push(() => el.removeEventListener("pointerup", handlePointerUp));
   }
 
   refresh(initial);
@@ -44,7 +78,7 @@ export function renderTaskMarkdown(
       }
     },
     destroy() {
-      onDestroy?.();
+      cleanUp();
     },
   };
 }

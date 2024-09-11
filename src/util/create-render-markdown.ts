@@ -7,9 +7,11 @@ export const createRenderMarkdown =
     el.empty();
 
     // TODO: investigate why `await` doesn't work as expected here
-    MarkdownRenderer.render(app, markdown, el, "", loader);
-
-    loader.load();
+    // TODO: inconsistent link behavior is probably here. We need to pass file path to renderer from each task
+    MarkdownRenderer.render(app, markdown, el, "/", loader).then(
+      () => loader.load(),
+      (error) => console.error(`Failed to render markdown. `, error),
+    );
 
     return () => loader.unload();
   };

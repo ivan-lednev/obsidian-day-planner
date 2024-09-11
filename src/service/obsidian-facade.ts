@@ -13,6 +13,15 @@ function doesLeafContainFile(leaf: WorkspaceLeaf, file: TFile) {
   return view instanceof FileView && view.file === file;
 }
 
+// todo: make more robust
+function toggleCheckbox(line: string) {
+  if (line.includes("[ ]")) {
+    return line.replace("[ ]", "[x]");
+  }
+
+  return line.replace("[x]", "[ ]");
+}
+
 export class ObsidianFacade {
   constructor(readonly app: App) {}
 
@@ -99,6 +108,16 @@ export class ObsidianFacade {
 
     await this.app.vault.modify(file, newContents);
   }
+
+  toggleCheckboxInFile = async (path: string, line: number) => {
+    await this.editFile(path, (contents) => {
+      const updated = contents.split("\n");
+
+      updated[line] = toggleCheckbox(updated[line]);
+
+      return updated.join("\n");
+    });
+  };
 
   private getFileByPath(path: string) {
     const file = this.app.vault.getAbstractFileByPath(path);

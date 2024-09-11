@@ -12,11 +12,8 @@ export function useDisplayedTasksForDay(
   day: Moment,
 ) {
   return derived(displayedTasks, ($displayedTasks) => {
-    const tasksForDay = $displayedTasks[getDayKey(day)];
-
-    if (!tasksForDay) {
-      return getEmptyRecordsForDay();
-    }
+    const tasksForDay =
+      $displayedTasks[getDayKey(day)] || getEmptyRecordsForDay();
 
     const withTime = flow(
       uniqBy(getRenderKey),

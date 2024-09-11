@@ -233,6 +233,7 @@ export default class DayPlanner extends Plugin {
       refreshTasks: this.dataviewFacade.getAllTasksFrom,
       dataviewLoaded,
       renderMarkdown: createRenderMarkdown(this.app),
+      toggleCheckboxInFile: this.obsidianFacade.toggleCheckboxInFile,
       showReleaseNotes: this.showReleaseNotes,
       editContext,
       visibleTasks,

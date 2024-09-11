@@ -8,12 +8,18 @@
 
   export let task: UnscheduledTask;
 
-  const { renderMarkdown } = getContext<ObsidianContext>(obsidianContext);
+  const { renderMarkdown, toggleCheckboxInFile } =
+    getContext<ObsidianContext>(obsidianContext);
 </script>
 
 <div
   class="rendered-markdown"
-  use:renderTaskMarkdown={{ task, settings: $settings, renderMarkdown }}
+  use:renderTaskMarkdown={{
+    task,
+    settings: $settings,
+    renderMarkdown,
+    toggleCheckboxInFile,
+  }}
 ></div>
 
 <style>

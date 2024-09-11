@@ -28,8 +28,29 @@ export interface TaskTokens {
   status?: string;
 }
 
-export interface UnscheduledTask extends TaskTokens {
+export interface FileLine {
   text: string;
+  line: number;
+  task: boolean;
+}
+
+export interface RemoteTask {
+  summary: string;
+  calendar: IcalConfig;
+  description?: string;
+}
+
+export interface LocalTask {
+  lines: Array<FileLine>;
+  location: TaskLocation;
+}
+
+export interface UnscheduledTask extends TaskTokens {
+  /**
+   * @deprecated
+   */
+  text: string;
+  lines: Array<FileLine>;
 
   id: string;
   location?: TaskLocation;
@@ -73,6 +94,7 @@ export interface ObsidianContext {
   refreshTasks: (source: string) => void;
   dataviewLoaded: Readable<boolean>;
   renderMarkdown: RenderMarkdown;
+  toggleCheckboxInFile: ObsidianFacade["toggleCheckboxInFile"];
   editContext: ReturnType<typeof useEditContext>;
   visibleTasks: Readable<DayToTasks>;
   showReleaseNotes: () => void;
