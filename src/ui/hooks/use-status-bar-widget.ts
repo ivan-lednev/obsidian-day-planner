@@ -6,7 +6,7 @@ import { currentTime } from "../../global-store/current-time";
 import type { TasksForDay } from "../../types";
 import { ellipsis } from "../../util/ellipsis";
 import { getDiffInMinutes } from "../../util/moment";
-import { getEndTime, getFirstLine } from "../../util/task-utils";
+import { getEndTime, getOneLineSummary } from "../../util/task-utils";
 
 interface UseStatusBarWidgetProps {
   tasksForToday: Readable<TasksForDay>;
@@ -60,7 +60,7 @@ export function useStatusBarWidget({ tasksForToday }: UseStatusBarWidgetProps) {
         );
         const timeLeft = minutesToTimestamp(minutesLeft);
         const text = ellipsis(
-          getFirstLine(currentItem.text),
+          getOneLineSummary(currentItem),
           statusBarTextLimit,
         );
 
@@ -77,7 +77,7 @@ export function useStatusBarWidget({ tasksForToday }: UseStatusBarWidgetProps) {
           nextItem.startTime,
         );
         const timeToNext = minutesToTimestamp(minutesToNext);
-        const text = ellipsis(getFirstLine(nextItem.text), statusBarTextLimit);
+        const text = ellipsis(getOneLineSummary(nextItem), statusBarTextLimit);
 
         widget.next = {
           timeToNext,

@@ -1,14 +1,14 @@
 import type { DayPlannerSettings } from "../../settings";
-import type { UnscheduledTask } from "../../types";
-import { getFirstLine } from "../../util/task-utils";
+import type { TaskWithNoTime } from "../../types";
+import { getOneLineSummary } from "../../util/task-utils";
 
 export function getColorOverride(
-  task: UnscheduledTask,
+  task: TaskWithNoTime,
   isDarkMode: boolean,
   settings: DayPlannerSettings,
 ) {
   const colorOverride = settings.colorOverrides.find((override) =>
-    getFirstLine(task.text).includes(override.text),
+    getOneLineSummary(task).includes(override.text),
   );
 
   if (colorOverride) {

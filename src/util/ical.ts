@@ -7,7 +7,7 @@ import {
   noTitle,
   originalRecurrenceDayKeyFormat,
 } from "../constants";
-import type { Task, UnscheduledTask, WithIcalConfig } from "../types";
+import type { RemoteTask, WithIcalConfig, WithTime } from "../types";
 
 import { getId } from "./id";
 import { getMinutesSinceMidnight } from "./moment";
@@ -68,7 +68,7 @@ export function icalEventToTasks(
 function icalEventToTask(
   icalEvent: WithIcalConfig<ical.VEvent>,
   date: Date,
-): Task | UnscheduledTask {
+): RemoteTask | WithTime<RemoteTask> {
   let startTimeAdjusted = window.moment(date);
   const tzid = icalEvent.rrule?.origOptions?.tzid;
 
@@ -80,12 +80,10 @@ function icalEventToTask(
   const isAllDayEvent = icalEvent.datetype === "date";
 
   const base = {
-    calendar: icalEvent.calendar,
     id: getId(),
-    text: icalEvent.summary || noTitle,
+    calendar: icalEvent.calendar,
+    summary: icalEvent.summary || noTitle,
     startTime: startTimeAdjusted,
-    readonly: true,
-    symbol: "-",
   };
 
   if (isAllDayEvent) {

@@ -3,7 +3,7 @@
 
   import { currentTime } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
-  import type { Task, WithPlacing } from "../../types";
+  import type { TaskWithTime, WithPlacing } from "../../types";
   import type { ActionArray } from "../actions/use-actions";
   import { useTaskVisuals } from "../hooks/use-task-visuals";
 
@@ -15,7 +15,7 @@
     use = [],
   }: {
     children: Snippet;
-    task: WithPlacing<Task>;
+    task: WithPlacing<TaskWithTime>;
     use?: ActionArray;
   } = $props();
 

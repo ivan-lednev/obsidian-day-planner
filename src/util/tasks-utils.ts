@@ -5,7 +5,15 @@ import {
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
 
-import type { DayToTasks, Diff, Task, TasksForDay } from "../types";
+import {
+  type DayToEditableTasks,
+  type DayToTasks,
+  type Diff,
+  isRemote,
+  type Task,
+  type TasksForDay,
+  type UnscheduledTask,
+} from "../types";
 
 import {
   isEqualTask,
@@ -17,11 +25,7 @@ export function getEmptyRecordsForDay(): TasksForDay {
   return { withTime: [], noTime: [] };
 }
 
-export function getTasksWithTime(tasks: DayToTasks) {
-  return Object.values(tasks).flatMap(({ withTime }) => withTime);
-}
-
-export function getFlatTasks(tasks: DayToTasks) {
+export function getTasksWithTime(tasks: DayToEditableTasks) {
   return Object.values(tasks).flatMap(({ withTime }) => withTime);
 }
 
@@ -79,7 +83,8 @@ export function moveTaskToColumn(
   return moveTaskToDay(baseline, task, day);
 }
 
-export function getTasksWithUpdatedDayProp(tasks: DayToTasks) {
+// TODO: remove duplication
+export function getTasksWithUpdatedDayProp(tasks: DayToEditableTasks) {
   return Object.entries(tasks)
     .flatMap(([dayKey, tasks]) =>
       tasks.withTime.map((task) => ({ dayKey, task })),
@@ -97,19 +102,26 @@ export function getTasksWithUpdatedDayProp(tasks: DayToTasks) {
     });
 }
 
-// TODO: remove duplication
-export function getTasksInDailyNotesWithUpdatedDay(tasks: DayToTasks) {
+export function getTasksInDailyNotesWithUpdatedDay(
+  tasks: DayToTasks,
+): Array<{ dayKey: string; task: Task }> {
   return Object.entries(tasks)
     .flatMap(([dayKey, tasks]) =>
       tasks.withTime.map((task) => ({ dayKey, task })),
     )
-    .filter(({ dayKey, task }) => {
+    .filter((pair): pair is { dayKey: string; task: Task } => {
+      const { task, dayKey } = pair;
+
+      if (isRemote(task)) {
+        return false;
+      }
+
       const dateFromPath = task.location?.path
         ? getDateFromPath(task.location?.path, "day")
         : null;
 
-      return (
-        !task.isGhost && dayKey !== getDayKey(task.startTime) && dateFromPath
+      return Boolean(
+        !task.isGhost && dayKey !== getDayKey(task.startTime) && dateFromPath,
       );
     });
 }
@@ -130,15 +142,42 @@ function getTasksWithUpdatedTime(base: Task[], next: Task[]) {
   return difference(next, pristine).filter((task) => !task.isGhost);
 }
 
+function getEditableTasks(dayToTasks: DayToTasks) {
+  const filteredEntries = Object.entries(dayToTasks).map(
+    ([dayKey, tasks]) =>
+      [
+        dayKey,
+        {
+          noTime: tasks.noTime.filter(
+            (task): task is UnscheduledTask => !isRemote(task),
+          ),
+          withTime: tasks.withTime.filter(
+            (task): task is Task => !isRemote(task),
+          ),
+        },
+      ] as const,
+  );
+
+  return Object.fromEntries<{ withTime: Task[]; noTime: UnscheduledTask[] }>(
+    filteredEntries,
+  );
+}
+
 export function getDiff(base: DayToTasks, next: DayToTasks) {
+  const editableBase = getEditableTasks(base);
+  const editableNext = getEditableTasks(next);
+
   return {
     updatedTime: getTasksWithUpdatedTime(
-      getTasksWithTime(base),
-      getTasksWithTime(next),
+      getTasksWithTime(editableBase),
+      getTasksWithTime(editableNext),
     ),
-    updatedDay: getTasksWithUpdatedDayProp(next),
-    moved: getTasksInDailyNotesWithUpdatedDay(next),
-    created: getCreatedTasks(getFlatTasks(base), getFlatTasks(next)),
+    updatedDay: getTasksWithUpdatedDayProp(editableNext),
+    moved: getTasksInDailyNotesWithUpdatedDay(editableNext),
+    created: getCreatedTasks(
+      getTasksWithTime(editableBase),
+      getTasksWithTime(editableNext),
+    ),
   };
 }
 

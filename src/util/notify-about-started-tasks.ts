@@ -1,13 +1,13 @@
-import type { Task } from "../types";
+import type { TaskWithTime } from "../types";
 
-import { getFirstLine } from "./task-utils";
+import { getOneLineSummary } from "./task-utils";
 
-export function notifyAboutStartedTasks(tasks: Task[]) {
+export function notifyAboutStartedTasks(tasks: TaskWithTime[]) {
   if (tasks.length === 0) {
     return;
   }
 
   const firstTask = tasks[0];
 
-  new Notification(`Task started: ${getFirstLine(firstTask.text)}`);
+  new Notification(`Task started: ${getOneLineSummary(firstTask)}`);
 }

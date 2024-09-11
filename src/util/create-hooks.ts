@@ -8,7 +8,13 @@ import {
   partition,
 } from "lodash/fp";
 import { App } from "obsidian";
-import { derived, readable, writable, type Writable } from "svelte/store";
+import {
+  derived,
+  readable,
+  writable,
+  type Readable,
+  type Writable,
+} from "svelte/store";
 
 import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
 import { currentTime } from "../global-store/current-time";
@@ -16,7 +22,7 @@ import { DataviewFacade } from "../service/dataview-facade";
 import { ObsidianFacade } from "../service/obsidian-facade";
 import { PlanEditor } from "../service/plan-editor";
 import type { DayPlannerSettings } from "../settings";
-import type { Task, UnscheduledTask } from "../types";
+import type { RemoteTask, Task, UnscheduledTask, WithTime } from "../types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
@@ -146,12 +152,12 @@ export function createHooks({
     flow(
       filter(Boolean),
       flatten,
-      groupBy((task: Task) => getDayKey(task.startTime)),
+      groupBy((task: WithTime<RemoteTask>) => getDayKey(task.startTime)),
       mapValues((tasks) => {
-        const [withTime, noTime]: [Task[], UnscheduledTask[]] = partition(
-          (task) => task.startMinutes !== undefined,
-          tasks,
-        );
+        const [withTime, noTime]: [
+          Array<WithTime<RemoteTask>>,
+          Array<Omit<WithTime<RemoteTask>, "startMinutes">>,
+        ] = partition((task) => task.startMinutes !== undefined, tasks);
 
         return { withTime, noTime };
       }),
@@ -193,7 +199,15 @@ export function createHooks({
     visibleDays,
   );
 
-  const visibleTasks = derived(
+  const visibleTasks: Readable<
+    Record<
+      string,
+      {
+        withTime: Array<WithTime<RemoteTask> | Task>;
+        noTime: Array<RemoteTask | UnscheduledTask>;
+      }
+    >
+  > = derived(
     [visibleDataviewTasks, visibleDayToEventOccurences],
     ([$visibleDataviewTasks, $visibleDayToEventOccurences]) =>
       mergeTasks($visibleDataviewTasks, $visibleDayToEventOccurences),

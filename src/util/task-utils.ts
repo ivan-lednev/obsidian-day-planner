@@ -12,7 +12,13 @@ import {
   timestampRegExp,
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
-import type { Task, UnscheduledTask } from "../types";
+import {
+  isRemote,
+  type Task,
+  type TaskWithNoTime,
+  type TaskWithTime,
+  type WithTime,
+} from "../types";
 
 import { getListTokens } from "./dataview";
 import { getId } from "./id";
@@ -40,25 +46,31 @@ export function getEndTime(task: {
   return task.startTime.clone().add(task.durationMinutes, "minutes");
 }
 
-function isScheduled(task: UnscheduledTask): task is Task {
+function isScheduled<T extends object>(task: T): task is WithTime<T> {
   return Object.hasOwn(task, "startMinutes");
 }
 
-function getUnscheduledTaskRenderKey(task: UnscheduledTask) {
-  return `${task.text} ${task.isGhost ?? ""}`;
-}
+export function getRenderKey(task: TaskWithTime | TaskWithNoTime) {
+  const key: string[] = [];
 
-export function getRenderKey(task: Task | UnscheduledTask) {
   if (isScheduled(task)) {
-    return `${task.startMinutes} ${getEndMinutes(
-      task,
-    )} ${getUnscheduledTaskRenderKey(task)}`;
+    key.push(String(task.startMinutes), String(getEndMinutes(task)));
   }
 
-  return getUnscheduledTaskRenderKey(task);
+  if (isRemote(task)) {
+    key.push(task.calendar.name, task.summary);
+  } else {
+    key.push(task.text, String(task.isGhost ? "ghost" : ""));
+  }
+
+  return key.join("::");
 }
 
-export function getNotificationKey(task: Task) {
+export function getNotificationKey(task: TaskWithTime) {
+  if (isRemote(task)) {
+    return `${task.calendar.name}::${task.startMinutes}:${task.durationMinutes}::${task.summary}`;
+  }
+
   return `${task.location?.path ?? "blank"}::${task.startMinutes}::${
     task.durationMinutes
   }::${task.text}`;
@@ -159,6 +171,14 @@ export function createTask(
 
 export function getFirstLine(text: string) {
   return text.split("\n")[0];
+}
+
+export function getOneLineSummary(task: TaskWithNoTime) {
+  if (isRemote(task)) {
+    return task.summary;
+  }
+
+  return getFirstLine(task.text);
 }
 
 export function getLinesAfterFirst(text: string) {

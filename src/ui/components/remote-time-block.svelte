@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { Task, WithIcalConfig, WithPlacing } from "../../types";
+  import type { RemoteTask, WithPlacing, WithTime } from "../../types";
 
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
 
-  export let task: WithIcalConfig<WithPlacing<Task>>;
+  export let task: WithPlacing<WithTime<RemoteTask>>;
 </script>
 
 <ScheduledTimeBlock {task}>
@@ -14,7 +14,7 @@
         {task.calendar.name}
       </span>
       <span class="summary">
-        {task.text}
+        {task.summary}
       </span>
     </div>
   </div>

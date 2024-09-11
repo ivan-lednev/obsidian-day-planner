@@ -1,9 +1,14 @@
 import { produce } from "immer";
-import { partition } from "lodash/fp";
 import { isNotVoid } from "typed-assert";
 
 import type { DayPlannerSettings } from "../../../../settings";
-import { type DayToTasks, isWithIcalConfig, type Task } from "../../../../types";
+import {
+  type DayToTasks,
+  isRemote,
+  type RemoteTask,
+  type Task,
+  type WithTime,
+} from "../../../../types";
 import { getDayKey, moveTaskToColumn } from "../../../../util/tasks-utils";
 import { EditMode, type EditOperation, type TaskTransformer } from "../types";
 
@@ -73,10 +78,17 @@ export function transform(
 
   isNotVoid(transformFn, `No transformer for operation: ${operation.mode}`);
 
-  const [readonly, editable] = partition(
-    isWithIcalConfig,
-    destTasks.withTime,
-  );
+  const readonly: Array<WithTime<RemoteTask>> = [];
+  const editable: Array<Task> = [];
+
+  destTasks.withTime.forEach((task) => {
+    if (isRemote(task)) {
+      readonly.push(task);
+    } else {
+      editable.push(task);
+    }
+  });
+
   const withTimeSorted = sortByStartMinutes(editable);
   const transformed = transformFn(
     withTimeSorted,

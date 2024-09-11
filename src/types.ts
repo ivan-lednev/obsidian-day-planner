@@ -38,6 +38,25 @@ export type WithPlacing<T> = T & {
   placing: ReturnType<typeof getHorizontalPlacing>;
 };
 
+export type RenderId = {
+  id: string;
+};
+
+export type WithTime<T> = T & {
+  startTime: Moment;
+  /**
+   * @deprecated Should be derived from startTime
+   */
+  startMinutes: number;
+  durationMinutes: number;
+};
+
+export type RemoteTask = RenderId & {
+  calendar: IcalConfig;
+  summary: string;
+  description?: string;
+};
+
 export interface UnscheduledTask extends TaskTokens {
   /**
    * @deprecated
@@ -46,25 +65,34 @@ export interface UnscheduledTask extends TaskTokens {
   lines?: Array<FileLine>;
 
   id: string;
+
+  // todo: move out to InMemoryTask
   location?: TaskLocation;
   isGhost?: boolean;
+
+  // todo: move to Time
   durationMinutes: number;
 }
 
-export interface Task extends UnscheduledTask {
-  startTime: Moment;
-  /**
-   * @deprecated Should be derived from startTime
-   */
-  startMinutes: number;
-}
+export type Task = WithTime<UnscheduledTask>;
 
+export type TaskWithNoTime = UnscheduledTask | RemoteTask;
+export type TaskWithTime = WithTime<TaskWithNoTime>;
+
+// todo: use generics
 export interface TasksForDay {
-  withTime: Array<Task | WithIcalConfig<Task>>;
-  noTime: UnscheduledTask[];
+  withTime: Array<TaskWithTime>;
+  noTime: Array<TaskWithNoTime>;
 }
 
+export type EditableTasksForDay = {
+  withTime: Array<Task>;
+  noTime: Array<UnscheduledTask>;
+};
+
+// todo: we can use generics here
 export type DayToTasks = Record<string, TasksForDay>;
+export type DayToEditableTasks = Record<string, EditableTasksForDay>;
 
 export type RelationToNow = "past" | "present" | "future";
 
@@ -110,10 +138,14 @@ declare global {
 
 export type WithIcalConfig<T> = T & { calendar: IcalConfig };
 
-export function isWithIcalConfig<T extends object>(
+export function isRemote<T extends TaskWithNoTime>(
   task: T,
-): task is WithIcalConfig<T> {
+): task is T & RemoteTask {
   return Object.hasOwn(task, "calendar");
+}
+
+export function isLocal(task: TaskWithNoTime): task is Task {
+  return Object.hasOwn(task, "location");
 }
 
 export type DateRange = Writable<Moment[]> & { untrack: () => void };
