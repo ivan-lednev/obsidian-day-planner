@@ -50,7 +50,7 @@ export interface UnscheduledTask extends TaskTokens {
    * @deprecated
    */
   text: string;
-  lines: Array<FileLine>;
+  lines?: Array<FileLine>;
 
   id: string;
   location?: TaskLocation;

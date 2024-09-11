@@ -38,7 +38,10 @@ export function renderTaskMarkdown(
 
     onDestroy.push(renderMarkdown(el, onlyFirstLineIfNeeded));
 
-    // todo: this is throwing on new tasks
+    if (!task.lines) {
+      return
+    }
+
     const linesWithTasks = task.lines.filter((line) => line.task);
 
     el.querySelectorAll('[data-task] input[type="checkbox"]').forEach(
