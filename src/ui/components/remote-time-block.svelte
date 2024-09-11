@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { Task, WithIcalConfig } from "../../types";
+  import type { Task, WithIcalConfig, WithPlacing } from "../../types";
 
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
 
-  export let task: WithIcalConfig<Task>;
+  export let task: WithIcalConfig<WithPlacing<Task>>;
 </script>
 
 <ScheduledTimeBlock {task}>

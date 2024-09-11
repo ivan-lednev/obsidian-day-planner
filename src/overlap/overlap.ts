@@ -2,7 +2,7 @@ import Fraction from "fraction.js";
 import { partition } from "lodash/fp";
 import { isNotVoid } from "typed-assert";
 
-import type { Overlap, Task, TimeBlock } from "../types";
+import type { Overlap, TimeBlock } from "../types";
 import { getEndMinutes } from "../util/task-utils";
 
 import { getHorizontalPlacing } from "./horizontal-placing";
@@ -125,14 +125,14 @@ function overlaps(a: TimeBlock, b: TimeBlock) {
   return getEndMinutes(early) > late.startMinutes;
 }
 
-export function addHorizontalPlacing(tasks: Task[]) {
-  if (tasks.length === 0) {
+export function addHorizontalPlacing(blocks: Array<TimeBlock>) {
+  if (blocks.length === 0) {
     return [];
   }
 
-  const overlapLookup = computeOverlap(tasks);
+  const overlapLookup = computeOverlap(blocks);
 
-  return tasks.map((task) => {
+  return blocks.map((task) => {
     const overlap = overlapLookup.get(task.id);
 
     return {

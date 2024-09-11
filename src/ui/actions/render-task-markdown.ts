@@ -39,7 +39,7 @@ export function renderTaskMarkdown(
     onDestroy.push(renderMarkdown(el, onlyFirstLineIfNeeded));
 
     if (!task.lines) {
-      return
+      return;
     }
 
     const linesWithTasks = task.lines.filter((line) => line.task);

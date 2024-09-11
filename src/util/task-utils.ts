@@ -154,10 +154,6 @@ export function createTask(
       settings.eventFormatOnCreation === "task"
         ? settings.taskStatusOnCreation
         : undefined,
-    placing: {
-      widthPercent: 100,
-      xOffsetPercent: 0,
-    },
   };
 }
 

@@ -7,7 +7,7 @@
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
-  import type { ObsidianContext } from "../../types";
+  import { isWithIcalConfig, type ObsidianContext } from "../../types";
   import { getRenderKey } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
 
@@ -65,7 +65,7 @@
     on:pointerup|stopPropagation
   >
     {#each $displayedTasks.withTime as task (getRenderKey(task))}
-      {#if task.calendar}
+      {#if isWithIcalConfig(task)}
         <RemoteTimeBlock {task} />
       {:else}
         <LocalTimeBlock

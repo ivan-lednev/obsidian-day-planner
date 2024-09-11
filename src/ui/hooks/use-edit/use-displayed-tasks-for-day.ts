@@ -3,7 +3,7 @@ import type { Moment } from "moment/moment";
 import { derived, type Readable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../../overlap/overlap";
-import type { DayToTasks } from "../../../types";
+import type { DayToTasks, Task, WithPlacing } from "../../../types";
 import { getRenderKey } from "../../../util/task-utils";
 import { getDayKey, getEmptyRecordsForDay } from "../../../util/tasks-utils";
 
@@ -15,9 +15,8 @@ export function useDisplayedTasksForDay(
     const tasksForDay =
       $displayedTasks[getDayKey(day)] || getEmptyRecordsForDay();
 
-    const withTime = flow(
+    const withTime: Array<WithPlacing<Task>> = flow(
       uniqBy(getRenderKey),
-      (task) => task,
       addHorizontalPlacing,
     )(tasksForDay.withTime);
 

@@ -3,7 +3,7 @@ import { partition } from "lodash/fp";
 import { isNotVoid } from "typed-assert";
 
 import type { DayPlannerSettings } from "../../../../settings";
-import type { DayToTasks, Task } from "../../../../types";
+import { type DayToTasks, isWithIcalConfig, type Task } from "../../../../types";
 import { getDayKey, moveTaskToColumn } from "../../../../util/tasks-utils";
 import { EditMode, type EditOperation, type TaskTransformer } from "../types";
 
@@ -74,7 +74,7 @@ export function transform(
   isNotVoid(transformFn, `No transformer for operation: ${operation.mode}`);
 
   const [readonly, editable] = partition(
-    (task) => task.calendar,
+    isWithIcalConfig,
     destTasks.withTime,
   );
   const withTimeSorted = sortByStartMinutes(editable);

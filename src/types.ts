@@ -34,16 +34,9 @@ export interface FileLine {
   task: boolean;
 }
 
-export interface RemoteTask {
-  summary: string;
-  calendar: IcalConfig;
-  description?: string;
-}
-
-export interface LocalTask {
-  lines: Array<FileLine>;
-  location: TaskLocation;
-}
+export type WithPlacing<T> = T & {
+  placing: ReturnType<typeof getHorizontalPlacing>;
+};
 
 export interface UnscheduledTask extends TaskTokens {
   /**
@@ -54,9 +47,7 @@ export interface UnscheduledTask extends TaskTokens {
 
   id: string;
   location?: TaskLocation;
-  placing?: ReturnType<typeof getHorizontalPlacing>;
   isGhost?: boolean;
-  calendar?: IcalConfig;
   durationMinutes: number;
 }
 
@@ -69,7 +60,7 @@ export interface Task extends UnscheduledTask {
 }
 
 export interface TasksForDay {
-  withTime: Task[];
+  withTime: Array<Task | WithIcalConfig<Task>>;
   noTime: UnscheduledTask[];
 }
 
@@ -118,5 +109,11 @@ declare global {
 }
 
 export type WithIcalConfig<T> = T & { calendar: IcalConfig };
+
+export function isWithIcalConfig<T extends object>(
+  task: T,
+): task is WithIcalConfig<T> {
+  return Object.hasOwn(task, "calendar");
+}
 
 export type DateRange = Writable<Moment[]> & { untrack: () => void };
