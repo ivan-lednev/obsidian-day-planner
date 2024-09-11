@@ -17,7 +17,7 @@ export interface TaskLocation {
 
 export type OnUpdateFn = (
   taskUpdate: ReturnType<typeof updateText> & {
-    moved: { dayKey: string; task: Task }[];
+    moved: { dayKey: string; task: WithTime<LocalTask> }[];
   },
 ) => Promise<void | void[]>;
 
@@ -57,7 +57,7 @@ export type RemoteTask = RenderId & {
   description?: string;
 };
 
-export interface UnscheduledTask extends TaskTokens {
+export interface LocalTask extends TaskTokens {
   /**
    * @deprecated
    */
@@ -74,29 +74,20 @@ export interface UnscheduledTask extends TaskTokens {
   durationMinutes: number;
 }
 
-export type Task = WithTime<UnscheduledTask>;
+export type Task = LocalTask | RemoteTask;
 
-export type TaskWithNoTime = UnscheduledTask | RemoteTask;
-export type TaskWithTime = WithTime<TaskWithNoTime>;
-
-// todo: use generics
-export interface TasksForDay {
-  withTime: Array<TaskWithTime>;
-  noTime: Array<TaskWithNoTime>;
+export interface TasksForDay<T = Task> {
+  withTime: Array<WithTime<T>>;
+  noTime: Array<Task>;
 }
 
-export type EditableTasksForDay = {
-  withTime: Array<Task>;
-  noTime: Array<UnscheduledTask>;
-};
-
-// todo: we can use generics here
-export type DayToTasks = Record<string, TasksForDay>;
-export type DayToEditableTasks = Record<string, EditableTasksForDay>;
+export type EditableTasksForDay = TasksForDay<LocalTask>;
+export type DayToTasks<T = TasksForDay> = Record<string, T>;
+export type DayToEditableTasks = DayToTasks<EditableTasksForDay>;
 
 export type RelationToNow = "past" | "present" | "future";
 
-export type TimeBlock = Pick<Task, "startMinutes" | "durationMinutes" | "id">;
+export type TimeBlock = Omit<WithTime<RenderId>, "startTime">;
 
 export interface Overlap {
   columns: number;
@@ -138,13 +129,11 @@ declare global {
 
 export type WithIcalConfig<T> = T & { calendar: IcalConfig };
 
-export function isRemote<T extends TaskWithNoTime>(
-  task: T,
-): task is T & RemoteTask {
+export function isRemote<T extends Task>(task: T): task is T & RemoteTask {
   return Object.hasOwn(task, "calendar");
 }
 
-export function isLocal(task: TaskWithNoTime): task is Task {
+export function isLocal(task: Task): task is WithTime<LocalTask> {
   return Object.hasOwn(task, "location");
 }
 

@@ -1,15 +1,15 @@
 import { last } from "lodash";
 
 import type { DayPlannerSettings } from "../../../../settings";
-import type { Task } from "../../../../types";
+import type { LocalTask, WithTime } from "../../../../types";
 import { getEndMinutes } from "../../../../util/task-utils";
 
 export function resizeAndShiftOthers(
-  baseline: Task[],
-  editTarget: Task,
+  baseline: WithTime<LocalTask>[],
+  editTarget: WithTime<LocalTask>,
   cursorTime: number,
   settings: DayPlannerSettings,
-): Task[] {
+): WithTime<LocalTask>[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
   const preceding = baseline.slice(0, index);
   const following = baseline.slice(index + 1);
@@ -24,31 +24,34 @@ export function resizeAndShiftOthers(
     durationMinutes,
   };
 
-  const updatedFollowing = following.reduce<Task[]>((result, current) => {
-    const previous = last(result) || updated;
+  const updatedFollowing = following.reduce<WithTime<LocalTask>[]>(
+    (result, current) => {
+      const previous = last(result) || updated;
 
-    if (getEndMinutes(previous) > current.startMinutes) {
-      return [
-        ...result,
-        {
-          ...current,
-          startMinutes: getEndMinutes(previous),
-        },
-      ];
-    }
+      if (getEndMinutes(previous) > current.startMinutes) {
+        return [
+          ...result,
+          {
+            ...current,
+            startMinutes: getEndMinutes(previous),
+          },
+        ];
+      }
 
-    return [...result, current];
-  }, []);
+      return [...result, current];
+    },
+    [],
+  );
 
   return [...preceding, updated, ...updatedFollowing];
 }
 
 export function resizeFromTopAndShiftOthers(
-  baseline: Task[],
-  editTarget: Task,
+  baseline: WithTime<LocalTask>[],
+  editTarget: WithTime<LocalTask>,
   cursorTime: number,
   settings: DayPlannerSettings,
-): Task[] {
+): WithTime<LocalTask>[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
   const preceding = baseline.slice(0, index);
   const following = baseline.slice(index + 1);
@@ -66,7 +69,7 @@ export function resizeFromTopAndShiftOthers(
 
   const updatedPreceding = preceding
     .reverse()
-    .reduce<Task[]>((result, current) => {
+    .reduce<WithTime<LocalTask>[]>((result, current) => {
       const nextInTimeline = last(result) || updated;
 
       if (nextInTimeline.startMinutes < getEndMinutes(current)) {

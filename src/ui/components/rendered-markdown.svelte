@@ -3,10 +3,10 @@
 
   import { obsidianContext } from "../../constants";
   import { settings } from "../../global-store/settings";
-  import type { ObsidianContext, UnscheduledTask } from "../../types";
+  import type { ObsidianContext, LocalTask } from "../../types";
   import { renderTaskMarkdown } from "../actions/render-task-markdown";
 
-  export let task: UnscheduledTask;
+  export let task: LocalTask;
 
   const { renderMarkdown, toggleCheckboxInFile } =
     getContext<ObsidianContext>(obsidianContext);

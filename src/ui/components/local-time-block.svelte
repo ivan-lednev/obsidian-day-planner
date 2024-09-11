@@ -3,7 +3,12 @@
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../constants";
-  import type { ObsidianContext, Task, WithPlacing } from "../../types";
+  import type {
+    LocalTask,
+    ObsidianContext,
+    WithPlacing,
+    WithTime,
+  } from "../../types";
   import { copy } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
   import type { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
@@ -17,7 +22,7 @@
   import ResizeControls from "./resize-controls.svelte";
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
 
-  export let task: WithPlacing<Task>;
+  export let task: WithPlacing<WithTime<LocalTask>>;
   export let onGripMouseDown: EditHandlers["handleGripMouseDown"];
   export let onResizerMouseDown: EditHandlers["handleResizerMouseDown"];
   export let onFloatingUiPointerDown: (event: PointerEvent) => void;

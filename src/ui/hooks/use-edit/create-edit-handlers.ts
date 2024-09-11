@@ -5,7 +5,7 @@ import { get } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
 import type { DayPlannerSettings } from "../../../settings";
-import type { Task, UnscheduledTask } from "../../../types";
+import type { LocalTask, WithTime } from "../../../types";
 import { createTask } from "../../../util/task-utils";
 
 import type { EditOperation } from "./types";
@@ -39,11 +39,11 @@ export function createEditHandlers({
     });
   }
 
-  function handleResizerMouseDown(task: Task, mode: EditMode) {
+  function handleResizerMouseDown(task: WithTime<LocalTask>, mode: EditMode) {
     startEdit({ task, mode, day });
   }
 
-  async function handleTaskMouseUp(task: UnscheduledTask) {
+  async function handleTaskMouseUp(task: LocalTask) {
     if (get(editOperation) || !task.location) {
       return;
     }
@@ -52,12 +52,12 @@ export function createEditHandlers({
     await obsidianFacade.revealLineInFile(path, position?.start?.line);
   }
 
-  function handleGripMouseDown(task: Task, mode: EditMode) {
+  function handleGripMouseDown(task: WithTime<LocalTask>, mode: EditMode) {
     startEdit({ task, mode, day });
   }
 
   // todo: fix
-  function handleUnscheduledTaskGripMouseDown(task: UnscheduledTask) {
+  function handleUnscheduledTaskGripMouseDown(task: LocalTask) {
     const withAddedTime = {
       ...task,
       startMinutes: get(cursorMinutes),

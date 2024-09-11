@@ -4,7 +4,7 @@ import { STask } from "obsidian-dataview";
 
 import { timeFromStartRegExp } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
-import type { Task } from "../types";
+import type { LocalTask, WithTime } from "../types";
 
 import { toTask, toUnscheduledTask } from "./dataview";
 
@@ -17,7 +17,10 @@ type DurationOptions = Pick<
   "defaultDurationMinutes" | "extendDurationUntilNext"
 >;
 
-function calculateDuration(tasks: Task[], options: DurationOptions) {
+function calculateDuration(
+  tasks: WithTime<LocalTask>[],
+  options: DurationOptions,
+) {
   return tasks.map((current, i, array) => {
     if (current.durationMinutes) {
       return current;
@@ -50,7 +53,7 @@ export function mapToTasksForDay(
   const [withTime, withoutTime] = partition(isTimeSetOnTask, tasksForDay);
 
   const { parsed: tasksWithTime, errors } = withTime.reduce<{
-    parsed: Task[];
+    parsed: WithTime<LocalTask>[];
     errors: unknown[];
   }>(
     (result, sTask) => {

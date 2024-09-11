@@ -1,11 +1,11 @@
-import type { Task } from "../../../../types";
+import type { LocalTask, WithTime } from "../../../../types";
 import { toSpliced } from "../../../../util/to-spliced";
 
 export function drag(
-  baseline: Task[],
-  editTarget: Task,
+  baseline: WithTime<LocalTask>[],
+  editTarget: WithTime<LocalTask>,
   cursorTime: number,
-): Task[] {
+): WithTime<LocalTask>[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
 
   const startMinutes = cursorTime;

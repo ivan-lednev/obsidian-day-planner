@@ -1,8 +1,8 @@
-import type { TaskWithTime } from "../types";
+import type { Task, WithTime } from "../types";
 
 import { getOneLineSummary } from "./task-utils";
 
-export function notifyAboutStartedTasks(tasks: TaskWithTime[]) {
+export function notifyAboutStartedTasks(tasks: WithTime<Task>[]) {
   if (tasks.length === 0) {
     return;
   }

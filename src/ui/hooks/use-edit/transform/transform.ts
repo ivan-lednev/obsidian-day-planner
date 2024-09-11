@@ -5,8 +5,8 @@ import type { DayPlannerSettings } from "../../../../settings";
 import {
   type DayToTasks,
   isRemote,
+  type LocalTask,
   type RemoteTask,
-  type Task,
   type WithTime,
 } from "../../../../types";
 import { getDayKey, moveTaskToColumn } from "../../../../util/tasks-utils";
@@ -52,7 +52,7 @@ function getDestDay(operation: EditOperation) {
   return isMultiday(operation.mode) ? operation.day : operation.task.startTime;
 }
 
-function sortByStartMinutes(tasks: Task[]) {
+function sortByStartMinutes(tasks: WithTime<LocalTask>[]) {
   return produce(tasks, (draft) =>
     draft.sort((a, b) => a.startMinutes - b.startMinutes),
   );
@@ -79,7 +79,7 @@ export function transform(
   isNotVoid(transformFn, `No transformer for operation: ${operation.mode}`);
 
   const readonly: Array<WithTime<RemoteTask>> = [];
-  const editable: Array<Task> = [];
+  const editable: Array<WithTime<LocalTask>> = [];
 
   destTasks.withTime.forEach((task) => {
     if (isRemote(task)) {

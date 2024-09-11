@@ -1,12 +1,12 @@
 import type { DayPlannerSettings } from "../../../../settings";
-import type { Task } from "../../../../types";
+import type { LocalTask, WithTime } from "../../../../types";
 
 export function create(
-  baseline: Task[],
-  editTarget: Task,
+  baseline: WithTime<LocalTask>[],
+  editTarget: WithTime<LocalTask>,
   cursorTime: number,
   settings: DayPlannerSettings,
-): Task[] {
+): WithTime<LocalTask>[] {
   return baseline.map((task) => {
     if (task.id === editTarget.id) {
       return {

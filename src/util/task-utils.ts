@@ -12,19 +12,13 @@ import {
   timestampRegExp,
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
-import {
-  isRemote,
-  type Task,
-  type TaskWithNoTime,
-  type TaskWithTime,
-  type WithTime,
-} from "../types";
+import { isRemote, type LocalTask, type Task, type WithTime } from "../types";
 
 import { getListTokens } from "./dataview";
 import { getId } from "./id";
 import { addMinutes, minutesToMoment, minutesToMomentOfDay } from "./moment";
 
-export function isEqualTask(a: Task, b: Task) {
+export function isEqualTask(a: WithTime<LocalTask>, b: WithTime<LocalTask>) {
   return (
     a.id === b.id &&
     a.startMinutes === b.startMinutes &&
@@ -50,7 +44,7 @@ function isScheduled<T extends object>(task: T): task is WithTime<T> {
   return Object.hasOwn(task, "startMinutes");
 }
 
-export function getRenderKey(task: TaskWithTime | TaskWithNoTime) {
+export function getRenderKey(task: WithTime<Task> | Task) {
   const key: string[] = [];
 
   if (isScheduled(task)) {
@@ -66,7 +60,7 @@ export function getRenderKey(task: TaskWithTime | TaskWithNoTime) {
   return key.join("::");
 }
 
-export function getNotificationKey(task: TaskWithTime) {
+export function getNotificationKey(task: WithTime<Task>) {
   if (isRemote(task)) {
     return `${task.calendar.name}::${task.startMinutes}:${task.durationMinutes}::${task.summary}`;
   }
@@ -76,7 +70,7 @@ export function getNotificationKey(task: TaskWithTime) {
   }::${task.text}`;
 }
 
-export function copy(task: Task): Task {
+export function copy(task: WithTime<LocalTask>): WithTime<LocalTask> {
   return {
     ...task,
     id: getId(),
@@ -102,7 +96,7 @@ export function areValuesEmpty(record: Record<string, [] | object>) {
 
 // todo: confusing. Do not mix up parsed and updated props
 // todo: add replaceTimestamp()
-function taskLineToString(task: Task) {
+function taskLineToString(task: WithTime<LocalTask>) {
   const firstLineText = removeTimestamp(
     removeListTokens(getFirstLine(task.text)),
   );
@@ -128,11 +122,14 @@ export function updateScheduledPropInText(text: string, dayKey: string) {
   return `${text} ⏳ ${dayKey}`;
 }
 
-export function updateTaskText(task: Task) {
+export function updateTaskText(task: WithTime<LocalTask>) {
   return { ...task, text: taskLineToString(task) };
 }
 
-export function updateTaskScheduledDay(task: Task, dayKey: string) {
+export function updateTaskScheduledDay(
+  task: WithTime<LocalTask>,
+  dayKey: string,
+) {
   return {
     ...task,
     text: `${updateScheduledPropInText(getFirstLine(task.text), dayKey)}
@@ -154,7 +151,7 @@ export function createTask(
   day: Moment,
   startMinutes: number,
   settings: DayPlannerSettings,
-): Task {
+): WithTime<LocalTask> {
   return {
     id: getId(),
     startMinutes,
@@ -173,7 +170,7 @@ export function getFirstLine(text: string) {
   return text.split("\n")[0];
 }
 
-export function getOneLineSummary(task: TaskWithNoTime) {
+export function getOneLineSummary(task: Task) {
   if (isRemote(task)) {
     return task.summary;
   }

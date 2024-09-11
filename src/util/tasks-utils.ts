@@ -10,9 +10,9 @@ import {
   type DayToTasks,
   type Diff,
   isRemote,
-  type Task,
+  type LocalTask,
   type TasksForDay,
-  type UnscheduledTask,
+  type WithTime,
 } from "../types";
 
 import {
@@ -29,7 +29,7 @@ export function getTasksWithTime(tasks: DayToEditableTasks) {
   return Object.values(tasks).flatMap(({ withTime }) => withTime);
 }
 
-export function removeTask(task: Task, tasks: TasksForDay) {
+export function removeTask(task: WithTime<LocalTask>, tasks: TasksForDay) {
   return {
     ...tasks,
     noTime: tasks.noTime.filter((t) => t.id !== task.id),
@@ -37,14 +37,14 @@ export function removeTask(task: Task, tasks: TasksForDay) {
   };
 }
 
-export function addTaskWithTime(task: Task, tasks: TasksForDay) {
+export function addTaskWithTime(task: WithTime<LocalTask>, tasks: TasksForDay) {
   return {
     ...tasks,
     withTime: [...tasks.withTime, task],
   };
 }
 
-export function moveToTimed(task: Task, tasks: TasksForDay) {
+export function moveToTimed(task: WithTime<LocalTask>, tasks: TasksForDay) {
   const withRemoved = removeTask(task, tasks);
   return { ...withRemoved, withTime: [...withRemoved.withTime, task] };
 }
@@ -53,7 +53,11 @@ export function getDayKey(day: Moment) {
   return day.format(DEFAULT_DAILY_NOTE_FORMAT);
 }
 
-export function moveTaskToDay(baseline: DayToTasks, task: Task, day: Moment) {
+export function moveTaskToDay(
+  baseline: DayToTasks,
+  task: WithTime<LocalTask>,
+  day: Moment,
+) {
   const sourceKey = getDayKey(task.startTime);
   const destKey = getDayKey(day);
   const source = baseline[sourceKey];
@@ -68,7 +72,7 @@ export function moveTaskToDay(baseline: DayToTasks, task: Task, day: Moment) {
 
 export function moveTaskToColumn(
   day: Moment,
-  task: Task,
+  task: WithTime<LocalTask>,
   baseline: DayToTasks,
 ) {
   if (day.isSame(task.startTime, "day")) {
@@ -104,12 +108,12 @@ export function getTasksWithUpdatedDayProp(tasks: DayToEditableTasks) {
 
 export function getTasksInDailyNotesWithUpdatedDay(
   tasks: DayToTasks,
-): Array<{ dayKey: string; task: Task }> {
+): Array<{ dayKey: string; task: WithTime<LocalTask> }> {
   return Object.entries(tasks)
     .flatMap(([dayKey, tasks]) =>
       tasks.withTime.map((task) => ({ dayKey, task })),
     )
-    .filter((pair): pair is { dayKey: string; task: Task } => {
+    .filter((pair): pair is { dayKey: string; task: WithTime<LocalTask> } => {
       const { task, dayKey } = pair;
 
       if (isRemote(task)) {
@@ -126,17 +130,26 @@ export function getTasksInDailyNotesWithUpdatedDay(
     });
 }
 
-function getPristine(flatBaseline: Task[], flatNext: Task[]) {
+function getPristine(
+  flatBaseline: WithTime<LocalTask>[],
+  flatNext: WithTime<LocalTask>[],
+) {
   return flatNext.filter((task) =>
     flatBaseline.find((baselineTask) => isEqualTask(task, baselineTask)),
   );
 }
 
-function getCreatedTasks(base: Task[], next: Task[]) {
+function getCreatedTasks(
+  base: WithTime<LocalTask>[],
+  next: WithTime<LocalTask>[],
+) {
   return differenceBy((task) => task.id, next, base);
 }
 
-function getTasksWithUpdatedTime(base: Task[], next: Task[]) {
+function getTasksWithUpdatedTime(
+  base: WithTime<LocalTask>[],
+  next: WithTime<LocalTask>[],
+) {
   const pristine = getPristine(base, next);
 
   return difference(next, pristine).filter((task) => !task.isGhost);
@@ -149,18 +162,19 @@ function getEditableTasks(dayToTasks: DayToTasks) {
         dayKey,
         {
           noTime: tasks.noTime.filter(
-            (task): task is UnscheduledTask => !isRemote(task),
+            (task): task is LocalTask => !isRemote(task),
           ),
           withTime: tasks.withTime.filter(
-            (task): task is Task => !isRemote(task),
+            (task): task is WithTime<LocalTask> => !isRemote(task),
           ),
         },
       ] as const,
   );
 
-  return Object.fromEntries<{ withTime: Task[]; noTime: UnscheduledTask[] }>(
-    filteredEntries,
-  );
+  return Object.fromEntries<{
+    withTime: WithTime<LocalTask>[];
+    noTime: LocalTask[];
+  }>(filteredEntries);
 }
 
 export function getDiff(base: DayToTasks, next: DayToTasks) {

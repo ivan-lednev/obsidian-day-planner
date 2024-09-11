@@ -1,13 +1,13 @@
 import { getDisplayedText } from "../../parser/parser";
 import type { ObsidianFacade } from "../../service/obsidian-facade";
 import type { DayPlannerSettings } from "../../settings";
-import type { RenderMarkdown, UnscheduledTask } from "../../types";
+import type { RenderMarkdown, LocalTask } from "../../types";
 import { getFirstLine, getRenderKey } from "../../util/task-utils";
 
 import { createMemo } from "./memoize-props";
 
 interface RenderedMarkdownProps {
-  task: UnscheduledTask;
+  task: LocalTask;
   settings: DayPlannerSettings;
   renderMarkdown: RenderMarkdown;
   toggleCheckboxInFile: ObsidianFacade["toggleCheckboxInFile"];

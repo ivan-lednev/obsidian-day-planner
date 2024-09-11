@@ -1,9 +1,9 @@
 import type { DayPlannerSettings } from "../../settings";
-import type { TaskWithNoTime } from "../../types";
+import type { Task } from "../../types";
 import { getOneLineSummary } from "../../util/task-utils";
 
 export function getColorOverride(
-  task: TaskWithNoTime,
+  task: Task,
   isDarkMode: boolean,
   settings: DayPlannerSettings,
 ) {

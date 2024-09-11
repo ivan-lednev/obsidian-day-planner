@@ -3,7 +3,7 @@ import { derived, type Readable, type Writable } from "svelte/store";
 
 import { getHiddenHoursSize } from "../../global-store/derived-settings";
 import type { DayPlannerSettings } from "../../settings";
-import type { TaskWithTime, WithPlacing } from "../../types";
+import type { Task, WithPlacing, WithTime } from "../../types";
 import { getRelationToNow } from "../../util/moment";
 import { getEndTime } from "../../util/task-utils";
 
@@ -16,7 +16,7 @@ interface UseTaskVisualsProps {
 
 // todo: useTaskPosition, move to one of stores, don't call inside component
 export function useTaskVisuals(
-  task: WithPlacing<TaskWithTime>,
+  task: WithPlacing<WithTime<Task>>,
   { settings, currentTime }: UseTaskVisualsProps,
 ) {
   const relationToNow = derived(currentTime, ($currentTime) => {

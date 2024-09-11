@@ -3,7 +3,7 @@
   import { fromStore } from "svelte/store";
 
   import { settings } from "../../global-store/settings";
-  import type { ObsidianContext, TaskWithNoTime } from "../../types";
+  import type { ObsidianContext, Task } from "../../types";
   import { tappable } from "../actions/tappable";
   import type { ActionArray } from "../actions/use-actions";
   import { useActions } from "../actions/use-actions";
@@ -15,7 +15,7 @@
     children,
     task,
     use = [],
-  }: { children: Snippet; task: TaskWithNoTime; use: ActionArray } = $props();
+  }: { children: Snippet; task: Task; use: ActionArray } = $props();
 
   const { isDarkMode } = getContext<ObsidianContext>(obsidianContext);
 

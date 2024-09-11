@@ -11,8 +11,8 @@ import { App } from "obsidian";
 import {
   derived,
   readable,
-  writable,
   type Readable,
+  writable,
   type Writable,
 } from "svelte/store";
 
@@ -22,7 +22,7 @@ import { DataviewFacade } from "../service/dataview-facade";
 import { ObsidianFacade } from "../service/obsidian-facade";
 import { PlanEditor } from "../service/plan-editor";
 import type { DayPlannerSettings } from "../settings";
-import type { RemoteTask, Task, UnscheduledTask, WithTime } from "../types";
+import type { LocalTask, RemoteTask, WithTime } from "../types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
@@ -203,8 +203,8 @@ export function createHooks({
     Record<
       string,
       {
-        withTime: Array<WithTime<RemoteTask> | Task>;
-        noTime: Array<RemoteTask | UnscheduledTask>;
+        withTime: Array<WithTime<RemoteTask> | WithTime<LocalTask>>;
+        noTime: Array<RemoteTask | LocalTask>;
       }
     >
   > = derived(

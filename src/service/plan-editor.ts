@@ -5,7 +5,7 @@ import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
-import type { Task } from "../types";
+import type { LocalTask, WithTime } from "../types";
 import { createDailyNoteIfNeeded } from "../util/daily-notes";
 import { getFirstLine, updateTaskText } from "../util/task-utils";
 
@@ -23,9 +23,9 @@ export class PlanEditor {
     created,
     moved,
   }: {
-    updated: Task[];
-    created: Task[];
-    moved: { dayKey: string; task: Task }[];
+    updated: WithTime<LocalTask>[];
+    created: WithTime<LocalTask>[];
+    moved: { dayKey: string; task: WithTime<LocalTask> }[];
   }) => {
     if (created.length > 0) {
       const [task] = await this.ensureFilesForTasks(created);
@@ -68,7 +68,7 @@ export class PlanEditor {
         getAllDailyNotes(),
       );
 
-      const updated = updateTaskText(task as Task);
+      const updated = updateTaskText(task as WithTime<LocalTask>);
 
       return this.obsidianFacade.editFile(noteForFile.path, (contents) => {
         // @ts-ignore
@@ -107,7 +107,7 @@ export class PlanEditor {
   }
 
   // todo: rework to ensure files for dates
-  private async ensureFilesForTasks(tasks: Task[]) {
+  private async ensureFilesForTasks(tasks: WithTime<LocalTask>[]) {
     return Promise.all(
       tasks.map(async (task) => {
         const { path } = await createDailyNoteIfNeeded(task.startTime);
@@ -117,7 +117,11 @@ export class PlanEditor {
     );
   }
 
-  private writeTaskToFileContents(task: Task, contents: string, path: string) {
+  private writeTaskToFileContents(
+    task: WithTime<LocalTask>,
+    contents: string,
+    path: string,
+  ) {
     // todo: we can use dataview
     const metadata = this.obsidianFacade.getMetadataForPath(path) || {};
     const [planEndLine, splitContents] = this.getPlanEndLine(
@@ -132,7 +136,10 @@ export class PlanEditor {
     return result.join("\n");
   }
 
-  private removeTaskFromFileContents(task: Task, contents: string) {
+  private removeTaskFromFileContents(
+    task: WithTime<LocalTask>,
+    contents: string,
+  ) {
     const newContents = contents.split("\n");
     const taskLinesCount = task.text.split("\n").length - 1;
 
@@ -143,7 +150,10 @@ export class PlanEditor {
     return newContents.join("\n");
   }
 
-  private updateTaskInFileContents(contents: string, task: Task) {
+  private updateTaskInFileContents(
+    contents: string,
+    task: WithTime<LocalTask>,
+  ) {
     return contents
       .split("\n")
       .map((line, index) => {

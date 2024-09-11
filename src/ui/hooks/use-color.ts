@@ -1,13 +1,13 @@
 import chroma from "chroma-js";
-import { type Readable, derived } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
 import type { settings } from "../../global-store/settings";
-import type { RelationToNow, TaskWithTime } from "../../types";
+import type { RelationToNow, Task, WithTime } from "../../types";
 import { getTextColorWithEnoughContrast } from "../../util/color";
 
 interface UseColorProps {
   settings: typeof settings;
-  task: TaskWithTime;
+  task: WithTime<Task>;
   relationToNow: Readable<RelationToNow>;
 }
 

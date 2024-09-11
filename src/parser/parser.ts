@@ -3,7 +3,7 @@ import type { CachedMetadata } from "obsidian";
 import { dedent } from "ts-dedent";
 
 import { timestampRegExp } from "../regexp";
-import type { UnscheduledTask } from "../types";
+import type { LocalTask } from "../types";
 import { getDiffInMinutes } from "../util/moment";
 import {
   getFirstLine,
@@ -74,7 +74,7 @@ export function getTimeFromSTask({ line, day }: { line: string; day: Moment }) {
   };
 }
 
-export function getDisplayedText(task: UnscheduledTask) {
+export function getDisplayedText(task: LocalTask) {
   if (task.status) {
     return task.text;
   }

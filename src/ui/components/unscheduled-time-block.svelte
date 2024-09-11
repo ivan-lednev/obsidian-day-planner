@@ -3,7 +3,7 @@
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../constants";
-  import type { ObsidianContext, UnscheduledTask } from "../../types";
+  import type { ObsidianContext, LocalTask } from "../../types";
   import { isTouchEvent } from "../../util/util";
   import type { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
   import { useFloatingUi } from "../hooks/use-floating-ui";
@@ -14,7 +14,7 @@
   import RenderedMarkdown from "./rendered-markdown.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
 
-  export let task: UnscheduledTask;
+  export let task: LocalTask;
   export let onGripMouseDown: EditHandlers["handleUnscheduledTaskGripMouseDown"];
   export let onMouseUp: () => void;
 

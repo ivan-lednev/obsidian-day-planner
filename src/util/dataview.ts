@@ -11,7 +11,7 @@ import {
 } from "../constants";
 import { getTimeFromSTask } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
-import type { FileLine, Task, TaskTokens } from "../types";
+import type { FileLine, LocalTask, TaskTokens, WithTime } from "../types";
 
 import { type ClockMoments, toTime } from "./clock";
 import { getId } from "./id";
@@ -76,7 +76,7 @@ export function toTask(
   sTask: STask,
   day: Moment,
   settings: DayPlannerSettings,
-): Task {
+): WithTime<LocalTask> {
   const parsedTime = getTimeFromSTask({
     line: sTask.text,
     day,
