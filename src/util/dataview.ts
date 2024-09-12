@@ -58,6 +58,7 @@ export function getLines(node, result: Array<FileLine> = []) {
 
 export function toUnscheduledTask(sTask: STask, day: Moment) {
   return {
+    startTime: day,
     durationMinutes: defaultDurationMinutes,
     symbol: sTask.symbol,
     status: sTask.status,

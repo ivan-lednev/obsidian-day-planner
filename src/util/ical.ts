@@ -2,11 +2,7 @@ import moment, { type Moment } from "moment";
 import { tz } from "moment-timezone";
 import ical from "node-ical";
 
-import {
-  defaultDurationMinutes,
-  noTitle,
-  originalRecurrenceDayKeyFormat,
-} from "../constants";
+import { noTitle, originalRecurrenceDayKeyFormat } from "../constants";
 import type { RemoteTask, WithIcalConfig, WithTime } from "../types";
 
 import { getId } from "./id";
@@ -87,10 +83,7 @@ function icalEventToTask(
   };
 
   if (isAllDayEvent) {
-    return {
-      ...base,
-      durationMinutes: defaultDurationMinutes,
-    };
+    return base;
   }
 
   return {

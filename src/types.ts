@@ -38,12 +38,12 @@ export type WithPlacing<T> = T & {
   placing: ReturnType<typeof getHorizontalPlacing>;
 };
 
-export type RenderId = {
+export type BaseTask = {
   id: string;
+  startTime: Moment;
 };
 
 export type WithTime<T> = T & {
-  startTime: Moment;
   /**
    * @deprecated Should be derived from startTime
    */
@@ -51,20 +51,18 @@ export type WithTime<T> = T & {
   durationMinutes: number;
 };
 
-export type RemoteTask = RenderId & {
+export type RemoteTask = BaseTask & {
   calendar: IcalConfig;
   summary: string;
   description?: string;
 };
 
-export interface LocalTask extends TaskTokens {
+export interface LocalTask extends TaskTokens, BaseTask {
   /**
    * @deprecated
    */
   text: string;
   lines?: Array<FileLine>;
-
-  id: string;
 
   // todo: move out to InMemoryTask
   location?: TaskLocation;
@@ -87,7 +85,7 @@ export type DayToEditableTasks = DayToTasks<EditableTasksForDay>;
 
 export type RelationToNow = "past" | "present" | "future";
 
-export type TimeBlock = Omit<WithTime<RenderId>, "startTime">;
+export type TimeBlock = Omit<WithTime<BaseTask>, "startTime">;
 
 export interface Overlap {
   columns: number;
