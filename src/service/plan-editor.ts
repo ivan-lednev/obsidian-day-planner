@@ -2,6 +2,7 @@ import { groupBy } from "lodash/fp";
 import type { Moment } from "moment";
 import type { CachedMetadata } from "obsidian";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
+import { isNotVoid } from "typed-assert";
 
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
@@ -89,7 +90,7 @@ export class PlanEditor {
       async (path) =>
         await this.obsidianFacade.editFile(path, (contents) =>
           pathToEditedTasksLookup[path].reduce(
-            (result, current) => this.updateTaskInFileContents(result, current),
+            (result, current) => this.syncTaskWithFile(result, current),
             contents,
           ),
         ),
@@ -150,23 +151,17 @@ export class PlanEditor {
     return newContents.join("\n");
   }
 
-  private updateTaskInFileContents(
-    contents: string,
-    task: WithTime<LocalTask>,
-  ) {
-    return contents
-      .split("\n")
-      .map((line, index) => {
-        if (index === task.location?.position?.start?.line) {
-          return (
-            line.substring(0, task.location.position.start.col) +
-            getFirstLine(task.text)
-          );
-        }
+  private syncTaskWithFile(contents: string, task: WithTime<LocalTask>) {
+    const location = task.location;
 
-        return line;
-      })
-      .join("\n");
+    isNotVoid(location);
+
+    const { line, col } = location.position.start;
+    const updated = contents.split("\n");
+
+    updated[line] = updated[line].substring(0, col) + getFirstLine(task.text);
+
+    return updated.join("\n");
   }
 
   private getPlanEndLine(
