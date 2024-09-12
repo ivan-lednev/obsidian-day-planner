@@ -1,7 +1,8 @@
 import { getDisplayedText } from "../../parser/parser";
 import type { ObsidianFacade } from "../../service/obsidian-facade";
 import type { DayPlannerSettings } from "../../settings";
-import type { RenderMarkdown, LocalTask } from "../../types";
+import type { LocalTask } from "../../task-types";
+import type { RenderMarkdown } from "../../types";
 import { getFirstLine, getRenderKey } from "../../util/task-utils";
 
 import { createMemo } from "./memoize-props";
@@ -65,6 +66,7 @@ export function renderTaskMarkdown(
         return;
       }
 
+      event.stopPropagation();
       await initial.toggleCheckboxInFile(task.location.path, Number(line));
     }
 

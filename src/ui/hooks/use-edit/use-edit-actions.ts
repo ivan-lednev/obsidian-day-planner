@@ -1,6 +1,7 @@
 import { get, type Readable, type Writable } from "svelte/store";
 
-import type { DayToTasks, OnUpdateFn } from "../../../types";
+import type { DayToTasks } from "../../../task-types";
+import type { OnUpdateFn } from "../../../types";
 import { areValuesEmpty } from "../../../util/task-utils";
 import { getDiff, updateText } from "../../../util/tasks-utils";
 

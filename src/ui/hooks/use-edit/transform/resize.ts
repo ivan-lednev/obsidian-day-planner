@@ -1,5 +1,5 @@
 import type { DayPlannerSettings } from "../../../../settings";
-import type { LocalTask, WithTime } from "../../../../types";
+import type { LocalTask, WithTime } from "../../../../task-types";
 import { getEndMinutes } from "../../../../util/task-utils";
 import { toSpliced } from "../../../../util/to-spliced";
 

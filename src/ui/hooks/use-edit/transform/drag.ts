@@ -1,4 +1,4 @@
-import type { LocalTask, WithTime } from "../../../../types";
+import type { LocalTask, WithTime } from "../../../../task-types";
 import { toSpliced } from "../../../../util/to-spliced";
 
 export function drag(

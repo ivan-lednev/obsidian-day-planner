@@ -1,7 +1,7 @@
 import type { Moment } from "moment";
 
 import type { DayPlannerSettings } from "../../../settings";
-import type { LocalTask, WithTime } from "../../../types";
+import type { LocalTask, WithTime } from "../../../task-types";
 
 export enum EditMode {
   DRAG = "DRAG",

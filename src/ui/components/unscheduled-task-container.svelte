@@ -5,7 +5,8 @@
 
   import { obsidianContext } from "../../constants";
   import { settings } from "../../global-store/settings";
-  import { isLocal, type ObsidianContext } from "../../types";
+  import { isLocal } from "../../task-types";
+  import { type ObsidianContext } from "../../types";
 
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 

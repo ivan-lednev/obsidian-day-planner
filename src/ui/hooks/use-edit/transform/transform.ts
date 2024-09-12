@@ -8,7 +8,7 @@ import {
   type LocalTask,
   type RemoteTask,
   type WithTime,
-} from "../../../../types";
+} from "../../../../task-types";
 import { getDayKey, moveTaskToColumn } from "../../../../util/tasks-utils";
 import { EditMode, type EditOperation, type TaskTransformer } from "../types";
 

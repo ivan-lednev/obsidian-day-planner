@@ -2,7 +2,8 @@ import Fraction from "fraction.js";
 import { partition } from "lodash/fp";
 import { isNotVoid } from "typed-assert";
 
-import type { Overlap, TimeBlock } from "../types";
+import type { TimeBlock } from "../task-types";
+import type { Overlap } from "../types";
 import { getEndMinutes } from "../util/task-utils";
 
 import { getHorizontalPlacing } from "./horizontal-placing";

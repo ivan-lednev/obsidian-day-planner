@@ -3,7 +3,8 @@
   import { fromStore } from "svelte/store";
 
   import { settings } from "../../global-store/settings";
-  import type { ObsidianContext, Task } from "../../types";
+  import type { Task } from "../../task-types";
+  import type { ObsidianContext } from "../../types";
   import { tappable } from "../actions/tappable";
   import type { ActionArray } from "../actions/use-actions";
   import { useActions } from "../actions/use-actions";

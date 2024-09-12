@@ -5,7 +5,7 @@ import { get } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
 import type { DayPlannerSettings } from "../../../settings";
-import type { LocalTask, WithTime } from "../../../types";
+import type { LocalTask, WithTime } from "../../../task-types";
 import { createTask } from "../../../util/task-utils";
 
 import type { EditOperation } from "./types";

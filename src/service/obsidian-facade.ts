@@ -95,7 +95,7 @@ export class ObsidianFacade {
       .getActiveViewOfType(MarkdownView)
       ?.setEphemeralState({ line });
 
-    editor.setCursor({ line, ch: 0 });
+    editor.setCursor({ line, ch: editor.getLine(line).length });
   }
 
   async editFile(path: string, editFn: (contents: string) => string) {

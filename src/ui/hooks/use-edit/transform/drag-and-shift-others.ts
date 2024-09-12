@@ -1,6 +1,6 @@
 import { last } from "lodash";
 
-import type { LocalTask, WithTime } from "../../../../types";
+import type { LocalTask, WithTime } from "../../../../task-types";
 import { getEndMinutes } from "../../../../util/task-utils";
 
 export function dragAndShiftOthers(

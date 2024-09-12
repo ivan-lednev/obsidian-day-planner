@@ -1,7 +1,7 @@
 import { get } from "svelte/store";
 
 import { defaultSettingsForTests } from "../../../../settings";
-import type { DayToTasks } from "../../../../types";
+import type { DayToTasks } from "../../../../task-types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 import { EditMode } from "../types";

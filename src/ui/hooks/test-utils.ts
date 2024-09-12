@@ -1,6 +1,6 @@
 import moment from "moment/moment";
 
-import type { LocalTask, WithPlacing, WithTime } from "../../types";
+import type { LocalTask, WithPlacing, WithTime } from "../../task-types";
 
 export const baseTask: WithPlacing<WithTime<LocalTask>> = {
   symbol: "-",

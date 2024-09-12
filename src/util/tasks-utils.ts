@@ -13,7 +13,7 @@ import {
   type LocalTask,
   type TasksForDay,
   type WithTime,
-} from "../types";
+} from "../task-types";
 
 import {
   isEqualTask,

@@ -1,5 +1,5 @@
 import type { DayPlannerSettings } from "../../settings";
-import type { Task } from "../../types";
+import type { Task } from "../../task-types";
 import { getOneLineSummary } from "../../util/task-utils";
 
 export function getColorOverride(

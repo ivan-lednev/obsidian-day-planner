@@ -6,7 +6,7 @@ import { isNotVoid } from "typed-assert";
 
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
-import type { LocalTask, WithTime } from "../types";
+import type { LocalTask, WithTime } from "../task-types";
 import { createDailyNoteIfNeeded } from "../util/daily-notes";
 import { getFirstLine, updateTaskText } from "../util/task-utils";
 

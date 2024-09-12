@@ -2,7 +2,7 @@ import type { Moment } from "moment";
 import { STask } from "obsidian-dataview";
 import { derived, type Readable } from "svelte/store";
 
-import type { TasksForDay } from "../../types";
+import type { TasksForDay } from "../../task-types";
 import { toClockRecord } from "../../util/dataview";
 import { getDayKey, getEmptyRecordsForDay } from "../../util/tasks-utils";
 

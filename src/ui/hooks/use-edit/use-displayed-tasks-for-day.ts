@@ -3,7 +3,12 @@ import type { Moment } from "moment/moment";
 import { derived, type Readable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../../overlap/overlap";
-import type { DayToTasks, Task, WithPlacing, WithTime } from "../../../types";
+import type {
+  DayToTasks,
+  Task,
+  WithPlacing,
+  WithTime,
+} from "../../../task-types";
 import { getRenderKey } from "../../../util/task-utils";
 import { getDayKey, getEmptyRecordsForDay } from "../../../util/tasks-utils";
 

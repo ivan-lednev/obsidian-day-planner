@@ -22,7 +22,7 @@ import { DataviewFacade } from "../service/dataview-facade";
 import { ObsidianFacade } from "../service/obsidian-facade";
 import { PlanEditor } from "../service/plan-editor";
 import type { DayPlannerSettings } from "../settings";
-import type { LocalTask, RemoteTask, WithTime } from "../types";
+import type { LocalTask, RemoteTask, WithTime } from "../task-types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";

@@ -3,7 +3,8 @@
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../constants";
-  import type { ObsidianContext, LocalTask } from "../../types";
+  import type { LocalTask } from "../../task-types";
+  import type { ObsidianContext } from "../../types";
   import { isTouchEvent } from "../../util/util";
   import type { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
   import { useFloatingUi } from "../hooks/use-floating-ui";
@@ -33,18 +34,18 @@
 <TimeBlockBase
   {task}
   use={[drag.anchorSetup]}
-  on:tap={onMouseUp}
   on:longpress={() => {
     navigator.vibrate(100);
     isActive.set(true);
   }}
+  on:pointerenter={drag.handleAnchorPointerEnter}
+  on:pointerleave={drag.handleAnchorPointerLeave}
   on:pointerup={(event) => {
     if (!isTouchEvent(event)) {
       onMouseUp();
     }
   }}
-  on:pointerenter={drag.handleAnchorPointerEnter}
-  on:pointerleave={drag.handleAnchorPointerLeave}
+  on:tap={onMouseUp}
 >
   <MarkdownBlockContent {task}>
     <RenderedMarkdown {task} />

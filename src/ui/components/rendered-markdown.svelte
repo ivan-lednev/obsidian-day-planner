@@ -3,7 +3,8 @@
 
   import { obsidianContext } from "../../constants";
   import { settings } from "../../global-store/settings";
-  import type { ObsidianContext, LocalTask } from "../../types";
+  import type { LocalTask } from "../../task-types";
+  import type { ObsidianContext } from "../../types";
   import { renderTaskMarkdown } from "../actions/render-task-markdown";
 
   export let task: LocalTask;

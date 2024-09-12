@@ -3,7 +3,7 @@ import { derived, type Readable } from "svelte/store";
 
 import { statusBarTextLimit } from "../../constants";
 import { currentTime } from "../../global-store/current-time";
-import type { TasksForDay } from "../../types";
+import type { TasksForDay } from "../../task-types";
 import { ellipsis } from "../../util/ellipsis";
 import { getDiffInMinutes } from "../../util/moment";
 import { getEndTime, getOneLineSummary } from "../../util/task-utils";

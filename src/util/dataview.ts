@@ -11,7 +11,7 @@ import {
 } from "../constants";
 import { getTimeFromSTask } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
-import type { FileLine, LocalTask, TaskTokens, WithTime } from "../types";
+import type { FileLine, LocalTask, TaskTokens, WithTime } from "../task-types";
 
 import { type ClockMoments, toTime } from "./clock";
 import { getId } from "./id";

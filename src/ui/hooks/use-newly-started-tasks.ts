@@ -3,7 +3,7 @@ import type { Moment } from "moment";
 import { derived, get, type Readable } from "svelte/store";
 
 import type { DayPlannerSettings } from "../../settings";
-import type { TasksForDay, Task, WithTime } from "../../types";
+import type { Task, TasksForDay, WithTime } from "../../task-types";
 import { getEndTime, getNotificationKey } from "../../util/task-utils";
 
 interface UseNewlyStartedTasksProps {

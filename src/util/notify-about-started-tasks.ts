@@ -1,4 +1,4 @@
-import type { Task, WithTime } from "../types";
+import type { Task, WithTime } from "../task-types";
 
 import { getOneLineSummary } from "./task-utils";
 

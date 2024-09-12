@@ -1,7 +1,7 @@
 import { derived, type Readable } from "svelte/store";
 
 import type { DayPlannerSettings } from "../../../settings";
-import type { DayToTasks } from "../../../types";
+import type { DayToTasks } from "../../../task-types";
 
 import { transform } from "./transform/transform";
 import type { EditOperation } from "./types";

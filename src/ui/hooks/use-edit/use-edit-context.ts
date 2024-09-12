@@ -3,7 +3,8 @@ import { type Readable, writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
 import type { DayPlannerSettings } from "../../../settings";
-import type { OnUpdateFn, TasksForDay } from "../../../types";
+import type { TasksForDay } from "../../../task-types";
+import type { OnUpdateFn } from "../../../types";
 
 import { createEditHandlers } from "./create-edit-handlers";
 import { useCursor } from "./cursor";

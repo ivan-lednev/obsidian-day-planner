@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LocalTask } from "../../types";
+  import type { LocalTask } from "../../task-types";
   import { hoverPreview } from "../actions/hover-preview";
 
   export let task: LocalTask;

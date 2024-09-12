@@ -4,7 +4,7 @@ import { STask } from "obsidian-dataview";
 
 import { timeFromStartRegExp } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
-import type { LocalTask, WithTime } from "../types";
+import type { LocalTask, WithTime } from "../task-types";
 
 import { toTask, toUnscheduledTask } from "./dataview";
 

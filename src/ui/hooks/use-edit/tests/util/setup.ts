@@ -7,7 +7,7 @@ import {
   type DayPlannerSettings,
   defaultSettingsForTests,
 } from "../../../../../settings";
-import type { DayToTasks } from "../../../../../types";
+import type { DayToTasks } from "../../../../../task-types";
 import { toMinutes } from "../../../../../util/moment";
 import { useEditContext } from "../../use-edit-context";
 

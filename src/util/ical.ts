@@ -3,7 +3,8 @@ import { tz } from "moment-timezone";
 import ical from "node-ical";
 
 import { noTitle, originalRecurrenceDayKeyFormat } from "../constants";
-import type { RemoteTask, WithIcalConfig, WithTime } from "../types";
+import type { RemoteTask, WithTime } from "../task-types";
+import type { WithIcalConfig } from "../types";
 
 import { getId } from "./id";
 import { getMinutesSinceMidnight } from "./moment";

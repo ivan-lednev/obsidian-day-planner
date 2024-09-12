@@ -3,14 +3,9 @@
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../constants";
-  import type {
-    LocalTask,
-    ObsidianContext,
-    WithPlacing,
-    WithTime,
-  } from "../../types";
+  import type { LocalTask, WithPlacing, WithTime } from "../../task-types";
+  import type { ObsidianContext } from "../../types";
   import { copy } from "../../util/task-utils";
-  import { isTouchEvent } from "../../util/util";
   import type { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
   import { EditMode } from "../hooks/use-edit/types";
   import { useFloatingUi } from "../hooks/use-floating-ui";
@@ -73,12 +68,7 @@
     resize.handleAnchorPointerLeave(event);
     resizeFromTop.handleAnchorPointerLeave(event);
   }}
-  on:pointerup={(event) => {
-    if (!isTouchEvent(event)) {
-      onMouseUp();
-    }
-  }}
-  on:tap={onMouseUp}
+  on:pointerup={onMouseUp}
 >
   <MarkdownBlockContent {task}>
     <RenderedMarkdown {task} />

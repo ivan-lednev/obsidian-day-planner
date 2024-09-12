@@ -3,7 +3,7 @@ import type { CachedMetadata } from "obsidian";
 import { dedent } from "ts-dedent";
 
 import { timestampRegExp } from "../regexp";
-import type { LocalTask } from "../types";
+import type { LocalTask } from "../task-types";
 import { getDiffInMinutes } from "../util/moment";
 import {
   getFirstLine,

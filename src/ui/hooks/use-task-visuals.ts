@@ -3,7 +3,7 @@ import { derived, type Readable, type Writable } from "svelte/store";
 
 import { getHiddenHoursSize } from "../../global-store/derived-settings";
 import type { DayPlannerSettings } from "../../settings";
-import type { Task, WithPlacing, WithTime } from "../../types";
+import type { Task, WithPlacing, WithTime } from "../../task-types";
 import { getRelationToNow } from "../../util/moment";
 import { getEndTime } from "../../util/task-utils";
 

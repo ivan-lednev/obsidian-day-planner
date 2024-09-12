@@ -12,7 +12,12 @@ import {
   timestampRegExp,
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
-import { isRemote, type LocalTask, type Task, type WithTime } from "../types";
+import {
+  isRemote,
+  type LocalTask,
+  type Task,
+  type WithTime,
+} from "../task-types";
 
 import { getListTokens } from "./dataview";
 import { getId } from "./id";

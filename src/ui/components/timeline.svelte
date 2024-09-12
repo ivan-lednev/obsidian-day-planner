@@ -7,7 +7,8 @@
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
-  import { isRemote, type ObsidianContext } from "../../types";
+  import { isRemote } from "../../task-types";
+  import { type ObsidianContext } from "../../types";
   import { getRenderKey } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
 

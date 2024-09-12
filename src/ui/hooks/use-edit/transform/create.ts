@@ -1,5 +1,5 @@
 import type { DayPlannerSettings } from "../../../../settings";
-import type { LocalTask, WithTime } from "../../../../types";
+import type { LocalTask, WithTime } from "../../../../task-types";
 
 export function create(
   baseline: WithTime<LocalTask>[],

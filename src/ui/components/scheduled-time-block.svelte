@@ -3,7 +3,7 @@
 
   import { currentTime } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
-  import type { Task, WithPlacing, WithTime } from "../../types";
+  import type { Task, WithPlacing, WithTime } from "../../task-types";
   import type { ActionArray } from "../actions/use-actions";
   import { useTaskVisuals } from "../hooks/use-task-visuals";
 

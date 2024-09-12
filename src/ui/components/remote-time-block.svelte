@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { RemoteTask, WithPlacing, WithTime } from "../../types";
+  import type { RemoteTask, WithPlacing, WithTime } from "../../task-types";
 
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
 
