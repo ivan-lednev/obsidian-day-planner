@@ -1,0 +1,52 @@
+name: Feature Request
+description: Request a new feature
+labels: ["enhancement"]
+body:
+  - type: checkboxes
+    id: no-duplicate-issues
+    attributes:
+      label: "⚠️ Please check that this feature request hasn't been suggested before."
+      description: "There are two locations for previous feature requests. Please search in both. Thank you. The **Label filters** may help make your search more focused."
+      options:
+        - label: "I searched previous [Issues](https://github.com/ivan-lednev/obsidian-day-planner/issues?q=is%3Aissue+is%3Aopen) didn't find any similar feature requests."
+          required: true
+        - label: "I am only requesting a single feature. Multiple changes should be split into individual requests, with links between them."
+          required: true
+        - label: "I believe my requested feature will be generally applicable to other users, not just me: it is not uniquely tied to my personal workflow."
+          required: true
+
+  - type: textarea
+    id: feature-description
+    validations:
+      required: true
+    attributes:
+      label: "🔖 Feature description"
+      description: "A clear and concise description of what the feature request is."
+      placeholder: "You should add ..."
+
+  - type: textarea
+    id: solution
+    validations:
+      required: true
+    attributes:
+      label: "✔️ Solution"
+      description: "A clear and concise description of what you want to happen, and why."
+      placeholder: "In my use-case, ..."
+
+  - type: textarea
+    id: alternatives
+    validations:
+      required: false
+    attributes:
+      label: "❓ Alternatives"
+      description: "A clear and concise description of any alternative solutions or features you've considered."
+      placeholder: "I have considered ..."
+
+  - type: textarea
+    id: additional-context
+    validations:
+      required: false
+    attributes:
+      label: "📝 Additional Context"
+      description: "Add any other context or screenshots about the feature request here."
+      placeholder: "..."
