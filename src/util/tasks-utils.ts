@@ -1,4 +1,4 @@
-import { difference, differenceBy, mergeWith } from "lodash/fp";
+import { difference, mergeWith } from "lodash/fp";
 import type { Moment } from "moment/moment";
 import {
   DEFAULT_DAILY_NOTE_FORMAT,
@@ -139,13 +139,6 @@ function getPristine(
   );
 }
 
-function getCreatedTasks(
-  base: WithTime<LocalTask>[],
-  next: WithTime<LocalTask>[],
-) {
-  return differenceBy((task) => task.id, next, base);
-}
-
 function getTasksWithUpdatedTime(
   base: WithTime<LocalTask>[],
   next: WithTime<LocalTask>[],
@@ -188,10 +181,9 @@ export function getDiff(base: DayToTasks, next: DayToTasks) {
     ),
     updatedDay: getTasksWithUpdatedDayProp(editableNext),
     moved: getTasksInDailyNotesWithUpdatedDay(editableNext),
-    created: getCreatedTasks(
-      getTasksWithTime(editableBase),
-      getTasksWithTime(editableNext),
-    ),
+    created: Object.values(editableNext)
+      .flatMap(({ withTime }) => withTime)
+      .filter((task) => task.isGhost),
   };
 }
 
