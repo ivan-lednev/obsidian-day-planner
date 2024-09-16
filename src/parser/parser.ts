@@ -2,7 +2,10 @@ import type { Moment } from "moment";
 import type { CachedMetadata } from "obsidian";
 import { dedent } from "ts-dedent";
 
-import { timestampRegExp } from "../regexp";
+import {
+  strictTimestampAnywhereInLineRegExp,
+  looseTimestampAtStartOfLineRegExp,
+} from "../regexp";
 import type { LocalTask } from "../task-types";
 import { getDiffInMinutes } from "../util/moment";
 import {
@@ -51,8 +54,48 @@ export function getHeadingByText(metadata: CachedMetadata, text: string) {
   return headings?.find((h) => h.heading === text);
 }
 
+function execTimestampPatterns(line: string) {
+  const trimmed = line.trim();
+
+  return (
+    looseTimestampAtStartOfLineRegExp.exec(trimmed) ||
+    strictTimestampAnywhereInLineRegExp.exec(trimmed)
+  );
+}
+
+export function testTimestampPatterns(line: string) {
+  const trimmed = line.trim();
+
+  return (
+    looseTimestampAtStartOfLineRegExp.test(trimmed) ||
+    strictTimestampAnywhereInLineRegExp.test(trimmed)
+  );
+}
+
+export function replaceOrPrependTimestamp(line: string, timestamp: string) {
+  const withStartOfLineReplacement = line.replace(
+    looseTimestampAtStartOfLineRegExp,
+    timestamp,
+  );
+
+  if (line !== withStartOfLineReplacement) {
+    return withStartOfLineReplacement;
+  }
+
+  const withStrictReplacement = line.replace(
+    strictTimestampAnywhereInLineRegExp,
+    timestamp,
+  );
+
+  if (line !== withStrictReplacement) {
+    return withStrictReplacement;
+  }
+
+  return `${timestamp} ${line}`;
+}
+
 export function getTimeFromSTask({ line, day }: { line: string; day: Moment }) {
-  const match = timestampRegExp.exec(line.trim());
+  const match = execTimestampPatterns(line);
 
   if (!match?.groups) {
     return null;
@@ -61,6 +104,7 @@ export function getTimeFromSTask({ line, day }: { line: string; day: Moment }) {
   const {
     groups: { start, end },
   } = match;
+
   const startTime = parseTimestamp(start, day);
   const endTime = parseTimestamp(end, day);
 

@@ -2,15 +2,11 @@ import { partition } from "lodash/fp";
 import type { Moment } from "moment/moment";
 import { STask } from "obsidian-dataview";
 
-import { timeFromStartRegExp } from "../regexp";
+import { testTimestampPatterns } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
 import type { LocalTask, WithTime } from "../task-types";
 
 import { toTask, toUnscheduledTask } from "./dataview";
-
-function isTimeSetOnTask(task: STask) {
-  return timeFromStartRegExp.test(task.text);
-}
 
 type DurationOptions = Pick<
   DayPlannerSettings,
@@ -50,7 +46,10 @@ export function mapToTasksForDay(
   tasksForDay: STask[],
   settings: DayPlannerSettings,
 ) {
-  const [withTime, withoutTime] = partition(isTimeSetOnTask, tasksForDay);
+  const [withTime, withoutTime] = partition(
+    ({ text }) => testTimestampPatterns(text),
+    tasksForDay,
+  );
 
   const { parsed: tasksWithTime, errors } = withTime.reduce<{
     parsed: WithTime<LocalTask>[];
