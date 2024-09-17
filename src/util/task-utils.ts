@@ -1,7 +1,6 @@
 import { isEmpty } from "lodash/fp";
 import type { Moment } from "moment";
 import { get } from "svelte/store";
-import { isNotVoid } from "typed-assert";
 
 import { settings } from "../global-store/settings";
 import { replaceOrPrependTimestamp } from "../parser/parser";
@@ -101,10 +100,7 @@ export function areValuesEmpty(record: Record<string, [] | object>) {
 }
 
 function taskLineToString(task: WithTime<LocalTask>) {
-  const firstLine = task.lines?.[0];
-
-  // todo: remove once lines is not optional
-  isNotVoid(firstLine);
+  const firstLine = removeListTokens(getFirstLine(task.text));
 
   const updatedTimestamp = createTimestamp(
     task.startMinutes,
@@ -113,7 +109,7 @@ function taskLineToString(task: WithTime<LocalTask>) {
   );
   const listTokens = getListTokens(task);
   const updatedFirstLineText = replaceOrPrependTimestamp(
-    firstLine.text,
+    firstLine,
     updatedTimestamp,
   );
 
