@@ -3,13 +3,13 @@ import type { Moment } from "moment";
 import { get } from "svelte/store";
 
 import { settings } from "../global-store/settings";
+import { replaceOrPrependTimestamp } from "../parser/parser";
 import {
   checkboxRegExp,
   keylessScheduledPropRegExp,
   listTokenRegExp,
   scheduledPropRegExp,
   shortScheduledPropRegExp,
-  timestampRegExp,
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
 import {
@@ -99,19 +99,24 @@ export function areValuesEmpty(record: Record<string, [] | object>) {
   return Object.values(record).every(isEmpty);
 }
 
-// todo: confusing. Do not mix up parsed and updated props
-// todo: add replaceTimestamp()
 function taskLineToString(task: WithTime<LocalTask>) {
-  const firstLineText = removeTimestamp(
-    removeListTokens(getFirstLine(task.text)),
-  );
+  const firstLine = removeListTokens(getFirstLine(task.text));
 
-  return `${getListTokens(task)} ${createTimestamp(
+  const updatedTimestamp = createTimestamp(
     task.startMinutes,
     task.durationMinutes,
     get(settings).timestampFormat,
-  )} ${firstLineText}
-${getLinesAfterFirst(task.text)}`;
+  );
+  const listTokens = getListTokens(task);
+  const updatedFirstLineText = replaceOrPrependTimestamp(
+    firstLine,
+    updatedTimestamp,
+  );
+
+  const otherLines = getLinesAfterFirst(task.text);
+
+  return `${listTokens} ${updatedFirstLineText}
+${otherLines}`;
 }
 
 export function updateScheduledPropInText(text: string, dayKey: string) {
@@ -185,20 +190,6 @@ export function getOneLineSummary(task: Task) {
 
 export function getLinesAfterFirst(text: string) {
   return text.split("\n").slice(1).join("\n");
-}
-
-export function removeTimestamp(text: string) {
-  const match = timestampRegExp.exec(text.trim());
-
-  if (!match?.groups) {
-    return text;
-  }
-
-  const {
-    groups: { text: textWithoutTimestamp },
-  } = match;
-
-  return textWithoutTimestamp;
 }
 
 export function removeListTokens(text: string) {

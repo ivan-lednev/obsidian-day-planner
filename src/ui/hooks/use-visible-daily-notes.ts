@@ -36,8 +36,10 @@ export function useVisibleDailyNotes(
         return [];
       }
 
+      const allDailyNotes = getAllDailyNotesSafely();
+
       return $visibleDays
-        .map((day) => getDailyNote(day, getAllDailyNotesSafely()))
+        .map((day) => getDailyNote(day, allDailyNotes))
         .filter(Boolean);
     },
   );
