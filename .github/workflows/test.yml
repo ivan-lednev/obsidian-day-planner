@@ -19,7 +19,7 @@ jobs:
           node-version: "latest"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci --ignore-scripts
 
       - name: Lint
         run: npm run lint

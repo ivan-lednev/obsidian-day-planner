@@ -14,8 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true
+
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -27,7 +26,7 @@ jobs:
           echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci --omit=dev --ignore-scripts
 
       - name: Build
         id: build
