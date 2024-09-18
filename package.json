@@ -72,7 +72,7 @@
     "@babel/preset-typescript": "^7.24.7",
     "@floating-ui/dom": "^1.6.11",
     "@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
-    "@types/jest": "^29.5.12",
+    "@types/jest": "^29.5.13",
     "@types/lodash": "^4.17.7",
     "babel": "^6.23.0",
     "babel-jest": "^29.7.0",
