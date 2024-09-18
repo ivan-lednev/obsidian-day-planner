@@ -21,7 +21,7 @@
     "@commitlint/cli": "^19.4.1",
     "@commitlint/config-conventional": "^19.4.1",
     "@jest/globals": "^29.7.0",
-    "@swc/core": "^1.7.23",
+    "@swc/core": "^1.7.26",
     "@swc/jest": "^0.2.36",
     "@testing-library/jest-dom": "^6.5.0",
     "@tsconfig/svelte": "^5.0.4",
