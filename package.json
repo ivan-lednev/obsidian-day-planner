@@ -84,7 +84,7 @@
     "fraction.js": "4.3.7",
     "immer": "^10.1.1",
     "lodash": "^4.17.21",
-    "lucide-svelte": "^0.439.0",
+    "lucide-svelte": "^0.441.0",
     "mdast-util-from-markdown": "^2.0.1",
     "mdast-util-to-markdown": "^2.1.0",
     "moment-timezone": "^0.5.45",
