@@ -51,7 +51,7 @@
     "nyc": "^17.0.0",
     "obsidian-dataview": "^0.5.67",
     "postcss-html": "^1.7.0",
-    "sass": "^1.78.0",
+    "sass": "^1.79.1",
     "simple-git": "^3.26.0",
     "stylelint": "^16.9.0",
     "stylelint-config-html": "^1.1.0",
