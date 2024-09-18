@@ -70,7 +70,7 @@
   "dependencies": {
     "@babel/preset-env": "^7.25.4",
     "@babel/preset-typescript": "^7.24.7",
-    "@floating-ui/dom": "^1.6.10",
+    "@floating-ui/dom": "^1.6.11",
     "@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
     "@types/jest": "^29.5.12",
     "@types/lodash": "^4.17.7",
