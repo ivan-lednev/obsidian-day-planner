@@ -5,7 +5,6 @@
   import { obsidianContext } from "../../constants";
   import type { LocalTask } from "../../task-types";
   import type { ObsidianContext } from "../../types";
-  import { isTouchEvent } from "../../util/util";
   import type { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
   import { useFloatingUi } from "../hooks/use-floating-ui";
 
@@ -40,12 +39,7 @@
   }}
   on:pointerenter={drag.handleAnchorPointerEnter}
   on:pointerleave={drag.handleAnchorPointerLeave}
-  on:pointerup={(event) => {
-    if (!isTouchEvent(event)) {
-      onMouseUp();
-    }
-  }}
-  on:tap={onMouseUp}
+  on:pointerup={onMouseUp}
 >
   <MarkdownBlockContent {task}>
     <RenderedMarkdown {task} />
