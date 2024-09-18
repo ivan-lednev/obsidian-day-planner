@@ -7,6 +7,8 @@ import {
 } from "obsidian-daily-notes-interface";
 import { isInstanceOf, isNotVoid } from "typed-assert";
 
+import type { TasksApiV1 } from "../tasks-plugin-types";
+
 function doesLeafContainFile(leaf: WorkspaceLeaf, file: TFile) {
   const { view } = leaf;
 
@@ -109,14 +111,34 @@ export class ObsidianFacade {
     await this.app.vault.modify(file, newContents);
   }
 
-  toggleCheckboxInFile = async (path: string, line: number) => {
+  async editLineInFile(
+    path: string,
+    line: number,
+    editFn: (line: string) => string,
+  ) {
     await this.editFile(path, (contents) => {
-      const updated = contents.split("\n");
+      const lines = contents.split("\n");
+      const originalLine = lines[line];
 
-      updated[line] = toggleCheckbox(updated[line]);
+      isNotVoid(originalLine, `No line ${line} in ${path}`);
 
-      return updated.join("\n");
+      lines[line] = editFn(originalLine);
+
+      return lines.join("\n");
     });
+  }
+
+  toggleCheckboxInFile = async (path: string, line: number) => {
+    const tasksApi: TasksApiV1 | undefined =
+      // @ts-expect-error
+      this.app.plugins.plugins["obsidian-tasks-plugin"]?.apiV1;
+
+    const editFn = tasksApi
+      ? (lineContents: string) =>
+          tasksApi.executeToggleTaskDoneCommand(lineContents, path)
+      : toggleCheckbox;
+
+    await this.editLineInFile(path, line, editFn);
   };
 
   private getFileByPath(path: string) {
