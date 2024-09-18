@@ -19,7 +19,7 @@ export function parseTimestamp(asText: string, day: Moment) {
 
   const parsedMinutes = parseInt(minutes) || 0;
 
-  if (ampm?.toLowerCase() === "pm" && parsedHours < 12) {
+  if (ampm?.toLowerCase().trim() === "pm" && parsedHours < 12) {
     parsedHours += 12;
   }
 
