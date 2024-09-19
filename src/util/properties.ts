@@ -1,3 +1,5 @@
+import { isNotVoid } from "typed-assert";
+
 import { propRegexp } from "../regexp";
 
 export function createProp(key: string, value: string) {
@@ -8,8 +10,11 @@ export function updateProp(
   line: string,
   updateFn: (previous: string) => string,
 ) {
-  // TODO: move out
-  const [, key, previous] = propRegexp.exec(line);
+  const match = propRegexp.exec(line);
+
+  isNotVoid(match);
+
+  const [, key, previous] = match;
 
   return `[${key}::${updateFn(previous)}]`;
 }

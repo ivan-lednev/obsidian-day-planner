@@ -1,5 +1,6 @@
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
+import { EditMode } from "../types";
 
 import { emptyTasks, nextDayKey, unscheduledTask } from "./util/fixtures";
 import { setUp } from "./util/setup";
@@ -15,7 +16,7 @@ describe("Finding diff before writing updates to files", () => {
   test("Finds tasks moved between days", async () => {
     const { todayControls, nextDayControls, confirmEdit, props } = setUp();
 
-    todayControls.handleGripMouseDown(baseTask);
+    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
     nextDayControls.handleMouseEnter();
 
     await confirmEdit();
@@ -25,7 +26,7 @@ describe("Finding diff before writing updates to files", () => {
         updated: [
           expect.objectContaining({
             id: baseTask.id,
-            firstLineText: expect.stringContaining(`⏳ ${nextDayKey}`),
+            text: expect.stringContaining(`⏳ ${nextDayKey}`),
           }),
         ],
       }),
@@ -52,7 +53,7 @@ describe("Finding diff before writing updates to files", () => {
   test("Finds tasks moved within one day", async () => {
     const { todayControls, confirmEdit, props, moveCursorTo } = setUp();
 
-    todayControls.handleGripMouseDown(baseTask);
+    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
     moveCursorTo("2:00");
 
     await confirmEdit();
@@ -74,7 +75,7 @@ describe("Finding diff before writing updates to files", () => {
       tasks: unscheduledTask,
     });
 
-    todayControls.handleGripMouseDown(baseTask);
+    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
     moveCursorTo("2:00");
 
     await confirmEdit();

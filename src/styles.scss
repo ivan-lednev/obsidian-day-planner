@@ -1,3 +1,4 @@
+@use "node_modules/overlayscrollbars/styles/overlayscrollbars";
 @use "../vendor/progress_pie_scss";
 
 @keyframes pulse {
@@ -110,6 +111,20 @@
   padding: 0;
 }
 
+.os-scrollbar {
+  box-sizing: border-box;
+  --os-size: var(--scrollbar-width);
+  --os-padding-perpendicular: 2px;
+  --os-padding-axis: 2px;
+  --os-track-border-radius: 10px;
+  --os-handle-interactive-area-offset: 4px;
+  --os-handle-border-radius: 10px;
+
+  --os-handle-bg: var(--scrollbar-thumb-bg);
+  --os-handle-bg-hover: var(--scrollbar-active-thumb-bg);
+  --os-handle-bg-active: var(--scrollbar-active-thumb-bg);
+}
+
 .absolute-stretch-x {
   position: absolute;
   right: 0;
@@ -127,4 +142,15 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--size-4-2);
+}
+
+.overlayscrollbars-svelte {
+  width: 100%;
+  height: 100%;
+}
+
+.day-planner-release-notes-container {
+  max-width: var(--file-line-width);
+  margin-left: auto;
+  margin-right: auto;
 }

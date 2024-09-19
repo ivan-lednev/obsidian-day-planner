@@ -18,6 +18,21 @@
     "plugin:import/recommended",
     "plugin:import/typescript"
   ],
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [
+        ".ts",
+        ".tsx"
+      ]
+    },
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true,
+        // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
+        "project": "./tsconfig.json"
+      }
+    }
+  },
   "parserOptions": {
     "sourceType": "module",
     "extraFileExtensions": [
@@ -36,6 +51,9 @@
     }
   ],
   "rules": {
+    // todo: Reenable once https://github.com/import-js/eslint-plugin-import/issues/1479 is fixed.
+    "import/no-duplicates": "off",
+    "svelte/valid-compile": "off",
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": [
       "error",

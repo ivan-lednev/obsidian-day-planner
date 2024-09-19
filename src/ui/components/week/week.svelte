@@ -1,20 +1,20 @@
 <script lang="ts">
-  import { Moment } from "moment";
+  import type { Moment } from "moment";
   import { getContext } from "svelte";
-  import { Writable } from "svelte/store";
+  import type { Writable } from "svelte/store";
 
   import { dateRangeContextKey, obsidianContext } from "../../../constants";
+  import { isToday } from "../../../global-store/current-time";
   import { getVisibleHours } from "../../../global-store/derived-settings";
   import { settings } from "../../../global-store/settings";
   import type { ObsidianContext } from "../../../types";
-  import { isToday } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
-  import GlobalHandlers from "../global-handlers.svelte";
+  import ResizeHandle from "../resize-handle.svelte";
+  import ResizeableBox from "../resizeable-box.svelte";
   import Ruler from "../ruler.svelte";
   import Scroller from "../scroller.svelte";
   import Timeline from "../timeline.svelte";
   import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
-
 
   const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
@@ -29,15 +29,13 @@
   }
 </script>
 
-<GlobalHandlers />
-
 <div bind:this={weekHeaderRef} class="week-header">
   <div class="header-row day-buttons">
     <div class="corner"></div>
     {#each $dateRange as day}
-      <div class="header-cell" class:today={isToday(day)}>
+      <div class="header-cell" class:today={$isToday(day)}>
         <ControlButton
-          --color={isToday(day) ? "white" : "var(--icon-color)"}
+          --color={$isToday(day) ? "white" : "var(--icon-color)"}
           label="Open note for day"
           on:click={async () => await obsidianFacade.openFileForDay(day)}
         >
@@ -47,14 +45,17 @@
     {/each}
   </div>
 
-  <div class="header-row">
-    <div class="corner"></div>
-    {#each $dateRange as day}
-      <div class="header-cell">
-        <UnscheduledTaskContainer {day} />
-      </div>
-    {/each}
-  </div>
+  <ResizeableBox classNames="header-row">
+    {#snippet children(startEdit)}
+      <div class="corner"></div>
+      {#each $dateRange as day}
+        <div class="header-cell">
+          <UnscheduledTaskContainer {day} />
+        </div>
+      {/each}
+      <ResizeHandle on:mousedown={startEdit} />
+    {/snippet}
+  </ResizeableBox>
 </div>
 
 <Scroller on:scroll={handleScroll}>
@@ -70,7 +71,8 @@
 </Scroller>
 
 <style>
-  .header-row {
+  :global(.header-row) {
+    position: relative;
     display: flex;
   }
 
@@ -125,7 +127,7 @@
     border-bottom: 1px solid var(--background-modifier-border);
   }
 
-  .header-cell:last-child {
+  .header-cell:last-of-type {
     flex: 1 0 calc(200px + var(--scrollbar-width));
     border-right: none;
   }

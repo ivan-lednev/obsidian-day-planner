@@ -1,5 +1,5 @@
 import { DataArray, STask } from "obsidian-dataview";
-import { derived, Readable } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
 import { hasActiveClockProp } from "../../util/clock";
 

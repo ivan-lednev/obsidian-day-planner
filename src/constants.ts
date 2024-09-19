@@ -1,5 +1,6 @@
 export const viewTypeTimeline = "timeline";
 export const viewTypeWeekly = "weekly";
+export const viewTypeReleaseNotes = "planner-release-notes";
 export const viewTypeTimeTracker = "timeTracker";
 export const obsidianContext = "obsidian";
 export const editContextKey = "editContext";
@@ -16,16 +17,8 @@ export const clockKey = "clocked";
 export const clockFormat = "YYYY-MM-DDTHH:mm:ss";
 export const reQueryAfterMillis = 200;
 export const icalRefreshIntervalMillis = 5 * 60 * 1000;
-export const supportBanner = `🪲 [Report bugs and suggest features](https://github.com/ivan-lednev/obsidian-day-planner/issues)<br>
-❓ [Ask questions](https://github.com/ivan-lednev/obsidian-day-planner/discussions/new?category=q-a)<br>
-👍 [Give thumbs up to issues important to you](https://github.com/ivan-lednev/obsidian-day-planner/issues)<br>
-🪛 [Submit pull-requests](./CONTRIBUTING.md)<br>
-❤️ Support the project directly:
 
-<a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
-
-You can disable these release notes in the settings tab.
-`;
+export const noTitle = "(No title)";
 
 export const icons = [
   "any-key",

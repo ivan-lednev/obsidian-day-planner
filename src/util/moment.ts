@@ -28,7 +28,6 @@ export function getDaysOfCurrentWeek() {
 export function getDaysOfWeek(moment: Moment) {
   const firstDay = moment.clone().startOf("isoWeek");
 
-  // TODO: 'only workdays goes here'
   return range(1, 7).reduce(
     (result, dayIndex) => {
       const nextDay = firstDay.clone().add(dayIndex, "day");
@@ -72,10 +71,6 @@ export function getRelationToNow(
   }
 
   return "present";
-}
-
-export function isToday(moment: Moment) {
-  return moment.isSame(window.moment(), "day");
 }
 
 export function splitMultiday(

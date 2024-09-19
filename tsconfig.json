@@ -6,12 +6,13 @@
     "inlineSources": true,
     "module": "ESNext",
     "target": "es6",
-//    "strict": true,
+    "strict": true,
     "allowJs": true,
-    "noImplicitAny": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "importHelpers": true,
+    // TODO: remove once Dataview type imports get fixed
+    "noImplicitAny": false,
     "lib": [
       "DOM",
       "ES5",
@@ -32,6 +33,7 @@
     "obsidian-metadata-utils/*"
   ],
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/**/*.svelte"
   ]
 }

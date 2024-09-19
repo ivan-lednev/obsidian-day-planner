@@ -1,23 +1,22 @@
 import { partition } from "lodash/fp";
-import { Moment } from "moment/moment";
+import type { Moment } from "moment/moment";
 import { STask } from "obsidian-dataview";
 
-import { timeFromStartRegExp } from "../regexp";
-import { DayPlannerSettings } from "../settings";
-import { Task } from "../types";
+import { testTimestampPatterns } from "../parser/parser";
+import type { DayPlannerSettings } from "../settings";
+import type { LocalTask, WithTime } from "../task-types";
 
 import { toTask, toUnscheduledTask } from "./dataview";
-
-function isTimeSetOnTask(task: STask) {
-  return timeFromStartRegExp.test(task.text);
-}
 
 type DurationOptions = Pick<
   DayPlannerSettings,
   "defaultDurationMinutes" | "extendDurationUntilNext"
 >;
 
-function calculateDuration(tasks: Task[], options: DurationOptions) {
+function calculateDuration(
+  tasks: WithTime<LocalTask>[],
+  options: DurationOptions,
+) {
   return tasks.map((current, i, array) => {
     if (current.durationMinutes) {
       return current;
@@ -47,13 +46,19 @@ export function mapToTasksForDay(
   tasksForDay: STask[],
   settings: DayPlannerSettings,
 ) {
-  const [withTime, withoutTime] = partition(isTimeSetOnTask, tasksForDay);
+  const [withTime, withoutTime] = partition(
+    ({ text }) => testTimestampPatterns(text),
+    tasksForDay,
+  );
 
-  const { parsed: tasksWithTime, errors } = withTime.reduce(
+  const { parsed: tasksWithTime, errors } = withTime.reduce<{
+    parsed: WithTime<LocalTask>[];
+    errors: unknown[];
+  }>(
     (result, sTask) => {
       // todo: remove once proper handling is in place
       try {
-        const task = toTask(sTask, day);
+        const task = toTask(sTask, day, settings);
 
         result.parsed.push(task);
       } catch (error) {
@@ -64,7 +69,6 @@ export function mapToTasksForDay(
     },
     { parsed: [], errors: [] },
   );
-  // TODO: sortByStartMinutes()
 
   tasksWithTime.sort((a, b) => a.startMinutes - b.startMinutes);
 

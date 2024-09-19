@@ -1,15 +1,20 @@
-import type { PlacedTask } from "../../../../types";
+import type { DayPlannerSettings } from "../../../../settings";
+import type { LocalTask, WithTime } from "../../../../task-types";
 
 export function create(
-  baseline: PlacedTask[],
-  editTarget: PlacedTask,
+  baseline: WithTime<LocalTask>[],
+  editTarget: WithTime<LocalTask>,
   cursorTime: number,
-): PlacedTask[] {
+  settings: DayPlannerSettings,
+): WithTime<LocalTask>[] {
   return baseline.map((task) => {
     if (task.id === editTarget.id) {
       return {
         ...editTarget,
-        durationMinutes: cursorTime - editTarget.startMinutes,
+        durationMinutes: Math.max(
+          cursorTime - editTarget.startMinutes,
+          settings.minimalDurationMinutes,
+        ),
       };
     }
 

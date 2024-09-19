@@ -1,9 +1,11 @@
+import { produce } from "immer";
 import { PluginSettingTab, Setting } from "obsidian";
 import type { Writable } from "svelte/store";
+import { isOneOf } from "typed-assert";
 
 import { icons } from "../constants";
 import type DayPlanner from "../main";
-import type { DayPlannerSettings } from "../settings";
+import { type DayPlannerSettings, eventFormats } from "../settings";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   constructor(
@@ -27,6 +29,46 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             this.update({ releaseNotes: value });
           }),
       );
+
+    new Setting(containerEl)
+      .setName("Event format on creation")
+      .addDropdown((dropdown) => {
+        dropdown.addOptions({
+          bullet: `Bullet (- New item)`,
+          task: `Task (- [ ] New item)`,
+        });
+        return dropdown
+          .setValue(this.plugin.settings().eventFormatOnCreation)
+          .onChange((value) => {
+            isOneOf(value, eventFormats);
+
+            this.update({ eventFormatOnCreation: value });
+            this.display();
+          });
+      });
+
+    if (this.plugin.settings().eventFormatOnCreation === "task") {
+      new Setting(containerEl)
+        .setName("Default task status on creation")
+        .setDesc(
+          "You can use custom statuses for more advanced workflows. E.g.: '- [>] Task'",
+        )
+        .addText((el) =>
+          el
+            .setPlaceholder("Empty")
+            .setValue(this.plugin.settings().taskStatusOnCreation)
+            .onChange((value: string) => {
+              this.settingsStore.update((previous) => {
+                const newValue = value.length > 0 ? value.substring(0, 1) : " ";
+
+                return {
+                  ...previous,
+                  taskStatusOnCreation: newValue,
+                };
+              });
+            }),
+        );
+    }
 
     new Setting(containerEl)
       .setName("Round time to minutes")
@@ -153,16 +195,12 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName(`Calendar ${index + 1}`)
         .addColorPicker((el) =>
-          // todo: replace with immer
           el.setValue(ical.color).onChange((value: string) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              icals: previous.icals.map((editedIcal, editedIndex) =>
-                editedIndex === index
-                  ? { ...editedIcal, color: value }
-                  : editedIcal,
-              ),
-            }));
+            this.settingsStore.update(
+              produce((draft) => {
+                draft.icals[index].color = value;
+              }),
+            );
           }),
         )
         .addText((el) =>
@@ -170,14 +208,11 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             .setPlaceholder("Displayed name")
             .setValue(ical.name)
             .onChange((value: string) => {
-              this.settingsStore.update((previous) => ({
-                ...previous,
-                icals: previous.icals.map((editedIcal, editedIndex) =>
-                  editedIndex === index
-                    ? { ...editedIcal, name: value }
-                    : editedIcal,
-                ),
-              }));
+              this.settingsStore.update(
+                produce((draft) => {
+                  draft.icals[index].name = value;
+                }),
+              );
             }),
         )
         .addText((el) =>
@@ -185,14 +220,11 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             .setPlaceholder("URL")
             .setValue(ical.url)
             .onChange((value: string) => {
-              this.settingsStore.update((previous) => ({
-                ...previous,
-                icals: previous.icals.map((editedIcal, editedIndex) =>
-                  editedIndex === index
-                    ? { ...editedIcal, url: value }
-                    : editedIcal,
-                ),
-              }));
+              this.settingsStore.update(
+                produce((draft) => {
+                  draft.icals[index].url = value;
+                }),
+              );
             }),
         )
         .addExtraButton((el) =>
@@ -434,6 +466,19 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           }),
       );
 
+    new Setting(containerEl)
+      .setName("Minimal task duration")
+      .setDesc("Used when you create a task with drag-and-drop")
+      .addSlider((slider) =>
+        slider
+          .setLimits(5, 15, 5)
+          .setValue(Number(this.plugin.settings().minimalDurationMinutes))
+          .setDynamicTooltip()
+          .onChange((value: number) => {
+            this.update({ minimalDurationMinutes: value });
+          }),
+      );
+
     containerEl.createEl("h2", { text: "Color blocking" });
     containerEl.createEl("p", {
       text: `Define a background color for a block containing some text (it might be a tag, like '#important'). The first color is for light mode, the second is for dark mode.`,
@@ -443,31 +488,21 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName(`Color ${index + 1}`)
         .addColorPicker((el) =>
-          // todo: replace with immer
           el.setValue(colorOverride.color).onChange((value: string) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              colorOverrides: previous.colorOverrides.map(
-                (editedOverride, editedIndex) =>
-                  editedIndex === index
-                    ? { ...editedOverride, color: value }
-                    : editedOverride,
-              ),
-            }));
+            this.settingsStore.update(
+              produce((draft) => {
+                draft.colorOverrides[index].color = value;
+              }),
+            );
           }),
         )
         .addColorPicker((el) =>
-          // todo: replace with immer
           el.setValue(colorOverride.darkModeColor).onChange((value: string) => {
-            this.settingsStore.update((previous) => ({
-              ...previous,
-              colorOverrides: previous.colorOverrides.map(
-                (editedOverride, editedIndex) =>
-                  editedIndex === index
-                    ? { ...editedOverride, darkModeColor: value }
-                    : editedOverride,
-              ),
-            }));
+            this.settingsStore.update(
+              produce((draft) => {
+                draft.colorOverrides[index].darkModeColor = value;
+              }),
+            );
           }),
         )
         .addText((el) =>

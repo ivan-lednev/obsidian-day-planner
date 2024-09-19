@@ -1,6 +1,6 @@
-import { derived, Readable } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
-import { DayPlannerSettings } from "../../../settings";
+import type { DayPlannerSettings } from "../../../settings";
 import { offsetYToMinutes } from "../../../util/task-utils";
 
 export function useCursorMinutes(

@@ -7,10 +7,21 @@ import {
 } from "obsidian-daily-notes-interface";
 import { isInstanceOf, isNotVoid } from "typed-assert";
 
+import type { TasksApiV1 } from "../tasks-plugin-types";
+
 function doesLeafContainFile(leaf: WorkspaceLeaf, file: TFile) {
   const { view } = leaf;
 
   return view instanceof FileView && view.file === file;
+}
+
+// todo: make more robust
+function toggleCheckbox(line: string) {
+  if (line.includes("[ ]")) {
+    return line.replace("[ ]", "[x]");
+  }
+
+  return line.replace("[x]", "[ ]");
 }
 
 export class ObsidianFacade {
@@ -78,11 +89,15 @@ export class ObsidianFacade {
 
     const editor = await this.openFileInEditor(file);
 
+    if (!editor) {
+      return;
+    }
+
     this.app.workspace
       .getActiveViewOfType(MarkdownView)
       ?.setEphemeralState({ line });
 
-    editor.setCursor({ line, ch: 0 });
+    editor.setCursor({ line, ch: editor.getLine(line).length });
   }
 
   async editFile(path: string, editFn: (contents: string) => string) {
@@ -95,6 +110,36 @@ export class ObsidianFacade {
 
     await this.app.vault.modify(file, newContents);
   }
+
+  async editLineInFile(
+    path: string,
+    line: number,
+    editFn: (line: string) => string,
+  ) {
+    await this.editFile(path, (contents) => {
+      const lines = contents.split("\n");
+      const originalLine = lines[line];
+
+      isNotVoid(originalLine, `No line ${line} in ${path}`);
+
+      lines[line] = editFn(originalLine);
+
+      return lines.join("\n");
+    });
+  }
+
+  toggleCheckboxInFile = async (path: string, line: number) => {
+    const tasksApi: TasksApiV1 | undefined =
+      // @ts-expect-error
+      this.app.plugins.plugins["obsidian-tasks-plugin"]?.apiV1;
+
+    const editFn = tasksApi
+      ? (lineContents: string) =>
+          tasksApi.executeToggleTaskDoneCommand(lineContents, path)
+      : toggleCheckbox;
+
+    await this.editLineInFile(path, line, editFn);
+  };
 
   private getFileByPath(path: string) {
     const file = this.app.vault.getAbstractFileByPath(path);

@@ -2,7 +2,7 @@ import esbuild from "esbuild";
 import process from "process";
 import builtins from "builtin-modules";
 import esbuildSvelte from "esbuild-svelte";
-import sveltePreprocess from "svelte-preprocess";
+import {sveltePreprocess} from "svelte-preprocess";
 import { sassPlugin } from "esbuild-sass-plugin";
 import { replace } from "esbuild-plugin-replace";
 import fs from "node:fs";
@@ -43,11 +43,13 @@ const context = await esbuild.context({
   logLevel: "info",
   sourcemap: prod ? false : "inline",
   treeShaking: true,
+  conditions: ['svelte'],
   plugins: [
     sassPlugin(),
     esbuildSvelte({
-      compilerOptions: { css: true, dev: !prod },
-      preprocess: sveltePreprocess()
+      compilerOptions: { css: "injected", dev: !prod },
+      preprocess: sveltePreprocess(),
+      include: /\.svelte(\.ts)?$/,
     }),
     replace({
       include: /release-notes-modal\.ts|main\.ts/,

@@ -1,4 +1,4 @@
-import { Readable, readable } from "svelte/store";
+import { type Readable, readable } from "svelte/store";
 
 import { debounceWithDelay } from "../../util/debounce-with-delay";
 import { getUpdateTrigger } from "../../util/store";

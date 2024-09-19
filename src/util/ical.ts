@@ -1,12 +1,10 @@
-import moment, { Moment } from "moment";
+import moment, { type Moment } from "moment";
 import { tz } from "moment-timezone";
 import ical from "node-ical";
 
-import {
-  defaultDurationMinutes,
-  originalRecurrenceDayKeyFormat,
-} from "../constants";
-import { Task, UnscheduledTask, WithIcalConfig } from "../types";
+import { noTitle, originalRecurrenceDayKeyFormat } from "../constants";
+import type { RemoteTask, WithTime } from "../task-types";
+import type { WithIcalConfig } from "../types";
 
 import { getId } from "./id";
 import { getMinutesSinceMidnight } from "./moment";
@@ -37,7 +35,6 @@ export function icalEventToTasks(
   day: Moment,
 ) {
   if (icalEvent.rrule) {
-    // todo: don't clone and modify them every single time
     const startOfDay = day.clone().startOf("day").toDate();
     const endOfDay = day.clone().endOf("day").toDate();
 
@@ -57,7 +54,6 @@ export function icalEventToTasks(
     return [...recurrences, ...recurrenceOverrides];
   }
 
-  // todo: do this once
   const eventStart = window.moment(icalEvent.start);
   const startsOnVisibleDay = day.isSame(eventStart, "day");
 
@@ -69,7 +65,7 @@ export function icalEventToTasks(
 function icalEventToTask(
   icalEvent: WithIcalConfig<ical.VEvent>,
   date: Date,
-): Task | UnscheduledTask {
+): RemoteTask | WithTime<RemoteTask> {
   let startTimeAdjusted = window.moment(date);
   const tzid = icalEvent.rrule?.origOptions?.tzid;
 
@@ -81,20 +77,14 @@ function icalEventToTask(
   const isAllDayEvent = icalEvent.datetype === "date";
 
   const base = {
-    calendar: icalEvent.calendar,
     id: getId(),
-    text: icalEvent.summary,
-    firstLineText: icalEvent.summary,
+    calendar: icalEvent.calendar,
+    summary: icalEvent.summary || noTitle,
     startTime: startTimeAdjusted,
-    readonly: true,
-    listTokens: "- ",
   };
 
   if (isAllDayEvent) {
-    return {
-      ...base,
-      durationMinutes: defaultDurationMinutes,
-    };
+    return base;
   }
 
   return {

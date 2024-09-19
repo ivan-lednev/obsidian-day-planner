@@ -1,7 +1,6 @@
 import { Keymap } from "obsidian";
 import { readable } from "svelte/store";
 
-// todo: also track 'blur'
 export function useModPressed() {
   return readable(false, (set) => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -16,12 +15,18 @@ export function useModPressed() {
       }
     };
 
+    const handleBlur = () => {
+      set(false);
+    };
+
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("blur", handleBlur);
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", handleBlur);
     };
   });
 }

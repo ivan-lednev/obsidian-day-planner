@@ -1,4 +1,5 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
+import { mount, unmount } from "svelte";
 
 import { dateRangeContextKey, viewTypeWeekly } from "../constants";
 import type { DayPlannerSettings } from "../settings";
@@ -10,9 +11,9 @@ import Week from "./components/week/week.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
 
 export default class WeeklyView extends ItemView {
-  private weekComponent: Week;
-  private headerActionsComponent: HeaderActions;
-  private dateRange: DateRange;
+  private weekComponent?: Week;
+  private headerActionsComponent?: HeaderActions;
+  private dateRange?: DateRange;
 
   constructor(
     leaf: WorkspaceLeaf,
@@ -39,11 +40,6 @@ export default class WeeklyView extends ItemView {
     const headerEl = this.containerEl.children[0];
     const contentEl = this.containerEl.children[1];
 
-    const viewActionsEl = headerEl.querySelector(".view-actions");
-
-    const customActionsEl = createDiv();
-    viewActionsEl.prepend(customActionsEl);
-
     this.dateRange = this.dateRanges.trackRange(getDaysOfCurrentWeek());
 
     const context = new Map([
@@ -51,20 +47,35 @@ export default class WeeklyView extends ItemView {
       [dateRangeContextKey, this.dateRange],
     ]);
 
-    this.headerActionsComponent = new HeaderActions({
-      target: customActionsEl,
-      context,
-    });
-
-    this.weekComponent = new Week({
+    // @ts-expect-error
+    this.weekComponent = mount(Week, {
       target: contentEl,
       context,
     });
+
+    const viewActionsEl = headerEl.querySelector(".view-actions");
+
+    if (viewActionsEl) {
+      const customActionsEl = createDiv();
+
+      viewActionsEl.prepend(customActionsEl);
+      // @ts-expect-error
+      this.headerActionsComponent = mount(HeaderActions, {
+        target: customActionsEl,
+        context,
+      });
+    }
   }
 
   async onClose() {
-    this.dateRange.untrack();
-    this.weekComponent?.$destroy();
-    this.headerActionsComponent?.$destroy();
+    this.dateRange?.untrack();
+
+    if (this.weekComponent) {
+      unmount(this.weekComponent);
+    }
+
+    if (this.headerActionsComponent) {
+      unmount(this.headerActionsComponent);
+    }
   }
 }

@@ -1,6 +1,7 @@
-import { Moment } from "moment/moment";
+import type { Moment } from "moment";
 import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { DataArray, DateTime, STask } from "obsidian-dataview";
+import { isNotVoid } from "typed-assert";
 
 import {
   defaultDayFormat,
@@ -8,13 +9,13 @@ import {
   defaultDurationMinutes,
   indentBeforeTaskParagraph,
 } from "../constants";
-import { createTask } from "../parser/parser";
-import { timeFromStartRegExp } from "../regexp";
-import { Task } from "../types";
+import { getTimeFromSTask } from "../parser/parser";
+import type { DayPlannerSettings } from "../settings";
+import type { FileLine, LocalTask, TaskTokens, WithTime } from "../task-types";
 
-import { ClockMoments, toTime } from "./clock";
+import { type ClockMoments, toTime } from "./clock";
 import { getId } from "./id";
-import { getDiffInMinutes, getMinutesSinceMidnight } from "./moment";
+import { getMinutesSinceMidnight } from "./moment";
 import { deleteProps } from "./properties";
 
 export function unwrap<T>(group: ReturnType<DataArray<T>["groupBy"]>) {
@@ -34,14 +35,22 @@ export function textToString(node: Node) {
   return `${node.symbol} ${status}${deleteProps(node.text)}\n`;
 }
 
-// todo: remove duplication: toMarkdown
 export function toString(node: Node, indentation = "") {
   let result = `${indentation}${textToString(node)}`;
 
   for (const child of node.children) {
-    if (!child.scheduled && !timeFromStartRegExp.test(child.text)) {
-      result += toString(child, `\t${indentation}`);
-    }
+    // todo (minor): handle custom indentation (spaces of differing lengths)
+    result += toString(child, `\t${indentation}`);
+  }
+
+  return result;
+}
+
+export function getLines(node, result: Array<FileLine> = []) {
+  result.push({ text: node.text, line: node.line, task: node.task });
+
+  for (const child of node.children) {
+    getLines(child, result);
   }
 
   return result;
@@ -49,11 +58,12 @@ export function toString(node: Node, indentation = "") {
 
 export function toUnscheduledTask(sTask: STask, day: Moment) {
   return {
+    startTime: day,
     durationMinutes: defaultDurationMinutes,
-    // todo: bad abstraction
-    listTokens: `${sTask.symbol} [${sTask.status}] `,
-    firstLineText: sTask.text,
+    symbol: sTask.symbol,
+    status: sTask.status,
     text: toString(sTask),
+    lines: getLines(sTask),
     location: {
       path: sTask.path,
       line: sTask.line,
@@ -63,32 +73,34 @@ export function toUnscheduledTask(sTask: STask, day: Moment) {
   };
 }
 
-export function toTask(sTask: STask, day: Moment): Task {
-  const { startTime, endTime, firstLineText, text } = createTask({
-    line: textToString(sTask),
-    completeContent: toString(sTask),
+export function toTask(
+  sTask: STask,
+  day: Moment,
+  settings: DayPlannerSettings,
+): WithTime<LocalTask> {
+  const parsedTime = getTimeFromSTask({
+    line: sTask.text,
     day,
-    location: {
-      path: sTask.path,
-      line: sTask.line,
-      position: sTask.position,
-    },
   });
 
-  const durationMinutes = endTime?.isAfter(startTime)
-    ? getDiffInMinutes(endTime, startTime)
-    : undefined;
+  isNotVoid(
+    parsedTime,
+    `Unexpectedly received an STask without a timestamp: ${sTask.text}`,
+  );
+
+  const { startTime, durationMinutes = settings.defaultDurationMinutes } =
+    parsedTime;
 
   return {
     startTime,
-    listTokens: `${sTask.symbol} [${sTask.status}] `,
-    firstLineText,
-    text,
+    symbol: sTask.symbol,
+    status: sTask.status,
+    text: toString(sTask),
+    lines: getLines(sTask),
     durationMinutes,
     startMinutes: getMinutesSinceMidnight(startTime),
     location: {
       path: sTask.path,
-      line: sTask.line,
       position: sTask.position,
     },
     id: getId(),
@@ -111,12 +123,10 @@ export function toClockRecord(sTask: STask, clockMoments: ClockMoments) {
   return {
     ...toTime(clockMoments),
     startTime: clockMoments[0],
-    firstLineText: textToString(sTask),
     text: toString(sTask),
-    listTokens: "",
+    symbol: "-",
     location: {
       path: sTask.path,
-      line: sTask.line,
       position: sTask.position,
     },
     id: getId(),
@@ -132,12 +142,17 @@ export function toMarkdown(sTask: STask) {
     .map((line, i) => {
       if (i === 0) {
         // TODO: remove duplication
-        return `${baseIndent}${sTask.symbol} [${sTask.status}] ${line}`;
+        return `${baseIndent}${getListTokens(sTask)} ${line}`;
       }
 
       return `${baseIndent}${extraIndent}${line}`;
     })
     .join("\n");
+}
+
+export function getListTokens(task: TaskTokens) {
+  const maybeCheckbox = task.status === undefined ? "" : `[${task.status}]`;
+  return `${task.symbol} ${maybeCheckbox}`.trim();
 }
 
 export function replaceSTaskInFile(

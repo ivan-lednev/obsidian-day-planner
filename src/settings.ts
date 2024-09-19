@@ -13,6 +13,8 @@ export interface ColorOverride {
   darkModeColor: string;
 }
 
+export const eventFormats = ["task", "bullet"] as const;
+
 export interface DayPlannerSettings {
   progressIndicator: "pie" | "bar" | "none";
   showTaskNotification: boolean;
@@ -32,6 +34,7 @@ export interface DayPlannerSettings {
   dataviewSource: string;
   extendDurationUntilNext: boolean;
   defaultDurationMinutes: number;
+  minimalDurationMinutes: number;
   showTimestampInTaskBlock: boolean;
   showUncheduledTasks: boolean;
   showUnscheduledNestedTasks: boolean;
@@ -42,11 +45,10 @@ export interface DayPlannerSettings {
   showCompletedTasks: boolean;
   showSubtasksInTaskBlocks: boolean;
   icals: Array<IcalConfig>;
-  editMode: "simple" | "push" | "shrink";
-  copyOnDrag: boolean;
   colorOverrides: Array<ColorOverride>;
   releaseNotes: boolean;
-  reorderTasksAfterMoving: boolean;
+  taskStatusOnCreation: string;
+  eventFormatOnCreation: (typeof eventFormats)[number];
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -69,6 +71,7 @@ export const defaultSettings: DayPlannerSettings = {
   dataviewSource: "",
   extendDurationUntilNext: false,
   defaultDurationMinutes: 30,
+  minimalDurationMinutes: 10,
   showTimestampInTaskBlock: false,
   showUncheduledTasks: true,
   showUnscheduledNestedTasks: true,
@@ -79,11 +82,9 @@ export const defaultSettings: DayPlannerSettings = {
   showSubtasksInTaskBlocks: true,
   icals: [],
   colorOverrides: [],
-  editMode: "simple",
-  copyOnDrag: false,
   releaseNotes: true,
-  // `false` by default while it is being tested
-  reorderTasksAfterMoving: false,
+  taskStatusOnCreation: " ",
+  eventFormatOnCreation: "task",
 };
 
 export const defaultSettingsForTests = {

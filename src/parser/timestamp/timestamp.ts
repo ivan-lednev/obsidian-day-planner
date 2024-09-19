@@ -2,11 +2,7 @@ import type { Moment } from "moment/moment";
 
 import { timeRegExp } from "../../regexp";
 
-export function parseTimestamp(asText?: string, day?: Moment): Moment | null {
-  if (!asText) {
-    return null;
-  }
-
+export function parseTimestamp(asText: string, day: Moment) {
   const result = timeRegExp.exec(asText);
 
   if (result === null) {
@@ -23,7 +19,7 @@ export function parseTimestamp(asText?: string, day?: Moment): Moment | null {
 
   const parsedMinutes = parseInt(minutes) || 0;
 
-  if (ampm?.toLowerCase() === "pm" && parsedHours < 12) {
+  if (ampm?.toLowerCase().trim() === "pm" && parsedHours < 12) {
     parsedHours += 12;
   }
 

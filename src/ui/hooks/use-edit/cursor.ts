@@ -1,6 +1,6 @@
-import { derived, Readable } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
-import { EditMode, EditOperation } from "./types";
+import { EditMode, type EditOperation } from "./types";
 
 export function useCursor(editOperation: Readable<EditOperation | undefined>) {
   return derived(editOperation, ($editOperation) => {

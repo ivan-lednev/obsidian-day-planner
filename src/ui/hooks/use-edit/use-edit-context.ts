@@ -1,13 +1,14 @@
-import { Moment } from "moment";
-import { Readable, writable } from "svelte/store";
+import type { Moment } from "moment";
+import { type Readable, writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../service/obsidian-facade";
-import { DayPlannerSettings } from "../../../settings";
-import { OnUpdateFn, TasksForDay } from "../../../types";
+import type { DayPlannerSettings } from "../../../settings";
+import type { TasksForDay } from "../../../task-types";
+import type { OnUpdateFn } from "../../../types";
 
 import { createEditHandlers } from "./create-edit-handlers";
 import { useCursor } from "./cursor";
-import { EditOperation } from "./types";
+import type { EditOperation } from "./types";
 import { useCursorMinutes } from "./use-cursor-minutes";
 import { useDisplayedTasks } from "./use-displayed-tasks";
 import { useDisplayedTasksForDay } from "./use-displayed-tasks-for-day";
@@ -20,7 +21,6 @@ export interface UseEditContextProps {
   visibleTasks: Readable<Record<string, TasksForDay>>;
 }
 
-// todo: the name is misleading
 export function useEditContext({
   obsidianFacade,
   onUpdate,
@@ -32,7 +32,6 @@ export function useEditContext({
   const pointerOffsetY = writable(0);
   const cursorMinutes = useCursorMinutes(pointerOffsetY, settings);
 
-  // todo: change misleading name
   const baselineTasks = writable({}, (set) => {
     return visibleTasks.subscribe(set);
   });
@@ -41,6 +40,7 @@ export function useEditContext({
     baselineTasks,
     editOperation,
     cursorMinutes,
+    settings,
   });
 
   const { startEdit, confirmEdit, cancelEdit } = useEditActions({
@@ -62,16 +62,13 @@ export function useEditContext({
 
     return {
       ...handlers,
-      cursor,
-      cancelEdit,
-      pointerOffsetY,
       displayedTasks: useDisplayedTasksForDay(displayedTasks, day),
     };
   }
 
-  // todo: return stuff only once
   return {
     cursor,
+    pointerOffsetY,
     displayedTasks,
     confirmEdit,
     cancelEdit,

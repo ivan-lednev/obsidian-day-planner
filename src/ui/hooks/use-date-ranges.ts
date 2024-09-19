@@ -1,6 +1,11 @@
 import { omit } from "lodash/fp";
-import { Moment } from "moment";
-import { Subscriber, Updater, Writable, writable } from "svelte/store";
+import type { Moment } from "moment";
+import {
+  type Subscriber,
+  type Updater,
+  type Writable,
+  writable,
+} from "svelte/store";
 
 import { getId } from "../../util/id";
 

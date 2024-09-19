@@ -1,23 +1,47 @@
 <script lang="ts">
-  import { UnscheduledTask } from "../../types";
-  import { useColorOverride } from "../hooks/use-color-override";
+  import { getContext, type Snippet } from "svelte";
+  import { fromStore } from "svelte/store";
 
-  export let task: UnscheduledTask;
+  import { settings } from "../../global-store/settings";
+  import type { Task } from "../../task-types";
+  import type { ObsidianContext } from "../../types";
+  import { tappable } from "../actions/tappable";
+  import type { ActionArray } from "../actions/use-actions";
+  import { useActions } from "../actions/use-actions";
+  import { getColorOverride } from "../hooks/get-color-override.svelte";
 
-  $: override = useColorOverride(task);
-  // todo: hide in hook
-  $: backgroundColor =
-    $override || "var(--time-block-bg-color, var(--background-primary))";
+  import { obsidianContext } from "./../../constants";
+
+  const {
+    children,
+    task,
+    use = [],
+  }: { children: Snippet; task: Task; use: ActionArray } = $props();
+
+  const { isDarkMode } = getContext<ObsidianContext>(obsidianContext);
+
+  const override = $derived(
+    getColorOverride(
+      task,
+      fromStore(isDarkMode).current,
+      fromStore(settings).current,
+    ),
+  );
 </script>
 
 <div class="padding">
   <div
-    style:background-color={backgroundColor}
+    style:background-color={override}
     class="content"
-    on:mousedown={(event) => event.stopPropagation()}
-    on:mouseup
+    on:longpress
+    on:pointerenter
+    on:pointerleave
+    on:pointerup
+    on:tap
+    use:tappable
+    use:useActions={use}
   >
-    <slot />
+    {@render children()}
   </div>
 </div>
 
@@ -34,12 +58,6 @@
     padding: 0 1px 2px;
 
     transition: 0.05s linear;
-  }
-
-  /* TODO: Move out */
-  .padding :global(svg.lock-icon) {
-    width: var(--icon-xs);
-    height: var(--icon-xs);
   }
 
   .content {

@@ -1,9 +1,9 @@
 import { get } from "svelte/store";
 
-import { defaultSettingsForTests } from "../../../../settings";
-import { Tasks } from "../../../../types";
+import type { DayToTasks } from "../../../../task-types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
+import { EditMode } from "../types";
 
 import { dayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
@@ -12,7 +12,7 @@ describe("resize", () => {
   test("resizing changes duration", () => {
     const { todayControls, moveCursorTo, displayedTasks } = setUp();
 
-    todayControls.handleResizerMouseDown(baseTask);
+    todayControls.handleResizerMouseDown(baseTask, EditMode.RESIZE);
     moveCursorTo("03:00");
 
     expect(get(displayedTasks)).toMatchObject({
@@ -30,7 +30,7 @@ describe("resize", () => {
         startMinutes: toMinutes("02:00"),
       };
 
-      const tasks: Tasks = {
+      const tasks: DayToTasks = {
         [dayKey]: {
           withTime: [
             { ...baseTask, id: "1", startMinutes: toMinutes("01:00") },
@@ -43,10 +43,12 @@ describe("resize", () => {
 
       const { todayControls, moveCursorTo, displayedTasks } = setUp({
         tasks,
-        settings: { ...defaultSettingsForTests, editMode: "push" },
       });
 
-      todayControls.handleResizerMouseDown(middleTask);
+      todayControls.handleResizerMouseDown(
+        middleTask,
+        EditMode.RESIZE_AND_SHIFT_OTHERS,
+      );
       moveCursorTo("04:00");
 
       expect(get(displayedTasks)).toMatchObject({

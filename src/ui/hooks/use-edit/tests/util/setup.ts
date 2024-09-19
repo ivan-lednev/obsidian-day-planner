@@ -1,13 +1,13 @@
 import { noop } from "lodash/fp";
-import { Moment } from "moment/moment";
+import type { Moment } from "moment/moment";
 import { writable } from "svelte/store";
 
 import { ObsidianFacade } from "../../../../../service/obsidian-facade";
 import {
-  DayPlannerSettings,
+  type DayPlannerSettings,
   defaultSettingsForTests,
 } from "../../../../../settings";
-import { Tasks } from "../../../../../types";
+import type { DayToTasks } from "../../../../../task-types";
 import { toMinutes } from "../../../../../util/moment";
 import { useEditContext } from "../../use-edit-context";
 
@@ -17,7 +17,7 @@ function createProps({
   tasks,
   settings,
 }: {
-  tasks: Tasks;
+  tasks: DayToTasks;
   settings: DayPlannerSettings;
 }) {
   const onUpdate = jest.fn();
@@ -36,11 +36,10 @@ export function setUp({
   settings = defaultSettingsForTests,
 } = {}) {
   const props = createProps({ tasks, settings });
-  const { getEditHandlers, displayedTasks, confirmEdit } =
+  const { getEditHandlers, displayedTasks, confirmEdit, pointerOffsetY } =
     useEditContext(props);
 
   const todayControls = getEditHandlers(day);
-  const { pointerOffsetY } = todayControls;
   const nextDayControls = getEditHandlers(nextDay);
 
   // this prevents the store from resetting;

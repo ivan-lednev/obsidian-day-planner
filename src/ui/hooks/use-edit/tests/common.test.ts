@@ -2,6 +2,7 @@ import { get } from "svelte/store";
 
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
+import { EditMode } from "../types";
 
 import { dayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
@@ -24,7 +25,7 @@ describe("drag one & common edit mechanics", () => {
       confirmEdit,
     } = setUp();
 
-    todayControls.handleGripMouseDown(baseTask);
+    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
     moveCursorTo("01:00");
     await confirmEdit();
     nextDayControls.handleMouseEnter();
@@ -40,7 +41,7 @@ describe("drag one & common edit mechanics", () => {
   test("when a task is set to its current time, nothing happens", async () => {
     const { todayControls, confirmEdit, props } = setUp();
 
-    todayControls.handleGripMouseDown(baseTask);
+    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
     await confirmEdit();
 
     expect(props.onUpdate).not.toHaveBeenCalled();

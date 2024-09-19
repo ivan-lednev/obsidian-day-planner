@@ -12,17 +12,16 @@
     Info,
     RefreshCw,
     RefreshCwOff,
-    Move,
   } from "lucide-svelte";
-  import { Moment } from "moment";
+  import type { Moment } from "moment";
   import { getContext } from "svelte";
-  import { Writable } from "svelte/store";
+  import type { Writable } from "svelte/store";
 
   import { dateRangeContextKey, obsidianContext } from "../../constants";
+  import { isToday } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
   import type { ObsidianContext } from "../../types";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
-  import { isToday } from "../../util/moment";
   import { useDataviewSource } from "../hooks/use-dataview-source";
 
   import ControlButton from "./control-button.svelte";
@@ -53,7 +52,6 @@
 
   let settingsVisible = false;
   let filterVisible = false;
-  let editControlsVisible = false;
 
   function toggleSettings() {
     settingsVisible = !settingsVisible;
@@ -63,15 +61,8 @@
     filterVisible = !filterVisible;
   }
 
-  function toggleEditControls() {
-    editControlsVisible = !editControlsVisible;
-  }
-
   async function goBack() {
     const previousDay = $dateRange[0].clone().subtract(1, "day");
-
-    const previousNote = await createDailyNoteIfNeeded(previousDay);
-    await obsidianFacade.openFileInEditor(previousNote);
 
     $dateRange = [previousDay];
   }
@@ -79,14 +70,12 @@
   async function goForward() {
     const nextDay = $dateRange[0].clone().add(1, "day");
 
-    const nextNote = await createDailyNoteIfNeeded(nextDay);
-    await obsidianFacade.openFileInEditor(nextNote);
-
     $dateRange = [nextDay];
   }
 
   async function goToToday() {
     const noteForToday = await createDailyNoteIfNeeded(window.moment());
+
     await obsidianFacade.openFileInEditor(noteForToday);
   }
 
@@ -134,7 +123,7 @@
     </ControlButton>
 
     <ControlButton
-      --control-button-border={isToday($dateRange[0])
+      --control-button-border={$isToday($dateRange[0])
         ? "1px solid var(--color-accent)"
         : "none"}
       label="Go to file"
@@ -157,14 +146,7 @@
     </ControlButton>
 
     <ControlButton
-      isActive={editControlsVisible}
-      label="Show time block edit controls"
-      on:click={toggleEditControls}
-    >
-      <Move class="svg-icon" />
-    </ControlButton>
-
-    <ControlButton
+      --grid-column-start="8"
       isActive={filterVisible}
       label="Dataview source"
       on:click={toggleFilter}
@@ -186,51 +168,6 @@
   <div>
     <Pill key="filter" value={$settings.dataviewSource} />
   </div>
-  {#if editControlsVisible}
-    Drag mode:
-    <div class="button-box">
-      <ControlButton
-        isActive={$settings.editMode === "simple"}
-        label="Other time blocks will not be changed"
-        on:click={() => {
-          $settings.editMode = "simple";
-        }}
-      >
-        Simple edit
-      </ControlButton>
-      <ControlButton
-        isActive={$settings.editMode === "push"}
-        label="Other time blocks are going to shift as you move a block"
-        on:click={() => {
-          $settings.editMode = "push";
-        }}
-      >
-        Push other blocks
-      </ControlButton>
-    </div>
-
-    Drag action:
-    <div class="button-box">
-      <ControlButton
-        isActive={$settings.copyOnDrag === false}
-        label="Move a task when dragging"
-        on:click={() => {
-          $settings.copyOnDrag = false;
-        }}
-      >
-        Move on drag
-      </ControlButton>
-      <ControlButton
-        isActive={$settings.copyOnDrag}
-        label="Copy a task when dragging"
-        on:click={() => {
-          $settings.copyOnDrag = true;
-        }}
-      >
-        Copy on drag
-      </ControlButton>
-    </div>
-  {/if}
 
   {#if !$dataviewLoaded}
     <div class="info-container">
@@ -259,7 +196,6 @@
       {/if}
       {#if $dataviewErrorMessage.length > 0}
         <div class="info-container">
-          <!--          TODO: move out -->
           <pre class="error-message">{$dataviewErrorMessage}</pre>
         </div>
       {/if}
@@ -403,30 +339,6 @@
 
   :global(.mod-error) {
     color: var(--text-error);
-  }
-
-  .button-box :global(.clickable-icon.is-active) {
-    color: var(--text-on-accent);
-    background-color: var(--interactive-accent);
-  }
-
-  .button-box :global(.clickable-icon:not(.is-active)) {
-    background-color: var(--background-primary);
-  }
-
-  .button-box {
-    overflow: hidden;
-    display: flex;
-
-    font-size: var(--font-ui-small);
-
-    border: 1px solid var(--color-base-40);
-    border-radius: var(--clickable-icon-radius);
-  }
-
-  .button-box > :global(*) {
-    flex: 1 0 0;
-    border-radius: 0;
   }
 
   .stretcher input {

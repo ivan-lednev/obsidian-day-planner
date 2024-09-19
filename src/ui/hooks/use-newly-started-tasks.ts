@@ -1,9 +1,9 @@
 import { differenceBy } from "lodash/fp";
-import { Moment } from "moment";
-import { derived, get, Readable } from "svelte/store";
+import type { Moment } from "moment";
+import { derived, get, type Readable } from "svelte/store";
 
-import { DayPlannerSettings } from "../../settings";
-import { PlacedTask, TasksForDay } from "../../types";
+import type { DayPlannerSettings } from "../../settings";
+import type { Task, TasksForDay, WithTime } from "../../task-types";
 import { getEndTime, getNotificationKey } from "../../util/task-utils";
 
 interface UseNewlyStartedTasksProps {
@@ -14,21 +14,19 @@ interface UseNewlyStartedTasksProps {
 
 export function useNewlyStartedTasks(props: UseNewlyStartedTasksProps) {
   const { settings, currentTime, tasksForToday } = props;
-  let previousTasksInProgress: PlacedTask[] = [];
+  let previousTasksInProgress: Array<WithTime<Task>> = [];
 
   return derived([settings, currentTime], ([$settings, $currentTime]) => {
     if (!$settings.showTaskNotification) {
       return [];
     }
 
-    const tasksInProgress = get(tasksForToday).withTime.filter(
-      (task: PlacedTask) => {
-        return (
-          task.startTime.isBefore($currentTime) &&
-          getEndTime(task).isAfter($currentTime)
-        );
-      },
-    );
+    const tasksInProgress = get(tasksForToday).withTime.filter((task) => {
+      return (
+        task.startTime.isBefore($currentTime) &&
+        getEndTime(task).isAfter($currentTime)
+      );
+    });
 
     const newlyStarted = differenceBy(
       getNotificationKey,

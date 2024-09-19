@@ -1,4 +1,33 @@
-## 0.20.1 - 0.20.3
+## 0.22.0
+
+### ✨ New features
+
+- Default task status on creation is now configurable
+
+### 🐞 Fixed issues
+
+- Fixed load failure when unable to read daily notes
+- Fixed console error on plugin load
+- Fixed moving tasks to non-existent daily notes
+- Fixed active day in week not changing on next day
+- No more note switching when navigating between days from timeline view
+
+## 0.21.1
+
+### ✨ New features
+
+- Drag-and-drop edits are now working on mobile: long-press on a task block to see the controls, tap on the control and start dragging to change task time
+- Added floating edit controls on top of task blocks. All the edit modes are now easily available
+- Now you can change task start time
+- There is now a new edit mode: move block and shrink neighboring blocks
+- Now you can manually adjust the height of the unscheduled tasks section through drag-and-drop
+
+### 🐞 Fixed issues
+
+- Fixed empty remote event names breaking the plugin (#430)
+- Fixed advanced editing with Ctrl/Shift not working (#462). To do advanced edits, simply hover over the block, then over the edit controls
+
+## 0.20.1 - 0.20.4
 
 - 🐞 add toggle to disable release notes (#399)
 - 🐞 do not reset timeline position when it's already open (#289)
@@ -6,6 +35,9 @@
 - 🐞 fix status bar error breaking plugin
 - 🐞 Move task on copy, instead of changing its size
 - 🐞 Fix different hourglass emoji breaking task movement
+- 🐞 Fix calendar events without a location crashes plugin (#438, thanks, @sepatel)
+- 🐞 Do not print undefined inside checkbox when list item is not a task (#368, thanks, @Gelio)
+- 🐞 AM/PM doesn't match unexpectedly anymore (#312, thanks, @teisermann)
 
 ## 0.20.0
 

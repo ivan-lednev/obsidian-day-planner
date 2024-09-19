@@ -28,7 +28,7 @@
 
     background-color: var(--background-primary);
     border-right: 1px solid var(--background-modifier-border);
-    box-shadow: var(--ruler-box-shadow, none)
+    box-shadow: var(--ruler-box-shadow, none);
   }
 
   .hour {

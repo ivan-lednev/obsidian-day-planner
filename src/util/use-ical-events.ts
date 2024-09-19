@@ -1,9 +1,9 @@
 import ical from "node-ical";
 import { request } from "obsidian";
-import { derived, Readable } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
-import { DayPlannerSettings } from "../settings";
-import { WithIcalConfig } from "../types";
+import type { DayPlannerSettings } from "../settings";
+import type { WithIcalConfig } from "../types";
 
 function isVEvent(event: ical.CalendarComponent): event is ical.VEvent {
   return event.type === "VEVENT";
@@ -15,19 +15,19 @@ export function useIcalEvents(
   isOnline: Readable<boolean>,
 ) {
   const previousFetches = new Map<string, Array<WithIcalConfig<ical.VEvent>>>();
+  const icals = derived(settings, ($settings) => $settings.icals);
 
-  // todo: [minor] derive only from relevant setting
   return derived(
-    [settings, isOnline, syncTrigger],
+    [icals, isOnline, syncTrigger],
     (
-      [$settings, $isOnline],
+      [$icals, $isOnline],
       set: (events: Array<WithIcalConfig<ical.VEvent>>) => void,
     ) => {
       if (!$isOnline) {
         return;
       }
 
-      const calendarPromises = $settings.icals
+      const calendarPromises = $icals
         .filter((ical) => ical.url.trim().length > 0)
         .map((calendar) =>
           request({

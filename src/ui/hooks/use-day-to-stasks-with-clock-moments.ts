@@ -1,6 +1,6 @@
 import { isString } from "lodash/fp";
 import { DataArray, STask } from "obsidian-dataview";
-import { derived, Readable } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
 import { areValidClockMoments, toClockMoments } from "../../util/clock";
 import { unwrap } from "../../util/dataview";

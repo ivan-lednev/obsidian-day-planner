@@ -1,9 +1,11 @@
 import { Plugin, WorkspaceLeaf } from "obsidian";
-import { get, writable, Writable } from "svelte/store";
+import { mount } from "svelte";
+import { get, writable, type Writable } from "svelte/store";
 
 import {
   errorContextKey,
   obsidianContext,
+  viewTypeReleaseNotes,
   viewTypeTimeline,
   viewTypeWeekly,
 } from "./constants";
@@ -15,11 +17,11 @@ import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { STaskEditor } from "./service/stask-editor";
-import { DayPlannerSettings, defaultSettings } from "./settings";
-import { ObsidianContext } from "./types";
+import { type DayPlannerSettings, defaultSettings } from "./settings";
+import type { ObsidianContext } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { ConfirmationModal } from "./ui/confirmation-modal";
-import { ReleaseNotesModal } from "./ui/release-notes-modal";
+import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimelineView from "./ui/timeline-view";
 import WeeklyView from "./ui/weekly-view";
@@ -55,8 +57,7 @@ export default class DayPlanner extends Plugin {
     this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
 
-    this.handleNewPluginVersion();
-
+    await this.handleNewPluginVersion();
     await this.initTimelineLeafSilently();
   }
 
@@ -75,9 +76,18 @@ export default class DayPlanner extends Plugin {
   };
 
   initTimelineLeafSilently = async () => {
-    await this.detachLeavesOfType(viewTypeTimeline);
-    await this.app.workspace.getRightLeaf(false).setViewState({
-      type: viewTypeTimeline,
+    this.app.workspace.onLayoutReady(async () => {
+      const [firstExistingTimeline] =
+        this.app.workspace.getLeavesOfType(viewTypeTimeline);
+      if (firstExistingTimeline) {
+        return;
+      }
+
+      await this.detachLeavesOfType(viewTypeTimeline);
+
+      await this.app.workspace.getRightLeaf(false)?.setViewState({
+        type: viewTypeTimeline,
+      });
     });
   };
 
@@ -91,14 +101,14 @@ export default class DayPlanner extends Plugin {
     }
 
     await this.detachLeavesOfType(viewTypeTimeline);
-    await this.app.workspace.getRightLeaf(false).setViewState({
+    await this.app.workspace.getRightLeaf(false)?.setViewState({
       type: viewTypeTimeline,
       active: true,
     });
     this.app.workspace.rightSplit.expand();
   };
 
-  private handleNewPluginVersion() {
+  private async handleNewPluginVersion() {
     if (this.settings().pluginVersion === currentPluginVersion) {
       return;
     }
@@ -109,20 +119,22 @@ export default class DayPlanner extends Plugin {
     }));
 
     if (this.settings().releaseNotes) {
-      this.showReleaseNotes();
+      this.app.workspace.onLayoutReady(async () => {
+        await this.showReleaseNotes();
+      });
     }
   }
 
   private registerCommands() {
     this.addCommand({
       id: "show-day-planner-timeline",
-      name: "Show the Day Planner Timeline",
+      name: "Show timeline",
       callback: async () => await this.initTimelineLeaf(),
     });
 
     this.addCommand({
       id: "show-weekly-view",
-      name: "Show the Week Planner",
+      name: "Show week planner",
       callback: this.initWeeklyLeaf,
     });
 
@@ -199,9 +211,11 @@ export default class DayPlanner extends Plugin {
     await this.app.workspace.detachLeavesOfType(type);
   }
 
-  private showReleaseNotes = () => {
-    const modal = new ReleaseNotesModal(this);
-    modal.open();
+  private showReleaseNotes = async () => {
+    await this.app.workspace.getLeaf("tab").setViewState({
+      type: viewTypeReleaseNotes,
+      active: true,
+    });
   };
 
   private registerViews() {
@@ -211,7 +225,6 @@ export default class DayPlanner extends Plugin {
       visibleTasks,
       dataviewLoaded,
       isModPressed,
-      // todo: this doesn't fit method name, move out
       newlyStartedTasks,
       icalSyncTrigger,
       isOnline,
@@ -225,11 +238,19 @@ export default class DayPlanner extends Plugin {
       planEditor: this.planEditor,
     });
 
+    this.registerDomEvent(window, "blur", editContext.cancelEdit);
+    this.registerDomEvent(document, "pointerup", editContext.cancelEdit);
+    this.register(
+      editContext.cursor.subscribe(({ bodyCursor }) => {
+        document.body.style.cursor = bodyCursor;
+      }),
+    );
+
     const errorStore = writable<Error | undefined>();
 
     // todo: move out
     // todo: pass context with day
-    new StatusBarWidget({
+    mount(StatusBarWidget, {
       target: this.addStatusBarItem(),
       props: {
         onClick: this.initTimelineLeaf,
@@ -254,6 +275,7 @@ export default class DayPlanner extends Plugin {
       refreshTasks: this.dataviewFacade.getAllTasksFrom,
       dataviewLoaded,
       renderMarkdown: createRenderMarkdown(this.app),
+      toggleCheckboxInFile: this.obsidianFacade.toggleCheckboxInFile,
       showReleaseNotes: this.showReleaseNotes,
       editContext,
       visibleTasks,
@@ -285,6 +307,11 @@ export default class DayPlanner extends Plugin {
       viewTypeWeekly,
       (leaf: WorkspaceLeaf) =>
         new WeeklyView(leaf, this.settings, componentContext, dateRanges),
+    );
+
+    this.registerView(
+      viewTypeReleaseNotes,
+      (leaf: WorkspaceLeaf) => new DayPlannerReleaseNotesView(leaf),
     );
   }
 }

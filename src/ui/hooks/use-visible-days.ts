@@ -1,13 +1,12 @@
 import { isEqual, uniqBy } from "lodash/fp";
-import { Moment } from "moment";
-import { derived, Readable } from "svelte/store";
+import type { Moment } from "moment";
+import { derived, type Readable } from "svelte/store";
 
 import { getDayKey } from "../../util/tasks-utils";
 
 export function useVisibleDays(
   ranges: Readable<Record<string, Array<Moment>>>,
 ) {
-  // todo [minor] encapsulate this 'previous' logic
   let previousDayKeys: string[];
 
   return derived(ranges, ($ranges, set: (days: Moment[]) => void) => {

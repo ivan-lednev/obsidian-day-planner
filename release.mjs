@@ -45,10 +45,18 @@ const newVersionsFile = {
 };
 fs.writeFileSync("versions.json", stringify(newVersionsFile));
 
+const supportBanner = fs.readFileSync("./support-banner.md", "utf-8");
+const readmeBase = fs.readFileSync("./readme-base.md", "utf-8");
+const readmeOutput = `${supportBanner}
+
+${readmeBase}`;
+
+fs.writeFileSync("README.md", readmeOutput, "utf-8");
+
 const git = simpleGit();
 
 git
-  .add(["manifest.json", "package-lock.json", "package.json", "versions.json"])
+  .add(["manifest.json", "package-lock.json", "package.json", "versions.json", "README.md"])
   .commit(versionString, { "--no-verify": null })
   .tag([versionString])
   .push()

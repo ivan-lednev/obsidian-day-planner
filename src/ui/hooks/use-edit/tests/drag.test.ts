@@ -1,9 +1,10 @@
 import { get } from "svelte/store";
 
 import { defaultSettingsForTests } from "../../../../settings";
-import { Tasks } from "../../../../types";
+import type { DayToTasks } from "../../../../task-types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
+import { EditMode } from "../types";
 
 import { dayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
@@ -12,7 +13,7 @@ describe("drag", () => {
   test("when drag starts, target task reacts to cursor", () => {
     const { todayControls, moveCursorTo, displayedTasks } = setUp();
 
-    todayControls.handleGripMouseDown(baseTask);
+    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
     moveCursorTo("01:00");
 
     expect(get(displayedTasks)).toMatchObject({
@@ -30,7 +31,7 @@ describe("drag", () => {
         startMinutes: toMinutes("02:00"),
       };
 
-      const tasks: Tasks = {
+      const tasks: DayToTasks = {
         [dayKey]: {
           withTime: [
             { ...baseTask, id: "1", startMinutes: toMinutes("01:00") },
@@ -43,10 +44,12 @@ describe("drag", () => {
 
       const { todayControls, moveCursorTo, displayedTasks } = setUp({
         tasks,
-        settings: { ...defaultSettingsForTests, editMode: "push" },
       });
 
-      todayControls.handleGripMouseDown(middleTask);
+      todayControls.handleGripMouseDown(
+        middleTask,
+        EditMode.DRAG_AND_SHIFT_OTHERS,
+      );
       moveCursorTo("03:00");
 
       expect(get(displayedTasks)).toMatchObject({
@@ -67,7 +70,7 @@ describe("drag", () => {
         startMinutes: toMinutes("02:00"),
       };
 
-      const tasks: Tasks = {
+      const tasks: DayToTasks = {
         [dayKey]: {
           withTime: [
             { ...baseTask, id: "1", startMinutes: toMinutes("01:00") },
@@ -80,10 +83,13 @@ describe("drag", () => {
 
       const { todayControls, moveCursorTo, displayedTasks } = setUp({
         tasks,
-        settings: { ...defaultSettingsForTests, editMode: "push" },
+        settings: { ...defaultSettingsForTests },
       });
 
-      todayControls.handleGripMouseDown(middleTask);
+      todayControls.handleGripMouseDown(
+        middleTask,
+        EditMode.DRAG_AND_SHIFT_OTHERS,
+      );
       moveCursorTo("03:00");
       moveCursorTo("01:00");
 
@@ -99,7 +105,7 @@ describe("drag", () => {
     });
 
     test.skip("tasks stop moving once there is not enough time", () => {
-      const tasks: Tasks = {
+      const tasks: DayToTasks = {
         [dayKey]: {
           withTime: [
             baseTask,
@@ -113,7 +119,7 @@ describe("drag", () => {
         tasks,
       });
 
-      todayControls.handleGripMouseDown(baseTask);
+      todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
       moveCursorTo("21:00");
 
       expect(get(displayedTasks)).toMatchObject({

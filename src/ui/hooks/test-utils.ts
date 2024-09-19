@@ -1,21 +1,20 @@
 import moment from "moment/moment";
 
-import type { PlacedTask } from "../../types";
+import type { LocalTask, WithPlacing, WithTime } from "../../task-types";
 
-export const baseTask: PlacedTask = {
-  listTokens: "- ",
+export const baseTask: WithPlacing<WithTime<LocalTask>> = {
+  symbol: "-",
+  status: " ",
   startTime: moment("2023-01-01"),
   startMinutes: 0,
   durationMinutes: 60,
-  text: "",
-  firstLineText: "",
+  text: "text",
   placing: {
     xOffsetPercent: 0,
     widthPercent: 100,
   },
   location: {
     path: "path",
-    line: 0,
     position: {
       start: {
         line: 0,

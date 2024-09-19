@@ -1,73 +1,97 @@
 <script lang="ts">
-  import { Moment } from "moment";
+  import type { Moment } from "moment";
   import { getContext } from "svelte";
-  import { Writable } from "svelte/store";
+  import { isNotVoid } from "typed-assert";
 
-  import { dateRangeContextKey, obsidianContext } from "../../constants";
-  import { getVisibleHours } from "../../global-store/derived-settings";
+  import { obsidianContext } from "../../constants";
+  import { isToday } from "../../global-store/current-time";
+  import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
-  import { ObsidianContext } from "../../types";
-  import { isToday } from "../../util/moment";
+  import { isRemote } from "../../task-types";
+  import { type ObsidianContext } from "../../types";
   import { getRenderKey } from "../../util/task-utils";
-  import { styledCursor } from "../actions/styled-cursor";
+  import { isTouchEvent } from "../../util/util";
 
   import Column from "./column.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Needle from "./needle.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
-  import ScheduledTaskContainer from "./scheduled-task-container.svelte";
 
-  // TODO: showRuler or add <slot name="left-gutter" />
-  export let day: Moment | undefined = undefined;
+  export let day: Moment;
   export let isUnderCursor = false;
 
   const {
-    editContext: { confirmEdit, editOperation, getEditHandlers },
+    editContext: { confirmEdit, getEditHandlers, pointerOffsetY },
   } = getContext<ObsidianContext>(obsidianContext);
-  const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
-  $: actualDay = day || $dateRange[0];
   $: ({
     displayedTasks,
-    cancelEdit,
     handleContainerMouseDown,
     handleResizerMouseDown,
     handleTaskMouseUp,
     handleGripMouseDown,
     handleMouseEnter,
-    pointerOffsetY,
-    cursor,
-  } = getEditHandlers(actualDay));
+  } = getEditHandlers(day));
+
+  let el: HTMLElement | undefined;
+
+  function updatePointerOffsetY(event: PointerEvent) {
+    isNotVoid(el);
+
+    const viewportToElOffsetY = el.getBoundingClientRect().top;
+    const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
+
+    pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings));
+  }
 </script>
 
-<svelte:window on:blur={cancelEdit} />
-<svelte:body use:styledCursor={$cursor.bodyCursor} />
-<svelte:document on:mouseup={cancelEdit} />
-
 <Column visibleHours={getVisibleHours($settings)}>
-  {#if isToday(actualDay)}
+  {#if $isToday(day)}
     <Needle autoScrollBlocked={isUnderCursor} />
   {/if}
 
-  <ScheduledTaskContainer
-    {pointerOffsetY}
-    on:mousedown={handleContainerMouseDown}
+  <div
+    bind:this={el}
+    class="tasks absolute-stretch-x"
     on:mouseenter={handleMouseEnter}
-    on:mouseup={confirmEdit}
+    on:pointerdown={(event) => {
+      if (isTouchEvent(event) || event.target !== el) {
+        return;
+      }
+
+      handleContainerMouseDown();
+    }}
+    on:pointermove={updatePointerOffsetY}
+    on:pointerup={confirmEdit}
+    on:pointerup|stopPropagation
   >
     {#each $displayedTasks.withTime as task (getRenderKey(task))}
-      {#if task.calendar}
+      {#if isRemote(task)}
         <RemoteTimeBlock {task} />
       {:else}
         <LocalTimeBlock
-          gripCursor={$cursor.gripCursor}
-          isResizeHandleVisible={!$editOperation}
-          onGripMouseDown={() => handleGripMouseDown(task)}
-          onResizerMouseDown={() => handleResizerMouseDown(task)}
+          onFloatingUiPointerDown={updatePointerOffsetY}
+          onGripMouseDown={handleGripMouseDown}
+          onMouseUp={() => {
+            handleTaskMouseUp(task);
+          }}
+          onResizerMouseDown={handleResizerMouseDown}
           {task}
-          on:mouseup={() => handleTaskMouseUp(task)}
         />
       {/if}
     {/each}
-  </ScheduledTaskContainer>
+  </div>
 </Column>
+
+<style>
+  .tasks {
+    top: 0;
+    bottom: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    margin-right: 10px;
+    margin-left: 10px;
+  }
+</style>

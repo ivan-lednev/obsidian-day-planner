@@ -1,7 +1,9 @@
 import Fraction from "fraction.js";
 import { partition } from "lodash/fp";
+import { isNotVoid } from "typed-assert";
 
-import type { Overlap, TimeBlock, Task } from "../types";
+import type { TimeBlock } from "../task-types";
+import type { Overlap } from "../types";
 import { getEndMinutes } from "../util/task-utils";
 
 import { getHorizontalPlacing } from "./horizontal-placing";
@@ -59,8 +61,11 @@ function computeOverlapForGroup(
   }
 
   const fractionOfPlacedItems = itemsPlacedPreviously.reduce((sum, current) => {
-    const { span, columns } = newLookup.get(current.id);
-    return new Fraction(span, columns).add(sum);
+    const placing = newLookup.get(current.id);
+
+    isNotVoid(placing);
+
+    return new Fraction(placing.span, placing.columns).add(sum);
   }, new Fraction(0));
 
   const fractionForNewItems = new Fraction(1).sub(fractionOfPlacedItems);
@@ -74,7 +79,11 @@ function computeOverlapForGroup(
   const slots = Array(columnsForNewGroup).fill(empty);
 
   itemsPlacedPreviously.forEach((item) => {
-    const { start, span, columns: previousColumns } = newLookup.get(item.id);
+    const placing = newLookup.get(item.id);
+
+    isNotVoid(placing);
+
+    const { start, span, columns: previousColumns } = placing;
 
     const scale = columnsForNewGroup / previousColumns;
     const scaledStart = scale * start;
@@ -117,14 +126,14 @@ function overlaps(a: TimeBlock, b: TimeBlock) {
   return getEndMinutes(early) > late.startMinutes;
 }
 
-export function addHorizontalPlacing(tasks: Task[]) {
-  if (tasks.length === 0) {
+export function addHorizontalPlacing(blocks: Array<TimeBlock>) {
+  if (blocks.length === 0) {
     return [];
   }
 
-  const overlapLookup = computeOverlap(tasks);
+  const overlapLookup = computeOverlap(blocks);
 
-  return tasks.map((task) => {
+  return blocks.map((task) => {
     const overlap = overlapLookup.get(task.id);
 
     return {

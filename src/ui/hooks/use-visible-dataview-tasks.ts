@@ -1,10 +1,10 @@
 import { groupBy } from "lodash/fp";
-import { Moment } from "moment";
+import type { Moment } from "moment";
 import { STask } from "obsidian-dataview";
-import { derived, Readable } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
 import { settings } from "../../global-store/settings";
-import { TasksForDay } from "../../types";
+import type { TasksForDay } from "../../task-types";
 import { getScheduledDay } from "../../util/dataview";
 import { mapToTasksForDay } from "../../util/get-tasks-for-day";
 import { getDayKey, getEmptyRecordsForDay } from "../../util/tasks-utils";
@@ -23,13 +23,13 @@ export function useVisibleDataviewTasks(
         const sTasksForDay = dayToSTasks[key];
 
         if (sTasksForDay) {
-          // todo: process errors
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { errors, ...tasks } = mapToTasksForDay(
             day,
             sTasksForDay,
             $settings,
           );
+
+          errors.forEach(console.log);
 
           result[key] = tasks;
         } else {

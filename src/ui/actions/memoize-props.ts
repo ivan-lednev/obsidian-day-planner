@@ -1,5 +1,9 @@
 import { identity } from "lodash/fp";
 
+type Entries<T> = {
+  [K in keyof T]: [K, T[K]];
+}[keyof T][];
+
 type IdentityGetters<T> = Partial<{
   [Prop in keyof T]: (value: T[Prop]) => string;
 }>;
@@ -10,16 +14,17 @@ type IdentityGetters<T> = Partial<{
  * @param initialProps
  * @param identityGetters
  */
-// TODO: figure out how to make TypeScript happy
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createMemo<T extends Record<string, any>>(
-  initialProps: T,
-  identityGetters: IdentityGetters<T>,
+export function createMemo<PropsType>(
+  initialProps: PropsType,
+  identityGetters: IdentityGetters<PropsType>,
 ) {
-  let previousProps = initialProps;
+  let previousProps: PropsType = initialProps;
 
-  function shouldUpdate(newProps: T) {
-    for (const [propKey, propValue] of Object.entries(newProps)) {
+  function shouldUpdate(newProps: PropsType) {
+    for (const [propKey, propValue] of Object.entries(
+      // @ts-ignore
+      newProps,
+    ) as Entries<PropsType>) {
       const previousValue = previousProps[propKey];
       const identityFn = identityGetters?.[propKey] || identity;
       const propChanged = identityFn(propValue) !== identityFn(previousValue);

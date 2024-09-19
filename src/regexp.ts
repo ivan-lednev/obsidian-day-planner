@@ -1,29 +1,33 @@
 const ulToken = `[-*+]`;
 const olToken = `\\d+\\.`;
-const listToken = `(${ulToken}|${olToken})\\s+`;
+const listToken = `\\s*(${ulToken}|${olToken})\\s+`;
 
-const checkbox = `\\[(?<completion>[^\\]])]\\s+`;
-const checkboxOrNothing = `(${checkbox})?`;
+const checkbox = `\\s*\\[(?<completion>[^\\]])]\\s+`;
 
-const durationSeparator = `\\s*-{1,2}\\s*`;
+const durationSeparator = `\\s?-{1,2}\\s?`;
 
 const hours = `\\d{1,2}`;
 const minutes = `\\d{2}`;
 const hourMinuteSeparator = `[:. ]`;
+const strictHourMinuteSeparator = ":";
+const amPm = "\\s?[apAP][mM](?!\\w)";
 
 const date = "\\d{4}-\\d{2}-\\d{2}";
 
-const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))?\\s*([apAP][mM])?`;
+const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))?(${amPm})?`;
+const strictTime = `${hours}${strictHourMinuteSeparator}${minutes}(${amPm})?`;
 
+export const listTokenRegExp = new RegExp(listToken);
+export const checkboxRegExp = new RegExp(checkbox);
 export const timeRegExp = new RegExp(time);
 export const timeFromStartRegExp = new RegExp(`^${time}`);
-export const timestampRegExp = new RegExp(
-  `^(?<listTokens>${listToken}${checkboxOrNothing})(?<times>(?<start>${time})(?:${durationSeparator}(?<end>${time}))?)(?<text>.+)$`,
+
+export const looseTimestampAtStartOfLineRegExp = new RegExp(
+  `^(?<start>${time})(?:${durationSeparator}(?<end>${time}))?`,
   "im",
 );
-
-export const sTaskTimestampRegExp = new RegExp(
-  `^(?<start>${time})(?:${durationSeparator}(?<end>${time}))?$`,
+export const strictTimestampAnywhereInLineRegExp = new RegExp(
+  `(?<start>${strictTime})(?:${durationSeparator}(?<end>${strictTime}))?`,
   "im",
 );
 

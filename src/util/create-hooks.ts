@@ -8,15 +8,21 @@ import {
   partition,
 } from "lodash/fp";
 import { App } from "obsidian";
-import { derived, readable, writable, Writable } from "svelte/store";
+import {
+  derived,
+  readable,
+  type Readable,
+  writable,
+  type Writable,
+} from "svelte/store";
 
 import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
 import { currentTime } from "../global-store/current-time";
 import { DataviewFacade } from "../service/dataview-facade";
 import { ObsidianFacade } from "../service/obsidian-facade";
 import { PlanEditor } from "../service/plan-editor";
-import { DayPlannerSettings } from "../settings";
-import { Task, UnscheduledTask } from "../types";
+import type { DayPlannerSettings } from "../settings";
+import type { LocalTask, RemoteTask, WithTime } from "../task-types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
@@ -76,11 +82,9 @@ export function createHooks({
     };
   });
 
-  // todo: these can be global stores
   const keyDown = useKeyDown();
   const isModPressed = useModPressed();
   const isOnline = useIsOnline();
-  // ---
 
   const dataviewChange = useDataviewChange(app.metadataCache);
   const dataviewLoaded = useDataviewLoaded(app);
@@ -110,7 +114,6 @@ export function createHooks({
   const dateRanges = useDateRanges();
   const visibleDays = useVisibleDays(dateRanges.ranges);
 
-  // todo: improve naming
   const schedulerQueue = derived(
     [icalEvents, visibleDays],
     ([$icalEvents, $visibleDays]) => {
@@ -124,7 +127,6 @@ export function createHooks({
         canHappenAfter(icalEvent, startOfEarliestDay),
       );
 
-      // todo: make it easier to understand
       return relevantIcalEvents.flatMap((icalEvent) => {
         return $visibleDays.map(
           (day) => () => icalEventToTasks(icalEvent, day),
@@ -147,16 +149,15 @@ export function createHooks({
 
   const visibleDayToEventOccurences = derived(
     tasksFromEvents,
-    // todo: move out
     flow(
       filter(Boolean),
       flatten,
-      groupBy((task: Task) => getDayKey(task.startTime)),
+      groupBy((task: WithTime<RemoteTask>) => getDayKey(task.startTime)),
       mapValues((tasks) => {
-        const [withTime, noTime]: [Task[], UnscheduledTask[]] = partition(
-          (task) => task.startMinutes !== undefined,
-          tasks,
-        );
+        const [withTime, noTime]: [
+          Array<WithTime<RemoteTask>>,
+          Array<Omit<WithTime<RemoteTask>, "startMinutes">>,
+        ] = partition((task) => task.startMinutes !== undefined, tasks);
 
         return { withTime, noTime };
       }),
@@ -198,7 +199,15 @@ export function createHooks({
     visibleDays,
   );
 
-  const visibleTasks = derived(
+  const visibleTasks: Readable<
+    Record<
+      string,
+      {
+        withTime: Array<WithTime<RemoteTask> | WithTime<LocalTask>>;
+        noTime: Array<RemoteTask | LocalTask>;
+      }
+    >
+  > = derived(
     [visibleDataviewTasks, visibleDayToEventOccurences],
     ([$visibleDataviewTasks, $visibleDayToEventOccurences]) =>
       mergeTasks($visibleDataviewTasks, $visibleDayToEventOccurences),

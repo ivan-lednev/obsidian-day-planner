@@ -1,27 +1,27 @@
 import { flow, uniqBy } from "lodash/fp";
-import { Moment } from "moment/moment";
-import { derived, Readable } from "svelte/store";
+import type { Moment } from "moment/moment";
+import { derived, type Readable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../../overlap/overlap";
-import { Tasks } from "../../../types";
+import type {
+  DayToTasks,
+  Task,
+  WithPlacing,
+  WithTime,
+} from "../../../task-types";
 import { getRenderKey } from "../../../util/task-utils";
 import { getDayKey, getEmptyRecordsForDay } from "../../../util/tasks-utils";
 
 export function useDisplayedTasksForDay(
-  displayedTasks: Readable<Tasks>,
+  displayedTasks: Readable<DayToTasks>,
   day: Moment,
 ) {
   return derived(displayedTasks, ($displayedTasks) => {
-    // todo: displayedTasks may be empty
-    const tasksForDay = $displayedTasks[getDayKey(day)];
+    const tasksForDay =
+      $displayedTasks[getDayKey(day)] || getEmptyRecordsForDay();
 
-    if (!tasksForDay) {
-      return getEmptyRecordsForDay();
-    }
-
-    const withTime = flow(
+    const withTime: Array<WithPlacing<WithTime<Task>>> = flow(
       uniqBy(getRenderKey),
-      (task) => task,
       addHorizontalPlacing,
     )(tasksForDay.withTime);
 

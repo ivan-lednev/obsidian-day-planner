@@ -1,12 +1,12 @@
 import { sortBy } from "lodash/fp";
-import { derived, Readable } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
 import { statusBarTextLimit } from "../../constants";
 import { currentTime } from "../../global-store/current-time";
-import { TasksForDay } from "../../types";
+import type { TasksForDay } from "../../task-types";
 import { ellipsis } from "../../util/ellipsis";
 import { getDiffInMinutes } from "../../util/moment";
-import { getEndTime } from "../../util/task-utils";
+import { getEndTime, getOneLineSummary } from "../../util/task-utils";
 
 interface UseStatusBarWidgetProps {
   tasksForToday: Readable<TasksForDay>;
@@ -59,7 +59,10 @@ export function useStatusBarWidget({ tasksForToday }: UseStatusBarWidgetProps) {
           window.moment(),
         );
         const timeLeft = minutesToTimestamp(minutesLeft);
-        const text = ellipsis(currentItem.firstLineText, statusBarTextLimit);
+        const text = ellipsis(
+          getOneLineSummary(currentItem),
+          statusBarTextLimit,
+        );
 
         widget.current = {
           percentageComplete: percentageComplete.toFixed(0),
@@ -74,7 +77,7 @@ export function useStatusBarWidget({ tasksForToday }: UseStatusBarWidgetProps) {
           nextItem.startTime,
         );
         const timeToNext = minutesToTimestamp(minutesToNext);
-        const text = ellipsis(nextItem.firstLineText, statusBarTextLimit);
+        const text = ellipsis(getOneLineSummary(nextItem), statusBarTextLimit);
 
         widget.next = {
           timeToNext,

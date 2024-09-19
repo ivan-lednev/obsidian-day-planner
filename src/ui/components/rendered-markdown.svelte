@@ -3,18 +3,24 @@
 
   import { obsidianContext } from "../../constants";
   import { settings } from "../../global-store/settings";
-  import type { ObsidianContext, UnscheduledTask } from "../../types";
+  import type { LocalTask } from "../../task-types";
+  import type { ObsidianContext } from "../../types";
   import { renderTaskMarkdown } from "../actions/render-task-markdown";
 
-  export let task: UnscheduledTask;
+  export let task: LocalTask;
 
-  // todo: use context inside action
-  const { renderMarkdown } = getContext<ObsidianContext>(obsidianContext);
+  const { renderMarkdown, toggleCheckboxInFile } =
+    getContext<ObsidianContext>(obsidianContext);
 </script>
 
 <div
   class="rendered-markdown"
-  use:renderTaskMarkdown={{ task, settings: $settings, renderMarkdown }}
+  use:renderTaskMarkdown={{
+    task,
+    settings: $settings,
+    renderMarkdown,
+    toggleCheckboxInFile,
+  }}
 ></div>
 
 <style>
@@ -41,8 +47,7 @@
 
   .rendered-markdown :global(p),
   .rendered-markdown :global(ul) {
-    margin-block-start: 0;
-    margin-block-end: 0;
+    margin-block: 0;
   }
 
   .rendered-markdown :global(ul),

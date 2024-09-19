@@ -1,6 +1,6 @@
 import moment from "moment/moment";
 
-import { TasksForDay } from "../../../../../types";
+import type { TasksForDay } from "../../../../../task-types";
 import { baseTask } from "../../../test-utils";
 
 export const dayKey = "2023-01-01";

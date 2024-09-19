@@ -1,4 +1,6 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
+import { mount, unmount } from "svelte";
+import type { Component } from "svelte";
 
 import { dateRangeContextKey, viewTypeTimeline } from "../constants";
 import type { DayPlannerSettings } from "../settings";
@@ -9,8 +11,8 @@ import TimelineWithControls from "./components/timeline-with-controls.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
 
 export default class TimelineView extends ItemView {
-  private timeline: TimelineWithControls;
-  private dateRange: DateRange;
+  private timeline?: Component;
+  private dateRange?: DateRange;
 
   constructor(
     leaf: WorkspaceLeaf,
@@ -26,7 +28,7 @@ export default class TimelineView extends ItemView {
   }
 
   getDisplayText(): string {
-    return "Day Planner Timeline";
+    return "Timeline";
   }
 
   getIcon() {
@@ -38,9 +40,13 @@ export default class TimelineView extends ItemView {
 
     this.dateRange = this.dateRanges.trackRange([window.moment()]);
     this.registerEvent(
-      this.app.workspace.on("active-leaf-change", (leaf) =>
-        handleActiveLeafChange(leaf, this.dateRange),
-      ),
+      this.app.workspace.on("active-leaf-change", (leaf) => {
+        if (!this.dateRange) {
+          return;
+        }
+
+        handleActiveLeafChange(leaf, this.dateRange);
+      }),
     );
 
     const context = new Map([
@@ -48,14 +54,18 @@ export default class TimelineView extends ItemView {
       [dateRangeContextKey, this.dateRange],
     ]);
 
-    this.timeline = new TimelineWithControls({
+    // @ts-expect-error
+    this.timeline = mount(TimelineWithControls, {
       target: contentEl,
       context,
     });
   }
 
   async onClose() {
-    this.dateRange.untrack();
-    this.timeline?.$destroy();
+    this.dateRange?.untrack();
+
+    if (this.timeline) {
+      unmount(this.timeline);
+    }
   }
 }

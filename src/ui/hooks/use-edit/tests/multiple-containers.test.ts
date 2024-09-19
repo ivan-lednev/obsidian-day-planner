@@ -1,9 +1,10 @@
 import { get } from "svelte/store";
 
 import { defaultSettingsForTests } from "../../../../settings";
-import { Tasks } from "../../../../types";
+import type { DayToTasks } from "../../../../task-types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
+import { EditMode } from "../types";
 
 import {
   baseTasks,
@@ -34,7 +35,7 @@ describe("moving tasks between containers", () => {
         tasks: unscheduledTask,
       });
 
-    todayControls.handleGripMouseDown(baseTask);
+    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
     nextDayControls.handleMouseEnter();
     moveCursorTo("01:00");
 
@@ -50,7 +51,7 @@ describe("moving tasks between containers", () => {
   });
 
   test("drag works between days", () => {
-    const tasks: Tasks = {
+    const tasks: DayToTasks = {
       [dayKey]: {
         withTime: [
           baseTask,
@@ -69,7 +70,7 @@ describe("moving tasks between containers", () => {
         tasks,
       });
 
-    todayControls.handleGripMouseDown(baseTask);
+    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
     nextDayControls.handleMouseEnter();
     moveCursorTo("01:00");
 
@@ -87,7 +88,7 @@ describe("moving tasks between containers", () => {
   });
 
   test("drag many works between days", () => {
-    const tasks: Tasks = {
+    const tasks: DayToTasks = {
       [dayKey]: {
         withTime: [
           baseTask,
@@ -104,10 +105,10 @@ describe("moving tasks between containers", () => {
     const { todayControls, nextDayControls, moveCursorTo, displayedTasks } =
       setUp({
         tasks,
-        settings: { ...defaultSettingsForTests, editMode: "push" },
+        settings: { ...defaultSettingsForTests },
       });
 
-    todayControls.handleGripMouseDown(baseTask);
+    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG_AND_SHIFT_OTHERS);
     nextDayControls.handleMouseEnter();
     moveCursorTo("01:00");
 
@@ -148,7 +149,7 @@ describe("moving tasks between containers", () => {
   test("resize doesn't work between days", () => {
     const { todayControls, nextDayControls, displayedTasks } = setUp();
 
-    todayControls.handleResizerMouseDown(baseTask);
+    todayControls.handleResizerMouseDown(baseTask, EditMode.RESIZE);
     nextDayControls.handleMouseEnter();
 
     expect(get(displayedTasks)).toMatchObject({

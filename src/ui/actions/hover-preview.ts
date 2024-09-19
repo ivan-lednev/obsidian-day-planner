@@ -2,9 +2,10 @@ import { getContext } from "svelte";
 import { derived, writable } from "svelte/store";
 
 import { obsidianContext } from "../../constants";
-import { ObsidianContext, UnscheduledTask } from "../../types";
+import type { LocalTask } from "../../task-types";
+import type { ObsidianContext } from "../../types";
 
-export function hoverPreview(el: HTMLElement, task: UnscheduledTask) {
+export function hoverPreview(el: HTMLElement, task: LocalTask) {
   const { isModPressed, showPreview } =
     getContext<ObsidianContext>(obsidianContext);
 
@@ -30,7 +31,7 @@ export function hoverPreview(el: HTMLElement, task: UnscheduledTask) {
 
   const unsubscribe = shouldShowPreview.subscribe((newValue) => {
     if (newValue && task.location?.path) {
-      showPreview(el, task.location.path, task.location.line);
+      showPreview(el, task.location.path, task.location.position?.start?.line);
     }
   });
 

@@ -1,36 +1,38 @@
 <script lang="ts">
-  import { Moment } from "moment";
+  import type { Moment } from "moment";
   import { getContext } from "svelte";
-  import { Writable } from "svelte/store";
+  import type { Writable } from "svelte/store";
 
   import { dateRangeContextKey } from "../../constants";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
 
-  import GlobalHandlers from "./global-handlers.svelte";
+  import ResizeHandle from "./resize-handle.svelte";
+  import ResizeableBox from "./resizeable-box.svelte";
   import Ruler from "./ruler.svelte";
   import Scroller from "./scroller.svelte";
   import TimelineControls from "./timeline-controls.svelte";
   import Timeline from "./timeline.svelte";
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
 
-  export let day: Moment | undefined = undefined;
-
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
-
-  // todo: refactor to remove this one
-  $: actualDay = day || $dateRange[0];
+  $: firstDayInRange = $dateRange[0];
 </script>
-
-<GlobalHandlers />
 
 <div class="controls">
   <TimelineControls />
-  <UnscheduledTaskContainer day={actualDay} />
+  <ResizeableBox classNames="timeline-box">
+    {#snippet children(startEdit)}
+      <UnscheduledTaskContainer day={firstDayInRange} />
+      <ResizeHandle on:mousedown={startEdit} />
+    {/snippet}
+  </ResizeableBox>
 </div>
-<Scroller let:hovering={autoScrollBlocked}>
-  <Ruler visibleHours={getVisibleHours($settings)} />
-  <Timeline day={actualDay} isUnderCursor={autoScrollBlocked} />
+<Scroller>
+  {#snippet children(isUnderCursor)}
+    <Ruler visibleHours={getVisibleHours($settings)} />
+    <Timeline day={firstDayInRange} {isUnderCursor} />
+  {/snippet}
 </Scroller>
 
 <style>
@@ -42,5 +44,10 @@
 
   .controls > :global(*) {
     border-bottom: 1px solid var(--background-modifier-border);
+  }
+
+  :global(.timeline-box) {
+    display: flex;
+    flex-direction: column;
   }
 </style>
