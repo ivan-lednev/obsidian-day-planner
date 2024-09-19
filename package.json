@@ -46,7 +46,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jsdom": "^25.0.0",
     "jsdom-global": "^3.0.2",
-    "knip": "^5.29.2",
+    "knip": "^5.30.2",
     "moment": "^2.29.4",
     "nyc": "^17.0.0",
     "obsidian-dataview": "^0.5.67",
