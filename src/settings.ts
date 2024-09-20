@@ -3,6 +3,7 @@ import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
 export interface IcalConfig {
   name: string;
+  email: string;
   url: string;
   color: string;
 }

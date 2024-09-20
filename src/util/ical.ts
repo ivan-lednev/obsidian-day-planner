@@ -75,12 +75,14 @@ function icalEventToTask(
   }
 
   const isAllDayEvent = icalEvent.datetype === "date";
+  const rsvpStatus = getRSVPStatus(icalEvent, icalEvent.calendar.email);
 
   const base = {
     id: getId(),
     calendar: icalEvent.calendar,
     summary: icalEvent.summary || noTitle,
     startTime: startTimeAdjusted,
+    rsvpStatus: rsvpStatus,
   };
 
   if (isAllDayEvent) {
@@ -94,6 +96,20 @@ function icalEventToTask(
       (icalEvent.end.getTime() - icalEvent.start.getTime()) / 1000 / 60,
   };
 }
+
+const getRSVPStatus = (event, email) => {
+  if (event.attendee) {
+    const attendees = Array.isArray(event.attendee)
+      ? event.attendee
+      : [event.attendee];
+    for (const attendee of attendees) {
+      if (attendee.val.includes(email)) {
+        return attendee.params.PARTSTAT || "NEEDS-ACTION";
+      }
+    }
+  }
+  return "";
+};
 
 function adjustForOtherZones(tzid: string, currentDate: Date) {
   const localTzid = tz.guess();
