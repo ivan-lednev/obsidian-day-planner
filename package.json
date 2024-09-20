@@ -34,7 +34,7 @@
     "esbuild": "^0.23.1",
     "esbuild-plugin-replace": "^1.4.0",
     "esbuild-sass-plugin": "^3.3.1",
-    "esbuild-svelte": "^0.8.1",
+    "esbuild-svelte": "^0.8.2",
     "eslint": "^8.57.0",
     "eslint-import-resolver-typescript": "^3.6.3",
     "eslint-plugin-import": "^2.30.0",
