@@ -15,7 +15,9 @@ import {
   findNodeAtPoint,
   fromMarkdown,
   sortListsRecursively,
+  toEditorPos,
   toMarkdown,
+  toMdastPoint,
 } from "./mdast/mdast";
 import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
@@ -161,17 +163,14 @@ export default class DayPlanner extends Plugin {
 
     this.addCommand({
       id: "reorder-tasks-by-time",
-      name: "Reorder tasks in planner by time",
+      name: "Sort tasks under cursor by time",
       editorCallback: (editor) => {
         const mdastRoot = fromMarkdown(editor.getValue());
 
         const list = findNodeAtPoint({
           tree: mdastRoot,
           type: "list",
-          point: {
-            line: editor.getCursor().line,
-            column: 0,
-          },
+          point: toMdastPoint(editor.getCursor()),
         });
 
         if (!list) {
@@ -180,8 +179,14 @@ export default class DayPlanner extends Plugin {
           return;
         }
 
-        sortListsRecursively(list, compareByTimestampInText);
-        editor.setValue(toMarkdown(mdastRoot));
+        const sorted = sortListsRecursively(list, compareByTimestampInText);
+        const updatedText = toMarkdown(sorted).trim();
+
+        editor.replaceRange(
+          updatedText,
+          toEditorPos(sorted.position.start),
+          toEditorPos(sorted.position.end),
+        );
       },
     });
   }

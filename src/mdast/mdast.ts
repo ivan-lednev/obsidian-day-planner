@@ -1,7 +1,7 @@
 import type { Node, Parent, RootContent, Text as MdastText } from "mdast";
-import { type Point } from "mdast-util-from-markdown/lib";
+import type { Point, Nodes } from "mdast-util-from-markdown";
 import * as mdast from "mdast-util-to-markdown";
-import type { Nodes } from "mdast-util-to-markdown/lib";
+import type { EditorPosition } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
 import { compareTimestamps } from "../parser/parser";
@@ -130,9 +130,25 @@ function positionContainsPoint(
   point: Point,
 ) {
   return (
-    position.start.line <= point.line &&
-    position.end.line >= point.line &&
-    position.start.column <= point.column &&
-    position.end.column >= point.column
+    (position.start.line < point.line ||
+      (position.start.line === point.line &&
+        position.start.column <= point.column)) &&
+    (position.end.line > point.line ||
+      (position.end.line === point.line && position.end.column >= point.column))
   );
+}
+
+// todo: move out
+export function toEditorPos(mdastPoint: Point) {
+  return {
+    line: mdastPoint.line - 1,
+    ch: mdastPoint.column - 1,
+  };
+}
+
+export function toMdastPoint(editorPosition: EditorPosition) {
+  return {
+    line: editorPosition.line + 1,
+    column: editorPosition.ch + 1,
+  };
 }
