@@ -1,4 +1,4 @@
-import { Plugin, WorkspaceLeaf } from "obsidian";
+import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
 import { mount } from "svelte";
 import { get, writable, type Writable } from "svelte/store";
 
@@ -10,9 +10,13 @@ import {
   viewTypeWeekly,
 } from "./constants";
 import { settings } from "./global-store/settings";
-import { findNodeAtPoint, fromMarkdown, toMarkdown } from "./mdast/mdast";
-import { reorderListByTime } from "./mdast/mdast-task";
-import { getListItemsUnderHeading } from "./parser/parser";
+import {
+  compareByTimestampInText,
+  findNodeAtPoint,
+  fromMarkdown,
+  sortListsRecursively,
+  toMarkdown,
+} from "./mdast/mdast";
 import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
@@ -157,33 +161,26 @@ export default class DayPlanner extends Plugin {
 
     this.addCommand({
       id: "reorder-tasks-by-time",
-      name: "Reorder tasks by time",
+      name: "Reorder tasks in planner by time",
       editorCallback: (editor) => {
-        const metadata = this.app.metadataCache.getFileCache(
-          this.obsidianFacade.getActiveMarkdownView().file,
-        );
-        const listItems = getListItemsUnderHeading(
-          metadata,
-          this.settings().plannerHeading,
-        );
-        if (listItems.length === 0) {
-          return;
-        }
-
         const mdastRoot = fromMarkdown(editor.getValue());
+
         const list = findNodeAtPoint({
-          searchedNodeType: "list",
           tree: mdastRoot,
+          type: "list",
           point: {
-            line: listItems[0].position.start.line + 1,
-            column: listItems[0].position.start.col + 1,
+            line: editor.getCursor().line,
+            column: 0,
           },
         });
 
         if (!list) {
+          new Notice("There is no list under cursor!");
+
           return;
         }
-        reorderListByTime(list);
+
+        sortListsRecursively(list, compareByTimestampInText);
         editor.setValue(toMarkdown(mdastRoot));
       },
     });

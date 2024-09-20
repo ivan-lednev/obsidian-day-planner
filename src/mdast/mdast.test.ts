@@ -1,4 +1,12 @@
-import { findNodeAtPoint, fromMarkdown, toMarkdown } from "./mdast";
+import { isNotVoid } from "typed-assert";
+
+import {
+  compareByTimestampInText,
+  findNodeAtPoint,
+  fromMarkdown,
+  sortListsRecursively,
+  toMarkdown,
+} from "./mdast";
 
 test("roundtripping doesn't mess up Obsidian-styled markdown", () => {
   const input = `# [[Heading]]
@@ -35,55 +43,58 @@ ${listInput}`;
       line: 5,
       column: 8,
     },
-    searchedNodeType: "list",
+    type: "list",
   });
 
-  expect(listNode).toBeDefined();
+  isNotVoid(listNode);
+
   expect(toMarkdown(listNode)).toBe(listInput + "\n");
 });
 
-// function addTaskUnderHeading(root: Root, addition: Root) {}
-//
-// test("add a task under a present heading", () => {
-//   const contents = `# Plan
-//
-// - [ ] 10:00 - 11:00 Wake up
-// `;
-//   const newTask = "- [ ] 11:00 - 12:00 Eat";
-//
-//   const parsed = fromMarkdown(contents);
-//   const parsedTask = fromMarkdown(newTask);
-//
-//   const result = addTaskUnderHeading(parsed, parsedTask);
-// });
-//
-// function sortByTime(list: List) {
-//   const now = window.moment();
-//   const sorted = list.children.slice().sort((a, b) => {
-//     const aTime = parseTimestamp(toMarkdown(a), now);
-//     const bTime = parseTimestamp(toMarkdown(b), now);
-//
-//     return aTime.isBefore(bTime) ? -1 : 1;
-//   });
-//
-//   return {
-//     ...list,
-//     children: sorted,
-//   };
-// }
-//
-// test("sort tasks by time", () => {
-//   const contents = `- [ ] 10:00 Wake up
-// - [ ] 9:00 Sweet dreams
-// `;
-//
-//   const result = `- [ ] 9:00 Sweet dreams
-// - [ ] 10:00 Wake up
-// `;
-//
-//   const parsed = fromMarkdown(contents);
-//   const list = parsed.children[0];
-//   const sorted = sortByTime(list);
-//
-//   expect(toMarkdown(sorted)).toEqual(result);
-// });
+test("Sort lists recursively", () => {
+  const input = `- b
+- c
+    - a
+    - c
+    - b
+- a
+`;
+
+  const expected = `- a
+- b
+- c
+    - a
+    - b
+    - c
+`;
+
+  const tree = fromMarkdown(input);
+  const list = tree.children[0];
+  const actual = toMarkdown(sortListsRecursively(list));
+
+  expect(actual).toBe(expected);
+});
+
+test("Sort lists by time", () => {
+  const input = `- 10:00 - 11:00 b
+- No time
+- 09:00 - 10:00 a
+- 11:00 - 12:00 c
+- 13:00 d
+`;
+
+  const expected = `- 09:00 - 10:00 a
+- 10:00 - 11:00 b
+- 11:00 - 12:00 c
+- 13:00 d
+- No time
+`;
+
+  const tree = fromMarkdown(input);
+  const list = tree.children[0];
+  const actual = toMarkdown(
+    sortListsRecursively(list, compareByTimestampInText),
+  );
+
+  expect(actual).toBe(expected);
+});

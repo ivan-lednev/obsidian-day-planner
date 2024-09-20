@@ -42,3 +42,6 @@ export const keylessScheduledPropRegExp = new RegExp(
 export const shortScheduledPropRegExp = new RegExp(`(⏳\\s*)${date}`);
 
 export const propRegexp = /\[(.+)::(.*)]/g;
+
+export const dashOrNumberWithMultipleSpaces = /(-|\d+[.)])\s+/g;
+export const escapedSquareBracket = /\\\[/g;

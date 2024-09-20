@@ -9,7 +9,7 @@ import {
   defaultDurationMinutes,
   indentBeforeTaskParagraph,
 } from "../constants";
-import { getTimeFromSTask } from "../parser/parser";
+import { getTimeFromLine } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
 import type { FileLine, LocalTask, TaskTokens, WithTime } from "../task-types";
 
@@ -78,7 +78,7 @@ export function toTask(
   day: Moment,
   settings: DayPlannerSettings,
 ): WithTime<LocalTask> {
-  const parsedTime = getTimeFromSTask({
+  const parsedTime = getTimeFromLine({
     line: sTask.text,
     day,
   });

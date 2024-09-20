@@ -1,12 +1,15 @@
-import type { Node, Parent, RootContent } from "mdast";
-import { Point } from "mdast-util-from-markdown/lib";
+import type { Node, Parent, RootContent, Text as MdastText } from "mdast";
+import { type Point } from "mdast-util-from-markdown/lib";
 import * as mdast from "mdast-util-to-markdown";
 import type { Nodes } from "mdast-util-to-markdown/lib";
+import { isNotVoid } from "typed-assert";
 
-const dashOrNumberWithMultipleSpaces = /(-|\d+[.)])\s+/g;
-const escapedSquareBracket = /\\\[/g;
+import { compareTimestamps } from "../parser/parser";
+import {
+  dashOrNumberWithMultipleSpaces,
+  escapedSquareBracket,
+} from "../regexp";
 
-// NOTE: re-export for consistency
 export { fromMarkdown } from "mdast-util-from-markdown";
 
 export function toMarkdown(nodes: Nodes) {
@@ -22,53 +25,110 @@ export function findNodeAtPoint<
 >({
   tree,
   point,
-  searchedNodeType,
+  type,
 }: {
   tree: Node;
-  /** Both line and column are 1-indexed. */
   point: Point;
-  /**
-   * The type of the searched node.
-   *
-   * {@link findNodeAtPoint} will only return nodes of this type.
-   */
-  searchedNodeType: SearchedNodeType;
+  type: SearchedNodeType;
 }): SearchedNode | undefined {
+  isNotVoid(tree.position);
+
   if (!positionContainsPoint(tree.position, point)) {
-    // Point is outside of the current node, no need to look further
     return undefined;
   }
 
-  if (tree.type === searchedNodeType) {
-    // SAFETY: node types in mdast are unique
-    return tree as SearchedNode;
+  if (tree.type === type) {
+    // todo: fix type
+    return tree;
   }
 
-  if (isParent(tree)) {
-    // Attempt to find a more specific child node at that point
+  if (isParentNode(tree)) {
     const childAtPoint = tree.children.find((child) =>
       findNodeAtPoint<SearchedNodeType, SearchedNode>({
         tree: child,
         point,
-        searchedNodeType,
+        type: type,
       }),
     );
+
     if (childAtPoint) {
-      // SAFETY: node types in mdast are unique
-      return childAtPoint as SearchedNode;
+      // todo: fix type
+      return childAtPoint;
     }
   }
 
-  // The current node is not the searched node, and it doesn't have children
-  // that are the searched node.
   return undefined;
 }
 
-function isParent(node: Node): node is Parent {
-  return "children" in node;
+export function sortListsRecursively(
+  root: RootContent,
+  sortFn: (a: Node, b: Node) => number = compareAlphabetically,
+) {
+  if (root.type !== "list") {
+    return root;
+  }
+
+  return {
+    ...root,
+    children: root.children
+      .map((listItem) => ({
+        ...listItem,
+        children: listItem.children.map((child) =>
+          sortListsRecursively(child, sortFn),
+        ),
+      }))
+      .sort(sortFn),
+  };
 }
 
-function positionContainsPoint(position: Node["position"], point: Point) {
+function compareAlphabetically(a: Node, b: Node) {
+  const aText = getFirstTextNodeValue(a);
+  const bText = getFirstTextNodeValue(b);
+
+  isNotVoid(aText);
+  isNotVoid(bText);
+
+  return aText.localeCompare(bText);
+}
+
+export function compareByTimestampInText(a: Node, b: Node) {
+  const aText = getFirstTextNodeValue(a);
+  const bText = getFirstTextNodeValue(b);
+
+  isNotVoid(aText);
+  isNotVoid(bText);
+
+  return compareTimestamps(aText, bText);
+}
+
+export function getFirstTextNodeValue(node: Node) {
+  if (isParentNode(node)) {
+    if (node.children.length === 0) {
+      return null;
+    }
+
+    const firstNode = node.children[0];
+
+    isNotVoid(firstNode);
+
+    return getFirstTextNodeValue(firstNode);
+  }
+
+  return isTextNode(node) ? node.value : null;
+}
+
+export function isParentNode(node: Node): node is Parent {
+  return Object.hasOwn(node, "children");
+}
+
+export function isTextNode(node: Node): node is MdastText {
+  return node.type === "text";
+}
+
+function positionContainsPoint(
+  position: NonNullable<Node["position"]>,
+  point: Point,
+) {
   return (
     position.start.line <= point.line &&
     position.end.line >= point.line &&

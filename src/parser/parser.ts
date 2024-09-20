@@ -94,7 +94,7 @@ export function replaceOrPrependTimestamp(line: string, timestamp: string) {
   return `${timestamp} ${line}`;
 }
 
-export function getTimeFromSTask({ line, day }: { line: string; day: Moment }) {
+export function getTimeFromLine({ line, day }: { line: string; day: Moment }) {
   const match = execTimestampPatterns(line);
 
   if (!match?.groups) {
@@ -106,11 +106,16 @@ export function getTimeFromSTask({ line, day }: { line: string; day: Moment }) {
   } = match;
 
   const startTime = parseTimestamp(start, day);
-  const endTime = parseTimestamp(end, day);
 
-  const durationMinutes = endTime?.isAfter(startTime)
-    ? getDiffInMinutes(endTime, startTime)
-    : undefined;
+  let durationMinutes;
+
+  if (end) {
+    const endTime = parseTimestamp(end, day);
+
+    if (endTime?.isAfter(startTime)) {
+      durationMinutes = getDiffInMinutes(endTime, startTime);
+    }
+  }
 
   return {
     startTime,
@@ -125,4 +130,25 @@ export function getDisplayedText(task: LocalTask) {
 
   return `${removeListTokens(getFirstLine(task.text))}
 ${dedent(getLinesAfterFirst(task.text)).trimStart()}`;
+}
+
+export function compareTimestamps(a: string, b: string) {
+  const now = window.moment();
+
+  const aTime = getTimeFromLine({ line: a, day: now });
+  const bTime = getTimeFromLine({ line: b, day: now });
+
+  if (!aTime && !bTime) {
+    return 0;
+  }
+
+  if (!aTime) {
+    return 1;
+  }
+
+  if (!bTime) {
+    return -1;
+  }
+
+  return aTime.startTime.diff(bTime.startTime);
 }
