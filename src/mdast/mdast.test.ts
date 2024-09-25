@@ -3,7 +3,6 @@ import { isNotVoid } from "typed-assert";
 import {
   compareByTimestampInText,
   findHeadingWithChildren,
-  findRootContentAtPoint,
   fromMarkdown,
   sortListsRecursively,
   toMarkdown,
@@ -26,31 +25,6 @@ test("roundtripping doesn't mess up Obsidian-styled markdown", () => {
   const parsed = fromMarkdown(input);
 
   expect(toMarkdown(parsed)).toEqual(input);
-});
-
-test("find the list at a point", () => {
-  const listInput = `- [ ] 10:00 - 11:00 Wake up
-- [ ] 11:00 - 12:00 Eat breakfast
-`;
-
-  const input = `# 2024-04-13
-
-## Plan
-
-${listInput}`;
-
-  const listNode = findRootContentAtPoint({
-    root: fromMarkdown(input),
-    point: {
-      line: 5,
-      column: 8,
-    },
-    type: "list",
-  });
-
-  isNotVoid(listNode);
-
-  expect(toMarkdown(listNode)).toBe(listInput);
 });
 
 test("Find heading position", () => {
