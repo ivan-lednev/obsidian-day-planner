@@ -2,6 +2,7 @@ import { isNotVoid } from "typed-assert";
 
 import {
   compareByTimestampInText,
+  findHeadingWithChildren,
   findNodeAtPoint,
   fromMarkdown,
   sortListsRecursively,
@@ -49,6 +50,41 @@ ${listInput}`;
   isNotVoid(listNode);
 
   expect(toMarkdown(listNode)).toBe(listInput + "\n");
+});
+
+test("Find heading position", () => {
+  const input = `1
+2
+
+# Target
+
+text
+
+## Sub-heading
+
+sub-heading text
+
+# Next heading
+
+text
+`;
+
+  const expected = `# Target
+
+text
+
+## Sub-heading
+
+sub-heading text
+`;
+
+  const mdastRoot = fromMarkdown(input);
+
+  const headingWithChildren = findHeadingWithChildren(mdastRoot, "Target");
+
+  isNotVoid(headingWithChildren);
+
+  expect(toMarkdown(headingWithChildren)).toBe(expected);
 });
 
 test("Sort lists recursively", () => {

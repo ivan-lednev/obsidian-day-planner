@@ -1,8 +1,10 @@
+import { takeWhile } from "lodash/fp";
 import type { Node, Parent, RootContent, Text as MdastText } from "mdast";
-import type { Point, Nodes } from "mdast-util-from-markdown";
+import type { Heading, Root } from "mdast-util-from-markdown/lib";
 import * as mdast from "mdast-util-to-markdown";
+import type { Nodes, Point } from "mdast-util-to-markdown/lib/types";
 import type { EditorPosition } from "obsidian";
-import { isNotVoid } from "typed-assert";
+import { isExactly, isNotVoid } from "typed-assert";
 
 import { compareTimestamps } from "../parser/parser";
 import {
@@ -60,6 +62,35 @@ export function findNodeAtPoint<
   return undefined;
 }
 
+export function findHeadingWithChildren(
+  root: Root,
+  text: string,
+): Root | undefined {
+  const planHeadingIndex = root.children.findIndex((node) => {
+    return node.type === "heading" && getFirstTextNodeValue(node) === text;
+  });
+
+  if (planHeadingIndex < 0) {
+    return undefined;
+  }
+
+  const planHeading = root.children[planHeadingIndex];
+
+  isHeading(planHeading);
+
+  const nodesAfterHeading = root.children.slice(planHeadingIndex + 1);
+
+  const nodesBeforeNextHeading = takeWhile(
+    (node) => node.type !== "heading" || node.depth > planHeading.depth,
+    nodesAfterHeading,
+  );
+
+  return {
+    type: "root",
+    children: [planHeading, ...nodesBeforeNextHeading],
+  };
+}
+
 export function sortListsRecursively(
   root: RootContent,
   sortFn: (a: Node, b: Node) => number = compareAlphabetically,
@@ -92,6 +123,7 @@ function compareAlphabetically(a: Node, b: Node) {
 }
 
 export function compareByTimestampInText(a: Node, b: Node) {
+  // todo: remove duplication
   const aText = getFirstTextNodeValue(a);
   const bText = getFirstTextNodeValue(b);
 
@@ -125,16 +157,19 @@ export function isTextNode(node: Node): node is MdastText {
   return node.type === "text";
 }
 
+export function isHeading(node: Node): asserts node is Heading {
+  return isExactly(node.type, "heading");
+}
+
 function positionContainsPoint(
-  position: NonNullable<Node["position"]>,
+  { start, end }: NonNullable<Node["position"]>,
   point: Point,
 ) {
   return (
-    (position.start.line < point.line ||
-      (position.start.line === point.line &&
-        position.start.column <= point.column)) &&
-    (position.end.line > point.line ||
-      (position.end.line === point.line && position.end.column >= point.column))
+    (start.line < point.line ||
+      (start.line === point.line && start.column <= point.column)) &&
+    (end.line > point.line ||
+      (end.line === point.line && end.column >= point.column))
   );
 }
 

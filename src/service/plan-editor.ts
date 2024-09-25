@@ -4,6 +4,13 @@ import type { CachedMetadata } from "obsidian";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
 import { isNotVoid } from "typed-assert";
 
+import {
+  compareByTimestampInText,
+  findHeadingWithChildren,
+  fromMarkdown,
+  sortListsRecursively,
+  toMarkdown,
+} from "../mdast/mdast";
 import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
 import type { LocalTask, WithTime } from "../task-types";
@@ -31,7 +38,7 @@ export class PlanEditor {
     if (created.length > 0) {
       const [task] = await this.ensureFilesForTasks(created);
 
-      return this.obsidianFacade.editFile(task.location.path, (contents) => {
+      return this.editFile(task.location.path, (contents) => {
         // @ts-ignore
         return this.writeTaskToFileContents(task, contents, task.location.path);
       });
@@ -42,13 +49,10 @@ export class PlanEditor {
       const movedTask = moved[0];
 
       if (movedTask.task.location) {
-        await this.obsidianFacade.editFile(
-          movedTask.task.location.path,
-          (contents) => {
-            // @ts-ignore
-            return this.removeTaskFromFileContents(movedTask.task, contents);
-          },
-        );
+        await this.editFile(movedTask.task.location.path, (contents) => {
+          // @ts-ignore
+          return this.removeTaskFromFileContents(movedTask.task, contents);
+        });
       }
 
       const withNewDates = moved.map(({ dayKey, task }) => {
@@ -71,7 +75,7 @@ export class PlanEditor {
 
       const updated = updateTaskText(task as WithTime<LocalTask>);
 
-      return this.obsidianFacade.editFile(noteForFile.path, (contents) => {
+      return this.editFile(noteForFile.path, (contents) => {
         // @ts-ignore
         return this.writeTaskToFileContents(
           updated,
@@ -88,9 +92,9 @@ export class PlanEditor {
 
     const editPromises = Object.keys(pathToEditedTasksLookup).map(
       async (path) =>
-        await this.obsidianFacade.editFile(path, (contents) =>
+        await this.editFile(path, (contents) =>
           pathToEditedTasksLookup[path].reduce(
-            (result, current) => this.syncTaskWithFile(result, current),
+            (result, current) => this.updateTaskInFileContents(result, current),
             contents,
           ),
         ),
@@ -123,7 +127,6 @@ export class PlanEditor {
     contents: string,
     path: string,
   ) {
-    // todo: we can use dataview
     const metadata = this.obsidianFacade.getMetadataForPath(path) || {};
     const [planEndLine, splitContents] = this.getPlanEndLine(
       contents.split("\n"),
@@ -151,7 +154,10 @@ export class PlanEditor {
     return newContents.join("\n");
   }
 
-  private syncTaskWithFile(contents: string, task: WithTime<LocalTask>) {
+  private updateTaskInFileContents(
+    contents: string,
+    task: WithTime<LocalTask>,
+  ) {
     const location = task.location;
 
     isNotVoid(location);
@@ -162,6 +168,43 @@ export class PlanEditor {
     updated[line] = updated[line].substring(0, col) + getFirstLine(task.text);
 
     return updated.join("\n");
+  }
+
+  private async editFile(path: string, editFn: (contents: string) => string) {
+    await this.obsidianFacade.editFile(path, (contents) => {
+      const edited = editFn(contents);
+      const plannerHeading = this.settings().plannerHeading;
+      const mdastRoot = fromMarkdown(edited);
+      const headingWithChildren = findHeadingWithChildren(
+        mdastRoot,
+        plannerHeading,
+      );
+
+      if (!headingWithChildren) {
+        return edited;
+      }
+
+      const firstNode = headingWithChildren.children[0];
+      const lastNode = headingWithChildren.children.at(-1);
+
+      isNotVoid(firstNode);
+      isNotVoid(firstNode.position?.start?.offset);
+      isNotVoid(lastNode);
+      isNotVoid(lastNode.position?.end?.offset);
+
+      const { start } = firstNode.position;
+      const { end } = lastNode.position;
+
+      headingWithChildren.children = headingWithChildren.children.map((child) =>
+        sortListsRecursively(child, compareByTimestampInText),
+      );
+
+      return (
+        edited.substring(0, start.offset) +
+        toMarkdown(headingWithChildren) +
+        edited.substring(end.offset)
+      );
+    });
   }
 
   private getPlanEndLine(
