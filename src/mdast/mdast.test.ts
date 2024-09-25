@@ -3,7 +3,7 @@ import { isNotVoid } from "typed-assert";
 import {
   compareByTimestampInText,
   findHeadingWithChildren,
-  findNodeAtPoint,
+  findRootContentAtPoint,
   fromMarkdown,
   sortListsRecursively,
   toMarkdown,
@@ -39,8 +39,8 @@ test("find the list at a point", () => {
 
 ${listInput}`;
 
-  const listNode = findNodeAtPoint({
-    tree: fromMarkdown(input),
+  const listNode = findRootContentAtPoint({
+    root: fromMarkdown(input),
     point: {
       line: 5,
       column: 8,

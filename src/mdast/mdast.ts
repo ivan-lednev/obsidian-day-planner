@@ -1,6 +1,6 @@
 import { takeWhile } from "lodash/fp";
 import type { Node, Parent, RootContent, Text as MdastText } from "mdast";
-import type { Heading, Root } from "mdast-util-from-markdown/lib";
+import { type Heading, type Root } from "mdast-util-from-markdown/lib";
 import * as mdast from "mdast-util-to-markdown";
 import type { Nodes, Point } from "mdast-util-to-markdown/lib/types";
 import type { EditorPosition } from "obsidian";
@@ -19,47 +19,6 @@ export function toMarkdown(nodes: Nodes) {
     .toMarkdown(nodes, { bullet: "-", listItemIndent: "tab" })
     .replace(dashOrNumberWithMultipleSpaces, "- ")
     .replace(escapedSquareBracket, "[");
-}
-
-export function findNodeAtPoint<
-  SearchedNodeType extends RootContent["type"],
-  SearchedNode = Extract<RootContent, { type: SearchedNodeType }>,
->({
-  tree,
-  point,
-  type,
-}: {
-  tree: Node;
-  point: Point;
-  type: SearchedNodeType;
-}): SearchedNode | undefined {
-  isNotVoid(tree.position);
-
-  if (!positionContainsPoint(tree.position, point)) {
-    return undefined;
-  }
-
-  if (tree.type === type) {
-    // todo: fix type
-    return tree;
-  }
-
-  if (isParentNode(tree)) {
-    const childAtPoint = tree.children.find((child) =>
-      findNodeAtPoint<SearchedNodeType, SearchedNode>({
-        tree: child,
-        point,
-        type: type,
-      }),
-    );
-
-    if (childAtPoint) {
-      // todo: fix type
-      return childAtPoint;
-    }
-  }
-
-  return undefined;
 }
 
 export function findHeadingWithChildren(
@@ -161,7 +120,7 @@ export function isHeading(node: Node): asserts node is Heading {
   return isExactly(node.type, "heading");
 }
 
-function positionContainsPoint(
+export function positionContainsPoint(
   { start, end }: NonNullable<Node["position"]>,
   point: Point,
 ) {

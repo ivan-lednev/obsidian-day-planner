@@ -12,8 +12,8 @@ import {
 import { settings } from "./global-store/settings";
 import {
   compareByTimestampInText,
-  findNodeAtPoint,
   fromMarkdown,
+  positionContainsPoint,
   sortListsRecursively,
   toEditorPos,
   toMarkdown,
@@ -166,15 +166,16 @@ export default class DayPlanner extends Plugin {
       name: "Sort tasks under cursor by time",
       editorCallback: (editor) => {
         const mdastRoot = fromMarkdown(editor.getValue());
+        const cursorPoint = toMdastPoint(editor.getCursor());
 
-        const list = findNodeAtPoint({
-          tree: mdastRoot,
-          type: "list",
-          point: toMdastPoint(editor.getCursor()),
-        });
+        const list = mdastRoot.children.find(
+          (rootContent) =>
+            rootContent.position &&
+            positionContainsPoint(rootContent.position, cursorPoint),
+        );
 
         if (!list) {
-          new Notice("There is no list under cursor!");
+          new Notice("There is no list under cursor");
 
           return;
         }
