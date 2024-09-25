@@ -4,6 +4,7 @@ import {
   compareByTimestampInText,
   findHeadingWithChildren,
   fromMarkdown,
+  isList,
   sortListsRecursively,
   toMarkdown,
 } from "./mdast";
@@ -81,6 +82,9 @@ test("Sort lists recursively", () => {
 
   const tree = fromMarkdown(input);
   const list = tree.children[0];
+
+  isList(list);
+
   const actual = toMarkdown(sortListsRecursively(list));
 
   expect(actual).toBe(expected);
@@ -103,9 +107,14 @@ test("Sort lists by time", () => {
 
   const tree = fromMarkdown(input);
   const list = tree.children[0];
+
+  isList(list);
+
   const actual = toMarkdown(
     sortListsRecursively(list, compareByTimestampInText),
   );
 
   expect(actual).toBe(expected);
 });
+
+test.todo("Handle empty lists");

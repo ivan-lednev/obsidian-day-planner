@@ -8,7 +8,7 @@ import {
 import * as mdast from "mdast-util-to-markdown";
 import type { Nodes, Point } from "mdast-util-to-markdown/lib/types";
 import type { EditorPosition } from "obsidian";
-import { isExactly, isNotVoid } from "typed-assert";
+import { check, isExactly, isNotVoid } from "typed-assert";
 
 import { compareTimestamps } from "../parser/parser";
 import {
@@ -64,7 +64,7 @@ export function sortListsRecursively(
       .map((listItem) => ({
         ...listItem,
         children: listItem.children.map((child) =>
-          isList(child) ? sortListsRecursively(child, sortFn) : child,
+          check(isList)(child) ? sortListsRecursively(child, sortFn) : child,
         ),
       }))
       .sort(sortFn),
@@ -120,8 +120,8 @@ export function isHeading(node: Node): asserts node is Heading {
   return isExactly(node.type, "heading");
 }
 
-export function isList(node: Node): node is List {
-  return node.type === "list";
+export function isList(node: Node): asserts node is List {
+  return isExactly(node.type, "list");
 }
 
 export function positionContainsPoint(
