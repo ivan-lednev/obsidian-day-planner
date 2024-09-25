@@ -187,6 +187,7 @@ export class PlanEditor {
       const firstNode = headingWithChildren.children[0];
       const lastNode = headingWithChildren.children.at(-1);
 
+      // todo: clean up assertions
       isNotVoid(firstNode);
       isNotVoid(firstNode.position?.start?.offset);
       isNotVoid(lastNode);
@@ -195,6 +196,7 @@ export class PlanEditor {
       const { start } = firstNode.position;
       const { end } = lastNode.position;
 
+      // todo: no mutation?
       headingWithChildren.children = headingWithChildren.children.map((child) =>
         sortListsRecursively(child, compareByTimestampInText),
       );
@@ -202,7 +204,7 @@ export class PlanEditor {
       return (
         edited.substring(0, start.offset) +
         toMarkdown(headingWithChildren) +
-        edited.substring(end.offset)
+        edited.substring(end.offset + 1)
       );
     });
   }

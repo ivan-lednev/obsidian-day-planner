@@ -30,7 +30,8 @@ test("roundtripping doesn't mess up Obsidian-styled markdown", () => {
 
 test("find the list at a point", () => {
   const listInput = `- [ ] 10:00 - 11:00 Wake up
-- [ ] 11:00 - 12:00 Eat breakfast`;
+- [ ] 11:00 - 12:00 Eat breakfast
+`;
 
   const input = `# 2024-04-13
 
@@ -49,7 +50,7 @@ ${listInput}`;
 
   isNotVoid(listNode);
 
-  expect(toMarkdown(listNode)).toBe(listInput + "\n");
+  expect(toMarkdown(listNode)).toBe(listInput);
 });
 
 test("Find heading position", () => {
