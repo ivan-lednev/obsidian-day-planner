@@ -1,6 +1,7 @@
 const ulToken = `[-*+]`;
-const olToken = `\\d+\\.`;
-const listToken = `\\s*(${ulToken}|${olToken})\\s+`;
+const olToken = `\\d+[.)]`;
+const listToken = `(${ulToken}|${olToken})`;
+const listTokenWithSpaces = `\\s*${listToken}\\s+`;
 
 const checkbox = `\\s*\\[(?<completion>[^\\]])]\\s+`;
 
@@ -17,7 +18,7 @@ const date = "\\d{4}-\\d{2}-\\d{2}";
 const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))?(${amPm})?`;
 const strictTime = `${hours}${strictHourMinuteSeparator}${minutes}(${amPm})?`;
 
-export const listTokenRegExp = new RegExp(listToken);
+export const listTokenWithSpacesRegExp = new RegExp(listTokenWithSpaces);
 export const checkboxRegExp = new RegExp(checkbox);
 export const timeRegExp = new RegExp(time);
 export const timeFromStartRegExp = new RegExp(`^${time}`);
@@ -45,3 +46,7 @@ export const propRegexp = /\[(.+)::(.*)]/g;
 
 export const dashOrNumberWithMultipleSpaces = /(-|\d+[.)])\s+/g;
 export const escapedSquareBracket = /\\\[/g;
+export const mdastUtilListIndentationSpaces = new RegExp(
+  `^( {4})+(?=${listToken})`,
+  "gm",
+);

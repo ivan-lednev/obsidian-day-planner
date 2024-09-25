@@ -10,15 +10,24 @@ import { compareTimestamps } from "../parser/parser";
 import {
   dashOrNumberWithMultipleSpaces,
   escapedSquareBracket,
+  mdastUtilListIndentationSpaces,
 } from "../regexp";
 
 export { fromMarkdown } from "mdast-util-from-markdown";
 
 export function toMarkdown(nodes: Nodes) {
-  return mdast
-    .toMarkdown(nodes, { bullet: "-", listItemIndent: "tab" })
-    .replace(dashOrNumberWithMultipleSpaces, "- ")
-    .replace(escapedSquareBracket, "[");
+  return (
+    mdast
+      .toMarkdown(nodes, { bullet: "-", listItemIndent: "tab" })
+      .replace(dashOrNumberWithMultipleSpaces, "- ")
+      .replace(escapedSquareBracket, "[")
+      // mdast-util-to-markdown uses 4 spaces, Obsidian uses tabs by default, that's why we need a replacement
+      .replace(mdastUtilListIndentationSpaces, (match) => {
+        const tabCount = match.length / 4;
+
+        return "\t".repeat(tabCount);
+      })
+  );
 }
 
 export function findHeadingWithChildren(

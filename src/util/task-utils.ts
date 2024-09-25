@@ -7,7 +7,7 @@ import { replaceOrPrependTimestamp } from "../parser/parser";
 import {
   checkboxRegExp,
   keylessScheduledPropRegExp,
-  listTokenRegExp,
+  listTokenWithSpacesRegExp,
   scheduledPropRegExp,
   shortScheduledPropRegExp,
 } from "../regexp";
@@ -193,5 +193,7 @@ export function getLinesAfterFirst(text: string) {
 }
 
 export function removeListTokens(text: string) {
-  return text.replace(listTokenRegExp, "").replace(checkboxRegExp, "");
+  return text
+    .replace(listTokenWithSpacesRegExp, "")
+    .replace(checkboxRegExp, "");
 }
