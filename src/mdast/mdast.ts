@@ -54,17 +54,21 @@ export function findHeadingWithChildren(
   };
 }
 
-export function sortListsRecursively(
-  root: List,
+export function sortListsRecursively<T extends Node>(
+  root: T,
   sortFn: (a: Node, b: Node) => number = compareAlphabetically,
-): List {
+): T {
+  if (!checkList(root)) {
+    return root;
+  }
+
   return {
     ...root,
     children: root.children
       .map((listItem) => ({
         ...listItem,
         children: listItem.children.map((child) =>
-          check(isList)(child) ? sortListsRecursively(child, sortFn) : child,
+          sortListsRecursively(child, sortFn),
         ),
       }))
       .sort(sortFn),
@@ -75,19 +79,12 @@ function compareAlphabetically(a: Node, b: Node) {
   const aText = getFirstTextNodeValue(a);
   const bText = getFirstTextNodeValue(b);
 
-  isNotVoid(aText);
-  isNotVoid(bText);
-
   return aText.localeCompare(bText);
 }
 
 export function compareByTimestampInText(a: Node, b: Node) {
-  // todo: remove duplication
   const aText = getFirstTextNodeValue(a);
   const bText = getFirstTextNodeValue(b);
-
-  isNotVoid(aText);
-  isNotVoid(bText);
 
   return compareTimestamps(aText, bText);
 }
@@ -95,7 +92,7 @@ export function compareByTimestampInText(a: Node, b: Node) {
 export function getFirstTextNodeValue(node: Node) {
   if (isParentNode(node)) {
     if (node.children.length === 0) {
-      return null;
+      return "";
     }
 
     const firstNode = node.children[0];
@@ -105,7 +102,7 @@ export function getFirstTextNodeValue(node: Node) {
     return getFirstTextNodeValue(firstNode);
   }
 
-  return isTextNode(node) ? node.value : null;
+  return isTextNode(node) ? node.value : "";
 }
 
 export function isParentNode(node: Node): node is Parent {
@@ -124,6 +121,8 @@ export function isList(node: Node): asserts node is List {
   return isExactly(node.type, "list");
 }
 
+export const checkList = check(isList);
+
 export function positionContainsPoint(
   { start, end }: NonNullable<Node["position"]>,
   point: Point,
@@ -136,7 +135,6 @@ export function positionContainsPoint(
   );
 }
 
-// todo: move out
 export function toEditorPos(mdastPoint: Point) {
   return {
     line: mdastPoint.line - 1,

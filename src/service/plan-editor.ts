@@ -184,27 +184,23 @@ export class PlanEditor {
         return edited;
       }
 
-      const firstNode = headingWithChildren.children[0];
+      const firstNode = headingWithChildren.children.at(0);
       const lastNode = headingWithChildren.children.at(-1);
 
-      // todo: clean up assertions
-      isNotVoid(firstNode);
-      isNotVoid(firstNode.position?.start?.offset);
-      isNotVoid(lastNode);
-      isNotVoid(lastNode.position?.end?.offset);
+      isNotVoid(firstNode?.position?.start?.offset);
+      isNotVoid(lastNode?.position?.end?.offset);
 
-      const { start } = firstNode.position;
-      const { end } = lastNode.position;
-
-      // todo: no mutation?
-      headingWithChildren.children = headingWithChildren.children.map((child) =>
-        sortListsRecursively(child, compareByTimestampInText),
-      );
+      const sorted = {
+        ...headingWithChildren,
+        children: headingWithChildren.children.map((child) =>
+          sortListsRecursively(child, compareByTimestampInText),
+        ),
+      };
 
       return (
-        edited.substring(0, start.offset) +
-        toMarkdown(headingWithChildren) +
-        edited.substring(end.offset + 1)
+        edited.substring(0, firstNode.position.start.offset) +
+        toMarkdown(sorted) +
+        edited.substring(lastNode.position.end.offset + 1)
       );
     });
   }

@@ -117,4 +117,16 @@ test("Sort lists by time", () => {
   expect(actual).toBe(expected);
 });
 
-test.todo("Handle empty lists");
+test("Handle empty lists", () => {
+  const input = `- b
+- 
+- a
+`;
+
+  const tree = fromMarkdown(input);
+  const list = tree.children[0];
+
+  isList(list);
+
+  expect(() => toMarkdown(sortListsRecursively(list))).not.toThrow();
+});

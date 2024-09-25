@@ -1,6 +1,7 @@
 import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
 import { mount } from "svelte";
 import { get, writable, type Writable } from "svelte/store";
+import { isNotVoid } from "typed-assert";
 
 import {
   errorContextKey,
@@ -182,6 +183,8 @@ export default class DayPlanner extends Plugin {
 
         const sorted = sortListsRecursively(list, compareByTimestampInText);
         const updatedText = toMarkdown(sorted).trim();
+
+        isNotVoid(sorted.position);
 
         editor.replaceRange(
           updatedText,
