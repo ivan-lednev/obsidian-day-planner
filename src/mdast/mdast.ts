@@ -1,14 +1,10 @@
 import { takeWhile } from "lodash/fp";
 import type { Node, Parent, Text as MdastText } from "mdast";
-import {
-  type Heading,
-  type List,
-  type Root,
-} from "mdast-util-from-markdown/lib";
+import type { Heading, List, Root, Nodes } from "mdast";
 import * as mdast from "mdast-util-to-markdown";
-import type { Nodes, Point } from "mdast-util-to-markdown/lib/types";
 import type { EditorPosition } from "obsidian";
 import { check, isExactly, isNotVoid } from "typed-assert";
+import type { Point } from "unist";
 
 import { compareTimestamps } from "../parser/parser";
 import {
