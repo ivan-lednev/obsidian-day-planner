@@ -49,6 +49,7 @@ export interface DayPlannerSettings {
   releaseNotes: boolean;
   taskStatusOnCreation: string;
   eventFormatOnCreation: (typeof eventFormats)[number];
+  sortTasksInPlanAfterEdit: boolean;
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -85,6 +86,7 @@ export const defaultSettings: DayPlannerSettings = {
   releaseNotes: true,
   taskStatusOnCreation: " ",
   eventFormatOnCreation: "task",
+  sortTasksInPlanAfterEdit: false,
 };
 
 export const defaultSettingsForTests = {

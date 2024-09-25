@@ -173,6 +173,11 @@ export class PlanEditor {
   private async editFile(path: string, editFn: (contents: string) => string) {
     await this.obsidianFacade.editFile(path, (contents) => {
       const edited = editFn(contents);
+
+      if (!this.settings().sortTasksInPlanAfterEdit) {
+        return edited;
+      }
+
       const plannerHeading = this.settings().plannerHeading;
       const mdastRoot = fromMarkdown(edited);
       const headingWithChildren = findHeadingWithChildren(
