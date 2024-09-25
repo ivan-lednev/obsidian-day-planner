@@ -1,6 +1,10 @@
 import { takeWhile } from "lodash/fp";
-import type { Node, Parent, RootContent, Text as MdastText } from "mdast";
-import { type Heading, type Root } from "mdast-util-from-markdown/lib";
+import type { Node, Parent, Text as MdastText } from "mdast";
+import {
+  type Heading,
+  type List,
+  type Root,
+} from "mdast-util-from-markdown/lib";
 import * as mdast from "mdast-util-to-markdown";
 import type { Nodes, Point } from "mdast-util-to-markdown/lib/types";
 import type { EditorPosition } from "obsidian";
@@ -51,20 +55,16 @@ export function findHeadingWithChildren(
 }
 
 export function sortListsRecursively(
-  root: RootContent,
+  root: List,
   sortFn: (a: Node, b: Node) => number = compareAlphabetically,
-) {
-  if (root.type !== "list") {
-    return root;
-  }
-
+): List {
   return {
     ...root,
     children: root.children
       .map((listItem) => ({
         ...listItem,
         children: listItem.children.map((child) =>
-          sortListsRecursively(child, sortFn),
+          isList(child) ? sortListsRecursively(child, sortFn) : child,
         ),
       }))
       .sort(sortFn),
@@ -118,6 +118,10 @@ export function isTextNode(node: Node): node is MdastText {
 
 export function isHeading(node: Node): asserts node is Heading {
   return isExactly(node.type, "heading");
+}
+
+export function isList(node: Node): node is List {
+  return node.type === "list";
 }
 
 export function positionContainsPoint(
