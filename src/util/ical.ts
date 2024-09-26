@@ -102,8 +102,8 @@ function icalEventToTask(
   };
 }
 
-function getRsvpStatus(event: ical.VEvent, email: string): AttendeePartStat {
-  if (email.trim() === "") {
+function getRsvpStatus(event: ical.VEvent, email?: string): AttendeePartStat {
+  if (!email?.trim()) {
     return fallbackPartStat;
   }
 

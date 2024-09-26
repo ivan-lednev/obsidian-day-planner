@@ -205,7 +205,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
         .addText((el) =>
           el
             .setPlaceholder("Your email address")
-            .setValue(ical.email)
+            .setValue(ical.email || "")
             .onChange((value: string) => {
               this.settingsStore.update(
                 produce((draft) => {
