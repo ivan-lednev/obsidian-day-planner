@@ -178,9 +178,11 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
 
     containerEl.createEl("h2", { text: "Remote calendars" });
 
-    this.plugin.settings().icals.map((ical, index) =>
+    this.plugin.settings().icals.map((ical, index) => {
+      containerEl.createEl("h2", { text: `Calendar ${index + 1}` });
+
       new Setting(containerEl)
-        .setName(`Calendar ${index + 1}`)
+        .setName("Mark calendar with color")
         .addColorPicker((el) =>
           el.setValue(ical.color).onChange((value: string) => {
             this.settingsStore.update(
@@ -189,7 +191,10 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
               }),
             );
           }),
-        )
+        );
+
+      new Setting(containerEl)
+        .setName("Prepend this text to events from this calendar")
         .addText((el) =>
           el
             .setPlaceholder("Displayed name")
@@ -201,6 +206,11 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
                 }),
               );
             }),
+        );
+
+      new Setting(containerEl)
+        .setName(
+          "Your email address, used to show 'tentative'/'needs action'/'declined' marker",
         )
         .addText((el) =>
           el
@@ -213,35 +223,37 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
                 }),
               );
             }),
-        )
-        .addText((el) =>
-          el
-            .setPlaceholder("URL")
-            .setValue(ical.url)
-            .onChange((value: string) => {
-              this.settingsStore.update(
-                produce((draft) => {
-                  draft.icals[index].url = value;
-                }),
-              );
-            }),
-        )
-        .addExtraButton((el) =>
-          el
-            .setIcon("trash")
-            .setTooltip("Delete calendar")
-            .onClick(() => {
-              this.settingsStore.update((previous) => ({
-                ...previous,
-                icals: previous.icals.filter(
-                  (editedIcal, editedIndex) => editedIndex !== index,
-                ),
-              }));
+        );
 
-              this.display();
-            }),
-        ),
-    );
+      new Setting(containerEl).setName("Remote calendar URL").addText((el) =>
+        el
+          .setPlaceholder("URL")
+          .setValue(ical.url)
+          .onChange((value: string) => {
+            this.settingsStore.update(
+              produce((draft) => {
+                draft.icals[index].url = value;
+              }),
+            );
+          }),
+      );
+
+      new Setting(containerEl).addButton((el) =>
+        el
+          .setIcon("trash")
+          .setButtonText(`Delete calendar ${index + 1}`)
+          .onClick(() => {
+            this.settingsStore.update((previous) => ({
+              ...previous,
+              icals: previous.icals.filter(
+                (editedIcal, editedIndex) => editedIndex !== index,
+              ),
+            }));
+
+            this.display();
+          }),
+      );
+    });
 
     new Setting(containerEl).addButton((el) =>
       el.setButtonText("Add remote calendar").onClick(() => {
