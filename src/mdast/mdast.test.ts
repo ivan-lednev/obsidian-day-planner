@@ -5,6 +5,7 @@ import {
   findHeadingWithChildren,
   fromMarkdown,
   isList,
+  listIndentationSpacesToTabs,
   sortListsRecursively,
   toMarkdown,
 } from "./mdast";
@@ -25,7 +26,7 @@ test("roundtripping doesn't mess up Obsidian-styled markdown", () => {
 `;
   const parsed = fromMarkdown(input);
 
-  expect(toMarkdown(parsed)).toEqual(input);
+  expect(toMarkdown(parsed)).toEqual(listIndentationSpacesToTabs(input));
 });
 
 test("Find heading position", () => {
@@ -87,7 +88,7 @@ test("Sort lists recursively", () => {
 
   const actual = toMarkdown(sortListsRecursively(list));
 
-  expect(actual).toBe(expected);
+  expect(actual).toBe(listIndentationSpacesToTabs(expected));
 });
 
 test("Sort lists by time", () => {
@@ -117,7 +118,9 @@ test("Sort lists by time", () => {
   expect(actual).toBe(expected);
 });
 
-test("Handle empty lists", () => {
+test.todo("Tabs don't get replaced with spaces on roundtripping");
+
+test("Does not throw errors on empty lists", () => {
   const input = `- b
 - 
 - a

@@ -6,6 +6,7 @@ import type { EditorPosition } from "obsidian";
 import { check, isExactly, isNotVoid } from "typed-assert";
 import type { Point } from "unist";
 
+import { mdastUtilNumberOfSpacesInTab } from "../constants";
 import { compareTimestamps } from "../parser/parser";
 import {
   dashOrNumberWithMultipleSpaces,
@@ -16,17 +17,11 @@ import {
 export { fromMarkdown } from "mdast-util-from-markdown";
 
 export function toMarkdown(nodes: Nodes) {
-  return (
+  return listIndentationSpacesToTabs(
     mdast
       .toMarkdown(nodes, { bullet: "-", listItemIndent: "tab" })
       .replace(dashOrNumberWithMultipleSpaces, "- ")
-      .replace(escapedSquareBracket, "[")
-      // mdast-util-to-markdown uses 4 spaces, Obsidian uses tabs by default, that's why we need a replacement
-      .replace(mdastUtilListIndentationSpaces, (match) => {
-        const tabCount = match.length / 4;
-
-        return "\t".repeat(tabCount);
-      })
+      .replace(escapedSquareBracket, "["),
   );
 }
 
@@ -152,4 +147,15 @@ export function toMdastPoint(editorPosition: EditorPosition) {
     line: editorPosition.line + 1,
     column: editorPosition.ch + 1,
   };
+}
+
+/**
+ * mdast-util uses 4 spaces for a tab, Obsidian uses a tab character. That's why we need this conversion
+ */
+export function listIndentationSpacesToTabs(input: string) {
+  return input.replace(mdastUtilListIndentationSpaces, (match) => {
+    const tabCount = match.length / mdastUtilNumberOfSpacesInTab;
+
+    return "\t".repeat(tabCount);
+  });
 }

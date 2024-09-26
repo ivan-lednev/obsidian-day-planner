@@ -17,6 +17,7 @@ export const clockKey = "clocked";
 export const clockFormat = "YYYY-MM-DDTHH:mm:ss";
 export const reQueryAfterMillis = 200;
 export const icalRefreshIntervalMillis = 5 * 60 * 1000;
+export const mdastUtilNumberOfSpacesInTab = 4;
 
 export const noTitle = "(No title)";
 

@@ -5,6 +5,7 @@ module.exports = {
   transform: {
     "^.+\\.[tj]s$": "@swc/jest",
   },
+  collectCoverageFrom: ["src/**/*/*.ts"],
   transformIgnorePatterns: [
     "/node_modules/(?!(svelte.*|esm-env.*|mdast.*|micromark.*|zwitch|longest-streak|unist-util.*|decode-named-character-reference))",
   ],
