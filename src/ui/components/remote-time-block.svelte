@@ -4,16 +4,26 @@
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
 
   export let task: WithPlacing<WithTime<RemoteTask>>;
+
+  const tentative = task.rsvpStatus === "TENTATIVE";
+  const declined = task.rsvpStatus === "DECLINED";
 </script>
 
 <ScheduledTimeBlock {task}>
   <div class="remote-task-content">
-    <div style:background-color={task.calendar.color} class="ribbon" />
+    <div
+      style="
+
+--ribbon-color: {task.calendar.color}"
+      class="ribbon"
+      class:declined
+      class:tentative
+    ></div>
     <div class="text">
       <span class="calendar-name">
         {task.calendar.name}
       </span>
-      <span class="summary">
+      <span class="summary" class:declined>
         {task.summary}
       </span>
     </div>
@@ -44,5 +54,28 @@
     left: 0;
 
     width: var(--size-4-2);
+
+    background-color: var(--ribbon-color);
+  }
+
+  .declined {
+    background-color: inherit;
+    border-right: 2px solid var(--ribbon-color);
+  }
+
+  .ribbon.tentative {
+    background: repeating-linear-gradient(
+      45deg,
+      var(--ribbon-color),
+      var(--ribbon-color) 5px,
+      transparent 5px,
+      transparent 10px
+    );
+    border-right: 1px solid var(--ribbon-color);
+  }
+
+  .summary.declined {
+    color: var(--text-muted);
+    text-decoration: line-through;
   }
 </style>

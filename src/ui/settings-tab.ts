@@ -204,6 +204,18 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
         )
         .addText((el) =>
           el
+            .setPlaceholder("Your email address")
+            .setValue(ical.email)
+            .onChange((value: string) => {
+              this.settingsStore.update(
+                produce((draft) => {
+                  draft.icals[index].email = value.trim();
+                }),
+              );
+            }),
+        )
+        .addText((el) =>
+          el
             .setPlaceholder("URL")
             .setValue(ical.url)
             .onChange((value: string) => {
@@ -235,6 +247,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       el.setButtonText("Add remote calendar").onClick(() => {
         const newIcal = {
           name: "",
+          email: "",
           url: "",
           color: "#ffffff",
         };

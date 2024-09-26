@@ -1,12 +1,17 @@
 import moment, { type Moment } from "moment";
 import { tz } from "moment-timezone";
-import ical from "node-ical";
+import ical, { type AttendeePartStat } from "node-ical";
 
-import { noTitle, originalRecurrenceDayKeyFormat } from "../constants";
+import {
+  fallbackPartStat,
+  noTitle,
+  originalRecurrenceDayKeyFormat,
+} from "../constants";
 import type { RemoteTask, WithTime } from "../task-types";
 import type { WithIcalConfig } from "../types";
 
 import { getId } from "./id";
+import { liftToArray } from "./lift";
 import { getMinutesSinceMidnight } from "./moment";
 
 export function canHappenAfter(icalEvent: ical.VEvent, date: Date) {
@@ -75,12 +80,14 @@ function icalEventToTask(
   }
 
   const isAllDayEvent = icalEvent.datetype === "date";
+  const rsvpStatus = getRsvpStatus(icalEvent, icalEvent.calendar.email);
 
   const base = {
     id: getId(),
     calendar: icalEvent.calendar,
     summary: icalEvent.summary || noTitle,
     startTime: startTimeAdjusted,
+    rsvpStatus,
   };
 
   if (isAllDayEvent) {
@@ -93,6 +100,22 @@ function icalEventToTask(
     durationMinutes:
       (icalEvent.end.getTime() - icalEvent.start.getTime()) / 1000 / 60,
   };
+}
+
+function getRsvpStatus(event: ical.VEvent, email: string): AttendeePartStat {
+  if (email.trim() === "") {
+    return fallbackPartStat;
+  }
+
+  const attendeeWithMatchingEmail = liftToArray(event.attendee).find(
+    (attendee) => typeof attendee !== "string" && attendee?.params.CN === email,
+  );
+
+  if (typeof attendeeWithMatchingEmail === "string") {
+    throw new Error("Unexpected attendee format");
+  }
+
+  return attendeeWithMatchingEmail?.params.PARTSTAT || fallbackPartStat;
 }
 
 function adjustForOtherZones(tzid: string, currentDate: Date) {

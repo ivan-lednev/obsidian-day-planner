@@ -1,4 +1,5 @@
 import type { Moment } from "moment";
+import type { AttendeePartStat } from "node-ical";
 import type { Pos } from "obsidian";
 
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
@@ -43,6 +44,7 @@ export type WithTime<T> = T & {
 export type RemoteTask = BaseTask & {
   calendar: IcalConfig;
   summary: string;
+  rsvpStatus: AttendeePartStat;
   description?: string;
 };
 
