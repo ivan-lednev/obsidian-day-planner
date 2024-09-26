@@ -4,8 +4,9 @@
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
 
   export let task: WithPlacing<WithTime<RemoteTask>>;
-  const isTentative = task.rsvpStatus === "TENTATIVE";
-  const isDeclined = task.rsvpStatus === "DECLINED";
+
+  const tentative = task.rsvpStatus === "TENTATIVE";
+  const declined = task.rsvpStatus === "DECLINED";
 </script>
 
 <ScheduledTimeBlock {task}>
@@ -13,16 +14,16 @@
     <div
       style="
 
---ribbon-color: {task.calendar.color};"
+--ribbon-color: {task.calendar.color}"
       class="ribbon"
-      class:declined={isDeclined}
-      class:tentative={isTentative}
-    />
+      class:declined
+      class:tentative
+    ></div>
     <div class="text">
       <span class="calendar-name">
         {task.calendar.name}
       </span>
-      <span class="summary">
+      <span class="summary" class:declined>
         {task.summary}
       </span>
     </div>
@@ -57,24 +58,24 @@
     background-color: var(--ribbon-color);
   }
 
-  .ribbon.declined {
+  .declined {
     background-color: inherit;
-    border: 1.5px solid var(--ribbon-color);
+    border-right: 2px solid var(--ribbon-color);
   }
 
-  .ribbon.tentative::before {
-    content: "";
-
-    position: absolute;
-    z-index: 1;
-    inset: 0;
-
-    background-image: repeating-linear-gradient(
+  .ribbon.tentative {
+    background: repeating-linear-gradient(
       45deg,
-      rgb(255 255 255 / 80%),
-      rgb(255 255 255 / 80%) 5px,
+      var(--ribbon-color),
+      var(--ribbon-color) 5px,
       transparent 5px,
       transparent 10px
     );
+    border-right: 1px solid var(--ribbon-color);
+  }
+
+  .summary.declined {
+    color: var(--text-muted);
+    text-decoration: line-through;
   }
 </style>

@@ -44,8 +44,8 @@ export type WithTime<T> = T & {
 export type RemoteTask = BaseTask & {
   calendar: IcalConfig;
   summary: string;
+  rsvpStatus: AttendeePartStat;
   description?: string;
-  rsvpStatus?: AttendeePartStat;
 };
 
 export interface LocalTask extends TaskTokens, BaseTask {
