@@ -4,9 +4,9 @@ import { isNotVoid } from "typed-assert";
 import replace from "vite-plugin-filter-replace";
 import fs from "node:fs";
 
-export default defineConfig({
+export default defineConfig((env) => ({
   define: {
-    "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || 'development')
+    "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "development")
   },
   plugins: [
     replace([
@@ -15,42 +15,40 @@ export default defineConfig({
         replace: [
           {
             from: "changelogMd",
-            to: JSON.stringify(fs.readFileSync("./CHANGELOG.md", "utf-8")),
+            to: JSON.stringify(fs.readFileSync("./CHANGELOG.md", "utf-8"))
           },
           {
             from: "currentPluginVersion",
             to: JSON.stringify(
-              JSON.parse(fs.readFileSync("./package.json", "utf-8")).version,
-            ),
+              JSON.parse(fs.readFileSync("./package.json", "utf-8")).version
+            )
           },
           {
             from: "supportBanner",
-            to: JSON.stringify(fs.readFileSync("./support-banner.md", "utf-8")),
+            to: JSON.stringify(fs.readFileSync("./support-banner.md", "utf-8"))
           }
-        ],
-      },
+        ]
+      }
     ]),
     svelte({
       compilerOptions: {
-        dev: true,
-      },
-    }),
+        dev: env.mode === "development"
+      }
+    })
   ],
-  mode: "development",
   css: {
     preprocessorOptions: {
-      scss: { includePaths: ["node_modules"] },
-    },
+      scss: { includePaths: ["node_modules"] }
+    }
   },
   build: {
-    watch: { include: "src/**/*" },
     lib: {
       entry: ["src/main.ts", "src/styles.scss"],
       name: "main",
       fileName: () => "main.js",
-      formats: ["cjs" as const],
+      formats: ["cjs" as const]
     },
-    minify: false,
+    minify: env.mode === "production",
     outDir: ".",
     rollupOptions: {
       output: {
@@ -63,9 +61,9 @@ export default defineConfig({
           isNotVoid(assetInfo.name);
 
           return assetInfo.name;
-        },
+        }
       },
-      external: ["obsidian", "electron"],
-    },
-  },
-});
+      external: ["obsidian", "electron"]
+    }
+  }
+}));
