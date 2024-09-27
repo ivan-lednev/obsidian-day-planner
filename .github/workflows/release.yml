@@ -26,7 +26,7 @@ jobs:
           echo "::set-output name=tag::$(git describe --abbrev=0 --tags)"
 
       - name: Install dependencies
-        run: npm ci --omit=dev --ignore-scripts
+        run: npm ci --ignore-scripts
 
       - name: Build
         id: build
