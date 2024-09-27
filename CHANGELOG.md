@@ -1,3 +1,21 @@
+## 0.23.0
+
+### ✨ New features
+
+- Now clicking on checkboxes on the timeline completes a task. [obsidian-tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) logic is also respected: recurrent tasks get updated, 'finished' property gets added
+- There is now an option to sort items by time in your planner after an edit (thanks, @Gelio)
+- You can now configure what kind of task to create on edit: bullet (`- task`) or checkbox (`- [ ] task`)
+- Minimal task duration is now configurable. Now tasks won't shrink beyond this point when editing
+- Timestamps get parsed anywhere on the line, not only at the start, e.g.: `- [ ] #task 20:30 - 21:00 Wake up`
+  - Note that if a timestamp is not at the start of the line, it needs to be in a stricter format to avoid confusing the plugin
+    - `20:00` will work
+    - `2000` will not work
+- There is now an option to specify your email in remote calendar config. If you do this, your RSVP status (declined/tentative) will get displayed on remote tasks from this calendar (thanks, @ramandv)
+
+### 🐞 Fixed issues
+
+- Now timeline will stay where you've left it when you reload Obsidian (thanks, @k4a-l)
+
 ## 0.22.0
 
 ### ✨ New features
@@ -45,12 +63,12 @@
 
 - ✨ Color coding: you can define background color for blocks containing certain text in first line
 - ✨ Weekly view now displays unscheduled tasks on top
-- ✨ Advanced drag-and-drop editing does not require modifier keys any more, you pick current edit mode in timeline controls 
+- ✨ Advanced drag-and-drop editing does not require modifier keys any more, you pick current edit mode in timeline controls
 
 ### Fixed issues
 
 - 🐞 Fixed scheduling tasks for other days than today (by @Lunkle)
-- 🐞 Pointer to current time is now more visible 
+- 🐞 Pointer to current time is now more visible
 - 🐞 Task summary in internet calendars is now displayed next to calendar name, to make it visible in short blocks
 
 ## 0.19.1 - 0.19.6
