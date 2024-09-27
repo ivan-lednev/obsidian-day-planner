@@ -1,12 +1,3 @@
-import {
-  filter,
-  flatten,
-  flow,
-  groupBy,
-  isEmpty,
-  mapValues,
-  partition,
-} from "lodash/fp";
 import { App } from "obsidian";
 import {
   derived,
@@ -39,12 +30,9 @@ import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "../ui/hooks/use-visible-dataview-tasks";
 import { useVisibleDays } from "../ui/hooks/use-visible-days";
 
-import { canHappenAfter, icalEventToTasks } from "./ical";
-import { getEarliestMoment } from "./moment";
-import { createBackgroundBatchScheduler } from "./scheduler";
 import { getUpdateTrigger } from "./store";
 import { getDayKey, getEmptyRecordsForDay, mergeTasks } from "./tasks-utils";
-import { useIcalEvents } from "./use-ical-events";
+import { useDayToEventOccurences } from "./use-day-to-event-occurences";
 
 interface CreateHooksProps {
   app: App;
@@ -105,64 +93,15 @@ export function createHooks({
     getUpdateTrigger,
   );
 
-  const icalEvents = useIcalEvents(
-    settingsStore,
-    combinedIcalSyncTrigger,
-    isOnline,
-  );
-
   const dateRanges = useDateRanges();
   const visibleDays = useVisibleDays(dateRanges.ranges);
 
-  const schedulerQueue = derived(
-    [icalEvents, visibleDays],
-    ([$icalEvents, $visibleDays]) => {
-      if (isEmpty($icalEvents) || isEmpty($visibleDays)) {
-        return [];
-      }
-
-      const earliestDay = getEarliestMoment($visibleDays);
-      const startOfEarliestDay = earliestDay.clone().startOf("day").toDate();
-      const relevantIcalEvents = $icalEvents.filter((icalEvent) =>
-        canHappenAfter(icalEvent, startOfEarliestDay),
-      );
-
-      return relevantIcalEvents.flatMap((icalEvent) => {
-        return $visibleDays.map(
-          (day) => () => icalEventToTasks(icalEvent, day),
-        );
-      });
-    },
-  );
-
-  const tasksFromEvents = readable<Array<ReturnType<typeof icalEventToTasks>>>(
-    [],
-    (set) => {
-      const scheduler =
-        createBackgroundBatchScheduler<ReturnType<typeof icalEventToTasks>>(
-          set,
-        );
-
-      return schedulerQueue.subscribe(scheduler.enqueueTasks);
-    },
-  );
-
-  const visibleDayToEventOccurences = derived(
-    tasksFromEvents,
-    flow(
-      filter(Boolean),
-      flatten,
-      groupBy((task: WithTime<RemoteTask>) => getDayKey(task.startTime)),
-      mapValues((tasks) => {
-        const [withTime, noTime]: [
-          Array<WithTime<RemoteTask>>,
-          Array<Omit<WithTime<RemoteTask>, "startMinutes">>,
-        ] = partition((task) => task.startMinutes !== undefined, tasks);
-
-        return { withTime, noTime };
-      }),
-    ),
-  );
+  const visibleDayToEventOccurences = useDayToEventOccurences({
+    settings: settingsStore,
+    syncTrigger: combinedIcalSyncTrigger,
+    isOnline,
+    visibleDays,
+  });
 
   const taskUpdateTrigger = derived(
     [dataviewChange, dataviewSource],

@@ -56,7 +56,7 @@ fs.writeFileSync("README.md", readmeOutput, "utf-8");
 const git = simpleGit();
 
 git
-  .add(["manifest.json", "package-lock.json", "package.json", "versions.json", "README.md"])
+  .add(["manifest.json", "package-lock.json", "package.json", "versions.json", "README.md", "CHANGELOG.md"])
   .commit(versionString, { "--no-verify": null })
   .tag([versionString])
   .push()

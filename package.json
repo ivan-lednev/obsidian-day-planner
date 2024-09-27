@@ -26,6 +26,7 @@
     "@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
     "@swc/core": "^1.7.26",
     "@swc/jest": "^0.2.36",
+    "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.5.0",
     "@tsconfig/svelte": "^5.0.4",
     "@types/chroma-js": "^2.4.4",
