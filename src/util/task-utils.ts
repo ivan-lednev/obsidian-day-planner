@@ -1,4 +1,4 @@
-import { isEmpty } from "lodash/fp";
+import { flow, isEmpty } from "lodash/fp";
 import type { Moment } from "moment";
 import { get } from "svelte/store";
 
@@ -8,6 +8,7 @@ import {
   checkboxRegExp,
   keylessScheduledPropRegExp,
   listTokenWithSpacesRegExp,
+  looseTimestampAtStartOfLineRegExp,
   scheduledPropRegExp,
   shortScheduledPropRegExp,
 } from "../regexp";
@@ -185,7 +186,10 @@ export function getOneLineSummary(task: Task) {
     return task.summary;
   }
 
-  return getFirstLine(task.text);
+  return flow(
+    removeListTokens,
+    removeTimestampFromStart,
+  )(getFirstLine(task.text));
 }
 
 export function getLinesAfterFirst(text: string) {
@@ -196,4 +200,8 @@ export function removeListTokens(text: string) {
   return text
     .replace(listTokenWithSpacesRegExp, "")
     .replace(checkboxRegExp, "");
+}
+
+export function removeTimestampFromStart(text: string) {
+  return text.replace(looseTimestampAtStartOfLineRegExp, "");
 }

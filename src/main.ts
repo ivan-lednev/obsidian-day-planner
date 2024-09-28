@@ -265,7 +265,11 @@ export default class DayPlanner extends Plugin {
       },
     });
 
-    this.register(newlyStartedTasks.subscribe(notifyAboutStartedTasks));
+    this.register(
+      newlyStartedTasks.subscribe((value) =>
+        notifyAboutStartedTasks(value, this.settings()),
+      ),
+    );
     this.addCommand({
       id: "re-sync",
       name: "Re-sync tasks",
