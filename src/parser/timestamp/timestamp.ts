@@ -23,6 +23,10 @@ export function parseTimestamp(asText: string, day: Moment) {
     parsedHours += 12;
   }
 
+  if (ampm?.toLowerCase().trim() === "am" && parsedHours === 12) {
+    parsedHours = 0;
+  }
+
   const timeOfDay = window.moment.duration({
     hours: parsedHours,
     minutes: parsedMinutes,
