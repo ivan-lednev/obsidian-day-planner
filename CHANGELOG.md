@@ -1,3 +1,16 @@
+## 0.24.0
+
+### ✨ New features
+
+- Active task end time is now shown in status bar
+- Notifications now show timestamps
+
+### 🐞 Fixed issues
+
+- Now tasks with no text content are not shown in timeline
+- Fixed deleted recurrences of events in remote calendars showing up
+- Fixed 12 am parsed as noon
+
 ## 0.23.0
 
 ### ✨ New features
