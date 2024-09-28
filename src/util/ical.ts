@@ -2,11 +2,7 @@ import moment, { type Moment } from "moment";
 import { tz } from "moment-timezone";
 import ical, { type AttendeePartStat } from "node-ical";
 
-import {
-  fallbackPartStat,
-  noTitle,
-  originalRecurrenceDayKeyFormat,
-} from "../constants";
+import { fallbackPartStat, noTitle, icalDayKeyFormat } from "../constants";
 import type { RemoteTask, WithTime } from "../task-types";
 import type { WithIcalConfig } from "../types";
 
@@ -25,14 +21,24 @@ export function canHappenAfter(icalEvent: ical.VEvent, date: Date) {
   );
 }
 
-function hasRecurrenceOverride(icalEvent: ical.VEvent, date: Date) {
+function hasRecurrenceOverrideForDate(icalEvent: ical.VEvent, date: Date) {
   if (!icalEvent.recurrences) {
     return false;
   }
 
-  const dateKey = moment(date).format(originalRecurrenceDayKeyFormat);
+  return Object.hasOwn(icalEvent.recurrences, getIcalDayKey(date));
+}
 
-  return Object.hasOwn(icalEvent.recurrences, dateKey);
+function getIcalDayKey(date: Date) {
+  return moment(date).format(icalDayKeyFormat);
+}
+
+function hasExceptionForDate(icalEvent: ical.VEvent, date: Date) {
+  if (!icalEvent.exdate) {
+    return false;
+  }
+
+  return Object.keys(icalEvent.exdate).includes(getIcalDayKey(date));
 }
 
 export function icalEventToTasks(
@@ -53,7 +59,11 @@ export function icalEventToTasks(
 
     const recurrences = icalEvent.rrule
       ?.between(startOfDay, endOfDay)
-      .filter((date) => !hasRecurrenceOverride(icalEvent, date))
+      .filter(
+        (date) =>
+          !hasRecurrenceOverrideForDate(icalEvent, date) &&
+          !hasExceptionForDate(icalEvent, date),
+      )
       .map((date) => icalEventToTask(icalEvent, date));
 
     return [...recurrences, ...recurrenceOverrides];

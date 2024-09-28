@@ -26,12 +26,12 @@ function getMockRequest(): Mock {
   return jest.requireMock("obsidian").request;
 }
 
-function createStore() {
+function createStore({ visibleDays = [moment("2024-09-26")] } = {}) {
   const syncTrigger = writable({});
 
   const store = useDayToEventOccurences({
     isOnline: writable(true),
-    visibleDays: writable([moment("2024-09-26")]),
+    visibleDays: writable(visibleDays),
     syncTrigger,
     settings: writable({
       ...defaultSettingsForTests,
@@ -92,7 +92,30 @@ test("Falls back on previous values if fetching a calendar fails", async () => {
   });
 });
 
-test.todo("Deleted recurrences don't show up as tasks");
+test("Deleted recurrences don't show up as tasks", async () => {
+  getMockRequest().mockReturnValue(
+    getIcalFixture("google-recurring-with-exception-and-location"),
+  );
+
+  const { store } = createStore({
+    visibleDays: [moment("2024-09-27"), moment("2024-09-28")],
+  });
+
+  await waitFor(() => {
+    expect(get(store)).toEqual({
+      "2024-09-27": {
+        noTime: [],
+        withTime: [
+          expect.objectContaining({
+            summary: "recurring",
+          }),
+        ],
+      },
+    });
+  });
+});
+
+test.todo("Location gets passed to an event");
 
 test.todo("Yearly recurrences do not show up every month");
 
