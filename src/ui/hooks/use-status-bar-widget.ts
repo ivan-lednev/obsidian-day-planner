@@ -1,4 +1,5 @@
 import { sortBy } from "lodash/fp";
+import type { Moment } from "moment";
 import { derived, type Readable } from "svelte/store";
 
 import { statusBarTextLimit } from "../../constants";
@@ -17,6 +18,7 @@ interface Widget {
     text: string;
     timeLeft: string;
     percentageComplete: string;
+    endTime: Moment;
   };
   next?: {
     text: string;
@@ -68,6 +70,7 @@ export function useStatusBarWidget({ tasksForToday }: UseStatusBarWidgetProps) {
           percentageComplete: percentageComplete.toFixed(0),
           timeLeft,
           text,
+          endTime: getEndTime(currentItem),
         };
       }
 
