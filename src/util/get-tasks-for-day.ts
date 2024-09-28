@@ -56,7 +56,6 @@ export function mapToTasksForDay(
     errors: unknown[];
   }>(
     (result, sTask) => {
-      // todo: remove once proper handling is in place
       try {
         const task = toTask(sTask, day, settings);
 
@@ -73,9 +72,8 @@ export function mapToTasksForDay(
   tasksWithTime.sort((a, b) => a.startMinutes - b.startMinutes);
 
   const noTime = withoutTime
-    // todo: move out
     .filter((sTask) => {
-      if (!sTask.task) {
+      if (!sTask.task || sTask.text.trim().length === 0) {
         return false;
       }
 

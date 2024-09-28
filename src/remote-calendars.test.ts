@@ -93,3 +93,7 @@ test("Falls back on previous values if fetching a calendar fails", async () => {
 });
 
 test.todo("Deleted recurrences don't show up as tasks");
+
+test.todo("Yearly recurrences do not show up every month");
+
+test.todo("Time zones get calculated correctly");
