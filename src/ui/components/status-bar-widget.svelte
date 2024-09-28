@@ -11,7 +11,7 @@
 
   const statusBarProps = useStatusBarWidget({ tasksForToday });
 
-  $: ({ showNow, showNext, progressIndicator } = $settings);
+  $: ({ showNow, showNext, progressIndicator, timestampFormat } = $settings);
   $: ({ current, next } = $statusBarProps);
 </script>
 
@@ -24,7 +24,9 @@
   {:else}
     {#if showNow && current}
       <span class="status-bar-item-segment"
-        >Now: {current.text} (-{current.timeLeft})</span
+        >Now: {current.text} (-{current.timeLeft}, till {current.endTime.format(
+          timestampFormat,
+        )})</span
       >
       {#if progressIndicator === "pie"}
         <div
