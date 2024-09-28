@@ -173,12 +173,12 @@ export class PlanEditor {
   private async editFile(path: string, editFn: (contents: string) => string) {
     await this.obsidianFacade.editFile(path, (contents) => {
       const edited = editFn(contents);
+      const { plannerHeading, sortTasksInPlanAfterEdit } = this.settings();
 
-      if (!this.settings().sortTasksInPlanAfterEdit) {
+      if (!plannerHeading || !sortTasksInPlanAfterEdit) {
         return edited;
       }
 
-      const plannerHeading = this.settings().plannerHeading;
       const mdastRoot = fromMarkdown(edited);
       const headingWithChildren = findHeadingWithChildren(
         mdastRoot,
@@ -214,15 +214,14 @@ export class PlanEditor {
     contents: string[],
     metadata: CachedMetadata,
   ): [number, string[]] {
-    const planHeading = getHeadingByText(
-      metadata,
-      this.settings().plannerHeading,
-    );
+    const { plannerHeading } = this.settings();
 
-    const planListItems = getListItemsUnderHeading(
-      metadata,
-      this.settings().plannerHeading,
-    );
+    if (!plannerHeading) {
+      return [contents.length, contents];
+    }
+
+    const planHeading = getHeadingByText(metadata, plannerHeading);
+    const planListItems = getListItemsUnderHeading(metadata, plannerHeading);
 
     if (planListItems && planListItems?.length > 0) {
       const lastListItem = planListItems[planListItems.length - 1];

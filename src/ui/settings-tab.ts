@@ -375,7 +375,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Planner Heading Text")
       .setDesc(
-        `When you create a planner, this text is going to be in the heading`,
+        `When you create a planner, the events will be kept under this header. If empty, then events are placed at the bottom of the file.`,
       )
       .addText((component) =>
         component
