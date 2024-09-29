@@ -118,7 +118,8 @@ function getRsvpStatus(event: ical.VEvent, email?: string): AttendeePartStat {
   }
 
   const attendeeWithMatchingEmail = liftToArray(event.attendee).find(
-    (attendee) => typeof attendee !== "string" && attendee?.params.CN === email,
+    (attendee) =>
+      typeof attendee !== "string" && attendee?.val?.includes(email),
   );
 
   if (typeof attendeeWithMatchingEmail === "string") {
