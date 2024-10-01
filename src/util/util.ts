@@ -1,3 +1,5 @@
+import { isNotVoid } from "typed-assert";
+
 export function isTouchEvent(event: PointerEvent) {
   return ["pen", "touch"].includes(event.pointerType);
 }
@@ -46,4 +48,30 @@ export function addFadeTransition(el: HTMLElement) {
     transition: "opacity 200ms",
     opacity: 0,
   });
+}
+
+export function toggleCheckbox(line: string) {
+  if (line.includes("[ ]")) {
+    return line.replace("[ ]", "[x]");
+  }
+
+  return line.replace("[x]", "[ ]");
+}
+
+export function updateLine(
+  contents: string,
+  lineNumber: number,
+  editFn: (line: string) => string,
+) {
+  const lines = contents.split("\n");
+  const originalLine = lines[lineNumber];
+
+  isNotVoid(
+    originalLine,
+    `No line #${lineNumber} in text with ${lines.length} lines`,
+  );
+
+  lines[lineNumber] = editFn(originalLine);
+
+  return lines.join("\n");
 }

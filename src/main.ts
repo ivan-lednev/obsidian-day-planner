@@ -24,6 +24,7 @@ import { DataviewFacade } from "./service/dataview-facade";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { PlanEditor } from "./service/plan-editor";
 import { STaskEditor } from "./service/stask-editor";
+import { VaultFacade } from "./service/vault-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
 import type { ObsidianContext } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
@@ -46,10 +47,12 @@ export default class DayPlanner extends Plugin {
   private planEditor!: PlanEditor;
   private dataviewFacade!: DataviewFacade;
   private sTaskEditor!: STaskEditor;
+  private vaultFacade!: VaultFacade;
 
   async onload() {
     await this.initSettingsStore();
 
+    this.vaultFacade = new VaultFacade(this.app.vault, this.getTasksApi);
     this.obsidianFacade = new ObsidianFacade(this.app);
     this.dataviewFacade = new DataviewFacade(this.app);
     this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
@@ -113,6 +116,11 @@ export default class DayPlanner extends Plugin {
       active: true,
     });
     this.app.workspace.rightSplit.expand();
+  };
+
+  private getTasksApi = () => {
+    // @ts-expect-error
+    return this.app.plugins.plugins["obsidian-tasks-plugin"]?.apiV1;
   };
 
   private async handleNewPluginVersion() {

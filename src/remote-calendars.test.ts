@@ -74,6 +74,10 @@ test("RSVP status appears in tasks", async () => {
   });
 });
 
+test.todo(
+  "RSVP status gets pulled from params if email is not in CN (common name)",
+);
+
 test("Falls back on previous values if fetching a calendar fails", async () => {
   getMockRequest().mockReturnValue(getIcalFixture("google-tentative-attendee"));
 

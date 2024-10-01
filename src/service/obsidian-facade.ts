@@ -15,15 +15,6 @@ function doesLeafContainFile(leaf: WorkspaceLeaf, file: TFile) {
   return view instanceof FileView && view.file === file;
 }
 
-// todo: make more robust
-function toggleCheckbox(line: string) {
-  if (line.includes("[ ]")) {
-    return line.replace("[ ]", "[x]");
-  }
-
-  return line.replace("[x]", "[ ]");
-}
-
 export class ObsidianFacade {
   constructor(readonly app: App) {}
 
