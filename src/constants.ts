@@ -31,6 +31,8 @@ export const icons = [
   "broken-link",
   "bullet-list",
   "calendar-with-checkmark",
+  "calendar-clock",
+  "calendar-range",
   "checkmark",
   "create-new",
   "cross",
