@@ -39,6 +39,7 @@ export function useEditActions({
 
     // todo: diffing can be moved outside to separate concerns
     //  but we need to know if something changed to not cause extra rewrites?
+    // todo: push that into onUpdate(baselineTasks, currentTasks)
     const diff = getDiff(get(baselineTasks), currentTasks);
 
     if (areValuesEmpty(diff)) {

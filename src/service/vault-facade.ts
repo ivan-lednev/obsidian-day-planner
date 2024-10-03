@@ -43,7 +43,7 @@ export class VaultFacade {
   getFileByPath(path: string) {
     const file = this.vault.getAbstractFileByPath(path);
 
-    isInstanceOf(file, TFile, `Unable to open file: ${path}`);
+    isInstanceOf(file, TFile, `${path} is not a markdown file`);
 
     return file;
   }

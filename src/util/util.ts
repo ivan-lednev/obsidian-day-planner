@@ -75,3 +75,11 @@ export function updateLine(
 
   return lines.join("\n");
 }
+
+export function deleteLines(contents: string, from: number, count: number) {
+  const lines = contents.split("\n");
+
+  lines.splice(from, count);
+
+  return lines.join("\n");
+}

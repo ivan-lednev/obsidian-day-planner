@@ -33,6 +33,10 @@ describe("Finding diff before writing updates to files", () => {
     );
   });
 
+  test.todo("Finds tasks from daily notes moved between days");
+
+  test.todo("Finds 'obsidian-tasks' tasks moved between days");
+
   test("Finds created tasks", async () => {
     const { todayControls, confirmEdit, props } = setUp({
       tasks: emptyTasks,

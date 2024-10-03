@@ -143,6 +143,7 @@ function getTasksWithUpdatedTime(
   base: WithTime<LocalTask>[],
   next: WithTime<LocalTask>[],
 ) {
+  // todo: just find tasks that are not in the baseline
   const pristine = getPristine(base, next);
 
   return difference(next, pristine).filter((task) => !task.isGhost);
@@ -170,6 +171,7 @@ function getEditableTasks(dayToTasks: DayToTasks) {
   }>(filteredEntries);
 }
 
+// todo: delete
 export function getDiff(base: DayToTasks, next: DayToTasks) {
   const editableBase = getEditableTasks(base);
   const editableNext = getEditableTasks(next);
@@ -187,6 +189,7 @@ export function getDiff(base: DayToTasks, next: DayToTasks) {
   };
 }
 
+// todo: delete
 export function updateText(diff: Diff) {
   return {
     created: diff.created.map(updateTaskText),

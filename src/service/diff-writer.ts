@@ -18,23 +18,22 @@ import { createDailyNoteIfNeeded } from "../util/daily-notes";
 import { getFirstLine, updateTaskText } from "../util/task-utils";
 
 import type { ObsidianFacade } from "./obsidian-facade";
+import type { VaultFacade } from "./vault-facade";
 
-export class PlanEditor {
+export type WriterDiff = {
+  updated: WithTime<LocalTask>[];
+  created: WithTime<LocalTask>[];
+  moved: { dayKey: string; task: WithTime<LocalTask> }[];
+};
+
+export class DiffWriter {
   constructor(
     private readonly settings: () => DayPlannerSettings,
     private readonly obsidianFacade: ObsidianFacade,
+    private readonly vaultFacade: VaultFacade,
   ) {}
 
-  // todo: all except this can be re-written to use mdast
-  syncTasksWithFile = async ({
-    updated,
-    created,
-    moved,
-  }: {
-    updated: WithTime<LocalTask>[];
-    created: WithTime<LocalTask>[];
-    moved: { dayKey: string; task: WithTime<LocalTask> }[];
-  }) => {
+  syncTasksWithFile = async ({ updated, created, moved }: WriterDiff) => {
     if (created.length > 0) {
       const [task] = await this.ensureFilesForTasks(created);
 
@@ -140,6 +139,7 @@ export class PlanEditor {
     return result.join("\n");
   }
 
+  // todo: use deleteLines
   private removeTaskFromFileContents(
     task: WithTime<LocalTask>,
     contents: string,
@@ -171,7 +171,7 @@ export class PlanEditor {
   }
 
   private async editFile(path: string, editFn: (contents: string) => string) {
-    await this.obsidianFacade.editFile(path, (contents) => {
+    await this.vaultFacade.editFile(path, (contents) => {
       const edited = editFn(contents);
 
       if (!this.settings().sortTasksInPlanAfterEdit) {

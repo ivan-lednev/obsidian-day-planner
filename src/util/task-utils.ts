@@ -17,6 +17,7 @@ import {
   isRemote,
   type LocalTask,
   type Task,
+  type TaskLocation,
   type WithTime,
 } from "../task-types";
 
@@ -158,16 +159,21 @@ export function offsetYToMinutes(
   return (offsetY + hiddenHoursSize) / zoomLevel;
 }
 
-export function createTask(
-  day: Moment,
-  startMinutes: number,
-  settings: DayPlannerSettings,
-): WithTime<LocalTask> {
+export function createTask(props: {
+  day: Moment;
+  startMinutes: number;
+  settings: DayPlannerSettings;
+  text?: string;
+  location?: TaskLocation;
+}): WithTime<LocalTask> {
+  const { day, startMinutes, settings, location, text = "New item" } = props;
+
   return {
+    location,
     id: getId(),
     startMinutes,
     durationMinutes: settings.defaultDurationMinutes,
-    text: "New item",
+    text,
     startTime: minutesToMomentOfDay(startMinutes, day),
     symbol: "-",
     status:

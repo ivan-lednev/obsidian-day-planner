@@ -6,7 +6,7 @@ import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import type { IcalConfig } from "./settings";
 import { getDiff } from "./util/tasks-utils";
 
-export interface TaskTypes {
+export interface TaskLocation {
   path: string;
   position: Pos;
 }
@@ -56,7 +56,7 @@ export interface LocalTask extends TaskTokens, BaseTask {
   lines?: Array<FileLine>;
 
   // todo: move out to InMemoryTask
-  location?: TaskTypes;
+  location?: TaskLocation;
   isGhost?: boolean;
 
   // todo: move to Time

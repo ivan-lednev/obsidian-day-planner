@@ -10,8 +10,8 @@ import {
 import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
 import { currentTime } from "../global-store/current-time";
 import { DataviewFacade } from "../service/dataview-facade";
+import { DiffWriter } from "../service/diff-writer";
 import { ObsidianFacade } from "../service/obsidian-facade";
-import { PlanEditor } from "../service/plan-editor";
 import type { DayPlannerSettings } from "../settings";
 import type { LocalTask, RemoteTask, WithTime } from "../task-types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
@@ -39,7 +39,7 @@ interface CreateHooksProps {
   dataviewFacade: DataviewFacade;
   obsidianFacade: ObsidianFacade;
   settingsStore: Writable<DayPlannerSettings>;
-  planEditor: PlanEditor;
+  planEditor: DiffWriter;
 }
 
 function getDarkModeFlag() {

@@ -30,7 +30,11 @@ export function createEditHandlers({
   settings,
 }: UseEditHandlersProps) {
   function handleContainerMouseDown() {
-    const newTask = createTask(day, get(cursorMinutes), get(settings));
+    const newTask = createTask({
+      day,
+      startMinutes: get(cursorMinutes),
+      settings: get(settings),
+    });
 
     startEdit({
       task: { ...newTask, isGhost: true },

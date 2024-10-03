@@ -21,8 +21,8 @@ import {
   toMdastPoint,
 } from "./mdast/mdast";
 import { DataviewFacade } from "./service/dataview-facade";
+import { DiffWriter } from "./service/diff-writer";
 import { ObsidianFacade } from "./service/obsidian-facade";
-import { PlanEditor } from "./service/plan-editor";
 import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
@@ -44,7 +44,7 @@ export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
   private settingsStore!: Writable<DayPlannerSettings>;
   private obsidianFacade!: ObsidianFacade;
-  private planEditor!: PlanEditor;
+  private planEditor!: DiffWriter;
   private dataviewFacade!: DataviewFacade;
   private sTaskEditor!: STaskEditor;
   private vaultFacade!: VaultFacade;
@@ -55,7 +55,7 @@ export default class DayPlanner extends Plugin {
     this.vaultFacade = new VaultFacade(this.app.vault, this.getTasksApi);
     this.obsidianFacade = new ObsidianFacade(this.app);
     this.dataviewFacade = new DataviewFacade(this.app);
-    this.planEditor = new PlanEditor(this.settings, this.obsidianFacade);
+    this.planEditor = new DiffWriter(this.settings, this.obsidianFacade);
     this.sTaskEditor = new STaskEditor(
       this.obsidianFacade,
       this.dataviewFacade,
