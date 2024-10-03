@@ -1,3 +1,4 @@
+import moment from "moment";
 import { get } from "svelte/store";
 
 import type { DayToTasks } from "../../../../task-types";
@@ -56,7 +57,11 @@ describe("resize", () => {
           withTime: [
             { id: "1", startMinutes: toMinutes("01:00") },
             { id: "2", startMinutes: toMinutes("02:00") },
-            { id: "3", startMinutes: toMinutes("04:00") },
+            {
+              id: "3",
+              startMinutes: toMinutes("04:00"),
+              startTime: moment("2023-01-01 04:00"),
+            },
           ],
         },
       });

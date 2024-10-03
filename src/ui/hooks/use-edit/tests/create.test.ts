@@ -1,3 +1,4 @@
+import moment from "moment";
 import { get } from "svelte/store";
 
 import { toMinutes } from "../../../../util/moment";
@@ -17,7 +18,13 @@ describe("create", () => {
 
     expect(get(displayedTasks)).toMatchObject({
       [dayKey]: {
-        withTime: [{ startMinutes: toMinutes("01:00"), durationMinutes: 60 }],
+        withTime: [
+          {
+            startMinutes: toMinutes("01:00"),
+            startTime: moment("2023-01-01 01:00"),
+            durationMinutes: 60,
+          },
+        ],
       },
     });
   });

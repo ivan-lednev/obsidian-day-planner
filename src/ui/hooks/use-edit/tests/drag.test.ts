@@ -1,3 +1,4 @@
+import moment from "moment";
 import { get } from "svelte/store";
 
 import { defaultSettingsForTests } from "../../../../settings";
@@ -18,7 +19,12 @@ describe("drag", () => {
 
     expect(get(displayedTasks)).toMatchObject({
       [dayKey]: {
-        withTime: [{ startMinutes: toMinutes("01:00") }],
+        withTime: [
+          {
+            startMinutes: toMinutes("01:00"),
+            startTime: moment("2023-01-01 01:00"),
+          },
+        ],
       },
     });
   });
@@ -29,14 +35,25 @@ describe("drag", () => {
         ...baseTask,
         id: "2",
         startMinutes: toMinutes("02:00"),
+        startTime: moment("2023-01-01 02:00"),
       };
 
       const tasks: DayToTasks = {
         [dayKey]: {
           withTime: [
-            { ...baseTask, id: "1", startMinutes: toMinutes("01:00") },
+            {
+              ...baseTask,
+              id: "1",
+              startMinutes: toMinutes("01:00"),
+              startTime: moment("2023-01-01 01:00"),
+            },
             middleTask,
-            { ...baseTask, id: "3", startMinutes: toMinutes("03:00") },
+            {
+              ...baseTask,
+              id: "3",
+              startMinutes: toMinutes("03:00"),
+              startTime: moment("2023-01-01 03:00"),
+            },
           ],
           noTime: [],
         },
@@ -55,9 +72,21 @@ describe("drag", () => {
       expect(get(displayedTasks)).toMatchObject({
         [dayKey]: {
           withTime: [
-            { id: "1", startMinutes: toMinutes("01:00") },
-            { id: "2", startMinutes: toMinutes("03:00") },
-            { id: "3", startMinutes: toMinutes("04:00") },
+            {
+              id: "1",
+              startMinutes: toMinutes("01:00"),
+              startTime: moment("2023-01-01 01:00"),
+            },
+            {
+              id: "2",
+              startMinutes: toMinutes("03:00"),
+              startTime: moment("2023-01-01 03:00"),
+            },
+            {
+              id: "3",
+              startMinutes: toMinutes("04:00"),
+              startTime: moment("2023-01-01 04:00"),
+            },
           ],
         },
       });
@@ -68,14 +97,25 @@ describe("drag", () => {
         ...baseTask,
         id: "2",
         startMinutes: toMinutes("02:00"),
+        startTime: moment("2023-01-01 02:00"),
       };
 
       const tasks: DayToTasks = {
         [dayKey]: {
           withTime: [
-            { ...baseTask, id: "1", startMinutes: toMinutes("01:00") },
+            {
+              ...baseTask,
+              id: "1",
+              startMinutes: toMinutes("01:00"),
+              startTime: moment("2023-01-01 01:00"),
+            },
             middleTask,
-            { ...baseTask, id: "3", startMinutes: toMinutes("03:00") },
+            {
+              ...baseTask,
+              id: "3",
+              startMinutes: toMinutes("03:00"),
+              startTime: moment("2023-01-01 03:00"),
+            },
           ],
           noTime: [],
         },
@@ -96,9 +136,21 @@ describe("drag", () => {
       expect(get(displayedTasks)).toMatchObject({
         [dayKey]: {
           withTime: [
-            { id: "1", startMinutes: toMinutes("00:00") },
-            { id: "2", startMinutes: toMinutes("01:00") },
-            { id: "3", startMinutes: toMinutes("03:00") },
+            {
+              id: "1",
+              startMinutes: toMinutes("00:00"),
+              startTime: moment("2023-01-01 00:00"),
+            },
+            {
+              id: "2",
+              startMinutes: toMinutes("01:00"),
+              startTime: moment("2023-01-01 01:00"),
+            },
+            {
+              id: "3",
+              startMinutes: toMinutes("03:00"),
+              startTime: moment("2023-01-01 03:00"),
+            },
           ],
         },
       });
@@ -142,5 +194,9 @@ describe("drag", () => {
         },
       });
     });
+  });
+
+  describe("drag and shrink others", () => {
+    test.todo("base case");
   });
 });

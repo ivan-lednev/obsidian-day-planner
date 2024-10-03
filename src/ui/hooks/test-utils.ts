@@ -2,10 +2,12 @@ import moment from "moment/moment";
 
 import type { LocalTask, WithPlacing, WithTime } from "../../task-types";
 
+export const baseTaskStartTime = moment("2023-01-01");
+
 export const baseTask: WithPlacing<WithTime<LocalTask>> = {
   symbol: "-",
   status: " ",
-  startTime: moment("2023-01-01"),
+  startTime: baseTaskStartTime,
   startMinutes: 0,
   durationMinutes: 60,
   text: "text",

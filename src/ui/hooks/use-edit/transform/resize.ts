@@ -1,5 +1,6 @@
 import type { DayPlannerSettings } from "../../../../settings";
 import type { LocalTask, WithTime } from "../../../../task-types";
+import { minutesToMomentOfDay } from "../../../../util/moment";
 import { getEndMinutes } from "../../../../util/task-utils";
 import { toSpliced } from "../../../../util/to-spliced";
 
@@ -37,6 +38,7 @@ export function resizeFromTop(
   const updated = {
     ...editTarget,
     startMinutes: cursorTime,
+    startTime: minutesToMomentOfDay(cursorTime, editTarget.startTime),
     durationMinutes,
   };
 

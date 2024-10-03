@@ -2,6 +2,7 @@ import { last } from "lodash";
 
 import type { DayPlannerSettings } from "../../../../settings";
 import type { LocalTask, WithTime } from "../../../../task-types";
+import { minutesToMomentOfDay } from "../../../../util/moment";
 import { getEndMinutes } from "../../../../util/task-utils";
 
 export function resizeAndShiftOthers(
@@ -34,6 +35,10 @@ export function resizeAndShiftOthers(
           {
             ...current,
             startMinutes: getEndMinutes(previous),
+            startTime: minutesToMomentOfDay(
+              getEndMinutes(previous),
+              current.startTime,
+            ),
           },
         ];
       }
@@ -64,6 +69,7 @@ export function resizeFromTopAndShiftOthers(
   const updated = {
     ...editTarget,
     startMinutes: cursorTime,
+    startTime: minutesToMomentOfDay(cursorTime, editTarget.startTime),
     durationMinutes,
   };
 
@@ -77,6 +83,10 @@ export function resizeFromTopAndShiftOthers(
           ...result,
           {
             ...current,
+            startTime: minutesToMomentOfDay(
+              nextInTimeline.startMinutes - current.durationMinutes,
+              current.startTime,
+            ),
             startMinutes: nextInTimeline.startMinutes - current.durationMinutes,
           },
         ];

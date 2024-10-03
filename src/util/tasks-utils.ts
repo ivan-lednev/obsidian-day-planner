@@ -11,10 +11,12 @@ import {
   type Diff,
   isRemote,
   type LocalTask,
+  type Task,
   type TasksForDay,
   type WithTime,
 } from "../task-types";
 
+import { minutesToMomentOfDay } from "./moment";
 import {
   isEqualTask,
   updateTaskScheduledDay,
@@ -63,10 +65,15 @@ export function moveTaskToDay(
   const source = baseline[sourceKey];
   const dest = baseline[destKey];
 
+  const withUpdatedStartTime = {
+    ...task,
+    startTime: minutesToMomentOfDay(task.startMinutes, day),
+  };
+
   return {
     ...baseline,
-    [sourceKey]: removeTask(task, source),
-    [destKey]: addTaskWithTime(task, dest),
+    [sourceKey]: removeTask(withUpdatedStartTime, source),
+    [destKey]: addTaskWithTime(withUpdatedStartTime, dest),
   };
 }
 
@@ -149,6 +156,7 @@ function getTasksWithUpdatedTime(
   return difference(next, pristine).filter((task) => !task.isGhost);
 }
 
+// todo: remove, replace with simple filter
 function getEditableTasks(dayToTasks: DayToTasks) {
   const filteredEntries = Object.entries(dayToTasks).map(
     ([dayKey, tasks]) =>
@@ -187,6 +195,70 @@ export function getDiff(base: DayToTasks, next: DayToTasks) {
       .flatMap(({ withTime }) => withTime)
       .filter((task) => task.isGhost),
   };
+}
+
+function getFlatTimeBlocks(dayToTasks: DayToTasks) {
+  return Object.values(dayToTasks).flatMap(({ withTime, noTime }) => [
+    ...withTime,
+    ...noTime,
+  ]);
+}
+
+// todo
+function isFromDailyNote(task: WithTime<Task>) {
+  return false;
+}
+
+function isOnSameDay(a: WithTime<Task>, b: WithTime<Task>) {
+  return a.startTime.isSame(b.startTime, "day");
+}
+
+function isOnSameTime(a: WithTime<Task>, b: WithTime<Task>) {
+  return a.startTime.isSame(b.startTime);
+}
+
+export type Diff_v2 = {
+  deleted: Array<LocalTask>;
+  updated: Array<LocalTask>;
+  created: Array<LocalTask>;
+};
+
+// todo: assumes that time is always in sync
+export function getDiff_v2(base: DayToTasks, next: DayToTasks) {
+  const editableBase = getEditableTasks(base);
+  const editableNext = getEditableTasks(next);
+
+  const flatBase = getFlatTimeBlocks(editableBase);
+  const flatNext = getFlatTimeBlocks(editableNext);
+
+  return flatNext.reduce<Diff_v2>(
+    (result, task) => {
+      const thisTaskInBase = flatBase.find(
+        (baseTask) => baseTask.id === task.id,
+      );
+
+      if (thisTaskInBase) {
+        const needToMoveBetweenDailyNotes =
+          isFromDailyNote(task) && !isOnSameDay(thisTaskInBase, task);
+
+        if (needToMoveBetweenDailyNotes) {
+          result.deleted.push(task);
+          result.created.push(task);
+        } else if (!isOnSameTime(thisTaskInBase, task)) {
+          result.updated.push(task);
+        }
+      } else {
+        result.created.push(task);
+      }
+
+      return result;
+    },
+    {
+      deleted: [],
+      updated: [],
+      created: [],
+    },
+  );
 }
 
 // todo: delete
