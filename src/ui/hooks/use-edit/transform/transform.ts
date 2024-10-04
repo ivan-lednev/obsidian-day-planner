@@ -9,6 +9,10 @@ import {
   type RemoteTask,
   type WithTime,
 } from "../../../../task-types";
+import {
+  getMinutesSinceMidnight,
+  minutesToMomentOfDay,
+} from "../../../../util/moment";
 import { getDayKey, moveTaskToColumn } from "../../../../util/tasks-utils";
 import { EditMode, type EditOperation, type TaskTransformer } from "../types";
 
@@ -42,6 +46,7 @@ const transformers: Record<EditMode, TaskTransformer> = {
 const multidayModes: Partial<EditMode[]> = [
   EditMode.DRAG,
   EditMode.DRAG_AND_SHIFT_OTHERS,
+  EditMode.CREATE,
 ];
 
 function isMultiday(mode: EditMode) {
@@ -73,6 +78,17 @@ export function transform(
     baseline,
   );
 
+  // We need to sync task day too, while using the old approach
+  const withUpdatedStartTime = isMultiday(operation.mode)
+    ? {
+        ...operation.task,
+        startTime: minutesToMomentOfDay(
+          getMinutesSinceMidnight(operation.task.startTime),
+          operation.day,
+        ),
+      }
+    : operation.task;
+
   const destTasks = withTaskInRightColumn[destKey];
   const transformFn = transformers[operation.mode];
 
@@ -92,7 +108,7 @@ export function transform(
   const withTimeSorted = sortByStartMinutes(editable);
   const transformed = transformFn(
     withTimeSorted,
-    operation.task,
+    withUpdatedStartTime,
     cursorMinutes,
     settings,
   );

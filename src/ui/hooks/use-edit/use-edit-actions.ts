@@ -3,7 +3,7 @@ import { get, type Readable, type Writable } from "svelte/store";
 import type { DayToTasks } from "../../../task-types";
 import type { OnUpdateFn } from "../../../types";
 import { areValuesEmpty } from "../../../util/task-utils";
-import { getDiff, updateText } from "../../../util/tasks-utils";
+import { getDiff, getDiff_v2 } from "../../../util/tasks-utils";
 
 import type { EditOperation } from "./types";
 
@@ -41,6 +41,7 @@ export function useEditActions({
     //  but we need to know if something changed to not cause extra rewrites?
     // todo: push that into onUpdate(baselineTasks, currentTasks)
     const diff = getDiff(get(baselineTasks), currentTasks);
+    const oldBase = get(baselineTasks);
 
     if (areValuesEmpty(diff)) {
       return;
@@ -48,7 +49,8 @@ export function useEditActions({
 
     baselineTasks.set(currentTasks);
 
-    await onUpdate({ ...updateText(diff), moved: diff.moved });
+    await onUpdate(getDiff_v2(oldBase, currentTasks));
+    // await onUpdate({ ...updateText(diff), moved: diff.moved });
   }
 
   return {

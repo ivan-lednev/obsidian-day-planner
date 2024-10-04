@@ -45,7 +45,7 @@ describe("moving tasks between containers", () => {
         withTime: [],
       },
       [nextDayKey]: {
-        withTime: [{ startTime: moment("2023-01-01 01:00") }],
+        withTime: [{ startTime: moment("2023-01-02 01:00") }],
       },
     });
   });
@@ -82,7 +82,7 @@ describe("moving tasks between containers", () => {
       },
       [nextDayKey]: {
         withTime: [
-          { startTime: moment("2023-01-01 01:00") },
+          { startTime: moment("2023-01-02 01:00") },
           { id: "3", startTime: moment("2023-01-02 01:00") },
         ],
       },
@@ -122,14 +122,14 @@ describe("moving tasks between containers", () => {
       },
       [nextDayKey]: {
         withTime: [
-          { startTime: moment("2023-01-01 01:00") },
+          { startTime: moment("2023-01-02 01:00") },
           { id: "3", startTime: moment("2023-01-02 02:00") },
         ],
       },
     });
   });
 
-  test("create doesn't work between days", () => {
+  test("create works between days", () => {
     const { todayControls, moveCursorTo, nextDayControls, displayedTasks } =
       setUp({
         tasks: emptyTasks,
@@ -142,12 +142,12 @@ describe("moving tasks between containers", () => {
 
     expect(get(displayedTasks)).toMatchObject({
       [dayKey]: {
-        withTime: [
-          { startTime: moment("2023-01-01 01:00"), durationMinutes: 60 },
-        ],
+        withTime: [],
       },
       [nextDayKey]: {
-        withTime: [],
+        withTime: [
+          { startTime: moment("2023-01-02 01:00"), durationMinutes: 60 },
+        ],
       },
     });
   });
@@ -160,7 +160,7 @@ describe("moving tasks between containers", () => {
 
     expect(get(displayedTasks)).toMatchObject({
       [dayKey]: {
-        withTime: [{ id: "id" }],
+        withTime: [{ id: "id", startTime: moment("2023-01-01 00:00") }],
       },
       [nextDayKey]: {
         withTime: [],

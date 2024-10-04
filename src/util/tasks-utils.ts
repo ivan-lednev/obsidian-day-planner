@@ -209,7 +209,7 @@ function getFlatTimeBlocks(dayToTasks: DayToTasks) {
 
 // todo
 function isFromDailyNote(task: WithTime<Task>) {
-  return false;
+  return true;
 }
 
 function isOnSameDay(a: WithTime<Task>, b: WithTime<Task>) {
