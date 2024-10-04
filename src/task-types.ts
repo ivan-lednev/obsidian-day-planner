@@ -4,14 +4,11 @@ import type { Pos } from "obsidian";
 
 import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
 import type { IcalConfig } from "./settings";
-import { getDiff } from "./util/tasks-utils";
 
 export interface TaskLocation {
   path: string;
   position: Pos;
 }
-
-export type Diff = ReturnType<typeof getDiff>;
 
 export interface TaskTokens {
   symbol: string;

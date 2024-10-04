@@ -1,15 +1,10 @@
-import { difference, mergeWith } from "lodash/fp";
+import { mergeWith } from "lodash/fp";
 import type { Moment } from "moment/moment";
-import {
-  DEFAULT_DAILY_NOTE_FORMAT,
-  getDateFromPath,
-} from "obsidian-daily-notes-interface";
+import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
 import { scheduledPropRegExps } from "../regexp";
 import {
-  type DayToEditableTasks,
   type DayToTasks,
-  type Diff,
   type LocalTask,
   type Task,
   type TasksForDay,
@@ -18,18 +13,10 @@ import {
 } from "../task-types";
 
 import { getMinutesSinceMidnight, minutesToMomentOfDay } from "./moment";
-import {
-  isEqualTask,
-  updateTaskScheduledDay,
-  updateTaskText,
-} from "./task-utils";
+import { updateTaskText } from "./task-utils";
 
 export function getEmptyRecordsForDay(): TasksForDay {
   return { withTime: [], noTime: [] };
-}
-
-export function getTasksWithTime(tasks: DayToEditableTasks) {
-  return Object.values(tasks).flatMap(({ withTime }) => withTime);
 }
 
 export function removeTask(task: WithTime<LocalTask>, tasks: TasksForDay) {
@@ -98,68 +85,6 @@ export function moveTaskToColumn(
   return moveTaskToDay(baseline, task, day);
 }
 
-// TODO: remove duplication
-export function getTasksWithUpdatedDayProp(tasks: DayToEditableTasks) {
-  return Object.entries(tasks)
-    .flatMap(([dayKey, tasks]) =>
-      tasks.withTime.map((task) => ({ dayKey, task })),
-    )
-    .filter(({ dayKey, task }) => {
-      const dateFromPath = task.location?.path
-        ? getDateFromPath(task.location?.path, "day")
-        : null;
-
-      // todo: remove path from comparison, only take into account the prop
-      // todo: this is not going to work for obsidian-tasks if the task is inside a daily note
-      return (
-        !task.isGhost && dayKey !== getDayKey(task.startTime) && !dateFromPath
-      );
-    });
-}
-
-export function getTasksInDailyNotesWithUpdatedDay(
-  tasks: DayToTasks,
-): Array<{ dayKey: string; task: WithTime<LocalTask> }> {
-  return Object.entries(tasks)
-    .flatMap(([dayKey, tasks]) =>
-      tasks.withTime.map((task) => ({ dayKey, task })),
-    )
-    .filter((pair): pair is { dayKey: string; task: WithTime<LocalTask> } => {
-      const { task, dayKey } = pair;
-
-      if (isRemote(task)) {
-        return false;
-      }
-
-      const dateFromPath = task.location?.path
-        ? getDateFromPath(task.location?.path, "day")
-        : null;
-
-      return Boolean(
-        !task.isGhost && dayKey !== getDayKey(task.startTime) && dateFromPath,
-      );
-    });
-}
-
-function getPristine(
-  flatBaseline: WithTime<LocalTask>[],
-  flatNext: WithTime<LocalTask>[],
-) {
-  return flatNext.filter((task) =>
-    flatBaseline.find((baselineTask) => isEqualTask(task, baselineTask)),
-  );
-}
-
-function getTasksWithUpdatedTime(
-  base: WithTime<LocalTask>[],
-  next: WithTime<LocalTask>[],
-) {
-  // todo: just find tasks that are not in the baseline
-  const pristine = getPristine(base, next);
-
-  return difference(next, pristine).filter((task) => !task.isGhost);
-}
-
 // todo: remove, replace with simple filter
 function getEditableTasks(dayToTasks: DayToTasks) {
   const filteredEntries = Object.entries(dayToTasks).map(
@@ -183,24 +108,6 @@ function getEditableTasks(dayToTasks: DayToTasks) {
   }>(filteredEntries);
 }
 
-// todo: delete
-export function getDiff(base: DayToTasks, next: DayToTasks) {
-  const editableBase = getEditableTasks(base);
-  const editableNext = getEditableTasks(next);
-
-  return {
-    updatedTime: getTasksWithUpdatedTime(
-      getTasksWithTime(editableBase),
-      getTasksWithTime(editableNext),
-    ),
-    updatedDay: getTasksWithUpdatedDayProp(editableNext),
-    moved: getTasksInDailyNotesWithUpdatedDay(editableNext),
-    created: Object.values(editableNext)
-      .flatMap(({ withTime }) => withTime)
-      .filter((task) => task.isGhost),
-  };
-}
-
 function getFlatTimeBlocks(dayToTasks: DayToTasks) {
   return Object.values(dayToTasks).flatMap(({ withTime, noTime }) => [
     ...withTime,
@@ -222,21 +129,23 @@ function isOnSameTime(a: WithTime<Task>, b: WithTime<Task>) {
   return a.startTime.isSame(b.startTime);
 }
 
-export type Diff_v2 = {
+export type Diff = {
   deleted: Array<LocalTask>;
   updated: Array<LocalTask>;
   created: Array<LocalTask>;
 };
 
-export function getDiff_v2(base: DayToTasks, next: DayToTasks) {
+export function getDiff(base: DayToTasks, next: DayToTasks) {
   const editableBase = getEditableTasks(base);
   const editableNext = getEditableTasks(next);
 
   // todo: remove assertion
   const flatBase = getFlatTimeBlocks(editableBase) as Array<LocalTask>;
-  const flatNext = getFlatTimeBlocks(editableNext) as Array<LocalTask>;
+  const flatNext = (getFlatTimeBlocks(editableNext) as Array<LocalTask>).map(
+    updateTaskText,
+  );
 
-  return flatNext.reduce<Diff_v2>(
+  return flatNext.reduce<Diff>(
     (result, task) => {
       const thisTaskInBase = flatBase.find(
         (baseTask) => baseTask.id === task.id,
@@ -264,19 +173,6 @@ export function getDiff_v2(base: DayToTasks, next: DayToTasks) {
       created: [],
     },
   );
-}
-
-// todo: delete
-export function updateText(diff: Diff) {
-  return {
-    created: diff.created.map(updateTaskText),
-    updated: [
-      ...diff.updatedTime.map(updateTaskText),
-      ...diff.updatedDay.map(({ dayKey, task }) =>
-        updateTaskText(updateTaskScheduledDay(task, dayKey)),
-      ),
-    ],
-  };
 }
 
 export const mergeTasks = mergeWith((value, sourceValue) => {

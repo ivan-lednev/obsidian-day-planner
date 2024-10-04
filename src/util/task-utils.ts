@@ -6,11 +6,9 @@ import { settings } from "../global-store/settings";
 import { replaceOrPrependTimestamp } from "../parser/parser";
 import {
   checkboxRegExp,
-  keylessScheduledPropRegExp,
   listTokenWithSpacesRegExp,
   looseTimestampAtStartOfLineRegExp,
-  scheduledPropRegExp,
-  shortScheduledPropRegExp,
+  scheduledPropRegExps,
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
 import {
@@ -29,6 +27,7 @@ import {
   minutesToMoment,
   minutesToMomentOfDay,
 } from "./moment";
+import { getDayKey } from "./tasks-utils";
 
 export function isEqualTask(a: WithTime<LocalTask>, b: WithTime<LocalTask>) {
   return (
@@ -121,9 +120,13 @@ function taskLineToString(task: WithTime<LocalTask>) {
     get(settings).timestampFormat,
   );
   const listTokens = getListTokens(task);
-  const updatedFirstLineText = replaceOrPrependTimestamp(
+  const withUpdatedTimestamp = replaceOrPrependTimestamp(
     firstLine,
     updatedTimestamp,
+  );
+  const updatedFirstLineText = updateScheduledPropInText(
+    withUpdatedTimestamp,
+    getDayKey(task.startTime),
   );
 
   const otherLines = getLinesAfterFirst(task.text);
@@ -133,31 +136,14 @@ ${otherLines}`;
 }
 
 export function updateScheduledPropInText(text: string, dayKey: string) {
-  const updated = text
-    .replace(shortScheduledPropRegExp, `$1${dayKey}`)
-    .replace(scheduledPropRegExp, `$1${dayKey}$2`)
-    .replace(keylessScheduledPropRegExp, `$1${dayKey}$2`);
-
-  if (updated !== text) {
-    return updated;
-  }
-
-  return `${text} ⏳ ${dayKey}`;
+  return scheduledPropRegExps.reduce(
+    (result, regexp) => result.replace(regexp, `$1${dayKey}$2`),
+    text,
+  );
 }
 
 export function updateTaskText(task: WithTime<LocalTask>) {
   return { ...task, text: taskLineToString(task) };
-}
-
-export function updateTaskScheduledDay(
-  task: WithTime<LocalTask>,
-  dayKey: string,
-) {
-  return {
-    ...task,
-    text: `${updateScheduledPropInText(getFirstLine(task.text), dayKey)}
-${getLinesAfterFirst(task.text)}`,
-  };
 }
 
 export function offsetYToMinutes(
