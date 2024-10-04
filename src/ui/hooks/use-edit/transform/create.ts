@@ -1,5 +1,6 @@
 import type { DayPlannerSettings } from "../../../../settings";
 import type { LocalTask, WithTime } from "../../../../task-types";
+import { getMinutesSinceMidnight } from "../../../../util/moment";
 
 export function create(
   baseline: WithTime<LocalTask>[],
@@ -12,7 +13,7 @@ export function create(
       return {
         ...editTarget,
         durationMinutes: Math.max(
-          cursorTime - editTarget.startMinutes,
+          cursorTime - getMinutesSinceMidnight(editTarget.startTime),
           settings.minimalDurationMinutes,
         ),
       };

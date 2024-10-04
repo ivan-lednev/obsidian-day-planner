@@ -1,8 +1,8 @@
+import moment from "moment";
 import { get, writable } from "svelte/store";
 
 import { currentTime } from "../../global-store/current-time";
 import { settings } from "../../global-store/settings";
-import { toMinutes } from "../../util/moment";
 
 import { baseTask } from "./test-utils";
 import { useTaskVisuals } from "./use-task-visuals";
@@ -20,7 +20,7 @@ function getBaseUseTaskProps() {
 
 test("derives task offset from settings and time", () => {
   const { offset, height } = useTaskVisuals(
-    { ...baseTask, startMinutes: toMinutes("13:00") },
+    { ...baseTask, startTime: moment("2023-01-01 13:00") },
     getBaseUseTaskProps(),
   );
 

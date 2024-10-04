@@ -3,7 +3,6 @@ import { get } from "svelte/store";
 
 import { defaultSettingsForTests } from "../../../../settings";
 import type { DayToTasks } from "../../../../task-types";
-import { toMinutes } from "../../../../util/moment";
 import { baseTask, threeTasks } from "../../test-utils";
 import { EditMode } from "../types";
 
@@ -21,7 +20,6 @@ describe("drag", () => {
       [dayKey]: {
         withTime: [
           {
-            startMinutes: toMinutes("01:00"),
             startTime: moment("2023-01-01 01:00"),
           },
         ],
@@ -53,17 +51,14 @@ describe("drag", () => {
           withTime: [
             {
               id: "1",
-              startMinutes: toMinutes("01:00"),
               startTime: moment("2023-01-01 01:00"),
             },
             {
               id: "2",
-              startMinutes: toMinutes("03:00"),
               startTime: moment("2023-01-01 03:00"),
             },
             {
               id: "3",
-              startMinutes: toMinutes("04:00"),
               startTime: moment("2023-01-01 04:00"),
             },
           ],
@@ -96,17 +91,14 @@ describe("drag", () => {
           withTime: [
             {
               id: "1",
-              startMinutes: toMinutes("00:00"),
               startTime: moment("2023-01-01 00:00"),
             },
             {
               id: "2",
-              startMinutes: toMinutes("01:00"),
               startTime: moment("2023-01-01 01:00"),
             },
             {
               id: "3",
-              startMinutes: toMinutes("03:00"),
               startTime: moment("2023-01-01 03:00"),
             },
           ],
@@ -114,44 +106,7 @@ describe("drag", () => {
       });
     });
 
-    test.skip("tasks stop moving once there is not enough time", () => {
-      const tasks: DayToTasks = {
-        [dayKey]: {
-          withTime: [
-            baseTask,
-            { ...baseTask, id: "2", startMinutes: toMinutes("03:00") },
-          ],
-          noTime: [],
-        },
-      };
-
-      const { todayControls, moveCursorTo, displayedTasks } = setUp({
-        tasks,
-      });
-
-      todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
-      moveCursorTo("21:00");
-
-      expect(get(displayedTasks)).toMatchObject({
-        [dayKey]: {
-          withTime: [
-            { startMinutes: toMinutes("21:00") },
-            { startMinutes: toMinutes("22:00") },
-          ],
-        },
-      });
-
-      moveCursorTo("22:00");
-
-      expect(get(displayedTasks)).toMatchObject({
-        [dayKey]: {
-          withTime: [
-            { startMinutes: toMinutes("21:00") },
-            { startMinutes: toMinutes("22:00") },
-          ],
-        },
-      });
-    });
+    test.todo("tasks stop moving once there is not enough time");
   });
 
   describe("drag and shrink others", () => {
@@ -178,17 +133,14 @@ describe("drag", () => {
           withTime: [
             {
               id: "1",
-              startMinutes: toMinutes("01:00"),
               startTime: moment("2023-01-01 01:00"),
             },
             {
               id: "2",
-              startMinutes: toMinutes("03:00"),
               startTime: moment("2023-01-01 03:00"),
             },
             {
               id: "3",
-              startMinutes: toMinutes("04:00"),
               durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
               startTime: moment("2023-01-01 04:00"),
             },

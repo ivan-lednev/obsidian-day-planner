@@ -64,7 +64,6 @@ export function createEditHandlers({
   function handleUnscheduledTaskGripMouseDown(task: LocalTask) {
     const withAddedTime = {
       ...task,
-      startMinutes: get(cursorMinutes),
       // todo: add a proper fix
       //  in what case does a task not have a location?
       startTime: task.location

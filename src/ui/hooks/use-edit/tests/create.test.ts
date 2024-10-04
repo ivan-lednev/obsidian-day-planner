@@ -1,8 +1,6 @@
 import moment from "moment";
 import { get } from "svelte/store";
 
-import { toMinutes } from "../../../../util/moment";
-
 import { dayKey, emptyTasks } from "./util/fixtures";
 import { setUp } from "./util/setup";
 
@@ -20,7 +18,6 @@ describe("create", () => {
       [dayKey]: {
         withTime: [
           {
-            startMinutes: toMinutes("01:00"),
             startTime: moment("2023-01-01 01:00"),
             durationMinutes: 60,
           },

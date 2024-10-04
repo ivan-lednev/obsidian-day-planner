@@ -9,14 +9,14 @@ import {
   type DayToEditableTasks,
   type DayToTasks,
   type Diff,
-  isRemote,
   type LocalTask,
   type Task,
   type TasksForDay,
   type WithTime,
+  isRemote,
 } from "../task-types";
 
-import { minutesToMomentOfDay } from "./moment";
+import { getMinutesSinceMidnight, minutesToMomentOfDay } from "./moment";
 import {
   isEqualTask,
   updateTaskScheduledDay,
@@ -67,7 +67,10 @@ export function moveTaskToDay(
 
   const withUpdatedStartTime = {
     ...task,
-    startTime: minutesToMomentOfDay(task.startMinutes, day),
+    startTime: minutesToMomentOfDay(
+      getMinutesSinceMidnight(task.startTime),
+      day,
+    ),
   };
 
   return {
@@ -227,8 +230,9 @@ export function getDiff_v2(base: DayToTasks, next: DayToTasks) {
   const editableBase = getEditableTasks(base);
   const editableNext = getEditableTasks(next);
 
-  const flatBase = getFlatTimeBlocks(editableBase);
-  const flatNext = getFlatTimeBlocks(editableNext);
+  // todo: remove assertion
+  const flatBase = getFlatTimeBlocks(editableBase) as Array<LocalTask>;
+  const flatNext = getFlatTimeBlocks(editableNext) as Array<LocalTask>;
 
   return flatNext.reduce<Diff_v2>(
     (result, task) => {

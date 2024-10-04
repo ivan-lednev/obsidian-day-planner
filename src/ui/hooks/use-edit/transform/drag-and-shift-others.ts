@@ -1,7 +1,10 @@
 import { last } from "lodash";
 
 import type { LocalTask, WithTime } from "../../../../task-types";
-import { minutesToMomentOfDay } from "../../../../util/moment";
+import {
+  getMinutesSinceMidnight,
+  minutesToMomentOfDay,
+} from "../../../../util/moment";
 import { getEndMinutes } from "../../../../util/task-utils";
 
 export function dragAndShiftOthers(
@@ -15,7 +18,6 @@ export function dragAndShiftOthers(
 
   const updated = {
     ...editTarget,
-    startMinutes: cursorTime,
     startTime: minutesToMomentOfDay(cursorTime, editTarget.startTime),
   };
 
@@ -23,12 +25,13 @@ export function dragAndShiftOthers(
     (result, current) => {
       const previous = last(result) || updated;
 
-      if (getEndMinutes(previous) > current.startMinutes) {
+      if (
+        getEndMinutes(previous) > getMinutesSinceMidnight(current.startTime)
+      ) {
         return [
           ...result,
           {
             ...current,
-            startMinutes: getEndMinutes(previous),
             startTime: minutesToMomentOfDay(
               getEndMinutes(previous),
               current.startTime,
@@ -47,14 +50,17 @@ export function dragAndShiftOthers(
     .reduce<WithTime<LocalTask>[]>((result, current) => {
       const nextInTimeline = last(result) || updated;
 
-      if (nextInTimeline.startMinutes < getEndMinutes(current)) {
+      if (
+        getMinutesSinceMidnight(nextInTimeline.startTime) <
+        getEndMinutes(current)
+      ) {
         return [
           ...result,
           {
             ...current,
-            startMinutes: nextInTimeline.startMinutes - current.durationMinutes,
             startTime: minutesToMomentOfDay(
-              nextInTimeline.startMinutes - current.durationMinutes,
+              getMinutesSinceMidnight(nextInTimeline.startTime) -
+                current.durationMinutes,
               current.startTime,
             ),
           },

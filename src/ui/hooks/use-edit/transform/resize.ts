@@ -1,6 +1,9 @@
 import type { DayPlannerSettings } from "../../../../settings";
 import type { LocalTask, WithTime } from "../../../../task-types";
-import { minutesToMomentOfDay } from "../../../../util/moment";
+import {
+  getMinutesSinceMidnight,
+  minutesToMomentOfDay,
+} from "../../../../util/moment";
 import { getEndMinutes } from "../../../../util/task-utils";
 import { toSpliced } from "../../../../util/to-spliced";
 
@@ -12,7 +15,7 @@ export function resize(
 ): WithTime<LocalTask>[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
   const durationMinutes = Math.max(
-    cursorTime - editTarget.startMinutes,
+    cursorTime - getMinutesSinceMidnight(editTarget.startTime),
     settings.minimalDurationMinutes,
   );
   const updated = {
@@ -37,7 +40,6 @@ export function resizeFromTop(
 
   const updated = {
     ...editTarget,
-    startMinutes: cursorTime,
     startTime: minutesToMomentOfDay(cursorTime, editTarget.startTime),
     durationMinutes,
   };

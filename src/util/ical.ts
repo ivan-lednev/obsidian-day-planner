@@ -8,7 +8,6 @@ import type { WithIcalConfig } from "../types";
 
 import { getId } from "./id";
 import { liftToArray } from "./lift";
-import { getMinutesSinceMidnight } from "./moment";
 
 export function canHappenAfter(icalEvent: ical.VEvent, date: Date) {
   if (!icalEvent.rrule) {
@@ -101,12 +100,12 @@ function icalEventToTask(
   };
 
   if (isAllDayEvent) {
-    return base;
+    return { ...base, isAllDayEvent: true };
   }
 
   return {
     ...base,
-    startMinutes: getMinutesSinceMidnight(startTimeAdjusted),
+    isAllDayEvent: false,
     durationMinutes:
       (icalEvent.end.getTime() - icalEvent.start.getTime()) / 1000 / 60,
   };

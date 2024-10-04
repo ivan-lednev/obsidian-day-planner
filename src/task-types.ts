@@ -34,10 +34,6 @@ export type BaseTask = {
 };
 
 export type WithTime<T> = T & {
-  /**
-   * @deprecated Should be derived from startTime
-   */
-  startMinutes: number;
   durationMinutes: number;
 };
 
@@ -45,6 +41,7 @@ export type RemoteTask = BaseTask & {
   calendar: IcalConfig;
   summary: string;
   rsvpStatus: AttendeePartStat;
+  isAllDayEvent: boolean;
   description?: string;
 };
 

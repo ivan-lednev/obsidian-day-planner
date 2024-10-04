@@ -1,8 +1,8 @@
+import moment from "moment";
 import { get } from "svelte/store";
 
 import { defaultSettingsForTests } from "../../../../settings";
 import type { DayToTasks } from "../../../../task-types";
-import { toMinutes } from "../../../../util/moment";
 import { baseTask } from "../../test-utils";
 import { EditMode } from "../types";
 
@@ -45,7 +45,7 @@ describe("moving tasks between containers", () => {
         withTime: [],
       },
       [nextDayKey]: {
-        withTime: [{ startMinutes: toMinutes("01:00") }],
+        withTime: [{ startTime: moment("2023-01-01 01:00") }],
       },
     });
   });
@@ -55,12 +55,14 @@ describe("moving tasks between containers", () => {
       [dayKey]: {
         withTime: [
           baseTask,
-          { ...baseTask, id: "2", startMinutes: toMinutes("01:00") },
+          { ...baseTask, id: "2", startTime: moment("2023-01-01 01:00") },
         ],
         noTime: [],
       },
       [nextDayKey]: {
-        withTime: [{ ...baseTask, id: "3", startMinutes: toMinutes("01:00") }],
+        withTime: [
+          { ...baseTask, id: "3", startTime: moment("2023-01-02 01:00") },
+        ],
         noTime: [],
       },
     };
@@ -76,12 +78,12 @@ describe("moving tasks between containers", () => {
 
     expect(get(displayedTasks)).toMatchObject({
       [dayKey]: {
-        withTime: [{ id: "2", startMinutes: toMinutes("01:00") }],
+        withTime: [{ id: "2", startTime: moment("2023-01-01 01:00") }],
       },
       [nextDayKey]: {
         withTime: [
-          { startMinutes: toMinutes("01:00") },
-          { id: "3", startMinutes: toMinutes("01:00") },
+          { startTime: moment("2023-01-01 01:00") },
+          { id: "3", startTime: moment("2023-01-02 01:00") },
         ],
       },
     });
@@ -92,12 +94,14 @@ describe("moving tasks between containers", () => {
       [dayKey]: {
         withTime: [
           baseTask,
-          { ...baseTask, id: "2", startMinutes: toMinutes("01:00") },
+          { ...baseTask, id: "2", startTime: moment("2023-01-01 01:00") },
         ],
         noTime: [],
       },
       [nextDayKey]: {
-        withTime: [{ ...baseTask, id: "3", startMinutes: toMinutes("01:00") }],
+        withTime: [
+          { ...baseTask, id: "3", startTime: moment("2023-01-02 01:00") },
+        ],
         noTime: [],
       },
     };
@@ -114,12 +118,12 @@ describe("moving tasks between containers", () => {
 
     expect(get(displayedTasks)).toMatchObject({
       [dayKey]: {
-        withTime: [{ id: "2", startMinutes: toMinutes("01:00") }],
+        withTime: [{ id: "2", startTime: moment("2023-01-01 01:00") }],
       },
       [nextDayKey]: {
         withTime: [
-          { startMinutes: toMinutes("01:00") },
-          { id: "3", startMinutes: toMinutes("02:00") },
+          { startTime: moment("2023-01-01 01:00") },
+          { id: "3", startTime: moment("2023-01-02 02:00") },
         ],
       },
     });
@@ -138,7 +142,9 @@ describe("moving tasks between containers", () => {
 
     expect(get(displayedTasks)).toMatchObject({
       [dayKey]: {
-        withTime: [{ startMinutes: toMinutes("01:00"), durationMinutes: 60 }],
+        withTime: [
+          { startTime: moment("2023-01-01 01:00"), durationMinutes: 60 },
+        ],
       },
       [nextDayKey]: {
         withTime: [],

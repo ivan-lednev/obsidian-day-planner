@@ -79,11 +79,10 @@ describe("resize", () => {
       expect(get(displayedTasks)).toMatchObject({
         [dayKey]: {
           withTime: [
-            { id: "1", startMinutes: toMinutes("01:00") },
-            { id: "2", startMinutes: toMinutes("02:00") },
+            { id: "1" },
+            { id: "2" },
             {
               id: "3",
-              startMinutes: toMinutes("04:00"),
               startTime: moment("2023-01-01 04:00"),
             },
           ],
@@ -115,19 +114,16 @@ describe("resize", () => {
             {
               id: "1",
               startTime: moment("2023-01-01 00:30"),
-              startMinutes: toMinutes("00:30"),
               durationMinutes: toMinutes("01:00"),
             },
             {
               id: "2",
               startTime: moment("2023-01-01 01:30"),
-              startMinutes: toMinutes("01:30"),
               durationMinutes: toMinutes("01:30"),
             },
             {
               id: "3",
               startTime: moment("2023-01-01 03:00"),
-              startMinutes: toMinutes("03:00"),
             },
           ],
         },
@@ -157,16 +153,14 @@ describe("resize", () => {
       expect(get(displayedTasks)).toMatchObject({
         [dayKey]: {
           withTime: [
-            { id: "1", startMinutes: toMinutes("01:00") },
+            { id: "1" },
             {
               id: "2",
-              startMinutes: toMinutes("02:00"),
               durationMinutes: toMinutes("02:00"),
             },
             {
               id: "3",
               startTime: moment("2023-01-01 04:00"),
-              startMinutes: toMinutes("04:00"),
               durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
             },
           ],
@@ -197,19 +191,16 @@ describe("resize", () => {
           withTime: [
             {
               id: "1",
-              startMinutes: toMinutes("00:20"),
               durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
             },
             {
               id: "2",
               startTime: moment("2023-01-01 00:30"),
-              startMinutes: toMinutes("00:30"),
               durationMinutes: toMinutes("02:30"),
             },
             {
               id: "3",
               startTime: moment("2023-01-01 03:00"),
-              startMinutes: toMinutes("03:00"),
             },
           ],
         },

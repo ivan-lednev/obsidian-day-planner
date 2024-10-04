@@ -33,7 +33,7 @@ import {
 export function isEqualTask(a: WithTime<LocalTask>, b: WithTime<LocalTask>) {
   return (
     a.id === b.id &&
-    a.startMinutes === b.startMinutes &&
+    a.startTime.isSame(b.startTime) &&
     a.durationMinutes === b.durationMinutes
   );
 }
@@ -53,14 +53,20 @@ export function getEndTime(task: {
 }
 
 function isScheduled<T extends object>(task: T): task is WithTime<T> {
-  return Object.hasOwn(task, "startMinutes");
+  return (
+    Object.hasOwn(task, "startTime") ||
+    ("isAllDayEvent" in task && task.isAllDayEvent === false)
+  );
 }
 
 export function getRenderKey(task: WithTime<Task> | Task) {
   const key: string[] = [];
 
   if (isScheduled(task)) {
-    key.push(String(task.startMinutes), String(getEndMinutes(task)));
+    key.push(
+      String(getMinutesSinceMidnight(task.startTime)),
+      String(getEndMinutes(task)),
+    );
   }
 
   if (isRemote(task)) {
@@ -74,10 +80,10 @@ export function getRenderKey(task: WithTime<Task> | Task) {
 
 export function getNotificationKey(task: WithTime<Task>) {
   if (isRemote(task)) {
-    return `${task.calendar.name}::${task.startMinutes}:${task.durationMinutes}::${task.summary}`;
+    return `${task.calendar.name}::${getMinutesSinceMidnight(task.startTime)}:${task.durationMinutes}::${task.summary}`;
   }
 
-  return `${task.location?.path ?? "blank"}::${task.startMinutes}::${
+  return `${task.location?.path ?? "blank"}::${getMinutesSinceMidnight(task.startTime)}::${
     task.durationMinutes
   }::${task.text}`;
 }
@@ -110,7 +116,7 @@ function taskLineToString(task: WithTime<LocalTask>) {
   const firstLine = removeListTokens(getFirstLine(task.text));
 
   const updatedTimestamp = createTimestamp(
-    task.startMinutes,
+    getMinutesSinceMidnight(task.startTime),
     task.durationMinutes,
     get(settings).timestampFormat,
   );
@@ -176,7 +182,6 @@ export function createTask(props: {
   return {
     location,
     id: getId(),
-    startMinutes,
     durationMinutes: settings.defaultDurationMinutes,
     text,
     startTime: minutesToMomentOfDay(startMinutes, day),

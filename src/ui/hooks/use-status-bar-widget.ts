@@ -1,4 +1,3 @@
-import { sortBy } from "lodash/fp";
 import type { Moment } from "moment";
 import { derived, type Readable } from "svelte/store";
 
@@ -42,10 +41,12 @@ export function useStatusBarWidget({ tasksForToday }: UseStatusBarWidgetProps) {
           getEndTime(item).isAfter($currentTime),
       );
 
-      const nextItem = sortBy(
-        (task) => task.startMinutes,
-        $tasksForToday.withTime,
-      ).find((task) => task.startTime.isAfter($currentTime));
+      // TODO: add tests
+      const nextItem = $tasksForToday.withTime
+        .slice()
+        // todo: remote dupilcation
+        .sort((a, b) => a.startTime.diff(b.startTime))
+        .find((task) => task.startTime.isAfter($currentTime));
 
       const widget: Widget = {};
 

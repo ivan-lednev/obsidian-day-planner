@@ -15,7 +15,6 @@ import type { FileLine, LocalTask, TaskTokens, WithTime } from "../task-types";
 
 import { type ClockMoments, toTime } from "./clock";
 import { getId } from "./id";
-import { getMinutesSinceMidnight } from "./moment";
 import { deleteProps } from "./properties";
 
 export function unwrap<T>(group: ReturnType<DataArray<T>["groupBy"]>) {
@@ -98,7 +97,6 @@ export function toTask(
     text: toString(sTask),
     lines: getLines(sTask),
     durationMinutes,
-    startMinutes: getMinutesSinceMidnight(startTime),
     location: {
       path: sTask.path,
       position: sTask.position,

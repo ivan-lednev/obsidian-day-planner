@@ -64,63 +64,69 @@ const tentativeEventMatcher = {
   },
 };
 
-test("RSVP status appears in tasks", async () => {
-  getMockRequest().mockReturnValue(getIcalFixture("google-tentative-attendee"));
+describe("ical", () => {
+  test("RSVP status appears in tasks", async () => {
+    getMockRequest().mockReturnValue(
+      getIcalFixture("google-tentative-attendee"),
+    );
 
-  const { store } = createStore();
+    const { store } = createStore();
 
-  await waitFor(() => {
-    expect(get(store)).toEqual(tentativeEventMatcher);
-  });
-});
-
-test.todo(
-  "RSVP status gets pulled from params if email is not in CN (common name)",
-);
-
-test("Falls back on previous values if fetching a calendar fails", async () => {
-  getMockRequest().mockReturnValue(getIcalFixture("google-tentative-attendee"));
-
-  const { store } = createStore();
-
-  await waitFor(() => {
-    expect(get(store)).toEqual(tentativeEventMatcher);
-  });
-
-  getMockRequest().mockReturnValue(
-    Promise.reject(new Error("Mock calendar rejected")),
-  );
-
-  await waitForNeverToHappen(() => {
-    expect(() => get(store)).toThrow();
-  });
-});
-
-test("Deleted recurrences don't show up as tasks", async () => {
-  getMockRequest().mockReturnValue(
-    getIcalFixture("google-recurring-with-exception-and-location"),
-  );
-
-  const { store } = createStore({
-    visibleDays: [moment("2024-09-27"), moment("2024-09-28")],
-  });
-
-  await waitFor(() => {
-    expect(get(store)).toEqual({
-      "2024-09-27": {
-        noTime: [],
-        withTime: [
-          expect.objectContaining({
-            summary: "recurring",
-          }),
-        ],
-      },
+    await waitFor(() => {
+      expect(get(store)).toEqual(tentativeEventMatcher);
     });
   });
+
+  test.todo(
+    "RSVP status gets pulled from params if email is not in CN (common name)",
+  );
+
+  test("Falls back on previous values if fetching a calendar fails", async () => {
+    getMockRequest().mockReturnValue(
+      getIcalFixture("google-tentative-attendee"),
+    );
+
+    const { store } = createStore();
+
+    await waitFor(() => {
+      expect(get(store)).toEqual(tentativeEventMatcher);
+    });
+
+    getMockRequest().mockReturnValue(
+      Promise.reject(new Error("Mock calendar rejected")),
+    );
+
+    await waitForNeverToHappen(() => {
+      expect(() => get(store)).toThrow();
+    });
+  });
+
+  test("Deleted recurrences don't show up as tasks", async () => {
+    getMockRequest().mockReturnValue(
+      getIcalFixture("google-recurring-with-exception-and-location"),
+    );
+
+    const { store } = createStore({
+      visibleDays: [moment("2024-09-27"), moment("2024-09-28")],
+    });
+
+    await waitFor(() => {
+      expect(get(store)).toEqual({
+        "2024-09-27": {
+          noTime: [],
+          withTime: [
+            expect.objectContaining({
+              summary: "recurring",
+            }),
+          ],
+        },
+      });
+    });
+  });
+
+  test.todo("Location gets passed to an event");
+
+  test.todo("Yearly recurrences do not show up every month");
+
+  test.todo("Time zones get calculated correctly");
 });
-
-test.todo("Location gets passed to an event");
-
-test.todo("Yearly recurrences do not show up every month");
-
-test.todo("Time zones get calculated correctly");

@@ -54,7 +54,7 @@ function getDestDay(operation: EditOperation) {
 
 function sortByStartMinutes(tasks: WithTime<LocalTask>[]) {
   return produce(tasks, (draft) =>
-    draft.sort((a, b) => a.startMinutes - b.startMinutes),
+    draft.sort((a, b) => a.startTime.diff(b.startTime)),
   );
 }
 

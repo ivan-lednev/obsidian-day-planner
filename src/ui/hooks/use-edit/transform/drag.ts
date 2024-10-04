@@ -9,13 +9,9 @@ export function drag(
 ): WithTime<LocalTask>[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
 
-  const startMinutes = cursorTime;
-  const startTime = minutesToMomentOfDay(cursorTime, editTarget.startTime);
-
   const updated = {
     ...editTarget,
-    startMinutes,
-    startTime,
+    startTime: minutesToMomentOfDay(cursorTime, editTarget.startTime),
   };
 
   return toSpliced(baseline, index, updated);

@@ -1,10 +1,10 @@
+import moment from "moment";
 import { get } from "svelte/store";
 
-import { toMinutes } from "../../../../util/moment";
-import { baseTask } from "../../test-utils";
+import { baseTask, threeTasks } from "../../test-utils";
 import { EditMode } from "../types";
 
-import { dayKey } from "./util/fixtures";
+import { dayKey, nextDayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
 
 // todo: remove duplication, ideally this check should be pulled out of the diffing logic
@@ -23,17 +23,37 @@ describe("drag one & common edit mechanics", () => {
       moveCursorTo,
       displayedTasks,
       confirmEdit,
-    } = setUp();
+    } = setUp({
+      tasks: {
+        [dayKey]: {
+          withTime: threeTasks,
+          noTime: [],
+        },
+        [nextDayKey]: {
+          withTime: [],
+          noTime: [],
+        },
+      },
+    });
 
-    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
-    moveCursorTo("01:00");
+    todayControls.handleGripMouseDown(threeTasks[1], EditMode.DRAG);
+    moveCursorTo("03:00");
+
     await confirmEdit();
+
     nextDayControls.handleMouseEnter();
     moveCursorTo("03:00");
 
     expect(get(displayedTasks)).toMatchObject({
       [dayKey]: {
-        withTime: [{ startMinutes: toMinutes("01:00") }],
+        withTime: [
+          { id: "1" },
+          { id: "2", startTime: moment("2023-01-01 03:00") },
+          { id: "3" },
+        ],
+      },
+      [nextDayKey]: {
+        withTime: [],
       },
     });
   });

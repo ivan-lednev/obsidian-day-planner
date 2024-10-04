@@ -65,9 +65,7 @@ export function useDayToEventOccurences(props: {
 
               return veventsWithCalendar;
             })
-            .catch((error) => {
-              console.error(error);
-
+            .catch(() => {
               return previousFetches.get(calendar.url) || [];
             }),
         );
@@ -120,10 +118,10 @@ export function useDayToEventOccurences(props: {
       flatten,
       groupBy((task: WithTime<RemoteTask>) => getDayKey(task.startTime)),
       mapValues((tasks) => {
-        const [withTime, noTime]: [
+        const [noTime, withTime]: [
           Array<WithTime<RemoteTask>>,
           Array<Omit<WithTime<RemoteTask>, "startMinutes">>,
-        ] = partition((task) => task.startMinutes !== undefined, tasks);
+        ] = partition((task) => task.isAllDayEvent, tasks);
 
         return { withTime, noTime };
       }),

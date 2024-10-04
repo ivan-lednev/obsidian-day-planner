@@ -4,7 +4,7 @@ import { derived, type Readable, type Writable } from "svelte/store";
 import { getHiddenHoursSize } from "../../global-store/derived-settings";
 import type { DayPlannerSettings } from "../../settings";
 import type { Task, WithPlacing, WithTime } from "../../task-types";
-import { getRelationToNow } from "../../util/moment";
+import { getMinutesSinceMidnight, getRelationToNow } from "../../util/moment";
 import { getEndTime } from "../../util/task-utils";
 
 import { useColor } from "./use-color";
@@ -30,7 +30,8 @@ export function useTaskVisuals(
 
   const offset = derived(settings, ($settings) => {
     const number =
-      task.startMinutes * $settings.zoomLevel - getHiddenHoursSize($settings);
+      getMinutesSinceMidnight(task.startTime) * $settings.zoomLevel -
+      getHiddenHoursSize($settings);
 
     return `${number}px`;
   });

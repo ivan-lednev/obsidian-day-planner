@@ -7,6 +7,7 @@ import type { DayPlannerSettings } from "../settings";
 import type { LocalTask, WithTime } from "../task-types";
 
 import { toTask, toUnscheduledTask } from "./dataview";
+import { getMinutesSinceMidnight } from "./moment";
 
 type DurationOptions = Pick<
   DayPlannerSettings,
@@ -26,7 +27,9 @@ function calculateDuration(
     const shouldExtendUntilNext = next && options.extendDurationUntilNext;
 
     if (shouldExtendUntilNext) {
-      const minutesUntilNext = next.startMinutes - current.startMinutes;
+      const minutesUntilNext =
+        getMinutesSinceMidnight(next.startTime) -
+        getMinutesSinceMidnight(current.startTime);
 
       return {
         ...current,
@@ -69,7 +72,7 @@ export function mapToTasksForDay(
     { parsed: [], errors: [] },
   );
 
-  tasksWithTime.sort((a, b) => a.startMinutes - b.startMinutes);
+  tasksWithTime.sort((a, b) => a.startTime.diff(b.startTime));
 
   const noTime = withoutTime
     .filter((sTask) => {
