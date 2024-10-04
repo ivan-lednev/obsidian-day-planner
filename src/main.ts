@@ -55,7 +55,11 @@ export default class DayPlanner extends Plugin {
     this.vaultFacade = new VaultFacade(this.app.vault, this.getTasksApi);
     this.obsidianFacade = new ObsidianFacade(this.app);
     this.dataviewFacade = new DataviewFacade(this.app);
-    this.planEditor = new DiffWriter(this.settings, this.obsidianFacade);
+    this.planEditor = new DiffWriter(
+      this.settings,
+      this.obsidianFacade,
+      this.vaultFacade,
+    );
     this.sTaskEditor = new STaskEditor(
       this.obsidianFacade,
       this.dataviewFacade,

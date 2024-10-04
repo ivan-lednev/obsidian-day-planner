@@ -2,6 +2,7 @@ import { last } from "lodash";
 
 import type { DayPlannerSettings } from "../../../../settings";
 import type { LocalTask, WithTime } from "../../../../task-types";
+import { minutesToMomentOfDay } from "../../../../util/moment";
 import { getEndMinutes } from "../../../../util/task-utils";
 
 export function dragAndShrinkOthers(
@@ -17,6 +18,7 @@ export function dragAndShrinkOthers(
   const updated = {
     ...editTarget,
     startMinutes: cursorTime,
+    startTime: minutesToMomentOfDay(cursorTime, editTarget.startTime),
   };
 
   const updatedFollowing = following.reduce<WithTime<LocalTask>[]>(
@@ -34,6 +36,10 @@ export function dragAndShrinkOthers(
           ...result,
           {
             ...current,
+            startTime: minutesToMomentOfDay(
+              newCurrentStartMinutes,
+              current.startTime,
+            ),
             startMinutes: newCurrentStartMinutes,
             durationMinutes: Math.max(
               newCurrentDurationMinutes,
@@ -68,6 +74,10 @@ export function dragAndShrinkOthers(
           ...result,
           {
             ...current,
+            startTime: minutesToMomentOfDay(
+              newCurrentStartMinutes,
+              current.startTime,
+            ),
             startMinutes: newCurrentStartMinutes,
             durationMinutes:
               nextInTimeline.startMinutes - newCurrentStartMinutes,

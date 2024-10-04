@@ -1,8 +1,9 @@
 import moment from "moment/moment";
 
 import type { LocalTask, WithPlacing, WithTime } from "../../task-types";
+import { toMinutes } from "../../util/moment";
 
-export const baseTaskStartTime = moment("2023-01-01");
+export const baseTaskStartTime = moment("2023-01-01 00:00");
 
 export const baseTask: WithPlacing<WithTime<LocalTask>> = {
   symbol: "-",
@@ -32,3 +33,24 @@ export const baseTask: WithPlacing<WithTime<LocalTask>> = {
   },
   id: "id",
 };
+
+export const threeTasks: WithPlacing<WithTime<LocalTask>>[] = [
+  {
+    ...baseTask,
+    id: "1",
+    startMinutes: toMinutes("01:00"),
+    startTime: moment("2023-01-01 01:00"),
+  },
+  {
+    ...baseTask,
+    id: "2",
+    startMinutes: toMinutes("02:00"),
+    startTime: moment("2023-01-01 02:00"),
+  },
+  {
+    ...baseTask,
+    id: "3",
+    startMinutes: toMinutes("03:00"),
+    startTime: moment("2023-01-01 03:00"),
+  },
+];

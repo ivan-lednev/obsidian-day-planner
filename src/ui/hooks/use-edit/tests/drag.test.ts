@@ -4,7 +4,7 @@ import { get } from "svelte/store";
 import { defaultSettingsForTests } from "../../../../settings";
 import type { DayToTasks } from "../../../../task-types";
 import { toMinutes } from "../../../../util/moment";
-import { baseTask } from "../../test-utils";
+import { baseTask, threeTasks } from "../../test-utils";
 import { EditMode } from "../types";
 
 import { dayKey } from "./util/fixtures";
@@ -31,30 +31,9 @@ describe("drag", () => {
 
   describe("drag many", () => {
     test("tasks below react to shifting selected task once there is overlap", () => {
-      const middleTask = {
-        ...baseTask,
-        id: "2",
-        startMinutes: toMinutes("02:00"),
-        startTime: moment("2023-01-01 02:00"),
-      };
-
       const tasks: DayToTasks = {
         [dayKey]: {
-          withTime: [
-            {
-              ...baseTask,
-              id: "1",
-              startMinutes: toMinutes("01:00"),
-              startTime: moment("2023-01-01 01:00"),
-            },
-            middleTask,
-            {
-              ...baseTask,
-              id: "3",
-              startMinutes: toMinutes("03:00"),
-              startTime: moment("2023-01-01 03:00"),
-            },
-          ],
+          withTime: threeTasks,
           noTime: [],
         },
       };
@@ -64,7 +43,7 @@ describe("drag", () => {
       });
 
       todayControls.handleGripMouseDown(
-        middleTask,
+        threeTasks[1],
         EditMode.DRAG_AND_SHIFT_OTHERS,
       );
       moveCursorTo("03:00");
@@ -93,30 +72,9 @@ describe("drag", () => {
     });
 
     test("tasks below stay in initial position once the overlap is reversed, tasks above shift as well", () => {
-      const middleTask = {
-        ...baseTask,
-        id: "2",
-        startMinutes: toMinutes("02:00"),
-        startTime: moment("2023-01-01 02:00"),
-      };
-
       const tasks: DayToTasks = {
         [dayKey]: {
-          withTime: [
-            {
-              ...baseTask,
-              id: "1",
-              startMinutes: toMinutes("01:00"),
-              startTime: moment("2023-01-01 01:00"),
-            },
-            middleTask,
-            {
-              ...baseTask,
-              id: "3",
-              startMinutes: toMinutes("03:00"),
-              startTime: moment("2023-01-01 03:00"),
-            },
-          ],
+          withTime: threeTasks,
           noTime: [],
         },
       };
@@ -127,7 +85,7 @@ describe("drag", () => {
       });
 
       todayControls.handleGripMouseDown(
-        middleTask,
+        threeTasks[1],
         EditMode.DRAG_AND_SHIFT_OTHERS,
       );
       moveCursorTo("03:00");
@@ -197,6 +155,46 @@ describe("drag", () => {
   });
 
   describe("drag and shrink others", () => {
-    test.todo("base case");
+    test("Next task shrinks up to minimal duration and starts moving down", () => {
+      const tasks: DayToTasks = {
+        [dayKey]: {
+          withTime: threeTasks,
+          noTime: [],
+        },
+      };
+
+      const { todayControls, moveCursorTo, displayedTasks } = setUp({
+        tasks,
+      });
+
+      todayControls.handleGripMouseDown(
+        threeTasks[1],
+        EditMode.DRAG_AND_SHRINK_OTHERS,
+      );
+      moveCursorTo("03:00");
+
+      expect(get(displayedTasks)).toMatchObject({
+        [dayKey]: {
+          withTime: [
+            {
+              id: "1",
+              startMinutes: toMinutes("01:00"),
+              startTime: moment("2023-01-01 01:00"),
+            },
+            {
+              id: "2",
+              startMinutes: toMinutes("03:00"),
+              startTime: moment("2023-01-01 03:00"),
+            },
+            {
+              id: "3",
+              startMinutes: toMinutes("04:00"),
+              durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
+              startTime: moment("2023-01-01 04:00"),
+            },
+          ],
+        },
+      });
+    });
   });
 });

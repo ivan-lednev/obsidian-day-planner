@@ -223,7 +223,6 @@ export type Diff_v2 = {
   created: Array<LocalTask>;
 };
 
-// todo: assumes that time is always in sync
 export function getDiff_v2(base: DayToTasks, next: DayToTasks) {
   const editableBase = getEditableTasks(base);
   const editableNext = getEditableTasks(next);
