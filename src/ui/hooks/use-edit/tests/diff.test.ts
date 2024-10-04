@@ -1,8 +1,14 @@
-import { toMinutes } from "../../../../util/moment";
+import moment from "moment";
+
 import { baseTask } from "../../test-utils";
 import { EditMode } from "../types";
 
-import { emptyTasks, nextDayKey, unscheduledTask } from "./util/fixtures";
+import {
+  dayKey,
+  emptyTasks,
+  nextDayKey,
+  unscheduledTask,
+} from "./util/fixtures";
 import { setUp } from "./util/setup";
 
 jest.mock("obsidian-daily-notes-interface", () => ({
@@ -13,10 +19,25 @@ jest.mock("obsidian-daily-notes-interface", () => ({
 }));
 
 describe("Finding diff before writing updates to files", () => {
-  test("Finds tasks moved between days", async () => {
-    const { todayControls, nextDayControls, confirmEdit, props } = setUp();
+  test.todo("Keeps task text in sync");
 
-    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
+  test("Finds tasks moved between days", async () => {
+    const task = { ...baseTask, text: "- 12:00 - 13:00 Task ⏳ 2023-01-01" };
+
+    const { todayControls, nextDayControls, confirmEdit, props } = setUp({
+      tasks: {
+        [dayKey]: {
+          withTime: [task],
+          noTime: [],
+        },
+        [nextDayKey]: {
+          withTime: [],
+          noTime: [],
+        },
+      },
+    });
+
+    todayControls.handleGripMouseDown(task, EditMode.DRAG);
     nextDayControls.handleMouseEnter();
 
     await confirmEdit();
@@ -26,16 +47,48 @@ describe("Finding diff before writing updates to files", () => {
         updated: [
           expect.objectContaining({
             id: baseTask.id,
-            text: expect.stringContaining(`⏳ ${nextDayKey}`),
           }),
         ],
       }),
     );
   });
 
-  test.todo("Finds tasks from daily notes moved between days");
+  test("Finds tasks from daily notes moved between days", async () => {
+    const task = { ...baseTask, text: "- 12:00 - 13:00 Task" };
 
-  test.todo("Finds 'obsidian-tasks' tasks moved between days");
+    const { todayControls, nextDayControls, confirmEdit, props } = setUp({
+      tasks: {
+        [dayKey]: {
+          withTime: [task],
+          noTime: [],
+        },
+        [nextDayKey]: {
+          withTime: [],
+          noTime: [],
+        },
+      },
+    });
+
+    todayControls.handleGripMouseDown(task, EditMode.DRAG);
+    nextDayControls.handleMouseEnter();
+
+    await confirmEdit();
+
+    expect(props.onUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        created: [
+          expect.objectContaining({
+            id: baseTask.id,
+          }),
+        ],
+        deleted: [
+          expect.objectContaining({
+            id: baseTask.id,
+          }),
+        ],
+      }),
+    );
+  });
 
   test("Finds created tasks", async () => {
     const { todayControls, confirmEdit, props } = setUp({
@@ -48,7 +101,9 @@ describe("Finding diff before writing updates to files", () => {
 
     expect(props.onUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
-        created: [expect.objectContaining({ startMinutes: 0 })],
+        created: [
+          expect.objectContaining({ startTime: moment("2023-01-01 00:00") }),
+        ],
         updated: [],
       }),
     );
@@ -66,7 +121,7 @@ describe("Finding diff before writing updates to files", () => {
       expect.objectContaining({
         updated: [
           expect.objectContaining({
-            startMinutes: toMinutes("2:00"),
+            startTime: moment("2023-01-01 02:00"),
           }),
         ],
         created: [],
@@ -89,7 +144,7 @@ describe("Finding diff before writing updates to files", () => {
         created: [],
         updated: [
           expect.objectContaining({
-            startMinutes: toMinutes("2:00"),
+            startTime: moment("2023-01-01 02:00"),
           }),
         ],
       }),

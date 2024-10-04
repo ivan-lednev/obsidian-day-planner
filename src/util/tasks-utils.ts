@@ -5,6 +5,7 @@ import {
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
 
+import { scheduledPropRegExps } from "../regexp";
 import {
   type DayToEditableTasks,
   type DayToTasks,
@@ -207,9 +208,10 @@ function getFlatTimeBlocks(dayToTasks: DayToTasks) {
   ]);
 }
 
-// todo
-function isFromDailyNote(task: WithTime<Task>) {
-  return true;
+// todo:
+//  cover all kinds of props on all lines in parent block
+function hasDateFromProp(task: LocalTask) {
+  return scheduledPropRegExps.some((regexp) => regexp.test(task.text));
 }
 
 function isOnSameDay(a: WithTime<Task>, b: WithTime<Task>) {
@@ -242,7 +244,7 @@ export function getDiff_v2(base: DayToTasks, next: DayToTasks) {
 
       if (thisTaskInBase) {
         const needToMoveBetweenDailyNotes =
-          isFromDailyNote(task) && !isOnSameDay(thisTaskInBase, task);
+          !hasDateFromProp(task) && !isOnSameDay(thisTaskInBase, task);
 
         if (needToMoveBetweenDailyNotes) {
           result.deleted.push(task);
