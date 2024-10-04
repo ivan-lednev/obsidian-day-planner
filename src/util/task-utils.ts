@@ -23,7 +23,12 @@ import {
 
 import { getListTokens } from "./dataview";
 import { getId } from "./id";
-import { addMinutes, minutesToMoment, minutesToMomentOfDay } from "./moment";
+import {
+  addMinutes,
+  getMinutesSinceMidnight,
+  minutesToMoment,
+  minutesToMomentOfDay,
+} from "./moment";
 
 export function isEqualTask(a: WithTime<LocalTask>, b: WithTime<LocalTask>) {
   return (
@@ -34,10 +39,10 @@ export function isEqualTask(a: WithTime<LocalTask>, b: WithTime<LocalTask>) {
 }
 
 export function getEndMinutes(task: {
-  startMinutes: number;
+  startTime: Moment;
   durationMinutes: number;
 }) {
-  return task.startMinutes + task.durationMinutes;
+  return getMinutesSinceMidnight(task.startTime) + task.durationMinutes;
 }
 
 export function getEndTime(task: {

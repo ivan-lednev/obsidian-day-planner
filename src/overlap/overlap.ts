@@ -4,6 +4,7 @@ import { isNotVoid } from "typed-assert";
 
 import type { TimeBlock } from "../task-types";
 import type { Overlap } from "../types";
+import { getMinutesSinceMidnight } from "../util/moment";
 import { getEndMinutes } from "../util/task-utils";
 
 import { getHorizontalPlacing } from "./horizontal-placing";
@@ -42,7 +43,7 @@ function getItemsOverlappingItemAndEachOther(
       },
       [item],
     )
-    .sort((a, b) => a.startMinutes - b.startMinutes);
+    .sort((a, b) => a.startTime.diff(b.startTime));
 }
 
 function computeOverlapForGroup(
@@ -121,9 +122,12 @@ function computeOverlapForGroup(
 }
 
 function overlaps(a: TimeBlock, b: TimeBlock) {
-  const [early, late] = a.startMinutes < b.startMinutes ? [a, b] : [b, a];
+  const [early, late] =
+    getMinutesSinceMidnight(a.startTime) < getMinutesSinceMidnight(b.startTime)
+      ? [a, b]
+      : [b, a];
 
-  return getEndMinutes(early) > late.startMinutes;
+  return getEndMinutes(early) > getMinutesSinceMidnight(late.startTime);
 }
 
 export function addHorizontalPlacing(blocks: Array<TimeBlock>) {

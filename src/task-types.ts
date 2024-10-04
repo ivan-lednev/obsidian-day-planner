@@ -73,7 +73,7 @@ export interface TasksForDay<T = Task> {
 export type EditableTasksForDay = TasksForDay<LocalTask>;
 export type DayToTasks<T = TasksForDay> = Record<string, T>;
 export type DayToEditableTasks = DayToTasks<EditableTasksForDay>;
-export type TimeBlock = Omit<WithTime<BaseTask>, "startTime">;
+export type TimeBlock = Omit<WithTime<BaseTask>, "startMinutes">;
 
 export function isRemote<T extends Task>(task: T): task is T & RemoteTask {
   return Object.hasOwn(task, "calendar");
