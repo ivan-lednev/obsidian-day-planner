@@ -2,7 +2,12 @@ import moment, { type Moment } from "moment";
 import { TFile } from "obsidian";
 
 import { icalDayKeyFormat } from "./constants";
-import { DiffWriter, type WriterDiff } from "./service/diff-writer";
+import {
+  DiffWriter,
+  DiffWriter_v2,
+  type FileDiff,
+  type WriterDiff,
+} from "./service/diff-writer";
 import { VaultFacade } from "./service/vault-facade";
 import { type DayPlannerSettings, defaultSettingsForTests } from "./settings";
 import { createTask } from "./util/task-utils";
@@ -84,6 +89,288 @@ async function writeDiff(props: {
 
   return vault;
 }
+
+async function writeDiff_v2(props: { vault: InMemoryVault; diff: FileDiff }) {
+  const { vault, diff } = props;
+
+  const getTasksApi = () => {
+    throw new Error("Can't access tasks API inside tests");
+  };
+
+  const vaultFacade = new VaultFacade(vault, getTasksApi);
+  const writer = new DiffWriter_v2(vaultFacade);
+
+  await writer.writeDiff(diff);
+}
+
+describe("Diff writer v2", () => {
+  test("Deletes multiple entries in a file", async () => {
+    const files = [
+      createInMemoryFile({
+        path: "file-1",
+        contents: `line 0
+line 1
+line 2
+line 3
+line 4
+`,
+      }),
+    ];
+
+    const diff = [
+      {
+        type: "deleted",
+        path: "file-1",
+        range: {
+          start: {
+            line: 1,
+          },
+          end: {
+            line: 2,
+          },
+        },
+      },
+      {
+        type: "deleted",
+        path: "file-1",
+        range: {
+          start: {
+            line: 3,
+          },
+          end: {
+            line: 4,
+          },
+        },
+      },
+    ] satisfies FileDiff;
+
+    const vault = new InMemoryVault(files);
+
+    await writeDiff_v2({ vault, diff });
+
+    expect(vault.getAbstractFileByPath("file-1").contents).toBe(`line 0
+line 2
+line 4
+`);
+  });
+
+  test("Updates ranges", async () => {
+    const files = [
+      createInMemoryFile({
+        path: "file-1",
+        contents: `line 0
+line 1
+line 2
+`,
+      }),
+    ];
+
+    const diff = [
+      {
+        type: "updated",
+        path: "file-1",
+        range: {
+          start: {
+            line: 1,
+          },
+          end: {
+            line: 2,
+          },
+        },
+        contents: "line 1 updated",
+      },
+    ] satisfies FileDiff;
+
+    const vault = new InMemoryVault(files);
+
+    await writeDiff_v2({ vault, diff });
+
+    expect(vault.getAbstractFileByPath("file-1").contents).toBe(`line 0
+line 1 updated
+line 2
+`);
+  });
+
+  test("Combines updates with deletes", async () => {
+    const files = [
+      createInMemoryFile({
+        path: "file-1",
+        contents: `line 0
+line 1
+line 2
+line 3
+line 4
+`,
+      }),
+    ];
+
+    const diff = [
+      {
+        type: "updated",
+        path: "file-1",
+        contents: "line 1 updated",
+        range: {
+          start: {
+            line: 1,
+          },
+          end: {
+            line: 2,
+          },
+        },
+      },
+      {
+        type: "deleted",
+        path: "file-1",
+        range: {
+          start: {
+            line: 3,
+          },
+          end: {
+            line: 4,
+          },
+        },
+      },
+    ] satisfies FileDiff;
+
+    const vault = new InMemoryVault(files);
+
+    await writeDiff_v2({ vault, diff });
+
+    expect(vault.getAbstractFileByPath("file-1").contents).toBe(`line 0
+line 1 updated
+line 2
+line 4
+`);
+  });
+
+  test("Works on multiple files", async () => {
+    const files = [
+      createInMemoryFile({
+        path: "file-1",
+        contents: `line 0
+line 1
+line 2
+`,
+      }),
+      createInMemoryFile({
+        path: "file-2",
+        contents: `line 0
+line 1
+line 2
+`,
+      }),
+    ];
+
+    const diff = [
+      {
+        type: "updated",
+        path: "file-1",
+        contents: "line 1 updated",
+        range: {
+          start: {
+            line: 1,
+          },
+          end: {
+            line: 2,
+          },
+        },
+      },
+      {
+        type: "deleted",
+        path: "file-2",
+        range: {
+          start: {
+            line: 1,
+          },
+          end: {
+            line: 2,
+          },
+        },
+      },
+    ] satisfies FileDiff;
+
+    const vault = new InMemoryVault(files);
+
+    await writeDiff_v2({ vault, diff });
+
+    expect(vault.getAbstractFileByPath("file-1").contents).toBe(`line 0
+line 1 updated
+line 2
+`);
+
+    expect(vault.getAbstractFileByPath("file-2").contents).toBe(`line 0
+line 2
+`);
+  });
+
+  test("Appends new entries after a certain line", async () => {
+    const files = [
+      createInMemoryFile({
+        path: "file-1",
+        contents: `line 0
+line 1
+`,
+      }),
+    ];
+
+    const diff = [
+      {
+        type: "created",
+        path: "file-1",
+        contents: "new line",
+        target: 2,
+      },
+    ] satisfies FileDiff;
+
+    const vault = new InMemoryVault(files);
+
+    await writeDiff_v2({ vault, diff });
+
+    expect(vault.getAbstractFileByPath("file-1").contents).toBe(`line 0
+line 1
+new line
+`);
+  });
+
+  test("Appends new entries after a certain heading", async () => {
+    const files = [
+      createInMemoryFile({
+        path: "file-1",
+        contents: `line 0
+
+# Plan
+
+line 1
+`,
+      }),
+    ];
+
+    const diff = [
+      {
+        type: "created",
+        path: "file-1",
+        contents: "new line",
+        target: "Plan",
+      },
+    ] satisfies FileDiff;
+
+    const vault = new InMemoryVault(files);
+
+    await writeDiff_v2({ vault, diff });
+
+    expect(vault.getAbstractFileByPath("file-1").contents).toBe(`line 0
+
+# Plan
+
+new line
+line 1
+`);
+  });
+
+  test.todo("Combines all operations");
+
+  test.todo("Sorts lists at the end");
+});
 
 test("Adds a task with a header to an empty daily note", async () => {
   const vault = new InMemoryVault([

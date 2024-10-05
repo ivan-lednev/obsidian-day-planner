@@ -7,7 +7,7 @@ import {
 } from "obsidian-daily-notes-interface";
 import { isInstanceOf, isNotVoid } from "typed-assert";
 
-import type { TasksApiV1 } from "../tasks-plugin-types";
+import type { VaultFacade } from "./vault-facade";
 
 function doesLeafContainFile(leaf: WorkspaceLeaf, file: TFile) {
   const { view } = leaf;
@@ -16,7 +16,10 @@ function doesLeafContainFile(leaf: WorkspaceLeaf, file: TFile) {
 }
 
 export class ObsidianFacade {
-  constructor(readonly app: App) {}
+  constructor(
+    private readonly app: App,
+    private readonly vaultFacade: VaultFacade,
+  ) {}
 
   async openFileInEditor(file: TFile) {
     const leafWithThisFile = this.app.workspace
@@ -69,14 +72,15 @@ export class ObsidianFacade {
     return view;
   };
 
+  // todo: delete
   getMetadataForPath(path: string) {
-    const file = this.getFileByPath(path);
+    const file = this.vaultFacade.getFileByPath(path);
 
     return this.app.metadataCache.getFileCache(file);
   }
 
   async revealLineInFile(path: string, line: number) {
-    const file = this.getFileByPath(path);
+    const file = this.vaultFacade.getFileByPath(path);
 
     const editor = await this.openFileInEditor(file);
 
@@ -89,54 +93,5 @@ export class ObsidianFacade {
       ?.setEphemeralState({ line });
 
     editor.setCursor({ line, ch: editor.getLine(line).length });
-  }
-
-  async editFile(path: string, editFn: (contents: string) => string) {
-    const file = this.app.vault.getAbstractFileByPath(path);
-
-    isInstanceOf(file, TFile, `${path} is not a markdown file`);
-
-    const contents = await this.app.vault.read(file);
-    const newContents = editFn(contents);
-
-    await this.app.vault.modify(file, newContents);
-  }
-
-  async editLineInFile(
-    path: string,
-    line: number,
-    editFn: (line: string) => string,
-  ) {
-    await this.editFile(path, (contents) => {
-      const lines = contents.split("\n");
-      const originalLine = lines[line];
-
-      isNotVoid(originalLine, `No line ${line} in ${path}`);
-
-      lines[line] = editFn(originalLine);
-
-      return lines.join("\n");
-    });
-  }
-
-  toggleCheckboxInFile = async (path: string, line: number) => {
-    const tasksApi: TasksApiV1 | undefined =
-      // @ts-expect-error
-      this.app.plugins.plugins["obsidian-tasks-plugin"]?.apiV1;
-
-    const editFn = tasksApi
-      ? (lineContents: string) =>
-          tasksApi.executeToggleTaskDoneCommand(lineContents, path)
-      : toggleCheckbox;
-
-    await this.editLineInFile(path, line, editFn);
-  };
-
-  private getFileByPath(path: string) {
-    const file = this.app.vault.getAbstractFileByPath(path);
-
-    isInstanceOf(file, TFile, `Unable to open file: ${path}`);
-
-    return file;
   }
 }

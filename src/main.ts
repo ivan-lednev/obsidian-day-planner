@@ -53,7 +53,7 @@ export default class DayPlanner extends Plugin {
     await this.initSettingsStore();
 
     this.vaultFacade = new VaultFacade(this.app.vault, this.getTasksApi);
-    this.obsidianFacade = new ObsidianFacade(this.app);
+    this.obsidianFacade = new ObsidianFacade(this.app, this.vaultFacade);
     this.dataviewFacade = new DataviewFacade(this.app);
     this.planEditor = new DiffWriter(
       this.settings,
@@ -297,7 +297,7 @@ export default class DayPlanner extends Plugin {
       refreshTasks: this.dataviewFacade.getAllTasksFrom,
       dataviewLoaded,
       renderMarkdown: createRenderMarkdown(this.app),
-      toggleCheckboxInFile: this.obsidianFacade.toggleCheckboxInFile,
+      toggleCheckboxInFile: this.vaultFacade.toggleCheckboxInFile,
       showReleaseNotes: this.showReleaseNotes,
       editContext,
       visibleTasks,
