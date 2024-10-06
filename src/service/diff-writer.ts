@@ -1,4 +1,5 @@
 import { groupBy } from "lodash/fp";
+import type { Root } from "mdast";
 import type { Moment } from "moment";
 import type { CachedMetadata } from "obsidian";
 import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
@@ -36,11 +37,11 @@ interface Range {
   };
 }
 
-interface OperationBase {
+interface UpdateBase {
   path: string;
 }
 
-interface RangeOperation extends OperationBase {
+interface RangeOperation extends UpdateBase {
   range: Range;
 }
 
@@ -53,87 +54,130 @@ interface Updated extends RangeOperation {
   contents: string;
 }
 
-interface Created extends OperationBase {
+interface Created extends UpdateBase {
   type: "created";
   contents: string;
-  target?: number | string;
+  target?: number;
 }
 
-export type Operation = Deleted | Updated | Created;
+interface MdastUpdate extends UpdateBase {
+  type: "mdast";
+  updateFn: (root: Root) => Root;
+}
 
-export type FileDiff = Array<Operation>;
+export type RangeUpdate = Deleted | Updated | Created;
+export type Update = RangeUpdate | MdastUpdate;
+export type Transaction = ReturnType<typeof createTransaction>;
 
-export class DiffWriter_v2 {
-  constructor(private readonly vaultFacade: VaultFacade) {}
+function sortUpdates(a: RangeUpdate, b: RangeUpdate) {
+  const isACreated = a.type === "created";
+  const isBCreated = b.type === "created";
 
-  writeDiff = async (diff: FileDiff) => {
-    const pathToDiffs = groupBy((entry) => entry.path, diff);
-
-    const editPromises = Object.entries(pathToDiffs).flatMap(
-      ([path, entries]) => this.applyEntriesToFile(path, entries),
-    );
-
-    return Promise.all(editPromises);
-  };
-
-  private applyEntriesToFile(path: string, entries: FileDiff) {
-    return this.vaultFacade.editFile(path, (contents) => {
-      const edited = contents.split("\n");
-
-      const withDiffsApplied = entries
-        .slice()
-        .sort((a, b) => {
-          const isACreated = a.type === "created";
-          const isBCreated = b.type === "created";
-
-          if (isACreated && isBCreated) {
-            return 0;
-          }
-
-          // todo: test this
-          if (isACreated) {
-            return 1;
-          }
-
-          if (isBCreated) {
-            return -1;
-          }
-
-          return a.range.start.line - b.range.start.line;
-        })
-        .reverse()
-        .reduce(
-          (result, entry) => this.applyEntryToLines(result, entry),
-          edited,
-        );
-
-      return withDiffsApplied.join("\n");
-    });
+  if (isACreated && isBCreated) {
+    return 0;
   }
 
-  private applyEntryToLines(lines: string[], entry: Operation) {
-    const result = lines.slice();
+  // todo: test this
+  if (isACreated) {
+    return 1;
+  }
 
-    if (entry.type === "created") {
-      if (typeof entry.target === "number") {
-        result.splice(entry.target, 0, entry.contents);
-      }
+  if (isBCreated) {
+    return -1;
+  }
 
-      return result;
-    }
+  return a.range.start.line - b.range.start.line;
+}
 
-    const startLine = entry.range.start.line;
-    const endLine = entry.range.end.line;
-    const count = endLine - startLine;
+function applyRangeUpdate(lines: string[], rangeUpdate: RangeUpdate) {
+  const result = lines.slice();
 
-    if (entry.type === "updated") {
-      result.splice(startLine, count, entry.contents);
-    } else if (entry.type === "deleted") {
-      result.splice(startLine, count);
+  if (rangeUpdate.type === "created") {
+    if (typeof rangeUpdate.target === "number") {
+      result.splice(rangeUpdate.target, 0, rangeUpdate.contents);
     }
 
     return result;
   }
+
+  const startLine = rangeUpdate.range.start.line;
+  const endLine = rangeUpdate.range.end.line;
+  const count = endLine - startLine;
+
+  if (rangeUpdate.type === "updated") {
+    result.splice(startLine, count, rangeUpdate.contents);
+  } else if (rangeUpdate.type === "deleted") {
+    result.splice(startLine, count);
+  }
+
+  return result;
+}
+
+export function createTransaction(updates: Update[]) {
+  const pathToUpdates = groupBy((entry) => entry.path, updates);
+
+  return Object.entries(pathToUpdates).map(([path, updates]) => ({
+    path,
+    updateFn: (contents: string) => {
+      const lines = contents.split("\n");
+      const mdastUpdates = updates.filter(
+        (update): update is MdastUpdate => update.type === "mdast",
+      );
+
+      const rangeUpdates = updates.filter(
+        (update): update is RangeUpdate => update.type !== "mdast",
+      );
+
+      const withRangeUpdatesApplied = rangeUpdates
+        .toSorted(sortUpdates)
+        .toReversed()
+        .reduce(applyRangeUpdate, lines)
+        .join("\n");
+
+      if (mdastUpdates.length === 0) {
+        return withRangeUpdatesApplied;
+      }
+
+      const mdastRoot = fromMarkdown(withRangeUpdatesApplied);
+
+      const withMdastUpdatesApplied = mdastUpdates.reduce(
+        (result, { updateFn }) => updateFn(result),
+        mdastRoot,
+      );
+
+      return toMarkdown(withMdastUpdatesApplied);
+    },
+  }));
+}
+
+export class TransactionWriter {
+  private readonly history: Array<Record<string, string>> = [];
+
+  constructor(private readonly vaultFacade: VaultFacade) {}
+
+  writeTransaction = async (transaction: Transaction) => {
+    const previousState: Record<string, string> = {};
+
+    const editPromises = transaction.map(({ path, updateFn }) => {
+      this.vaultFacade.editFile(path, (contents) => {
+        previousState[path] = contents;
+
+        return updateFn(contents);
+      });
+    });
+
+    this.history.push(previousState);
+
+    return Promise.all(editPromises);
+  };
+
+  revert = async () => {
+    const lastUpdate = this.history.pop();
+
+    if (!lastUpdate) {
+      throw new Error("No updates to revert");
+    }
+  };
 }
 
 export class DiffWriter {

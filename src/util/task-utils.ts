@@ -111,7 +111,7 @@ export function areValuesEmpty(record: Record<string, [] | object>) {
   return Object.values(record).every(isEmpty);
 }
 
-function toString(task: WithTime<LocalTask>) {
+function taskToString(task: WithTime<LocalTask>) {
   const firstLine = removeListTokens(getFirstLine(task.text));
 
   const updatedTimestamp = createTimestamp(
@@ -143,7 +143,7 @@ export function updateScheduledPropInText(text: string, dayKey: string) {
 }
 
 export function updateTaskText(task: WithTime<LocalTask>) {
-  return { ...task, text: toString(task) };
+  return { ...task, text: taskToString(task) };
 }
 
 export function offsetYToMinutes(

@@ -1,109 +1,32 @@
-import moment, { type Moment } from "moment";
-import { TFile } from "obsidian";
+import type { Root } from "mdast";
 
-import { icalDayKeyFormat } from "./constants";
+import { insertListItemUnderHeading } from "./mdast/mdast";
 import {
-  DiffWriter,
-  DiffWriter_v2,
-  type FileDiff,
-  type WriterDiff,
+  createTransaction,
+  TransactionWriter,
+  type Update,
 } from "./service/diff-writer";
 import { VaultFacade } from "./service/vault-facade";
-import { type DayPlannerSettings, defaultSettingsForTests } from "./settings";
-import { createTask } from "./util/task-utils";
+import { createInMemoryFile, InMemoryVault } from "./test-utils";
 
-jest.mock("obsidian-daily-notes-interface", () => ({
-  ...jest.requireActual("obsidian-daily-notes-interface"),
-
-  getDateFromPath(): null {
-    return null;
-  },
-
-  getAllDailyNotes() {
-    return [];
-  },
-
-  createDailyNote() {
-    return createInMemoryFile({ path: "2024-01-01.md", contents: "" });
-  },
-}));
-
-function createInMemoryFile(props: { path: string; contents: string }) {
-  const mockTFile = Object.create(TFile.prototype);
-
-  return Object.assign(mockTFile, { ...props });
-}
-
-interface InMemoryFile {
-  path: string;
-  contents: string;
-}
-
-class InMemoryVault {
-  constructor(readonly files: Array<InMemoryFile>) {}
-
-  async read(file: TFile) {
-    return this.getAbstractFileByPath(file.path).contents;
-  }
-
-  async modify(file: TFile, contents: string) {
-    const found = this.getAbstractFileByPath(file.path);
-
-    found.contents = contents;
-  }
-
-  getAbstractFileByPath(path: string) {
-    const found = this.files.find((file) => file.path === path);
-
-    if (!found) {
-      throw new Error(`There is no file in the test vault: '${path}'`);
-    }
-
-    return found;
-  }
-}
-
-async function writeDiff(props: {
-  diff: WriterDiff;
+async function writeUpdates(props: {
   vault: InMemoryVault;
-  settings?: DayPlannerSettings;
+  updates: Update[];
 }) {
-  const { diff, vault, settings = defaultSettingsForTests } = props;
-
-  const getTasksApi = () => {
-    throw new Error("Can't access tasks API inside tests");
-  };
-
-  const obsidianFacade = {
-    getMetadataForPath: () => ({}),
-  };
-
-  const vaultFacade = new VaultFacade(vault, getTasksApi);
-  const planEditor = new DiffWriter(
-    () => settings,
-    obsidianFacade,
-    vaultFacade,
-  );
-
-  await planEditor.syncTasksWithFile(diff);
-
-  return vault;
-}
-
-async function writeDiff_v2(props: { vault: InMemoryVault; diff: FileDiff }) {
-  const { vault, diff } = props;
+  const { vault, updates } = props;
 
   const getTasksApi = () => {
     throw new Error("Can't access tasks API inside tests");
   };
 
   const vaultFacade = new VaultFacade(vault, getTasksApi);
-  const writer = new DiffWriter_v2(vaultFacade);
+  const writer = new TransactionWriter(vaultFacade);
+  const transaction = createTransaction(updates);
 
-  await writer.writeDiff(diff);
+  await writer.writeTransaction(transaction);
 }
 
-describe("Diff writer v2", () => {
+describe("Diff writer", () => {
   test("Deletes multiple entries in a file", async () => {
     const files = [
       createInMemoryFile({
@@ -117,7 +40,7 @@ line 4
       }),
     ];
 
-    const diff = [
+    const updates = [
       {
         type: "deleted",
         path: "file-1",
@@ -142,11 +65,11 @@ line 4
           },
         },
       },
-    ] satisfies FileDiff;
+    ] satisfies Update[];
 
     const vault = new InMemoryVault(files);
 
-    await writeDiff_v2({ vault, diff });
+    await writeUpdates({ vault, updates });
 
     expect(vault.getAbstractFileByPath("file-1").contents).toBe(`line 0
 line 2
@@ -165,7 +88,7 @@ line 2
       }),
     ];
 
-    const diff = [
+    const updates = [
       {
         type: "updated",
         path: "file-1",
@@ -179,11 +102,11 @@ line 2
         },
         contents: "line 1 updated",
       },
-    ] satisfies FileDiff;
+    ] satisfies Update[];
 
     const vault = new InMemoryVault(files);
 
-    await writeDiff_v2({ vault, diff });
+    await writeUpdates({ vault, updates });
 
     expect(vault.getAbstractFileByPath("file-1").contents).toBe(`line 0
 line 1 updated
@@ -204,7 +127,7 @@ line 4
       }),
     ];
 
-    const diff = [
+    const updates = [
       {
         type: "updated",
         path: "file-1",
@@ -230,11 +153,11 @@ line 4
           },
         },
       },
-    ] satisfies FileDiff;
+    ] satisfies Update[];
 
     const vault = new InMemoryVault(files);
 
-    await writeDiff_v2({ vault, diff });
+    await writeUpdates({ vault, updates });
 
     expect(vault.getAbstractFileByPath("file-1").contents).toBe(`line 0
 line 1 updated
@@ -261,7 +184,7 @@ line 2
       }),
     ];
 
-    const diff = [
+    const updates = [
       {
         type: "updated",
         path: "file-1",
@@ -287,11 +210,11 @@ line 2
           },
         },
       },
-    ] satisfies FileDiff;
+    ] satisfies Update[];
 
     const vault = new InMemoryVault(files);
 
-    await writeDiff_v2({ vault, diff });
+    await writeUpdates({ vault, updates });
 
     expect(vault.getAbstractFileByPath("file-1").contents).toBe(`line 0
 line 1 updated
@@ -313,18 +236,18 @@ line 1
       }),
     ];
 
-    const diff = [
+    const updates = [
       {
         type: "created",
         path: "file-1",
         contents: "new line",
         target: 2,
       },
-    ] satisfies FileDiff;
+    ] satisfies Update[];
 
     const vault = new InMemoryVault(files);
 
-    await writeDiff_v2({ vault, diff });
+    await writeUpdates({ vault, updates });
 
     expect(vault.getAbstractFileByPath("file-1").contents).toBe(`line 0
 line 1
@@ -332,192 +255,46 @@ new line
 `);
   });
 
-  test("Appends new entries after a certain heading", async () => {
+  test("Combines mdast updates with range updates", async () => {
     const files = [
       createInMemoryFile({
         path: "file-1",
         contents: `line 0
-
-# Plan
-
 line 1
 `,
       }),
     ];
 
-    const diff = [
+    const updates: Update[] = [
       {
-        type: "created",
         path: "file-1",
+        type: "created",
         contents: "new line",
-        target: "Plan",
+        target: 2,
       },
-    ] satisfies FileDiff;
+      {
+        path: "file-1",
+        type: "mdast",
+        updateFn: (root: Root) =>
+          insertListItemUnderHeading(root, "Plan", "New task"),
+      },
+    ];
 
     const vault = new InMemoryVault(files);
 
-    await writeDiff_v2({ vault, diff });
+    await writeUpdates({ vault, updates });
 
     expect(vault.getAbstractFileByPath("file-1").contents).toBe(`line 0
+line 1
+new line
 
 # Plan
 
-new line
-line 1
+- New task
 `);
   });
 
-  test.todo("Combines all operations");
+  test.todo("If create does not provide line, append to the end");
 
-  test.todo("Sorts lists at the end");
+  test.todo("Reverts changes");
 });
-
-test("Adds a task with a header to an empty daily note", async () => {
-  const vault = new InMemoryVault([
-    createInMemoryFile({ path: "2024-01-01.md", contents: "" }),
-  ]);
-
-  await writeDiff({
-    diff: {
-      updated: [],
-      created: [
-        createTask({
-          text: "- New item",
-          day: moment("2024-01-01"),
-          startMinutes: 0,
-          settings: defaultSettingsForTests,
-        }),
-      ],
-      moved: [],
-    },
-    vault,
-  });
-
-  expect(vault.getAbstractFileByPath("2024-01-01.md").contents)
-    .toContain(`# Day planner
-
-- New item`);
-});
-
-test("Moves a task between daily notes", async () => {
-  const files = [
-    createInMemoryFile({
-      path: "2024-01-01.md",
-      contents: `# Day planner
-
-- I've been moved
-    - More stuff
-`,
-    }),
-    createInMemoryFile({ path: "2024-01-02.md", contents: "" }),
-  ];
-
-  const vault = new InMemoryVault(files);
-
-  jest.requireMock("obsidian-daily-notes-interface").getDailyNote = (
-    day: Moment,
-  ) => vault.getAbstractFileByPath(`${day.format(icalDayKeyFormat)}.md`);
-
-  await writeDiff({
-    diff: {
-      updated: [],
-      created: [],
-      moved: [
-        {
-          dayKey: "2024-01-02",
-          task: createTask({
-            text: `- [ ] I've been moved
-    - More stuff
-`,
-            day: moment("2024-01-01"),
-            startMinutes: 0,
-            settings: defaultSettingsForTests,
-            location: {
-              path: "2024-01-01.md",
-              position: {
-                start: {
-                  offset: -1,
-                  line: 2,
-                  col: -1,
-                },
-                end: {
-                  offset: -1,
-                  line: 2,
-                  col: -1,
-                },
-              },
-            },
-          }),
-        },
-      ],
-    },
-    vault,
-  });
-
-  // todo: fix extra-newline
-  expect(vault.getAbstractFileByPath("2024-01-01.md").contents)
-    .toBe(`# Day planner
-
-`);
-
-  expect(vault.getAbstractFileByPath("2024-01-02.md").contents)
-    .toContain(`# Day planner
-
-- [ ] 00:00 - 00:30 I've been moved
-    - More stuff`);
-});
-
-// todo: this logic is outside of the diff writer for now
-test.skip("Updates scheduled property and does not remove other metadata", async () => {
-  const contents = `- [ ] 10:00 - 12:00 Task 🛫 2024-10-01 ⏳ 2024-01-01 📅 2024-10-01`;
-  const files = [
-    createInMemoryFile({
-      path: "tasks.md",
-      contents,
-    }),
-  ];
-
-  const vault = new InMemoryVault(files);
-
-  await writeDiff({
-    vault,
-    diff: {
-      updated: [
-        createTask({
-          text: contents,
-          day: moment("2024-01-02"),
-          startMinutes: 0,
-          settings: defaultSettingsForTests,
-          location: {
-            path: "tasks.md",
-            position: {
-              start: {
-                offset: 0,
-                line: 0,
-                col: 0,
-              },
-              end: {
-                offset: -1,
-                line: -1,
-                col: -1,
-              },
-            },
-          },
-        }),
-      ],
-      created: [],
-      moved: [],
-    },
-  });
-
-  expect(vault.getAbstractFileByPath("tasks.md").contents).toBe(
-    `- [ ] 10:00 - 12:00 Task 🛫 2024-10-01 ⏳ 2024-01-02 📅 2024-10-01`,
-  );
-});
-
-test.todo("Handles newlines in empty files");
-
-// todo: is this outside DiffWriter?
-test.todo("Updates task timestamps");
-
-test.todo("Asks for confirmation before creating files");

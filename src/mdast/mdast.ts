@@ -1,3 +1,4 @@
+import { produce } from "immer";
 import { takeWhile } from "lodash/fp";
 import type { Node, Parent, Text as MdastText } from "mdast";
 import type { Heading, List, Root, Nodes } from "mdast";
@@ -71,8 +72,89 @@ export function sortListsRecursively<T extends Node>(
           sortListsRecursively(child, sortFn),
         ),
       }))
-      .sort(sortFn),
+      .toSorted(sortFn),
   };
+}
+
+// todo: add merge()
+export function insertListItemUnderHeading(
+  root: Root,
+  heading: string,
+  listItem: string,
+) {
+  return produce(root, (draft) => {
+    const headingIndex = draft.children.findIndex(
+      (child) =>
+        checkHeading(child) && getFirstTextNodeValue(child) === heading,
+    );
+
+    if (headingIndex >= 0) {
+      const afterHeading = draft.children.slice(headingIndex + 1);
+
+      const nextHeadingIndex = afterHeading.findIndex((child) =>
+        checkHeading(child),
+      );
+
+      const end = nextHeadingIndex === -1 ? undefined : nextHeadingIndex;
+      const underHeading = afterHeading.slice(0, end);
+
+      const list = underHeading.find((child) => checkList(child));
+
+      if (list) {
+        list.children.push({
+          type: "listItem",
+          children: [
+            {
+              type: "paragraph",
+              children: [{ type: "text", value: listItem }],
+            },
+          ],
+        });
+      } else {
+        draft.children.splice(headingIndex + 1, 0, {
+          type: "list",
+          children: [
+            {
+              type: "listItem",
+              children: [
+                {
+                  type: "paragraph",
+                  children: [{ type: "text", value: listItem }],
+                },
+              ],
+            },
+          ],
+        });
+      }
+    } else {
+      draft.children.push(
+        {
+          type: "heading",
+          depth: 1,
+          children: [
+            {
+              type: "text",
+              value: heading,
+            },
+          ],
+        },
+        {
+          type: "list",
+          children: [
+            {
+              type: "listItem",
+              children: [
+                {
+                  type: "paragraph",
+                  children: [{ type: "text", value: listItem }],
+                },
+              ],
+            },
+          ],
+        },
+      );
+    }
+  });
 }
 
 function compareAlphabetically(a: Node, b: Node) {
@@ -122,6 +204,7 @@ export function isList(node: Node): asserts node is List {
 }
 
 export const checkList = check(isList);
+export const checkHeading = check(isHeading);
 
 export function positionContainsPoint(
   { start, end }: NonNullable<Node["position"]>,

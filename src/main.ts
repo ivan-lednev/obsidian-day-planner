@@ -181,6 +181,7 @@ export default class DayPlanner extends Plugin {
         const mdastRoot = fromMarkdown(editor.getValue());
         const cursorPoint = toMdastPoint(editor.getCursor());
 
+        // todo: move out
         const list = mdastRoot.children.find(
           (rootContent) =>
             rootContent.position &&

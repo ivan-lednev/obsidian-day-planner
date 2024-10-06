@@ -175,6 +175,51 @@ export function getDiff(base: DayToTasks, next: DayToTasks) {
   );
 }
 
+export function taskDiffToUpdates(diff: Diff) {
+  return [
+    // ...diff.created.map((task) => {
+    //   return {
+    //     type: "created",
+    //     path: task.location.path,
+    //     contents: task.text,
+    //     target: task.location.position?.start?.line,
+    //   };
+    // }),
+    ...diff.deleted
+      .map((task) => {
+        if (!task.location) {
+          return undefined;
+        }
+
+        const { path, position } = task.location;
+
+        return {
+          type: "deleted",
+          path,
+          range: position,
+        };
+      })
+      .filter(Boolean),
+    ...diff.updated
+      .map((task) => {
+        // todo: remove copypasta
+        if (!task.location) {
+          return undefined;
+        }
+
+        const { path, position } = task.location;
+
+        return {
+          type: "updated",
+          path,
+          range: position,
+          contents: task.text,
+        };
+      })
+      .filter(Boolean),
+  ];
+}
+
 export const mergeTasks = mergeWith((value, sourceValue) => {
   return Array.isArray(value) ? value.concat(sourceValue) : undefined;
 });
