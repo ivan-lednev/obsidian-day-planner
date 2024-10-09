@@ -21,11 +21,16 @@ import {
   toMdastPoint,
 } from "./mdast/mdast";
 import { DataviewFacade } from "./service/dataview-facade";
-import { DiffWriter } from "./service/diff-writer";
+import {
+  createTransaction,
+  DiffWriter,
+  TransactionWriter,
+} from "./service/diff-writer";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
+import type { DayToTasks } from "./task-types";
 import type { ObsidianContext } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { ConfirmationModal } from "./ui/confirmation-modal";
@@ -39,6 +44,10 @@ import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { getUpdateTrigger } from "./util/store";
+import {
+  getTaskDiffFromEditState,
+  mapTaskDiffToUpdates,
+} from "./util/tasks-utils";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -48,11 +57,13 @@ export default class DayPlanner extends Plugin {
   private dataviewFacade!: DataviewFacade;
   private sTaskEditor!: STaskEditor;
   private vaultFacade!: VaultFacade;
+  private transationWriter!: TransactionWriter;
 
   async onload() {
     await this.initSettingsStore();
 
     this.vaultFacade = new VaultFacade(this.app.vault, this.getTasksApi);
+    this.transationWriter = new TransactionWriter(this.vaultFacade);
     this.obsidianFacade = new ObsidianFacade(this.app, this.vaultFacade);
     this.dataviewFacade = new DataviewFacade(this.app);
     this.planEditor = new DiffWriter(
@@ -237,7 +248,59 @@ export default class DayPlanner extends Plugin {
     });
   };
 
+  private askForConfirmation = async (props: {
+    title: string;
+    text: string;
+    cta: string;
+  }) => {
+    return new Promise((resolve) => {
+      new ConfirmationModal(this.app, {
+        ...props,
+        onAccept: async () => resolve(true),
+        onCancel: () => resolve(false),
+      }).open();
+    });
+  };
+
+  private getPathsToCreate(paths: string[]) {
+    return paths.reduce<string[]>(
+      (result, path) =>
+        this.vaultFacade.checkFileExists(path) ? result : result.concat(path),
+      [],
+    );
+  }
+
   private registerViews() {
+    // todo: move out
+    // todo: re-add sorting
+    const onUpdate = async (base: DayToTasks, next: DayToTasks) => {
+      const diff = getTaskDiffFromEditState(base, next);
+      const updates = mapTaskDiffToUpdates(diff, this.settings());
+      const transaction = createTransaction(updates);
+      const updatePaths = [
+        ...new Set([...transaction.map(({ path }) => path)]),
+      ];
+      const needToCreate = this.getPathsToCreate(updatePaths);
+
+      if (needToCreate.length > 0) {
+        const confirmed = await this.askForConfirmation({
+          title: "Need to create files",
+          text: `The following files need to be created: ${needToCreate.join("; ")}`,
+          cta: "Create",
+        });
+
+        if (!confirmed) {
+          new Notice("Edit canceled");
+
+          return;
+        }
+
+        // todo: create files
+      }
+
+      await this.transationWriter.writeTransaction(transaction);
+    };
+
     const {
       editContext,
       tasksForToday,
@@ -254,7 +317,7 @@ export default class DayPlanner extends Plugin {
       dataviewFacade: this.dataviewFacade,
       obsidianFacade: this.obsidianFacade,
       settingsStore: this.settingsStore,
-      planEditor: this.planEditor,
+      onUpdate,
     });
 
     this.registerDomEvent(window, "blur", editContext.cancelEdit);
@@ -267,8 +330,6 @@ export default class DayPlanner extends Plugin {
 
     const errorStore = writable<Error | undefined>();
 
-    // todo: move out
-    // todo: pass context with day
     mount(StatusBarWidget, {
       target: this.addStatusBarItem(),
       props: {
@@ -291,7 +352,6 @@ export default class DayPlanner extends Plugin {
       },
     });
 
-    // todo: make it dependent on config
     const defaultObsidianContext: ObsidianContext = {
       obsidianFacade: this.obsidianFacade,
       initWeeklyView: this.initWeeklyLeaf,
@@ -307,9 +367,6 @@ export default class DayPlanner extends Plugin {
       reSync: () => icalSyncTrigger.set(getUpdateTrigger()),
       isOnline,
       isDarkMode,
-      showConfirmationModal: (props) => {
-        new ConfirmationModal(this.app, props).open();
-      },
     };
 
     const componentContext = new Map<

@@ -1,8 +1,23 @@
 import { mergeWith } from "lodash/fp";
+import type { Root } from "mdast";
 import type { Moment } from "moment/moment";
-import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
+import { normalizePath } from "obsidian";
+import {
+  DEFAULT_DAILY_NOTE_FORMAT,
+  getDailyNoteSettings,
+} from "obsidian-daily-notes-interface";
+import { isNotVoid } from "typed-assert";
 
+import {
+  checkListItem,
+  findFirst,
+  fromMarkdown,
+  insertListItemUnderHeading,
+  isListItem,
+} from "../mdast/mdast";
 import { scheduledPropRegExps } from "../regexp";
+import type { Update } from "../service/diff-writer";
+import type { DayPlannerSettings } from "../settings";
 import {
   type DayToTasks,
   type LocalTask,
@@ -13,7 +28,7 @@ import {
 } from "../task-types";
 
 import { getMinutesSinceMidnight, minutesToMomentOfDay } from "./moment";
-import { updateTaskText } from "./task-utils";
+import { getFirstLine, taskToString, updateTaskText } from "./task-utils";
 
 export function getEmptyRecordsForDay(): TasksForDay {
   return { withTime: [], noTime: [] };
@@ -115,9 +130,7 @@ function getFlatTimeBlocks(dayToTasks: DayToTasks) {
   ]);
 }
 
-// todo:
-//  cover all kinds of props on all lines in parent block
-function hasDateFromProp(task: LocalTask) {
+export function hasDateFromProp(task: LocalTask) {
   return scheduledPropRegExps.some((regexp) => regexp.test(task.text));
 }
 
@@ -130,12 +143,12 @@ function isOnSameTime(a: WithTime<Task>, b: WithTime<Task>) {
 }
 
 export type Diff = {
-  deleted: Array<LocalTask>;
-  updated: Array<LocalTask>;
-  created: Array<LocalTask>;
+  deleted?: Array<LocalTask>;
+  updated?: Array<LocalTask>;
+  created?: Array<LocalTask>;
 };
 
-export function getDiff(base: DayToTasks, next: DayToTasks) {
+export function getTaskDiffFromEditState(base: DayToTasks, next: DayToTasks) {
   const editableBase = getEditableTasks(base);
   const editableNext = getEditableTasks(next);
 
@@ -145,7 +158,7 @@ export function getDiff(base: DayToTasks, next: DayToTasks) {
     updateTaskText,
   );
 
-  return flatNext.reduce<Diff>(
+  return flatNext.reduce<Required<Diff>>(
     (result, task) => {
       const thisTaskInBase = flatBase.find(
         (baseTask) => baseTask.id === task.id,
@@ -175,49 +188,75 @@ export function getDiff(base: DayToTasks, next: DayToTasks) {
   );
 }
 
-export function taskDiffToUpdates(diff: Diff) {
-  return [
-    // ...diff.created.map((task) => {
-    //   return {
-    //     type: "created",
-    //     path: task.location.path,
-    //     contents: task.text,
-    //     target: task.location.position?.start?.line,
-    //   };
-    // }),
-    ...diff.deleted
-      .map((task) => {
-        if (!task.location) {
-          return undefined;
+function createDailyNotePath(date: Moment) {
+  const { format, folder } = getDailyNoteSettings();
+  let filename = date.format(format);
+
+  if (!filename.endsWith(".md")) {
+    filename += ".md";
+  }
+
+  return normalizePath(`${folder}/${filename}`);
+}
+
+export function mapTaskDiffToUpdates(
+  diff: Diff,
+  settings: DayPlannerSettings,
+): Update[] {
+  return Object.entries(diff)
+    .flatMap(([type, tasks]) => tasks.map((task) => ({ type, task })))
+    .reduce<Update[]>((result, { type, task }) => {
+      if (type === "created") {
+        if (task.location) {
+          return result.concat({
+            type: "created",
+            contents: task.text,
+            path: task.location.path,
+            target: task.location.position?.start?.line,
+          });
         }
 
-        const { path, position } = task.location;
+        // todo: do not spread this logic all over functions
+        return result.concat({
+          type: "mdast",
+          path: createDailyNotePath(task.startTime),
+          updateFn: (root: Root) => {
+            const taskRoot = fromMarkdown(task.text);
+            const listItem = findFirst(taskRoot, checkListItem);
 
-        return {
+            isNotVoid(listItem);
+            isListItem(listItem);
+
+            return insertListItemUnderHeading(
+              root,
+              settings.plannerHeading,
+              listItem,
+            );
+          },
+        });
+      }
+
+      if (!task.location) {
+        throw new Error(`Can't update a task without location: ${task.text}`);
+      }
+
+      const { path, position } = task.location;
+
+      if (type === "deleted") {
+        return result.concat({
           type: "deleted",
           path,
           range: position,
-        };
-      })
-      .filter(Boolean),
-    ...diff.updated
-      .map((task) => {
-        // todo: remove copypasta
-        if (!task.location) {
-          return undefined;
-        }
+        });
+      }
 
-        const { path, position } = task.location;
-
-        return {
-          type: "updated",
-          path,
-          range: position,
-          contents: task.text,
-        };
-      })
-      .filter(Boolean),
-  ];
+      return result.concat({
+        type: "updated",
+        path,
+        range: { start: position.start, end: position.start },
+        contents: getFirstLine(taskToString(task)),
+      });
+    }, []);
 }
 
 export const mergeTasks = mergeWith((value, sourceValue) => {

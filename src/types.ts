@@ -3,17 +3,11 @@ import type { Readable, Writable } from "svelte/store";
 
 import type { ObsidianFacade } from "./service/obsidian-facade";
 import type { IcalConfig } from "./settings";
-import type { DayToTasks, LocalTask, WithTime } from "./task-types";
-import type { ConfirmationModalProps } from "./ui/confirmation-modal";
+import type { DayToTasks } from "./task-types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { createShowPreview } from "./util/create-show-preview";
-import { updateText } from "./util/tasks-utils";
 
-export type OnUpdateFn = (
-  taskUpdate: ReturnType<typeof updateText> & {
-    moved: { dayKey: string; task: WithTime<LocalTask> }[];
-  },
-) => Promise<void | void[]>;
+export type OnUpdateFn = (base: DayToTasks, next: DayToTasks) => Promise<void>;
 
 export type RelationToNow = "past" | "present" | "future";
 
@@ -41,7 +35,6 @@ export interface ObsidianContext {
   reSync: () => void;
   isOnline: Readable<boolean>;
   isDarkMode: Readable<boolean>;
-  showConfirmationModal: (props: ConfirmationModalProps) => void;
 }
 
 export type ComponentContext = Map<string, unknown>;

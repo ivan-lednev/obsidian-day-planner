@@ -47,4 +47,8 @@ export class VaultFacade {
 
     return file;
   }
+
+  checkFileExists(path: string) {
+    return this.vault.getAbstractFileByPath(path) !== null;
+  }
 }

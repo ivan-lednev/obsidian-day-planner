@@ -31,9 +31,11 @@ export type WriterDiff = {
 interface Range {
   start: {
     line: number;
+    col: number;
   };
   end: {
     line: number;
+    col: number;
   };
 }
 
@@ -54,7 +56,7 @@ interface Updated extends RangeOperation {
   contents: string;
 }
 
-interface Created extends UpdateBase {
+export interface Created extends UpdateBase {
   type: "created";
   contents: string;
   target?: number;
@@ -93,6 +95,7 @@ function applyRangeUpdate(lines: string[], rangeUpdate: RangeUpdate) {
   const result = lines.slice();
 
   if (rangeUpdate.type === "created") {
+    // todo: remove this
     if (typeof rangeUpdate.target === "number") {
       result.splice(rangeUpdate.target, 0, rangeUpdate.contents);
     }
@@ -101,11 +104,15 @@ function applyRangeUpdate(lines: string[], rangeUpdate: RangeUpdate) {
   }
 
   const startLine = rangeUpdate.range.start.line;
+  const startCol = rangeUpdate.range.start.col;
   const endLine = rangeUpdate.range.end.line;
-  const count = endLine - startLine;
+  const count = endLine - startLine + 1;
 
   if (rangeUpdate.type === "updated") {
-    result.splice(startLine, count, rangeUpdate.contents);
+    const indentation = result[startLine].substring(0, startCol);
+    const updatedLine = indentation + rangeUpdate.contents;
+
+    result.splice(startLine, 1, updatedLine);
   } else if (rangeUpdate.type === "deleted") {
     result.splice(startLine, count);
   }
@@ -158,13 +165,13 @@ export class TransactionWriter {
   writeTransaction = async (transaction: Transaction) => {
     const previousState: Record<string, string> = {};
 
-    const editPromises = transaction.map(({ path, updateFn }) => {
+    const editPromises = transaction.map(({ path, updateFn }) =>
       this.vaultFacade.editFile(path, (contents) => {
         previousState[path] = contents;
 
         return updateFn(contents);
-      });
-    });
+      }),
+    );
 
     this.history.push(previousState);
 
@@ -177,6 +184,12 @@ export class TransactionWriter {
     if (!lastUpdate) {
       throw new Error("No updates to revert");
     }
+
+    const editPromises = Object.entries(lastUpdate).map(([path, contents]) =>
+      this.vaultFacade.editFile(path, () => contents),
+    );
+
+    return Promise.all(editPromises);
   };
 }
 

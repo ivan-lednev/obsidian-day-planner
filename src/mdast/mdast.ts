@@ -1,6 +1,6 @@
 import { produce } from "immer";
 import { takeWhile } from "lodash/fp";
-import type { Node, Parent, Text as MdastText } from "mdast";
+import type { Node, Parent, Text as MdastText, ListItem } from "mdast";
 import type { Heading, List, Root, Nodes } from "mdast";
 import * as mdast from "mdast-util-to-markdown";
 import type { EditorPosition } from "obsidian";
@@ -76,11 +76,49 @@ export function sortListsRecursively<T extends Node>(
   };
 }
 
-// todo: add merge()
+export function findFirst(
+  node: Node,
+  predicate: (node: Node) => boolean,
+): Node | undefined {
+  if (predicate(node)) {
+    return node;
+  }
+
+  if (isParentNode(node)) {
+    for (const child of node.children) {
+      const found = findFirst(child, predicate);
+
+      if (found) {
+        return found;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+export function updateFirst(node: Node, updateFn: (node: Node) => boolean) {
+  return produce(node, (draft) => {
+    if (updateFn(draft)) {
+      return;
+    }
+
+    if (isParentNode(draft)) {
+      for (const child of draft.children) {
+        const found = updateFirst(child, updateFn);
+
+        if (found) {
+          return;
+        }
+      }
+    }
+  });
+}
+
 export function insertListItemUnderHeading(
   root: Root,
   heading: string,
-  listItem: string,
+  listItem: ListItem,
 ) {
   return produce(root, (draft) => {
     const headingIndex = draft.children.findIndex(
@@ -101,29 +139,11 @@ export function insertListItemUnderHeading(
       const list = underHeading.find((child) => checkList(child));
 
       if (list) {
-        list.children.push({
-          type: "listItem",
-          children: [
-            {
-              type: "paragraph",
-              children: [{ type: "text", value: listItem }],
-            },
-          ],
-        });
+        list.children.push(listItem);
       } else {
         draft.children.splice(headingIndex + 1, 0, {
           type: "list",
-          children: [
-            {
-              type: "listItem",
-              children: [
-                {
-                  type: "paragraph",
-                  children: [{ type: "text", value: listItem }],
-                },
-              ],
-            },
-          ],
+          children: [listItem],
         });
       }
     } else {
@@ -140,17 +160,7 @@ export function insertListItemUnderHeading(
         },
         {
           type: "list",
-          children: [
-            {
-              type: "listItem",
-              children: [
-                {
-                  type: "paragraph",
-                  children: [{ type: "text", value: listItem }],
-                },
-              ],
-            },
-          ],
+          children: [listItem],
         },
       );
     }
@@ -203,8 +213,13 @@ export function isList(node: Node): asserts node is List {
   return isExactly(node.type, "list");
 }
 
+export function isListItem(node: Node): asserts node is ListItem {
+  return isExactly(node.type, "listItem");
+}
+
 export const checkList = check(isList);
 export const checkHeading = check(isHeading);
+export const checkListItem = check(isListItem);
 
 export function positionContainsPoint(
   { start, end }: NonNullable<Node["position"]>,

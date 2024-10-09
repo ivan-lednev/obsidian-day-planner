@@ -1,6 +1,8 @@
-import { flow, isEmpty } from "lodash/fp";
+import { produce } from "immer";
+import { flow } from "lodash/fp";
 import type { Moment } from "moment";
 import { get } from "svelte/store";
+import { isNotVoid } from "typed-assert";
 
 import { settings } from "../global-store/settings";
 import { replaceOrPrependTimestamp } from "../parser/parser";
@@ -27,15 +29,7 @@ import {
   minutesToMoment,
   minutesToMomentOfDay,
 } from "./moment";
-import { getDayKey } from "./tasks-utils";
-
-export function isEqualTask(a: WithTime<LocalTask>, b: WithTime<LocalTask>) {
-  return (
-    a.id === b.id &&
-    a.startTime.isSame(b.startTime) &&
-    a.durationMinutes === b.durationMinutes
-  );
-}
+import { getDayKey, hasDateFromProp } from "./tasks-utils";
 
 export function getEndMinutes(task: {
   startTime: Moment;
@@ -87,12 +81,33 @@ export function getNotificationKey(task: WithTime<Task>) {
   }::${task.text}`;
 }
 
-export function copy(task: WithTime<LocalTask>): WithTime<LocalTask> {
+/**
+ * Tasks with date prop are copied under the original task, tasks from daily
+ * notes get sent under a heading based on the new date.
+ *
+ * @param original
+ */
+export function copy(original: WithTime<LocalTask>): WithTime<LocalTask> {
+  let location: TaskLocation | undefined;
+
+  if (hasDateFromProp(original)) {
+    const originalLocation = original.location;
+
+    isNotVoid(
+      originalLocation,
+      `Did not find location on task$ ${getOneLineSummary(original)}`,
+    );
+
+    location = produce(originalLocation, (draft) => {
+      draft.position.start.line = draft.position.end.line + 1;
+    });
+  }
+
   return {
-    ...task,
+    ...original,
     id: getId(),
     isGhost: true,
-    location: task.location && { ...task.location },
+    location,
   };
 }
 
@@ -107,11 +122,7 @@ export function createTimestamp(
   return `${start.format(format)} - ${end.format(format)}`;
 }
 
-export function areValuesEmpty(record: Record<string, [] | object>) {
-  return Object.values(record).every(isEmpty);
-}
-
-function taskToString(task: WithTime<LocalTask>) {
+export function taskToString(task: WithTime<LocalTask>) {
   const firstLine = removeListTokens(getFirstLine(task.text));
 
   const updatedTimestamp = createTimestamp(

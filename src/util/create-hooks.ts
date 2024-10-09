@@ -10,10 +10,14 @@ import {
 import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
 import { currentTime } from "../global-store/current-time";
 import { DataviewFacade } from "../service/dataview-facade";
-import { DiffWriter } from "../service/diff-writer";
 import { ObsidianFacade } from "../service/obsidian-facade";
 import type { DayPlannerSettings } from "../settings";
-import type { LocalTask, RemoteTask, WithTime } from "../task-types";
+import type {
+  DayToTasks,
+  LocalTask,
+  RemoteTask,
+  WithTime,
+} from "../task-types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
@@ -39,7 +43,7 @@ interface CreateHooksProps {
   dataviewFacade: DataviewFacade;
   obsidianFacade: ObsidianFacade;
   settingsStore: Writable<DayPlannerSettings>;
-  planEditor: DiffWriter;
+  onUpdate: (base: DayToTasks, next: DayToTasks) => Promise<void>;
 }
 
 function getDarkModeFlag() {
@@ -51,7 +55,7 @@ export function createHooks({
   dataviewFacade,
   obsidianFacade,
   settingsStore,
-  planEditor,
+  onUpdate,
 }: CreateHooksProps) {
   const dataviewSource = derived(settingsStore, ($settings) => {
     return $settings.dataviewSource;
@@ -161,7 +165,7 @@ export function createHooks({
 
   const editContext = useEditContext({
     obsidianFacade,
-    onUpdate: planEditor.syncTasksWithFile,
+    onUpdate,
     settings: settingsStore,
     visibleTasks,
   });

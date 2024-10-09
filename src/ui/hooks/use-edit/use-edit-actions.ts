@@ -2,7 +2,6 @@ import { get, type Readable, type Writable } from "svelte/store";
 
 import type { DayToTasks } from "../../../task-types";
 import type { OnUpdateFn } from "../../../types";
-import { getDiff } from "../../../util/tasks-utils";
 
 import type { EditOperation } from "./types";
 
@@ -38,8 +37,7 @@ export function useEditActions({
     baselineTasks.set(currentTasks);
     editOperation.set(undefined);
 
-    // todo: move out
-    await onUpdate(getDiff(oldBase, currentTasks));
+    await onUpdate(oldBase, currentTasks);
   }
 
   return {
