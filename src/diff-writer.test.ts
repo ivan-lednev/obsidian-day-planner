@@ -224,9 +224,45 @@ describe("From diff to vault", () => {
 `);
   });
 
-  test("Moves updated tasks between daily notes", () => {});
+  test("Creates multiline tasks", async () => {
+    const files = [
+      createInMemoryFile({
+        path: "file-1",
+        contents: "",
+      }),
+    ];
 
-  test.todo("Creates multiline tasks and a heading if it's needed");
+    const diff = {
+      created: [
+        createTestTask({
+          text: `- Task
+  Text
+    - Subtask
+      Text`,
+          location: {
+            path: "file-1",
+            position: {
+              start: {
+                line: 0,
+                col: 0,
+              },
+              end: {
+                line: 0,
+              },
+            },
+          },
+        }),
+      ],
+    };
+
+    const { vault } = await writeDiff({ diff, files });
+
+    expect(vault.getAbstractFileByPath("file-1").contents).toBe(`- Task
+  Text
+    - Subtask
+      Text
+`);
+  });
 
   test.todo("Sorts tasks in plan after edit");
 });
