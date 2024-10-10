@@ -16,15 +16,13 @@ import {
   fromMarkdown,
   positionContainsPoint,
   sortListsRecursively,
+  sortListsRecursivelyUnderHeading,
   toEditorPos,
   toMarkdown,
   toMdastPoint,
 } from "./mdast/mdast";
 import { DataviewFacade } from "./service/dataview-facade";
-import {
-  createTransaction,
-  TransactionWriter,
-} from "./service/diff-writer";
+import { createTransaction, TransactionWriter } from "./service/diff-writer";
 import { ObsidianFacade } from "./service/obsidian-facade";
 import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
@@ -258,11 +256,18 @@ export default class DayPlanner extends Plugin {
 
   private registerViews() {
     // todo: move out
-    // todo: re-add sorting
     const onUpdate = async (base: DayToTasks, next: DayToTasks) => {
       const diff = getTaskDiffFromEditState(base, next);
       const updates = mapTaskDiffToUpdates(diff, this.settings());
-      const transaction = createTransaction(updates);
+      const afterEach = this.settings().sortTasksInPlanAfterEdit
+        ? (contents: string) =>
+            sortListsRecursivelyUnderHeading(
+              contents,
+              this.settings().plannerHeading,
+            )
+        : undefined;
+
+      const transaction = createTransaction({ updates, afterEach });
       const updatePaths = [
         ...new Set([...transaction.map(({ path }) => path)]),
       ];

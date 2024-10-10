@@ -1,6 +1,7 @@
 import moment, { type Moment } from "moment";
 import { getDailyNoteSettings } from "obsidian-daily-notes-interface";
 
+import { sortListsRecursivelyUnderHeading } from "./mdast/mdast";
 import { createTransaction, TransactionWriter } from "./service/diff-writer";
 import { VaultFacade } from "./service/vault-facade";
 import { defaultSettingsForTests } from "./settings";
@@ -10,12 +11,16 @@ import {
   type InMemoryFile,
   InMemoryVault,
 } from "./test-utils";
+import { toMinutes } from "./util/moment";
 import { createTask } from "./util/task-utils";
 import { type Diff, mapTaskDiffToUpdates } from "./util/tasks-utils";
 
 jest.mock("obsidian-daily-notes-interface", () => ({
   getDateFromPath: jest.fn(() => null),
-  getDailyNoteSettings: jest.fn(),
+  getDailyNoteSettings: jest.fn(() => ({
+    format: "YYYY-MM-DD",
+    folder: ".",
+  })),
 }));
 
 async function writeDiff(props: { diff: Diff; files: Array<InMemoryFile> }) {
@@ -27,7 +32,14 @@ async function writeDiff(props: { diff: Diff; files: Array<InMemoryFile> }) {
   const vault = new InMemoryVault(files);
   const vaultFacade = new VaultFacade(vault, getTasksApi);
   const updates = mapTaskDiffToUpdates(diff, defaultSettingsForTests);
-  const transaction = createTransaction(updates);
+  const transaction = createTransaction({
+    updates,
+    afterEach: (contents: string) =>
+      sortListsRecursivelyUnderHeading(
+        contents,
+        defaultSettingsForTests.plannerHeading,
+      ),
+  });
   const writer = new TransactionWriter(vaultFacade);
 
   await writer.writeTransaction(transaction);
@@ -39,13 +51,14 @@ function createTestTask(
   props: Pick<WithTime<LocalTask>, "location"> & {
     text?: string;
     day?: Moment;
+    startMinutes?: number;
   },
 ) {
-  const { location, text = "", day = moment() } = props;
+  const { location, startMinutes = 0, text = "", day = moment() } = props;
   return createTask({
     settings: { ...defaultSettingsForTests, eventFormatOnCreation: "bullet" },
     day,
-    startMinutes: 0,
+    startMinutes,
     text,
     location,
   });
@@ -168,7 +181,9 @@ describe("From diff to vault", () => {
 `);
   });
 
+  // todo: rewrite this
   test("Moves tasks in daily notes between files", async () => {
+    // todo: need to reset mocks to remove this
     jest.mocked(getDailyNoteSettings).mockReturnValue({
       format: "YYYY-MM-DD",
       folder: ".",
@@ -264,5 +279,41 @@ describe("From diff to vault", () => {
 `);
   });
 
-  test.todo("Sorts tasks in plan after edit");
+  test("Sorts tasks in plan after edit", async () => {
+    jest.mocked(getDailyNoteSettings).mockReturnValue({
+      format: "YYYY-MM-DD",
+      folder: ".",
+    });
+
+    const files = [
+      createInMemoryFile({
+        path: "2023-01-01.md",
+        contents: `# Day planner
+
+- 10:00 - 11:00 Task 1
+- 12:00 - 13:00 Task 3
+`,
+      }),
+    ];
+
+    const diff = {
+      created: [
+        createTestTask({
+          text: "- 11:00 - 12:00 Task 2",
+          day: moment("2023-01-01"),
+          startMinutes: toMinutes("11:00"),
+        }),
+      ],
+    };
+
+    const { vault } = await writeDiff({ diff, files });
+
+    expect(vault.getAbstractFileByPath("2023-01-01.md").contents)
+      .toBe(`# Day planner
+
+- 10:00 - 11:00 Task 1
+- 11:00 - 12:00 Task 2
+- 12:00 - 13:00 Task 3
+`);
+  });
 });

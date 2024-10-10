@@ -1,25 +1,9 @@
 import { groupBy } from "lodash/fp";
 import type { Root } from "mdast";
-import type { Moment } from "moment";
-import type { CachedMetadata } from "obsidian";
-import { getAllDailyNotes, getDailyNote } from "obsidian-daily-notes-interface";
-import { isNotVoid } from "typed-assert";
 
-import {
-  compareByTimestampInText,
-  findHeadingWithChildren,
-  fromMarkdown,
-  sortListsRecursively,
-  toMarkdown,
-} from "../mdast/mdast";
-import { getHeadingByText, getListItemsUnderHeading } from "../parser/parser";
-import type { DayPlannerSettings } from "../settings";
+import { fromMarkdown, toMarkdown } from "../mdast/mdast";
 import type { LocalTask, WithTime } from "../task-types";
-import { createDailyNoteIfNeeded } from "../util/daily-notes";
-import { getFirstLine, updateTaskText } from "../util/task-utils";
-import type { Diff } from "../util/tasks-utils";
 
-import type { ObsidianFacade } from "./obsidian-facade";
 import type { VaultFacade } from "./vault-facade";
 
 export type WriterDiff = {
@@ -71,7 +55,7 @@ export type RangeUpdate = Deleted | Updated | Created;
 export type Update = RangeUpdate | MdastUpdate;
 export type Transaction = ReturnType<typeof createTransaction>;
 
-function sortUpdates(a: RangeUpdate, b: RangeUpdate) {
+function sortRangeUpdates(a: RangeUpdate, b: RangeUpdate) {
   const isACreated = a.type === "created";
   const isBCreated = b.type === "created";
 
@@ -120,7 +104,11 @@ function applyRangeUpdate(lines: string[], rangeUpdate: RangeUpdate) {
   return result;
 }
 
-export function createTransaction(updates: Update[]) {
+export function createTransaction(props: {
+  updates: Update[];
+  afterEach?: (contents: string) => string;
+}) {
+  const { updates, afterEach } = props;
   const pathToUpdates = groupBy((entry) => entry.path, updates);
 
   return Object.entries(pathToUpdates).map(([path, updates]) => ({
@@ -136,7 +124,7 @@ export function createTransaction(updates: Update[]) {
       );
 
       const withRangeUpdatesApplied = rangeUpdates
-        .toSorted(sortUpdates)
+        .toSorted(sortRangeUpdates)
         .toReversed()
         .reduce(applyRangeUpdate, lines)
         .join("\n");
@@ -152,7 +140,9 @@ export function createTransaction(updates: Update[]) {
         mdastRoot,
       );
 
-      return toMarkdown(withMdastUpdatesApplied);
+      const asMarkdown = toMarkdown(withMdastUpdatesApplied);
+
+      return afterEach ? afterEach(asMarkdown) : asMarkdown;
     },
   }));
 }

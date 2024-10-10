@@ -2,6 +2,7 @@ import { produce } from "immer";
 import { takeWhile } from "lodash/fp";
 import type { Node, Parent, Text as MdastText, ListItem } from "mdast";
 import type { Heading, List, Root, Nodes } from "mdast";
+import { fromMarkdown } from "mdast-util-from-markdown";
 import * as mdast from "mdast-util-to-markdown";
 import type { EditorPosition } from "obsidian";
 import { check, isExactly, isNotVoid } from "typed-assert";
@@ -15,7 +16,7 @@ import {
   mdastUtilListIndentationSpaces,
 } from "../regexp";
 
-export { fromMarkdown } from "mdast-util-from-markdown";
+export { fromMarkdown };
 
 export function toMarkdown(nodes: Nodes) {
   return listIndentationSpacesToTabs(
@@ -23,6 +24,37 @@ export function toMarkdown(nodes: Nodes) {
       .toMarkdown(nodes, { bullet: "-", listItemIndent: "tab" })
       .replace(dashOrNumberWithMultipleSpaces, "- ")
       .replace(escapedSquareBracket, "["),
+  );
+}
+
+export function sortListsRecursivelyUnderHeading(
+  contents: string,
+  heading: string,
+) {
+  const mdastRoot = fromMarkdown(contents);
+  const headingWithChildren = findHeadingWithChildren(mdastRoot, heading);
+
+  if (!headingWithChildren) {
+    return contents;
+  }
+
+  const firstNode = headingWithChildren.children.at(0);
+  const lastNode = headingWithChildren.children.at(-1);
+
+  isNotVoid(firstNode?.position?.start?.offset);
+  isNotVoid(lastNode?.position?.end?.offset);
+
+  const sorted = {
+    ...headingWithChildren,
+    children: headingWithChildren.children.map((child) =>
+      sortListsRecursively(child, compareByTimestampInText),
+    ),
+  };
+
+  return (
+    contents.substring(0, firstNode.position.start.offset) +
+    toMarkdown(sorted) +
+    contents.substring(lastNode.position.end.offset + 1)
   );
 }
 
