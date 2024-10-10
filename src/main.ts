@@ -1,4 +1,8 @@
 import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
+import {
+  createDailyNote,
+  getDateFromPath,
+} from "obsidian-daily-notes-interface";
 import { mount } from "svelte";
 import { get, writable, type Writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
@@ -286,7 +290,15 @@ export default class DayPlanner extends Plugin {
           return;
         }
 
-        // todo: create files
+        await Promise.all(
+          needToCreate.map(async (path) => {
+            const date = getDateFromPath(path, "day");
+
+            isNotVoid(date);
+
+            await createDailyNote(date);
+          }),
+        );
       }
 
       await this.transationWriter.writeTransaction(transaction);
