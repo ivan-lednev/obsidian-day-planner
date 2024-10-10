@@ -21,11 +21,10 @@ import type { Update } from "../service/diff-writer";
 import type { DayPlannerSettings } from "../settings";
 import {
   type DayToTasks,
+  isRemote,
   type LocalTask,
-  type Task,
   type TasksForDay,
   type WithTime,
-  isRemote,
 } from "../task-types";
 
 import { join } from "./daily-notes";
@@ -136,10 +135,6 @@ export function hasDateFromProp(task: LocalTask) {
   return scheduledPropRegExps.some((regexp) => regexp.test(task.text));
 }
 
-function isOnSameTime(a: WithTime<Task>, b: WithTime<Task>) {
-  return a.startTime.isSame(b.startTime);
-}
-
 export type Diff = {
   deleted?: Array<LocalTask>;
   updated?: Array<LocalTask>;
@@ -166,7 +161,7 @@ export function getTaskDiffFromEditState(base: DayToTasks, next: DayToTasks) {
         result.created.push(task);
       }
 
-      if (thisTaskInBase && !isOnSameTime(thisTaskInBase, task)) {
+      if (thisTaskInBase && !thisTaskInBase.startTime.isSame(task.startTime)) {
         result.updated.push(task);
       }
 

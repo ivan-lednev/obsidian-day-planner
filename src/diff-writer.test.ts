@@ -14,12 +14,7 @@ import { createTask } from "./util/task-utils";
 import { type Diff, mapTaskDiffToUpdates } from "./util/tasks-utils";
 
 jest.mock("obsidian-daily-notes-interface", () => ({
-  // todo: remove, we don't need the original
-  ...jest.requireActual("obsidian-daily-notes-interface"),
-  // todo: configure per test
-  getDateFromPath(): null {
-    return null;
-  },
+  getDateFromPath: jest.fn(() => null),
   getDailyNoteSettings: jest.fn(),
 }));
 
