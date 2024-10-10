@@ -23,7 +23,6 @@ import {
 import { DataviewFacade } from "./service/dataview-facade";
 import {
   createTransaction,
-  DiffWriter,
   TransactionWriter,
 } from "./service/diff-writer";
 import { ObsidianFacade } from "./service/obsidian-facade";
@@ -53,7 +52,6 @@ export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
   private settingsStore!: Writable<DayPlannerSettings>;
   private obsidianFacade!: ObsidianFacade;
-  private planEditor!: DiffWriter;
   private dataviewFacade!: DataviewFacade;
   private sTaskEditor!: STaskEditor;
   private vaultFacade!: VaultFacade;
@@ -66,11 +64,6 @@ export default class DayPlanner extends Plugin {
     this.transationWriter = new TransactionWriter(this.vaultFacade);
     this.obsidianFacade = new ObsidianFacade(this.app, this.vaultFacade);
     this.dataviewFacade = new DataviewFacade(this.app);
-    this.planEditor = new DiffWriter(
-      this.settings,
-      this.obsidianFacade,
-      this.vaultFacade,
-    );
     this.sTaskEditor = new STaskEditor(
       this.obsidianFacade,
       this.dataviewFacade,
@@ -176,13 +169,6 @@ export default class DayPlanner extends Plugin {
 
         await this.app.workspace.getLeaf(false).openFile(dailyNote);
       },
-    });
-
-    this.addCommand({
-      id: "insert-planner-heading-at-cursor",
-      name: "Insert Planner Heading at Cursor",
-      editorCallback: (editor) =>
-        editor.replaceSelection(this.planEditor.createPlannerHeading()),
     });
 
     this.addCommand({
