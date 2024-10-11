@@ -12,7 +12,6 @@ import {
   listTokenWithSpacesRegExp,
   looseTimestampAtStartOfLineRegExp,
   scheduledPropRegExp,
-  scheduledPropRegExps,
   shortScheduledPropRegExp,
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";

@@ -1,17 +1,31 @@
 import type { Moment } from "moment";
-import type { TFile } from "obsidian";
+import { normalizePath, type TFile } from "obsidian";
 import {
   createDailyNote,
+  DEFAULT_DAILY_NOTE_FORMAT,
   getAllDailyNotes,
   getDailyNote,
+  getDailyNoteSettings,
 } from "obsidian-daily-notes-interface";
 
 export async function createDailyNoteIfNeeded(moment: Moment): Promise<TFile> {
   return getDailyNote(moment, getAllDailyNotes()) || createDailyNote(moment);
 }
 
+export function createDailyNotePath(date: Moment) {
+  const { format = DEFAULT_DAILY_NOTE_FORMAT, folder = "." } =
+    getDailyNoteSettings();
+  let filename = date.format(format);
+
+  if (!filename.endsWith(".md")) {
+    filename += ".md";
+  }
+
+  return normalizePath(join(folder, filename));
+}
+
 // Copied from obsidian-daily-notes-interface
-export function join(...partSegments: string[]) {
+function join(...partSegments: string[]) {
   // Split the inputs into a list of path commands.
   let parts: string[] = [];
   for (let i = 0, l = partSegments.length; i < l; i++) {

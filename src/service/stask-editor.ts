@@ -14,8 +14,8 @@ import { locToEditorPosition } from "../util/editor";
 import { withNotice } from "../util/with-notice";
 
 import { DataviewFacade } from "./dataview-facade";
-import { WorkspaceFacade } from "./workspace-facade";
 import type { VaultFacade } from "./vault-facade";
+import { WorkspaceFacade } from "./workspace-facade";
 
 export class STaskEditor {
   clockOut = withNotice(async (sTask: STask) => {

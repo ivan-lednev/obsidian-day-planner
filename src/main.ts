@@ -27,9 +27,9 @@ import {
 } from "./mdast/mdast";
 import { DataviewFacade } from "./service/dataview-facade";
 import { createTransaction, TransactionWriter } from "./service/diff-writer";
-import { WorkspaceFacade } from "./service/workspace-facade";
 import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
+import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
 import type { DayToTasks } from "./task-types";
 import type { ObsidianContext } from "./types";

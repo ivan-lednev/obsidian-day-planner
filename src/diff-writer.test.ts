@@ -1,9 +1,11 @@
 import moment, { type Moment } from "moment";
+import type { Vault } from "obsidian";
 import {
   getDailyNoteSettings,
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
 
+import { defaultDayFormat } from "./constants";
 import { sortListsRecursivelyUnderHeading } from "./mdast/mdast";
 import { createTransaction, TransactionWriter } from "./service/diff-writer";
 import { VaultFacade } from "./service/vault-facade";
@@ -17,8 +19,6 @@ import {
 import { toMinutes } from "./util/moment";
 import { createTask } from "./util/task-utils";
 import { type Diff, mapTaskDiffToUpdates } from "./util/tasks-utils";
-import type { Vault } from "obsidian";
-import { defaultDayFormat } from "./constants";
 
 jest.mock("obsidian-daily-notes-interface", () => ({
   getDateFromPath: jest.fn(() => null),

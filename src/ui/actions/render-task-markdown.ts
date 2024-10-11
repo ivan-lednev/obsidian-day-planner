@@ -1,11 +1,11 @@
 import { getDisplayedText } from "../../parser/parser";
+import type { VaultFacade } from "../../service/vault-facade";
 import type { DayPlannerSettings } from "../../settings";
 import type { LocalTask } from "../../task-types";
 import type { RenderMarkdown } from "../../types";
 import { getFirstLine, getRenderKey } from "../../util/task-utils";
 
 import { createMemo } from "./memoize-props";
-import type { VaultFacade } from "../../service/vault-facade";
 
 interface RenderedMarkdownProps {
   task: LocalTask;

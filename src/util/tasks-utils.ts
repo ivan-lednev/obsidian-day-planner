@@ -1,10 +1,8 @@
 import { mergeWith } from "lodash/fp";
 import type { Root } from "mdast";
 import type { Moment } from "moment/moment";
-import { normalizePath } from "obsidian";
 import {
   DEFAULT_DAILY_NOTE_FORMAT,
-  getDailyNoteSettings,
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
 import { isNotVoid } from "typed-assert";
@@ -27,9 +25,9 @@ import {
   type WithTime,
 } from "../task-types";
 
-import { join } from "./daily-notes";
+import { createDailyNotePath } from "./daily-notes";
 import { getMinutesSinceMidnight, minutesToMomentOfDay } from "./moment";
-import { getFirstLine, taskToString, updateTaskText } from "./task-utils";
+import { getFirstLine, updateTaskText } from "./task-utils";
 
 export function getEmptyRecordsForDay(): TasksForDay {
   return { withTime: [], noTime: [] };
@@ -176,18 +174,6 @@ export function getTaskDiffFromEditState(base: DayToTasks, next: DayToTasks) {
       created: [],
     },
   );
-}
-
-function createDailyNotePath(date: Moment) {
-  const { format = DEFAULT_DAILY_NOTE_FORMAT, folder = "." } =
-    getDailyNoteSettings();
-  let filename = date.format(format);
-
-  if (!filename.endsWith(".md")) {
-    filename += ".md";
-  }
-
-  return normalizePath(join(folder, filename));
 }
 
 export function mapTaskDiffToUpdates(
