@@ -1,5 +1,8 @@
 import moment, { type Moment } from "moment";
-import { getDailyNoteSettings } from "obsidian-daily-notes-interface";
+import {
+  getDailyNoteSettings,
+  getDateFromPath,
+} from "obsidian-daily-notes-interface";
 
 import { sortListsRecursivelyUnderHeading } from "./mdast/mdast";
 import { createTransaction, TransactionWriter } from "./service/diff-writer";
@@ -181,13 +184,12 @@ describe("From diff to vault", () => {
 `);
   });
 
-  // todo: rewrite this
   test("Moves tasks in daily notes between files", async () => {
-    // todo: need to reset mocks to remove this
     jest.mocked(getDailyNoteSettings).mockReturnValue({
       format: "YYYY-MM-DD",
       folder: ".",
     });
+    jest.mocked(getDateFromPath).mockReturnValue(moment("2023-01-01"));
 
     const files = [
       createInMemoryFile({
@@ -204,24 +206,15 @@ describe("From diff to vault", () => {
     ];
 
     const diff = {
-      deleted: [
+      updated: [
         createTestTask({
-          text: "- Moved",
           location: {
             path: "2023-01-01.md",
             position: {
-              start: {
-                line: 0,
-              },
-              end: {
-                line: 0,
-              },
+              start: { line: 0, col: 0 },
+              end: { line: 0, col: 7 },
             },
           },
-        }),
-      ],
-      created: [
-        createTestTask({
           text: "- Moved",
           day: moment("2023-01-02"),
         }),

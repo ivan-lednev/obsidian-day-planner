@@ -222,11 +222,7 @@ export function mapTaskDiffToUpdates(
         });
       }
 
-      if (!task.location) {
-        throw new Error(
-          `Can't update a task without location: ${getFirstLine(task.text)}`,
-        );
-      }
+      isNotVoid(task.location);
 
       const { path, position } = task.location;
 

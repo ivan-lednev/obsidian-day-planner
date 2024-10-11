@@ -43,7 +43,7 @@ interface Updated extends RangeOperation {
 export interface Created extends UpdateBase {
   type: "created";
   contents: string;
-  target?: number;
+  target: number;
 }
 
 interface MdastUpdate extends UpdateBase {
@@ -79,10 +79,7 @@ function applyRangeUpdate(lines: string[], rangeUpdate: RangeUpdate) {
   const result = lines.slice();
 
   if (rangeUpdate.type === "created") {
-    // todo: remove this
-    if (typeof rangeUpdate.target === "number") {
-      result.splice(rangeUpdate.target, 0, rangeUpdate.contents);
-    }
+    result.splice(rangeUpdate.target, 0, rangeUpdate.contents);
 
     return result;
   }
