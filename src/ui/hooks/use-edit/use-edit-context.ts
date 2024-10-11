@@ -1,7 +1,7 @@
 import type { Moment } from "moment";
 import { type Readable, writable } from "svelte/store";
 
-import { ObsidianFacade } from "../../../service/obsidian-facade";
+import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
 import type { TasksForDay } from "../../../task-types";
 import type { OnUpdateFn } from "../../../types";
@@ -15,14 +15,14 @@ import { useDisplayedTasksForDay } from "./use-displayed-tasks-for-day";
 import { useEditActions } from "./use-edit-actions";
 
 export interface UseEditContextProps {
-  obsidianFacade: ObsidianFacade;
+  workspaceFacade: WorkspaceFacade;
   onUpdate: OnUpdateFn;
   settings: Readable<DayPlannerSettings>;
   visibleTasks: Readable<Record<string, TasksForDay>>;
 }
 
 export function useEditContext({
-  obsidianFacade,
+  workspaceFacade,
   onUpdate,
   settings,
   visibleTasks,
@@ -53,7 +53,7 @@ export function useEditContext({
   function getEditHandlers(day: Moment) {
     const handlers = createEditHandlers({
       day,
-      obsidianFacade,
+      workspaceFacade,
       startEdit,
       cursorMinutes,
       editOperation,

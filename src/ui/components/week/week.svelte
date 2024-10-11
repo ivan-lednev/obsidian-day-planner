@@ -16,7 +16,7 @@
   import Timeline from "../timeline.svelte";
   import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
 
-  const { obsidianFacade } = getContext<ObsidianContext>(obsidianContext);
+  const { workspaceFacade } = getContext<ObsidianContext>(obsidianContext);
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
   let weekHeaderRef: HTMLDivElement | undefined;
@@ -37,7 +37,7 @@
         <ControlButton
           --color={$isToday(day) ? "white" : "var(--icon-color)"}
           label="Open note for day"
-          on:click={async () => await obsidianFacade.openFileForDay(day)}
+          on:click={async () => await workspaceFacade.openFileForDay(day)}
         >
           {day.format($settings.timelineDateFormat)}
         </ControlButton>

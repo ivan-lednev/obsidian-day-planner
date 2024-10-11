@@ -17,6 +17,7 @@ import {
 import { toMinutes } from "./util/moment";
 import { createTask } from "./util/task-utils";
 import { type Diff, mapTaskDiffToUpdates } from "./util/tasks-utils";
+import type { Vault } from "obsidian";
 
 jest.mock("obsidian-daily-notes-interface", () => ({
   getDateFromPath: jest.fn(() => null),
@@ -33,7 +34,7 @@ async function writeDiff(props: { diff: Diff; files: Array<InMemoryFile> }) {
 
   const { diff, files } = props;
   const vault = new InMemoryVault(files);
-  const vaultFacade = new VaultFacade(vault, getTasksApi);
+  const vaultFacade = new VaultFacade(vault as unknown as Vault, getTasksApi);
   const updates = mapTaskDiffToUpdates(diff, defaultSettingsForTests);
   const transaction = createTransaction({
     updates,
@@ -91,9 +92,13 @@ describe("From diff to vault", () => {
             position: {
               start: {
                 line: 1,
+                col: -1,
+                offset: -1,
               },
               end: {
                 line: 3,
+                col: -1,
+                offset: -1,
               },
             },
           },
@@ -104,9 +109,13 @@ describe("From diff to vault", () => {
             position: {
               start: {
                 line: 5,
+                col: -1,
+                offset: -1,
               },
               end: {
                 line: 5,
+                col: -1,
+                offset: -1,
               },
             },
           },
@@ -148,9 +157,12 @@ describe("From diff to vault", () => {
               start: {
                 line: 1,
                 col: 0,
+                offset: -1,
               },
               end: {
                 line: 4,
+                col: -1,
+                offset: -1,
               },
             },
           },
@@ -163,9 +175,12 @@ describe("From diff to vault", () => {
               start: {
                 line: 3,
                 col: 4,
+                offset: -1,
               },
               end: {
                 line: 4,
+                col: -1,
+                offset: -1,
               },
             },
           },
@@ -211,8 +226,8 @@ describe("From diff to vault", () => {
           location: {
             path: "2023-01-01.md",
             position: {
-              start: { line: 0, col: 0 },
-              end: { line: 0, col: 7 },
+              start: { line: 0, col: 0, offset: -1 },
+              end: { line: 0, col: 7, offset: -1 },
             },
           },
           text: "- Moved",
@@ -253,9 +268,12 @@ describe("From diff to vault", () => {
               start: {
                 line: 0,
                 col: 0,
+                offset: -1,
               },
               end: {
                 line: 0,
+                col: -1,
+                offset: -1,
               },
             },
           },

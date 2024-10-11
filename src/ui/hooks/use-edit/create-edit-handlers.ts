@@ -3,7 +3,7 @@ import { getDateFromPath } from "obsidian-daily-notes-interface";
 import type { Readable, Writable } from "svelte/store";
 import { get } from "svelte/store";
 
-import { ObsidianFacade } from "../../../service/obsidian-facade";
+import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
 import type { LocalTask, WithTime } from "../../../task-types";
 import { createTask } from "../../../util/task-utils";
@@ -15,7 +15,7 @@ export interface UseEditHandlersProps {
   startEdit: (operation: EditOperation) => void;
   // todo: make dynamic, since it can change?
   day: Moment;
-  obsidianFacade: ObsidianFacade;
+  workspaceFacade: WorkspaceFacade;
   cursorMinutes: Readable<number>;
   editOperation: Writable<EditOperation | undefined>;
   settings: Readable<DayPlannerSettings>;
@@ -23,7 +23,7 @@ export interface UseEditHandlersProps {
 
 export function createEditHandlers({
   day,
-  obsidianFacade,
+  workspaceFacade,
   startEdit,
   cursorMinutes,
   editOperation,
@@ -53,7 +53,7 @@ export function createEditHandlers({
     }
 
     const { path, position } = task.location;
-    await obsidianFacade.revealLineInFile(path, position?.start?.line);
+    await workspaceFacade.revealLineInFile(path, position?.start?.line);
   }
 
   function handleGripMouseDown(task: WithTime<LocalTask>, mode: EditMode) {

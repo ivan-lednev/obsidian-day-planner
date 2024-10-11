@@ -10,7 +10,7 @@ import {
 import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
 import { currentTime } from "../global-store/current-time";
 import { DataviewFacade } from "../service/dataview-facade";
-import { ObsidianFacade } from "../service/obsidian-facade";
+import { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
 import type {
   DayToTasks,
@@ -41,7 +41,7 @@ import { useDayToEventOccurences } from "./use-day-to-event-occurences";
 interface CreateHooksProps {
   app: App;
   dataviewFacade: DataviewFacade;
-  obsidianFacade: ObsidianFacade;
+  workspaceFacade: WorkspaceFacade;
   settingsStore: Writable<DayPlannerSettings>;
   onUpdate: (base: DayToTasks, next: DayToTasks) => Promise<void>;
 }
@@ -53,7 +53,7 @@ function getDarkModeFlag() {
 export function createHooks({
   app,
   dataviewFacade,
-  obsidianFacade,
+  workspaceFacade,
   settingsStore,
   onUpdate,
 }: CreateHooksProps) {
@@ -165,7 +165,7 @@ export function createHooks({
   );
 
   const editContext = useEditContext({
-    obsidianFacade,
+    workspaceFacade,
     onUpdate,
     settings: settingsStore,
     visibleTasks,

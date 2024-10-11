@@ -1,11 +1,12 @@
 import type { Moment } from "moment";
 import type { Readable, Writable } from "svelte/store";
 
-import type { ObsidianFacade } from "./service/obsidian-facade";
+import type { WorkspaceFacade } from "./service/workspace-facade";
 import type { IcalConfig } from "./settings";
 import type { DayToTasks } from "./task-types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { createShowPreview } from "./util/create-show-preview";
+import type { VaultFacade } from "./service/vault-facade";
 
 export type OnUpdateFn = (base: DayToTasks, next: DayToTasks) => Promise<void>;
 
@@ -21,12 +22,12 @@ export type CleanUp = () => void;
 export type RenderMarkdown = (el: HTMLElement, markdown: string) => CleanUp;
 
 export interface ObsidianContext {
-  obsidianFacade: ObsidianFacade;
+  workspaceFacade: WorkspaceFacade;
   initWeeklyView: () => Promise<void>;
   refreshTasks: (source: string) => void;
   dataviewLoaded: Readable<boolean>;
   renderMarkdown: RenderMarkdown;
-  toggleCheckboxInFile: ObsidianFacade["toggleCheckboxInFile"];
+  toggleCheckboxInFile: VaultFacade["toggleCheckboxInFile"];
   editContext: ReturnType<typeof useEditContext>;
   visibleTasks: Readable<DayToTasks>;
   showReleaseNotes: () => void;

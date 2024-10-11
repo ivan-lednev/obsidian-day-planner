@@ -10,15 +10,15 @@ export async function createDailyNoteIfNeeded(moment: Moment): Promise<TFile> {
   return getDailyNote(moment, getAllDailyNotes()) || createDailyNote(moment);
 }
 
-// Credit: @creationix/path.js
+// Copied from obsidian-daily-notes-interface
 export function join(...partSegments: string[]) {
   // Split the inputs into a list of path commands.
-  let parts = [];
+  let parts: string[] = [];
   for (let i = 0, l = partSegments.length; i < l; i++) {
     parts = parts.concat(partSegments[i].split("/"));
   }
   // Interpret the path commands to get the new resolved path.
-  const newParts = [];
+  const newParts: string[] = [];
   for (let i = 0, l = parts.length; i < l; i++) {
     const part = parts[i];
     // Remove leading and trailing slashes

@@ -31,7 +31,7 @@
   import Pill from "./pill.svelte";
 
   const {
-    obsidianFacade,
+    workspaceFacade,
     initWeeklyView,
     refreshTasks,
     dataviewLoaded,
@@ -76,7 +76,7 @@
   async function goToToday() {
     const noteForToday = await createDailyNoteIfNeeded(window.moment());
 
-    await obsidianFacade.openFileInEditor(noteForToday);
+    await workspaceFacade.openFileInEditor(noteForToday);
   }
 
   function handleStartHourInput(event: Event) {
@@ -129,7 +129,7 @@
       label="Go to file"
       on:click={async () => {
         const note = await createDailyNoteIfNeeded($dateRange[0]);
-        await obsidianFacade.openFileInEditor(note);
+        await workspaceFacade.openFileInEditor(note);
       }}
     >
       <span class="date"

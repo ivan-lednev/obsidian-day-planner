@@ -14,11 +14,12 @@ import { locToEditorPosition } from "../util/editor";
 import { withNotice } from "../util/with-notice";
 
 import { DataviewFacade } from "./dataview-facade";
-import { ObsidianFacade } from "./obsidian-facade";
+import { WorkspaceFacade } from "./workspace-facade";
+import type { VaultFacade } from "./vault-facade";
 
 export class STaskEditor {
   clockOut = withNotice(async (sTask: STask) => {
-    await this.obsidianFacade.editFile(sTask.path, (contents) =>
+    await this.vaultFacade.editFile(sTask.path, (contents) =>
       replaceSTaskInFile(
         contents,
         sTask,
@@ -27,7 +28,7 @@ export class STaskEditor {
     );
   });
   cancelClock = withNotice(async (sTask: STask) => {
-    await this.obsidianFacade.editFile(sTask.path, (contents) =>
+    await this.vaultFacade.editFile(sTask.path, (contents) =>
       replaceSTaskInFile(
         contents,
         sTask,
@@ -37,12 +38,13 @@ export class STaskEditor {
   });
 
   constructor(
-    private readonly obsidianFacade: ObsidianFacade,
+    private readonly workspaceFacade: WorkspaceFacade,
+    private readonly vaultFacade: VaultFacade,
     private readonly dataviewFacade: DataviewFacade,
   ) {}
 
   private replaceSTaskUnderCursor = (newMarkdown: string) => {
-    const view = this.obsidianFacade.getActiveMarkdownView();
+    const view = this.workspaceFacade.getActiveMarkdownView();
     const sTask = this.getSTaskUnderCursorFromLastView();
 
     view.editor.replaceRange(
@@ -54,7 +56,7 @@ export class STaskEditor {
 
   private getSTaskUnderCursorFromLastView = () => {
     const sTask = this.dataviewFacade.getTaskFromCaretLocation(
-      this.obsidianFacade.getLastCaretLocation(),
+      this.workspaceFacade.getLastCaretLocation(),
     );
 
     isNotVoid(sTask, "No task under cursor");

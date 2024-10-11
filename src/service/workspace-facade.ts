@@ -1,5 +1,11 @@
 import type { Moment } from "moment/moment";
-import { App, FileView, MarkdownView, TFile, WorkspaceLeaf } from "obsidian";
+import {
+  FileView,
+  MarkdownView,
+  TFile,
+  Workspace,
+  WorkspaceLeaf,
+} from "obsidian";
 import {
   createDailyNote,
   getAllDailyNotes,
@@ -15,25 +21,25 @@ function doesLeafContainFile(leaf: WorkspaceLeaf, file: TFile) {
   return view instanceof FileView && view.file === file;
 }
 
-export class ObsidianFacade {
+export class WorkspaceFacade {
   constructor(
-    private readonly app: App,
+    private readonly workspace: Workspace,
     private readonly vaultFacade: VaultFacade,
   ) {}
 
   async openFileInEditor(file: TFile) {
-    const leafWithThisFile = this.app.workspace
+    const leafWithThisFile = this.workspace
       .getLeavesOfType("markdown")
       .find((leaf) => doesLeafContainFile(leaf, file));
 
     if (leafWithThisFile) {
-      this.app.workspace.setActiveLeaf(leafWithThisFile, { focus: true });
+      this.workspace.setActiveLeaf(leafWithThisFile, { focus: true });
 
       if (leafWithThisFile.view instanceof MarkdownView) {
         return leafWithThisFile.view.editor;
       }
     } else {
-      const newLeaf = this.app.workspace.getLeaf(false);
+      const newLeaf = this.workspace.getLeaf(false);
 
       await newLeaf.openFile(file);
 
@@ -65,19 +71,12 @@ export class ObsidianFacade {
   }
 
   getActiveMarkdownView = () => {
-    const view = this.app.workspace.getMostRecentLeaf()?.view;
+    const view = this.workspace.getMostRecentLeaf()?.view;
 
     isInstanceOf(view, MarkdownView, "No markdown editor is active");
 
     return view;
   };
-
-  // todo: delete
-  getMetadataForPath(path: string) {
-    const file = this.vaultFacade.getFileByPath(path);
-
-    return this.app.metadataCache.getFileCache(file);
-  }
 
   async revealLineInFile(path: string, line: number) {
     const file = this.vaultFacade.getFileByPath(path);
@@ -88,7 +87,7 @@ export class ObsidianFacade {
       return;
     }
 
-    this.app.workspace
+    this.workspace
       .getActiveViewOfType(MarkdownView)
       ?.setEphemeralState({ line });
 

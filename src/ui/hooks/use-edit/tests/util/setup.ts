@@ -2,7 +2,7 @@ import { noop } from "lodash/fp";
 import type { Moment } from "moment/moment";
 import { writable } from "svelte/store";
 
-import { ObsidianFacade } from "../../../../../service/obsidian-facade";
+import { WorkspaceFacade } from "../../../../../service/workspace-facade";
 import {
   type DayPlannerSettings,
   defaultSettingsForTests,
@@ -21,12 +21,12 @@ function createProps({
   settings: DayPlannerSettings;
 }) {
   const onUpdate = jest.fn();
-  const obsidianFacade = jest.fn() as unknown as ObsidianFacade;
+  const workspaceFacade = jest.fn() as unknown as WorkspaceFacade;
 
   return {
     settings: writable(settings),
     onUpdate,
-    obsidianFacade,
+    workspaceFacade,
     visibleTasks: writable(tasks),
   };
 }
