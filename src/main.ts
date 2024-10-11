@@ -58,6 +58,7 @@ export default class DayPlanner extends Plugin {
   private sTaskEditor!: STaskEditor;
   private vaultFacade!: VaultFacade;
   private transationWriter!: TransactionWriter;
+  private syncDataview?: () => void;
 
   async onload() {
     await this.initSettingsStore();
@@ -286,6 +287,7 @@ export default class DayPlanner extends Plugin {
 
         if (!confirmed) {
           new Notice("Edit canceled");
+          this.syncDataview?.();
 
           return;
         }
@@ -315,6 +317,7 @@ export default class DayPlanner extends Plugin {
       isOnline,
       isDarkMode,
       dateRanges,
+      dataviewSyncTrigger,
     } = createHooks({
       app: this.app,
       dataviewFacade: this.dataviewFacade,
@@ -323,6 +326,7 @@ export default class DayPlanner extends Plugin {
       onUpdate,
     });
 
+    this.syncDataview = () => dataviewSyncTrigger.set({});
     this.registerDomEvent(window, "blur", editContext.cancelEdit);
     this.registerDomEvent(document, "pointerup", editContext.cancelEdit);
     this.register(

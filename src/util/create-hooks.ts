@@ -107,8 +107,9 @@ export function createHooks({
     visibleDays,
   });
 
+  const dataviewSyncTrigger = writable();
   const taskUpdateTrigger = derived(
-    [dataviewChange, dataviewSource],
+    [dataviewChange, dataviewSource, dataviewSyncTrigger],
     getUpdateTrigger,
   );
   const debouncedTaskUpdateTrigger = useDebounceWithDelay(
@@ -184,6 +185,7 @@ export function createHooks({
     newlyStartedTasks,
     isModPressed,
     icalSyncTrigger,
+    dataviewSyncTrigger,
     isOnline,
     isDarkMode,
     dateRanges,
