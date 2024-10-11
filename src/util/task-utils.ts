@@ -8,9 +8,12 @@ import { settings } from "../global-store/settings";
 import { replaceOrPrependTimestamp } from "../parser/parser";
 import {
   checkboxRegExp,
+  keylessScheduledPropRegExp,
   listTokenWithSpacesRegExp,
   looseTimestampAtStartOfLineRegExp,
+  scheduledPropRegExp,
   scheduledPropRegExps,
+  shortScheduledPropRegExp,
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
 import {
@@ -147,10 +150,10 @@ ${otherLines}`;
 }
 
 export function updateScheduledPropInText(text: string, dayKey: string) {
-  return scheduledPropRegExps.reduce(
-    (result, regexp) => result.replace(regexp, `$1${dayKey}$2`),
-    text,
-  );
+  return text
+    .replace(shortScheduledPropRegExp, `$1${dayKey}`)
+    .replace(scheduledPropRegExp, `$1${dayKey}$2`)
+    .replace(keylessScheduledPropRegExp, `$1${dayKey}$2`);
 }
 
 export function updateTaskText(task: WithTime<LocalTask>) {

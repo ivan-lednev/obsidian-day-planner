@@ -141,7 +141,7 @@ describe("From diff to vault", () => {
     const diff = {
       updated: [
         createTestTask({
-          text: "Updated task",
+          text: "- 00:00 - 00:30 Updated task",
           location: {
             path: "file-1",
             position: {
@@ -156,7 +156,7 @@ describe("From diff to vault", () => {
           },
         }),
         createTestTask({
-          text: "Updated subtask",
+          text: "- 00:00 - 00:30 Updated subtask",
           location: {
             path: "file-1",
             position: {

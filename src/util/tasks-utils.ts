@@ -161,7 +161,11 @@ export function getTaskDiffFromEditState(base: DayToTasks, next: DayToTasks) {
         result.created.push(task);
       }
 
-      if (thisTaskInBase && !thisTaskInBase.startTime.isSame(task.startTime)) {
+      if (
+        thisTaskInBase &&
+        (!thisTaskInBase.startTime.isSame(task.startTime) ||
+          thisTaskInBase.durationMinutes !== task.durationMinutes)
+      ) {
         result.updated.push(task);
       }
 
@@ -243,9 +247,8 @@ export function mapTaskDiffToUpdates(
         return result.concat({
           type: "updated",
           path,
-          // todo: we can update all the lines if we re-indent the task using 'start.col'
           range: { start: position.start, end: position.start },
-          contents: getFirstLine(taskToString(task)),
+          contents: getFirstLine(task.text),
         });
       }
 
