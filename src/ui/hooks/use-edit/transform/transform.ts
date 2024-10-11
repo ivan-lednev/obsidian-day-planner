@@ -7,6 +7,7 @@ import {
   isRemote,
   type LocalTask,
   type RemoteTask,
+  type Task,
   type WithTime,
 } from "../../../../task-types";
 import {
@@ -43,20 +44,6 @@ const transformers: Record<EditMode, TaskTransformer> = {
   [EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS]: resizeFromTopAndShrinkOthers,
 };
 
-const multidayModes: Partial<EditMode[]> = [
-  EditMode.DRAG,
-  EditMode.DRAG_AND_SHIFT_OTHERS,
-  EditMode.CREATE,
-];
-
-function isMultiday(mode: EditMode) {
-  return multidayModes.includes(mode);
-}
-
-function getDestDay(operation: EditOperation) {
-  return isMultiday(operation.mode) ? operation.day : operation.task.startTime;
-}
-
 function sortByStartMinutes(tasks: WithTime<LocalTask>[]) {
   return produce(tasks, (draft) =>
     draft.sort((a, b) => a.startTime.diff(b.startTime)),
@@ -64,61 +51,16 @@ function sortByStartMinutes(tasks: WithTime<LocalTask>[]) {
 }
 
 export function transform(
-  baseline: DayToTasks,
+  baseline: LocalTask[],
   cursorMinutes: number,
   operation: EditOperation,
   settings: DayPlannerSettings,
 ) {
-  const destDay = getDestDay(operation);
-  const destKey = getDayKey(destDay);
-
-  const withTaskInRightColumn = moveTaskToColumn(
-    destDay,
-    operation.task,
-    baseline,
-  );
-
-  // We need to sync task day too, while using the old approach
-  const withUpdatedStartTime = isMultiday(operation.mode)
-    ? {
-        ...operation.task,
-        startTime: minutesToMomentOfDay(
-          getMinutesSinceMidnight(operation.task.startTime),
-          operation.day,
-        ),
-      }
-    : operation.task;
-
-  const destTasks = withTaskInRightColumn[destKey];
   const transformFn = transformers[operation.mode];
 
   isNotVoid(transformFn, `No transformer for operation: ${operation.mode}`);
 
-  const readonly: Array<WithTime<RemoteTask>> = [];
-  const editable: Array<WithTime<LocalTask>> = [];
+  const withTimeSorted = sortByStartMinutes(baseline);
 
-  destTasks.withTime.forEach((task) => {
-    if (isRemote(task)) {
-      readonly.push(task);
-    } else {
-      editable.push(task);
-    }
-  });
-
-  const withTimeSorted = sortByStartMinutes(editable);
-  const transformed = transformFn(
-    withTimeSorted,
-    withUpdatedStartTime,
-    cursorMinutes,
-    settings,
-  );
-  const merged = [...readonly, ...transformed];
-
-  return {
-    ...withTaskInRightColumn,
-    [destKey]: {
-      ...destTasks,
-      withTime: merged,
-    },
-  };
+  return transformFn(withTimeSorted, operation.task, cursorMinutes, settings);
 }

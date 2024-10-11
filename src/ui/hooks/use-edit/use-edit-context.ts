@@ -1,9 +1,9 @@
 import type { Moment } from "moment";
-import { type Readable, writable } from "svelte/store";
+import { type Readable, type Writable, writable } from "svelte/store";
 
 import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
-import type { TasksForDay } from "../../../task-types";
+import type { Task, TasksForDay } from "../../../task-types";
 import type { OnUpdateFn } from "../../../types";
 
 import { createEditHandlers } from "./create-edit-handlers";
@@ -18,7 +18,7 @@ export interface UseEditContextProps {
   workspaceFacade: WorkspaceFacade;
   onUpdate: OnUpdateFn;
   settings: Readable<DayPlannerSettings>;
-  visibleTasks: Readable<Record<string, TasksForDay>>;
+  visibleTasks: Readable<Task[]>;
 }
 
 export function useEditContext({
@@ -32,7 +32,7 @@ export function useEditContext({
   const pointerOffsetY = writable(0);
   const cursorMinutes = useCursorMinutes(pointerOffsetY, settings);
 
-  const baselineTasks = writable({}, (set) => {
+  const baselineTasks: Writable<Task[]> = writable([], (set) => {
     return visibleTasks.subscribe(set);
   });
 

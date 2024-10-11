@@ -73,6 +73,7 @@ export function mapToTasksForDay(
   );
 
   tasksWithTime.sort((a, b) => a.startTime.diff(b.startTime));
+  const withTimeAndDuration = calculateDuration(tasksWithTime, settings);
 
   const noTime = withoutTime
     .filter((sTask) => {
@@ -88,7 +89,5 @@ export function mapToTasksForDay(
     })
     .map((sTask: STask) => toUnscheduledTask(sTask, day));
 
-  const withTimeAndDuration = calculateDuration(tasksWithTime, settings);
-
-  return { withTime: withTimeAndDuration, noTime, errors };
+  return [...withTimeAndDuration, ...noTime];
 }

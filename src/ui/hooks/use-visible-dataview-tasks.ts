@@ -23,13 +23,11 @@ export function useVisibleDataviewTasks(
         const sTasksForDay = dayToSTasks[key];
 
         if (sTasksForDay) {
-          const { errors, ...tasks } = mapToTasksForDay(
+          const { ...tasks } = mapToTasksForDay(
             day,
             sTasksForDay,
             $settings,
           );
-
-          errors.forEach(console.log);
 
           result[key] = tasks;
         } else {

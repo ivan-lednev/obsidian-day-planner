@@ -143,19 +143,20 @@ export function createHooks({
     visibleDays,
   );
 
-  const visibleTasks: Readable<
-    Record<
-      string,
-      {
-        withTime: Array<WithTime<RemoteTask> | WithTime<LocalTask>>;
-        noTime: Array<RemoteTask | LocalTask>;
-      }
-    >
-  > = derived(
-    [visibleDataviewTasks, visibleDayToEventOccurences],
-    ([$visibleDataviewTasks, $visibleDayToEventOccurences]) =>
-      mergeTasks($visibleDataviewTasks, $visibleDayToEventOccurences),
-  );
+  // const visibleTasks: Readable<
+  //   Record<
+  //     string,
+  //     {
+  //       withTime: Array<WithTime<RemoteTask> | WithTime<LocalTask>>;
+  //       noTime: Array<RemoteTask | LocalTask>;
+  //     }
+  //   >
+  // > = derived(
+  //   [visibleDataviewTasks, visibleDayToEventOccurences],
+  //   ([$visibleDataviewTasks, $visibleDayToEventOccurences]) =>
+  //     mergeTasks($visibleDataviewTasks, $visibleDayToEventOccurences),
+  // );
+  const visibleTasks = visibleDataviewTasks
 
   const tasksForToday = derived(
     [visibleTasks, currentTime],

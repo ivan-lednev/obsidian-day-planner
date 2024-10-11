@@ -5,6 +5,8 @@ import type { DayToTasks } from "../../../task-types";
 
 import { transform } from "./transform/transform";
 import type { EditOperation } from "./types";
+import { partition } from "lodash/fp";
+import { getDayKey } from "../../../util/tasks-utils";
 
 export interface UseDisplayedTasksProps {
   editOperation: Readable<EditOperation | undefined>;
@@ -26,12 +28,30 @@ export function useDisplayedTasks({
         return $baselineTasks;
       }
 
-      return transform(
+      const transformed = transform(
         $baselineTasks,
         $cursorMinutes,
         $editOperation,
         $settings,
       );
+
+      const grouped = transformed.reduce((result, task) => {
+        const key = getDayKey(task.startTime);
+
+        if (!result[key]) {
+          result[key] = { withTime: [], noTime: [] };
+        }
+
+        if (task.isAllDayEvent) {
+          result[key].noTime.push(task);
+        } else {
+          result[key].withTime.push(task);
+        }
+
+        return result;
+      }, {});
+
+      return grouped;
     },
   );
 }

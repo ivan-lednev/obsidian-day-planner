@@ -7,17 +7,18 @@ import {
   type DayPlannerSettings,
   defaultSettingsForTests,
 } from "../../../../../settings";
-import type { DayToTasks } from "../../../../../task-types";
+import type { DayToTasks, Task } from "../../../../../task-types";
 import { toMinutes } from "../../../../../util/moment";
 import { useEditContext } from "../../use-edit-context";
 
 import { baseTasks, day, nextDay } from "./fixtures";
+import { baseTask } from "../../../test-utils";
 
 function createProps({
   tasks,
   settings,
 }: {
-  tasks: DayToTasks;
+  tasks: Task[];
   settings: DayPlannerSettings;
 }) {
   const onUpdate = jest.fn();
@@ -35,7 +36,9 @@ export function setUp({
   tasks = baseTasks,
   settings = defaultSettingsForTests,
 } = {}) {
-  const props = createProps({ tasks, settings });
+  const newTasks = [baseTask];
+
+  const props = createProps({ tasks: newTasks, settings });
   const { getEditHandlers, displayedTasks, confirmEdit, pointerOffsetY } =
     useEditContext(props);
 
