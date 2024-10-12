@@ -1,11 +1,10 @@
 import { derived, type Readable } from "svelte/store";
 
 import type { DayPlannerSettings } from "../../../settings";
-import type { DayToTasks } from "../../../task-types";
+import type { DayToTasks, Task } from "../../../task-types";
 
 import { transform } from "./transform/transform";
 import type { EditOperation } from "./types";
-import { partition } from "lodash/fp";
 import { getDayKey } from "../../../util/tasks-utils";
 
 export interface UseDisplayedTasksProps {
@@ -13,6 +12,24 @@ export interface UseDisplayedTasksProps {
   cursorMinutes: Readable<number>;
   baselineTasks: Readable<DayToTasks>;
   settings: Readable<DayPlannerSettings>;
+}
+
+function groupByDay(tasks: Task[]) {
+  return tasks.reduce((result, task) => {
+    const key = getDayKey(task.startTime);
+
+    if (!result[key]) {
+      result[key] = { withTime: [], noTime: [] };
+    }
+
+    if (task.isAllDayEvent) {
+      result[key].noTime.push(task);
+    } else {
+      result[key].withTime.push(task);
+    }
+
+    return result;
+  }, {});
 }
 
 export function useDisplayedTasks({
@@ -25,7 +42,7 @@ export function useDisplayedTasks({
     [editOperation, cursorMinutes, baselineTasks, settings],
     ([$editOperation, $cursorMinutes, $baselineTasks, $settings]) => {
       if (!$editOperation) {
-        return $baselineTasks;
+        return groupByDay($baselineTasks);
       }
 
       const transformed = transform(
@@ -35,23 +52,7 @@ export function useDisplayedTasks({
         $settings,
       );
 
-      const grouped = transformed.reduce((result, task) => {
-        const key = getDayKey(task.startTime);
-
-        if (!result[key]) {
-          result[key] = { withTime: [], noTime: [] };
-        }
-
-        if (task.isAllDayEvent) {
-          result[key].noTime.push(task);
-        } else {
-          result[key].withTime.push(task);
-        }
-
-        return result;
-      }, {});
-
-      return grouped;
+      return groupByDay(transformed);
     },
   );
 }

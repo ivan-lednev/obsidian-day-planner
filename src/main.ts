@@ -341,20 +341,20 @@ export default class DayPlanner extends Plugin {
 
     const errorStore = writable<Error | undefined>();
 
-    mount(StatusBarWidget, {
-      target: this.addStatusBarItem(),
-      props: {
-        onClick: this.initTimelineLeaf,
-        tasksForToday,
-        errorStore,
-      },
-    });
+    // mount(StatusBarWidget, {
+    //   target: this.addStatusBarItem(),
+    //   props: {
+    //     onClick: this.initTimelineLeaf,
+    //     tasksForToday,
+    //     errorStore,
+    //   },
+    // });
 
-    this.register(
-      newlyStartedTasks.subscribe((value) =>
-        notifyAboutStartedTasks(value, this.settings()),
-      ),
-    );
+    // this.register(
+    //   newlyStartedTasks.subscribe((value) =>
+    //     notifyAboutStartedTasks(value, this.settings()),
+    //   ),
+    // );
     this.addCommand({
       id: "re-sync",
       name: "Re-sync tasks",
