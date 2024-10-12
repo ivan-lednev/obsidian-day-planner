@@ -25,7 +25,7 @@ function isVEvent(event: ical.CalendarComponent): event is ical.VEvent {
   return event.type === "VEVENT";
 }
 
-export function useDayToEventOccurences(props: {
+export function useRemoteTasks(props: {
   settings: Readable<DayPlannerSettings>;
   syncTrigger: Readable<unknown>;
   isOnline: Readable<boolean>;
@@ -111,20 +111,7 @@ export function useDayToEventOccurences(props: {
     },
   );
 
-  return derived(
-    tasksFromEvents,
-    flow(
-      filter(Boolean),
-      flatten,
-      groupBy((task: WithTime<RemoteTask>) => getDayKey(task.startTime)),
-      mapValues((tasks) => {
-        const [noTime, withTime]: [
-          Array<WithTime<RemoteTask>>,
-          Array<Omit<WithTime<RemoteTask>, "startMinutes">>,
-        ] = partition((task) => task.isAllDayEvent, tasks);
-
-        return { withTime, noTime };
-      }),
-    ),
+  return derived(tasksFromEvents, ($tasksFromEvents) =>
+    $tasksFromEvents.filter(Boolean).flat(),
   );
 }

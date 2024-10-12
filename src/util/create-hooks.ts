@@ -36,7 +36,7 @@ import { useVisibleDays } from "../ui/hooks/use-visible-days";
 
 import { getUpdateTrigger } from "./store";
 import { getDayKey, getEmptyRecordsForDay, mergeTasks } from "./tasks-utils";
-import { useDayToEventOccurences } from "./use-day-to-event-occurences";
+import { useRemoteTasks } from "./use-remote-tasks";
 
 interface CreateHooksProps {
   app: App;
@@ -100,7 +100,7 @@ export function createHooks({
   const dateRanges = useDateRanges();
   const visibleDays = useVisibleDays(dateRanges.ranges);
 
-  const visibleDayToEventOccurences = useDayToEventOccurences({
+  const remoteTasks = useRemoteTasks({
     settings: settingsStore,
     syncTrigger: combinedIcalSyncTrigger,
     isOnline,
@@ -138,30 +138,13 @@ export function createHooks({
     tasksFromExtraSources,
     settingsStore,
   });
-  const visibleDataviewTasks = useVisibleDataviewTasks(
-    dataviewTasks,
-    visibleDays,
-  );
+  const localTasks = useVisibleDataviewTasks(dataviewTasks, visibleDays);
 
-  // const visibleTasks: Readable<
-  //   Record<
-  //     string,
-  //     {
-  //       withTime: Array<WithTime<RemoteTask> | WithTime<LocalTask>>;
-  //       noTime: Array<RemoteTask | LocalTask>;
-  //     }
-  //   >
-  // > = derived(
-  //   [visibleDataviewTasks, visibleDayToEventOccurences],
-  //   ([$visibleDataviewTasks, $visibleDayToEventOccurences]) =>
-  //     mergeTasks($visibleDataviewTasks, $visibleDayToEventOccurences),
-  // );
-  const visibleTasks = visibleDataviewTasks
-
+  // todo: fix status bar, should receive a combined list of local and remote tasks
   const tasksForToday = derived(
-    [visibleTasks, currentTime],
-    ([$visibleTasks, $currentTime]) => {
-      return $visibleTasks[getDayKey($currentTime)] || getEmptyRecordsForDay();
+    [localTasks, currentTime],
+    ([$localTasks, $currentTime]) => {
+      return $localTasks[getDayKey($currentTime)] || getEmptyRecordsForDay();
     },
   );
 
@@ -169,7 +152,8 @@ export function createHooks({
     workspaceFacade,
     onUpdate,
     settings: settingsStore,
-    visibleTasks,
+    localTasks,
+    remoteTasks,
   });
 
   const newlyStartedTasks = useNewlyStartedTasks({
@@ -181,7 +165,8 @@ export function createHooks({
   return {
     editContext,
     tasksForToday,
-    visibleTasks,
+    // todo: delete, it's not used
+    visibleTasks: null,
     dataviewLoaded,
     newlyStartedTasks,
     isModPressed,

@@ -6,7 +6,7 @@ import moment from "moment";
 import { get, writable } from "svelte/store";
 
 import { defaultSettingsForTests } from "./settings";
-import { useDayToEventOccurences } from "./util/use-day-to-event-occurences";
+import { useRemoteTasks } from "./util/use-remote-tasks";
 
 jest.mock("obsidian", () => ({
   request: jest.fn(),
@@ -29,7 +29,7 @@ function getMockRequest(): Mock {
 function createStore({ visibleDays = [moment("2024-09-26")] } = {}) {
   const syncTrigger = writable({});
 
-  const store = useDayToEventOccurences({
+  const store = useRemoteTasks({
     isOnline: writable(true),
     visibleDays: writable(visibleDays),
     syncTrigger,
