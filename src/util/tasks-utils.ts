@@ -21,6 +21,7 @@ import {
   type DayToTasks,
   isRemote,
   type LocalTask,
+  type Task,
   type TasksForDay,
   type WithTime,
 } from "../task-types";
@@ -139,22 +140,10 @@ export type Diff = {
   created?: Array<LocalTask>;
 };
 
-export function getTaskDiffFromEditState(base: DayToTasks, next: DayToTasks) {
-  // todo: remove
-  const editableBase = getEditableTasks(base);
-  const editableNext = getEditableTasks(next);
-
-  // todo: remove
-  const flatBase = getFlatTimeBlocks(editableBase) as Array<LocalTask>;
-  const flatNext = (getFlatTimeBlocks(editableNext) as Array<LocalTask>).map(
-    updateTaskText,
-  );
-
-  return flatNext.reduce<Omit<Required<Diff>, "deleted">>(
+export function getTaskDiffFromEditState(base: LocalTask[], next: LocalTask[]) {
+  return next.map(updateTaskText).reduce<Omit<Required<Diff>, "deleted">>(
     (result, task) => {
-      const thisTaskInBase = flatBase.find(
-        (baseTask) => baseTask.id === task.id,
-      );
+      const thisTaskInBase = base.find((baseTask) => baseTask.id === task.id);
 
       if (!thisTaskInBase) {
         result.created.push(task);
