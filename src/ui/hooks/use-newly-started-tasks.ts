@@ -3,13 +3,13 @@ import type { Moment } from "moment";
 import { derived, get, type Readable } from "svelte/store";
 
 import type { DayPlannerSettings } from "../../settings";
-import type { Task, TasksForDay, WithTime } from "../../task-types";
+import type { Task, WithTime } from "../../task-types";
 import { getEndTime, getNotificationKey } from "../../util/task-utils";
 
 interface UseNewlyStartedTasksProps {
   settings: Readable<DayPlannerSettings>;
   currentTime: Readable<Moment>;
-  tasksForToday: Readable<TasksForDay>;
+  tasksForToday: Readable<Array<WithTime<Task>>>;
 }
 
 export function useNewlyStartedTasks(props: UseNewlyStartedTasksProps) {
@@ -21,7 +21,7 @@ export function useNewlyStartedTasks(props: UseNewlyStartedTasksProps) {
       return [];
     }
 
-    const tasksInProgress = get(tasksForToday).withTime.filter((task) => {
+    const tasksInProgress = get(tasksForToday).filter((task) => {
       return (
         task.startTime.isBefore($currentTime) &&
         getEndTime(task).isAfter($currentTime)

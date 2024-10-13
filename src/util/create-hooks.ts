@@ -6,7 +6,7 @@ import { currentTime } from "../global-store/current-time";
 import { DataviewFacade } from "../service/dataview-facade";
 import { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
-import type { LocalTask } from "../task-types";
+import type { LocalTask, Task, WithTime } from "../task-types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
@@ -24,7 +24,7 @@ import { useVisibleDataviewTasks } from "../ui/hooks/use-visible-dataview-tasks"
 import { useVisibleDays } from "../ui/hooks/use-visible-days";
 
 import { getUpdateTrigger } from "./store";
-import { getDayKey, getEmptyRecordsForDay } from "./tasks-utils";
+import { isWithTime } from "./task-utils";
 import { useRemoteTasks } from "./use-remote-tasks";
 
 interface CreateHooksProps {
@@ -129,11 +129,13 @@ export function createHooks({
   });
   const localTasks = useVisibleDataviewTasks(dataviewTasks, visibleDays);
 
-  // todo: fix status bar, should receive a combined list of local and remote tasks
   const tasksForToday = derived(
-    [localTasks, currentTime],
-    ([$localTasks, $currentTime]) => {
-      return $localTasks[getDayKey($currentTime)] || getEmptyRecordsForDay();
+    [localTasks, remoteTasks, currentTime],
+    ([$localTasks, $remoteTasks, $currentTime]) => {
+      return [...$localTasks, ...$remoteTasks].filter(
+        (task): task is WithTime<Task> =>
+          task.startTime.isSame($currentTime, "day") && isWithTime(task),
+      );
     },
   );
 

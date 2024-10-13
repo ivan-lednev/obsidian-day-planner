@@ -3,6 +3,7 @@ import {
   createDailyNote,
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
+import { mount } from "svelte";
 import { get, writable, type Writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
@@ -32,6 +33,7 @@ import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
 import type { LocalTask } from "./task-types";
 import type { ObsidianContext } from "./types";
+import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { ConfirmationModal } from "./ui/confirmation-modal";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
@@ -41,6 +43,7 @@ import { createHooks } from "./util/create-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
+import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { getUpdateTrigger } from "./util/store";
 import {
   getTaskDiffFromEditState,
@@ -337,20 +340,20 @@ export default class DayPlanner extends Plugin {
 
     const errorStore = writable<Error | undefined>();
 
-    // mount(StatusBarWidget, {
-    //   target: this.addStatusBarItem(),
-    //   props: {
-    //     onClick: this.initTimelineLeaf,
-    //     tasksForToday,
-    //     errorStore,
-    //   },
-    // });
+    mount(StatusBarWidget, {
+      target: this.addStatusBarItem(),
+      props: {
+        onClick: this.initTimelineLeaf,
+        tasksForToday,
+        errorStore,
+      },
+    });
 
-    // this.register(
-    //   newlyStartedTasks.subscribe((value) =>
-    //     notifyAboutStartedTasks(value, this.settings()),
-    //   ),
-    // );
+    this.register(
+      newlyStartedTasks.subscribe((value) =>
+        notifyAboutStartedTasks(value, this.settings()),
+      ),
+    );
     this.addCommand({
       id: "re-sync",
       name: "Re-sync tasks",

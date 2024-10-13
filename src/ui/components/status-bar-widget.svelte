@@ -2,11 +2,11 @@
   import type { Readable } from "svelte/store";
 
   import { settings } from "../../global-store/settings";
-  import type { TasksForDay } from "../../task-types";
+  import type { Task, WithTime } from "../../task-types";
   import { useStatusBarWidget } from "../hooks/use-status-bar-widget";
 
   export let onClick: () => Promise<void>;
-  export let tasksForToday: Readable<TasksForDay>;
+  export let tasksForToday: Readable<Array<WithTime<Task>>>;
   export let errorStore: Readable<Error | undefined>;
 
   const statusBarProps = useStatusBarWidget({ tasksForToday });

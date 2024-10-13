@@ -47,17 +47,14 @@ export function getEndTime(task: {
   return task.startTime.clone().add(task.durationMinutes, "minutes");
 }
 
-function isScheduled<T extends object>(task: T): task is WithTime<T> {
-  return (
-    Object.hasOwn(task, "startTime") ||
-    ("isAllDayEvent" in task && task.isAllDayEvent === false)
-  );
+export function isWithTime<T extends Task>(task: T): task is WithTime<T> {
+  return Object.hasOwn(task, "startTime") || !task.isAllDayEvent;
 }
 
 export function getRenderKey(task: WithTime<Task> | Task) {
   const key: string[] = [];
 
-  if (isScheduled(task)) {
+  if (isWithTime(task)) {
     key.push(
       String(getMinutesSinceMidnight(task.startTime)),
       String(getEndMinutes(task)),

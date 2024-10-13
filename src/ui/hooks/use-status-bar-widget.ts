@@ -3,13 +3,13 @@ import { derived, type Readable } from "svelte/store";
 
 import { statusBarTextLimit } from "../../constants";
 import { currentTime } from "../../global-store/current-time";
-import type { TasksForDay } from "../../task-types";
+import type { Task, WithTime } from "../../task-types";
 import { ellipsis } from "../../util/ellipsis";
 import { getDiffInMinutes } from "../../util/moment";
 import { getEndTime, getOneLineSummary } from "../../util/task-utils";
 
 interface UseStatusBarWidgetProps {
-  tasksForToday: Readable<TasksForDay>;
+  tasksForToday: Readable<Array<WithTime<Task>>>;
 }
 
 interface Widget {
@@ -35,14 +35,14 @@ export function useStatusBarWidget({ tasksForToday }: UseStatusBarWidgetProps) {
   return derived(
     [tasksForToday, currentTime],
     ([$tasksForToday, $currentTime]) => {
-      const currentItem = $tasksForToday.withTime.find(
+      const currentItem = $tasksForToday.find(
         (item) =>
           item.startTime.isBefore($currentTime) &&
           getEndTime(item).isAfter($currentTime),
       );
 
       // TODO: add tests
-      const nextItem = $tasksForToday.withTime
+      const nextItem = $tasksForToday
         .slice()
         // todo: remote dupilcation
         .sort((a, b) => a.startTime.diff(b.startTime))

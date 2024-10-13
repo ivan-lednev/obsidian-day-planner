@@ -16,12 +16,12 @@ import {
 import { scheduledPropRegExps } from "../regexp";
 import type { Update } from "../service/diff-writer";
 import type { DayPlannerSettings } from "../settings";
-import { type LocalTask, type TasksForDay } from "../task-types";
+import { type LocalTask } from "../task-types";
 
 import { createDailyNotePath } from "./daily-notes";
 import { getFirstLine, updateTaskText } from "./task-utils";
 
-export function getEmptyRecordsForDay(): TasksForDay {
+export function getEmptyRecordsForDay() {
   return { withTime: [], noTime: [] };
 }
 

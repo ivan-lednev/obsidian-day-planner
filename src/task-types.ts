@@ -28,6 +28,7 @@ export type WithPlacing<T> = T & {
 export type BaseTask = {
   id: string;
   startTime: Moment;
+  isAllDayEvent?: boolean;
 };
 
 export type WithTime<T> = T & {
@@ -38,21 +39,16 @@ export type RemoteTask = BaseTask & {
   calendar: IcalConfig;
   summary: string;
   rsvpStatus: AttendeePartStat;
-  isAllDayEvent: boolean;
   description?: string;
 };
 
 export interface LocalTask extends TaskTokens, BaseTask {
-  /**
-   * @deprecated
-   */
   text: string;
   lines?: Array<FileLine>;
 
   // todo: move out to InMemoryTask
   location?: TaskLocation;
   isGhost?: boolean;
-  isAllDayEvent?: boolean;
 
   // todo: move to Time
   durationMinutes: number;
@@ -60,14 +56,6 @@ export interface LocalTask extends TaskTokens, BaseTask {
 
 export type Task = LocalTask | RemoteTask;
 
-export interface TasksForDay<T = Task> {
-  withTime: Array<WithTime<T>>;
-  noTime: Array<Task>;
-}
-
-export type EditableTasksForDay = TasksForDay<LocalTask>;
-export type DayToTasks<T = TasksForDay> = Record<string, T>;
-export type DayToEditableTasks = DayToTasks<EditableTasksForDay>;
 export type TimeBlock = Omit<WithTime<BaseTask>, "startMinutes">;
 
 export function isRemote<T extends Task>(task: T): task is T & RemoteTask {

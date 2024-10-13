@@ -55,7 +55,7 @@ export function mapToTasksForDay(
     tasksForDay,
   );
 
-  const { parsed: tasksWithTime, errors } = withTime.reduce<{
+  const { parsed: tasksWithTime } = withTime.reduce<{
     parsed: WithTime<LocalTask>[];
     errors: unknown[];
   }>(

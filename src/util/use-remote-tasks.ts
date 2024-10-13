@@ -5,7 +5,7 @@ import { request } from "obsidian";
 import { derived, readable, type Readable } from "svelte/store";
 
 import type { DayPlannerSettings } from "../settings";
-import type { RemoteTask } from "../task-types";
+import type { RemoteTask, WithTime } from "../task-types";
 import type { WithIcalConfig } from "../types";
 
 import { canHappenAfter, icalEventToTasks } from "./ical";
@@ -103,6 +103,10 @@ export function useRemoteTasks(props: {
   );
 
   return derived(tasksFromEvents, ($tasksFromEvents) =>
-    $tasksFromEvents.filter((task): task is RemoteTask => Boolean(task)).flat(),
+    $tasksFromEvents
+      .flat()
+      .filter((task): task is RemoteTask | WithTime<RemoteTask> =>
+        Boolean(task),
+      ),
   );
 }
