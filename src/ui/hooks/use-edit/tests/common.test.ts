@@ -4,7 +4,7 @@ import { get } from "svelte/store";
 import { baseTask, threeTasks } from "../../test-utils";
 import { EditMode } from "../types";
 
-import { dayKey } from "./util/fixtures";
+import { dayKey, nextDayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
 
 // todo: remove duplication, ideally this check should be pulled out of the diffing logic
@@ -16,7 +16,39 @@ jest.mock("obsidian-daily-notes-interface", () => ({
 }));
 
 describe("drag one & common edit mechanics", () => {
-  test.todo("Splits multi-day tasks into single-day tasks");
+  test("Splits multi-day tasks into single-day tasks", () => {
+    const { displayedTasks } = setUp({
+      tasks: [
+        {
+          ...baseTask,
+          startTime: moment("2023-01-01 23:00"),
+          durationMinutes: 120,
+          id: "1",
+        },
+      ],
+    });
+
+    expect(get(displayedTasks)).toMatchObject({
+      [dayKey]: {
+        withTime: [
+          {
+            id: "1",
+            startTime: moment("2023-01-01 23:00"),
+            durationMinutes: 59,
+          },
+        ],
+      },
+      [nextDayKey]: {
+        withTime: [
+          {
+            id: "1",
+            startTime: moment("2023-01-02 00:00"),
+            durationMinutes: 60,
+          },
+        ],
+      },
+    });
+  });
 
   test("after edit confirmation, tasks freeze and stop reacting to cursor", async () => {
     const {

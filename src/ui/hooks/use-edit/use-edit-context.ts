@@ -12,7 +12,8 @@ import type {
   WithTime,
 } from "../../../task-types";
 import type { OnUpdateFn } from "../../../types";
-import { getRenderKey } from "../../../util/task-utils";
+import { getDiffInMinutes, splitMultiday } from "../../../util/moment";
+import { getEndTime, getRenderKey, isWithTime } from "../../../util/task-utils";
 import { getDayKey, getEmptyRecordsForDay } from "../../../util/tasks-utils";
 
 import { createEditHandlers } from "./create-edit-handlers";
@@ -72,8 +73,21 @@ export function useEditContext(props: {
     [remoteTasks, tasksWithPendingUpdate],
     ([$remoteTasks, $displayedTasks]) => {
       const combinedTasks = $remoteTasks.concat($displayedTasks);
+      const split = combinedTasks.flatMap((task) => {
+        if (!isWithTime(task)) {
+          return task;
+        }
 
-      return groupByDay(combinedTasks);
+        const chunks = splitMultiday(task.startTime, getEndTime(task));
+
+        return chunks.map(([startTime, endTime]) => ({
+          ...task,
+          startTime,
+          durationMinutes: getDiffInMinutes(startTime, endTime),
+        }));
+      });
+
+      return groupByDay(split);
     },
   );
 
