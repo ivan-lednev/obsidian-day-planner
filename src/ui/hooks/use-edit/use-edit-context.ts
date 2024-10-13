@@ -30,7 +30,7 @@ export interface UseEditContextProps {
   remoteTasks: Readable<Task[]>;
 }
 
-export function groupByDay(tasks: Task[]) {
+function groupByDay(tasks: Task[]) {
   return tasks.reduce((result, task) => {
     const key = getDayKey(task.startTime);
 
@@ -73,15 +73,10 @@ export function useEditContext({
     },
   );
 
-  const combinedLocalAndRemoteTasks = derived(
+  const grouped = derived(
     [remoteTasks, displayedTasks],
-    ([$remoteTasks, $displayedTasks]) => {
-      return $remoteTasks.concat($displayedTasks);
-    },
-  );
-
-  const grouped = derived(combinedLocalAndRemoteTasks, ($combinedLocalAndRemoteTasks) =>
-    groupByDay($combinedLocalAndRemoteTasks),
+    ([$remoteTasks, $displayedTasks]) =>
+      groupByDay($remoteTasks.concat($displayedTasks)),
   );
 
   const { startEdit, confirmEdit, cancelEdit } = useEditActions({

@@ -16,6 +16,8 @@ jest.mock("obsidian-daily-notes-interface", () => ({
 }));
 
 describe("drag one & common edit mechanics", () => {
+  test.todo("Splits multi-day tasks into single-day tasks");
+
   test("after edit confirmation, tasks freeze and stop reacting to cursor", async () => {
     const {
       todayControls,

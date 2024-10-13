@@ -49,6 +49,7 @@ export function mapToTasksForDay(
   tasksForDay: STask[],
   settings: DayPlannerSettings,
 ) {
+  // todo: since we don't need to preserve this partition, we can shorten this
   const [withTime, withoutTime] = partition(
     ({ text }) => testTimestampPatterns(text),
     tasksForDay,

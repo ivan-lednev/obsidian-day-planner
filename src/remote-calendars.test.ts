@@ -7,6 +7,7 @@ import { get, writable } from "svelte/store";
 
 import { defaultSettingsForTests } from "./settings";
 import { useRemoteTasks } from "./util/use-remote-tasks";
+import { request } from "obsidian";
 
 jest.mock("obsidian", () => ({
   request: jest.fn(),
@@ -20,10 +21,6 @@ function getIcalFixture(file: string) {
   return fs.readFile(`fixtures/${file}.txt`, {
     encoding: "utf8",
   });
-}
-
-function getMockRequest(): Mock {
-  return jest.requireMock("obsidian").request;
 }
 
 function createStore({ visibleDays = [moment("2024-09-26")] } = {}) {
@@ -52,23 +49,18 @@ function createStore({ visibleDays = [moment("2024-09-26")] } = {}) {
   };
 }
 
-const tentativeEventMatcher = {
-  "2024-09-26": {
-    noTime: [],
-    withTime: [
-      expect.objectContaining({
-        summary: "tentative-status",
-        rsvpStatus: "TENTATIVE",
-      }),
-    ],
-  },
-};
+const tentativeEventMatcher = [
+  expect.objectContaining({
+    summary: "tentative-status",
+    rsvpStatus: "TENTATIVE",
+  }),
+];
 
 describe("ical", () => {
   test("RSVP status appears in tasks", async () => {
-    getMockRequest().mockReturnValue(
-      getIcalFixture("google-tentative-attendee"),
-    );
+    jest
+      .mocked(request)
+      .mockReturnValue(getIcalFixture("google-tentative-attendee"));
 
     const { store } = createStore();
 
@@ -82,9 +74,9 @@ describe("ical", () => {
   );
 
   test("Falls back on previous values if fetching a calendar fails", async () => {
-    getMockRequest().mockReturnValue(
-      getIcalFixture("google-tentative-attendee"),
-    );
+    jest
+      .mocked(request)
+      .mockReturnValue(getIcalFixture("google-tentative-attendee"));
 
     const { store } = createStore();
 
@@ -92,9 +84,9 @@ describe("ical", () => {
       expect(get(store)).toEqual(tentativeEventMatcher);
     });
 
-    getMockRequest().mockReturnValue(
-      Promise.reject(new Error("Mock calendar rejected")),
-    );
+    jest
+      .mocked(request)
+      .mockReturnValue(Promise.reject(new Error("Mock calendar rejected")));
 
     await waitForNeverToHappen(() => {
       expect(() => get(store)).toThrow();
@@ -102,25 +94,22 @@ describe("ical", () => {
   });
 
   test("Deleted recurrences don't show up as tasks", async () => {
-    getMockRequest().mockReturnValue(
-      getIcalFixture("google-recurring-with-exception-and-location"),
-    );
+    jest
+      .mocked(request)
+      .mockReturnValue(
+        getIcalFixture("google-recurring-with-exception-and-location"),
+      );
 
     const { store } = createStore({
       visibleDays: [moment("2024-09-27"), moment("2024-09-28")],
     });
 
     await waitFor(() => {
-      expect(get(store)).toEqual({
-        "2024-09-27": {
-          noTime: [],
-          withTime: [
-            expect.objectContaining({
-              summary: "recurring",
-            }),
-          ],
-        },
-      });
+      expect(get(store)).toEqual([
+        expect.objectContaining({
+          summary: "recurring",
+        }),
+      ]);
     });
   });
 

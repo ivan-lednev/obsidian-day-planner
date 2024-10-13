@@ -36,6 +36,7 @@ export function setUp({
   tasks = baseTasks,
   settings = defaultSettingsForTests,
 } = {}) {
+  // todo: clean up
   const newTasks = [baseTask];
 
   const props = createProps({ tasks: newTasks, settings });
