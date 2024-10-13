@@ -34,100 +34,8 @@ export function getEmptyRecordsForDay(): TasksForDay {
   return { withTime: [], noTime: [] };
 }
 
-export function removeTask(task: WithTime<LocalTask>, tasks: TasksForDay) {
-  return {
-    ...tasks,
-    noTime: tasks.noTime.filter((t) => t.id !== task.id),
-    withTime: tasks.withTime.filter((t) => t.id !== task.id),
-  };
-}
-
-export function addTaskWithTime(task: WithTime<LocalTask>, tasks: TasksForDay) {
-  return {
-    ...tasks,
-    withTime: [...tasks.withTime, task],
-  };
-}
-
-export function moveToTimed(task: WithTime<LocalTask>, tasks: TasksForDay) {
-  const withRemoved = removeTask(task, tasks);
-  return { ...withRemoved, withTime: [...withRemoved.withTime, task] };
-}
-
 export function getDayKey(day: Moment) {
   return day.format(DEFAULT_DAILY_NOTE_FORMAT);
-}
-
-export function moveTaskToDay(
-  baseline: DayToTasks,
-  task: WithTime<LocalTask>,
-  day: Moment,
-) {
-  const sourceKey = getDayKey(task.startTime);
-  const destKey = getDayKey(day);
-  const source = baseline[sourceKey];
-  const dest = baseline[destKey];
-
-  const withUpdatedStartTime = {
-    ...task,
-    startTime: minutesToMomentOfDay(
-      getMinutesSinceMidnight(task.startTime),
-      day,
-    ),
-  };
-
-  return {
-    ...baseline,
-    [sourceKey]: removeTask(withUpdatedStartTime, source),
-    [destKey]: addTaskWithTime(withUpdatedStartTime, dest),
-  };
-}
-
-export function moveTaskToColumn(
-  day: Moment,
-  task: WithTime<LocalTask>,
-  baseline: DayToTasks,
-) {
-  if (day.isSame(task.startTime, "day")) {
-    const key = getDayKey(task.startTime);
-
-    return {
-      ...baseline,
-      [key]: moveToTimed(task, baseline[key]),
-    };
-  }
-
-  return moveTaskToDay(baseline, task, day);
-}
-
-// todo: remove, replace with simple filter
-function getEditableTasks(dayToTasks: DayToTasks) {
-  const filteredEntries = Object.entries(dayToTasks).map(
-    ([dayKey, tasks]) =>
-      [
-        dayKey,
-        {
-          noTime: tasks.noTime.filter(
-            (task): task is LocalTask => !isRemote(task),
-          ),
-          withTime: tasks.withTime.filter(
-            (task): task is WithTime<LocalTask> => !isRemote(task),
-          ),
-        },
-      ] as const,
-  );
-
-  return Object.fromEntries<{
-    withTime: WithTime<LocalTask>[];
-    noTime: LocalTask[];
-  }>(filteredEntries);
-}
-
-function getFlatTimeBlocks(dayToTasks: DayToTasks) {
-  return Object.values(dayToTasks).flatMap(({ withTime, noTime }) => [
-    ...withTime,
-    ...noTime,
-  ]);
 }
 
 export function hasDateFromProp(task: LocalTask) {
@@ -255,7 +163,3 @@ export function mapTaskDiffToUpdates(
       );
     }, []);
 }
-
-export const mergeTasks = mergeWith((value, sourceValue) => {
-  return Array.isArray(value) ? value.concat(sourceValue) : undefined;
-});
