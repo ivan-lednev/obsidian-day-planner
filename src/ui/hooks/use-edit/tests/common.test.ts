@@ -4,7 +4,7 @@ import { get } from "svelte/store";
 import { baseTask, threeTasks } from "../../test-utils";
 import { EditMode } from "../types";
 
-import { dayKey, nextDayKey } from "./util/fixtures";
+import { dayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
 
 // todo: remove duplication, ideally this check should be pulled out of the diffing logic
@@ -26,16 +26,7 @@ describe("drag one & common edit mechanics", () => {
       displayedTasks,
       confirmEdit,
     } = setUp({
-      tasks: {
-        [dayKey]: {
-          withTime: threeTasks,
-          noTime: [],
-        },
-        [nextDayKey]: {
-          withTime: [],
-          noTime: [],
-        },
-      },
+      tasks: threeTasks,
     });
 
     todayControls.handleGripMouseDown(threeTasks[1], EditMode.DRAG);
@@ -44,7 +35,7 @@ describe("drag one & common edit mechanics", () => {
     await confirmEdit();
 
     nextDayControls.handleMouseEnter();
-    moveCursorTo("03:00");
+    moveCursorTo("05:00");
 
     expect(get(displayedTasks)).toMatchObject({
       [dayKey]: {
@@ -53,9 +44,6 @@ describe("drag one & common edit mechanics", () => {
           { id: "2", startTime: moment("2023-01-01 03:00") },
           { id: "3" },
         ],
-      },
-      [nextDayKey]: {
-        withTime: [],
       },
     });
   });

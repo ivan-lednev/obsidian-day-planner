@@ -1,3 +1,5 @@
+import { isNotVoid } from "typed-assert";
+
 import type { DayPlannerSettings } from "../../../../settings";
 import type { LocalTask, WithTime } from "../../../../task-types";
 import {
@@ -14,12 +16,16 @@ export function resize(
   settings: DayPlannerSettings,
 ): WithTime<LocalTask>[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
+  const task = baseline[index];
+
+  isNotVoid(task);
+
   const durationMinutes = Math.max(
-    cursorTime - getMinutesSinceMidnight(editTarget.startTime),
+    cursorTime - getMinutesSinceMidnight(task.startTime),
     settings.minimalDurationMinutes,
   );
   const updated = {
-    ...editTarget,
+    ...task,
     durationMinutes,
   };
 
@@ -33,14 +39,18 @@ export function resizeFromTop(
   settings: DayPlannerSettings,
 ): WithTime<LocalTask>[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
+  const task = baseline[index];
+
+  isNotVoid(task);
+
   const durationMinutes = Math.max(
-    getEndMinutes(editTarget) - cursorTime,
+    getEndMinutes(task) - cursorTime,
     settings.minimalDurationMinutes,
   );
 
   const updated = {
-    ...editTarget,
-    startTime: minutesToMomentOfDay(cursorTime, editTarget.startTime),
+    ...task,
+    startTime: minutesToMomentOfDay(cursorTime, task.startTime),
     durationMinutes,
   };
 

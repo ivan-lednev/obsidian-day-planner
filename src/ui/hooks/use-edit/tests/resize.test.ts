@@ -2,7 +2,6 @@ import moment from "moment";
 import { get } from "svelte/store";
 
 import { defaultSettingsForTests } from "../../../../settings";
-import type { DayToTasks } from "../../../../task-types";
 import { toMinutes } from "../../../../util/moment";
 import { baseTask, threeTasks } from "../../test-utils";
 import { EditMode } from "../types";
@@ -59,15 +58,8 @@ describe("resize", () => {
 
   describe("resize many", () => {
     test("resizing with neighbors shifts neighbors as well", () => {
-      const tasks: DayToTasks = {
-        [dayKey]: {
-          withTime: threeTasks,
-          noTime: [],
-        },
-      };
-
       const { todayControls, moveCursorTo, displayedTasks } = setUp({
-        tasks,
+        tasks: threeTasks,
       });
 
       todayControls.handleResizerMouseDown(
@@ -91,15 +83,8 @@ describe("resize", () => {
     });
 
     test("Resizing from top works the same way", () => {
-      const tasks: DayToTasks = {
-        [dayKey]: {
-          withTime: threeTasks,
-          noTime: [],
-        },
-      };
-
       const { todayControls, moveCursorTo, displayedTasks } = setUp({
-        tasks,
+        tasks: threeTasks,
       });
 
       todayControls.handleResizerMouseDown(
@@ -133,15 +118,8 @@ describe("resize", () => {
 
   describe("Resize and shrink others", () => {
     test("Resizing shrinks neighbors & when they reach minimal duration, they start shifting", () => {
-      const tasks: DayToTasks = {
-        [dayKey]: {
-          withTime: threeTasks,
-          noTime: [],
-        },
-      };
-
       const { todayControls, moveCursorTo, displayedTasks } = setUp({
-        tasks,
+        tasks: threeTasks,
       });
 
       todayControls.handleResizerMouseDown(
@@ -169,15 +147,8 @@ describe("resize", () => {
     });
 
     test("Resizing from top works the same way", () => {
-      const tasks: DayToTasks = {
-        [dayKey]: {
-          withTime: threeTasks,
-          noTime: [],
-        },
-      };
-
       const { todayControls, moveCursorTo, displayedTasks } = setUp({
-        tasks,
+        tasks: threeTasks,
       });
 
       todayControls.handleResizerMouseDown(

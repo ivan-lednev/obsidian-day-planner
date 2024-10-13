@@ -2,19 +2,12 @@ import { produce } from "immer";
 import { isNotVoid } from "typed-assert";
 
 import type { DayPlannerSettings } from "../../../../settings";
-import {
-  type DayToTasks,
-  isRemote,
-  type LocalTask,
-  type RemoteTask,
-  type Task,
-  type WithTime,
-} from "../../../../task-types";
+import { type LocalTask, type WithTime } from "../../../../task-types";
 import {
   getMinutesSinceMidnight,
   minutesToMomentOfDay,
 } from "../../../../util/moment";
-import { getDayKey, moveTaskToColumn } from "../../../../util/tasks-utils";
+import { toSpliced } from "../../../../util/to-spliced";
 import { EditMode, type EditOperation, type TaskTransformer } from "../types";
 
 import { create } from "./create";
@@ -44,6 +37,17 @@ const transformers: Record<EditMode, TaskTransformer> = {
   [EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS]: resizeFromTopAndShrinkOthers,
 };
 
+function isSingleDayMode(mode: EditMode) {
+  return [
+    EditMode.RESIZE,
+    EditMode.RESIZE_FROM_TOP,
+    EditMode.RESIZE_AND_SHRINK_OTHERS,
+    EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS,
+    EditMode.RESIZE_AND_SHIFT_OTHERS,
+    EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS,
+  ].includes(mode);
+}
+
 function sortByStartMinutes(tasks: WithTime<LocalTask>[]) {
   return produce(tasks, (draft) =>
     draft.sort((a, b) => a.startTime.diff(b.startTime)),
@@ -60,7 +64,25 @@ export function transform(
 
   isNotVoid(transformFn, `No transformer for operation: ${operation.mode}`);
 
-  const withTimeSorted = sortByStartMinutes(baseline);
+  // todo: duplicated, task gets updated in transformer, in onMouseEnter, and here
+  const index = baseline.findIndex((task) => task.id === operation.task.id);
+
+  const taskWithUpdatedDay = isSingleDayMode(operation.mode)
+    ? operation.task
+    : {
+        ...operation.task,
+        startTime: minutesToMomentOfDay(
+          getMinutesSinceMidnight(operation.task.startTime),
+          operation.day,
+        ),
+      };
+
+  const withUpdatedDay =
+    index === -1
+      ? baseline.concat(taskWithUpdatedDay)
+      : toSpliced(baseline, index, taskWithUpdatedDay);
+
+  const withTimeSorted = sortByStartMinutes(withUpdatedDay);
 
   return transformFn(withTimeSorted, operation.task, cursorMinutes, settings);
 }

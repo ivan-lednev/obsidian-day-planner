@@ -1,13 +1,12 @@
 import fs from "node:fs/promises";
 
 import { waitFor } from "@testing-library/dom";
-import type { Mock } from "jest-mock";
 import moment from "moment";
+import { request } from "obsidian";
 import { get, writable } from "svelte/store";
 
 import { defaultSettingsForTests } from "./settings";
 import { useRemoteTasks } from "./util/use-remote-tasks";
-import { request } from "obsidian";
 
 jest.mock("obsidian", () => ({
   request: jest.fn(),

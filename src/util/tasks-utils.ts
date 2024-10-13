@@ -140,10 +140,11 @@ export type Diff = {
 };
 
 export function getTaskDiffFromEditState(base: DayToTasks, next: DayToTasks) {
+  // todo: remove
   const editableBase = getEditableTasks(base);
   const editableNext = getEditableTasks(next);
 
-  // todo: remove assertion
+  // todo: remove
   const flatBase = getFlatTimeBlocks(editableBase) as Array<LocalTask>;
   const flatNext = (getFlatTimeBlocks(editableNext) as Array<LocalTask>).map(
     updateTaskText,

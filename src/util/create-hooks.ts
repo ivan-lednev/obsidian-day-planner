@@ -1,23 +1,12 @@
 import { App } from "obsidian";
-import {
-  derived,
-  readable,
-  type Readable,
-  writable,
-  type Writable,
-} from "svelte/store";
+import { derived, readable, writable, type Writable } from "svelte/store";
 
 import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
 import { currentTime } from "../global-store/current-time";
 import { DataviewFacade } from "../service/dataview-facade";
 import { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
-import type {
-  DayToTasks,
-  LocalTask,
-  RemoteTask,
-  WithTime,
-} from "../task-types";
+import type { DayToTasks } from "../task-types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
@@ -35,7 +24,7 @@ import { useVisibleDataviewTasks } from "../ui/hooks/use-visible-dataview-tasks"
 import { useVisibleDays } from "../ui/hooks/use-visible-days";
 
 import { getUpdateTrigger } from "./store";
-import { getDayKey, getEmptyRecordsForDay, mergeTasks } from "./tasks-utils";
+import { getDayKey, getEmptyRecordsForDay } from "./tasks-utils";
 import { useRemoteTasks } from "./use-remote-tasks";
 
 interface CreateHooksProps {

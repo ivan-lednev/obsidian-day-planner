@@ -7,12 +7,11 @@ import {
   type DayPlannerSettings,
   defaultSettingsForTests,
 } from "../../../../../settings";
-import type { DayToTasks, Task } from "../../../../../task-types";
+import type { Task } from "../../../../../task-types";
 import { toMinutes } from "../../../../../util/moment";
 import { useEditContext } from "../../use-edit-context";
 
 import { baseTasks, day, nextDay } from "./fixtures";
-import { baseTask } from "../../../test-utils";
 
 function createProps({
   tasks,
@@ -28,7 +27,8 @@ function createProps({
     settings: writable(settings),
     onUpdate,
     workspaceFacade,
-    visibleTasks: writable(tasks),
+    localTasks: writable(tasks),
+    remoteTasks: writable([]),
   };
 }
 
@@ -36,10 +36,7 @@ export function setUp({
   tasks = baseTasks,
   settings = defaultSettingsForTests,
 } = {}) {
-  // todo: clean up
-  const newTasks = [baseTask];
-
-  const props = createProps({ tasks: newTasks, settings });
+  const props = createProps({ tasks, settings });
   const { getEditHandlers, displayedTasks, confirmEdit, pointerOffsetY } =
     useEditContext(props);
 

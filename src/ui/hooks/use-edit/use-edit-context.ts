@@ -1,26 +1,21 @@
+import { flow, uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
 import { derived, type Readable, type Writable, writable } from "svelte/store";
 
+import { addHorizontalPlacing } from "../../../overlap/overlap";
 import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
-import type {
-  Task,
-  TasksForDay,
-  WithPlacing,
-  WithTime,
-} from "../../../task-types";
+import type { Task, WithPlacing, WithTime } from "../../../task-types";
 import type { OnUpdateFn } from "../../../types";
+import { getRenderKey } from "../../../util/task-utils";
+import { getDayKey, getEmptyRecordsForDay } from "../../../util/tasks-utils";
 
 import { createEditHandlers } from "./create-edit-handlers";
 import { useCursor } from "./cursor";
+import { transform } from "./transform/transform";
 import type { EditOperation } from "./types";
 import { useCursorMinutes } from "./use-cursor-minutes";
 import { useEditActions } from "./use-edit-actions";
-import { transform } from "./transform/transform";
-import { getDayKey, getEmptyRecordsForDay } from "../../../util/tasks-utils";
-import { getRenderKey } from "../../../util/task-utils";
-import { addHorizontalPlacing } from "../../../overlap/overlap";
-import { flow, uniqBy } from "lodash/fp";
 
 export interface UseEditContextProps {
   workspaceFacade: WorkspaceFacade;
@@ -64,7 +59,7 @@ export function useEditContext({
     return localTasks.subscribe(set);
   });
 
-  const displayedTasks = derived(
+  const tasksWithPendingUpdate = derived(
     [editOperation, cursorMinutes, baselineTasks, settings],
     ([$editOperation, $cursorMinutes, $baselineTasks, $settings]) => {
       return $editOperation
@@ -74,15 +69,19 @@ export function useEditContext({
   );
 
   const grouped = derived(
-    [remoteTasks, displayedTasks],
-    ([$remoteTasks, $displayedTasks]) =>
-      groupByDay($remoteTasks.concat($displayedTasks)),
+    [remoteTasks, tasksWithPendingUpdate],
+    ([$remoteTasks, $displayedTasks]) => {
+      const combinedTasks = $remoteTasks.concat($displayedTasks);
+
+      return groupByDay(combinedTasks);
+    },
   );
 
   const { startEdit, confirmEdit, cancelEdit } = useEditActions({
     editOperation,
     baselineTasks,
-    displayedTasks,
+    // todo: consistent naming
+    displayedTasks: tasksWithPendingUpdate,
     onUpdate,
   });
 
@@ -119,7 +118,7 @@ export function useEditContext({
   return {
     cursor,
     pointerOffsetY,
-    displayedTasks,
+    displayedTasks: grouped,
     confirmEdit,
     cancelEdit,
     getEditHandlers,

@@ -8,17 +8,16 @@ export function create(
   cursorTime: number,
   settings: DayPlannerSettings,
 ): WithTime<LocalTask>[] {
+  // todo: unify approach
   return baseline.map((task) => {
-    if (task.id === editTarget.id) {
-      return {
-        ...editTarget,
-        durationMinutes: Math.max(
-          cursorTime - getMinutesSinceMidnight(editTarget.startTime),
-          settings.minimalDurationMinutes,
-        ),
-      };
-    }
-
-    return task;
+    return task.id === editTarget.id
+      ? {
+          ...task,
+          durationMinutes: Math.max(
+            cursorTime - getMinutesSinceMidnight(task.startTime),
+            settings.minimalDurationMinutes,
+          ),
+        }
+      : task;
   });
 }

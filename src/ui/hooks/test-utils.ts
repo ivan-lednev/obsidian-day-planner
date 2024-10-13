@@ -32,6 +32,11 @@ export const baseTask: WithPlacing<WithTime<LocalTask>> = {
   id: "id",
 };
 
+export const unscheduledTask: LocalTask = {
+  ...baseTask,
+  isAllDayEvent: true,
+};
+
 export const threeTasks: WithPlacing<WithTime<LocalTask>>[] = [
   {
     ...baseTask,

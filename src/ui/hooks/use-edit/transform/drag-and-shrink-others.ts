@@ -1,4 +1,5 @@
 import { last } from "lodash";
+import { isNotVoid } from "typed-assert";
 
 import type { DayPlannerSettings } from "../../../../settings";
 import type { LocalTask, WithTime } from "../../../../task-types";
@@ -15,12 +16,16 @@ export function dragAndShrinkOthers(
   settings: DayPlannerSettings,
 ): WithTime<LocalTask>[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
+  const task = baseline[index];
+
+  isNotVoid(task);
+
   const preceding = baseline.slice(0, index);
   const following = baseline.slice(index + 1);
 
   const updated = {
-    ...editTarget,
-    startTime: minutesToMomentOfDay(cursorTime, editTarget.startTime),
+    ...task,
+    startTime: minutesToMomentOfDay(cursorTime, task.startTime),
   };
 
   const updatedFollowing = following.reduce<WithTime<LocalTask>[]>(

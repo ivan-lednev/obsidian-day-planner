@@ -1,25 +1,15 @@
-import {
-  filter,
-  flatten,
-  flow,
-  groupBy,
-  isEmpty,
-  mapValues,
-  partition,
-} from "lodash/fp";
+import { isEmpty } from "lodash/fp";
 import type { Moment } from "moment";
 import ical from "node-ical";
 import { request } from "obsidian";
 import { derived, readable, type Readable } from "svelte/store";
 
 import type { DayPlannerSettings } from "../settings";
-import type { RemoteTask, WithTime } from "../task-types";
 import type { WithIcalConfig } from "../types";
 
 import { canHappenAfter, icalEventToTasks } from "./ical";
 import { getEarliestMoment } from "./moment";
 import { createBackgroundBatchScheduler } from "./scheduler";
-import { getDayKey } from "./tasks-utils";
 
 function isVEvent(event: ical.CalendarComponent): event is ical.VEvent {
   return event.type === "VEVENT";

@@ -2,7 +2,6 @@ import moment from "moment";
 import { get } from "svelte/store";
 
 import { defaultSettingsForTests } from "../../../../settings";
-import type { DayToTasks } from "../../../../task-types";
 import { baseTask, threeTasks } from "../../test-utils";
 import { EditMode } from "../types";
 
@@ -29,15 +28,8 @@ describe("drag", () => {
 
   describe("drag many", () => {
     test("tasks below react to shifting selected task once there is overlap", () => {
-      const tasks: DayToTasks = {
-        [dayKey]: {
-          withTime: threeTasks,
-          noTime: [],
-        },
-      };
-
       const { todayControls, moveCursorTo, displayedTasks } = setUp({
-        tasks,
+        tasks: threeTasks,
       });
 
       todayControls.handleGripMouseDown(
@@ -67,15 +59,8 @@ describe("drag", () => {
     });
 
     test("tasks below stay in initial position once the overlap is reversed, tasks above shift as well", () => {
-      const tasks: DayToTasks = {
-        [dayKey]: {
-          withTime: threeTasks,
-          noTime: [],
-        },
-      };
-
       const { todayControls, moveCursorTo, displayedTasks } = setUp({
-        tasks,
+        tasks: threeTasks,
         settings: { ...defaultSettingsForTests },
       });
 
@@ -111,15 +96,8 @@ describe("drag", () => {
 
   describe("drag and shrink others", () => {
     test("Next task shrinks up to minimal duration and starts moving down", () => {
-      const tasks: DayToTasks = {
-        [dayKey]: {
-          withTime: threeTasks,
-          noTime: [],
-        },
-      };
-
       const { todayControls, moveCursorTo, displayedTasks } = setUp({
-        tasks,
+        tasks: threeTasks,
       });
 
       todayControls.handleGripMouseDown(

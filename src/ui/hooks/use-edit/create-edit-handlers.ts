@@ -60,7 +60,7 @@ export function createEditHandlers({
     startEdit({ task, mode, day });
   }
 
-  // todo: fix
+  // todo: fix (should probably use "day")
   function handleUnscheduledTaskGripMouseDown(task: LocalTask) {
     const withAddedTime = {
       ...task,

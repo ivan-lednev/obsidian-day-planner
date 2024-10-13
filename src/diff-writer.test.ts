@@ -205,7 +205,7 @@ describe("From diff to vault", () => {
     const todayDailyNotePath = `${todayKey}.md`;
     const todayMoment = moment(todayKey);
 
-    const tomorrowKey = "2023-01-01";
+    const tomorrowKey = "2023-01-02";
     const tomorrowDailynotePath = `${tomorrowKey}.md`;
     const tomorrowMoment = moment(tomorrowKey);
 
