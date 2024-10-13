@@ -16,44 +16,6 @@ import {
 
 import { parseTimestamp } from "./timestamp/timestamp";
 
-export function getListItemsUnderHeading(
-  metadata: CachedMetadata,
-  heading: string,
-) {
-  const { headings } = metadata;
-
-  if (!headings) {
-    return [];
-  }
-
-  const planHeadingIndex = headings.findIndex((h) => h.heading === heading);
-
-  if (planHeadingIndex < 0) {
-    return [];
-  }
-
-  const planHeading = headings[planHeadingIndex];
-  const nextHeadingOfSameLevel = headings
-    .slice(planHeadingIndex + 1)
-    .find((heading) => heading.level <= planHeading.level);
-
-  return metadata.listItems?.filter((li) => {
-    const isBelowPlan =
-      li.position.start.line > planHeading.position.start.line;
-    const isAboveNextHeadingIfItExists =
-      !nextHeadingOfSameLevel ||
-      li.position.start.line < nextHeadingOfSameLevel.position.start.line;
-
-    return isBelowPlan && isAboveNextHeadingIfItExists;
-  });
-}
-
-export function getHeadingByText(metadata: CachedMetadata, text: string) {
-  const { headings = [] } = metadata;
-
-  return headings?.find((h) => h.heading === text);
-}
-
 function execTimestampPatterns(line: string) {
   const trimmed = line.trim();
 
