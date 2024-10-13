@@ -7,7 +7,7 @@ import {
   type DayPlannerSettings,
   defaultSettingsForTests,
 } from "../../../../../settings";
-import type { Task } from "../../../../../task-types";
+import type { LocalTask } from "../../../../../task-types";
 import { toMinutes } from "../../../../../util/moment";
 import { useEditContext } from "../../use-edit-context";
 
@@ -17,7 +17,7 @@ function createProps({
   tasks,
   settings,
 }: {
-  tasks: Task[];
+  tasks: LocalTask[];
   settings: DayPlannerSettings;
 }) {
   const onUpdate = jest.fn();

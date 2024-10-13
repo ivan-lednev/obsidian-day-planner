@@ -6,7 +6,7 @@ import { currentTime } from "../global-store/current-time";
 import { DataviewFacade } from "../service/dataview-facade";
 import { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
-import type { DayToTasks } from "../task-types";
+import type { LocalTask } from "../task-types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
@@ -32,7 +32,7 @@ interface CreateHooksProps {
   dataviewFacade: DataviewFacade;
   workspaceFacade: WorkspaceFacade;
   settingsStore: Writable<DayPlannerSettings>;
-  onUpdate: (base: DayToTasks, next: DayToTasks) => Promise<void>;
+  onUpdate: (base: Array<LocalTask>, next: Array<LocalTask>) => Promise<void>;
 }
 
 function getDarkModeFlag() {
@@ -154,8 +154,6 @@ export function createHooks({
   return {
     editContext,
     tasksForToday,
-    // todo: delete, it's not used
-    visibleTasks: null,
     dataviewLoaded,
     newlyStartedTasks,
     isModPressed,

@@ -1,21 +1,21 @@
 import { get, type Readable, type Writable } from "svelte/store";
 
-import type { DayToTasks } from "../../../task-types";
+import type { LocalTask } from "../../../task-types";
 import type { OnUpdateFn } from "../../../types";
 
 import type { EditOperation } from "./types";
 
 interface UseEditActionsProps {
-  baselineTasks: Writable<DayToTasks>;
+  baselineTasks: Writable<LocalTask[]>;
   editOperation: Writable<EditOperation | undefined>;
-  displayedTasks: Readable<DayToTasks>;
+  tasksWithPendingUpdate: Readable<LocalTask[]>;
   onUpdate: OnUpdateFn;
 }
 
 export function useEditActions({
   editOperation,
   baselineTasks,
-  displayedTasks,
+  tasksWithPendingUpdate,
   onUpdate,
 }: UseEditActionsProps) {
   function startEdit(operation: EditOperation) {
@@ -32,7 +32,7 @@ export function useEditActions({
     }
 
     const oldBase = get(baselineTasks);
-    const currentTasks = get(displayedTasks);
+    const currentTasks = get(tasksWithPendingUpdate);
 
     baselineTasks.set(currentTasks);
     editOperation.set(undefined);

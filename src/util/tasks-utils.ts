@@ -1,4 +1,3 @@
-import { mergeWith } from "lodash/fp";
 import type { Root } from "mdast";
 import type { Moment } from "moment/moment";
 import {
@@ -17,17 +16,9 @@ import {
 import { scheduledPropRegExps } from "../regexp";
 import type { Update } from "../service/diff-writer";
 import type { DayPlannerSettings } from "../settings";
-import {
-  type DayToTasks,
-  isRemote,
-  type LocalTask,
-  type Task,
-  type TasksForDay,
-  type WithTime,
-} from "../task-types";
+import { type LocalTask, type TasksForDay } from "../task-types";
 
 import { createDailyNotePath } from "./daily-notes";
-import { getMinutesSinceMidnight, minutesToMomentOfDay } from "./moment";
 import { getFirstLine, updateTaskText } from "./task-utils";
 
 export function getEmptyRecordsForDay(): TasksForDay {

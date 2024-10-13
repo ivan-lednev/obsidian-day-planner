@@ -4,7 +4,7 @@ import { STask } from "obsidian-dataview";
 import { derived, type Readable } from "svelte/store";
 
 import { settings } from "../../global-store/settings";
-import type { Task } from "../../task-types";
+import type { LocalTask } from "../../task-types";
 import { getScheduledDay } from "../../util/dataview";
 import { mapToTasksForDay } from "../../util/get-tasks-for-day";
 import { getDayKey } from "../../util/tasks-utils";
@@ -19,7 +19,7 @@ export function useVisibleDataviewTasks(
       // todo: this looks wrong
       const dayToSTasks = groupBy(getScheduledDay, $dataviewTasks);
 
-      return $visibleDays.reduce<Task[]>((result, day) => {
+      return $visibleDays.reduce<LocalTask[]>((result, day) => {
         const key = getDayKey(day);
         const sTasksForDay = dayToSTasks[key];
 

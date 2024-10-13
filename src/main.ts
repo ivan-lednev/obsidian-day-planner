@@ -30,7 +30,7 @@ import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
-import type { DayToTasks } from "./task-types";
+import type { LocalTask } from "./task-types";
 import type { ObsidianContext } from "./types";
 import { ConfirmationModal } from "./ui/confirmation-modal";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
@@ -262,7 +262,7 @@ export default class DayPlanner extends Plugin {
 
   private registerViews() {
     // todo: move out
-    const onUpdate = async (base: DayToTasks, next: DayToTasks) => {
+    const onUpdate = async (base: Array<LocalTask>, next: Array<LocalTask>) => {
       const diff = getTaskDiffFromEditState(base, next);
       const updates = mapTaskDiffToUpdates(diff, this.settings());
       const afterEach = this.settings().sortTasksInPlanAfterEdit
@@ -310,7 +310,6 @@ export default class DayPlanner extends Plugin {
     const {
       editContext,
       tasksForToday,
-      visibleTasks,
       dataviewLoaded,
       isModPressed,
       newlyStartedTasks,
@@ -369,7 +368,6 @@ export default class DayPlanner extends Plugin {
       toggleCheckboxInFile: this.vaultFacade.toggleCheckboxInFile,
       showReleaseNotes: this.showReleaseNotes,
       editContext,
-      visibleTasks,
       showPreview: createShowPreview(this.app),
       isModPressed,
       reSync: () => icalSyncTrigger.set(getUpdateTrigger()),

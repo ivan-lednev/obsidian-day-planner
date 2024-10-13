@@ -1,11 +1,16 @@
 import { flow, uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
-import { derived, type Readable, type Writable, writable } from "svelte/store";
+import { derived, type Readable, writable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../../overlap/overlap";
 import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
-import type { Task, WithPlacing, WithTime } from "../../../task-types";
+import type {
+  LocalTask,
+  Task,
+  WithPlacing,
+  WithTime,
+} from "../../../task-types";
 import type { OnUpdateFn } from "../../../types";
 import { getRenderKey } from "../../../util/task-utils";
 import { getDayKey, getEmptyRecordsForDay } from "../../../util/tasks-utils";
@@ -16,14 +21,6 @@ import { transform } from "./transform/transform";
 import type { EditOperation } from "./types";
 import { useCursorMinutes } from "./use-cursor-minutes";
 import { useEditActions } from "./use-edit-actions";
-
-export interface UseEditContextProps {
-  workspaceFacade: WorkspaceFacade;
-  onUpdate: OnUpdateFn;
-  settings: Readable<DayPlannerSettings>;
-  localTasks: Readable<Task[]>;
-  remoteTasks: Readable<Task[]>;
-}
 
 function groupByDay(tasks: Task[]) {
   return tasks.reduce((result, task) => {
@@ -43,19 +40,22 @@ function groupByDay(tasks: Task[]) {
   }, {});
 }
 
-export function useEditContext({
-  workspaceFacade,
-  onUpdate,
-  settings,
-  localTasks,
-  remoteTasks,
-}: UseEditContextProps) {
+export function useEditContext(props: {
+  workspaceFacade: WorkspaceFacade;
+  onUpdate: OnUpdateFn;
+  settings: Readable<DayPlannerSettings>;
+  localTasks: Readable<LocalTask[]>;
+  remoteTasks: Readable<Task[]>;
+}) {
+  const { workspaceFacade, onUpdate, settings, localTasks, remoteTasks } =
+    props;
+
   const editOperation = writable<EditOperation | undefined>();
   const cursor = useCursor(editOperation);
   const pointerOffsetY = writable(0);
   const cursorMinutes = useCursorMinutes(pointerOffsetY, settings);
 
-  const baselineTasks: Writable<Task[]> = writable([], (set) => {
+  const baselineTasks = writable<LocalTask[]>([], (set) => {
     return localTasks.subscribe(set);
   });
 
@@ -80,8 +80,7 @@ export function useEditContext({
   const { startEdit, confirmEdit, cancelEdit } = useEditActions({
     editOperation,
     baselineTasks,
-    // todo: consistent naming
-    displayedTasks: tasksWithPendingUpdate,
+    tasksWithPendingUpdate,
     onUpdate,
   });
 
@@ -118,6 +117,7 @@ export function useEditContext({
   return {
     cursor,
     pointerOffsetY,
+    // todo: consistent naming
     displayedTasks: grouped,
     confirmEdit,
     cancelEdit,
