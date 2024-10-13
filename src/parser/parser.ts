@@ -1,5 +1,4 @@
 import type { Moment } from "moment";
-import type { CachedMetadata } from "obsidian";
 import { dedent } from "ts-dedent";
 
 import {
@@ -74,8 +73,14 @@ export function getTimeFromLine({ line, day }: { line: string; day: Moment }) {
   if (end) {
     const endTime = parseTimestamp(end, day);
 
-    if (endTime?.isAfter(startTime)) {
+    // todo: handle edge, use default duration
+    if (endTime.isAfter(startTime)) {
       durationMinutes = getDiffInMinutes(endTime, startTime);
+    } else {
+      durationMinutes = getDiffInMinutes(
+        startTime,
+        endTime.clone().add(1, "day"),
+      );
     }
   }
 
