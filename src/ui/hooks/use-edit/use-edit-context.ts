@@ -73,7 +73,8 @@ export function useEditContext(props: {
     [remoteTasks, tasksWithPendingUpdate],
     ([$remoteTasks, $tasksWithPendingUpdate]) => {
       const combinedTasks = $remoteTasks.concat($tasksWithPendingUpdate);
-      const split = combinedTasks.flatMap((task) => {
+
+      const split: Task[] = combinedTasks.flatMap((task): Task[] | Task => {
         if (!isWithTime(task)) {
           return task;
         }
