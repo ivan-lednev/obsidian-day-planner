@@ -369,7 +369,6 @@ export default class DayPlanner extends Plugin {
       dataviewLoaded,
       renderMarkdown: createRenderMarkdown(this.app),
       toggleCheckboxInFile: this.vaultFacade.toggleCheckboxInFile,
-      showReleaseNotes: this.showReleaseNotes,
       editContext,
       showPreview: createShowPreview(this.app),
       isModPressed,

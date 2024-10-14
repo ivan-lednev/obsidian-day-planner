@@ -2,18 +2,14 @@
   import { range } from "lodash/fp";
   import {
     Settings,
-    ArrowLeft,
-    ArrowRight,
-    FileInput,
-    Table2,
-    Filter,
-    FilterX,
+    ChevronLeft,
+    ChevronRight,
     AlertTriangle,
     Info,
-    RefreshCw,
-    RefreshCwOff,
+    EllipsisVertical,
   } from "lucide-svelte";
   import type { Moment } from "moment";
+  import { Menu } from "obsidian";
   import { getContext } from "svelte";
   import type { Writable } from "svelte/store";
 
@@ -35,9 +31,7 @@
     initWeeklyView,
     refreshTasks,
     dataviewLoaded,
-    showReleaseNotes,
     reSync,
-    isOnline,
   } = getContext<ObsidianContext>(obsidianContext);
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
@@ -51,14 +45,9 @@
   const zoomLevelOptions = range(1, 9).map(String);
 
   let settingsVisible = false;
-  let filterVisible = false;
 
   function toggleSettings() {
     settingsVisible = !settingsVisible;
-  }
-
-  function toggleFilter() {
-    filterVisible = !filterVisible;
   }
 
   async function goBack() {
@@ -93,74 +82,72 @@
 <div class="controls">
   <ErrorReport />
   <div class="header">
-    <ControlButton label="Open today's daily note" on:click={goToToday}>
-      <FileInput class="svg-icon" />
-    </ControlButton>
-
-    <ControlButton label="Open week planner" on:click={initWeeklyView}>
-      <Table2 class="svg-icon" />
-    </ControlButton>
-
-    {#if $isOnline}
-      <ControlButton
-        label="Manually sync with all remote calendars"
-        on:click={reSync}
-      >
-        <RefreshCw class="svg-icon" />
-      </ControlButton>
-    {:else}
-      <ControlButton disabled label="Can't sync, you're offline!">
-        <RefreshCwOff class="svg-icon" />
-      </ControlButton>
-    {/if}
-
     <ControlButton
-      --justify-self="flex-end"
-      label="Go to previous day"
-      on:click={goBack}
-    >
-      <ArrowLeft class="svg-icon" />
-    </ControlButton>
+      onclick={(event: MouseEvent) => {
+        const menu = new Menu();
 
-    <ControlButton
-      --control-button-border={$isToday($dateRange[0])
-        ? "1px solid var(--color-accent)"
-        : "none"}
-      label="Go to file"
-      on:click={async () => {
-        const note = await createDailyNoteIfNeeded($dateRange[0]);
-        await workspaceFacade.openFileInEditor(note);
+        menu.addItem((item) =>
+          item
+            .setTitle("Undo last edit")
+            .setIcon("undo")
+            .onClick(() => {}),
+        );
+
+        menu.addSeparator();
+
+        menu.addItem((item) =>
+          item
+            .setTitle("Re-sync internet calendars")
+            .setIcon("sync")
+            .onClick(reSync),
+        );
+
+        menu.addItem((item) =>
+          item
+            .setTitle("Open week planner")
+            .setIcon("table")
+            .onClick(initWeeklyView),
+        );
+
+        menu.addItem((item) => {
+          item
+            .setTitle("Open today's daily note")
+            .setIcon("pencil")
+            .onClick(goToToday);
+        });
+
+        menu.showAtMouseEvent(event);
       }}
     >
-      <span class="date"
-        >{$dateRange[0].format($settings.timelineDateFormat)}</span
+      <EllipsisVertical class="svg-icon" />
+    </ControlButton>
+    <div class="day-controls">
+      <ControlButton label="Go to previous day" onclick={goBack}>
+        <ChevronLeft class="svg-icon" />
+      </ControlButton>
+
+      <ControlButton
+        classes={$isToday($dateRange[0]) ? "today" : ""}
+        label="Go to file"
+        onclick={async () => {
+          const note = await createDailyNoteIfNeeded($dateRange[0]);
+          await workspaceFacade.openFileInEditor(note);
+        }}
       >
-    </ControlButton>
+        <span class="date"
+          >{$dateRange[0].format($settings.timelineDateFormat)}</span
+        >
+      </ControlButton>
 
-    <ControlButton
-      --justify-self="flex-start"
-      label="Go to next day"
-      on:click={goForward}
-    >
-      <ArrowRight class="svg-icon" />
-    </ControlButton>
+      <ControlButton label="Go to next day" onclick={goForward}>
+        <ChevronRight class="svg-icon" />
+      </ControlButton>
+    </div>
 
-    <ControlButton
-      --grid-column-start="8"
-      isActive={filterVisible}
-      label="Dataview source"
-      on:click={toggleFilter}
-    >
-      {#if $sourceIsEmpty}
-        <FilterX class="svg-icon" />
-      {:else}
-        <Filter class="svg-icon active-filter" />
-      {/if}
-    </ControlButton>
     <ControlButton
       isActive={settingsVisible}
       label="Settings"
-      on:click={toggleSettings}
+      onclick={toggleSettings}
     >
       <Settings class="svg-icon" />
     </ControlButton>
@@ -179,7 +166,7 @@
       >
     </div>
   {/if}
-  {#if filterVisible}
+  {#if settingsVisible}
     <div class="stretcher">
       Include additional files, folders and tags with a Dataview source:
       <input
@@ -207,8 +194,6 @@
         >
       </div>
     </div>
-  {/if}
-  {#if settingsVisible}
     <div class="settings">
       <SettingItem>
         <svelte:fragment slot="name">Start hour</svelte:fragment>
@@ -236,7 +221,7 @@
           slot="control"
           class="checkbox-container mod-small"
           class:is-enabled={$settings.centerNeedle}
-          on:click={() => {
+          onclick={() => {
             $settings.centerNeedle = !$settings.centerNeedle;
           }}
         >
@@ -251,7 +236,7 @@
           slot="control"
           class="checkbox-container mod-small"
           class:is-enabled={$settings.showCompletedTasks}
-          on:click={() => {
+          onclick={() => {
             $settings.showCompletedTasks = !$settings.showCompletedTasks;
           }}
         >
@@ -268,7 +253,7 @@
           slot="control"
           class="checkbox-container mod-small"
           class:is-enabled={$settings.showSubtasksInTaskBlocks}
-          on:click={() => {
+          onclick={() => {
             // We create a new object to trigger immediate update in the timeline view
             settings.update((previous) => ({
               ...previous,
@@ -289,7 +274,7 @@
           slot="control"
           class="checkbox-container mod-small"
           class:is-enabled={$settings.showUncheduledTasks}
-          on:click={() => {
+          onclick={() => {
             $settings.showUncheduledTasks = !$settings.showUncheduledTasks;
           }}
         >
@@ -307,7 +292,7 @@
             slot="control"
             class="checkbox-container mod-small"
             class:is-enabled={$settings.showUnscheduledNestedTasks}
-            on:click={() => {
+            onclick={() => {
               $settings.showUnscheduledNestedTasks =
                 !$settings.showUnscheduledNestedTasks;
             }}
@@ -317,15 +302,17 @@
         </SettingItem>
       {/if}
     </div>
-    <button class="release-notes-button" on:click={showReleaseNotes}
-      >Show release notes
-    </button>
   {/if}
 </div>
 
 <style>
   :global(.active-filter) {
     color: var(--text-success);
+  }
+
+  :global(.today),
+  :global(.today:hover) {
+    background-color: var(--color-accent);
   }
 
   .stretcher {
@@ -395,10 +382,13 @@
   }
 
   .header {
-    display: grid;
-    grid-template-columns: repeat(3, var(--size-4-8)) repeat(3, 1fr) repeat(
-        3,
-        var(--size-4-8)
-      );
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .day-controls {
+    display: flex;
+    gap: var(--size-4-1);
+    justify-content: space-between;
   }
 </style>

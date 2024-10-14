@@ -46,15 +46,15 @@
   <div class="range">
     {startOfRange} - {endOfRange}
   </div>
-  <ControlButton label="Show previous week" on:click={handleShowPrevious}>
+  <ControlButton label="Show previous week" onclick={handleShowPrevious}>
     <ArrowLeftToLine class="svg-icon" />
   </ControlButton>
 
-  <ControlButton label="Show current week" on:click={handleShowCurrent}>
+  <ControlButton label="Show current week" onclick={handleShowCurrent}>
     <CircleDotIcon class="svg-icon" />
   </ControlButton>
 
-  <ControlButton label="Show next week" on:click={handleShowNext}>
+  <ControlButton label="Show next week" onclick={handleShowNext}>
     <ArrowRightToLine class="svg-icon" />
   </ControlButton>
 </div>

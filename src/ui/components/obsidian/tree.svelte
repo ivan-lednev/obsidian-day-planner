@@ -13,7 +13,7 @@
 
 <div class="tree-container">
   <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <div class="tree-item-self is-clickable" on:click={toggleTree}>
+  <div class="tree-item-self is-clickable" onclick={toggleTree}>
     <div
       class="tree-item-icon collapse-icon"
       class:is-collapsed={!isTreeVisible}

@@ -37,7 +37,7 @@
         <ControlButton
           --color={$isToday(day) ? "white" : "var(--icon-color)"}
           label="Open note for day"
-          on:click={async () => await workspaceFacade.openFileForDay(day)}
+          onclick={async () => await workspaceFacade.openFileForDay(day)}
         >
           {day.format($settings.timelineDateFormat)}
         </ControlButton>

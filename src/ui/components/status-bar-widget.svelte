@@ -16,7 +16,7 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class="root" on:click={onClick}>
+<div class="root" onclick={onClick}>
   {#if $errorStore}
     😵 Error in Day Planner (click to see)
   {:else if !current && !next}

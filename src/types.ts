@@ -32,7 +32,6 @@ export interface ObsidianContext {
   renderMarkdown: RenderMarkdown;
   toggleCheckboxInFile: VaultFacade["toggleCheckboxInFile"];
   editContext: ReturnType<typeof useEditContext>;
-  showReleaseNotes: () => void;
   showPreview: ReturnType<typeof createShowPreview>;
   isModPressed: Readable<boolean>;
   reSync: () => void;
