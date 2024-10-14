@@ -1,23 +1,26 @@
 <script lang="ts">
-  export let key: string;
-  export let value: string;
+  const {
+    key,
+    value,
+    onpointerup = () => {},
+  }: { key: string; value: string; onpointerup?: () => void } = $props();
 </script>
 
 {#if value}
-  <span class="pill">{key}: {value}</span>
+  <span class="pill" {onpointerup}>{key}: {value}</span>
 {/if}
 
 <style>
   .pill {
     display: inline-flex;
 
-    padding: var(--size-2-1) var(--size-4-1);
+    padding: var(--size-4-1) var(--size-4-2);
 
     font-size: var(--font-ui-smaller);
-    color: var(--color-accent);
+    color: var(--tag-color);
     white-space: nowrap;
 
-    border: 1px solid var(--color-accent);
+    background-color: var(--tag-background);
     border-radius: var(--radius-m);
   }
 </style>

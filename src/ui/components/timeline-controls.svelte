@@ -153,7 +153,13 @@
     </ControlButton>
   </div>
   <div>
-    <Pill key="filter" value={$settings.dataviewSource} />
+    <Pill
+      key="filter"
+      onpointerup={() => {
+        settingsVisible = true;
+      }}
+      value={$settings.dataviewSource}
+    />
   </div>
 
   {#if !$dataviewLoaded}
