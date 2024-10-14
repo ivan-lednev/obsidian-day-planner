@@ -6,7 +6,7 @@ import { setUp } from "./util/setup";
 
 describe("create", () => {
   test("when creating and dragging, task duration changes", () => {
-    const { todayControls, moveCursorTo, displayedTasks } = setUp({
+    const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp({
       tasks: emptyTasks,
     });
 
@@ -14,7 +14,7 @@ describe("create", () => {
     todayControls.handleContainerMouseDown();
     moveCursorTo("02:00");
 
-    expect(get(displayedTasks)).toMatchObject({
+    expect(get(dayToDisplayedTasks)).toMatchObject({
       [dayKey]: {
         withTime: [
           {

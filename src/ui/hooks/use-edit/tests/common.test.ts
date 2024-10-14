@@ -17,7 +17,7 @@ jest.mock("obsidian-daily-notes-interface", () => ({
 
 describe("drag one & common edit mechanics", () => {
   test("Splits multi-day tasks into single-day tasks", () => {
-    const { displayedTasks } = setUp({
+    const { dayToDisplayedTasks } = setUp({
       tasks: [
         {
           ...baseTask,
@@ -28,7 +28,7 @@ describe("drag one & common edit mechanics", () => {
       ],
     });
 
-    expect(get(displayedTasks)).toMatchObject({
+    expect(get(dayToDisplayedTasks)).toMatchObject({
       [dayKey]: {
         withTime: [
           {
@@ -55,7 +55,7 @@ describe("drag one & common edit mechanics", () => {
       todayControls,
       nextDayControls,
       moveCursorTo,
-      displayedTasks,
+      dayToDisplayedTasks,
       confirmEdit,
     } = setUp({
       tasks: threeTasks,
@@ -69,7 +69,7 @@ describe("drag one & common edit mechanics", () => {
     nextDayControls.handleMouseEnter();
     moveCursorTo("05:00");
 
-    expect(get(displayedTasks)).toMatchObject({
+    expect(get(dayToDisplayedTasks)).toMatchObject({
       [dayKey]: {
         withTime: [
           { id: "1" },

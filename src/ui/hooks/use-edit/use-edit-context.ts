@@ -69,10 +69,10 @@ export function useEditContext(props: {
     },
   );
 
-  const grouped = derived(
+  const dayToDisplayedTasks = derived(
     [remoteTasks, tasksWithPendingUpdate],
-    ([$remoteTasks, $displayedTasks]) => {
-      const combinedTasks = $remoteTasks.concat($displayedTasks);
+    ([$remoteTasks, $tasksWithPendingUpdate]) => {
+      const combinedTasks = $remoteTasks.concat($tasksWithPendingUpdate);
       const split = combinedTasks.flatMap((task) => {
         if (!isWithTime(task)) {
           return task;
@@ -108,31 +108,34 @@ export function useEditContext(props: {
       settings,
     });
 
-    const displayedTasksForDay = derived(grouped, ($grouped) => {
-      const tasksForDay = $grouped[getDayKey(day)] || getEmptyRecordsForDay();
+    const displayedTasksForDay = derived(
+      dayToDisplayedTasks,
+      ($dayToDisplayedTasks) => {
+        const tasksForDay =
+          $dayToDisplayedTasks[getDayKey(day)] || getEmptyRecordsForDay();
 
-      const withTime: Array<WithPlacing<WithTime<Task>>> = flow(
-        uniqBy(getRenderKey),
-        addHorizontalPlacing,
-      )(tasksForDay.withTime);
+        const withTime: Array<WithPlacing<WithTime<Task>>> = flow(
+          uniqBy(getRenderKey),
+          addHorizontalPlacing,
+        )(tasksForDay.withTime);
 
-      return {
-        ...tasksForDay,
-        withTime,
-      };
-    });
+        return {
+          ...tasksForDay,
+          withTime,
+        };
+      },
+    );
 
     return {
       ...handlers,
-      displayedTasks: displayedTasksForDay,
+      displayedTasksForDay,
     };
   }
 
   return {
     cursor,
     pointerOffsetY,
-    // todo: consistent naming
-    displayedTasks: grouped,
+    dayToDisplayedTasks,
     confirmEdit,
     cancelEdit,
     getEditHandlers,

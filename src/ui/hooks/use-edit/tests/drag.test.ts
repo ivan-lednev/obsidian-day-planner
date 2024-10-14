@@ -10,12 +10,12 @@ import { setUp } from "./util/setup";
 
 describe("drag", () => {
   test("when drag starts, target task reacts to cursor", () => {
-    const { todayControls, moveCursorTo, displayedTasks } = setUp();
+    const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp();
 
     todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
     moveCursorTo("01:00");
 
-    expect(get(displayedTasks)).toMatchObject({
+    expect(get(dayToDisplayedTasks)).toMatchObject({
       [dayKey]: {
         withTime: [
           {
@@ -28,7 +28,7 @@ describe("drag", () => {
 
   describe("drag many", () => {
     test("tasks below react to shifting selected task once there is overlap", () => {
-      const { todayControls, moveCursorTo, displayedTasks } = setUp({
+      const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp({
         tasks: threeTasks,
       });
 
@@ -38,7 +38,7 @@ describe("drag", () => {
       );
       moveCursorTo("03:00");
 
-      expect(get(displayedTasks)).toMatchObject({
+      expect(get(dayToDisplayedTasks)).toMatchObject({
         [dayKey]: {
           withTime: [
             {
@@ -59,7 +59,7 @@ describe("drag", () => {
     });
 
     test("tasks below stay in initial position once the overlap is reversed, tasks above shift as well", () => {
-      const { todayControls, moveCursorTo, displayedTasks } = setUp({
+      const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp({
         tasks: threeTasks,
         settings: { ...defaultSettingsForTests },
       });
@@ -71,7 +71,7 @@ describe("drag", () => {
       moveCursorTo("03:00");
       moveCursorTo("01:00");
 
-      expect(get(displayedTasks)).toMatchObject({
+      expect(get(dayToDisplayedTasks)).toMatchObject({
         [dayKey]: {
           withTime: [
             {
@@ -96,7 +96,7 @@ describe("drag", () => {
 
   describe("drag and shrink others", () => {
     test("Next task shrinks up to minimal duration and starts moving down", () => {
-      const { todayControls, moveCursorTo, displayedTasks } = setUp({
+      const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp({
         tasks: threeTasks,
       });
 
@@ -106,7 +106,7 @@ describe("drag", () => {
       );
       moveCursorTo("03:00");
 
-      expect(get(displayedTasks)).toMatchObject({
+      expect(get(dayToDisplayedTasks)).toMatchObject({
         [dayKey]: {
           withTime: [
             {

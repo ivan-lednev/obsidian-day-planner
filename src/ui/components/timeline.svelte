@@ -25,7 +25,7 @@
   } = getContext<ObsidianContext>(obsidianContext);
 
   $: ({
-    displayedTasks,
+    displayedTasksForDay,
     handleContainerMouseDown,
     handleResizerMouseDown,
     handleTaskMouseUp,
@@ -65,7 +65,7 @@
     on:pointerup={confirmEdit}
     on:pointerup|stopPropagation
   >
-    {#each $displayedTasks.withTime as task (getRenderKey(task))}
+    {#each $displayedTasksForDay.withTime as task (getRenderKey(task))}
       {#if isRemote(task)}
         <RemoteTimeBlock {task} />
       {:else}

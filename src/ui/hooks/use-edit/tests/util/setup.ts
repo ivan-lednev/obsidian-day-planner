@@ -37,14 +37,14 @@ export function setUp({
   settings = defaultSettingsForTests,
 } = {}) {
   const props = createProps({ tasks, settings });
-  const { getEditHandlers, displayedTasks, confirmEdit, pointerOffsetY } =
+  const { getEditHandlers, dayToDisplayedTasks, confirmEdit, pointerOffsetY } =
     useEditContext(props);
 
   const todayControls = getEditHandlers(day);
   const nextDayControls = getEditHandlers(nextDay);
 
   // this prevents the store from resetting;
-  displayedTasks.subscribe(noop);
+  dayToDisplayedTasks.subscribe(noop);
 
   function moveCursorTo(time: string, day?: Moment) {
     pointerOffsetY.set(toMinutes(time));
@@ -54,7 +54,7 @@ export function setUp({
     todayControls,
     nextDayControls,
     moveCursorTo,
-    displayedTasks,
+    dayToDisplayedTasks,
     confirmEdit,
     props,
   };

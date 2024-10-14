@@ -17,19 +17,19 @@
   } = getContext<ObsidianContext>(obsidianContext);
 
   $: ({
-    displayedTasks,
+    displayedTasksForDay,
     handleTaskMouseUp,
     handleUnscheduledTaskGripMouseDown,
   } = getEditHandlers(day));
 </script>
 
-{#if $displayedTasks.noTime.length > 0 && $settings.showUncheduledTasks}
+{#if $displayedTasksForDay.noTime.length > 0 && $settings.showUncheduledTasks}
   <OverlayScrollbarsComponent
     class="unscheduled-task-container overlayscrollbars-svelte"
     defer
     options={{ scrollbars: { theme: "os-theme-custom" } }}
   >
-    {#each $displayedTasks.noTime as task}
+    {#each $displayedTasksForDay.noTime as task}
       <!--    TODO: handle all day events here-->
       {#if isLocal(task)}
         <UnscheduledTimeBlock
