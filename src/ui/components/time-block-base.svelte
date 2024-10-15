@@ -8,7 +8,7 @@
   import { tappable } from "../actions/tappable";
   import type { ActionArray } from "../actions/use-actions";
   import { useActions } from "../actions/use-actions";
-  import { getColorOverride } from "../hooks/get-color-override.svelte";
+  import { getColorOverride } from "../hooks/get-color-override";
 
   import { obsidianContext } from "./../../constants";
 
@@ -16,7 +16,7 @@
     children,
     task,
     use = [],
-  }: { children: Snippet; task: Task; use: ActionArray } = $props();
+  }: { children: Snippet; task: Task; use?: ActionArray } = $props();
 
   const { isDarkMode } = getContext<ObsidianContext>(obsidianContext);
 

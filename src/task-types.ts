@@ -62,6 +62,6 @@ export function isRemote<T extends Task>(task: T): task is T & RemoteTask {
   return Object.hasOwn(task, "calendar");
 }
 
-export function isLocal(task: Task): task is WithTime<LocalTask> {
+export function isLocal(task: Task): task is LocalTask {
   return Object.hasOwn(task, "location");
 }

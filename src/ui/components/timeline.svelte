@@ -16,6 +16,7 @@
   import LocalTimeBlock from "./local-time-block.svelte";
   import Needle from "./needle.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
+  import ScheduledTimeBlock from "./scheduled-time-block.svelte";
 
   export let day: Moment;
   export let isUnderCursor = false;
@@ -67,7 +68,9 @@
   >
     {#each $displayedTasksForDay.withTime as task (getRenderKey(task))}
       {#if isRemote(task)}
-        <RemoteTimeBlock {task} />
+        <ScheduledTimeBlock {task}>
+          <RemoteTimeBlock {task} />
+        </ScheduledTimeBlock>
       {:else}
         <LocalTimeBlock
           onFloatingUiPointerDown={updatePointerOffsetY}

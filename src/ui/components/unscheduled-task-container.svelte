@@ -8,6 +8,8 @@
   import { isLocal } from "../../task-types";
   import { type ObsidianContext } from "../../types";
 
+  import RemoteTimeBlock from "./remote-time-block.svelte";
+  import TimeBlockBase from "./time-block-base.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   export let day: Moment;
@@ -17,6 +19,7 @@
   } = getContext<ObsidianContext>(obsidianContext);
 
   $: ({
+    // todo: fix `any`
     displayedTasksForDay,
     handleTaskMouseUp,
     handleUnscheduledTaskGripMouseDown,
@@ -30,8 +33,8 @@
     options={{ scrollbars: { theme: "os-theme-custom" } }}
   >
     {#each $displayedTasksForDay.noTime as task}
-      <!--    TODO: handle all day events here-->
       {#if isLocal(task)}
+        <!--TODO: rename to local-->
         <UnscheduledTimeBlock
           onGripMouseDown={handleUnscheduledTaskGripMouseDown}
           onMouseUp={() => {
@@ -39,6 +42,10 @@
           }}
           {task}
         />
+      {:else}
+        <TimeBlockBase {task}>
+          <RemoteTimeBlock {task} />
+        </TimeBlockBase>
       {/if}
     {/each}
   </OverlayScrollbarsComponent>

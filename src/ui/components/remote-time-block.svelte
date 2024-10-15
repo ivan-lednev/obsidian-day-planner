@@ -1,34 +1,30 @@
 <script lang="ts">
   import type { RemoteTask, WithPlacing, WithTime } from "../../task-types";
 
-  import ScheduledTimeBlock from "./scheduled-time-block.svelte";
-
   export let task: WithPlacing<WithTime<RemoteTask>>;
 
   const tentative = task.rsvpStatus === "TENTATIVE";
   const declined = task.rsvpStatus === "DECLINED";
 </script>
 
-<ScheduledTimeBlock {task}>
-  <div class="remote-task-content">
-    <div
-      style="
+<div class="remote-task-content">
+  <div
+    style="
 
 --ribbon-color: {task.calendar.color}"
-      class="ribbon"
-      class:declined
-      class:tentative
-    ></div>
-    <div class="text">
-      <span class="calendar-name">
-        {task.calendar.name}
-      </span>
-      <span class="summary" class:declined>
-        {task.summary}
-      </span>
-    </div>
+    class="ribbon"
+    class:declined
+    class:tentative
+  ></div>
+  <div class="text">
+    <span class="calendar-name">
+      {task.calendar.name}
+    </span>
+    <span class="summary" class:declined>
+      {task.summary}
+    </span>
   </div>
-</ScheduledTimeBlock>
+</div>
 
 <style>
   .calendar-name {
