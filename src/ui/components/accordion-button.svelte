@@ -1,22 +1,21 @@
 <script lang="ts">
+  import { type Component, type Snippet } from "svelte";
+
   import ControlButton from "./control-button.svelte";
 
-  // TODO: there is no type export in Svelte that satisfies this. Find another way
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  export let icon: any;
+  const {
+    onclick,
+    children,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    Icon,
+  }: { onclick: () => void; children: Snippet; Icon: Component } = $props();
 </script>
 
 <div style:display="contents" class="accordion-button">
-  <ControlButton
-    --align-self="stretch"
-    --flex-basis="auto"
-    --justify-content="flex-start"
-    classes="day-planner-clickable-icon"
-    on:click
-  >
+  <ControlButton classes="day-planner-clickable-icon" {onclick}>
     <div class="button-text">
-      <svelte:component this={icon} class="svg-icon" />
-      <slot />
+      <Icon class="svg-icon" />
+      {@render children()}
     </div>
   </ControlButton>
 </div>

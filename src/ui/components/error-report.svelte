@@ -24,7 +24,7 @@
     <ControlButton
       classes="dismiss-button"
       label="Dismiss error"
-      on:click={dismiss}
+      onclick={dismiss}
     >
       <X class="svg-icon" />
     </ControlButton>

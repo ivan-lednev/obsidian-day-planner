@@ -88,15 +88,6 @@
 
         menu.addItem((item) =>
           item
-            .setTitle("Undo last edit")
-            .setIcon("undo")
-            .onClick(() => {}),
-        );
-
-        menu.addSeparator();
-
-        menu.addItem((item) =>
-          item
             .setTitle("Re-sync internet calendars")
             .setIcon("sync")
             .onClick(reSync),

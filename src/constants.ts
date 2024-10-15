@@ -16,6 +16,7 @@ export const indentBeforeTaskParagraph = 6;
 export const clockKey = "clocked";
 export const clockFormat = "YYYY-MM-DDTHH:mm:ss";
 export const reQueryAfterMillis = 200;
+export const undoTimeoutMillis = 8000;
 export const icalRefreshIntervalMillis = 5 * 60 * 1000;
 export const fallbackPartStat = "NEEDS-ACTION";
 export const mdastUtilNumberOfSpacesInTab = 4;

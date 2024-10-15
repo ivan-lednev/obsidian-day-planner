@@ -38,6 +38,7 @@ import { ConfirmationModal } from "./ui/confirmation-modal";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimelineView from "./ui/timeline-view";
+import { createUndoNotice } from "./ui/undo-notice";
 import WeeklyView from "./ui/weekly-view";
 import { createHooks } from "./util/create-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
@@ -59,6 +60,7 @@ export default class DayPlanner extends Plugin {
   private vaultFacade!: VaultFacade;
   private transationWriter!: TransactionWriter;
   private syncDataview?: () => void;
+  private currentUndoNotice?: Notice;
 
   async onload() {
     await this.initSettingsStore();
@@ -308,6 +310,9 @@ export default class DayPlanner extends Plugin {
       }
 
       await this.transationWriter.writeTransaction(transaction);
+
+      this.currentUndoNotice?.hide();
+      this.currentUndoNotice = createUndoNotice(this.transationWriter.undo);
     };
 
     const {

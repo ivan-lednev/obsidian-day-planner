@@ -165,7 +165,7 @@ export class TransactionWriter {
     return Promise.all(editPromises);
   };
 
-  revert = async () => {
+  undo = async () => {
     const lastUpdate = this.history.pop();
 
     if (!lastUpdate) {

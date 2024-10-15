@@ -11,6 +11,15 @@
   }
 }
 
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
 .day-planner {
   position: relative;
 }
@@ -153,4 +162,18 @@
   max-width: var(--file-line-width);
   margin-left: auto;
   margin-right: auto;
+}
+
+.undo-timeout-bar {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--color-accent);
+}
+
+.planner-undo-notice {
+  position: relative;
+  overflow: hidden;
 }
