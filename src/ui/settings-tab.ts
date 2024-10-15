@@ -375,7 +375,19 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Planner Heading Text")
       .setDesc(
-        `When you create a planner, this text is going to be in the heading`,
+        createFragment((fragment) => {
+          fragment.append(
+            createEl("p", {
+              text: "Only the items under this heading (and its subheadings) are going to be pulled from daily notes.",
+            }),
+            createEl("p", {
+              text: "If left empty, the plugin will pull all items from daily notes.",
+            }),
+            createEl("p", {
+              text: `Also used when creating a plan with drag-and-drop.`,
+            }),
+          );
+        }),
       )
       .addText((component) =>
         component

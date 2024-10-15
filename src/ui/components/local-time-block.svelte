@@ -2,7 +2,7 @@
   import { offset } from "@floating-ui/dom";
   import { getContext } from "svelte";
 
-  import { obsidianContext } from "../../constants";
+  import { obsidianContext, vibrationDurationMillis } from "../../constants";
   import type { LocalTask, WithPlacing, WithTime } from "../../task-types";
   import type { ObsidianContext } from "../../types";
   import { copy } from "../../util/task-utils";
@@ -53,7 +53,7 @@
   {task}
   use={[drag.anchorSetup, resize.anchorSetup, resizeFromTop.anchorSetup]}
   on:longpress={() => {
-    navigator.vibrate(100);
+    navigator.vibrate(vibrationDurationMillis);
     isDragActive.set(true);
     isResizeActive.set(true);
     isResizeFromTopActive.set(true);

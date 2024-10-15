@@ -111,11 +111,14 @@ export function createHooks({
     debouncedTaskUpdateTrigger,
     visibleDays,
   );
-  const listsFromVisibleDailyNotes = useListsFromVisibleDailyNotes(
+
+  const listsFromVisibleDailyNotes = useListsFromVisibleDailyNotes({
     visibleDailyNotes,
     debouncedTaskUpdateTrigger,
     dataviewFacade,
-  );
+    metadataCache: app.metadataCache,
+    settings: settingsStore,
+  });
   const tasksFromExtraSources = useTasksFromExtraSources({
     dataviewSource,
     debouncedTaskUpdateTrigger,

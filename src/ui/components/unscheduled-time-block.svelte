@@ -2,7 +2,7 @@
   import { offset } from "@floating-ui/dom";
   import { getContext } from "svelte";
 
-  import { obsidianContext } from "../../constants";
+  import { obsidianContext, vibrationDurationMillis } from "../../constants";
   import type { LocalTask } from "../../task-types";
   import type { ObsidianContext } from "../../types";
   import type { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
@@ -34,7 +34,7 @@
   {task}
   use={[drag.anchorSetup]}
   on:longpress={() => {
-    navigator.vibrate(100);
+    navigator.vibrate(vibrationDurationMillis);
     isActive.set(true);
   }}
   on:pointerenter={drag.handleAnchorPointerEnter}
