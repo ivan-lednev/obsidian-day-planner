@@ -8,6 +8,7 @@
   import { getVisibleHours } from "../../../global-store/derived-settings";
   import { settings } from "../../../global-store/settings";
   import type { ObsidianContext } from "../../../types";
+  import { isOnWeekend } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
   import ResizeHandle from "../resize-handle.svelte";
   import ResizeableBox from "../resizeable-box.svelte";
@@ -64,7 +65,7 @@
     visibleHours={getVisibleHours($settings)}
   />
   {#each $dateRange as day}
-    <div class="day-column">
+    <div class="day-column" class:weekend={isOnWeekend(day)}>
       <Timeline {day} isUnderCursor={true} />
     </div>
   {/each}
@@ -135,5 +136,9 @@
   .today {
     color: white;
     background-color: var(--color-accent);
+  }
+
+  .weekend {
+    background-color: var(--background-primary);
   }
 </style>

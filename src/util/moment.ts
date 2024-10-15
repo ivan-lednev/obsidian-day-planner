@@ -125,3 +125,7 @@ export function getEarliestMoment(moments: Moment[]) {
     return result;
   });
 }
+
+export function isOnWeekend(day: Moment) {
+  return day.isoWeekday() === 6 || day.isoWeekday() === 7;
+}
