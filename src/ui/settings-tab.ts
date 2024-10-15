@@ -5,7 +5,11 @@ import { isOneOf } from "typed-assert";
 
 import { icons } from "../constants";
 import type DayPlanner from "../main";
-import { type DayPlannerSettings, eventFormats } from "../settings";
+import {
+  type DayPlannerSettings,
+  eventFormats,
+  firstDaysOfWeek,
+} from "../settings";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   constructor(
@@ -150,6 +154,24 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             const asNumber = Number(value);
 
             this.update({ startHour: asNumber });
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("First day of week")
+      .addDropdown((component) =>
+        component
+          .addOptions({
+            monday: "Monday",
+            sunday: "Sunday",
+            saturday: "Saturday",
+            friday: "Friday",
+          })
+          .setValue(String(this.plugin.settings().firstDayOfWeek))
+          .onChange((value: string) => {
+            isOneOf(value, firstDaysOfWeek);
+
+            this.update({ firstDayOfWeek: value });
           }),
       );
 

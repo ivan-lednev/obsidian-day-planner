@@ -15,6 +15,12 @@ export interface ColorOverride {
 }
 
 export const eventFormats = ["task", "bullet"] as const;
+export const firstDaysOfWeek = [
+  "monday",
+  "sunday",
+  "saturday",
+  "friday",
+] as const;
 
 export interface DayPlannerSettings {
   progressIndicator: "pie" | "bar" | "none";
@@ -51,6 +57,7 @@ export interface DayPlannerSettings {
   taskStatusOnCreation: string;
   eventFormatOnCreation: (typeof eventFormats)[number];
   sortTasksInPlanAfterEdit: boolean;
+  firstDayOfWeek: (typeof firstDaysOfWeek)[number];
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -88,6 +95,7 @@ export const defaultSettings: DayPlannerSettings = {
   taskStatusOnCreation: " ",
   eventFormatOnCreation: "task",
   sortTasksInPlanAfterEdit: false,
+  firstDayOfWeek: "monday",
 };
 
 export const defaultSettingsForTests = {

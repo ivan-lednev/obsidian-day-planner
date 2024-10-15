@@ -1,6 +1,7 @@
 import { range } from "lodash/fp";
 import type { Moment } from "moment/moment";
 
+import type { DayPlannerSettings } from "../settings";
 import type { RelationToNow } from "../types";
 
 const moment = window.moment;
@@ -25,6 +26,21 @@ export function getDaysOfCurrentWeek() {
   return getDaysOfWeek(window.moment());
 }
 
+export function getMomentFromDayOfWeek(
+  day: DayPlannerSettings["firstDayOfWeek"],
+) {
+  switch (day) {
+    case "monday":
+      return window.moment().startOf("isoWeek");
+    case "sunday":
+      return window.moment().startOf("isoWeek").subtract(1, "day");
+    case "saturday":
+      return window.moment().startOf("isoWeek").subtract(2, "days");
+    case "friday":
+      return window.moment().startOf("isoWeek").subtract(3, "days");
+  }
+}
+
 export function getDaysOfWeek(moment: Moment) {
   const firstDay = moment.clone().startOf("isoWeek");
 
@@ -35,6 +51,17 @@ export function getDaysOfWeek(moment: Moment) {
       return [...result, nextDay];
     },
     [firstDay],
+  );
+}
+
+export function getFullWeekFromDay(day: Moment) {
+  return range(1, 7).reduce(
+    (result, dayIndex) => {
+      result.push(day.clone().add(dayIndex, "day"));
+
+      return result;
+    },
+    [day],
   );
 }
 

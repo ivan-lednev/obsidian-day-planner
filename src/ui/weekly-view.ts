@@ -4,7 +4,7 @@ import { mount, unmount } from "svelte";
 import { dateRangeContextKey, viewTypeWeekly } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 import type { ComponentContext, DateRange } from "../types";
-import { getDaysOfCurrentWeek } from "../util/moment";
+import { getFullWeekFromDay, getMomentFromDayOfWeek } from "../util/moment";
 
 import HeaderActions from "./components/week/header-actions.svelte";
 import Week from "./components/week/week.svelte";
@@ -39,8 +39,13 @@ export default class WeeklyView extends ItemView {
   async onOpen() {
     const headerEl = this.containerEl.children[0];
     const contentEl = this.containerEl.children[1];
+    const firstDayOfWeek = getMomentFromDayOfWeek(
+      this.settings().firstDayOfWeek,
+    );
 
-    this.dateRange = this.dateRanges.trackRange(getDaysOfCurrentWeek());
+    this.dateRange = this.dateRanges.trackRange(
+      getFullWeekFromDay(firstDayOfWeek),
+    );
 
     const context = new Map([
       ...this.componentContext,
