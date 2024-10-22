@@ -3,6 +3,7 @@ import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
 
 export interface IcalConfig {
   name: string;
+  email?: string;
   url: string;
   color: string;
 }
@@ -49,7 +50,8 @@ export interface DayPlannerSettings {
   releaseNotes: boolean;
   taskStatusOnCreation: string;
   eventFormatOnCreation: (typeof eventFormats)[number];
-  firstDayOfWeek: number,
+  sortTasksInPlanAfterEdit: boolean;
+  firstDayOfWeek: number;
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -86,6 +88,7 @@ export const defaultSettings: DayPlannerSettings = {
   releaseNotes: true,
   taskStatusOnCreation: " ",
   eventFormatOnCreation: "task",
+  sortTasksInPlanAfterEdit: false,
   firstDayOfWeek: 0, // 0 for Sunday, 1 for Monday, etc.
 };
 
