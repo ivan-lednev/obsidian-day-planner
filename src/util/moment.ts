@@ -2,6 +2,8 @@ import { range } from "lodash/fp";
 import type { Moment } from "moment/moment";
 
 import type { RelationToNow } from "../types";
+import { settings as settingsStore } from '../global-store/settings';
+import { get } from 'svelte/store';
 
 const moment = window.moment;
 
@@ -26,16 +28,10 @@ export function getDaysOfCurrentWeek() {
 }
 
 export function getDaysOfWeek(moment: Moment) {
-  const firstDay = moment.clone().startOf("isoWeek");
+  const settings = get(settingsStore);
+  const firstDay = moment.clone().startOf('week').day(settings.firstDayOfWeek);
 
-  return range(1, 7).reduce(
-    (result, dayIndex) => {
-      const nextDay = firstDay.clone().add(dayIndex, "day");
-
-      return [...result, nextDay];
-    },
-    [firstDay],
-  );
+  return range(0, 7).map((dayIndex) => firstDay.clone().add(dayIndex, 'day'));
 }
 
 export function minutesToMomentOfDay(
