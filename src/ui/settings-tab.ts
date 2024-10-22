@@ -157,7 +157,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       .setName("First day of the week")
       .setDesc("Choose which day should be considered the start of the week")
       .addDropdown((dropdown) => {
-        const days = ['Sunday', 'Monday'];
+        const days = ["Sunday", "Monday"];
         days.forEach((day, index) => {
           dropdown.addOption(index.toString(), day);
         });
@@ -181,11 +181,23 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           });
       });
 
+    new Setting(containerEl)
+      .setName("Sort tasks in planner chronologically after edits")
+      .addToggle((component) => {
+        component
+          .setValue(this.plugin.settings().sortTasksInPlanAfterEdit)
+          .onChange((value) => {
+            this.update({ sortTasksInPlanAfterEdit: value });
+          });
+      });
+
     containerEl.createEl("h2", { text: "Remote calendars" });
 
-    this.plugin.settings().icals.map((ical, index) =>
+    this.plugin.settings().icals.map((ical, index) => {
+      containerEl.createEl("h2", { text: `Calendar ${index + 1}` });
+
       new Setting(containerEl)
-        .setName(`Calendar ${index + 1}`)
+        .setName("Mark calendar with color")
         .addColorPicker((el) =>
           el.setValue(ical.color).onChange((value: string) => {
             this.settingsStore.update(
@@ -194,7 +206,10 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
               }),
             );
           }),
-        )
+        );
+
+      new Setting(containerEl)
+        .setName("Prepend this text to events from this calendar")
         .addText((el) =>
           el
             .setPlaceholder("Displayed name")
@@ -206,40 +221,60 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
                 }),
               );
             }),
+        );
+
+      new Setting(containerEl)
+        .setName(
+          "Your email address, used to show 'tentative'/'needs action'/'declined' marker",
         )
         .addText((el) =>
           el
-            .setPlaceholder("URL")
-            .setValue(ical.url)
+            .setPlaceholder("Your email address")
+            .setValue(ical.email || "")
             .onChange((value: string) => {
               this.settingsStore.update(
                 produce((draft) => {
-                  draft.icals[index].url = value;
+                  draft.icals[index].email = value.trim();
                 }),
               );
             }),
-        )
-        .addExtraButton((el) =>
-          el
-            .setIcon("trash")
-            .setTooltip("Delete calendar")
-            .onClick(() => {
-              this.settingsStore.update((previous) => ({
-                ...previous,
-                icals: previous.icals.filter(
-                  (editedIcal, editedIndex) => editedIndex !== index,
-                ),
-              }));
+        );
 
-              this.display();
-            }),
-        ),
-    );
+      new Setting(containerEl).setName("Remote calendar URL").addText((el) =>
+        el
+          .setPlaceholder("URL")
+          .setValue(ical.url)
+          .onChange((value: string) => {
+            this.settingsStore.update(
+              produce((draft) => {
+                draft.icals[index].url = value;
+              }),
+            );
+          }),
+      );
+
+      new Setting(containerEl).addButton((el) =>
+        el
+          .setIcon("trash")
+          .setButtonText(`Delete calendar ${index + 1}`)
+          .onClick(() => {
+            this.settingsStore.update((previous) => ({
+              ...previous,
+              icals: previous.icals.filter(
+                (editedIcal, editedIndex) => editedIndex !== index,
+              ),
+            }));
+
+            this.display();
+          }),
+      );
+    });
 
     new Setting(containerEl).addButton((el) =>
       el.setButtonText("Add remote calendar").onClick(() => {
         const newIcal = {
           name: "",
+          email: "",
           url: "",
           color: "#ffffff",
         };
