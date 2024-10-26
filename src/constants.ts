@@ -8,6 +8,7 @@ export const dateRangeContextKey = "dateRangeContext";
 export const errorContextKey = "errorContext";
 export const defaultDayFormat = "YYYY-MM-DD";
 export const icalDayKeyFormat = "YYYY-MM-DD";
+export const defaultRangeDayFormat = "MMM, D";
 export const defaultDayFormatForLuxon = "yyyy-MM-dd";
 export const clockSeparator = "--";
 export const defaultDurationMinutes = 30;

@@ -11,9 +11,12 @@ import { getFullWeekFromDay, getMomentFromDayOfWeek } from "../util/moment";
 import HeaderActions from "./components/week/header-actions.svelte";
 import Week from "./components/week/week.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
+import * as r from "../util/range";
+import { get } from "svelte/store";
 
 export default class WeeklyView extends ItemView {
-  private weekComponent?: Week;
+  navigation = false;
+  private weekComponent?: typeof Week;
   private headerActionsComponent?: HeaderActions;
   private dateRange?: DateRange;
 
@@ -31,7 +34,11 @@ export default class WeeklyView extends ItemView {
   }
 
   getDisplayText(): string {
-    return "Week Planner";
+    if (!this.dateRange) {
+      return "Multi-Day View";
+    }
+
+    return r.toString(get(this.dateRange));
   }
 
   getIcon() {
@@ -44,7 +51,6 @@ export default class WeeklyView extends ItemView {
     const firstDayOfWeek = getMomentFromDayOfWeek(
       this.settings().firstDayOfWeek,
     );
-
     const today = window.moment();
     const initialRange = match(this.settings().multiDayRange)
       .with("full-week", () => getFullWeekFromDay(firstDayOfWeek))
@@ -64,6 +70,16 @@ export default class WeeklyView extends ItemView {
       .exhaustive();
 
     this.dateRange = this.dateRanges.trackRange(initialRange);
+    this.register(
+      this.dateRange.subscribe((next) => {
+        const newText = r.toString(next);
+
+        // @ts-expect-error: undocumented API
+        this.titleEl?.setText(newText);
+        // @ts-expect-error: undocumented API
+        this.leaf.updateHeader?.();
+      }),
+    );
 
     const context = new Map([
       ...this.componentContext,
@@ -82,6 +98,7 @@ export default class WeeklyView extends ItemView {
       const customActionsEl = createDiv();
 
       viewActionsEl.prepend(customActionsEl);
+      // @ts-expect-error
       this.headerActionsComponent = mount(HeaderActions, {
         target: customActionsEl,
         context,

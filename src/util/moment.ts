@@ -22,10 +22,6 @@ export function getDiffInMinutes(a: Moment, b: Moment) {
   return Math.abs(a.diff(b, "minutes"));
 }
 
-export function getDaysOfCurrentWeek() {
-  return getDaysOfWeek(window.moment());
-}
-
 export function getMomentFromDayOfWeek(
   day: DayPlannerSettings["firstDayOfWeek"],
 ) {
@@ -39,19 +35,6 @@ export function getMomentFromDayOfWeek(
     case "friday":
       return window.moment().startOf("isoWeek").subtract(3, "days");
   }
-}
-
-export function getDaysOfWeek(moment: Moment) {
-  const firstDay = moment.clone().startOf("isoWeek");
-
-  return range(1, 7).reduce(
-    (result, dayIndex) => {
-      const nextDay = firstDay.clone().add(dayIndex, "day");
-
-      return [...result, nextDay];
-    },
-    [firstDay],
-  );
 }
 
 export function getFullWeekFromDay(day: Moment) {

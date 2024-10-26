@@ -16,7 +16,9 @@
   import { getVisibleHours } from "../../../global-store/derived-settings";
   import { settings } from "../../../global-store/settings";
   import type { ObsidianContext } from "../../../types";
-  import { isOnWeekend } from "../../../util/moment";
+  import {
+    isOnWeekend,
+  } from "../../../util/moment";
   import ControlButton from "../control-button.svelte";
   import ResizeHandle from "../resize-handle.svelte";
   import ResizeableBox from "../resizeable-box.svelte";
@@ -24,12 +26,12 @@
   import Scroller from "../scroller.svelte";
   import Timeline from "../timeline.svelte";
   import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
+  import { getNextAdjacentRange, getPreviousAdjacentRange } from "../../../util/range";
 
   const { workspaceFacade } = getContext<ObsidianContext>(obsidianContext);
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
   let settingsVisible = $state(false);
-
   let weekHeaderRef: HTMLDivElement | undefined;
 
   function handleScroll(event: Event) {
@@ -104,15 +106,21 @@
     <Columns3 class="svg-icon" />
   </ControlButton>
 
-  <ControlButton label="Show current week" onclick={() => {}}>
+  <ControlButton label="Show current period" onclick={() => {}}>
     <CalendarArrowUp class="svg-icon" />
   </ControlButton>
 
-  <ControlButton label="Show next week" onclick={() => {}}>
+  <ControlButton
+    label="Show next period"
+    onclick={() => dateRange.update(getNextAdjacentRange)}
+  >
     <ChevronRight class="svg-icon" />
   </ControlButton>
 
-  <ControlButton label="Show previous week" onclick={() => {}}>
+  <ControlButton
+    label="Show previous period"
+    onclick={() => dateRange.update(getPreviousAdjacentRange)}
+  >
     <ChevronLeft class="svg-icon" />
   </ControlButton>
 </div>
