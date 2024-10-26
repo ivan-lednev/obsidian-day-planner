@@ -58,6 +58,7 @@ export interface DayPlannerSettings {
   eventFormatOnCreation: (typeof eventFormats)[number];
   sortTasksInPlanAfterEdit: boolean;
   firstDayOfWeek: (typeof firstDaysOfWeek)[number];
+  multiDayRange: "full-week" | "work-week" | "3-days";
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -96,6 +97,7 @@ export const defaultSettings: DayPlannerSettings = {
   eventFormatOnCreation: "task",
   sortTasksInPlanAfterEdit: false,
   firstDayOfWeek: "monday",
+  multiDayRange: "3-days",
 };
 
 export const defaultSettingsForTests = {

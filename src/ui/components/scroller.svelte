@@ -1,13 +1,16 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
-  const { children }: { children: Snippet<[boolean]> } = $props();
+  const {
+    children,
+    className,
+  }: { children: Snippet<[boolean]>; className?: string } = $props();
 
   let isUnderCursor = $state(false);
 </script>
 
 <div
-  class="scroller"
+  class="scroller {className}"
   on:mouseenter={() => {
     isUnderCursor = true;
   }}
@@ -16,19 +19,14 @@
   }}
   on:scroll
 >
-  <div class="stretcher">
-    {@render children(isUnderCursor)}
-  </div>
+  {@render children(isUnderCursor)}
 </div>
 
 <style>
   .scroller {
     overflow: auto;
     flex: 1 0 0;
-    background-color: var(--background-secondary);
-  }
-
-  .stretcher {
     display: flex;
+    background-color: var(--background-secondary);
   }
 </style>

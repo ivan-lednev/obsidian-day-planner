@@ -4,8 +4,8 @@
 
   const {
     children,
-    classNames,
-  }: { children: Snippet<[() => void]>; classNames?: string } = $props();
+    className,
+  }: { children: Snippet<[() => void]>; className?: string } = $props();
 
   let el: HTMLDivElement | undefined;
 
@@ -50,6 +50,6 @@
 />
 <svelte:window on:blur={handleBlur} />
 
-<div bind:this={el} style:height style:max-height="25vh" class={classNames}>
+<div bind:this={el} style:height style:max-height="25vh" class={className}>
   {@render children(startEdit)}
 </div>

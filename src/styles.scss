@@ -120,6 +120,12 @@
   padding: 0;
 }
 
+[data-type="weekly"] .view-content {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  grid-template-rows: auto 1fr;
+}
+
 .os-scrollbar {
   box-sizing: border-box;
   --os-size: var(--scrollbar-width);

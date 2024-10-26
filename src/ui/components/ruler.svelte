@@ -8,7 +8,7 @@
 
 <div class="hours-container">
   {#each visibleHours as hour}
-    <div style:height="{getHourSize($settings)}px" class="hour">
+    <div style:flex-basis="{getHourSize($settings)}px" class="hour">
       <div class="hour-number-container">
         {hoursToMoment(hour).format($settings.hourFormat)}
       </div>
@@ -18,11 +18,13 @@
 
 <style>
   .hours-container {
+    height: fit-content;
     position: sticky;
     z-index: 5;
     left: 0;
 
     display: flex;
+    /* TODO: move to variable */
     flex: 0 0 30px;
     flex-direction: column;
 

@@ -1,9 +1,4 @@
 <script lang="ts">
-  import {
-    ArrowLeftToLine,
-    ArrowRightToLine,
-    CircleDotIcon,
-  } from "lucide-svelte";
   import type { Moment } from "moment";
   import { getContext } from "svelte";
   import type { Writable } from "svelte/store";
@@ -11,13 +6,13 @@
   import { dateRangeContextKey } from "../../../constants";
   import { settings } from "../../../global-store/settings";
   import { getDaysOfCurrentWeek, getDaysOfWeek } from "../../../util/moment";
-  import ControlButton from "../control-button.svelte";
   import Pill from "../pill.svelte";
 
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
   $: firstDayOfShownWeek = $dateRange[0];
   $: startOfRange = firstDayOfShownWeek.format("MMM, D");
+  // todo: move to WeeklyView
   $: endOfRange = $dateRange.at(-1)?.format("MMM, D") ?? "N/A";
 
   function handleShowPrevious() {
@@ -46,17 +41,6 @@
   <div class="range">
     {startOfRange} - {endOfRange}
   </div>
-  <ControlButton label="Show previous week" onclick={handleShowPrevious}>
-    <ArrowLeftToLine class="svg-icon" />
-  </ControlButton>
-
-  <ControlButton label="Show current week" onclick={handleShowCurrent}>
-    <CircleDotIcon class="svg-icon" />
-  </ControlButton>
-
-  <ControlButton label="Show next week" onclick={handleShowNext}>
-    <ArrowRightToLine class="svg-icon" />
-  </ControlButton>
 </div>
 
 <style>

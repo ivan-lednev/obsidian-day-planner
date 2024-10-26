@@ -1,5 +1,7 @@
+import { range } from "lodash/fp";
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { mount, unmount } from "svelte";
+import { match } from "ts-pattern";
 
 import { dateRangeContextKey, viewTypeWeekly } from "../constants";
 import type { DayPlannerSettings } from "../settings";
@@ -43,9 +45,25 @@ export default class WeeklyView extends ItemView {
       this.settings().firstDayOfWeek,
     );
 
-    this.dateRange = this.dateRanges.trackRange(
-      getFullWeekFromDay(firstDayOfWeek),
-    );
+    const today = window.moment();
+    const initialRange = match(this.settings().multiDayRange)
+      .with("full-week", () => getFullWeekFromDay(firstDayOfWeek))
+      .with("3-days", () =>
+        range(1, 3).reduce(
+          (result, dayIndex) => {
+            result.push(today.clone().add(dayIndex, "day"));
+
+            return result;
+          },
+          [today],
+        ),
+      )
+      .with("work-week", () => {
+        throw new Error("Not implemented");
+      })
+      .exhaustive();
+
+    this.dateRange = this.dateRanges.trackRange(initialRange);
 
     const context = new Map([
       ...this.componentContext,
@@ -64,7 +82,6 @@ export default class WeeklyView extends ItemView {
       const customActionsEl = createDiv();
 
       viewActionsEl.prepend(customActionsEl);
-      // @ts-expect-error
       this.headerActionsComponent = mount(HeaderActions, {
         target: customActionsEl,
         context,
