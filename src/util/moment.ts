@@ -1,4 +1,3 @@
-import { range } from "lodash/fp";
 import type { Moment } from "moment/moment";
 
 import type { DayPlannerSettings } from "../settings";
@@ -23,29 +22,18 @@ export function getDiffInMinutes(a: Moment, b: Moment) {
 }
 
 export function getMomentFromDayOfWeek(
-  day: DayPlannerSettings["firstDayOfWeek"],
+  startingDay: Moment,
+  firstDayOFWeek: DayPlannerSettings["firstDayOfWeek"],
 ) {
-  switch (day) {
-    case "monday":
-      return window.moment().startOf("isoWeek");
-    case "sunday":
-      return window.moment().startOf("isoWeek").subtract(1, "day");
-    case "saturday":
-      return window.moment().startOf("isoWeek").subtract(2, "days");
-    case "friday":
-      return window.moment().startOf("isoWeek").subtract(3, "days");
-  }
-}
+  const startOfIsoWeek = startingDay.startOf("isoWeek");
+  const subtractDays: Record<DayPlannerSettings["firstDayOfWeek"], number> = {
+    monday: 0,
+    sunday: 1,
+    saturday: 2,
+    friday: 3,
+  };
 
-export function getFullWeekFromDay(day: Moment) {
-  return range(1, 7).reduce(
-    (result, dayIndex) => {
-      result.push(day.clone().add(dayIndex, "day"));
-
-      return result;
-    },
-    [day],
-  );
+  return startOfIsoWeek.subtract(subtractDays[firstDayOFWeek], "days");
 }
 
 export function minutesToMomentOfDay(

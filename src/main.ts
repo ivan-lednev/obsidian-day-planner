@@ -385,6 +385,7 @@ export default class DayPlanner extends Plugin {
       reSync: () => icalSyncTrigger.set(getUpdateTrigger()),
       isOnline,
       isDarkMode,
+      settings,
     };
 
     const componentContext = new Map<
@@ -404,7 +405,7 @@ export default class DayPlanner extends Plugin {
     this.registerView(
       viewTypeWeekly,
       (leaf: WorkspaceLeaf) =>
-        new WeeklyView(leaf, this.settings, componentContext, dateRanges),
+        new WeeklyView(leaf, this.settingsStore, componentContext, dateRanges),
     );
 
     this.registerView(

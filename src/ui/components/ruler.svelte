@@ -18,15 +18,17 @@
 
 <style>
   .hours-container {
-    height: fit-content;
     position: sticky;
     z-index: 5;
     left: 0;
 
     display: flex;
+
     /* TODO: move to variable */
     flex: 0 0 30px;
     flex-direction: column;
+
+    height: fit-content;
 
     background-color: var(--background-primary);
     border-right: 1px solid var(--background-modifier-border);

@@ -1,21 +1,37 @@
 import { range } from "lodash/fp";
 import type { Moment } from "moment";
-import { defaultRangeDayFormat } from "../constants";
+import { match } from "ts-pattern";
 
-export function getDaysOfCurrentWeek() {
-  return getDaysOfWeek(window.moment());
+import { defaultRangeDayFormat } from "../constants";
+import type { DayPlannerSettings } from "../settings";
+
+import { getMomentFromDayOfWeek } from "./moment";
+
+export function createRange(
+  type: DayPlannerSettings["multiDayRange"],
+  firstDayOfWeek: DayPlannerSettings["firstDayOfWeek"],
+) {
+  const today = window.moment();
+  return match(type)
+    .with("full-week", () => getFullWeek(today, firstDayOfWeek))
+    .with("3-days", () => getUpcomingDays(today, 3))
+    .with("work-week", () => getWorkWeek(today))
+    .exhaustive();
 }
 
-export function getDaysOfWeek(moment: Moment) {
-  const firstDay = moment.clone().startOf("isoWeek");
+export function getFullWeek(
+  moment: Moment,
+  firstDay: DayPlannerSettings["firstDayOfWeek"],
+) {
+  const firstDayMoment = getMomentFromDayOfWeek(moment, firstDay);
 
   return range(1, 7).reduce(
     (result, dayIndex) => {
-      const nextDay = firstDay.clone().add(dayIndex, "day");
+      const nextDay = firstDayMoment.clone().add(dayIndex, "day");
 
       return [...result, nextDay];
     },
-    [firstDay],
+    [firstDayMoment],
   );
 }
 

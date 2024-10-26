@@ -9,16 +9,20 @@
   import type { Moment } from "moment";
   import { Menu } from "obsidian";
   import { getContext } from "svelte";
-  import type { Writable } from "svelte/store";
+  import { type Writable, get } from "svelte/store";
 
   import { dateRangeContextKey, obsidianContext } from "../../../constants";
   import { isToday } from "../../../global-store/current-time";
   import { getVisibleHours } from "../../../global-store/derived-settings";
-  import { settings } from "../../../global-store/settings";
   import type { ObsidianContext } from "../../../types";
+  import { isOnWeekend } from "../../../util/moment";
   import {
-    isOnWeekend,
-  } from "../../../util/moment";
+    getNextAdjacentRange,
+    getNextWorkWeek,
+    getPreviousAdjacentRange,
+    getPreviousWorkWeek,
+  } from "../../../util/range";
+  import * as range from "../../../util/range";
   import ControlButton from "../control-button.svelte";
   import ResizeHandle from "../resize-handle.svelte";
   import ResizeableBox from "../resizeable-box.svelte";
@@ -26,18 +30,17 @@
   import Scroller from "../scroller.svelte";
   import Timeline from "../timeline.svelte";
   import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
-  import { getNextAdjacentRange, getPreviousAdjacentRange } from "../../../util/range";
 
-  const { workspaceFacade } = getContext<ObsidianContext>(obsidianContext);
+  const { workspaceFacade, settings } =
+    getContext<ObsidianContext>(obsidianContext);
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
   let settingsVisible = $state(false);
   let weekHeaderRef: HTMLDivElement | undefined;
 
   function handleScroll(event: Event) {
-    if (weekHeaderRef) {
-      // @ts-expect-error
-      weekHeaderRef.scrollLeft = event.target?.scrollLeft;
+    if (weekHeaderRef && event.target instanceof Element) {
+      weekHeaderRef.scrollLeft = event.target.scrollLeft;
     }
   }
 </script>
@@ -84,20 +87,41 @@
   <ControlButton
     label="Change columns"
     onclick={(event) => {
+      const currentMode = get(settings).multiDayRange;
       const menu = new Menu();
 
-      menu.addItem((item) => item.setTitle("Full week").onClick(() => {}));
+      menu.addItem((item) =>
+        item
+          .setTitle("Full week")
+          .setChecked(currentMode === "full-week")
+          .onClick(() => {
+            settings.update((previous) => ({
+              ...previous,
+              multiDayRange: "full-week",
+            }));
+          }),
+      );
       menu.addItem((item) => {
         item
           .setTitle("Work week")
-          .setChecked(true)
-          .onClick(() => {});
+          .setChecked(currentMode === "work-week")
+          .onClick(() => {
+            settings.update((previous) => ({
+              ...previous,
+              multiDayRange: "work-week",
+            }));
+          });
       });
       menu.addItem((item) => {
         item
           .setTitle("3 days")
-          .setChecked(false)
-          .onClick(() => {});
+          .setChecked(currentMode === "3-days")
+          .onClick(() => {
+            settings.update((previous) => ({
+              ...previous,
+              multiDayRange: "3-days",
+            }));
+          });
       });
 
       menu.showAtMouseEvent(event);
@@ -106,20 +130,39 @@
     <Columns3 class="svg-icon" />
   </ControlButton>
 
-  <ControlButton label="Show current period" onclick={() => {}}>
+  <ControlButton
+    label="Show current period"
+    onclick={() => {
+      dateRange.set(
+        range.createRange($settings.multiDayRange, $settings.firstDayOfWeek),
+      );
+    }}
+  >
     <CalendarArrowUp class="svg-icon" />
   </ControlButton>
 
   <ControlButton
     label="Show next period"
-    onclick={() => dateRange.update(getNextAdjacentRange)}
+    onclick={() => {
+      dateRange.update(
+        $settings.multiDayRange === "work-week"
+          ? ([firstDay]) => getNextWorkWeek(firstDay)
+          : getNextAdjacentRange,
+      );
+    }}
   >
     <ChevronRight class="svg-icon" />
   </ControlButton>
 
   <ControlButton
     label="Show previous period"
-    onclick={() => dateRange.update(getPreviousAdjacentRange)}
+    onclick={() => {
+      dateRange.update(
+        $settings.multiDayRange === "work-week"
+          ? ([firstDay]) => getPreviousWorkWeek(firstDay)
+          : getPreviousAdjacentRange,
+      );
+    }}
   >
     <ChevronLeft class="svg-icon" />
   </ControlButton>
@@ -154,12 +197,14 @@
 
   .controls-sidebar {
     display: flex;
+    grid-column: 2;
+    grid-row: 1 / 3;
     flex-direction: column;
     gap: var(--size-4-2);
+
     padding: var(--size-4-2) var(--size-4-1);
+
     border-left: 1px solid var(--background-modifier-border);
-    grid-row: 1 / 3;
-    grid-column: 2;
   }
 
   :global(.multiday-main-content) {
@@ -181,10 +226,11 @@
   }
 
   .day-column {
-    height: fit-content;
     display: flex;
     flex: 1 0 200px;
     flex-direction: column;
+
+    height: fit-content;
 
     background-color: var(--background-secondary);
     border-right: 1px solid var(--background-modifier-border);
@@ -207,8 +253,9 @@
 
   .header-cell {
     overflow-x: hidden;
-    width: 200px;
     flex: 1 0 200px;
+
+    width: 200px;
 
     background-color: var(--background-primary);
     border-right: 1px solid var(--background-modifier-border);

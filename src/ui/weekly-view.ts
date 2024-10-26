@@ -1,18 +1,15 @@
-import { range } from "lodash/fp";
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { mount, unmount } from "svelte";
-import { match } from "ts-pattern";
+import { get, type Writable } from "svelte/store";
 
 import { dateRangeContextKey, viewTypeWeekly } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 import type { ComponentContext, DateRange } from "../types";
-import { getFullWeekFromDay, getMomentFromDayOfWeek } from "../util/moment";
+import * as range from "../util/range";
 
 import HeaderActions from "./components/week/header-actions.svelte";
 import Week from "./components/week/week.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
-import * as r from "../util/range";
-import { get } from "svelte/store";
 
 export default class WeeklyView extends ItemView {
   navigation = false;
@@ -22,7 +19,7 @@ export default class WeeklyView extends ItemView {
 
   constructor(
     leaf: WorkspaceLeaf,
-    private readonly settings: () => DayPlannerSettings,
+    private readonly settings: Writable<DayPlannerSettings>,
     private readonly componentContext: ComponentContext,
     private readonly dateRanges: ReturnType<typeof useDateRanges>,
   ) {
@@ -38,46 +35,42 @@ export default class WeeklyView extends ItemView {
       return "Multi-Day View";
     }
 
-    return r.toString(get(this.dateRange));
+    return range.toString(get(this.dateRange));
   }
 
   getIcon() {
-    return this.settings().timelineIcon;
+    return "table-2";
   }
 
   async onOpen() {
     const headerEl = this.containerEl.children[0];
     const contentEl = this.containerEl.children[1];
-    const firstDayOfWeek = getMomentFromDayOfWeek(
-      this.settings().firstDayOfWeek,
+    const currentSettings = get(this.settings);
+
+    this.dateRange = this.dateRanges.trackRange(
+      range.createRange(
+        currentSettings.multiDayRange,
+        currentSettings.firstDayOfWeek,
+      ),
     );
-    const today = window.moment();
-    const initialRange = match(this.settings().multiDayRange)
-      .with("full-week", () => getFullWeekFromDay(firstDayOfWeek))
-      .with("3-days", () =>
-        range(1, 3).reduce(
-          (result, dayIndex) => {
-            result.push(today.clone().add(dayIndex, "day"));
 
-            return result;
-          },
-          [today],
-        ),
-      )
-      .with("work-week", () => {
-        throw new Error("Not implemented");
-      })
-      .exhaustive();
-
-    this.dateRange = this.dateRanges.trackRange(initialRange);
     this.register(
       this.dateRange.subscribe((next) => {
-        const newText = r.toString(next);
+        const newText = range.toString(next);
 
         // @ts-expect-error: undocumented API
         this.titleEl?.setText(newText);
         // @ts-expect-error: undocumented API
         this.leaf.updateHeader?.();
+      }),
+    );
+
+    // todo: remove manual state synchronization
+    this.register(
+      this.settings.subscribe((next) => {
+        this.dateRange?.set(
+          range.createRange(next.multiDayRange, next.firstDayOfWeek),
+        );
       }),
     );
 

@@ -25,8 +25,8 @@
 <style>
   .scroller {
     overflow: auto;
-    flex: 1 0 0;
     display: flex;
+    flex: 1 0 0;
     background-color: var(--background-secondary);
   }
 </style>
