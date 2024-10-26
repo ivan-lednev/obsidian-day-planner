@@ -188,7 +188,6 @@
   :global(.header-row) {
     position: relative;
     display: flex;
-    width: max-content;
   }
 
   .day-buttons {
