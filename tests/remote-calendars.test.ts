@@ -5,8 +5,8 @@ import moment from "moment";
 import { request } from "obsidian";
 import { get, writable } from "svelte/store";
 
-import { defaultSettingsForTests } from "./settings";
-import { useRemoteTasks } from "./util/use-remote-tasks";
+import { defaultSettingsForTests } from "../src/settings";
+import { useRemoteTasks } from "../src/util/use-remote-tasks";
 
 jest.mock("obsidian", () => ({
   request: jest.fn(),

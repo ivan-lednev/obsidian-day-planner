@@ -5,20 +5,23 @@ import {
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
 
-import { defaultDayFormat } from "./constants";
-import { sortListsRecursivelyUnderHeading } from "./mdast/mdast";
-import { createTransaction, TransactionWriter } from "./service/diff-writer";
-import { VaultFacade } from "./service/vault-facade";
-import { defaultSettingsForTests } from "./settings";
-import type { LocalTask, WithTime } from "./task-types";
+import { defaultDayFormat } from "../src/constants";
+import { sortListsRecursivelyUnderHeading } from "../src/mdast/mdast";
+import {
+  createTransaction,
+  TransactionWriter,
+} from "../src/service/diff-writer";
+import { VaultFacade } from "../src/service/vault-facade";
+import { defaultSettingsForTests } from "../src/settings";
+import type { LocalTask, WithTime } from "../src/task-types";
 import {
   createInMemoryFile,
   type InMemoryFile,
   InMemoryVault,
-} from "./test-utils";
-import { toMinutes } from "./util/moment";
-import { createTask } from "./util/task-utils";
-import { type Diff, mapTaskDiffToUpdates } from "./util/tasks-utils";
+} from "../src/test-utils";
+import { toMinutes } from "../src/util/moment";
+import { createTask } from "../src/util/task-utils";
+import { type Diff, mapTaskDiffToUpdates } from "../src/util/tasks-utils";
 
 jest.mock("obsidian-daily-notes-interface", () => ({
   getDateFromPath: jest.fn(() => null),
