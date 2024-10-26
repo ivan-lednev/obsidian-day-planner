@@ -81,7 +81,12 @@ export default class DayPlanner extends Plugin {
     this.registerViews();
     this.registerCommands();
 
-    this.addRibbonIcon("calendar-range", "Timeline", this.initTimelineLeaf);
+    this.addRibbonIcon(
+      "calendar-range",
+      "Open Timeline",
+      this.initTimelineLeaf,
+    );
+    this.addRibbonIcon("table-2", "Open Multi-Day View", this.initWeeklyLeaf);
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
 
     await this.handleNewPluginVersion();
