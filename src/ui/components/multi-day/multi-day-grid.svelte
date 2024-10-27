@@ -37,16 +37,16 @@
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
   let settingsVisible = $state(false);
-  let weekHeaderRef: HTMLDivElement | undefined;
+  let headerRef: HTMLDivElement | undefined;
 
   function handleScroll(event: Event) {
-    if (weekHeaderRef && event.target instanceof Element) {
-      weekHeaderRef.scrollLeft = event.target.scrollLeft;
+    if (headerRef && event.target instanceof Element) {
+      headerRef.scrollLeft = event.target.scrollLeft;
     }
   }
 </script>
 
-<div bind:this={weekHeaderRef} class="week-header">
+<div bind:this={headerRef} class="header">
   <div class="header-row day-buttons">
     <div class="corner"></div>
     {#each $dateRange as day}
@@ -243,7 +243,7 @@
     border-right: none;
   }
 
-  .week-header {
+  .header {
     position: relative;
     z-index: 1000;
 

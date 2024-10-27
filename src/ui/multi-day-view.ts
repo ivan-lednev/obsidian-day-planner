@@ -7,11 +7,11 @@ import type { DayPlannerSettings } from "../settings";
 import type { ComponentContext, DateRange } from "../types";
 import * as range from "../util/range";
 
-import HeaderActions from "./components/week/header-actions.svelte";
-import Week from "./components/week/week.svelte";
+import HeaderActions from "./components/multi-day/header-actions.svelte";
+import Week from "./components/multi-day/multi-day-grid.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
 
-export default class WeeklyView extends ItemView {
+export default class MultiDayView extends ItemView {
   navigation = false;
   private weekComponent?: typeof Week;
   private headerActionsComponent?: HeaderActions;

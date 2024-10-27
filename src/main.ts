@@ -35,11 +35,11 @@ import type { LocalTask } from "./task-types";
 import type { ObsidianContext } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { ConfirmationModal } from "./ui/confirmation-modal";
+import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimelineView from "./ui/timeline-view";
 import { createUndoNotice } from "./ui/undo-notice";
-import WeeklyView from "./ui/weekly-view";
 import { createHooks } from "./util/create-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
@@ -172,6 +172,12 @@ export default class DayPlanner extends Plugin {
     this.addCommand({
       id: "show-weekly-view",
       name: "Show week planner",
+      callback: this.initWeeklyLeaf,
+    });
+
+    this.addCommand({
+      id: "show-multi-day-view",
+      name: "Show multi-day planner",
       callback: this.initWeeklyLeaf,
     });
 
@@ -405,7 +411,12 @@ export default class DayPlanner extends Plugin {
     this.registerView(
       viewTypeWeekly,
       (leaf: WorkspaceLeaf) =>
-        new WeeklyView(leaf, this.settingsStore, componentContext, dateRanges),
+        new MultiDayView(
+          leaf,
+          this.settingsStore,
+          componentContext,
+          dateRanges,
+        ),
     );
 
     this.registerView(
