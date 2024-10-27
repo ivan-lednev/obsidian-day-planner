@@ -8,7 +8,7 @@ import {
   listIndentationSpacesToTabs,
   sortListsRecursively,
   toMarkdown,
-} from "./mdast";
+} from "../src/mdast/mdast";
 
 test("roundtripping doesn't mess up Obsidian-styled markdown", () => {
   const input = `# [[Heading]]

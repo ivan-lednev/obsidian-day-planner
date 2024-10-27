@@ -1,6 +1,6 @@
 import moment from "moment";
 
-import { computeOverlap } from "./overlap";
+import { computeOverlap } from "../src/overlap/overlap";
 
 test("simple case", () => {
   expect(

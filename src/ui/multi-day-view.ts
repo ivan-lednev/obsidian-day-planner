@@ -8,12 +8,13 @@ import type { ComponentContext, DateRange } from "../types";
 import * as range from "../util/range";
 
 import HeaderActions from "./components/multi-day/header-actions.svelte";
-import Week from "./components/multi-day/multi-day-grid.svelte";
+import MultiDayGrid from "./components/multi-day/multi-day-grid.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
 
 export default class MultiDayView extends ItemView {
+  private static readonly defaultDisplayText = "Multi-Day View";
   navigation = false;
-  private weekComponent?: typeof Week;
+  private multiDayComponent?: typeof MultiDayGrid;
   private headerActionsComponent?: HeaderActions;
   private dateRange?: DateRange;
 
@@ -32,7 +33,13 @@ export default class MultiDayView extends ItemView {
 
   getDisplayText(): string {
     if (!this.dateRange) {
-      return "Multi-Day View";
+      return MultiDayView.defaultDisplayText;
+    }
+
+    const currentDateRange = get(this.dateRange);
+
+    if (!currentDateRange) {
+      return MultiDayView.defaultDisplayText;
     }
 
     return range.toString(get(this.dateRange));
@@ -80,7 +87,7 @@ export default class MultiDayView extends ItemView {
     ]);
 
     // @ts-expect-error
-    this.weekComponent = mount(Week, {
+    this.weekComponent = mount(MultiDayGrid, {
       target: contentEl,
       context,
     });
@@ -102,8 +109,8 @@ export default class MultiDayView extends ItemView {
   async onClose() {
     this.dateRange?.untrack();
 
-    if (this.weekComponent) {
-      unmount(this.weekComponent);
+    if (this.multiDayComponent) {
+      unmount(this.multiDayComponent);
     }
 
     if (this.headerActionsComponent) {

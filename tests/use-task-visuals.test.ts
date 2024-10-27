@@ -1,11 +1,11 @@
 import moment from "moment";
 import { get, writable } from "svelte/store";
 
-import { currentTime } from "../../global-store/current-time";
-import { settings } from "../../global-store/settings";
+import { currentTime } from "../src/global-store/current-time";
+import { settings } from "../src/global-store/settings";
 
-import { baseTask } from "./test-utils";
-import { useTaskVisuals } from "./use-task-visuals";
+import { baseTask } from "../src/ui/hooks/test-utils";
+import { useTaskVisuals } from "../src/ui/hooks/use-task-visuals";
 
 function getBaseUseTaskProps() {
   const cursorOffsetY = writable(0);

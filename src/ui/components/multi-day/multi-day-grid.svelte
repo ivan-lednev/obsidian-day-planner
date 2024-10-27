@@ -10,6 +10,7 @@
   import { Menu } from "obsidian";
   import { getContext } from "svelte";
   import { type Writable, get } from "svelte/store";
+  import { fly } from "svelte/transition";
 
   import { dateRangeContextKey, obsidianContext } from "../../../constants";
   import { isToday } from "../../../global-store/current-time";
@@ -171,7 +172,10 @@
 </div>
 
 {#if settingsVisible}
-  <div class="settings-controls-container">
+  <div
+    class="settings-controls-container"
+    transition:fly={{ x: 400, duration: 100, opacity: 0.5 }}
+  >
     <SettingsControls />
   </div>
 {/if}

@@ -2,15 +2,8 @@ import { groupBy } from "lodash/fp";
 import type { Root } from "mdast";
 
 import { fromMarkdown, toMarkdown } from "../mdast/mdast";
-import type { LocalTask, WithTime } from "../task-types";
 
 import type { VaultFacade } from "./vault-facade";
-
-export type WriterDiff = {
-  updated: WithTime<LocalTask>[];
-  created: WithTime<LocalTask>[];
-  moved: { dayKey: string; task: WithTime<LocalTask> }[];
-};
 
 interface Range {
   start: {
