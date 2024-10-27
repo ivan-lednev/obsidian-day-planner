@@ -28,6 +28,7 @@
   import ResizeableBox from "../resizeable-box.svelte";
   import Ruler from "../ruler.svelte";
   import Scroller from "../scroller.svelte";
+  import SettingsControls from "../settings-controls.svelte";
   import Timeline from "../timeline.svelte";
   import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
 
@@ -77,6 +78,7 @@
 <div class="controls-sidebar">
   <ControlButton
     classes="settings-button"
+    isActive={settingsVisible}
     onclick={() => {
       settingsVisible = !settingsVisible;
     }}
@@ -169,7 +171,9 @@
 </div>
 
 {#if settingsVisible}
-  <div class="settings">This is the water, and this is the well</div>
+  <div class="settings-controls-container">
+    <SettingsControls />
+  </div>
 {/if}
 
 <Scroller className="multiday-main-content" on:scroll={handleScroll}>
@@ -273,5 +277,11 @@
 
   .weekend {
     background-color: var(--background-primary);
+  }
+
+  .settings-controls-container {
+    grid-column: 3;
+    grid-row: span 2;
+    padding: 0 var(--size-4-2);
   }
 </style>
