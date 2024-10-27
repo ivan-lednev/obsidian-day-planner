@@ -97,7 +97,7 @@
           await workspaceFacade.openFileInEditor(note);
         }}
       >
-        <span class="date"
+        <span class={`date ${$isToday($dateRange[0]) ? "today" : ""}`}
           >{$dateRange[0].format($settings.timelineDateFormat)}</span
         >
       </ControlButton>
@@ -148,6 +148,10 @@
   :global(.today),
   :global(.today:hover) {
     background-color: var(--color-accent);
+  }
+
+  .date.today {
+    color: white;
   }
 
   :global(.mod-error) {
