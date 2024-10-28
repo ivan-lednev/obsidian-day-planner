@@ -92,7 +92,7 @@
     "mdast-util-from-markdown": "^2.0.1",
     "mdast-util-to-markdown": "^2.1.0",
     "moment-timezone": "^0.5.45",
-    "node-ical": "0.18.0",
+    "node-ical": "0.20.0",
     "obsidian": "^1.6.6",
     "obsidian-daily-notes-interface": "^0.9.4",
     "overlayscrollbars": "^2.10.0",
