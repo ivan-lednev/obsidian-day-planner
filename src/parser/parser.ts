@@ -13,7 +13,7 @@ import {
   removeListTokens,
 } from "../util/task-utils";
 
-import { parseTimestamp } from "./timestamp/timestamp";
+import { parseTimestamp } from "./timestamp";
 
 function execTimestampPatterns(line: string) {
   const trimmed = line.trim();

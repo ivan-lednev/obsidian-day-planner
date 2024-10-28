@@ -1,6 +1,6 @@
 import type { Moment } from "moment/moment";
 
-import { timeRegExp } from "../../regexp";
+import { timeRegExp } from "../regexp";
 
 export function parseTimestamp(asText: string, day: Moment) {
   const result = timeRegExp.exec(asText);
