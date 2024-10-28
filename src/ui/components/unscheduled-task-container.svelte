@@ -19,7 +19,6 @@
   } = getContext<ObsidianContext>(obsidianContext);
 
   $: ({
-    // todo: fix `any`
     displayedTasksForDay,
     handleTaskMouseUp,
     handleUnscheduledTaskGripMouseDown,
@@ -34,7 +33,6 @@
   >
     {#each $displayedTasksForDay.noTime as task}
       {#if isLocal(task)}
-        <!--TODO: rename to local-->
         <UnscheduledTimeBlock
           onGripMouseDown={handleUnscheduledTaskGripMouseDown}
           onMouseUp={() => {

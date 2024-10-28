@@ -49,39 +49,39 @@
 
     await workspaceFacade.openFileInEditor(noteForToday);
   }
+
+  function handleReSyncClick(event: MouseEvent) {
+    const menu = new Menu();
+
+    menu.addItem((item) =>
+      item
+        .setTitle("Re-sync internet calendars")
+        .setIcon("sync")
+        .onClick(reSync),
+    );
+
+    menu.addItem((item) =>
+      item
+        .setTitle("Open multi-day planner")
+        .setIcon("table-2")
+        .onClick(initWeeklyView),
+    );
+
+    menu.addItem((item) => {
+      item
+        .setTitle("Open today's daily note")
+        .setIcon("pencil")
+        .onClick(goToToday);
+    });
+
+    menu.showAtMouseEvent(event);
+  }
 </script>
 
 <div class="controls">
   <ErrorReport />
   <div class="header">
-    <ControlButton
-      onclick={(event: MouseEvent) => {
-        const menu = new Menu();
-
-        menu.addItem((item) =>
-          item
-            .setTitle("Re-sync internet calendars")
-            .setIcon("sync")
-            .onClick(reSync),
-        );
-
-        menu.addItem((item) =>
-          item
-            .setTitle("Open week planner")
-            .setIcon("table")
-            .onClick(initWeeklyView),
-        );
-
-        menu.addItem((item) => {
-          item
-            .setTitle("Open today's daily note")
-            .setIcon("pencil")
-            .onClick(goToToday);
-        });
-
-        menu.showAtMouseEvent(event);
-      }}
-    >
+    <ControlButton onclick={handleReSyncClick}>
       <EllipsisVertical class="svg-icon" />
     </ControlButton>
     <div class="day-controls">
@@ -135,6 +135,7 @@
       >
     </div>
   {/if}
+
   {#if settingsVisible}
     <SettingsControls />
   {/if}

@@ -1,3 +1,4 @@
+import type { Moment } from "moment";
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { mount, unmount } from "svelte";
 import { get, type Writable } from "svelte/store";
@@ -5,7 +6,7 @@ import { get, type Writable } from "svelte/store";
 import { dateRangeContextKey, viewTypeWeekly } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 import type { ComponentContext, DateRange } from "../types";
-import * as range from "../util/range";
+import * as r from "../util/range";
 
 import HeaderActions from "./components/multi-day/header-actions.svelte";
 import MultiDayGrid from "./components/multi-day/multi-day-grid.svelte";
@@ -42,7 +43,7 @@ export default class MultiDayView extends ItemView {
       return MultiDayView.defaultDisplayText;
     }
 
-    return range.toString(get(this.dateRange));
+    return r.toString(get(this.dateRange));
   }
 
   getIcon() {
@@ -55,28 +56,20 @@ export default class MultiDayView extends ItemView {
     const currentSettings = get(this.settings);
 
     this.dateRange = this.dateRanges.trackRange(
-      range.createRange(
+      r.createRange(
         currentSettings.multiDayRange,
         currentSettings.firstDayOfWeek,
       ),
     );
 
-    this.register(
-      this.dateRange.subscribe((next) => {
-        const newText = range.toString(next);
-
-        // @ts-expect-error: undocumented API
-        this.titleEl?.setText(newText);
-        // @ts-expect-error: undocumented API
-        this.leaf.updateHeader?.();
-      }),
-    );
+    this.register(this.dateRange.subscribe(this.updateTabTitleAndHeader));
 
     // todo: remove manual state synchronization
+    // todo: test if this causes week reset
     this.register(
       this.settings.subscribe((next) => {
         this.dateRange?.set(
-          range.createRange(next.multiDayRange, next.firstDayOfWeek),
+          r.createRange(next.multiDayRange, next.firstDayOfWeek),
         );
       }),
     );
@@ -117,4 +110,13 @@ export default class MultiDayView extends ItemView {
       unmount(this.headerActionsComponent);
     }
   }
+
+  private updateTabTitleAndHeader = (range: Moment[]) => {
+    const newText = r.toString(range);
+
+    // @ts-expect-error: undocumented API
+    this.titleEl?.setText(newText);
+    // @ts-expect-error: undocumented API
+    this.leaf.updateHeader?.();
+  };
 }
