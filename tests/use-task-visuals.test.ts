@@ -4,7 +4,7 @@ import { get, writable } from "svelte/store";
 import { currentTime } from "../src/global-store/current-time";
 import { settings } from "../src/global-store/settings";
 
-import { baseTask } from "../src/ui/hooks/test-utils";
+import { baseTask } from "./edit/util/test-utils";
 import { useTaskVisuals } from "../src/ui/hooks/use-task-visuals";
 
 function getBaseUseTaskProps() {

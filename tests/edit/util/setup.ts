@@ -2,16 +2,16 @@ import { noop } from "lodash/fp";
 import type { Moment } from "moment/moment";
 import { writable } from "svelte/store";
 
-import { WorkspaceFacade } from "../../../../../service/workspace-facade";
+import { WorkspaceFacade } from "../../../src/service/workspace-facade";
 import {
   type DayPlannerSettings,
   defaultSettingsForTests,
-} from "../../../../../settings";
-import type { LocalTask } from "../../../../../task-types";
-import { toMinutes } from "../../../../../util/moment";
-import { useEditContext } from "../../use-edit-context";
+} from "../../../src/settings";
+import type { LocalTask } from "../../../src/task-types";
+import { toMinutes } from "../../../src/util/moment";
 
 import { baseTasks, day, nextDay } from "./fixtures";
+import { useEditContext } from "../../../src/ui/hooks/use-edit/use-edit-context";
 
 function createProps({
   tasks,

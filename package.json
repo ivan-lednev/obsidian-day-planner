@@ -9,7 +9,7 @@
     "format": "eslint --fix src && stylelint --fix src/**/*.svelte && prettier --write src",
     "lint": "prettier --check src && eslint src && stylelint src/**/*.svelte && npm run typescript && svelte-check src/",
     "typescript": "tsc --noEmit",
-    "test": "jest src/",
+    "test": "jest tests/",
     "test:coverage": "jest src/ --collectCoverage",
     "prepare": "husky install",
     "commitlint": "commitlint --edit"

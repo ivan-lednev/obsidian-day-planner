@@ -1,6 +1,6 @@
 import moment from "moment";
 
-import { parseTimestamp } from "../src/parser/timestamp/timestamp";
+import { parseTimestamp } from "../src/parser/timestamp";
 
 it.each([
   ["13:00", { hours: 13, minutes: 0 }],

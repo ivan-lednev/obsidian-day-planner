@@ -18,7 +18,7 @@ import {
   createInMemoryFile,
   type InMemoryFile,
   InMemoryVault,
-} from "../src/test-utils";
+} from "./test-utils";
 import { toMinutes } from "../src/util/moment";
 import { createTask } from "../src/util/task-utils";
 import { type Diff, mapTaskDiffToUpdates } from "../src/util/tasks-utils";

@@ -1,10 +1,6 @@
 import moment from "moment";
 import { get } from "svelte/store";
 
-import { defaultSettingsForTests } from "../../../../settings";
-import { baseTask } from "../../test-utils";
-import { EditMode } from "../types";
-
 import {
   baseTasks,
   dayKey,
@@ -13,6 +9,9 @@ import {
   tasksWithUnscheduledTask,
 } from "./util/fixtures";
 import { setUp } from "./util/setup";
+import { EditMode } from "../../src/ui/hooks/use-edit/types";
+import { baseTask } from "./util/test-utils";
+import { defaultSettingsForTests } from "../../src/settings";
 
 describe("moving tasks between containers", () => {
   test("with no edit operation in progress, nothing happens on mouse move", () => {

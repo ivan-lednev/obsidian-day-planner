@@ -1,6 +1,6 @@
 import moment from "moment/moment";
 
-import type { LocalTask, WithPlacing, WithTime } from "../../task-types";
+import type { LocalTask, WithPlacing, WithTime } from "../../../src/task-types";
 
 export const baseTaskStartTime = moment("2023-01-01 00:00");
 

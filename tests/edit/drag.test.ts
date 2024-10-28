@@ -1,12 +1,11 @@
 import moment from "moment";
 import { get } from "svelte/store";
 
-import { defaultSettingsForTests } from "../../../../settings";
-import { baseTask, threeTasks } from "../../test-utils";
-import { EditMode } from "../types";
-
 import { dayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
+import { baseTask, threeTasks } from "./util/test-utils";
+import { EditMode } from "../../src/ui/hooks/use-edit/types";
+import { defaultSettingsForTests } from "../../src/settings";
 
 describe("drag", () => {
   test("when drag starts, target task reacts to cursor", () => {
