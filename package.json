@@ -9,8 +9,8 @@
     "format": "eslint --fix src tests && stylelint --fix src/**/*.svelte && prettier --write src tests",
     "lint": "prettier --check src && eslint src && stylelint src/**/*.svelte && npm run typescript && svelte-check src/",
     "typescript": "tsc --noEmit",
-    "test": "jest tests/",
-    "test:coverage": "jest src/ --collectCoverage",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "prepare": "husky install",
     "commitlint": "commitlint --edit"
   },
@@ -37,6 +37,7 @@
     "@types/unist": "^3.0.3",
     "@typescript-eslint/eslint-plugin": "^8.4.0",
     "@typescript-eslint/parser": "^8.6.0",
+    "@vitest/coverage-istanbul": "^2.1.4",
     "babel": "^6.23.0",
     "babel-jest": "^29.7.0",
     "builtin-modules": "^4.0.0",
