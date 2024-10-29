@@ -1,4 +1,5 @@
 import { isNotVoid } from "typed-assert";
+import { test, expect } from "vitest";
 
 import {
   compareByTimestampInText,

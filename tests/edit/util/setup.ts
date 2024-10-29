@@ -1,6 +1,7 @@
 import { noop } from "lodash/fp";
 import type { Moment } from "moment/moment";
 import { writable } from "svelte/store";
+import { vi } from "vitest";
 
 import { WorkspaceFacade } from "../../../src/service/workspace-facade";
 import {
@@ -8,10 +9,10 @@ import {
   defaultSettingsForTests,
 } from "../../../src/settings";
 import type { LocalTask } from "../../../src/task-types";
+import { useEditContext } from "../../../src/ui/hooks/use-edit/use-edit-context";
 import { toMinutes } from "../../../src/util/moment";
 
 import { baseTasks, day, nextDay } from "./fixtures";
-import { useEditContext } from "../../../src/ui/hooks/use-edit/use-edit-context";
 
 function createProps({
   tasks,
@@ -20,8 +21,8 @@ function createProps({
   tasks: LocalTask[];
   settings: DayPlannerSettings;
 }) {
-  const onUpdate = jest.fn();
-  const workspaceFacade = jest.fn() as unknown as WorkspaceFacade;
+  const onUpdate = vi.fn();
+  const workspaceFacade = vi.fn() as unknown as WorkspaceFacade;
 
   return {
     settings: writable(settings),

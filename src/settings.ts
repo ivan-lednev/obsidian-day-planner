@@ -1,5 +1,6 @@
 import type { HexString } from "obsidian";
-import { DEFAULT_DAILY_NOTE_FORMAT } from "obsidian-daily-notes-interface";
+
+import { defaultDayFormat } from "./constants";
 
 export interface IcalConfig {
   name: string;
@@ -69,7 +70,7 @@ export const defaultSettings: DayPlannerSettings = {
   timelineIcon: "calendar-with-checkmark",
   endLabel: "All done",
   startHour: 6,
-  timelineDateFormat: DEFAULT_DAILY_NOTE_FORMAT,
+  timelineDateFormat: defaultDayFormat,
   centerNeedle: false,
   plannerHeading: "Day planner",
   plannerHeadingLevel: 1,

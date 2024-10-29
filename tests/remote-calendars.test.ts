@@ -4,12 +4,13 @@ import { waitFor } from "@testing-library/dom";
 import moment from "moment";
 import { request } from "obsidian";
 import { get, writable } from "svelte/store";
+import { vi, test, expect, describe } from "vitest";
 
 import { defaultSettingsForTests } from "../src/settings";
 import { useRemoteTasks } from "../src/util/use-remote-tasks";
 
-jest.mock("obsidian", () => ({
-  request: jest.fn(),
+vi.mock("obsidian", () => ({
+  request: vi.fn(),
 }));
 
 async function waitForNeverToHappen(callable: () => void) {
@@ -57,9 +58,9 @@ const tentativeEventMatcher = [
 
 describe("ical", () => {
   test("RSVP status appears in tasks", async () => {
-    jest
-      .mocked(request)
-      .mockReturnValue(getIcalFixture("google-tentative-attendee"));
+    vi.mocked(request).mockReturnValue(
+      getIcalFixture("google-tentative-attendee"),
+    );
 
     const { store } = createStore();
 
@@ -73,9 +74,9 @@ describe("ical", () => {
   );
 
   test("Falls back on previous values if fetching a calendar fails", async () => {
-    jest
-      .mocked(request)
-      .mockReturnValue(getIcalFixture("google-tentative-attendee"));
+    vi.mocked(request).mockReturnValue(
+      getIcalFixture("google-tentative-attendee"),
+    );
 
     const { store } = createStore();
 
@@ -83,9 +84,9 @@ describe("ical", () => {
       expect(get(store)).toEqual(tentativeEventMatcher);
     });
 
-    jest
-      .mocked(request)
-      .mockReturnValue(Promise.reject(new Error("Mock calendar rejected")));
+    vi.mocked(request).mockReturnValue(
+      Promise.reject(new Error("Mock calendar rejected")),
+    );
 
     await waitForNeverToHappen(() => {
       expect(() => get(store)).toThrow();
@@ -93,11 +94,9 @@ describe("ical", () => {
   });
 
   test("Deleted recurrences don't show up as tasks", async () => {
-    jest
-      .mocked(request)
-      .mockReturnValue(
-        getIcalFixture("google-recurring-with-exception-and-location"),
-      );
+    vi.mocked(request).mockReturnValue(
+      getIcalFixture("google-recurring-with-exception-and-location"),
+    );
 
     const { store } = createStore({
       visibleDays: [moment("2024-09-27"), moment("2024-09-28")],

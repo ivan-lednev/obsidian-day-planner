@@ -1,11 +1,19 @@
 import moment from "moment";
 import { get, writable } from "svelte/store";
+import { vi, test, expect } from "vitest";
 
 import { currentTime } from "../src/global-store/current-time";
 import { settings } from "../src/global-store/settings";
+import { useTaskVisuals } from "../src/ui/hooks/use-task-visuals";
 
 import { baseTask } from "./edit/util/test-utils";
-import { useTaskVisuals } from "../src/ui/hooks/use-task-visuals";
+
+vi.mock("obsidian", () => {
+  return {};
+});
+vi.mock("obsidian-dataview", () => {
+  return {};
+});
 
 function getBaseUseTaskProps() {
   const cursorOffsetY = writable(0);
@@ -13,8 +21,8 @@ function getBaseUseTaskProps() {
     settings,
     currentTime,
     cursorOffsetY,
-    onUpdate: jest.fn(),
-    onMouseUp: jest.fn(),
+    onUpdate: vi.fn(),
+    onMouseUp: vi.fn(),
   };
 }
 

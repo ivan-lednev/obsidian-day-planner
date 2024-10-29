@@ -4,6 +4,7 @@ import {
   getDailyNoteSettings,
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
+import { vi, test, expect, describe } from "vitest";
 
 import { defaultDayFormat } from "../src/constants";
 import { sortListsRecursivelyUnderHeading } from "../src/mdast/mdast";
@@ -14,18 +15,19 @@ import {
 import { VaultFacade } from "../src/service/vault-facade";
 import { defaultSettingsForTests } from "../src/settings";
 import type { LocalTask, WithTime } from "../src/task-types";
+import { toMinutes } from "../src/util/moment";
+import { createTask } from "../src/util/task-utils";
+import { type Diff, mapTaskDiffToUpdates } from "../src/util/tasks-utils";
+
 import {
   createInMemoryFile,
   type InMemoryFile,
   InMemoryVault,
 } from "./test-utils";
-import { toMinutes } from "../src/util/moment";
-import { createTask } from "../src/util/task-utils";
-import { type Diff, mapTaskDiffToUpdates } from "../src/util/tasks-utils";
 
-jest.mock("obsidian-daily-notes-interface", () => ({
-  getDateFromPath: jest.fn(() => null),
-  getDailyNoteSettings: jest.fn(() => ({
+vi.mock("obsidian-daily-notes-interface", () => ({
+  getDateFromPath: vi.fn(() => null),
+  getDailyNoteSettings: vi.fn(() => ({
     format: "YYYY-MM-DD",
     folder: ".",
   })),
@@ -136,7 +138,7 @@ describe("From diff to vault", () => {
   });
 
   test("Updates nested tasks", async () => {
-    jest.mocked(getDailyNoteSettings).mockReturnValue({});
+    vi.mocked(getDailyNoteSettings).mockReturnValue({});
 
     const files = [
       createInMemoryFile({
@@ -212,11 +214,11 @@ describe("From diff to vault", () => {
     const tomorrowDailynotePath = `${tomorrowKey}.md`;
     const tomorrowMoment = moment(tomorrowKey);
 
-    jest.mocked(getDailyNoteSettings).mockReturnValue({
+    vi.mocked(getDailyNoteSettings).mockReturnValue({
       format: defaultDayFormat,
       folder: ".",
     });
-    jest.mocked(getDateFromPath).mockReturnValue(todayMoment);
+    vi.mocked(getDateFromPath).mockReturnValue(todayMoment);
 
     const files = [
       createInMemoryFile({
@@ -303,7 +305,12 @@ describe("From diff to vault", () => {
   });
 
   test("Sorts tasks in plan after edit", async () => {
-    jest.mocked(getDailyNoteSettings).mockReturnValue({
+    vi.mocked(getDailyNoteSettings).mockReturnValue({
+      format: defaultDayFormat,
+      folder: ".",
+    });
+
+    expect(getDailyNoteSettings()).toEqual({
       format: defaultDayFormat,
       folder: ".",
     });

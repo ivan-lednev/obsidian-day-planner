@@ -1,3 +1,5 @@
+/// <reference types="vitest/config" />
+
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { defineConfig } from "vite";
 import { isNotVoid } from "typed-assert";
@@ -6,7 +8,9 @@ import fs from "node:fs";
 
 export default defineConfig((env) => ({
   define: {
-    "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "development")
+    "process.env.NODE_ENV": JSON.stringify(
+      process.env.NODE_ENV || "development",
+    ),
   },
   plugins: [
     replace([
@@ -15,38 +19,38 @@ export default defineConfig((env) => ({
         replace: [
           {
             from: "changelogMd",
-            to: JSON.stringify(fs.readFileSync("./CHANGELOG.md", "utf-8"))
+            to: JSON.stringify(fs.readFileSync("./CHANGELOG.md", "utf-8")),
           },
           {
             from: "currentPluginVersion",
             to: JSON.stringify(
-              JSON.parse(fs.readFileSync("./package.json", "utf-8")).version
-            )
+              JSON.parse(fs.readFileSync("./package.json", "utf-8")).version,
+            ),
           },
           {
             from: "supportBanner",
-            to: JSON.stringify(fs.readFileSync("./support-banner.md", "utf-8"))
-          }
-        ]
-      }
+            to: JSON.stringify(fs.readFileSync("./support-banner.md", "utf-8")),
+          },
+        ],
+      },
     ]),
     svelte({
       compilerOptions: {
-        dev: env.mode === "development"
-      }
-    })
+        dev: env.mode === "development",
+      },
+    }),
   ],
   css: {
     preprocessorOptions: {
-      scss: { includePaths: ["node_modules"] }
-    }
+      scss: { includePaths: ["node_modules"] },
+    },
   },
   build: {
     lib: {
       entry: ["src/main.ts", "src/styles.scss"],
       name: "main",
       fileName: () => "main.js",
-      formats: ["cjs" as const]
+      formats: ["cjs" as const],
     },
     minify: env.mode === "production",
     outDir: ".",
@@ -61,9 +65,17 @@ export default defineConfig((env) => ({
           isNotVoid(assetInfo.name);
 
           return assetInfo.name;
-        }
+        },
       },
-      external: ["obsidian", "electron"]
-    }
-  }
+      external: ["obsidian", "electron"],
+    },
+  },
+  test: {
+    include: ["tests/**/*.test.ts"],
+    environment: "jsdom",
+    setupFiles: ["vite-setup.ts"],
+    alias: {
+      obsidian: new URL("./__mocks__/obsidian.ts", import.meta.url).pathname,
+    },
+  },
 }));

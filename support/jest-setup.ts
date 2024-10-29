@@ -1,7 +1,7 @@
 import moment, { type Moment } from "moment";
 
 window.moment = moment;
-performance.mark = jest.fn();
+// performance.mark = jest.fn();
 
 function areMomentsEqual(a: Moment, b: Moment) {
   const isAMomment = moment.isMoment(a);

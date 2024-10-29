@@ -1,13 +1,14 @@
 import moment from "moment";
 import { get } from "svelte/store";
+import { test, expect, describe } from "vitest";
 
+import { defaultSettingsForTests } from "../../src/settings";
+import { EditMode } from "../../src/ui/hooks/use-edit/types";
+import { toMinutes } from "../../src/util/moment";
 
 import { dayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
 import { baseTask, threeTasks } from "./util/test-utils";
-import { EditMode } from "../../src/ui/hooks/use-edit/types";
-import { defaultSettingsForTests } from "../../src/settings";
-import { toMinutes } from "../../src/util/moment";
 
 describe("resize", () => {
   test("resizing changes duration", () => {

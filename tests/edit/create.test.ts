@@ -1,5 +1,6 @@
 import moment from "moment";
 import { get } from "svelte/store";
+import { test, expect, describe } from "vitest";
 
 import { dayKey, emptyTasks } from "./util/fixtures";
 import { setUp } from "./util/setup";

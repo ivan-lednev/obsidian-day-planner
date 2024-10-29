@@ -1,18 +1,12 @@
 import moment from "moment";
 import { get } from "svelte/store";
+import { test, expect, describe } from "vitest";
+
+import { EditMode } from "../../src/ui/hooks/use-edit/types";
 
 import { dayKey, nextDayKey } from "./util/fixtures";
 import { setUp } from "./util/setup";
 import { baseTask, threeTasks } from "./util/test-utils";
-import { EditMode } from "../../src/ui/hooks/use-edit/types";
-
-// todo: remove duplication, ideally this check should be pulled out of the diffing logic
-jest.mock("obsidian-daily-notes-interface", () => ({
-  ...jest.requireActual("obsidian-daily-notes-interface"),
-  getDateFromPath(): null {
-    return null;
-  },
-}));
 
 describe("drag one & common edit mechanics", () => {
   test("Splits multi-day tasks into single-day tasks", () => {
