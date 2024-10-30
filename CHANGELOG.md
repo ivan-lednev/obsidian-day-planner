@@ -11,6 +11,7 @@
 - Now the plugin will ask for permission before creating new files on drag-and-drop edits
 - Timeline controls look tidier now
 - Now all-day remote events are shown in the unscheduled tasks section
+- Text in blocks is now sticky and will stay visible when scrolling
 
 #### Week planner has become multi-day planner
 

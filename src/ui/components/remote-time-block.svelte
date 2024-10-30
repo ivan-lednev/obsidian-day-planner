@@ -16,7 +16,7 @@
     class:declined
     class:tentative
   ></div>
-  <div class="text">
+  <div class="planner-sticky-block-content">
     <span class="calendar-name">
       {task.calendar.name}
     </span>
@@ -32,11 +32,11 @@
   }
 
   .remote-task-content {
-    overflow: hidden;
     display: flex;
     flex: 1 0 0;
     flex-direction: column;
 
+    height: 100%;
     padding: var(--size-2-1) var(--size-4-1);
     padding-left: calc(4px + var(--size-4-2));
 
@@ -44,14 +44,16 @@
   }
 
   .ribbon {
+    /* TODO: might remove this. We need more thickness to show tentative/declined */
     position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
+    top: var(--size-2-1);
+    bottom: var(--size-2-1);
+    left: var(--size-2-1);
 
-    width: var(--size-4-2);
+    width: var(--size-4-1);
 
     background-color: var(--ribbon-color);
+    border-radius: var(--radius-s);
   }
 
   .declined {
