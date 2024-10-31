@@ -10,7 +10,6 @@
 
   import DragControls from "./drag-controls.svelte";
   import FloatingUi from "./floating-ui.svelte";
-  import MarkdownBlockContent from "./markdown-block-content.svelte";
   import RenderedMarkdown from "./rendered-markdown.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
 
@@ -41,9 +40,7 @@
   on:pointerleave={drag.handleAnchorPointerLeave}
   on:pointerup={onMouseUp}
 >
-  <MarkdownBlockContent {task}>
-    <RenderedMarkdown {task} />
-  </MarkdownBlockContent>
+  <RenderedMarkdown {task} />
 </TimeBlockBase>
 
 {#if !$editOperation}

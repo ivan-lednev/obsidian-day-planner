@@ -6,13 +6,13 @@
   import type { LocalTask, WithPlacing, WithTime } from "../../task-types";
   import type { ObsidianContext } from "../../types";
   import { copy } from "../../util/task-utils";
+  import { hoverPreview } from "../actions/hover-preview";
   import type { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
   import { EditMode } from "../hooks/use-edit/types";
   import { useFloatingUi } from "../hooks/use-floating-ui";
 
   import DragControls from "./drag-controls.svelte";
   import FloatingUi from "./floating-ui.svelte";
-  import MarkdownBlockContent from "./markdown-block-content.svelte";
   import RenderedMarkdown from "./rendered-markdown.svelte";
   import ResizeControls from "./resize-controls.svelte";
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
@@ -51,7 +51,12 @@
 
 <ScheduledTimeBlock
   {task}
-  use={[drag.anchorSetup, resize.anchorSetup, resizeFromTop.anchorSetup]}
+  use={[
+    drag.anchorSetup,
+    resize.anchorSetup,
+    resizeFromTop.anchorSetup,
+    (el: HTMLElement) => hoverPreview(el, task),
+  ]}
   on:longpress={() => {
     navigator.vibrate(vibrationDurationMillis);
     isDragActive.set(true);
@@ -70,9 +75,7 @@
   }}
   on:pointerup={onMouseUp}
 >
-  <MarkdownBlockContent {task}>
-    <RenderedMarkdown {task} />
-  </MarkdownBlockContent>
+  <RenderedMarkdown {task} />
 </ScheduledTimeBlock>
 
 {#if !$editOperation}
