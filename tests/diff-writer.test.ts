@@ -385,4 +385,56 @@ describe("From diff to vault", () => {
 - 12:00 - 13:00 Task 3
 `);
   });
+
+  test("Sorts tasks after non-mdast edit", async () => {
+    vi.mocked(getDailyNoteSettings).mockReturnValue({
+      format: defaultDayFormat,
+      folder: ".",
+    });
+
+    const files = [
+      createInMemoryFile({
+        path: "2023-01-01.md",
+        contents: `# Day planner
+
+- 12:00 - 13:00 Task 3
+- 10:00 - 11:00 Task 1
+`,
+      }),
+    ];
+
+    const diff = {
+      updated: [
+        createTestTask({
+          text: "- 11:00 - 12:00 Task 2",
+          day: moment("2023-01-01"),
+          startMinutes: toMinutes("11:00"),
+          location: {
+            path: "2023-01-01.md",
+            position: {
+              start: {
+                line: 2,
+                col: 0,
+                offset: -1,
+              },
+              end: {
+                line: 3,
+                col: -1,
+                offset: -1,
+              },
+            },
+          },
+        }),
+      ],
+    };
+
+    const { vault } = await writeDiff({ diff, files });
+
+    expect(vault.getAbstractFileByPath("2023-01-01.md").contents)
+      .toBe(`# Day planner
+
+- 10:00 - 11:00 Task 1
+- 11:00 - 12:00 Task 2
+`);
+  });
 });

@@ -116,25 +116,21 @@ export function createTransaction(props: {
         (update): update is RangeUpdate => update.type !== "mdast",
       );
 
-      const withRangeUpdatesApplied = rangeUpdates
+      let result = rangeUpdates
         .toSorted(sortRangeUpdates)
         .toReversed()
         .reduce(applyRangeUpdate, lines)
         .join("\n");
 
-      if (mdastUpdates.length === 0) {
-        return withRangeUpdatesApplied;
+      if (mdastUpdates.length > 0) {
+        result = applyScopedUpdates(
+          result,
+          settings.plannerHeading,
+          (contents) => applyMdastUpdates(contents, mdastUpdates),
+        );
       }
 
-      const withMdastUpdatesApplied = applyScopedUpdates(
-        withRangeUpdatesApplied,
-        settings.plannerHeading,
-        (contents) => applyMdastUpdates(contents, mdastUpdates),
-      );
-
-      return afterEach
-        ? afterEach(withMdastUpdatesApplied)
-        : withMdastUpdatesApplied;
+      return afterEach ? afterEach(result) : result;
     },
   }));
 }
