@@ -1,8 +1,7 @@
 <script lang="ts">
   import { getContext, type Snippet } from "svelte";
-  import { fromStore } from "svelte/store";
 
-  import { settings } from "../../global-store/settings";
+  import { obsidianContext } from "../../constants";
   import type { Task } from "../../task-types";
   import type { ObsidianContext } from "../../types";
   import { tappable } from "../actions/tappable";
@@ -10,28 +9,23 @@
   import { useActions } from "../actions/use-actions";
   import { getColorOverride } from "../hooks/get-color-override";
 
-  import { obsidianContext } from "./../../constants";
-
   const {
     children,
     task,
     use = [],
   }: { children: Snippet; task: Task; use?: ActionArray } = $props();
 
-  const { isDarkMode } = getContext<ObsidianContext>(obsidianContext);
-
-  const override = $derived(
-    getColorOverride(
-      task,
-      fromStore(isDarkMode).current,
-      fromStore(settings).current,
-    ),
-  );
+  const { isDarkMode, settingsSignal } =
+    getContext<ObsidianContext>(obsidianContext);
 </script>
 
 <div class="padding">
   <div
-    style:background-color={override}
+    style:background-color={getColorOverride(
+      task,
+      isDarkMode.current,
+      settingsSignal.current,
+    )}
     class="content"
     on:longpress
     on:pointerenter

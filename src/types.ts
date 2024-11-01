@@ -36,8 +36,9 @@ export interface ObsidianContext {
   isModPressed: Readable<boolean>;
   reSync: () => void;
   isOnline: Readable<boolean>;
-  isDarkMode: Readable<boolean>;
+  isDarkMode: { current: boolean };
   settings: Writable<DayPlannerSettings>;
+  settingsSignal: { current: DayPlannerSettings };
 }
 
 export type ComponentContext = Map<string, unknown>;

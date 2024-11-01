@@ -1,5 +1,11 @@
 import { App } from "obsidian";
-import { derived, readable, writable, type Writable } from "svelte/store";
+import {
+  derived,
+  fromStore,
+  readable,
+  writable,
+  type Writable,
+} from "svelte/store";
 
 import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
 import { currentTime } from "../global-store/current-time";
@@ -53,7 +59,7 @@ export function createHooks({
     app.workspace.onLayoutReady(() => set(true));
   });
 
-  const isDarkMode = readable(getDarkModeFlag(), (set) => {
+  const isDarkModeStore = readable(getDarkModeFlag(), (set) => {
     const eventRef = app.workspace.on("css-change", () => {
       set(getDarkModeFlag());
     });
@@ -62,6 +68,7 @@ export function createHooks({
       app.workspace.offref(eventRef);
     };
   });
+  const isDarkMode = fromStore(isDarkModeStore);
 
   const keyDown = useKeyDown();
   const isModPressed = useModPressed();

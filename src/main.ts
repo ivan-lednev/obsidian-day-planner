@@ -4,7 +4,7 @@ import {
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
 import { mount } from "svelte";
-import { get, writable, type Writable } from "svelte/store";
+import { fromStore, get, writable, type Writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
 import {
@@ -44,7 +44,7 @@ import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimelineView from "./ui/timeline-view";
 import { createUndoNotice } from "./ui/undo-notice";
-import { createHooks } from "./util/create-hooks";
+import { createHooks } from "./util/create-hooks.svelte";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
@@ -281,7 +281,6 @@ export default class DayPlanner extends Plugin {
   }
 
   private registerViews() {
-    // todo: move out
     const onUpdate = async (base: Array<LocalTask>, next: Array<LocalTask>) => {
       const diff = getTaskDiffFromEditState(base, next);
       const updates = mapTaskDiffToUpdates(diff, this.settings());
@@ -405,6 +404,7 @@ export default class DayPlanner extends Plugin {
       isOnline,
       isDarkMode,
       settings,
+      settingsSignal: fromStore(settings),
     };
 
     const componentContext = new Map<

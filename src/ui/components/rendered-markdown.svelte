@@ -2,14 +2,13 @@
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../constants";
-  import { settings } from "../../global-store/settings";
   import type { LocalTask } from "../../task-types";
   import type { ObsidianContext } from "../../types";
   import { renderTaskMarkdown } from "../actions/render-task-markdown";
 
   export let task: LocalTask;
 
-  const { renderMarkdown, toggleCheckboxInFile } =
+  const { renderMarkdown, toggleCheckboxInFile, settings } =
     getContext<ObsidianContext>(obsidianContext);
 </script>
 
