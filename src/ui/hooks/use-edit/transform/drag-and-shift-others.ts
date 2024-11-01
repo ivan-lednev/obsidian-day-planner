@@ -23,6 +23,7 @@ export function dragAndShiftOthers(
 
   const updated = {
     ...task,
+    isAllDayEvent: false,
     startTime: minutesToMomentOfDay(cursorTime, task.startTime),
   };
 

@@ -25,6 +25,7 @@ export function dragAndShrinkOthers(
 
   const updated = {
     ...task,
+    isAllDayEvent: false,
     startTime: minutesToMomentOfDay(cursorTime, task.startTime),
   };
 

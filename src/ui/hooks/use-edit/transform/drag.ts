@@ -16,6 +16,7 @@ export function drag(
 
   const updated = {
     ...task,
+    isAllDayEvent: false,
     startTime: minutesToMomentOfDay(cursorTime, task.startTime),
   };
 

@@ -27,12 +27,12 @@ import {
 const transformers: Record<EditMode, TaskTransformer> = {
   [EditMode.DRAG]: drag,
   [EditMode.DRAG_AND_SHIFT_OTHERS]: dragAndShiftOthers,
+  [EditMode.DRAG_AND_SHRINK_OTHERS]: dragAndShrinkOthers,
   [EditMode.CREATE]: create,
   [EditMode.RESIZE]: resize,
   [EditMode.RESIZE_AND_SHIFT_OTHERS]: resizeAndShiftOthers,
   [EditMode.RESIZE_FROM_TOP]: resizeFromTop,
   [EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS]: resizeFromTopAndShiftOthers,
-  [EditMode.DRAG_AND_SHRINK_OTHERS]: dragAndShrinkOthers,
   [EditMode.RESIZE_AND_SHRINK_OTHERS]: resizeAndShrinkOthers,
   [EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS]: resizeFromTopAndShrinkOthers,
 };
