@@ -238,9 +238,11 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
           .setPlaceholder("URL")
           .setValue(ical.url)
           .onChange((value: string) => {
+            const withCorrectProtocol = value.replace("webcal://", "https://");
+
             this.settingsStore.update(
               produce((draft) => {
-                draft.icals[index].url = value;
+                draft.icals[index].url = withCorrectProtocol;
               }),
             );
           }),
