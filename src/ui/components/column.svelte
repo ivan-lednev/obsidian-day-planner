@@ -21,6 +21,7 @@
   .column {
     position: relative;
     flex: 1 0 0;
+    height: fit-content;
   }
 
   .hour-block {
