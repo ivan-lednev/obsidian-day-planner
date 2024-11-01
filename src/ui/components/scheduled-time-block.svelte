@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
-  import { currentTime } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
   import type { Task, WithPlacing, WithTime } from "../../task-types";
   import type { ActionArray } from "../actions/use-actions";
@@ -24,23 +23,13 @@
     offset,
     width,
     left,
-    backgroundColor,
-    borderColor,
-    properContrastColors,
-  } = $derived(
-    useTaskVisuals(task, {
-      settings,
-      currentTime,
-    }),
-  );
+    // backgroundColor,
+    // borderColor,
+    // properContrastColors,
+  } = $derived(useTaskVisuals(task, { settings }));
 </script>
 
 <TimeBlockBase
-  --text-faint={$properContrastColors.faint}
-  --text-muted={$properContrastColors.muted}
-  --text-normal={$properContrastColors.normal}
-  --time-block-bg-color={$backgroundColor}
-  --time-block-border-color={$borderColor}
   --time-block-height={$height}
   --time-block-left={left}
   --time-block-position="absolute"

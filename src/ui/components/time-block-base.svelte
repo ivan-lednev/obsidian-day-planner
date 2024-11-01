@@ -8,6 +8,7 @@
   import type { ActionArray } from "../actions/use-actions";
   import { useActions } from "../actions/use-actions";
   import { getColorOverride } from "../hooks/get-color-override";
+  import { useColor } from "../hooks/use-color.svelte";
 
   const {
     children,
@@ -17,10 +18,21 @@
 
   const { isDarkMode, settingsSignal } =
     getContext<ObsidianContext>(obsidianContext);
+
+  const {
+    properContrastColors: { normal, muted, faint },
+    backgroundColor,
+    borderColor,
+  } = useColor({ task });
 </script>
 
 <div class="padding">
   <div
+    style:--text-faint={faint}
+    style:--text-muted={muted}
+    style:--text-normal={normal}
+    style:--time-block-bg-color={backgroundColor}
+    style:--time-block-border-color={borderColor}
     style:background-color={getColorOverride(
       task,
       isDarkMode.current,

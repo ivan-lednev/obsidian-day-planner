@@ -1,5 +1,5 @@
 import type { Moment } from "moment";
-import { derived, readable } from "svelte/store";
+import { derived, fromStore, readable } from "svelte/store";
 
 export const currentTime = readable<Moment>(window.moment(), (set) => {
   const interval = setInterval(() => {
@@ -10,6 +10,8 @@ export const currentTime = readable<Moment>(window.moment(), (set) => {
     clearInterval(interval);
   };
 });
+
+export const currentTimeSignal = fromStore(currentTime);
 
 export const isToday = derived(
   currentTime,
