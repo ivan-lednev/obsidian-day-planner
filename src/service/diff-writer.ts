@@ -2,6 +2,8 @@ import { groupBy } from "lodash/fp";
 import type { Root } from "mdast";
 
 import { fromMarkdown, toMarkdown } from "../mdast/mdast";
+import { headingRegExp } from "../regexp";
+import type { DayPlannerSettings } from "../settings";
 
 import type { VaultFacade } from "./vault-facade";
 
@@ -96,9 +98,10 @@ function applyRangeUpdate(lines: string[], rangeUpdate: RangeUpdate) {
 
 export function createTransaction(props: {
   updates: Update[];
+  settings: DayPlannerSettings;
   afterEach?: (contents: string) => string;
 }) {
-  const { updates, afterEach } = props;
+  const { updates, afterEach, settings } = props;
   const pathToUpdates = groupBy((entry) => entry.path, updates);
 
   return Object.entries(pathToUpdates).map(([path, updates]) => ({
@@ -123,18 +126,107 @@ export function createTransaction(props: {
         return withRangeUpdatesApplied;
       }
 
-      const mdastRoot = fromMarkdown(withRangeUpdatesApplied);
-
-      const withMdastUpdatesApplied = mdastUpdates.reduce(
-        (result, { updateFn }) => updateFn(result),
-        mdastRoot,
+      const withMdastUpdatesApplied = applyScopedUpdates(
+        withRangeUpdatesApplied,
+        settings.plannerHeading,
+        (contents) => applyMdastUpdates(contents, mdastUpdates),
       );
 
-      const asMarkdown = toMarkdown(withMdastUpdatesApplied);
-
-      return afterEach ? afterEach(asMarkdown) : asMarkdown;
+      return afterEach
+        ? afterEach(withMdastUpdatesApplied)
+        : withMdastUpdatesApplied;
     },
   }));
+}
+
+/**
+ * We need to limit our updatess to the scope of the heading because mdast-util-to-markdown breaks invalid markdown that we see in user templates.
+ */
+export function applyScopedUpdates(
+  contents: string,
+  headingScope: string,
+  updateFn: (scopedContents: string) => string,
+) {
+  if (headingScope.trim().length > 0) {
+    const heading = findHeading(contents, headingScope);
+
+    if (heading && heading.start) {
+      const lines = contents.split("\n");
+      const beforeHeading = lines.slice(0, heading.start);
+      const afterHeadingIndex = heading.start + heading.length;
+      const toUpdate = lines.slice(heading.start, afterHeadingIndex).join("\n");
+      const afterHeading = lines.slice(afterHeadingIndex);
+
+      const updated = updateFn(toUpdate).split("\n");
+
+      return beforeHeading.concat(updated, afterHeading).join("\n");
+    }
+  }
+
+  return updateFn(contents);
+}
+
+function findHeadingInLine(line: string) {
+  const headingMatch = headingRegExp.exec(line);
+
+  if (!headingMatch) {
+    return undefined;
+  }
+
+  const [, tokens] = headingMatch;
+
+  return { level: tokens.length };
+}
+
+function findHeading(text: string, headingText: string) {
+  const lines = text.split("\n");
+
+  const result: {
+    start: number | undefined;
+    length: number;
+    level: number;
+  } = {
+    start: undefined,
+    length: 0,
+    level: 0,
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const heading = findHeadingInLine(line);
+    const insideHeading = result.start !== undefined;
+
+    if (insideHeading) {
+      if (heading && heading.level <= result.level) {
+        return result;
+      }
+
+      result.length++;
+    } else {
+      if (heading && line.includes(headingText)) {
+        result.start = i;
+        result.level = heading.level;
+        result.length = 1;
+      }
+    }
+  }
+
+  if (result.start === undefined) {
+    return undefined;
+  }
+
+  return result;
+}
+
+function applyMdastUpdates(text: string, updates: MdastUpdate[]) {
+  const mdastRoot = fromMarkdown(text);
+
+  const withMdastUpdatesApplied = updates.reduce(
+    (result, { updateFn }) => updateFn(result),
+    mdastRoot,
+  );
+
+  return toMarkdown(withMdastUpdatesApplied);
 }
 
 export class TransactionWriter {

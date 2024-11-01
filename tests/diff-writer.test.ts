@@ -9,6 +9,7 @@ import { vi, test, expect, describe } from "vitest";
 import { defaultDayFormat } from "../src/constants";
 import { sortListsRecursivelyUnderHeading } from "../src/mdast/mdast";
 import {
+  applyScopedUpdates,
   createTransaction,
   TransactionWriter,
 } from "../src/service/diff-writer";
@@ -42,12 +43,20 @@ async function writeDiff(props: { diff: Diff; files: Array<InMemoryFile> }) {
   const vault = new InMemoryVault(files);
   const vaultFacade = new VaultFacade(vault as unknown as Vault, getTasksApi);
   const updates = mapTaskDiffToUpdates(diff, defaultSettingsForTests);
+  // todo: remove test tautology
   const transaction = createTransaction({
     updates,
+    settings: defaultSettingsForTests,
     afterEach: (contents: string) =>
-      sortListsRecursivelyUnderHeading(
+      applyScopedUpdates(
         contents,
         defaultSettingsForTests.plannerHeading,
+        (scoped) =>
+          sortListsRecursivelyUnderHeading(
+            scoped,
+            // todo: remove heading
+            defaultSettingsForTests.plannerHeading,
+          ),
       ),
   });
   const writer = new TransactionWriter(vaultFacade);
@@ -304,13 +313,43 @@ describe("From diff to vault", () => {
 `);
   });
 
+  test("Does not change invalid markdown (e.g. occurring in template files) outside planner section", async () => {
+    const files = [
+      createInMemoryFile({
+        path: "2023-01-01.md",
+        contents: `# Dreams
+
+- 
+
+# Day planner
+`,
+      }),
+    ];
+
+    const diff = {
+      created: [
+        createTestTask({
+          text: "- Task",
+          day: moment("2023-01-01"),
+          startMinutes: toMinutes("11:00"),
+        }),
+      ],
+    };
+
+    const { vault } = await writeDiff({ diff, files });
+
+    expect(vault.getAbstractFileByPath("2023-01-01.md").contents).toBe(`# Dreams
+
+- 
+
+# Day planner
+
+- Task
+`);
+  });
+
   test("Sorts tasks in plan after edit", async () => {
     vi.mocked(getDailyNoteSettings).mockReturnValue({
-      format: defaultDayFormat,
-      folder: ".",
-    });
-
-    expect(getDailyNoteSettings()).toEqual({
       format: defaultDayFormat,
       folder: ".",
     });

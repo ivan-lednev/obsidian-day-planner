@@ -26,7 +26,11 @@ import {
   toMdastPoint,
 } from "./mdast/mdast";
 import { DataviewFacade } from "./service/dataview-facade";
-import { createTransaction, TransactionWriter } from "./service/diff-writer";
+import {
+  applyScopedUpdates,
+  createTransaction,
+  TransactionWriter,
+} from "./service/diff-writer";
 import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
@@ -283,13 +287,22 @@ export default class DayPlanner extends Plugin {
       const updates = mapTaskDiffToUpdates(diff, this.settings());
       const afterEach = this.settings().sortTasksInPlanAfterEdit
         ? (contents: string) =>
-            sortListsRecursivelyUnderHeading(
+            applyScopedUpdates(
               contents,
               this.settings().plannerHeading,
+              (scoped) =>
+                sortListsRecursivelyUnderHeading(
+                  scoped,
+                  this.settings().plannerHeading,
+                ),
             )
         : undefined;
 
-      const transaction = createTransaction({ updates, afterEach });
+      const transaction = createTransaction({
+        updates,
+        afterEach,
+        settings: this.settings(),
+      });
       const updatePaths = [
         ...new Set([...transaction.map(({ path }) => path)]),
       ];
