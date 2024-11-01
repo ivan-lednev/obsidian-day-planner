@@ -1,11 +1,4 @@
 <script lang="ts">
-  import {
-    Settings,
-    ChevronLeft,
-    ChevronRight,
-    CalendarArrowUp,
-    Columns3,
-  } from "lucide-svelte";
   import type { Moment } from "moment";
   import { Menu } from "obsidian";
   import { getContext } from "svelte";
@@ -25,6 +18,13 @@
   } from "../../../util/range";
   import * as range from "../../../util/range";
   import ControlButton from "../control-button.svelte";
+  import {
+    Settings,
+    ChevronLeft,
+    ChevronRight,
+    CalendarArrowUp,
+    Columns3,
+  } from "../lucide";
   import ResizeHandle from "../resize-handle.svelte";
   import ResizeableBox from "../resizeable-box.svelte";
   import Ruler from "../ruler.svelte";
@@ -84,7 +84,7 @@
       settingsVisible = !settingsVisible;
     }}
   >
-    <Settings class="svg-icon" />
+    <Settings />
   </ControlButton>
 
   <ControlButton
@@ -130,7 +130,7 @@
       menu.showAtMouseEvent(event);
     }}
   >
-    <Columns3 class="svg-icon" />
+    <Columns3 />
   </ControlButton>
 
   <ControlButton
@@ -141,7 +141,7 @@
       );
     }}
   >
-    <CalendarArrowUp class="svg-icon" />
+    <CalendarArrowUp />
   </ControlButton>
 
   <ControlButton
@@ -154,7 +154,7 @@
       );
     }}
   >
-    <ChevronRight class="svg-icon" />
+    <ChevronRight />
   </ControlButton>
 
   <ControlButton
@@ -167,7 +167,7 @@
       );
     }}
   >
-    <ChevronLeft class="svg-icon" />
+    <ChevronLeft />
   </ControlButton>
 </div>
 
