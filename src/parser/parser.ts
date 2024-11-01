@@ -68,7 +68,7 @@ export function getTimeFromLine({ line, day }: { line: string; day: Moment }) {
 
   const startTime = parseTimestamp(start, day);
 
-  let durationMinutes;
+  let durationMinutes: number | undefined;
 
   if (end) {
     const endTime = parseTimestamp(end, day);

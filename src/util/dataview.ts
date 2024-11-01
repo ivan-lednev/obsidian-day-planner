@@ -10,8 +10,11 @@ import {
   indentBeforeTaskParagraph,
 } from "../constants";
 import { getTimeFromLine } from "../parser/parser";
-import type { DayPlannerSettings } from "../settings";
-import type { FileLine, LocalTask, TaskTokens, WithTime } from "../task-types";
+import type {
+  FileLine,
+  TaskTokens,
+  TaskWithoutComputedDuration,
+} from "../task-types";
 
 import { type ClockMoments, toTime } from "./clock";
 import { getId } from "./id";
@@ -73,11 +76,7 @@ export function toUnscheduledTask(sTask: STask, day: Moment) {
   };
 }
 
-export function toTask(
-  sTask: STask,
-  day: Moment,
-  settings: DayPlannerSettings,
-): WithTime<LocalTask> {
+export function toTask(sTask: STask, day: Moment): TaskWithoutComputedDuration {
   const parsedTime = getTimeFromLine({
     line: sTask.text,
     day,
@@ -88,8 +87,7 @@ export function toTask(
     `Unexpectedly received an STask without a timestamp: ${sTask.text}`,
   );
 
-  const { startTime, durationMinutes = settings.defaultDurationMinutes } =
-    parsedTime;
+  const { startTime, durationMinutes } = parsedTime;
 
   return {
     startTime,

@@ -4,9 +4,9 @@ import { STask } from "obsidian-dataview";
 
 import { testTimestampPatterns } from "../parser/parser";
 import type { DayPlannerSettings } from "../settings";
-import type { LocalTask, WithTime } from "../task-types";
+import type { LocalTask, TaskWithoutComputedDuration } from "../task-types";
 
-import { toTask, toUnscheduledTask } from "./dataview";
+import * as dataview from "./dataview";
 import { getMinutesSinceMidnight } from "./moment";
 
 type DurationOptions = Pick<
@@ -15,12 +15,12 @@ type DurationOptions = Pick<
 >;
 
 function calculateDuration(
-  tasks: WithTime<LocalTask>[],
+  tasks: TaskWithoutComputedDuration[],
   options: DurationOptions,
-) {
-  return tasks.map((current, i, array) => {
+): LocalTask[] {
+  return tasks.map((current, i, array): LocalTask => {
     if (current.durationMinutes) {
-      return current;
+      return current as LocalTask;
     }
 
     const next = array[i + 1];
@@ -55,13 +55,13 @@ export function mapToTasksForDay(
     tasksForDay,
   );
 
-  const { parsed: tasksWithTime } = withTime.reduce<{
-    parsed: WithTime<LocalTask>[];
+  const { parsed: tasksWithoutComputedDuration } = withTime.reduce<{
+    parsed: TaskWithoutComputedDuration[];
     errors: unknown[];
   }>(
     (result, sTask) => {
       try {
-        const task = toTask(sTask, day, settings);
+        const task = dataview.toTask(sTask, day);
 
         result.parsed.push(task);
       } catch (error) {
@@ -73,8 +73,11 @@ export function mapToTasksForDay(
     { parsed: [], errors: [] },
   );
 
-  tasksWithTime.sort((a, b) => a.startTime.diff(b.startTime));
-  const withTimeAndDuration = calculateDuration(tasksWithTime, settings);
+  tasksWithoutComputedDuration.sort((a, b) => a.startTime.diff(b.startTime));
+  const withTimeAndDuration = calculateDuration(
+    tasksWithoutComputedDuration,
+    settings,
+  );
 
   const noTime = withoutTime
     .filter((sTask) => {
@@ -88,7 +91,7 @@ export function mapToTasksForDay(
 
       return !sTask.parent;
     })
-    .map((sTask: STask) => toUnscheduledTask(sTask, day));
+    .map((sTask: STask) => dataview.toUnscheduledTask(sTask, day));
 
   return [...withTimeAndDuration, ...noTime];
 }

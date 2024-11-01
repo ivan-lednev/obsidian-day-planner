@@ -54,6 +54,9 @@ export interface LocalTask extends TaskTokens, BaseTask {
   durationMinutes: number;
 }
 
+export type TaskWithoutComputedDuration = Omit<LocalTask, "durationMinutes"> &
+  Partial<Pick<LocalTask, "durationMinutes">>;
+
 export type Task = LocalTask | RemoteTask;
 
 export type TimeBlock = Omit<WithTime<BaseTask>, "startMinutes">;
