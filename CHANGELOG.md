@@ -7,9 +7,9 @@
 ### ✨ New features
 
 - Now after edits there is an **UNDO** notice that lets you revert the changes to tasks, even across multiple files (partially addresses #341)
-- Tasks crossing midnight now get shown properly in multiple day columns instead of stretching the first day (#586, #364)
-  - E.g.: `- 23:00 - 4:00 Task` will get shown in 2 columns as 2 separate blocks 
 - Now the plugin will ask for permission before creating new files on drag-and-drop edits
+- Tasks crossing midnight now get shown properly in multiple day columns instead of stretching the first day (#586, #364)
+  - E.g.: `- 23:00 - 4:00 Task` will get shown in 2 columns as 2 separate blocks
 - Timeline controls look tidier now
 - Now all-day remote events are shown in the unscheduled tasks section
 - Text in blocks is now sticky and will stay visible when scrolling as well as when an event starts before the configured start hour
