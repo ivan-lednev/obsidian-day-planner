@@ -121,7 +121,7 @@ export function createTimestamp(
   return `${start.format(format)} - ${end.format(format)}`;
 }
 
-export function taskToString(task: WithTime<LocalTask>) {
+export function toString(task: WithTime<LocalTask>) {
   const firstLine = removeListTokens(getFirstLine(task.text));
 
   const updatedTimestamp = createTimestamp(
@@ -152,8 +152,8 @@ export function updateScheduledPropInText(text: string, dayKey: string) {
     .replace(keylessScheduledPropRegExp, `$1${dayKey}$2`);
 }
 
-export function updateTaskText(task: WithTime<LocalTask>) {
-  return { ...task, text: taskToString(task) };
+export function updateText(task: WithTime<LocalTask>) {
+  return { ...task, text: toString(task) };
 }
 
 export function offsetYToMinutes(

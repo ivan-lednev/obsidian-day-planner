@@ -19,7 +19,7 @@ import type { DayPlannerSettings } from "../settings";
 import { type LocalTask } from "../task-types";
 
 import { createDailyNotePath } from "./daily-notes";
-import { getFirstLine, updateTaskText } from "./task-utils";
+import * as t from "./task-utils";
 
 export function getEmptyRecordsForDay() {
   return { withTime: [], noTime: [] };
@@ -40,7 +40,7 @@ export type Diff = {
 };
 
 export function getTaskDiffFromEditState(base: LocalTask[], next: LocalTask[]) {
-  return next.map(updateTaskText).reduce<Omit<Required<Diff>, "deleted">>(
+  return next.reduce<Omit<Required<Diff>, "deleted">>(
     (result, task) => {
       const thisTaskInBase = base.find((baseTask) => baseTask.id === task.id);
 
@@ -123,7 +123,7 @@ export function mapTaskDiffToUpdates(
           type: "updated",
           path,
           range: { start: position.start, end: position.start },
-          contents: getFirstLine(task.text),
+          contents: t.getFirstLine(task.text),
         });
       }
 

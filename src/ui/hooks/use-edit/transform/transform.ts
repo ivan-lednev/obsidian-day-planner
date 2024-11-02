@@ -66,23 +66,30 @@ export function transform(
 
   // todo: duplicated, task gets updated in transformer, in onMouseEnter, and here
   const index = baseline.findIndex((task) => task.id === operation.task.id);
+  const isInBaseline = index >= 0;
 
-  const taskWithUpdatedDay = isSingleDayMode(operation.mode)
-    ? operation.task
-    : {
-        ...operation.task,
+  let taskWithUpdatedDay = operation.task;
+  let withUpdatedDay = baseline.concat(operation.task);
+
+  if (isInBaseline) {
+    const found = baseline[index];
+    taskWithUpdatedDay = found;
+
+    if (!isSingleDayMode(operation.mode)) {
+      taskWithUpdatedDay = {
+        ...found,
         startTime: minutesToMomentOfDay(
-          getMinutesSinceMidnight(operation.task.startTime),
+          getMinutesSinceMidnight(found.startTime),
           operation.day,
         ),
       };
+    }
 
-  const withUpdatedDay =
-    index === -1
-      ? baseline.concat(taskWithUpdatedDay)
-      : toSpliced(baseline, index, taskWithUpdatedDay);
+    withUpdatedDay = toSpliced(baseline, index, taskWithUpdatedDay);
+  }
 
   const withTimeSorted = sortByStartMinutes(withUpdatedDay);
 
+  // todo: cursor time should be a moment
   return transformFn(withTimeSorted, operation.task, cursorMinutes, settings);
 }

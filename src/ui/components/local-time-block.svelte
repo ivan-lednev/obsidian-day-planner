@@ -5,7 +5,7 @@
   import { obsidianContext, vibrationDurationMillis } from "../../constants";
   import type { LocalTask, WithPlacing, WithTime } from "../../task-types";
   import type { ObsidianContext } from "../../types";
-  import { copy } from "../../util/task-utils";
+  import * as t from "../../util/task-utils";
   import { hoverPreview } from "../actions/hover-preview";
   import type { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
   import { EditMode } from "../hooks/use-edit/types";
@@ -88,7 +88,7 @@
     >
       <DragControls
         onCopy={() => {
-          onGripMouseDown(copy(task), EditMode.DRAG);
+          onGripMouseDown(t.copy(task), EditMode.DRAG);
         }}
         onMove={() => onGripMouseDown(task, EditMode.DRAG)}
         onMoveWithNeighbors={() => {

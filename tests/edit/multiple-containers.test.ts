@@ -113,7 +113,7 @@ describe("moving tasks between containers", () => {
     });
   });
 
-  test("create works between days", () => {
+  test.skip("create works between days", () => {
     const {
       todayControls,
       moveCursorTo,

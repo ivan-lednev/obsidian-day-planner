@@ -12,7 +12,7 @@ import type {
   WithTime,
 } from "../../../task-types";
 import type { OnUpdateFn } from "../../../types";
-import { getDiffInMinutes, splitMultiday } from "../../../util/moment";
+import * as m from "../../../util/moment";
 import { getEndTime, getRenderKey, isWithTime } from "../../../util/task-utils";
 import { getDayKey, getEmptyRecordsForDay } from "../../../util/tasks-utils";
 
@@ -79,12 +79,12 @@ export function useEditContext(props: {
           return task;
         }
 
-        const chunks = splitMultiday(task.startTime, getEndTime(task));
+        const chunks = m.splitMultiday(task.startTime, getEndTime(task));
 
         return chunks.map(([startTime, endTime]) => ({
           ...task,
           startTime,
-          durationMinutes: getDiffInMinutes(startTime, endTime),
+          durationMinutes: m.getDiffInMinutes(startTime, endTime),
         }));
       });
 
