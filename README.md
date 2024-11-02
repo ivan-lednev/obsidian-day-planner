@@ -1,16 +1,15 @@
+- 🗳️ [Add '👍' reactions under the issues important to you.](https://github.com/ivan-lednev/obsidian-day-planner/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc) This helps me prioritize my work
 - 🪲 [Report bugs and suggest features](https://github.com/ivan-lednev/obsidian-day-planner/issues)
 - ❓ [Ask questions](https://github.com/ivan-lednev/obsidian-day-planner/discussions/new?category=q-a)
-- 👍 [Give thumbs up to issues important to you](https://github.com/ivan-lednev/obsidian-day-planner/issues)
-- 🪛 [Submit pull-requests](./CONTRIBUTING.md)
-- ❤️ Support the project directly:
-    - <a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+- 🛠️ [Submit pull-requests](./CONTRIBUTING.md)
+- ❤️ If this project adds value to your life, consider supporting it finantially:
+  - <a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
 
 ## Table of contents
 
 - [Table of contents](#table-of-contents)
 - [What it looks like](#what-it-looks-like)
-- [Drag-and-drop demos](#drag-and-drop-demos)
 - [How to use it](#how-to-use-it)
   - [1. Showing events from your daily notes](#1-showing-events-from-your-daily-notes)
   - [2. tasks community plugin integration, showing events from other files in your vault](#2-tasks-community-plugin-integration-showing-events-from-other-files-in-your-vault)
@@ -20,7 +19,6 @@
     - [Where to get an Outlook link](#where-to-get-an-outlook-link)
       - [Alternative](#alternative)
 - [What else you can do](#what-else-you-can-do)
-- [Commands](#commands)
 - [Note on the old plugin version](#note-on-the-old-plugin-version)
 - [Acknowledgements](#acknowledgements)
 
@@ -29,28 +27,18 @@
 ![](assets/ical-timeline-demo.png)
 ![](assets/week.png)
 
-## Drag-and-drop demos
-
-<details>
-<summary>Adding time to tasks</summary>
-
-![](assets/schedule-demo.gif)
-
-</details>
-
-<details>
-<summary>Basic editing: create, move, resize (click to expand)</summary>
-
-![](assets/basic-edit.gif)
-
-</details>
-
 ## How to use it
 
 > [!Warning]
 > Dataview (community plugin, [see in Obsidian](obsidian://show-plugin?id=dataview)) should be installed and enabled for the plugin to work.
 
-To see the sidebar with a timeline, run the following command: `Show the day planner timeline`
+To open the timeline in the sidebar:
+- Either run the command: `Show Timeline`
+- Or click the timeline icon in the left ribbon: 
+
+To open multi-day planner:
+- Either run the command: `Show multi-day planner`
+- Or click on the icon in the left ribbon: 
 
 The plugin has 3 distinct 'modes'. That is, it can display tasks from different sources:
 
@@ -65,7 +53,7 @@ Let's go over each one of them.
 > [!Warning]
 > Either the core 'Daily Notes' (core plugin) or the 'Periodic Notes' (community plugin, [see in Obsidian](obsidian://show-plugin?id=periodic-notes)) should be enabled. This is what allows day-planner to 'see' and interact with your daily notes.
 
-This is the most straightforward case that works out of the box: you write your tasks in a daily note and they show up on the timeline:
+This works out of the box: you write your tasks in a daily note, and they show up on the timeline:
 
 ```md
 # Day planner
@@ -76,10 +64,10 @@ This is the most straightforward case that works out of the box: you write your 
 
 ### 2. [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin) integration, showing events from other files in your vault
 
-This mode allows you to see tasks anywhere in the vault with dates added by the [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin). With this, day-planner serves as a kind of calendar for the [tasks plugin](obsidian://show-plugin?id=obsidian-tasks-plugin).
+This mode allows you to see tasks anywhere in the vault with dates added by the [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin).
 
 To make this work,
-1. Add a tag like `#task` or a folder to the Dataview source field. This is how the plugin knows which files it should monitor:
+1. Add a tag like `#task` or a folder to the Dataview source field:
    ![](./assets/dv-source.png)
 1. Add the tag (`#task` in this example) to the file with some tasks
 1. Add the `scheduled` property to a task in one of the formats:
@@ -91,13 +79,12 @@ To make this work,
 Full examples:
 
 ```md
----
-tags: "#task"
----
-
-- [ ] 08:00 - 10:00 This task uses the shorthand format ⏳ 2021-08-29
-- [ ] 11:00 - 13:00 This task uses the Dataview property format [scheduled:: 2021-08-29]
+- [ ] #task 08:00 - 10:00 This task uses the shorthand format ⏳ 2021-08-29
+- [ ] #task 11:00 - 13:00 This task uses the Dataview property format [scheduled:: 2021-08-29]
 ```
+
+> [!Note]
+> For now, the tags work at the level of files. So if `#task` is found anywhere in the file, all the tasks are going to be pulled into the calendar.
 
 ### 3. Showing internet calendars
 
@@ -107,9 +94,15 @@ To show events from internet calendars like **Google Calendar, iCloud Calendar a
 
 #### Where to get a Google Calendar link
 
+> [!Warning]
+> Make sure you copy the right link! It should end with `.ics`, otherwise, you won't see your events!
+
 [Google Calendar instructions](https://support.google.com/calendar/answer/37648?hl=en#zippy=%2Csync-your-google-calendar-view-edit%2Cget-your-calendar-view-only)
 
 #### Where to get an iCloud link
+
+> [!Note]
+> When you copy the link to your iCloud calendar, make sure to change the `webcal://` protocol to `https://`
 
 [iCloud Calendar instructions](https://www.souladvisor.com/help-centre/how-to-get-icloud-calendar-address-on-mac-in-ical-format)
 
@@ -137,13 +130,6 @@ If your organization doesn't let you share your calendar this way, you might try
 - Drag tasks to re-schedule
 - Copy tasks
 - Move multiple tasks at once
-
-## Commands
-
-- Show the Day Planner Timeline
-- Open today's Day Planner
-- Show the Week Planner
-- Insert Planner Heading at Cursor
 
 ## Note on the old plugin version
 
