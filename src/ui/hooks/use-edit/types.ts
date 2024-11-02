@@ -27,4 +27,5 @@ export type TaskTransformer = (
   editTarget: WithTime<LocalTask>,
   cursorTime: number,
   settings: DayPlannerSettings,
+  day?: Moment
 ) => WithTime<LocalTask>[];

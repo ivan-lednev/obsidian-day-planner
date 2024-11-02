@@ -170,11 +170,7 @@ describe("drag one & common edit mechanics", () => {
         id: "1",
       };
 
-      const {
-        dayToDisplayedTasks,
-        nextDayControls,
-        moveCursorTo,
-      } = setUp({
+      const { dayToDisplayedTasks, nextDayControls, moveCursorTo } = setUp({
         tasks: [task],
       });
 
@@ -187,7 +183,7 @@ describe("drag one & common edit mechanics", () => {
             {
               id: "1",
               startTime: moment("2023-01-01 23:00"),
-              durationMinutes: 60,
+              durationMinutes: 59,
             },
           ],
         },
