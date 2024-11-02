@@ -7,20 +7,20 @@
 ### ✨ New features
 
 - Now after edits there is an **UNDO** notice that lets you revert the changes to tasks, even across multiple files (partially addresses #341)
-- Now tasks can continue past midnight (#586)
+- Tasks crossing midnight now get shown properly in multiple day columns instead of stretching the first day (#586, #364)
+  - E.g.: `- 23:00 - 4:00 Task` will get shown in 2 columns as 2 separate blocks 
 - Now the plugin will ask for permission before creating new files on drag-and-drop edits
 - Timeline controls look tidier now
 - Now all-day remote events are shown in the unscheduled tasks section
-- Text in blocks is now sticky and will stay visible when scrolling
+- Text in blocks is now sticky and will stay visible when scrolling as well as when an event starts before the configured start hour
 
-#### Week planner has become multi-day planner
+#### Week planner -> multi-day planner
 
 - Now you can switch between 3 views:
   - **full week** (with configurable start of the week)
   - **work week** (starting on Monday)
   - **3 upcoming days** (#515)
 - You can now configure the first day of the week (#231)
-- Multi-day events get shown (#394)
 - Now you can move back and forth between time periods from the sidebar of the multiday-view (#458, #495)
 - Now weekends get marked by a different background color
 - Now you an open plugin settings from the multi-day view
@@ -29,9 +29,9 @@
 
 ### 🐞 Fixed issues
 
+- Now the plugin finds contrasting font colors for your color overrides for time blocks (#481)
 - obsidian-tasks tasks now get copied under the original line in the original file
 - Now copying a task also copies the sub-items under it
-- Multiday tasks now get shown properly in multiple day columns instead of stretching the first day
 - Extra spaces no longer get added in edited files
 
 ## 0.24.0
