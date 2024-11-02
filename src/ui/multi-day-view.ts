@@ -1,7 +1,7 @@
 import type { Moment } from "moment";
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { mount, unmount } from "svelte";
-import { get, type Writable } from "svelte/store";
+import { derived, get, type Writable } from "svelte/store";
 
 import { dateRangeContextKey, viewTypeWeekly } from "../constants";
 import type { DayPlannerSettings } from "../settings";
@@ -55,22 +55,39 @@ export default class MultiDayView extends ItemView {
     const contentEl = this.containerEl.children[1];
     const currentSettings = get(this.settings);
 
-    this.dateRange = this.dateRanges.trackRange(
-      r.createRange(
-        currentSettings.multiDayRange,
-        currentSettings.firstDayOfWeek,
-      ),
+    const range = r.createRange(
+      currentSettings.multiDayRange,
+      currentSettings.firstDayOfWeek,
     );
 
+    this.dateRange = this.dateRanges.trackRange(range);
     this.register(this.dateRange.subscribe(this.updateTabTitleAndHeader));
 
+    const relevantSettingsSignal = derived(this.settings, ($settings) => {
+      return {
+        multiDayRange: $settings.multiDayRange,
+        firstDayOfWeek: $settings.firstDayOfWeek,
+      };
+    });
+
     // todo: remove manual state synchronization
-    // todo: test if this causes week reset
+    const initialSettings = get(this.settings);
+    let previousMultiDayRange = initialSettings.multiDayRange;
+    let previousFirstDayOfWeek = initialSettings.firstDayOfWeek;
+
     this.register(
-      this.settings.subscribe((next) => {
-        this.dateRange?.set(
-          r.createRange(next.multiDayRange, next.firstDayOfWeek),
-        );
+      relevantSettingsSignal.subscribe((next) => {
+        if (
+          next.multiDayRange !== previousMultiDayRange ||
+          next.firstDayOfWeek !== previousFirstDayOfWeek
+        ) {
+          previousMultiDayRange = next.multiDayRange;
+          previousFirstDayOfWeek = next.firstDayOfWeek;
+
+          this.dateRange?.set(
+            r.createRange(next.multiDayRange, next.firstDayOfWeek),
+          );
+        }
       }),
     );
 

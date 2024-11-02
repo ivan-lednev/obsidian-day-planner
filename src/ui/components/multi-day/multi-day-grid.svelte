@@ -16,7 +16,7 @@
     getPreviousAdjacentRange,
     getPreviousWorkWeek,
   } from "../../../util/range";
-  import * as range from "../../../util/range";
+  import * as r from "../../../util/range";
   import ControlButton from "../control-button.svelte";
   import {
     Settings,
@@ -137,7 +137,7 @@
     label="Show current period"
     onclick={() => {
       dateRange.set(
-        range.createRange($settings.multiDayRange, $settings.firstDayOfWeek),
+        r.createRange($settings.multiDayRange, $settings.firstDayOfWeek),
       );
     }}
   >
