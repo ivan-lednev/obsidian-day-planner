@@ -1,14 +1,13 @@
+import type { Moment } from "moment";
 import { isNotVoid } from "typed-assert";
 
 import type { DayPlannerSettings } from "../../../../settings";
 import type { LocalTask, WithTime } from "../../../../task-types";
-import {
-  getMinutesSinceMidnight,
-  minutesToMomentOfDay,
-} from "../../../../util/moment";
+import { minutesToMomentOfDay } from "../../../../util/moment";
 import { getEndMinutes } from "../../../../util/task-utils";
 import { toSpliced } from "../../../../util/to-spliced";
-import type { Moment } from "moment";
+
+import { getDurationMinutes } from "./util";
 
 export function resize(
   baseline: WithTime<LocalTask>[],
@@ -22,27 +21,9 @@ export function resize(
 
   isNotVoid(task);
 
-  let durationMinutes = Math.max(
-    cursorTime - getMinutesSinceMidnight(task.startTime),
-    settings.minimalDurationMinutes,
-  );
-
-  if (day) {
-    durationMinutes = Math.max(
-      Math.abs(
-        day
-          .clone()
-          .startOf("day")
-          .add(cursorTime, "minutes")
-          .diff(task.startTime, "minutes"),
-      ),
-      settings.minimalDurationMinutes,
-    );
-  }
-
   const updated = {
     ...task,
-    durationMinutes,
+    durationMinutes: getDurationMinutes(task, cursorTime, settings, day),
   };
 
   return toSpliced(baseline, index, updated);

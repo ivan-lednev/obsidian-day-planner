@@ -1,4 +1,5 @@
 import { last } from "lodash";
+import type { Moment } from "moment";
 import { isNotVoid } from "typed-assert";
 
 import type { DayPlannerSettings } from "../../../../settings";
@@ -9,11 +10,14 @@ import {
 } from "../../../../util/moment";
 import { getEndMinutes } from "../../../../util/task-utils";
 
+import { getDurationMinutes } from "./util";
+
 export function resizeAndShrinkOthers(
   baseline: WithTime<LocalTask>[],
   editTarget: WithTime<LocalTask>,
   cursorTime: number,
   settings: DayPlannerSettings,
+  day?: Moment,
 ): WithTime<LocalTask>[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
   const task = baseline[index];
@@ -23,14 +27,9 @@ export function resizeAndShrinkOthers(
   const preceding = baseline.slice(0, index);
   const following = baseline.slice(index + 1);
 
-  const durationMinutes = Math.max(
-    cursorTime - getMinutesSinceMidnight(task.startTime),
-    settings.minimalDurationMinutes,
-  );
-
   const updated = {
     ...task,
-    durationMinutes,
+    durationMinutes: getDurationMinutes(task, cursorTime, settings, day),
   };
 
   const updatedFollowing = following.reduce<WithTime<LocalTask>[]>(

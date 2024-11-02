@@ -91,5 +91,11 @@ export function transform(
   const withTimeSorted = sortByStartMinutes(withUpdatedDay);
 
   // todo: cursor time should be a moment
-  return transformFn(withTimeSorted, operation.task, cursorMinutes, settings, operation.day);
+  return transformFn(
+    withTimeSorted,
+    operation.task,
+    cursorMinutes,
+    settings,
+    operation.day,
+  );
 }
