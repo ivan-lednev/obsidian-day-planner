@@ -10,12 +10,7 @@ import { baseTask, threeTasks } from "./util/test-utils";
 
 describe("drag one & common edit mechanics", () => {
   test("after edit confirmation, tasks freeze and stop reacting to cursor", async () => {
-    const {
-      handlers,
-      moveCursorTo,
-      dayToDisplayedTasks,
-      confirmEdit,
-    } = setUp({
+    const { handlers, moveCursorTo, dayToDisplayedTasks, confirmEdit } = setUp({
       tasks: threeTasks,
     });
 

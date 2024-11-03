@@ -111,11 +111,6 @@ export function useEditContext(props: {
     settings,
   });
 
-  // todo: at least rename, or turn into a hook
-  function getEditHandlers() {
-    return handlers;
-  }
-
   function getDisplayedTasksForTimeline(day: Moment) {
     return derived(dayToDisplayedTasks, ($dayToDisplayedTasks) => {
       const tasksForDay =
@@ -134,11 +129,11 @@ export function useEditContext(props: {
   }
 
   return {
+    handlers,
     cursor,
     dayToDisplayedTasks,
     confirmEdit,
     cancelEdit,
-    getEditHandlers,
     editOperation,
     getDisplayedTasksForTimeline,
   };

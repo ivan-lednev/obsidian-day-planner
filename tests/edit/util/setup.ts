@@ -1,5 +1,6 @@
 import { noop } from "lodash/fp";
 import type { Moment } from "moment/moment";
+import moment from "moment/moment";
 import { writable } from "svelte/store";
 import { vi } from "vitest";
 
@@ -10,11 +11,8 @@ import {
 } from "../../../src/settings";
 import type { LocalTask } from "../../../src/task-types";
 import { useEditContext } from "../../../src/ui/hooks/use-edit/use-edit-context";
-import { minutesToMomentOfDay, toMinutes } from "../../../src/util/moment";
 
-import { baseTasks, day, nextDay } from "./fixtures";
-import { offsetYToMinutes } from "../../../src/util/task-utils";
-import moment from "moment/moment";
+import { baseTasks } from "./fixtures";
 
 function createProps({
   tasks,
@@ -41,10 +39,7 @@ export function setUp({
   settings = defaultSettingsForTests,
 } = {}) {
   const props = createProps({ tasks, settings });
-  const { getEditHandlers, dayToDisplayedTasks, confirmEdit } =
-    useEditContext(props);
-
-  const handlers = getEditHandlers();
+  const { handlers, dayToDisplayedTasks, confirmEdit } = useEditContext(props);
 
   // this prevents the store from resetting;
   dayToDisplayedTasks.subscribe(noop);

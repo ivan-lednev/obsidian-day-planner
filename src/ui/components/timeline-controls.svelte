@@ -6,7 +6,6 @@
     AlertTriangle,
     EllipsisVertical,
   } from "lucide-svelte";
-  import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
   import type { Moment } from "moment";
   import { Menu } from "obsidian";
   import { getContext } from "svelte";
@@ -22,18 +21,18 @@
   import ErrorReport from "./error-report.svelte";
   import Pill from "./pill.svelte";
   import SettingsControls from "./settings-controls.svelte";
+  import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   const { workspaceFacade, initWeeklyView, dataviewLoaded, reSync, search } =
     getContext<ObsidianContext>(obsidianContext);
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
   const {
-    editContext: { getEditHandlers },
+    editContext: { handlers },
   } = getContext<ObsidianContext>(obsidianContext);
 
-  const { handleTaskMouseUp, handleUnscheduledTaskGripMouseDown } = $derived(
-    getEditHandlers(),
-  );
+  const { handleTaskMouseUp, handleUnscheduledTaskGripMouseDown } =
+    $derived(handlers);
 
   let settingsVisible = $state(false);
 
@@ -151,17 +150,17 @@
 
   <div class="search">
     <input
-      bind:value={search.query}
       placeholder="Search"
       spellcheck="false"
       type="text"
+      bind:value={search.query}
     />
     <div class="search-results">
       {#each search.result as foundBlock}
         <UnscheduledTimeBlock
-          task={foundBlock}
-          onMouseUp={() => {}}
           onGripMouseDown={handleUnscheduledTaskGripMouseDown}
+          onMouseUp={() => {}}
+          task={foundBlock}
         />
       {/each}
     </div>

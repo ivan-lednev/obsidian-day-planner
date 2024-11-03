@@ -1,7 +1,8 @@
+import { debounce } from "obsidian";
 import { fromStore, type Readable } from "svelte/store";
+
 import type { DataviewFacade } from "../../service/dataview-facade";
 import * as dv from "../../util/dataview";
-import { debounce } from "obsidian";
 
 export function useSearch(props: {
   dataviewFacade: DataviewFacade;

@@ -15,13 +15,10 @@
   export let day: Moment;
 
   const {
-    editContext: { getEditHandlers, getDisplayedTasksForTimeline },
+    editContext: { handlers, getDisplayedTasksForTimeline },
   } = getContext<ObsidianContext>(obsidianContext);
 
-  $: ({
-    handleTaskMouseUp,
-    handleUnscheduledTaskGripMouseDown,
-  } = getEditHandlers());
+  $: ({ handleTaskMouseUp, handleUnscheduledTaskGripMouseDown } = handlers);
   $: displayedTasksForTimeline = getDisplayedTasksForTimeline(day);
 </script>
 

@@ -8,6 +8,7 @@
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { isRemote } from "../../task-types";
   import { type ObsidianContext } from "../../types";
+  import { minutesToMomentOfDay } from "../../util/moment";
   import { getRenderKey, offsetYToMinutes } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
 
@@ -16,7 +17,6 @@
   import Needle from "./needle.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
-  import { minutesToMomentOfDay } from "../../util/moment";
 
   export let day: Moment;
   export let isUnderCursor = false;
@@ -24,7 +24,7 @@
   const {
     pointerDateTime,
     settings,
-    editContext: { confirmEdit, getEditHandlers, getDisplayedTasksForTimeline },
+    editContext: { confirmEdit, handlers, getDisplayedTasksForTimeline },
   } = getContext<ObsidianContext>(obsidianContext);
 
   $: ({
@@ -32,7 +32,7 @@
     handleResizerMouseDown,
     handleTaskMouseUp,
     handleGripMouseDown,
-  } = getEditHandlers());
+  } = handlers);
 
   $: displayedTasksForTimeline = getDisplayedTasksForTimeline(day);
   let el: HTMLElement | undefined;

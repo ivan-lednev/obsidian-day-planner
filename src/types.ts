@@ -6,8 +6,8 @@ import type { WorkspaceFacade } from "./service/workspace-facade";
 import type { DayPlannerSettings, IcalConfig } from "./settings";
 import type { LocalTask } from "./task-types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
-import { createShowPreview } from "./util/create-show-preview";
 import type { useSearch } from "./ui/hooks/use-search.svelte";
+import { createShowPreview } from "./util/create-show-preview";
 
 export type OnUpdateFn = (
   base: Array<LocalTask>,

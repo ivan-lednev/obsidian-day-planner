@@ -6,11 +6,11 @@ import { get } from "svelte/store";
 import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
 import type { LocalTask, WithTime } from "../../../task-types";
+import { getMinutesSinceMidnight } from "../../../util/moment";
 import { createTask } from "../../../util/task-utils";
 
 import type { EditOperation } from "./types";
 import { EditMode } from "./types";
-import { getMinutesSinceMidnight } from "../../../util/moment";
 
 export interface UseEditHandlersProps {
   startEdit: (operation: EditOperation) => void;

@@ -17,7 +17,7 @@ import { baseTask } from "./util/test-utils";
 
 describe("moving tasks between containers", () => {
   test("with no edit operation in progress, nothing happens on mouse move", () => {
-    const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp({
+    const { moveCursorTo, dayToDisplayedTasks } = setUp({
       tasks: baseTasks,
     });
 

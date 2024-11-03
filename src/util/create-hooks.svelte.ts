@@ -1,3 +1,4 @@
+import type { Moment } from "moment";
 import { App } from "obsidian";
 import {
   derived,
@@ -24,6 +25,7 @@ import { useKeyDown } from "../ui/hooks/use-key-down";
 import { useListsFromVisibleDailyNotes } from "../ui/hooks/use-lists-from-visible-daily-notes";
 import { useModPressed } from "../ui/hooks/use-mod-pressed";
 import { useNewlyStartedTasks } from "../ui/hooks/use-newly-started-tasks";
+import { useSearch } from "../ui/hooks/use-search.svelte";
 import { useTasksFromExtraSources } from "../ui/hooks/use-tasks-from-extra-sources";
 import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "../ui/hooks/use-visible-dataview-tasks";
@@ -32,8 +34,6 @@ import { useVisibleDays } from "../ui/hooks/use-visible-days";
 import { getUpdateTrigger } from "./store";
 import { isWithTime } from "./task-utils";
 import { useRemoteTasks } from "./use-remote-tasks";
-import { useSearch } from "../ui/hooks/use-search.svelte";
-import type { Moment } from "moment";
 
 interface CreateHooksProps {
   app: App;

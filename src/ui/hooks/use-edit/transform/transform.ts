@@ -1,4 +1,5 @@
 import { produce } from "immer";
+import type { Moment } from "moment";
 import { isNotVoid } from "typed-assert";
 
 import type { DayPlannerSettings } from "../../../../settings";
@@ -23,7 +24,6 @@ import {
   resizeAndShrinkOthers,
   resizeFromTopAndShrinkOthers,
 } from "./resize-and-shrink-others";
-import type { Moment } from "moment";
 
 const transformers: Record<EditMode, TaskTransformer> = {
   [EditMode.DRAG]: drag,
