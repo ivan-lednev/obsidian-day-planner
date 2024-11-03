@@ -351,6 +351,7 @@ export default class DayPlanner extends Plugin {
       isDarkMode,
       dateRanges,
       dataviewSyncTrigger,
+      search,
     } = createHooks({
       app: this.app,
       dataviewFacade: this.dataviewFacade,
@@ -393,6 +394,7 @@ export default class DayPlanner extends Plugin {
     });
 
     const defaultObsidianContext: ObsidianContext = {
+      search,
       workspaceFacade: this.workspaceFacade,
       initWeeklyView: this.initWeeklyLeaf,
       refreshTasks: this.dataviewFacade.getAllTasksFrom,

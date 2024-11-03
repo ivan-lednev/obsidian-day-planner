@@ -32,6 +32,7 @@ import { useVisibleDays } from "../ui/hooks/use-visible-days";
 import { getUpdateTrigger } from "./store";
 import { isWithTime } from "./task-utils";
 import { useRemoteTasks } from "./use-remote-tasks";
+import { useSearch } from "../ui/hooks/use-search.svelte";
 
 interface CreateHooksProps {
   app: App;
@@ -149,6 +150,11 @@ export function createHooks({
     },
   );
 
+  const search = useSearch({
+    dataviewFacade,
+    dataviewSource,
+  });
+
   const editContext = useEditContext({
     workspaceFacade,
     onUpdate,
@@ -173,6 +179,7 @@ export function createHooks({
     dataviewSyncTrigger,
     isOnline,
     isDarkMode,
+    search,
     dateRanges,
   };
 }

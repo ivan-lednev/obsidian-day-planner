@@ -7,6 +7,7 @@ import type { DayPlannerSettings, IcalConfig } from "./settings";
 import type { LocalTask } from "./task-types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { createShowPreview } from "./util/create-show-preview";
+import type { useSearch } from "./ui/hooks/use-search.svelte";
 
 export type OnUpdateFn = (
   base: Array<LocalTask>,
@@ -39,6 +40,8 @@ export interface ObsidianContext {
   isDarkMode: { current: boolean };
   settings: Writable<DayPlannerSettings>;
   settingsSignal: { current: DayPlannerSettings };
+  // todo: searchEngine/timeBlockSearch...
+  search: ReturnType<typeof useSearch>;
 }
 
 export type ComponentContext = Map<string, unknown>;
