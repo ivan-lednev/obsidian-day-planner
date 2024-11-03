@@ -32,7 +32,7 @@ function createProps({
     workspaceFacade,
     localTasks: writable(tasks),
     remoteTasks: writable([]),
-    pointerDateTime: writable({dateTime: moment("2023-01-01 00:00")}),
+    pointerDateTime: writable({ dateTime: moment("2023-01-01 00:00") }),
   };
 }
 
@@ -54,10 +54,6 @@ export function setUp({
   function moveCursorTo(time: string, day: Moment) {
     pointerOffsetY.set(toMinutes(time));
     const newDateTime = day.clone().startOf("day").add(moment.duration(time));
-
-    if (!newDateTime) {
-      throw new Error("Could not create dateTime");
-    }
 
     props.pointerDateTime.set({
       dateTime: newDateTime,

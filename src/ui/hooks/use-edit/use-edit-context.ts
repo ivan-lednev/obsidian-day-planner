@@ -49,8 +49,14 @@ export function useEditContext(props: {
   remoteTasks: Readable<Task[]>;
   pointerDateTime: Writable<{ dateTime?: Moment; type?: "dateTime" | "date" }>;
 }) {
-  const { workspaceFacade, onUpdate, settings, localTasks, remoteTasks, pointerDateTime } =
-    props;
+  const {
+    workspaceFacade,
+    onUpdate,
+    settings,
+    localTasks,
+    remoteTasks,
+    pointerDateTime,
+  } = props;
 
   const editOperation = writable<EditOperation | undefined>();
   const cursor = useCursor(editOperation);
@@ -64,10 +70,22 @@ export function useEditContext(props: {
   });
 
   const tasksWithPendingUpdate = derived(
-    [editOperation, cursorMinutes, baselineTasks, settings],
-    ([$editOperation, $cursorMinutes, $baselineTasks, $settings]) => {
+    [editOperation, cursorMinutes, baselineTasks, settings, pointerDateTime],
+    ([
+      $editOperation,
+      $cursorMinutes,
+      $baselineTasks,
+      $settings,
+      $pointerDateTime,
+    ]) => {
       return $editOperation
-        ? transform($baselineTasks, $cursorMinutes, $editOperation, $settings)
+        ? transform(
+            $baselineTasks,
+            $cursorMinutes,
+            $editOperation,
+            $settings,
+            $pointerDateTime,
+          )
         : $baselineTasks;
     },
   );

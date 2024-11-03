@@ -25,7 +25,6 @@ describe("drag one & common edit mechanics", () => {
 
     await confirmEdit();
 
-    nextDayControls.handleMouseEnter();
     moveCursorTo("05:00", moment("2023-01-02"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({

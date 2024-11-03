@@ -23,6 +23,7 @@ import {
   resizeAndShrinkOthers,
   resizeFromTopAndShrinkOthers,
 } from "./resize-and-shrink-others";
+import type { Moment } from "moment";
 
 const transformers: Record<EditMode, TaskTransformer> = {
   [EditMode.DRAG]: drag,
@@ -59,7 +60,14 @@ export function transform(
   cursorMinutes: number,
   operation: EditOperation,
   settings: DayPlannerSettings,
+  pointerDateTime: { dateTime?: Moment; type?: "dateTime" | "date" },
 ) {
+  const dateTime = pointerDateTime.dateTime;
+
+  if (!dateTime) {
+    throw new Error("DateTime cannot be undefined on edit");
+  }
+
   const transformFn = transformers[operation.mode];
 
   isNotVoid(transformFn, `No transformer for operation: ${operation.mode}`);
@@ -80,7 +88,7 @@ export function transform(
         ...found,
         startTime: minutesToMomentOfDay(
           getMinutesSinceMidnight(found.startTime),
-          operation.day,
+          dateTime,
         ),
       };
     }
@@ -96,6 +104,6 @@ export function transform(
     operation.task,
     cursorMinutes,
     settings,
-    operation.day,
+    dateTime,
   );
 }

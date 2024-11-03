@@ -33,7 +33,6 @@
     handleResizerMouseDown,
     handleTaskMouseUp,
     handleGripMouseDown,
-    handleMouseEnter,
   } = getEditHandlers(day));
 
   let el: HTMLElement | undefined;
@@ -65,7 +64,6 @@
   <div
     bind:this={el}
     class="tasks absolute-stretch-x"
-    on:mouseenter={handleMouseEnter}
     on:pointerdown={(event) => {
       if (isTouchEvent(event) || event.target !== el) {
         return;
