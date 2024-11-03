@@ -14,7 +14,7 @@ describe("drag", () => {
     const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp();
 
     todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
-    moveCursorTo("01:00", moment("2023-01-01"));
+    moveCursorTo(moment("2023-01-01 01:00"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
       [dayKey]: {
@@ -37,7 +37,7 @@ describe("drag", () => {
         threeTasks[1],
         EditMode.DRAG_AND_SHIFT_OTHERS,
       );
-      moveCursorTo("03:00", moment("2023-01-01"));
+      moveCursorTo(moment("2023-01-01 03:00"));
 
       expect(get(dayToDisplayedTasks)).toMatchObject({
         [dayKey]: {
@@ -69,8 +69,8 @@ describe("drag", () => {
         threeTasks[1],
         EditMode.DRAG_AND_SHIFT_OTHERS,
       );
-      moveCursorTo("03:00", moment("2023-01-01"));
-      moveCursorTo("01:00", moment("2023-01-01"));
+      moveCursorTo(moment("2023-01-01 03:00"));
+      moveCursorTo(moment("2023-01-01 01:00"));
 
       expect(get(dayToDisplayedTasks)).toMatchObject({
         [dayKey]: {
@@ -105,7 +105,7 @@ describe("drag", () => {
         threeTasks[1],
         EditMode.DRAG_AND_SHRINK_OTHERS,
       );
-      moveCursorTo("03:00", moment("2023-01-01"));
+      moveCursorTo(moment("2023-01-01 03:00"));
 
       expect(get(dayToDisplayedTasks)).toMatchObject({
         [dayKey]: {
