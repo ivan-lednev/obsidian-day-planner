@@ -41,7 +41,7 @@ export function setUp({
   settings = defaultSettingsForTests,
 } = {}) {
   const props = createProps({ tasks, settings });
-  const { getEditHandlers, dayToDisplayedTasks, confirmEdit, pointerOffsetY } =
+  const { getEditHandlers, dayToDisplayedTasks, confirmEdit, } =
     useEditContext(props);
 
   const todayControls = getEditHandlers(day);
@@ -52,7 +52,6 @@ export function setUp({
 
   // todo: -> dateTime: moment
   function moveCursorTo(time: string, day: Moment) {
-    pointerOffsetY.set(toMinutes(time));
     const newDateTime = day.clone().startOf("day").add(moment.duration(time));
 
     props.pointerDateTime.set({

@@ -24,7 +24,7 @@
   const {
     pointerDateTime,
     settings,
-    editContext: { confirmEdit, getEditHandlers, pointerOffsetY },
+    editContext: { confirmEdit, getEditHandlers,  },
   } = getContext<ObsidianContext>(obsidianContext);
 
   $: ({
@@ -52,7 +52,6 @@
       dateTime,
       type: "dateTime",
     });
-    pointerOffsetY.set(newOffsetY);
   }
 </script>
 

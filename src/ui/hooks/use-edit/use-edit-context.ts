@@ -60,9 +60,6 @@ export function useEditContext(props: {
   const editOperation = writable<EditOperation | undefined>();
   const cursor = useCursor(editOperation);
 
-  // todo: lift up
-  const pointerOffsetY = writable(0);
-
   const baselineTasks = writable<LocalTask[]>([], (set) => {
     return localTasks.subscribe(set);
   });
@@ -152,7 +149,6 @@ export function useEditContext(props: {
 
   return {
     cursor,
-    pointerOffsetY,
     dayToDisplayedTasks,
     confirmEdit,
     cancelEdit,
