@@ -57,7 +57,6 @@ function sortByStartMinutes(tasks: WithTime<LocalTask>[]) {
 
 export function transform(
   baseline: LocalTask[],
-  cursorMinutes: number,
   operation: EditOperation,
   settings: DayPlannerSettings,
   pointerDateTime: { dateTime?: Moment; type?: "dateTime" | "date" },
@@ -102,7 +101,7 @@ export function transform(
   return transformFn(
     withTimeSorted,
     operation.task,
-    cursorMinutes,
+    getMinutesSinceMidnight(dateTime),
     settings,
     dateTime,
   );

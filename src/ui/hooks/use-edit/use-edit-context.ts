@@ -20,7 +20,6 @@ import { createEditHandlers } from "./create-edit-handlers";
 import { useCursor } from "./cursor";
 import { transform } from "./transform/transform";
 import type { EditOperation } from "./types";
-import { useCursorMinutes } from "./use-cursor-minutes";
 import { useEditActions } from "./use-edit-actions";
 
 function groupByDay(tasks: Task[]) {
@@ -63,17 +62,15 @@ export function useEditContext(props: {
 
   // todo: lift up
   const pointerOffsetY = writable(0);
-  const cursorMinutes = useCursorMinutes(pointerOffsetY, settings);
 
   const baselineTasks = writable<LocalTask[]>([], (set) => {
     return localTasks.subscribe(set);
   });
 
   const tasksWithPendingUpdate = derived(
-    [editOperation, cursorMinutes, baselineTasks, settings, pointerDateTime],
+    [editOperation, baselineTasks, settings, pointerDateTime],
     ([
       $editOperation,
-      $cursorMinutes,
       $baselineTasks,
       $settings,
       $pointerDateTime,
@@ -81,7 +78,6 @@ export function useEditContext(props: {
       return $editOperation
         ? transform(
             $baselineTasks,
-            $cursorMinutes,
             $editOperation,
             $settings,
             $pointerDateTime,
@@ -120,17 +116,16 @@ export function useEditContext(props: {
     onUpdate,
   });
 
-  function getEditHandlers(day: Moment) {
-    const handlers = createEditHandlers({
-      pointerDateTime,
-      day,
-      workspaceFacade,
-      startEdit,
-      cursorMinutes,
-      editOperation,
-      settings,
-    });
+  const handlers = createEditHandlers({
+    pointerDateTime,
+    workspaceFacade,
+    startEdit,
+    editOperation,
+    settings,
+  });
 
+  // todo: at least rename, or turn into a hook
+  function getEditHandlers(day: Moment) {
     const displayedTasksForDay = derived(
       dayToDisplayedTasks,
       ($dayToDisplayedTasks) => {

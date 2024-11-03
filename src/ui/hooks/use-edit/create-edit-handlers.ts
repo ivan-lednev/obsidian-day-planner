@@ -10,13 +10,11 @@ import { createTask } from "../../../util/task-utils";
 
 import type { EditOperation } from "./types";
 import { EditMode } from "./types";
+import { getMinutesSinceMidnight } from "../../../util/moment";
 
 export interface UseEditHandlersProps {
   startEdit: (operation: EditOperation) => void;
-  // todo: make dynamic, since it can change?
-  day: Moment;
   workspaceFacade: WorkspaceFacade;
-  cursorMinutes: Readable<number>;
   editOperation: Writable<EditOperation | undefined>;
   settings: Readable<DayPlannerSettings>;
   pointerDateTime: Writable<{ dateTime?: Moment; type?: "dateTime" | "date" }>;
@@ -25,7 +23,6 @@ export interface UseEditHandlersProps {
 export function createEditHandlers({
   workspaceFacade,
   startEdit,
-  cursorMinutes,
   editOperation,
   settings,
   pointerDateTime,
@@ -37,9 +34,12 @@ export function createEditHandlers({
       throw new Error("Day cannot be undefined on edit");
     }
 
+    const pointerMinutes = getMinutesSinceMidnight(pointerDay);
+
+    // todo: use datetime
     const newTask = createTask({
       day: pointerDay,
-      startMinutes: get(cursorMinutes),
+      startMinutes: pointerMinutes,
       settings: get(settings),
     });
 
