@@ -11,9 +11,9 @@ describe("create", () => {
       tasks: emptyTasks,
     });
 
-    moveCursorTo("01:00");
+    moveCursorTo("01:00", moment("2023-01-01"));
     todayControls.handleContainerMouseDown();
-    moveCursorTo("02:00");
+    moveCursorTo("02:00", moment("2023-01-01"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
       [dayKey]: {

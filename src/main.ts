@@ -352,6 +352,7 @@ export default class DayPlanner extends Plugin {
       dateRanges,
       dataviewSyncTrigger,
       search,
+      pointerDateTime,
     } = createHooks({
       app: this.app,
       dataviewFacade: this.dataviewFacade,
@@ -409,6 +410,7 @@ export default class DayPlanner extends Plugin {
       isDarkMode,
       settings,
       settingsSignal: fromStore(settings),
+      pointerDateTime,
     };
 
     const componentContext = new Map<

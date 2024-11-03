@@ -40,6 +40,7 @@ export interface ObsidianContext {
   isDarkMode: { current: boolean };
   settings: Writable<DayPlannerSettings>;
   settingsSignal: { current: DayPlannerSettings };
+  pointerDateTime: Writable<{ date?: Moment; time?: Moment }>;
   // todo: searchEngine/timeBlockSearch...
   search: ReturnType<typeof useSearch>;
 }

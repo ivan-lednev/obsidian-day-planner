@@ -6,10 +6,9 @@
   import { obsidianContext } from "../../constants";
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
-  import { settings } from "../../global-store/settings";
   import { isRemote } from "../../task-types";
   import { type ObsidianContext } from "../../types";
-  import { getRenderKey } from "../../util/task-utils";
+  import { getRenderKey, offsetYToMinutes } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
 
   import Column from "./column.svelte";
@@ -17,11 +16,14 @@
   import Needle from "./needle.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
+  import { minutesToMomentOfDay } from "../../util/moment";
 
   export let day: Moment;
   export let isUnderCursor = false;
 
   const {
+    pointerDateTime,
+    settings,
     editContext: { confirmEdit, getEditHandlers, pointerOffsetY },
   } = getContext<ObsidianContext>(obsidianContext);
 
@@ -41,8 +43,17 @@
 
     const viewportToElOffsetY = el.getBoundingClientRect().top;
     const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
+    const newOffsetY = snap(borderTopToPointerOffsetY, $settings);
 
-    pointerOffsetY.set(snap(borderTopToPointerOffsetY, $settings));
+    const dateTime = minutesToMomentOfDay(
+      offsetYToMinutes(newOffsetY, $settings.zoomLevel, $settings.startHour),
+      day,
+    );
+    pointerDateTime.set({
+      dateTime,
+      type: "dateTime",
+    });
+    pointerOffsetY.set(newOffsetY);
   }
 </script>
 

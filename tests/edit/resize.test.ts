@@ -15,7 +15,7 @@ describe("resize", () => {
     const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp();
 
     todayControls.handleResizerMouseDown(baseTask, EditMode.RESIZE);
-    moveCursorTo("03:00");
+    moveCursorTo("03:00", moment("2023-01-01"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
       [dayKey]: {
@@ -28,7 +28,7 @@ describe("resize", () => {
     const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp();
 
     todayControls.handleResizerMouseDown(baseTask, EditMode.RESIZE_FROM_TOP);
-    moveCursorTo("00:30");
+    moveCursorTo("00:30", moment("2023-01-01"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
       [dayKey]: {
@@ -43,7 +43,7 @@ describe("resize", () => {
     const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp();
 
     todayControls.handleResizerMouseDown(baseTask, EditMode.RESIZE_FROM_TOP);
-    moveCursorTo("01:30");
+    moveCursorTo("01:30", moment("2023-01-01"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
       [dayKey]: {
@@ -67,7 +67,7 @@ describe("resize", () => {
         threeTasks[1],
         EditMode.RESIZE_AND_SHIFT_OTHERS,
       );
-      moveCursorTo("04:00");
+      moveCursorTo("04:00", moment("2023-01-01"));
 
       expect(get(dayToDisplayedTasks)).toMatchObject({
         [dayKey]: {
@@ -92,7 +92,7 @@ describe("resize", () => {
         threeTasks[1],
         EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS,
       );
-      moveCursorTo("01:30");
+      moveCursorTo("01:30", moment("2023-01-01"));
 
       expect(get(dayToDisplayedTasks)).toMatchObject({
         [dayKey]: {
@@ -127,7 +127,7 @@ describe("resize", () => {
         threeTasks[1],
         EditMode.RESIZE_AND_SHRINK_OTHERS,
       );
-      moveCursorTo("04:00");
+      moveCursorTo("04:00", moment("2023-01-01"));
 
       expect(get(dayToDisplayedTasks)).toMatchObject({
         [dayKey]: {
@@ -156,7 +156,7 @@ describe("resize", () => {
         threeTasks[1],
         EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS,
       );
-      moveCursorTo("00:30");
+      moveCursorTo("00:30", moment("2023-01-01"));
 
       expect(get(dayToDisplayedTasks)).toMatchObject({
         [dayKey]: {

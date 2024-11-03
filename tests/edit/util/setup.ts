@@ -10,9 +10,11 @@ import {
 } from "../../../src/settings";
 import type { LocalTask } from "../../../src/task-types";
 import { useEditContext } from "../../../src/ui/hooks/use-edit/use-edit-context";
-import { toMinutes } from "../../../src/util/moment";
+import { minutesToMomentOfDay, toMinutes } from "../../../src/util/moment";
 
 import { baseTasks, day, nextDay } from "./fixtures";
+import { offsetYToMinutes } from "../../../src/util/task-utils";
+import moment from "moment/moment";
 
 function createProps({
   tasks,
@@ -30,6 +32,7 @@ function createProps({
     workspaceFacade,
     localTasks: writable(tasks),
     remoteTasks: writable([]),
+    pointerDateTime: writable({dateTime: moment("2023-01-01 00:00")}),
   };
 }
 
@@ -47,8 +50,18 @@ export function setUp({
   // this prevents the store from resetting;
   dayToDisplayedTasks.subscribe(noop);
 
-  function moveCursorTo(time: string, day?: Moment) {
+  // todo: -> dateTime: moment
+  function moveCursorTo(time: string, day: Moment) {
     pointerOffsetY.set(toMinutes(time));
+    const newDateTime = day.clone().startOf("day").add(moment.duration(time));
+
+    if (!newDateTime) {
+      throw new Error("Could not create dateTime");
+    }
+
+    props.pointerDateTime.set({
+      dateTime: newDateTime,
+    });
   }
 
   return {

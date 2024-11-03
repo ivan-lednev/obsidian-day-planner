@@ -1,6 +1,6 @@
 import { flow, uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
-import { derived, type Readable, writable } from "svelte/store";
+import { derived, type Readable, type Writable, writable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../../overlap/overlap";
 import { WorkspaceFacade } from "../../../service/workspace-facade";
@@ -47,12 +47,15 @@ export function useEditContext(props: {
   settings: Readable<DayPlannerSettings>;
   localTasks: Readable<LocalTask[]>;
   remoteTasks: Readable<Task[]>;
+  pointerDateTime: Writable<{ dateTime?: Moment; type?: "dateTime" | "date" }>;
 }) {
-  const { workspaceFacade, onUpdate, settings, localTasks, remoteTasks } =
+  const { workspaceFacade, onUpdate, settings, localTasks, remoteTasks, pointerDateTime } =
     props;
 
   const editOperation = writable<EditOperation | undefined>();
   const cursor = useCursor(editOperation);
+
+  // todo: lift up
   const pointerOffsetY = writable(0);
   const cursorMinutes = useCursorMinutes(pointerOffsetY, settings);
 
@@ -101,6 +104,7 @@ export function useEditContext(props: {
 
   function getEditHandlers(day: Moment) {
     const handlers = createEditHandlers({
+      pointerDateTime,
       day,
       workspaceFacade,
       startEdit,

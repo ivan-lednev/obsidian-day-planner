@@ -33,6 +33,7 @@ import { getUpdateTrigger } from "./store";
 import { isWithTime } from "./task-utils";
 import { useRemoteTasks } from "./use-remote-tasks";
 import { useSearch } from "../ui/hooks/use-search.svelte";
+import type { Moment } from "moment";
 
 interface CreateHooksProps {
   app: App;
@@ -59,6 +60,10 @@ export function createHooks({
   const layoutReady = readable(false, (set) => {
     app.workspace.onLayoutReady(() => set(true));
   });
+  const pointerDateTime = writable<{
+    dateTime?: Moment;
+    type?: "dateTime" | "date";
+  }>({});
 
   const isDarkModeStore = readable(getDarkModeFlag(), (set) => {
     const eventRef = app.workspace.on("css-change", () => {
@@ -161,6 +166,8 @@ export function createHooks({
     settings: settingsStore,
     localTasks,
     remoteTasks,
+    // todo: doesn't have to know about pointers
+    pointerDateTime,
   });
 
   const newlyStartedTasks = useNewlyStartedTasks({
@@ -181,5 +188,6 @@ export function createHooks({
     isDarkMode,
     search,
     dateRanges,
+    pointerDateTime,
   };
 }

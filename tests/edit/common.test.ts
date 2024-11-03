@@ -21,12 +21,12 @@ describe("drag one & common edit mechanics", () => {
     });
 
     todayControls.handleGripMouseDown(threeTasks[1], EditMode.DRAG);
-    moveCursorTo("03:00");
+    moveCursorTo("03:00", moment("2023-01-01"));
 
     await confirmEdit();
 
     nextDayControls.handleMouseEnter();
-    moveCursorTo("05:00");
+    moveCursorTo("05:00", moment("2023-01-02"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
       [dayKey]: {
@@ -101,7 +101,7 @@ describe("drag one & common edit mechanics", () => {
       });
 
       todayControls.handleGripMouseDown(task, EditMode.DRAG);
-      moveCursorTo("23:00");
+      moveCursorTo("23:00", moment("2023-01-01"));
 
       expect(get(dayToDisplayedTasks)).toMatchObject({
         [dayKey]: {
@@ -149,7 +149,7 @@ describe("drag one & common edit mechanics", () => {
       });
 
       todayControls.handleGripMouseDown(task, EditMode.DRAG);
-      moveCursorTo("23:30");
+      moveCursorTo("23:30", moment("2023-01-01"));
 
       await confirmEdit();
 
@@ -175,7 +175,7 @@ describe("drag one & common edit mechanics", () => {
       });
 
       nextDayControls.handleGripMouseDown(task, EditMode.RESIZE);
-      moveCursorTo("02:00");
+      moveCursorTo("02:00", moment("2023-01-02"));
 
       expect(get(dayToDisplayedTasks)).toMatchObject({
         [dayKey]: {

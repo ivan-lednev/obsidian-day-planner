@@ -24,7 +24,7 @@ describe("moving tasks between containers", () => {
     const initial = get(dayToDisplayedTasks);
 
     todayControls.handleMouseEnter();
-    moveCursorTo("01:00");
+    moveCursorTo("01:00", moment("2023-01-01"));
 
     expect(get(dayToDisplayedTasks)).toEqual(initial);
   });
@@ -41,7 +41,7 @@ describe("moving tasks between containers", () => {
 
     todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
     nextDayControls.handleMouseEnter();
-    moveCursorTo("01:00");
+    moveCursorTo("01:00", moment("2023-01-02"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
       [nextDayKey]: {
@@ -66,7 +66,7 @@ describe("moving tasks between containers", () => {
 
     todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
     nextDayControls.handleMouseEnter();
-    moveCursorTo("01:00");
+    moveCursorTo("01:00", moment("2023-01-02"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
       [dayKey]: {
@@ -98,7 +98,7 @@ describe("moving tasks between containers", () => {
 
     todayControls.handleGripMouseDown(baseTask, EditMode.DRAG_AND_SHIFT_OTHERS);
     nextDayControls.handleMouseEnter();
-    moveCursorTo("02:00");
+    moveCursorTo("02:00", moment("2023-01-02"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
       [dayKey]: {
@@ -123,10 +123,10 @@ describe("moving tasks between containers", () => {
       tasks: emptyTasks,
     });
 
-    moveCursorTo("01:00");
+    moveCursorTo("01:00", moment("2023-01-01"));
     todayControls.handleContainerMouseDown();
     nextDayControls.handleMouseEnter();
-    moveCursorTo("02:00");
+    moveCursorTo("02:00", moment("2023-01-02"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
       [nextDayKey]: {

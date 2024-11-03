@@ -19,6 +19,7 @@ export interface UseEditHandlersProps {
   cursorMinutes: Readable<number>;
   editOperation: Writable<EditOperation | undefined>;
   settings: Readable<DayPlannerSettings>;
+  pointerDateTime: Writable<{ dateTime?: Moment; type?: "dateTime" | "date" }>;
 }
 
 export function createEditHandlers({
@@ -28,8 +29,15 @@ export function createEditHandlers({
   cursorMinutes,
   editOperation,
   settings,
+  pointerDateTime,
 }: UseEditHandlersProps) {
   function handleContainerMouseDown() {
+    // const day = get(pointerDateTime).dateTime;
+    //
+    // if (!day) {
+    //   throw new Error("Day cannot be undefined on edit");
+    // }
+
     const newTask = createTask({
       day,
       startMinutes: get(cursorMinutes),
@@ -44,6 +52,12 @@ export function createEditHandlers({
   }
 
   function handleResizerMouseDown(task: WithTime<LocalTask>, mode: EditMode) {
+    // const day = get(pointerDateTime).dateTime;
+    //
+    // if (!day) {
+    //   throw new Error("Day cannot be undefined on edit");
+    // }
+
     startEdit({ task, mode, day });
   }
 
@@ -56,12 +70,14 @@ export function createEditHandlers({
     await workspaceFacade.revealLineInFile(path, position?.start?.line);
   }
 
-  function handleGripMouseDown(task: WithTime<LocalTask>, mode: EditMode) {
-    startEdit({ task, mode, day });
-  }
-
   // todo: fix (should probably use "day")
   function handleUnscheduledTaskGripMouseDown(task: LocalTask) {
+    // const day = get(pointerDateTime).dateTime;
+    //
+    // if (!day) {
+    //   throw new Error("Day cannot be undefined on edit");
+    // }
+
     const withAddedTime = {
       ...task,
       // todo: add a proper fix
@@ -74,7 +90,14 @@ export function createEditHandlers({
     startEdit({ task: withAddedTime, mode: EditMode.DRAG, day });
   }
 
+  // todo: delete
   function handleMouseEnter() {
+    // const day = get(pointerDateTime).dateTime;
+    //
+    // if (!day) {
+    //   throw new Error("Day cannot be undefined on edit");
+    // }
+
     editOperation.update(
       (previous) =>
         previous && {
@@ -86,7 +109,7 @@ export function createEditHandlers({
 
   return {
     handleMouseEnter,
-    handleGripMouseDown,
+    handleGripMouseDown: handleResizerMouseDown,
     handleContainerMouseDown,
     handleResizerMouseDown,
     handleTaskMouseUp,
