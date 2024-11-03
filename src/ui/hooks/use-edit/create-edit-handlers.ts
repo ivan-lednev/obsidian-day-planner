@@ -47,7 +47,6 @@ export function createEditHandlers({
     startEdit({
       task: { ...newTask, isGhost: true },
       mode: EditMode.CREATE,
-      day: pointerDay,
     });
   }
 
@@ -58,7 +57,7 @@ export function createEditHandlers({
       throw new Error("Day cannot be undefined on edit");
     }
 
-    startEdit({ task, mode, day: pointerDay });
+    startEdit({ task, mode });
   }
 
   async function handleTaskMouseUp(task: LocalTask) {
@@ -72,10 +71,11 @@ export function createEditHandlers({
 
   // todo: fix (should probably use "day")
   function handleUnscheduledTaskGripMouseDown(task: LocalTask) {
-    const pointerDay = get(pointerDateTime).dateTime;
+    let pointerDay = get(pointerDateTime).dateTime;
 
     if (!pointerDay) {
-      throw new Error("Day cannot be undefined on edit");
+      console.warn("Day should not be undefined on edit");
+      pointerDay = window.moment();
     }
 
     const withAddedTime = {
@@ -87,7 +87,7 @@ export function createEditHandlers({
         : window.moment(),
     };
 
-    startEdit({ task: withAddedTime, mode: EditMode.DRAG, day: pointerDay });
+    startEdit({ task: withAddedTime, mode: EditMode.DRAG });
   }
 
   return {

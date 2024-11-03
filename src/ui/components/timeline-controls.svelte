@@ -28,11 +28,10 @@
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
   const {
-    editContext: { handlers },
+    editContext: {
+      handlers: { handleUnscheduledTaskGripMouseDown },
+    },
   } = getContext<ObsidianContext>(obsidianContext);
-
-  const { handleTaskMouseUp, handleUnscheduledTaskGripMouseDown } =
-    $derived(handlers);
 
   let settingsVisible = $state(false);
 
@@ -150,10 +149,10 @@
 
   <div class="search">
     <input
+      bind:value={search.query}
       placeholder="Search"
       spellcheck="false"
       type="text"
-      bind:value={search.query}
     />
     <div class="search-results">
       {#each search.result as foundBlock}

@@ -50,7 +50,6 @@
     );
     const dateTime = minutesToMomentOfDay(minutes, day);
 
-    console.log("dateTime", dateTime.toString());
     pointerDateTime.set({
       dateTime,
       type: "dateTime",
