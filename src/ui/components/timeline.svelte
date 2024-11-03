@@ -24,17 +24,17 @@
   const {
     pointerDateTime,
     settings,
-    editContext: { confirmEdit, getEditHandlers,  },
+    editContext: { confirmEdit, getEditHandlers, getDisplayedTasksForTimeline },
   } = getContext<ObsidianContext>(obsidianContext);
 
   $: ({
-    displayedTasksForDay,
     handleContainerMouseDown,
     handleResizerMouseDown,
     handleTaskMouseUp,
     handleGripMouseDown,
-  } = getEditHandlers(day));
+  } = getEditHandlers());
 
+  $: displayedTasksForTimeline = getDisplayedTasksForTimeline(day);
   let el: HTMLElement | undefined;
 
   function updatePointerOffsetY(event: PointerEvent) {
@@ -43,11 +43,14 @@
     const viewportToElOffsetY = el.getBoundingClientRect().top;
     const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
     const newOffsetY = snap(borderTopToPointerOffsetY, $settings);
-
-    const dateTime = minutesToMomentOfDay(
-      offsetYToMinutes(newOffsetY, $settings.zoomLevel, $settings.startHour),
-      day,
+    const minutes = offsetYToMinutes(
+      newOffsetY,
+      $settings.zoomLevel,
+      $settings.startHour,
     );
+    const dateTime = minutesToMomentOfDay(minutes, day);
+
+    console.log("dateTime", dateTime.toString());
     pointerDateTime.set({
       dateTime,
       type: "dateTime",
@@ -74,7 +77,7 @@
     on:pointerup={confirmEdit}
     on:pointerup|stopPropagation
   >
-    {#each $displayedTasksForDay.withTime as task (getRenderKey(task))}
+    {#each $displayedTasksForTimeline.withTime as task (getRenderKey(task))}
       {#if isRemote(task)}
         <ScheduledTimeBlock {task}>
           <RemoteTimeBlock {task} />

@@ -12,9 +12,9 @@ import { baseTask, threeTasks } from "./util/test-utils";
 
 describe("resize", () => {
   test("resizing changes duration", () => {
-    const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp();
+    const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp();
 
-    todayControls.handleResizerMouseDown(baseTask, EditMode.RESIZE);
+    handlers.handleResizerMouseDown(baseTask, EditMode.RESIZE);
     moveCursorTo(moment("2023-01-01 03:00"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
@@ -25,9 +25,9 @@ describe("resize", () => {
   });
 
   test("Resize from top works the same way", () => {
-    const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp();
+    const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp();
 
-    todayControls.handleResizerMouseDown(baseTask, EditMode.RESIZE_FROM_TOP);
+    handlers.handleResizerMouseDown(baseTask, EditMode.RESIZE_FROM_TOP);
     moveCursorTo(moment("2023-01-01 00:30"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
@@ -40,9 +40,9 @@ describe("resize", () => {
   });
 
   test("Once the minimal duration is reached, the task starts shifting down", () => {
-    const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp();
+    const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp();
 
-    todayControls.handleResizerMouseDown(baseTask, EditMode.RESIZE_FROM_TOP);
+    handlers.handleResizerMouseDown(baseTask, EditMode.RESIZE_FROM_TOP);
     moveCursorTo(moment("2023-01-01 01:30"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
@@ -59,11 +59,11 @@ describe("resize", () => {
 
   describe("resize many", () => {
     test("resizing with neighbors shifts neighbors as well", () => {
-      const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp({
+      const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp({
         tasks: threeTasks,
       });
 
-      todayControls.handleResizerMouseDown(
+      handlers.handleResizerMouseDown(
         threeTasks[1],
         EditMode.RESIZE_AND_SHIFT_OTHERS,
       );
@@ -84,11 +84,11 @@ describe("resize", () => {
     });
 
     test("Resizing from top works the same way", () => {
-      const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp({
+      const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp({
         tasks: threeTasks,
       });
 
-      todayControls.handleResizerMouseDown(
+      handlers.handleResizerMouseDown(
         threeTasks[1],
         EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS,
       );
@@ -119,11 +119,11 @@ describe("resize", () => {
 
   describe("Resize and shrink others", () => {
     test("Resizing shrinks neighbors & when they reach minimal duration, they start shifting", () => {
-      const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp({
+      const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp({
         tasks: threeTasks,
       });
 
-      todayControls.handleResizerMouseDown(
+      handlers.handleResizerMouseDown(
         threeTasks[1],
         EditMode.RESIZE_AND_SHRINK_OTHERS,
       );
@@ -148,11 +148,11 @@ describe("resize", () => {
     });
 
     test("Resizing from top works the same way", () => {
-      const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp({
+      const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp({
         tasks: threeTasks,
       });
 
-      todayControls.handleResizerMouseDown(
+      handlers.handleResizerMouseDown(
         threeTasks[1],
         EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS,
       );

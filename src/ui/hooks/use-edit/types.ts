@@ -19,7 +19,6 @@ export enum EditMode {
 export interface EditOperation {
   task: WithTime<LocalTask>;
   mode: EditMode;
-  day: Moment;
 }
 
 export type TaskTransformer = (

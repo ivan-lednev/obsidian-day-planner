@@ -17,7 +17,7 @@ import { baseTask } from "./util/test-utils";
 
 describe("moving tasks between containers", () => {
   test("with no edit operation in progress, nothing happens on mouse move", () => {
-    const { todayControls, moveCursorTo, dayToDisplayedTasks } = setUp({
+    const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp({
       tasks: baseTasks,
     });
 
@@ -29,16 +29,11 @@ describe("moving tasks between containers", () => {
   });
 
   test("scheduling works between days", () => {
-    const {
-      todayControls,
-      nextDayControls,
-      moveCursorTo,
-      dayToDisplayedTasks,
-    } = setUp({
+    const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp({
       tasks: tasksWithUnscheduledTask,
     });
 
-    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
+    handlers.handleGripMouseDown(baseTask, EditMode.DRAG);
     moveCursorTo(moment("2023-01-02 01:00"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
@@ -49,12 +44,7 @@ describe("moving tasks between containers", () => {
   });
 
   test("drag works between days", () => {
-    const {
-      todayControls,
-      nextDayControls,
-      moveCursorTo,
-      dayToDisplayedTasks,
-    } = setUp({
+    const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp({
       tasks: [
         baseTask,
         { ...baseTask, id: "2", startTime: moment("2023-01-01 01:00") },
@@ -62,7 +52,7 @@ describe("moving tasks between containers", () => {
       ],
     });
 
-    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG);
+    handlers.handleGripMouseDown(baseTask, EditMode.DRAG);
     moveCursorTo(moment("2023-01-02 01:00"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
@@ -79,12 +69,7 @@ describe("moving tasks between containers", () => {
   });
 
   test("drag many works between days", () => {
-    const {
-      todayControls,
-      nextDayControls,
-      moveCursorTo,
-      dayToDisplayedTasks,
-    } = setUp({
+    const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp({
       tasks: [
         baseTask,
         { ...baseTask, id: "2", startTime: moment("2023-01-01 01:00") },
@@ -93,7 +78,7 @@ describe("moving tasks between containers", () => {
       settings: defaultSettingsForTests,
     });
 
-    todayControls.handleGripMouseDown(baseTask, EditMode.DRAG_AND_SHIFT_OTHERS);
+    handlers.handleGripMouseDown(baseTask, EditMode.DRAG_AND_SHIFT_OTHERS);
     moveCursorTo(moment("2023-01-02 02:00"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
@@ -110,17 +95,12 @@ describe("moving tasks between containers", () => {
   });
 
   test.skip("create works between days", () => {
-    const {
-      todayControls,
-      moveCursorTo,
-      nextDayControls,
-      dayToDisplayedTasks,
-    } = setUp({
+    const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp({
       tasks: emptyTasks,
     });
 
     moveCursorTo(moment("2023-01-01 01:00"));
-    todayControls.handleContainerMouseDown();
+    handlers.handleContainerMouseDown();
     moveCursorTo(moment("2023-01-02 02:00"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
@@ -134,9 +114,9 @@ describe("moving tasks between containers", () => {
 
   // todo: fix
   test("resize doesn't works between days", () => {
-    const { todayControls, nextDayControls, dayToDisplayedTasks } = setUp();
+    const { handlers, dayToDisplayedTasks } = setUp();
 
-    todayControls.handleResizerMouseDown(baseTask, EditMode.RESIZE);
+    handlers.handleResizerMouseDown(baseTask, EditMode.RESIZE);
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
       [dayKey]: {

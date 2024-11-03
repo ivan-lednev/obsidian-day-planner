@@ -32,7 +32,7 @@
   } = getContext<ObsidianContext>(obsidianContext);
 
   const { handleTaskMouseUp, handleUnscheduledTaskGripMouseDown } = $derived(
-    getEditHandlers(window.moment()),
+    getEditHandlers(),
   );
 
   let settingsVisible = $state(false);

@@ -30,6 +30,7 @@ export function createEditHandlers({
   function handleContainerMouseDown() {
     const pointerDay = get(pointerDateTime).dateTime;
 
+    // todo: move out this check
     if (!pointerDay) {
       throw new Error("Day cannot be undefined on edit");
     }

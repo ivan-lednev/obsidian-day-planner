@@ -15,23 +15,23 @@
   export let day: Moment;
 
   const {
-    editContext: { getEditHandlers },
+    editContext: { getEditHandlers, getDisplayedTasksForTimeline },
   } = getContext<ObsidianContext>(obsidianContext);
 
   $: ({
-    displayedTasksForDay,
     handleTaskMouseUp,
     handleUnscheduledTaskGripMouseDown,
-  } = getEditHandlers(day));
+  } = getEditHandlers());
+  $: displayedTasksForTimeline = getDisplayedTasksForTimeline(day);
 </script>
 
-{#if $displayedTasksForDay.noTime.length > 0 && $settings.showUncheduledTasks}
+{#if $displayedTasksForTimeline.noTime.length > 0 && $settings.showUncheduledTasks}
   <OverlayScrollbarsComponent
     class="unscheduled-task-container overlayscrollbars-svelte"
     defer
     options={{ scrollbars: { theme: "os-theme-custom" } }}
   >
-    {#each $displayedTasksForDay.noTime as task}
+    {#each $displayedTasksForTimeline.noTime as task}
       {#if isLocal(task)}
         <UnscheduledTimeBlock
           onGripMouseDown={handleUnscheduledTaskGripMouseDown}

@@ -66,19 +66,9 @@ export function useEditContext(props: {
 
   const tasksWithPendingUpdate = derived(
     [editOperation, baselineTasks, settings, pointerDateTime],
-    ([
-      $editOperation,
-      $baselineTasks,
-      $settings,
-      $pointerDateTime,
-    ]) => {
+    ([$editOperation, $baselineTasks, $settings, $pointerDateTime]) => {
       return $editOperation
-        ? transform(
-            $baselineTasks,
-            $editOperation,
-            $settings,
-            $pointerDateTime,
-          )
+        ? transform($baselineTasks, $editOperation, $settings, $pointerDateTime)
         : $baselineTasks;
     },
   );
@@ -122,29 +112,25 @@ export function useEditContext(props: {
   });
 
   // todo: at least rename, or turn into a hook
-  function getEditHandlers(day: Moment) {
-    const displayedTasksForDay = derived(
-      dayToDisplayedTasks,
-      ($dayToDisplayedTasks) => {
-        const tasksForDay =
-          $dayToDisplayedTasks[getDayKey(day)] || getEmptyRecordsForDay();
+  function getEditHandlers() {
+    return handlers;
+  }
 
-        const withTime: Array<WithPlacing<WithTime<Task>>> = flow(
-          uniqBy(getRenderKey),
-          addHorizontalPlacing,
-        )(tasksForDay.withTime);
+  function getDisplayedTasksForTimeline(day: Moment) {
+    return derived(dayToDisplayedTasks, ($dayToDisplayedTasks) => {
+      const tasksForDay =
+        $dayToDisplayedTasks[getDayKey(day)] || getEmptyRecordsForDay();
 
-        return {
-          ...tasksForDay,
-          withTime,
-        };
-      },
-    );
+      const withTime: Array<WithPlacing<WithTime<Task>>> = flow(
+        uniqBy(getRenderKey),
+        addHorizontalPlacing,
+      )(tasksForDay.withTime);
 
-    return {
-      ...handlers,
-      displayedTasksForDay,
-    };
+      return {
+        ...tasksForDay,
+        withTime,
+      };
+    });
   }
 
   return {
@@ -154,5 +140,6 @@ export function useEditContext(props: {
     cancelEdit,
     getEditHandlers,
     editOperation,
+    getDisplayedTasksForTimeline,
   };
 }

@@ -44,8 +44,7 @@ export function setUp({
   const { getEditHandlers, dayToDisplayedTasks, confirmEdit } =
     useEditContext(props);
 
-  const todayControls = getEditHandlers(day);
-  const nextDayControls = getEditHandlers(nextDay);
+  const handlers = getEditHandlers();
 
   // this prevents the store from resetting;
   dayToDisplayedTasks.subscribe(noop);
@@ -57,8 +56,7 @@ export function setUp({
   }
 
   return {
-    todayControls,
-    nextDayControls,
+    handlers,
     moveCursorTo,
     dayToDisplayedTasks,
     confirmEdit,
