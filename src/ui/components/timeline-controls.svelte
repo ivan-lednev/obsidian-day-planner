@@ -22,6 +22,7 @@
   import Pill from "./pill.svelte";
   import SettingsControls from "./settings-controls.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
+  import Tree from "./obsidian/tree.svelte";
 
   const { workspaceFacade, initWeeklyView, dataviewLoaded, reSync, search } =
     getContext<ObsidianContext>(obsidianContext);
@@ -147,26 +148,44 @@
     <SettingsControls />
   {/if}
 
-  <div class="search">
-    <input
-      bind:value={search.query}
-      placeholder="Search"
-      spellcheck="false"
-      type="text"
-    />
-    <div class="search-results">
-      {#each search.result as foundBlock}
-        <UnscheduledTimeBlock
-          onGripMouseDown={handleUnscheduledTaskGripMouseDown}
-          onMouseUp={() => {}}
-          task={foundBlock}
-        />
-      {/each}
+  <Tree title="Search">
+    <div class="search-wrapper">
+      <input
+        bind:value={search.query}
+        placeholder="Search for tasks across the vault"
+        spellcheck="false"
+        type="text"
+      />
+
+      {#if search.result.length > 0}
+        <div class="search-results">
+          {#each search.result as foundTimeBlock}
+            <UnscheduledTimeBlock
+              onGripMouseDown={handleUnscheduledTaskGripMouseDown}
+              onMouseUp={() => {}}
+              task={foundTimeBlock}
+            />
+          {/each}
+        </div>
+      {/if}
     </div>
-  </div>
+  </Tree>
 </div>
 
 <style>
+  .search-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4-1);
+  }
+
+  .search-results {
+    padding: var(--size-4-1);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-s);
+    background-color: var(--background-secondary-alt);
+  }
+
   :global(.active-filter) {
     color: var(--text-success);
   }

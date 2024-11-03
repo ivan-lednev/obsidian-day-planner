@@ -1,10 +1,13 @@
 <script lang="ts">
-  export let title: string;
   import RightTriangle from "./right-triangle.svelte";
+  import { type Snippet } from "svelte";
 
-  let isTreeVisible = true;
+  const { children, title }: { children: Snippet; title: string } = $props();
+  let isTreeVisible = $state(false);
 
-  $: titleColor = isTreeVisible ? "var(--text-muted)" : "var(--text-faint)";
+  const titleColor = $derived(
+    isTreeVisible ? "var(--text-muted)" : "var(--text-faint)",
+  );
 
   function toggleTree() {
     isTreeVisible = !isTreeVisible;
@@ -12,7 +15,6 @@
 </script>
 
 <div class="tree-container">
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div class="tree-item-self is-clickable" onclick={toggleTree}>
     <div
       class="tree-item-icon collapse-icon"
@@ -23,7 +25,7 @@
     <div style:color={titleColor} class="tree-item-inner">{title}</div>
   </div>
   {#if isTreeVisible}
-    <slot />
+    {@render children()}
   {/if}
 </div>
 
@@ -32,10 +34,7 @@
     display: flex;
     flex: var(--flex);
     flex-direction: column;
-  }
-
-  .tree-item-self {
-    border-radius: 0;
+    gap: var(--size-4-1);
   }
 
   .tree-item-inner {
