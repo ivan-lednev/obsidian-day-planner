@@ -24,6 +24,7 @@
     ChevronRight,
     CalendarArrowUp,
     Columns3,
+    Search as SearchIcon,
   } from "../lucide";
   import ResizeHandle from "../resize-handle.svelte";
   import ResizeableBox from "../resizeable-box.svelte";
@@ -32,12 +33,14 @@
   import SettingsControls from "../settings-controls.svelte";
   import Timeline from "../timeline.svelte";
   import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
+  import Search from "../search.svelte";
 
   const { workspaceFacade, settings } =
     getContext<ObsidianContext>(obsidianContext);
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
   let settingsVisible = $state(false);
+  let searchVisible = $state(false);
   let headerRef: HTMLDivElement | undefined;
 
   function handleScroll(event: Event) {
@@ -78,7 +81,15 @@
 
 <div class="controls-sidebar">
   <ControlButton
-    classes="settings-button"
+    isActive={searchVisible}
+    onclick={() => {
+      searchVisible = !searchVisible;
+    }}
+  >
+    <SearchIcon />
+  </ControlButton>
+
+  <ControlButton
     isActive={settingsVisible}
     onclick={() => {
       settingsVisible = !settingsVisible;
@@ -171,12 +182,17 @@
   </ControlButton>
 </div>
 
-{#if settingsVisible}
+{#if settingsVisible || searchVisible}
   <div
-    class="settings-controls-container"
+    class="side-controls-container"
     transition:fly={{ x: 400, duration: 100, opacity: 0.5 }}
   >
-    <SettingsControls />
+    {#if settingsVisible}
+      <SettingsControls />
+    {/if}
+    {#if searchVisible}
+      <Search />
+    {/if}
   </div>
 {/if}
 
@@ -283,9 +299,10 @@
     background-color: var(--background-primary);
   }
 
-  .settings-controls-container {
+  .side-controls-container {
+    width: min(320px, 50vw);
     grid-column: 3;
     grid-row: span 2;
-    padding: 0 var(--size-4-2);
+    padding: var(--size-4-2);
   }
 </style>

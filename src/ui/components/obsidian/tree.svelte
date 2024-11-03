@@ -22,7 +22,7 @@
     >
       <RightTriangle />
     </div>
-    <div style:color={titleColor} class="tree-item-inner">{title}</div>
+    <div class="tree-item-inner" style:color={titleColor}>{title}</div>
   </div>
   {#if isTreeVisible}
     {@render children()}
