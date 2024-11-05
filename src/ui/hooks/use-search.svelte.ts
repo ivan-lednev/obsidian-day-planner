@@ -1,48 +1,50 @@
-import { debounce } from "obsidian";
-import { fromStore, type Readable } from "svelte/store";
+import { derived, get, writable, type Readable } from "svelte/store";
 
 import type { DataviewFacade } from "../../service/dataview-facade";
 import * as dv from "../../util/dataview";
+import { getUpdateTrigger } from "../../util/store";
+
+import { useDebounceWithDelay } from "./use-debounce-with-delay";
 
 export function useSearch(props: {
   dataviewFacade: DataviewFacade;
   dataviewSource: Readable<string>;
+  taskUpdateTrigger: Readable<unknown>;
+  keyDown: Readable<unknown>;
 }) {
-  const { dataviewFacade, dataviewSource } = props;
-  const sourceSignal = fromStore(dataviewSource);
+  const { dataviewFacade, dataviewSource, taskUpdateTrigger, keyDown } = props;
 
-  let query = $state("");
-  let result = $state([]);
-
-  const debouncedSearch = debounce(
-    (q: string) => {
-      if (q.trim().length === 0) {
-        result = [];
-        return;
-      }
-
-      result = dataviewFacade
-        .getAllTasksFrom(sourceSignal.current)
-        .filter((task) => {
-          return task.text.toLowerCase().includes(q.toLowerCase());
-        })
-        // todo: remove moment
-        .map((task) => dv.toUnscheduledTask(task, window.moment()));
-    },
+  const sourceSignal = dataviewSource;
+  const query = writable("");
+  const updateSignal = derived([taskUpdateTrigger, query], getUpdateTrigger);
+  // todo: pass through update signal
+  const debouncedSearchSignal = useDebounceWithDelay(
+    updateSignal,
+    keyDown,
     500,
-    true,
   );
 
+  const result = derived(debouncedSearchSignal, () => {
+    const currentQuery = get(query);
+    const currentSource = get(sourceSignal);
+
+    if (currentQuery.trim().length === 0) {
+      return [];
+    }
+
+    return (
+      dataviewFacade
+        .getAllTasksFrom(currentSource)
+        .filter((task) => {
+          return task.text.toLowerCase().includes(currentQuery.toLowerCase());
+        })
+        // todo: remove moment
+        .map((task) => dv.toUnscheduledTask(task, window.moment()))
+    );
+  });
+
   return {
-    get query() {
-      return query;
-    },
-    set query(value) {
-      query = value;
-      debouncedSearch(value);
-    },
-    get result() {
-      return result;
-    },
+    query,
+    result,
   };
 }

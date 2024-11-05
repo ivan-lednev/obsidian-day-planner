@@ -19,10 +19,10 @@
 
   import ControlButton from "./control-button.svelte";
   import ErrorReport from "./error-report.svelte";
-  import Pill from "./pill.svelte";
-  import SettingsControls from "./settings-controls.svelte";
-  import Search from "./search.svelte";
   import Tree from "./obsidian/tree.svelte";
+  import Pill from "./pill.svelte";
+  import Search from "./search.svelte";
+  import SettingsControls from "./settings-controls.svelte";
 
   const { workspaceFacade, initWeeklyView, dataviewLoaded, reSync } =
     getContext<ObsidianContext>(obsidianContext);

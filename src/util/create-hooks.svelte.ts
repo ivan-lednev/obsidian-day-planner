@@ -158,6 +158,8 @@ export function createHooks({
   const search = useSearch({
     dataviewFacade,
     dataviewSource,
+    taskUpdateTrigger,
+    keyDown,
   });
 
   const editContext = useEditContext({

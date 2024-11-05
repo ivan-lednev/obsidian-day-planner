@@ -1,6 +1,7 @@
 <script lang="ts">
-  import RightTriangle from "./right-triangle.svelte";
   import { type Snippet } from "svelte";
+
+  import RightTriangle from "./right-triangle.svelte";
 
   const { children, title }: { children: Snippet; title: string } = $props();
   let isTreeVisible = $state(false);
@@ -22,7 +23,7 @@
     >
       <RightTriangle />
     </div>
-    <div class="tree-item-inner" style:color={titleColor}>{title}</div>
+    <div style:color={titleColor} class="tree-item-inner">{title}</div>
   </div>
   {#if isTreeVisible}
     {@render children()}

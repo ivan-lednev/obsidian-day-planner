@@ -22,6 +22,7 @@ export const vibrationDurationMillis = 100;
 export const icalRefreshIntervalMillis = 5 * 60 * 1000;
 export const fallbackPartStat = "NEEDS-ACTION";
 export const mdastUtilNumberOfSpacesInTab = 4;
+export const searchResultLimit = 50;
 
 export const noTitle = "(No title)";
 

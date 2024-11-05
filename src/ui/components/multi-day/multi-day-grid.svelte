@@ -30,10 +30,10 @@
   import ResizeableBox from "../resizeable-box.svelte";
   import Ruler from "../ruler.svelte";
   import Scroller from "../scroller.svelte";
+  import Search from "../search.svelte";
   import SettingsControls from "../settings-controls.svelte";
   import Timeline from "../timeline.svelte";
   import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
-  import Search from "../search.svelte";
 
   const { workspaceFacade, settings } =
     getContext<ObsidianContext>(obsidianContext);
@@ -300,9 +300,9 @@
   }
 
   .side-controls-container {
-    width: min(320px, 50vw);
     grid-column: 3;
     grid-row: span 2;
-    padding: var(--size-4-2);
+    width: min(320px, 50vw);
+    padding-block: var(--size-4-2);
   }
 </style>

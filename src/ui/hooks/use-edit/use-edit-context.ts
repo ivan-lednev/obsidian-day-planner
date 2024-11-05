@@ -73,6 +73,22 @@ export function useEditContext(props: {
     },
   );
 
+  const { startEdit, confirmEdit, cancelEdit } = useEditActions({
+    editOperation,
+    baselineTasks,
+    tasksWithPendingUpdate,
+    onUpdate,
+  });
+
+  const handlers = createEditHandlers({
+    pointerDateTime,
+    workspaceFacade,
+    startEdit,
+    editOperation,
+    settings,
+  });
+
+  // todo: move this grouping out of the hook, they're not related
   const dayToDisplayedTasks = derived(
     [remoteTasks, tasksWithPendingUpdate],
     ([$remoteTasks, $tasksWithPendingUpdate]) => {
@@ -95,21 +111,6 @@ export function useEditContext(props: {
       return groupByDay(split);
     },
   );
-
-  const { startEdit, confirmEdit, cancelEdit } = useEditActions({
-    editOperation,
-    baselineTasks,
-    tasksWithPendingUpdate,
-    onUpdate,
-  });
-
-  const handlers = createEditHandlers({
-    pointerDateTime,
-    workspaceFacade,
-    startEdit,
-    editOperation,
-    settings,
-  });
 
   function getDisplayedTasksForTimeline(day: Moment) {
     return derived(dayToDisplayedTasks, ($dayToDisplayedTasks) => {
