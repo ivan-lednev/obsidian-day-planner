@@ -1,5 +1,6 @@
 import { derived, get, writable, type Readable } from "svelte/store";
 
+import { searchResultLimit } from "../../constants";
 import type { DataviewFacade } from "../../service/dataview-facade";
 import * as dv from "../../util/dataview";
 import { getUpdateTrigger } from "../../util/store";
@@ -43,8 +44,25 @@ export function useSearch(props: {
     );
   });
 
+  const description = derived([query, result], ([$query, $result]) => {
+    if ($query.trim().length === 0) {
+      return undefined;
+    }
+
+    if ($result.length === 0) {
+      return "No matches";
+    }
+
+    if ($result.length > searchResultLimit) {
+      return `The matches are limited to ${searchResultLimit} entries. Try refining your search.`;
+    }
+
+    return `${$result.length} matches`;
+  });
+
   return {
     query,
     result,
+    description,
   };
 }

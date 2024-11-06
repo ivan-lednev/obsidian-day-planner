@@ -1,13 +1,13 @@
 <script lang="ts">
   import { getContext } from "svelte";
 
-  import { obsidianContext, searchResultLimit } from "../../constants";
+  import { obsidianContext } from "../../constants";
   import type { ObsidianContext } from "../../types";
 
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   const {
-    search: { query, result },
+    search: { query, result, description },
     editContext: {
       handlers: { handleUnscheduledTaskGripMouseDown },
     },
@@ -22,16 +22,9 @@
     bind:value={$query}
   />
 
-  {#if $query.trim().length > 0}
+  {#if $description}
     <div class="result-message">
-      {#if $result.length === 0}
-        No matches
-      {:else if $result.length > searchResultLimit}
-        The matches are limited to {searchResultLimit} entries. Try refining your
-        search.
-      {:else}
-        {$result.length} matches
-      {/if}
+      {$description}
     </div>
   {/if}
   {#if $result.length > 0}
@@ -60,8 +53,13 @@
   }
 
   .search-results {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4-1);
+
     padding: var(--size-4-1);
-    background-color: var(--background-secondary-alt);
+
+    background-color: var(--background-secondary);
     border: 1px solid var(--background-modifier-border);
     border-radius: var(--radius-s);
   }
