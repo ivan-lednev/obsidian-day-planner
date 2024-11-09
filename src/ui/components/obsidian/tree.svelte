@@ -1,7 +1,10 @@
 <script lang="ts">
   import { type Snippet } from "svelte";
+  import { cubicInOut } from "svelte/easing";
+  import { slide } from "svelte/transition";
 
   import RightTriangle from "./right-triangle.svelte";
+
 
   const { children, title }: { children: Snippet; title: string } = $props();
   let isTreeVisible = $state(false);
@@ -26,7 +29,9 @@
     <div style:color={titleColor} class="tree-item-inner">{title}</div>
   </div>
   {#if isTreeVisible}
-    {@render children()}
+    <div transition:slide={{ axis: "y", duration: 150, easing: cubicInOut }}>
+      {@render children()}
+    </div>
   {/if}
 </div>
 
@@ -35,10 +40,14 @@
     display: flex;
     flex: var(--flex);
     flex-direction: column;
-    gap: var(--size-4-1);
   }
 
   .tree-item-inner {
     font-weight: var(--font-medium);
+  }
+
+  .tree-item-self {
+    margin-bottom: 0;
+    border-radius: 0;
   }
 </style>

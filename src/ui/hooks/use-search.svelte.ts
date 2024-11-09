@@ -22,11 +22,12 @@ export function useSearch(props: {
   const debouncedSearchSignal = useDebounceWithDelay(
     updateSignal,
     keyDown,
-    500,
+    250,
   );
 
   const result = derived(debouncedSearchSignal, () => {
-    const currentQuery = get(query);
+    // todo: pass through update signal and remove this
+    const currentQuery = get(query).toLowerCase();
     const currentSource = get(sourceSignal);
 
     if (currentQuery.trim().length === 0) {
@@ -37,7 +38,7 @@ export function useSearch(props: {
       dataviewFacade
         .getAllTasksFrom(currentSource)
         .filter((task) => {
-          return task.text.toLowerCase().includes(currentQuery.toLowerCase());
+          return task.text.toLowerCase().includes(currentQuery);
         })
         // todo: remove moment
         .map((task) => dv.toUnscheduledTask(task, window.moment()))
@@ -46,7 +47,7 @@ export function useSearch(props: {
 
   const description = derived([query, result], ([$query, $result]) => {
     if ($query.trim().length === 0) {
-      return undefined;
+      return "Empty";
     }
 
     if ($result.length === 0) {

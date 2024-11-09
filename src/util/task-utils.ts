@@ -12,6 +12,7 @@ import {
   listTokenWithSpacesRegExp,
   looseTimestampAtStartOfLineRegExp,
   scheduledPropRegExp,
+  scheduledPropRegExps,
   shortScheduledPropRegExp,
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
@@ -31,7 +32,7 @@ import {
   minutesToMoment,
   minutesToMomentOfDay,
 } from "./moment";
-import { getDayKey, hasDateFromProp } from "./tasks-utils";
+import { getDayKey } from "./tasks-utils";
 
 export function getEndMinutes(task: {
   startTime: Moment;
@@ -216,4 +217,14 @@ export function removeListTokens(text: string) {
 
 export function removeTimestampFromStart(text: string) {
   return text.replace(looseTimestampAtStartOfLineRegExp, "");
+}
+
+export function isTimeEqual(a: LocalTask, b: LocalTask) {
+  return (
+    a.startTime.isSame(b.startTime) && a.durationMinutes === b.durationMinutes
+  );
+}
+
+export function hasDateFromProp(task: LocalTask) {
+  return scheduledPropRegExps.some((regexp) => regexp.test(task.text));
 }

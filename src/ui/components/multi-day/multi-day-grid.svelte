@@ -2,8 +2,9 @@
   import type { Moment } from "moment";
   import { Menu } from "obsidian";
   import { getContext } from "svelte";
+  import { cubicInOut } from "svelte/easing";
   import { type Writable, get } from "svelte/store";
-  import { fly } from "svelte/transition";
+  import { slide } from "svelte/transition";
 
   import { dateRangeContextKey, obsidianContext } from "../../../constants";
   import { isToday } from "../../../global-store/current-time";
@@ -39,8 +40,56 @@
     getContext<ObsidianContext>(obsidianContext);
   const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
 
-  let settingsVisible = $state(false);
-  let searchVisible = $state(false);
+  type SideControls = "none" | "settings" | "search";
+
+  let visibleSideControls = $state<SideControls>("none");
+
+  function toggleSideControls(toggledControls: SideControls) {
+    visibleSideControls =
+      visibleSideControls === toggledControls ? "none" : toggledControls;
+  }
+
+  function handleColumnChange(event: MouseEvent) {
+    const currentMode = get(settings).multiDayRange;
+    const menu = new Menu();
+
+    menu.addItem((item) =>
+      item
+        .setTitle("Full week")
+        .setChecked(currentMode === "full-week")
+        .onClick(() => {
+          settings.update((previous) => ({
+            ...previous,
+            multiDayRange: "full-week",
+          }));
+        }),
+    );
+    menu.addItem((item) => {
+      item
+        .setTitle("Work week")
+        .setChecked(currentMode === "work-week")
+        .onClick(() => {
+          settings.update((previous) => ({
+            ...previous,
+            multiDayRange: "work-week",
+          }));
+        });
+    });
+    menu.addItem((item) => {
+      item
+        .setTitle("3 days")
+        .setChecked(currentMode === "3-days")
+        .onClick(() => {
+          settings.update((previous) => ({
+            ...previous,
+            multiDayRange: "3-days",
+          }));
+        });
+    });
+
+    menu.showAtMouseEvent(event);
+  }
+
   let headerRef: HTMLDivElement | undefined;
 
   function handleScroll(event: Event) {
@@ -81,65 +130,22 @@
 
 <div class="controls-sidebar">
   <ControlButton
-    isActive={searchVisible}
-    onclick={() => {
-      searchVisible = !searchVisible;
-    }}
+    isActive={visibleSideControls === "search"}
+    onclick={() => toggleSideControls("search")}
   >
     <SearchIcon />
   </ControlButton>
 
   <ControlButton
-    isActive={settingsVisible}
-    onclick={() => {
-      settingsVisible = !settingsVisible;
-    }}
+    isActive={visibleSideControls === "settings"}
+    onclick={() => toggleSideControls("settings")}
   >
     <Settings />
   </ControlButton>
 
   <ControlButton
     label="Change columns"
-    onclick={(event) => {
-      const currentMode = get(settings).multiDayRange;
-      const menu = new Menu();
-
-      menu.addItem((item) =>
-        item
-          .setTitle("Full week")
-          .setChecked(currentMode === "full-week")
-          .onClick(() => {
-            settings.update((previous) => ({
-              ...previous,
-              multiDayRange: "full-week",
-            }));
-          }),
-      );
-      menu.addItem((item) => {
-        item
-          .setTitle("Work week")
-          .setChecked(currentMode === "work-week")
-          .onClick(() => {
-            settings.update((previous) => ({
-              ...previous,
-              multiDayRange: "work-week",
-            }));
-          });
-      });
-      menu.addItem((item) => {
-        item
-          .setTitle("3 days")
-          .setChecked(currentMode === "3-days")
-          .onClick(() => {
-            settings.update((previous) => ({
-              ...previous,
-              multiDayRange: "3-days",
-            }));
-          });
-      });
-
-      menu.showAtMouseEvent(event);
-    }}
+    onclick={handleColumnChange}
   >
     <Columns3 />
   </ControlButton>
@@ -182,15 +188,15 @@
   </ControlButton>
 </div>
 
-{#if settingsVisible || searchVisible}
+{#if visibleSideControls !== "none"}
   <div
     class="side-controls-container"
-    transition:fly={{ x: 400, duration: 100, opacity: 0.5 }}
+    transition:slide={{ axis: "x", duration: 150, easing: cubicInOut }}
   >
-    {#if settingsVisible}
+    {#if visibleSideControls === "settings"}
       <SettingsControls />
     {/if}
-    {#if searchVisible}
+    {#if visibleSideControls === "search"}
       <Search />
     {/if}
   </div>
@@ -303,6 +309,6 @@
     grid-column: 3;
     grid-row: span 2;
     width: min(320px, 50vw);
-    padding-block: var(--size-4-2);
+    border-left: 1px solid var(--background-modifier-border);
   }
 </style>

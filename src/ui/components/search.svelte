@@ -22,20 +22,21 @@
     bind:value={$query}
   />
 
-  {#if $description}
-    <div class="result-message">
-      {$description}
-    </div>
-  {/if}
+  <div class="result-message">
+    {$description}
+  </div>
   {#if $result.length > 0}
-    <div class="scroller">
+    <div class="search-results-scroller">
       <div class="search-results">
         {#each $result as foundTimeBlock}
-          <UnscheduledTimeBlock
-            onGripMouseDown={handleUnscheduledTaskGripMouseDown}
-            onMouseUp={() => {}}
-            task={foundTimeBlock}
-          />
+          <div class="search-result">
+            <UnscheduledTimeBlock
+              --time-block-padding="var(--size-4-1)"
+              onGripMouseDown={handleUnscheduledTaskGripMouseDown}
+              onMouseUp={() => {}}
+              task={foundTimeBlock}
+            />
+          </div>
         {/each}
       </div>
     </div>
@@ -43,23 +44,38 @@
 </div>
 
 <style>
+  .result-message,
+  .search-results {
+    margin: var(--size-4-2) var(--size-4-3);
+  }
+
+  input {
+    flex-shrink: 0;
+    margin: var(--size-4-2) var(--size-4-3) 0;
+  }
+
+  .search-result:not(:last-child) {
+    border-bottom: 1px solid var(--background-modifier-border);
+  }
+
   .result-message {
     font-size: var(--font-ui-smaller);
     color: var(--text-faint);
   }
 
-  .scroller {
+  .search-results-scroller {
     overflow-y: auto;
+    border-top: 1px solid var(--background-modifier-border);
   }
 
   .search-results {
     display: flex;
     flex-direction: column;
-    gap: var(--size-4-1);
 
-    padding: var(--size-4-1);
-
-    background-color: var(--background-secondary);
+    background-color: var(
+      --search-results-bg-color,
+      var(--background-secondary)
+    );
     border: 1px solid var(--background-modifier-border);
     border-radius: var(--radius-s);
   }
@@ -67,7 +83,6 @@
   .search-wrapper {
     display: flex;
     flex-direction: column;
-    gap: var(--size-4-1);
-    max-height: 100%;
+    max-height: var(--search-max-height, 100%);
   }
 </style>

@@ -13,7 +13,6 @@ import {
   insertListItemUnderHeading,
   isListItem,
 } from "../mdast/mdast";
-import { scheduledPropRegExps } from "../regexp";
 import type { Update } from "../service/diff-writer";
 import type { DayPlannerSettings } from "../settings";
 import { type LocalTask } from "../task-types";
@@ -27,10 +26,6 @@ export function getEmptyRecordsForDay() {
 
 export function getDayKey(day: Moment) {
   return day.format(DEFAULT_DAILY_NOTE_FORMAT);
-}
-
-export function hasDateFromProp(task: LocalTask) {
-  return scheduledPropRegExps.some((regexp) => regexp.test(task.text));
 }
 
 export type Diff = {
@@ -48,11 +43,7 @@ export function getTaskDiffFromEditState(base: LocalTask[], next: LocalTask[]) {
         result.created.push(task);
       }
 
-      if (
-        thisTaskInBase &&
-        (!thisTaskInBase.startTime.isSame(task.startTime) ||
-          thisTaskInBase.durationMinutes !== task.durationMinutes)
-      ) {
+      if (thisTaskInBase && !t.isTimeEqual(thisTaskInBase, task)) {
         result.updated.push(task);
       }
 
@@ -73,6 +64,7 @@ export function mapTaskDiffToUpdates(
     .flatMap(([type, tasks]) => tasks.map((task) => ({ type, task })))
     .reduce<Update[]>((result, { type, task }) => {
       if (type === "created") {
+        // todo: differentiate here
         if (task.location) {
           return result.concat({
             type: "created",

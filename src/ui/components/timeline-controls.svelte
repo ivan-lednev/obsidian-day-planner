@@ -18,7 +18,6 @@
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 
   import ControlButton from "./control-button.svelte";
-  import ErrorReport from "./error-report.svelte";
   import Tree from "./obsidian/tree.svelte";
   import Pill from "./pill.svelte";
   import Search from "./search.svelte";
@@ -81,7 +80,6 @@
 </script>
 
 <div class="controls">
-  <ErrorReport />
   <div class="header">
     <ControlButton onclick={handleReSyncClick}>
       <EllipsisVertical class="svg-icon" />
@@ -117,7 +115,7 @@
       <Settings class="svg-icon" />
     </ControlButton>
   </div>
-  <div>
+  <div class="pill-wrapper">
     <Pill
       key="filter"
       onpointerup={() => {
@@ -132,8 +130,8 @@
       <AlertTriangle class="svg-icon mod-error" />
       <span
         >You need to install and enable
-        <a href="https://github.com/blacksmithgu/obsidian-dataview">Dataview</a>
-        for the day planner to work.</span
+        <a href="https://github.com/blacksmithgu/obsidian-dataview">Dataview</a
+        >.</span
       >
     </div>
   {/if}
@@ -143,7 +141,10 @@
   {/if}
 
   <Tree title="Search">
-    <Search />
+    <Search
+      --search-max-height="35vh"
+      --search-results-bg-color="var(--background-primary)"
+    />
   </Tree>
 </div>
 
@@ -175,6 +176,15 @@
     flex-shrink: 0;
   }
 
+  .pill-wrapper,
+  .header {
+    padding-inline: var(--size-4-3);
+  }
+
+  .header {
+    padding-top: var(--size-4-2);
+  }
+
   .date {
     display: flex;
     align-items: center;
@@ -190,9 +200,7 @@
     display: flex;
     flex: 0 0 auto;
     flex-direction: column;
-    gap: var(--size-4-1);
-
-    padding: var(--size-4-2);
+    gap: var(--size-4-2);
 
     font-size: var(--font-ui-small);
   }

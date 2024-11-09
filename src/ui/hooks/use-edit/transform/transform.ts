@@ -49,9 +49,6 @@ function isSingleDayMode(mode: EditMode) {
 }
 
 function sortByStartMinutes(tasks: WithTime<LocalTask>[]) {
-  // return produce(tasks, (draft) =>
-  //   draft.sort((a, b) => a.startTime.diff(b.startTime)),
-  // );
   return tasks.slice().sort((a, b) => a.startTime.diff(b.startTime));
 }
 
@@ -64,7 +61,7 @@ export function transform(
   const dateTime = pointerDateTime.dateTime;
 
   if (!dateTime) {
-    throw new Error("DateTime cannot be undefined on edit");
+    throw new Error("DateTime must be defined on edit");
   }
 
   const transformFn = transformers[operation.mode];

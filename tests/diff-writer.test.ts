@@ -270,7 +270,7 @@ describe("From diff to vault", () => {
 `);
   });
 
-  test("Creates multiline tasks", async () => {
+  test("Creates multi-line tasks", async () => {
     const files = [
       createInMemoryFile({
         path: "file-1",

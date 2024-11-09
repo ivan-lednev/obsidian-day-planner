@@ -46,6 +46,8 @@ export default defineConfig((env) => ({
     },
   },
   build: {
+    // todo: fix
+    // sourcemap: "inline",
     lib: {
       entry: ["src/main.ts", "src/styles.scss"],
       name: "main",
