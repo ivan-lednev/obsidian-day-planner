@@ -27,7 +27,9 @@ export function useEditActions({
   }
 
   async function confirmEdit() {
-    if (get(editOperation) === undefined) {
+    const currentOperation = get(editOperation);
+
+    if (currentOperation === undefined) {
       return;
     }
 
@@ -37,7 +39,7 @@ export function useEditActions({
     baselineTasks.set(currentTasks);
     editOperation.set(undefined);
 
-    await onUpdate(oldBase, currentTasks);
+    await onUpdate(oldBase, currentTasks, currentOperation.mode);
   }
 
   return {

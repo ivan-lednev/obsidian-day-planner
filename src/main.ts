@@ -35,8 +35,7 @@ import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
-import type { LocalTask } from "./task-types";
-import type { ObsidianContext } from "./types";
+import type { ObsidianContext, OnUpdateFn } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { ConfirmationModal } from "./ui/confirmation-modal";
 import MultiDayView from "./ui/multi-day-view";
@@ -282,10 +281,11 @@ export default class DayPlanner extends Plugin {
   }
 
   private registerViews() {
-    const onUpdate = async (base: Array<LocalTask>, next: Array<LocalTask>) => {
-      const nextWithUpdatedText = next.map(t.updateText);
+    const onUpdate: OnUpdateFn = async (base, next, mode) => {
+      // todo: remove
+      const nextWithUpdatedText = next.map((task) => t.updateText(task, mode));
       const diff = getTaskDiffFromEditState(base, nextWithUpdatedText);
-      const updates = mapTaskDiffToUpdates(diff, this.settings());
+      const updates = mapTaskDiffToUpdates(diff, mode, this.settings());
       const afterEach = this.settings().sortTasksInPlanAfterEdit
         ? (contents: string) =>
             applyScopedUpdates(

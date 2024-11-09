@@ -4,9 +4,11 @@ import type { Moment } from "moment";
 import { get } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
+import { defaultDayFormat } from "../constants";
 import { settings } from "../global-store/settings";
 import { replaceOrPrependTimestamp } from "../parser/parser";
 import {
+  obsidianBlockIdRegExp,
   checkboxRegExp,
   keylessScheduledPropRegExp,
   listTokenWithSpacesRegExp,
@@ -23,8 +25,9 @@ import {
   type TaskLocation,
   type WithTime,
 } from "../task-types";
+import { EditMode } from "../ui/hooks/use-edit/types";
 
-import { getListTokens } from "./dataview";
+import { createListTokens } from "./dataview";
 import { getId } from "./id";
 import {
   addMinutes,
@@ -122,7 +125,7 @@ export function createTimestamp(
   return `${start.format(format)} - ${end.format(format)}`;
 }
 
-export function toString(task: WithTime<LocalTask>) {
+export function toString(task: WithTime<LocalTask>, mode: EditMode) {
   const firstLine = removeListTokens(getFirstLine(task.text));
 
   const updatedTimestamp = createTimestamp(
@@ -130,15 +133,27 @@ export function toString(task: WithTime<LocalTask>) {
     task.durationMinutes,
     get(settings).timestampFormat,
   );
-  const listTokens = getListTokens(task);
+  const listTokens = createListTokens(task);
   const withUpdatedTimestamp = replaceOrPrependTimestamp(
     firstLine,
     updatedTimestamp,
   );
-  const updatedFirstLineText = updateScheduledPropInText(
+  let updatedFirstLineText = updateScheduledPropInText(
     withUpdatedTimestamp,
     getDayKey(task.startTime),
   );
+
+  // todo: should not be conditional
+  // todo: remove the hack
+  if (
+    mode === EditMode.SCHEDULE_SEARCH_RESULT &&
+    !shortScheduledPropRegExp.test(updatedFirstLineText)
+  ) {
+    updatedFirstLineText = addTasksPluginProp(
+      updatedFirstLineText,
+      `⏳ ${task.startTime.format(defaultDayFormat)}`,
+    );
+  }
 
   const otherLines = getLinesAfterFirst(task.text);
 
@@ -153,8 +168,24 @@ export function updateScheduledPropInText(text: string, dayKey: string) {
     .replace(keylessScheduledPropRegExp, `$1${dayKey}$2`);
 }
 
-export function updateText(task: WithTime<LocalTask>) {
-  return { ...task, text: toString(task) };
+export function appendText(taskText: string, toAppend: string) {
+  const blockIdMatch = obsidianBlockIdRegExp.exec(taskText);
+
+  if (blockIdMatch) {
+    const blockId = blockIdMatch[0];
+
+    return taskText.slice(0, blockIdMatch.index) + toAppend + blockId;
+  }
+
+  return taskText + toAppend;
+}
+
+export function addTasksPluginProp(text: string, prop: string) {
+  return appendText(text, ` ${prop}`);
+}
+
+export function updateText(task: WithTime<LocalTask>, mode: EditMode) {
+  return { ...task, text: toString(task, mode) };
 }
 
 export function offsetYToMinutes(
@@ -173,8 +204,16 @@ export function createTask(props: {
   settings: DayPlannerSettings;
   text?: string;
   location?: TaskLocation;
+  status?: string;
 }): WithTime<LocalTask> {
-  const { day, startMinutes, settings, location, text = "New item" } = props;
+  const {
+    day,
+    startMinutes,
+    settings,
+    location,
+    text = "New item",
+    status,
+  } = props;
 
   return {
     location,
@@ -184,7 +223,7 @@ export function createTask(props: {
     startTime: minutesToMomentOfDay(startMinutes, day),
     symbol: "-",
     status:
-      settings.eventFormatOnCreation === "task"
+      status || settings.eventFormatOnCreation === "task"
         ? settings.taskStatusOnCreation
         : undefined,
   };

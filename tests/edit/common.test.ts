@@ -120,13 +120,17 @@ describe("drag one & common edit mechanics", () => {
 
       await confirmEdit();
 
-      expect(props.onUpdate).toHaveBeenCalledWith(expect.anything(), [
-        expect.objectContaining({
-          id: "1",
-          startTime: moment("2023-01-01 23:00"),
-          durationMinutes: 120,
-        }),
-      ]);
+      expect(props.onUpdate).toHaveBeenCalledWith(
+        expect.anything(),
+        [
+          expect.objectContaining({
+            id: "1",
+            startTime: moment("2023-01-01 23:00"),
+            durationMinutes: 120,
+          }),
+        ],
+        expect.anything(),
+      );
     });
 
     test("Editing the first task of a split works", async () => {
@@ -146,13 +150,17 @@ describe("drag one & common edit mechanics", () => {
 
       await confirmEdit();
 
-      expect(props.onUpdate).toHaveBeenCalledWith(expect.anything(), [
-        expect.objectContaining({
-          id: "1",
-          startTime: moment("2023-01-01 23:30"),
-          durationMinutes: 180,
-        }),
-      ]);
+      expect(props.onUpdate).toHaveBeenCalledWith(
+        expect.anything(),
+        [
+          expect.objectContaining({
+            id: "1",
+            startTime: moment("2023-01-01 23:30"),
+            durationMinutes: 180,
+          }),
+        ],
+        expect.anything(),
+      );
     });
 
     test("Editing the second task of a split works", async () => {

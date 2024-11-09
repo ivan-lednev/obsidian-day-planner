@@ -139,7 +139,7 @@ export function toMarkdown(sTask: STask) {
     .map((line, i) => {
       if (i === 0) {
         // TODO: remove duplication
-        return `${baseIndent}${getListTokens(sTask)} ${line}`;
+        return `${baseIndent}${createListTokens(sTask)} ${line}`;
       }
 
       return `${baseIndent}${extraIndent}${line}`;
@@ -147,7 +147,7 @@ export function toMarkdown(sTask: STask) {
     .join("\n");
 }
 
-export function getListTokens(task: TaskTokens) {
+export function createListTokens(task: TaskTokens) {
   const maybeCheckbox = task.status === undefined ? "" : `[${task.status}]`;
   return `${task.symbol} ${maybeCheckbox}`.trim();
 }

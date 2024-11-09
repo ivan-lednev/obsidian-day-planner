@@ -143,10 +143,7 @@
     <Settings />
   </ControlButton>
 
-  <ControlButton
-    label="Change columns"
-    onclick={handleColumnChange}
-  >
+  <ControlButton label="Change columns" onclick={handleColumnChange}>
     <Columns3 />
   </ControlButton>
 

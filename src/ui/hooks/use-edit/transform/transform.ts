@@ -35,6 +35,7 @@ const transformers: Record<EditMode, TaskTransformer> = {
   [EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS]: resizeFromTopAndShiftOthers,
   [EditMode.RESIZE_AND_SHRINK_OTHERS]: resizeAndShrinkOthers,
   [EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS]: resizeFromTopAndShrinkOthers,
+  [EditMode.SCHEDULE_SEARCH_RESULT]: drag,
 };
 
 function isSingleDayMode(mode: EditMode) {

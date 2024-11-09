@@ -182,6 +182,8 @@
   }
 
   .header {
+    display: flex;
+    justify-content: space-between;
     padding-top: var(--size-4-2);
   }
 
@@ -203,11 +205,6 @@
     gap: var(--size-4-2);
 
     font-size: var(--font-ui-small);
-  }
-
-  .header {
-    display: flex;
-    justify-content: space-between;
   }
 
   .day-controls {

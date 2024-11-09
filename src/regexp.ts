@@ -23,6 +23,7 @@ export const checkboxRegExp = new RegExp(checkbox);
 export const timeRegExp = new RegExp(time);
 export const timeFromStartRegExp = new RegExp(`^${time}`);
 export const headingRegExp = /^(#+)\s/;
+export const obsidianBlockIdRegExp = /\s\^[a-z1-9-]+$/i;
 
 export const looseTimestampAtStartOfLineRegExp = new RegExp(
   `^(?<start>${time})(?:${durationSeparator}(?<end>${time}))?`,

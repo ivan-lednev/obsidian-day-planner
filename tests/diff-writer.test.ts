@@ -16,6 +16,7 @@ import {
 import { VaultFacade } from "../src/service/vault-facade";
 import { defaultSettingsForTests } from "../src/settings";
 import type { LocalTask, WithTime } from "../src/task-types";
+import { EditMode } from "../src/ui/hooks/use-edit/types";
 import { toMinutes } from "../src/util/moment";
 import { createTask } from "../src/util/task-utils";
 import { type Diff, mapTaskDiffToUpdates } from "../src/util/tasks-utils";
@@ -32,17 +33,23 @@ vi.mock("obsidian-daily-notes-interface", () => ({
     format: "YYYY-MM-DD",
     folder: ".",
   })),
+  DEFAULT_DAILY_NOTE_FORMAT: "YYYY-MM-DD",
 }));
 
-async function writeDiff(props: { diff: Diff; files: Array<InMemoryFile> }) {
+async function writeDiff(props: {
+  diff: Diff;
+  files: Array<InMemoryFile>;
+  mode: EditMode;
+}) {
+  const { diff, files, mode } = props;
+
   const getTasksApi = () => {
     throw new Error("Can't access tasks API inside tests");
   };
 
-  const { diff, files } = props;
   const vault = new InMemoryVault(files);
   const vaultFacade = new VaultFacade(vault as unknown as Vault, getTasksApi);
-  const updates = mapTaskDiffToUpdates(diff, defaultSettingsForTests);
+  const updates = mapTaskDiffToUpdates(diff, mode, defaultSettingsForTests);
   // todo: remove test tautology
   const transaction = createTransaction({
     updates,
@@ -71,15 +78,23 @@ function createTestTask(
     text?: string;
     day?: Moment;
     startMinutes?: number;
+    status?: string;
   },
 ) {
-  const { location, startMinutes = 0, text = "", day = moment() } = props;
+  const {
+    location,
+    startMinutes = 0,
+    text = "",
+    day = moment(),
+    status,
+  } = props;
   return createTask({
     settings: { ...defaultSettingsForTests, eventFormatOnCreation: "bullet" },
     day,
     startMinutes,
     text,
     location,
+    status,
   });
 }
 
@@ -138,7 +153,7 @@ describe("From diff to vault", () => {
       ],
     };
 
-    const { vault } = await writeDiff({ diff, files });
+    const { vault } = await writeDiff({ diff, files, mode: EditMode.DRAG });
 
     expect(vault.getAbstractFileByPath("file-1").contents).toBe(`- Before
 - After
@@ -203,12 +218,12 @@ describe("From diff to vault", () => {
       ],
     };
 
-    const { vault } = await writeDiff({ diff, files });
+    const { vault } = await writeDiff({ diff, files, mode: EditMode.DRAG });
 
     expect(vault.getAbstractFileByPath("file-1").contents).toBe(`- Before
-- Updated task
+- 00:00 - 00:30 Updated task
   Text
-    - Updated subtask
+    - 00:00 - 00:30 Updated subtask
       Text
 - After
 `);
@@ -259,14 +274,14 @@ describe("From diff to vault", () => {
       ],
     };
 
-    const { vault } = await writeDiff({ diff, files });
+    const { vault } = await writeDiff({ diff, files, mode: EditMode.DRAG });
 
     expect(vault.getAbstractFileByPath(todayDailyNotePath).contents).toBe("");
     expect(vault.getAbstractFileByPath(tomorrowDailynotePath).contents)
       .toBe(`# Day planner
 
+- 00:00 - 00:30 Moved
 - Other
-- Moved
 `);
   });
 
@@ -304,9 +319,10 @@ describe("From diff to vault", () => {
       ],
     };
 
-    const { vault } = await writeDiff({ diff, files });
+    const { vault } = await writeDiff({ diff, files, mode: EditMode.DRAG });
 
-    expect(vault.getAbstractFileByPath("file-1").contents).toBe(`- Task
+    expect(vault.getAbstractFileByPath("file-1").contents)
+      .toBe(`- 00:00 - 00:30 Task
   Text
     - Subtask
       Text
@@ -336,7 +352,7 @@ describe("From diff to vault", () => {
       ],
     };
 
-    const { vault } = await writeDiff({ diff, files });
+    const { vault } = await writeDiff({ diff, files, mode: EditMode.DRAG });
 
     expect(vault.getAbstractFileByPath("2023-01-01.md").contents).toBe(`# Dreams
 
@@ -344,9 +360,61 @@ describe("From diff to vault", () => {
 
 # Day planner
 
-- Task
+- 11:00 - 11:30 Task
 `);
   });
+
+  test("Adds tasks plugin props to tasks", async () => {
+    const files = [
+      createInMemoryFile({
+        path: "tasks.md",
+        // todo: add block ID
+        contents: `- [ ] Buy milk
+- [ ] Listen to music
+- [ ] Play bowling
+`,
+      }),
+    ];
+    const task = createTestTask({
+      status: " ",
+      text: "- [ ] Listen to music",
+      day: moment("2023-01-01"),
+      startMinutes: toMinutes("11:00"),
+      location: {
+        path: "tasks.md",
+        position: {
+          start: {
+            line: 1,
+            col: 0,
+            offset: -1,
+          },
+          end: {
+            line: 1,
+            col: -1,
+            offset: -1,
+          },
+        },
+      },
+    });
+
+    const diff = {
+      created: [task],
+    };
+
+    const { vault } = await writeDiff({
+      diff,
+      files,
+      mode: EditMode.SCHEDULE_SEARCH_RESULT,
+    });
+
+    expect(vault.getAbstractFileByPath("tasks.md").contents)
+      .toBe(`- [ ] Buy milk
+- [ ] 11:00 - 11:30 Listen to music ⏳ 2023-01-01
+- [ ] Play bowling
+`);
+  });
+
+  test.todo("Updates tasks plugin props");
 
   describe("Sorting by time", () => {
     test("Sorts tasks in plan after edit", async () => {
@@ -376,13 +444,13 @@ describe("From diff to vault", () => {
         ],
       };
 
-      const { vault } = await writeDiff({ diff, files });
+      const { vault } = await writeDiff({ diff, files, mode: EditMode.DRAG });
 
       expect(vault.getAbstractFileByPath("2023-01-01.md").contents)
         .toBe(`# Day planner
 
 - 10:00 - 11:00 Task 1
-- 11:00 - 12:00 Task 2
+- 11:00 - 11:30 Task 2
 - 12:00 - 13:00 Task 3
 `);
     });
@@ -429,13 +497,13 @@ describe("From diff to vault", () => {
         ],
       };
 
-      const { vault } = await writeDiff({ diff, files });
+      const { vault } = await writeDiff({ diff, files, mode: EditMode.DRAG });
 
       expect(vault.getAbstractFileByPath("2023-01-01.md").contents)
         .toBe(`# Day planner
 
 - 10:00 - 11:00 Task 1
-- 11:00 - 12:00 Task 2
+- 11:00 - 11:30 Task 2
 `);
     });
   });

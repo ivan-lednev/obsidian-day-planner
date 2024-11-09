@@ -5,7 +5,6 @@
 
   import RightTriangle from "./right-triangle.svelte";
 
-
   const { children, title }: { children: Snippet; title: string } = $props();
   let isTreeVisible = $state(false);
 

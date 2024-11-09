@@ -18,15 +18,9 @@
     use?: ActionArray;
   } = $props();
 
-  const {
-    height,
-    offset,
-    width,
-    left,
-    // backgroundColor,
-    // borderColor,
-    // properContrastColors,
-  } = $derived(useTaskVisuals(task, { settings }));
+  const { height, offset, width, left } = $derived(
+    useTaskVisuals(task, { settings }),
+  );
 </script>
 
 <TimeBlockBase

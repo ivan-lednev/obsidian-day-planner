@@ -16,6 +16,7 @@ import {
 import type { Update } from "../service/diff-writer";
 import type { DayPlannerSettings } from "../settings";
 import { type LocalTask } from "../task-types";
+import { EditMode } from "../ui/hooks/use-edit/types";
 
 import { createDailyNotePath } from "./daily-notes";
 import * as t from "./task-utils";
@@ -58,17 +59,33 @@ export function getTaskDiffFromEditState(base: LocalTask[], next: LocalTask[]) {
 
 export function mapTaskDiffToUpdates(
   diff: Diff,
+  mode: EditMode,
   settings: DayPlannerSettings,
 ): Update[] {
   return Object.entries(diff)
     .flatMap(([type, tasks]) => tasks.map((task) => ({ type, task })))
     .reduce<Update[]>((result, { type, task }) => {
+      const taskText = t.toString(task, mode);
+
+      // todo: move out to a function
       if (type === "created") {
-        // todo: differentiate here
         if (task.location) {
+          // todo: every test should have an operation
+          if (mode === EditMode.SCHEDULE_SEARCH_RESULT) {
+            return result.concat({
+              type: "updated",
+              path: task.location.path,
+              range: {
+                start: task.location.position.start,
+                end: task.location.position.start,
+              },
+              contents: t.getFirstLine(taskText),
+            });
+          }
+
           return result.concat({
             type: "created",
-            contents: task.text,
+            contents: taskText,
             path: task.location.path,
             target: task.location.position?.start?.line,
           });
@@ -78,7 +95,7 @@ export function mapTaskDiffToUpdates(
           type: "mdast",
           path: createDailyNotePath(task.startTime),
           updateFn: (root: Root) => {
-            const taskRoot = fromMarkdown(task.text);
+            const taskRoot = fromMarkdown(taskText);
             const listItemToInsert = findFirst(taskRoot, checkListItem);
 
             isNotVoid(listItemToInsert);
@@ -115,7 +132,7 @@ export function mapTaskDiffToUpdates(
           type: "updated",
           path,
           range: { start: position.start, end: position.start },
-          contents: t.getFirstLine(task.text),
+          contents: t.getFirstLine(taskText),
         });
       }
 
@@ -130,7 +147,7 @@ export function mapTaskDiffToUpdates(
           // todo: duplication
           path: createDailyNotePath(task.startTime),
           updateFn: (root: Root) => {
-            const taskRoot = fromMarkdown(task.text);
+            const taskRoot = fromMarkdown(taskText);
             const listItemToInsert = findFirst(taskRoot, checkListItem);
 
             isNotVoid(listItemToInsert);
