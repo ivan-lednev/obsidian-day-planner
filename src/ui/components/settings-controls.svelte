@@ -33,7 +33,7 @@
   }
 </script>
 
-<div class="stretcher">
+<div class="dataview-source">
   Include additional files, folders and tags with a Dataview source:
   <input
     placeholder={`-#archived and -"notes/personal"`}
@@ -163,7 +163,7 @@
 </div>
 
 <style>
-  .stretcher {
+  .dataview-source {
     display: flex;
     flex-direction: column;
     gap: var(--size-4-2);
@@ -172,7 +172,7 @@
     color: var(--text-muted);
   }
 
-  .stretcher input {
+  .dataview-source input {
     font-family: var(--font-monospace);
   }
 
@@ -189,7 +189,8 @@
     font-weight: var(--font-medium);
   }
 
-  .settings {
-    margin: var(--size-4-1) 0;
+  .settings,
+  .dataview-source {
+    margin-inline: var(--size-4-3);
   }
 </style>

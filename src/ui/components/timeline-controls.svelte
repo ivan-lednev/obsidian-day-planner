@@ -10,6 +10,7 @@
   import { Menu } from "obsidian";
   import { getContext } from "svelte";
   import type { Writable } from "svelte/store";
+  import { slide } from "svelte/transition";
 
   import { dateRangeContextKey, obsidianContext } from "../../constants";
   import { isToday } from "../../global-store/current-time";
@@ -18,6 +19,7 @@
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 
   import ControlButton from "./control-button.svelte";
+  import { createSlide } from "./defaults";
   import Tree from "./obsidian/tree.svelte";
   import Pill from "./pill.svelte";
   import Search from "./search.svelte";
@@ -137,7 +139,9 @@
   {/if}
 
   {#if settingsVisible}
-    <SettingsControls />
+    <div transition:slide={createSlide({ axis: "y" })}>
+      <SettingsControls />
+    </div>
   {/if}
 
   <Tree title="Search">
