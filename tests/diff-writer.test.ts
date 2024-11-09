@@ -414,7 +414,54 @@ describe("From diff to vault", () => {
 `);
   });
 
-  test.todo("Updates tasks plugin props");
+  test("Updates tasks plugin props without duplicating timestamps if moved to same time on another day", async () => {
+    const files = [
+      createInMemoryFile({
+        path: "tasks.md",
+        contents: `- [ ] Buy milk
+- [ ] 20:00 - 20:30 Listen to music ⏳ 2023-01-01
+- [ ] Play bowling
+`,
+      }),
+    ];
+    const task = createTestTask({
+      status: " ",
+      text: "- [ ] 20:00 - 20:30 Listen to music ⏳ 2023-01-01",
+      day: moment("2023-01-02"),
+      startMinutes: toMinutes("20:00"),
+      location: {
+        path: "tasks.md",
+        position: {
+          start: {
+            line: 1,
+            col: 0,
+            offset: -1,
+          },
+          end: {
+            line: 1,
+            col: -1,
+            offset: -1,
+          },
+        },
+      },
+    });
+
+    const diff = {
+      created: [task],
+    };
+
+    const { vault } = await writeDiff({
+      diff,
+      files,
+      mode: EditMode.SCHEDULE_SEARCH_RESULT,
+    });
+
+    expect(vault.getAbstractFileByPath("tasks.md").contents)
+      .toBe(`- [ ] Buy milk
+- [ ] 20:00 - 20:30 Listen to music ⏳ 2023-01-02
+- [ ] Play bowling
+`);
+  });
 
   describe("Sorting by time", () => {
     test("Sorts tasks in plan after edit", async () => {

@@ -49,7 +49,6 @@ import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { getUpdateTrigger } from "./util/store";
-import * as t from "./util/task-utils";
 import {
   getTaskDiffFromEditState,
   mapTaskDiffToUpdates,
@@ -282,9 +281,7 @@ export default class DayPlanner extends Plugin {
 
   private registerViews() {
     const onUpdate: OnUpdateFn = async (base, next, mode) => {
-      // todo: remove
-      const nextWithUpdatedText = next.map((task) => t.updateText(task, mode));
-      const diff = getTaskDiffFromEditState(base, nextWithUpdatedText);
+      const diff = getTaskDiffFromEditState(base, next);
       const updates = mapTaskDiffToUpdates(diff, mode, this.settings());
       const afterEach = this.settings().sortTasksInPlanAfterEdit
         ? (contents: string) =>

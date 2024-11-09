@@ -34,22 +34,12 @@ export function testTimestampPatterns(line: string) {
 }
 
 export function replaceOrPrependTimestamp(line: string, timestamp: string) {
-  const withStartOfLineReplacement = line.replace(
-    looseTimestampAtStartOfLineRegExp,
-    timestamp,
-  );
-
-  if (line !== withStartOfLineReplacement) {
-    return withStartOfLineReplacement;
+  if (looseTimestampAtStartOfLineRegExp.test(line)) {
+    return line.replace(looseTimestampAtStartOfLineRegExp, timestamp);
   }
 
-  const withStrictReplacement = line.replace(
-    strictTimestampAnywhereInLineRegExp,
-    timestamp,
-  );
-
-  if (line !== withStrictReplacement) {
-    return withStrictReplacement;
+  if (strictTimestampAnywhereInLineRegExp.test(line)) {
+    return line.replace(strictTimestampAnywhereInLineRegExp, timestamp);
   }
 
   return `${timestamp} ${line}`;
