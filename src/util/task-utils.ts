@@ -198,7 +198,7 @@ export function offsetYToMinutes(
   return (offsetY + hiddenHoursSize) / zoomLevel;
 }
 
-export function createTask(props: {
+export function create(props: {
   day: Moment;
   startMinutes: number;
   settings: DayPlannerSettings;

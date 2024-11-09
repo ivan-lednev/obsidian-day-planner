@@ -18,7 +18,7 @@ import { defaultSettingsForTests } from "../src/settings";
 import type { LocalTask, WithTime } from "../src/task-types";
 import { EditMode } from "../src/ui/hooks/use-edit/types";
 import { toMinutes } from "../src/util/moment";
-import { createTask } from "../src/util/task-utils";
+import * as t from "../src/util/task-utils";
 import { type Diff, mapTaskDiffToUpdates } from "../src/util/tasks-utils";
 
 import {
@@ -88,7 +88,7 @@ function createTestTask(
     day = moment(),
     status,
   } = props;
-  return createTask({
+  return t.create({
     settings: { ...defaultSettingsForTests, eventFormatOnCreation: "bullet" },
     day,
     startMinutes,

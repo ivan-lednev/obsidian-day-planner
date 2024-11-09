@@ -7,7 +7,7 @@ import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
 import type { LocalTask, WithTime } from "../../../task-types";
 import { getMinutesSinceMidnight } from "../../../util/moment";
-import { createTask } from "../../../util/task-utils";
+import * as t from "../../../util/task-utils";
 
 import type { EditOperation } from "./types";
 import { EditMode } from "./types";
@@ -38,7 +38,7 @@ export function createEditHandlers({
     const pointerMinutes = getMinutesSinceMidnight(pointerDay);
 
     // todo: use datetime
-    const newTask = createTask({
+    const newTask = t.create({
       day: pointerDay,
       startMinutes: pointerMinutes,
       settings: get(settings),

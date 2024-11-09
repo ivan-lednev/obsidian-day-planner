@@ -42,8 +42,6 @@ export type RemoteTask = BaseTask & {
   description?: string;
 };
 
-type LocalTaskSource = "properties" | "daily-notes";
-
 export interface LocalTask extends TaskTokens, BaseTask {
   text: string;
   lines?: Array<FileLine>;
@@ -54,8 +52,6 @@ export interface LocalTask extends TaskTokens, BaseTask {
 
   // todo: move to Time
   durationMinutes: number;
-
-  source: LocalTaskSource;
 }
 
 export type TaskWithoutComputedDuration = Omit<LocalTask, "durationMinutes"> &

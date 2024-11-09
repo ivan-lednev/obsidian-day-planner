@@ -13,7 +13,7 @@ import { currentTime } from "../global-store/current-time";
 import { DataviewFacade } from "../service/dataview-facade";
 import { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
-import type { LocalTask, Task, WithTime } from "../task-types";
+import type { Task, WithTime } from "../task-types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
@@ -34,13 +34,14 @@ import { useVisibleDays } from "../ui/hooks/use-visible-days";
 import { getUpdateTrigger } from "./store";
 import { isWithTime } from "./task-utils";
 import { useRemoteTasks } from "./use-remote-tasks";
+import type { OnUpdateFn } from "../types";
 
 interface CreateHooksProps {
   app: App;
   dataviewFacade: DataviewFacade;
   workspaceFacade: WorkspaceFacade;
   settingsStore: Writable<DayPlannerSettings>;
-  onUpdate: (base: Array<LocalTask>, next: Array<LocalTask>) => Promise<void>;
+  onUpdate: OnUpdateFn;
 }
 
 function getDarkModeFlag() {
