@@ -3,7 +3,6 @@
     Settings,
     ChevronLeft,
     ChevronRight,
-    AlertTriangle,
     EllipsisVertical,
   } from "lucide-svelte";
   import type { Moment } from "moment";
@@ -12,12 +11,17 @@
   import type { Writable } from "svelte/store";
   import { slide } from "svelte/transition";
 
-  import { dateRangeContextKey, obsidianContext } from "../../constants";
+  import {
+    dataviewDownloadLink,
+    dateRangeContextKey,
+    obsidianContext,
+  } from "../../constants";
   import { isToday } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
   import type { ObsidianContext } from "../../types";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 
+  import Callout from "./callout.svelte";
   import ControlButton from "./control-button.svelte";
   import { createSlide } from "./defaults";
   import Tree from "./obsidian/tree.svelte";
@@ -128,14 +132,12 @@
   </div>
 
   {#if !$dataviewLoaded}
-    <div class="info-container">
-      <AlertTriangle class="svg-icon mod-error" />
-      <span
-        >You need to install and enable
-        <a href="https://github.com/blacksmithgu/obsidian-dataview">Dataview</a
-        >.</span
-      >
-    </div>
+    <Callout --callout-margin-inline="var(--size-4-3)" type="error">
+      <span>
+        You need to install and enable
+        <a href={dataviewDownloadLink}>Dataview</a>
+      </span>
+    </Callout>
   {/if}
 
   {#if settingsVisible}
@@ -168,16 +170,6 @@
 
   :global(.mod-error) {
     color: var(--text-error);
-  }
-
-  .info-container {
-    display: flex;
-    gap: var(--size-4-1);
-    margin: var(--size-4-2);
-  }
-
-  .info-container :global(.svg-icon) {
-    flex-shrink: 0;
   }
 
   .pill-wrapper,

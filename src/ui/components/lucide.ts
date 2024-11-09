@@ -9,7 +9,7 @@ const obsidianIcon =
   (internals: any, props: ComponentProps<T>) => {
     const newProps = {
       ...props,
-      ["class"]: `${props.className || ""} svg-icon`,
+      ["class"]: `${props.class || ""} svg-icon`,
     };
 
     return IconComponent(internals, newProps);
@@ -23,4 +23,7 @@ export const ChevronRight = obsidianIcon(lucideSvelte.ChevronRight);
 export const CalendarArrowUp = obsidianIcon(lucideSvelte.CalendarArrowUp);
 export const Columns3 = obsidianIcon(lucideSvelte.Columns3);
 export const Search = obsidianIcon(lucideSvelte.Search);
+export const AlertTriangle = obsidianIcon(lucideSvelte.AlertTriangle);
+export const Info = obsidianIcon(lucideSvelte.Info);
+export const Zap = obsidianIcon(lucideSvelte.Zap);
 /* eslint-enable @typescript-eslint/naming-convention */

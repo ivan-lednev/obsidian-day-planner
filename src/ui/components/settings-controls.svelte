@@ -1,6 +1,5 @@
 <script lang="ts">
   import { range } from "lodash/fp";
-  import { AlertTriangle, Info } from "lucide-svelte";
   import { getContext } from "svelte";
 
   import { obsidianContext } from "../../constants";
@@ -8,6 +7,7 @@
   import type { ObsidianContext } from "../../types";
   import { useDataviewSource } from "../hooks/use-dataview-source";
 
+  import Callout from "./callout.svelte";
   import Dropdown from "./obsidian/dropdown.svelte";
   import SettingItem from "./obsidian/setting-item.svelte";
 
@@ -41,24 +41,23 @@
     type="text"
     bind:value={$dataviewSourceInput}
   />
+
   {#if $sourceIsEmpty}
-    <div class="info-container">
-      <AlertTriangle class="svg-icon" />
-      Tasks are pulled only from daily notes
-    </div>
+    <Callout type="warning">Tasks are pulled only from daily notes</Callout>
   {/if}
+
   {#if $dataviewErrorMessage.length > 0}
-    <div class="info-container">
+    <Callout type="error">
       <pre class="error-message">{$dataviewErrorMessage}</pre>
-    </div>
+    </Callout>
   {/if}
-  <div class="info-container">
-    <Info class="svg-icon" />
+
+  <Callout type="info">
     <a
       href="https://blacksmithgu.github.io/obsidian-dataview/reference/sources/"
       >Dataview source reference</a
     >
-  </div>
+  </Callout>
 </div>
 <div class="settings">
   <SettingItem>
@@ -178,7 +177,10 @@
 
   .error-message {
     overflow-x: auto;
+
+    margin-block: 0;
     padding: var(--size-4-1);
+
     border: 1px solid var(--text-error);
     border-radius: var(--radius-s);
   }
