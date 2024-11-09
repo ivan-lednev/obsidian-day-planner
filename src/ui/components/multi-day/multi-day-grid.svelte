@@ -2,7 +2,6 @@
   import type { Moment } from "moment";
   import { Menu } from "obsidian";
   import { getContext } from "svelte";
-  import { cubicInOut } from "svelte/easing";
   import { type Writable, get } from "svelte/store";
   import { slide } from "svelte/transition";
 
@@ -19,6 +18,7 @@
   } from "../../../util/range";
   import * as r from "../../../util/range";
   import ControlButton from "../control-button.svelte";
+  import { createSlide } from "../defaults";
   import {
     Settings,
     ChevronLeft,
@@ -188,7 +188,7 @@
 {#if visibleSideControls !== "none"}
   <div
     class="side-controls-container"
-    transition:slide={{ axis: "x", duration: 150, easing: cubicInOut }}
+    transition:slide={createSlide({ axis: "x" })}
   >
     {#if visibleSideControls === "settings"}
       <SettingsControls />

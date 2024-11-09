@@ -1,7 +1,8 @@
 <script lang="ts">
   import { type Snippet } from "svelte";
-  import { cubicInOut } from "svelte/easing";
   import { slide } from "svelte/transition";
+
+  import { createSlide } from "../defaults";
 
   import RightTriangle from "./right-triangle.svelte";
 
@@ -28,7 +29,7 @@
     <div style:color={titleColor} class="tree-item-inner">{title}</div>
   </div>
   {#if isTreeVisible}
-    <div transition:slide={{ axis: "y", duration: 150, easing: cubicInOut }}>
+    <div transition:slide={createSlide({ axis: "y" })}>
       {@render children()}
     </div>
   {/if}

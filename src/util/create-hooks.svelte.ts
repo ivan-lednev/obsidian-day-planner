@@ -14,6 +14,7 @@ import { DataviewFacade } from "../service/dataview-facade";
 import { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
 import type { Task, WithTime } from "../task-types";
+import type { OnUpdateFn } from "../types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
@@ -34,7 +35,6 @@ import { useVisibleDays } from "../ui/hooks/use-visible-days";
 import { getUpdateTrigger } from "./store";
 import { isWithTime } from "./task-utils";
 import { useRemoteTasks } from "./use-remote-tasks";
-import type { OnUpdateFn } from "../types";
 
 interface CreateHooksProps {
   app: App;
