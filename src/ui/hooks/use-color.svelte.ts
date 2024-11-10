@@ -1,10 +1,8 @@
 import chroma from "chroma-js";
-import { getContext } from "svelte";
 
-import { obsidianContext } from "../../constants";
+import { getObsidianContext } from "../../context/obsidian-context";
 import { currentTimeSignal } from "../../global-store/current-time";
 import type { Task } from "../../task-types";
-import type { ObsidianContext } from "../../types";
 import { getTextColorWithEnoughContrast } from "../../util/color";
 import { getRelationToNow } from "../../util/moment";
 import * as t from "../../util/task-utils";
@@ -17,8 +15,7 @@ interface UseColorProps {
 const defaultBorderColor = "var(--color-base-50)";
 
 export function useColor({ task }: UseColorProps) {
-  const { settingsSignal, isDarkMode } =
-    getContext<ObsidianContext>(obsidianContext);
+  const { settingsSignal, isDarkMode } = getObsidianContext();
 
   const endTime = $derived(
     t.isWithTime(task)

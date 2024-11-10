@@ -1,13 +1,10 @@
-import { getContext } from "svelte";
 import { derived, writable } from "svelte/store";
 
-import { obsidianContext } from "../../constants";
+import { getObsidianContext } from "../../context/obsidian-context";
 import type { LocalTask } from "../../task-types";
-import type { ObsidianContext } from "../../types";
 
 export function hoverPreview(el: HTMLElement, task: LocalTask) {
-  const { isModPressed, showPreview } =
-    getContext<ObsidianContext>(obsidianContext);
+  const { isModPressed, showPreview } = getObsidianContext();
 
   const hovering = writable(false);
 

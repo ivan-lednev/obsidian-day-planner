@@ -5,20 +5,14 @@
     ChevronRight,
     EllipsisVertical,
   } from "lucide-svelte";
-  import type { Moment } from "moment";
   import { Menu } from "obsidian";
-  import { getContext } from "svelte";
-  import type { Writable } from "svelte/store";
   import { slide } from "svelte/transition";
 
-  import {
-    dataviewDownloadLink,
-    dateRangeContextKey,
-    obsidianContext,
-  } from "../../constants";
+  import { dataviewDownloadLink } from "../../constants";
+  import { getDateRangeContext } from "../../context/date-range-context";
+  import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
-  import type { ObsidianContext } from "../../types";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 
   import Callout from "./callout.svelte";
@@ -30,8 +24,8 @@
   import SettingsControls from "./settings-controls.svelte";
 
   const { workspaceFacade, initWeeklyView, dataviewLoaded, reSync } =
-    getContext<ObsidianContext>(obsidianContext);
-  const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
+    getObsidianContext();
+  const dateRange = getDateRangeContext();
 
   let settingsVisible = $state(false);
 

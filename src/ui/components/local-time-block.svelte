@@ -1,10 +1,9 @@
 <script lang="ts">
   import { offset } from "@floating-ui/dom";
-  import { getContext } from "svelte";
 
-  import { obsidianContext, vibrationDurationMillis } from "../../constants";
+  import { vibrationDurationMillis } from "../../constants";
+  import { getObsidianContext } from "../../context/obsidian-context";
   import type { LocalTask, WithPlacing, WithTime } from "../../task-types";
-  import type { ObsidianContext } from "../../types";
   import * as t from "../../util/task-utils";
   import { hoverPreview } from "../actions/hover-preview";
   import type { EditHandlers } from "../hooks/use-edit/create-edit-handlers";
@@ -25,7 +24,7 @@
 
   const {
     editContext: { editOperation },
-  } = getContext<ObsidianContext>(obsidianContext);
+  } = getObsidianContext();
 
   const drag = useFloatingUi({
     middleware: [offset({ mainAxis: -32 })],

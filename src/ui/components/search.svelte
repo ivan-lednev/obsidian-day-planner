@@ -1,8 +1,5 @@
 <script lang="ts">
-  import { getContext } from "svelte";
-
-  import { obsidianContext } from "../../constants";
-  import type { ObsidianContext } from "../../types";
+  import { getObsidianContext } from "../../context/obsidian-context";
 
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
@@ -11,7 +8,7 @@
     editContext: {
       handlers: { handleSearchResultGripMouseDown },
     },
-  } = getContext<ObsidianContext>(obsidianContext);
+  } = getObsidianContext();
 </script>
 
 <div class="search-wrapper">

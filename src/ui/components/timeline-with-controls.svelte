@@ -1,9 +1,5 @@
 <script lang="ts">
-  import type { Moment } from "moment";
-  import { getContext } from "svelte";
-  import type { Writable } from "svelte/store";
-
-  import { dateRangeContextKey } from "../../constants";
+  import { getDateRangeContext } from "../../context/date-range-context";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
 
@@ -15,7 +11,7 @@
   import Timeline from "./timeline.svelte";
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
 
-  const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
+  const dateRange = getDateRangeContext();
   $: firstDayInRange = $dateRange[0];
 </script>
 

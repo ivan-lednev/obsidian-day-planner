@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { getContext, type Snippet } from "svelte";
+  import { type Snippet } from "svelte";
 
-  import { obsidianContext } from "../../constants";
+  import { getObsidianContext } from "../../context/obsidian-context";
   import type { Task } from "../../task-types";
-  import type { ObsidianContext } from "../../types";
   import { tappable } from "../actions/tappable";
   import type { ActionArray } from "../actions/use-actions";
   import { useActions } from "../actions/use-actions";
@@ -16,8 +15,7 @@
     use = [],
   }: { children: Snippet; task: Task; use?: ActionArray } = $props();
 
-  const { isDarkMode, settingsSignal } =
-    getContext<ObsidianContext>(obsidianContext);
+  const { isDarkMode, settingsSignal } = getObsidianContext();
 
   const {
     properContrastColors: { normal, muted, faint },

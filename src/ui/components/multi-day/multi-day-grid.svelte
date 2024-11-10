@@ -1,14 +1,12 @@
 <script lang="ts">
-  import type { Moment } from "moment";
   import { Menu } from "obsidian";
-  import { getContext } from "svelte";
-  import { type Writable, get } from "svelte/store";
+  import { get } from "svelte/store";
   import { slide } from "svelte/transition";
 
-  import { dateRangeContextKey, obsidianContext } from "../../../constants";
+  import { getDateRangeContext } from "../../../context/date-range-context";
+  import { getObsidianContext } from "../../../context/obsidian-context";
   import { isToday } from "../../../global-store/current-time";
   import { getVisibleHours } from "../../../global-store/derived-settings";
-  import type { ObsidianContext } from "../../../types";
   import { isOnWeekend } from "../../../util/moment";
   import {
     getNextAdjacentRange,
@@ -36,9 +34,8 @@
   import Timeline from "../timeline.svelte";
   import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
 
-  const { workspaceFacade, settings } =
-    getContext<ObsidianContext>(obsidianContext);
-  const dateRange = getContext<Writable<Moment[]>>(dateRangeContextKey);
+  const { workspaceFacade, settings } = getObsidianContext();
+  const dateRange = getDateRangeContext();
 
   type SideControls = "none" | "settings" | "search";
 

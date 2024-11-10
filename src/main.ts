@@ -9,7 +9,7 @@ import { isNotVoid } from "typed-assert";
 
 import {
   errorContextKey,
-  obsidianContext,
+  obsidianContextKey,
   viewTypeReleaseNotes,
   viewTypeTimeline,
   viewTypeWeekly,
@@ -414,7 +414,7 @@ export default class DayPlanner extends Plugin {
       string,
       ObsidianContext | typeof errorStore
     >([
-      [obsidianContext, defaultObsidianContext],
+      [obsidianContextKey, defaultObsidianContext],
       [errorContextKey, errorStore],
     ]);
 

@@ -1,13 +1,11 @@
 <script lang="ts">
   import type { Moment } from "moment";
-  import { getContext } from "svelte";
   import { isNotVoid } from "typed-assert";
 
-  import { obsidianContext } from "../../constants";
+  import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { isRemote } from "../../task-types";
-  import { type ObsidianContext } from "../../types";
   import { minutesToMomentOfDay } from "../../util/moment";
   import { getRenderKey, offsetYToMinutes } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
@@ -25,7 +23,7 @@
     pointerDateTime,
     settings,
     editContext: { confirmEdit, handlers, getDisplayedTasksForTimeline },
-  } = getContext<ObsidianContext>(obsidianContext);
+  } = getObsidianContext();
 
   $: ({
     handleContainerMouseDown,

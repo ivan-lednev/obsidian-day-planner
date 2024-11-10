@@ -1,12 +1,10 @@
 <script lang="ts">
   import type { Moment } from "moment";
   import { OverlayScrollbarsComponent } from "overlayscrollbars-svelte";
-  import { getContext } from "svelte";
 
-  import { obsidianContext } from "../../constants";
+  import { getObsidianContext } from "../../context/obsidian-context";
   import { settings } from "../../global-store/settings";
   import { isLocal } from "../../task-types";
-  import { type ObsidianContext } from "../../types";
 
   import RemoteTimeBlock from "./remote-time-block.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
@@ -16,7 +14,7 @@
 
   const {
     editContext: { handlers, getDisplayedTasksForTimeline },
-  } = getContext<ObsidianContext>(obsidianContext);
+  } = getObsidianContext();
 
   $: ({ handleTaskMouseUp, handleUnscheduledTaskGripMouseDown } = handlers);
   $: displayedTasksForTimeline = getDisplayedTasksForTimeline(day);

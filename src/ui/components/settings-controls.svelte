@@ -1,17 +1,15 @@
 <script lang="ts">
   import { range } from "lodash/fp";
-  import { getContext } from "svelte";
 
-  import { obsidianContext } from "../../constants";
+  import { getObsidianContext } from "../../context/obsidian-context";
   import { settings } from "../../global-store/settings";
-  import type { ObsidianContext } from "../../types";
   import { useDataviewSource } from "../hooks/use-dataview-source";
 
   import Callout from "./callout.svelte";
   import Dropdown from "./obsidian/dropdown.svelte";
   import SettingItem from "./obsidian/setting-item.svelte";
 
-  const { refreshTasks } = getContext<ObsidianContext>(obsidianContext);
+  const { refreshTasks } = getObsidianContext();
 
   const {
     sourceIsEmpty,
