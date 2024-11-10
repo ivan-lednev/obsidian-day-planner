@@ -2,7 +2,7 @@ import moment, { type Moment } from "moment";
 import { tz } from "moment-timezone";
 import ical, { type AttendeePartStat } from "node-ical";
 
-import { fallbackPartStat, noTitle, icalDayKeyFormat } from "../constants";
+import { fallbackPartStat, icalDayKeyFormat } from "../constants";
 import type { RemoteTask, WithTime } from "../task-types";
 import type { WithIcalConfig } from "../types";
 
@@ -94,7 +94,7 @@ function icalEventToTask(
   const base = {
     id: getId(),
     calendar: icalEvent.calendar,
-    summary: icalEvent.summary || noTitle,
+    summary: icalEvent.summary || "(No title)",
     startTime: startTimeAdjusted,
     rsvpStatus,
   };

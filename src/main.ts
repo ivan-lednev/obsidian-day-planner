@@ -12,7 +12,7 @@ import {
   obsidianContextKey,
   viewTypeReleaseNotes,
   viewTypeTimeline,
-  viewTypeWeekly,
+  viewTypeMultiDay,
 } from "./constants";
 import { settings } from "./global-store/settings";
 import {
@@ -37,9 +37,10 @@ import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
+import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
-import { ConfirmationModal } from "./ui/confirmation-modal";
+import { askForConfirmation } from "./ui/confirmation-modal";
 import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
@@ -66,7 +67,9 @@ export default class DayPlanner extends Plugin {
   async onload() {
     await this.initSettingsStore();
 
-    this.vaultFacade = new VaultFacade(this.app.vault, this.getTasksApi);
+    const getTasksApi = createGetTasksApi(this.app);
+
+    this.vaultFacade = new VaultFacade(this.app.vault, getTasksApi);
     this.transationWriter = new TransactionWriter(this.vaultFacade);
     this.workspaceFacade = new WorkspaceFacade(
       this.app.workspace,
@@ -97,13 +100,13 @@ export default class DayPlanner extends Plugin {
   async onunload() {
     return Promise.all([
       this.detachLeavesOfType(viewTypeTimeline),
-      this.detachLeavesOfType(viewTypeWeekly),
+      this.detachLeavesOfType(viewTypeMultiDay),
     ]);
   }
 
   initWeeklyLeaf = async () => {
     await this.app.workspace.getLeaf("tab").setViewState({
-      type: viewTypeWeekly,
+      type: viewTypeMultiDay,
       active: true,
     });
   };
@@ -139,11 +142,6 @@ export default class DayPlanner extends Plugin {
       active: true,
     });
     this.app.workspace.rightSplit.expand();
-  };
-
-  private getTasksApi = () => {
-    // @ts-expect-error
-    return this.app.plugins.plugins["obsidian-tasks-plugin"]?.apiV1;
   };
 
   private async handleNewPluginVersion() {
@@ -255,20 +253,6 @@ export default class DayPlanner extends Plugin {
     });
   };
 
-  private askForConfirmation = async (props: {
-    title: string;
-    text: string;
-    cta: string;
-  }) => {
-    return new Promise((resolve) => {
-      new ConfirmationModal(this.app, {
-        ...props,
-        onAccept: async () => resolve(true),
-        onCancel: () => resolve(false),
-      }).open();
-    });
-  };
-
   private getPathsToCreate(paths: string[]) {
     return paths.reduce<string[]>(
       (result, path) =>
@@ -305,7 +289,8 @@ export default class DayPlanner extends Plugin {
       const needToCreate = this.getPathsToCreate(updatePaths);
 
       if (needToCreate.length > 0) {
-        const confirmed = await this.askForConfirmation({
+        const confirmed = await askForConfirmation({
+          app: this.app,
           title: "Need to create files",
           text: `The following files need to be created: ${needToCreate.join("; ")}`,
           cta: "Create",
@@ -423,7 +408,7 @@ export default class DayPlanner extends Plugin {
     );
 
     this.registerView(
-      viewTypeWeekly,
+      viewTypeMultiDay,
       (leaf: WorkspaceLeaf) =>
         new MultiDayView(
           leaf,

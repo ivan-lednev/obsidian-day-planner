@@ -1,31 +1,36 @@
-export const viewTypeTimeline = "timeline";
-export const viewTypeWeekly = "weekly";
+export const viewTypeTimeline = "planner-timeline";
+export const viewTypeMultiDay = "planner-weekly";
 export const viewTypeReleaseNotes = "planner-release-notes";
-export const viewTypeTimeTracker = "timeTracker";
-export const obsidianContextKey = "obsidian";
-export const editContextKey = "editContext";
+
+export const obsidianContextKey = "obsidianContext";
 export const dateRangeContextKey = "dateRangeContext";
 export const errorContextKey = "errorContext";
+
 export const defaultDayFormat = "YYYY-MM-DD";
 export const icalDayKeyFormat = "YYYY-MM-DD";
 export const defaultRangeDayFormat = "MMM, D";
 export const defaultDayFormatForLuxon = "yyyy-MM-dd";
+
 export const clockSeparator = "--";
-export const defaultDurationMinutes = 30;
-export const statusBarTextLimit = 15;
-export const indentBeforeTaskParagraph = 6;
 export const clockKey = "clocked";
 export const clockFormat = "YYYY-MM-DDTHH:mm:ss";
+
+export const defaultDurationMinutes = 30;
+
+export const searchResultLimit = 50;
+export const statusBarTextLimit = 15;
+export const indentBeforeTaskParagraph = 6;
+
 export const reQueryAfterMillis = 200;
 export const undoTimeoutMillis = 8000;
 export const vibrationDurationMillis = 100;
+
 export const icalRefreshIntervalMillis = 5 * 60 * 1000;
 export const fallbackPartStat = "NEEDS-ACTION";
-export const mdastUtilNumberOfSpacesInTab = 4;
-export const searchResultLimit = 50;
-export const dataviewDownloadLink = "https://obsidian.md/plugins?id=dataview";
 
-export const noTitle = "(No title)";
+export const mdastUtilNumberOfSpacesInTab = 4;
+
+export const dataviewDownloadLink = "https://obsidian.md/plugins?id=dataview";
 
 export const icons = [
   "any-key",

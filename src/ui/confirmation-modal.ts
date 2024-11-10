@@ -8,7 +8,7 @@ export interface ConfirmationModalProps {
   title: string;
 }
 
-export class ConfirmationModal extends Modal {
+class ConfirmationModal extends Modal {
   constructor(app: App, props: ConfirmationModalProps) {
     super(app);
 
@@ -37,4 +37,21 @@ export class ConfirmationModal extends Modal {
         });
     });
   }
+}
+
+export async function askForConfirmation(props: {
+  app: App;
+  title: string;
+  text: string;
+  cta: string;
+}) {
+  return new Promise((resolve) => {
+    const { app, ...rest } = props;
+
+    new ConfirmationModal(app, {
+      ...rest,
+      onAccept: async () => resolve(true),
+      onCancel: () => resolve(false),
+    }).open();
+  });
 }

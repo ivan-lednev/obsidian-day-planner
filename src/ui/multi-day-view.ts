@@ -3,7 +3,7 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 import { mount, unmount } from "svelte";
 import { derived, get, type Writable } from "svelte/store";
 
-import { dateRangeContextKey, viewTypeWeekly } from "../constants";
+import { dateRangeContextKey, viewTypeMultiDay } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 import type { ComponentContext, DateRange } from "../types";
 import * as r from "../util/range";
@@ -29,7 +29,7 @@ export default class MultiDayView extends ItemView {
   }
 
   getViewType(): string {
-    return viewTypeWeekly;
+    return viewTypeMultiDay;
   }
 
   getDisplayText(): string {
