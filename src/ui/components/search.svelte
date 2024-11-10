@@ -6,7 +6,7 @@
   const {
     search: { query, result, description },
     editContext: {
-      handlers: { handleSearchResultGripMouseDown },
+      handlers: { handleSearchResultGripMouseDown, handleTaskMouseUp },
     },
   } = getObsidianContext();
 </script>
@@ -30,7 +30,9 @@
             <UnscheduledTimeBlock
               --time-block-padding="var(--size-4-1)"
               onGripMouseDown={handleSearchResultGripMouseDown}
-              onMouseUp={() => {}}
+              onMouseUp={() => {
+                handleTaskMouseUp(foundTimeBlock);
+              }}
               task={foundTimeBlock}
             />
           </div>
