@@ -36,20 +36,6 @@ export function isTapOutside(
   );
 }
 
-export function cancelFadeTransition(el: HTMLElement) {
-  Object.assign(el.style, {
-    transition: "none",
-    opacity: 1,
-  });
-}
-
-export function addFadeTransition(el: HTMLElement) {
-  Object.assign(el.style, {
-    transition: "opacity 200ms",
-    opacity: 0,
-  });
-}
-
 export function toggleCheckbox(line: string) {
   if (line.includes("[ ]")) {
     return line.replace("[ ]", "[x]");
@@ -72,14 +58,6 @@ export function updateLine(
   );
 
   lines[lineNumber] = editFn(originalLine);
-
-  return lines.join("\n");
-}
-
-export function deleteLines(contents: string, from: number, count: number) {
-  const lines = contents.split("\n");
-
-  lines.splice(from, count);
 
   return lines.join("\n");
 }

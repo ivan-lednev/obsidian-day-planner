@@ -8,11 +8,11 @@ import { defaultDayFormat } from "../constants";
 import { settings } from "../global-store/settings";
 import { replaceOrPrependTimestamp } from "../parser/parser";
 import {
-  obsidianBlockIdRegExp,
   checkboxRegExp,
   keylessScheduledPropRegExp,
   listTokenWithSpacesRegExp,
   looseTimestampAtStartOfLineRegExp,
+  obsidianBlockIdRegExp,
   scheduledPropRegExp,
   scheduledPropRegExps,
   shortScheduledPropRegExp,
@@ -35,7 +35,6 @@ import {
   minutesToMoment,
   minutesToMomentOfDay,
 } from "./moment";
-import { getDayKey } from "./tasks-utils";
 
 export function getEndMinutes(task: {
   startTime: Moment;
@@ -125,6 +124,14 @@ export function createTimestamp(
   return `${start.format(format)} - ${end.format(format)}`;
 }
 
+export function getEmptyTasksForDay() {
+  return { withTime: [], noTime: [] };
+}
+
+export function getDayKey(day: Moment) {
+  return day.format(defaultDayFormat);
+}
+
 export function toString(task: WithTime<LocalTask>, mode: EditMode) {
   const firstLine = removeListTokens(getFirstLine(task.text));
 
@@ -182,10 +189,6 @@ export function appendText(taskText: string, toAppend: string) {
 
 export function addTasksPluginProp(text: string, prop: string) {
   return appendText(text, ` ${prop}`);
-}
-
-export function updateText(task: WithTime<LocalTask>, mode: EditMode) {
-  return { ...task, text: toString(task, mode) };
 }
 
 export function offsetYToMinutes(

@@ -7,7 +7,7 @@ import { settings } from "../../global-store/settings";
 import type { LocalTask } from "../../task-types";
 import { getScheduledDay } from "../../util/dataview";
 import { mapToTasksForDay } from "../../util/get-tasks-for-day";
-import { getDayKey } from "../../util/tasks-utils";
+import { getDayKey } from "../../util/task-utils";
 
 export function useVisibleDataviewTasks(
   dataviewTasks: Readable<STask[]>,

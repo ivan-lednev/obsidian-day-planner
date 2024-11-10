@@ -1,9 +1,22 @@
 import { groupBy } from "lodash/fp";
 import type { Root } from "mdast";
+import { getDateFromPath } from "obsidian-daily-notes-interface";
+import { isNotVoid } from "typed-assert";
 
-import { fromMarkdown, toMarkdown } from "../mdast/mdast";
+import {
+  checkListItem,
+  findFirst,
+  fromMarkdown,
+  insertListItemUnderHeading,
+  isListItem,
+  toMarkdown,
+} from "../mdast/mdast";
 import { headingRegExp } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
+import type { LocalTask } from "../task-types";
+import { EditMode } from "../ui/hooks/use-edit/types";
+import { createDailyNotePath } from "../util/daily-notes";
+import * as t from "../util/task-utils";
 
 import type { VaultFacade } from "./vault-facade";
 
@@ -259,4 +272,142 @@ export class TransactionWriter {
 
     return Promise.all(editPromises);
   };
+}
+
+/**
+ * Describes what changed visually in a view after an edit.
+ */
+export type ViewDiff = {
+  deleted?: Array<LocalTask>;
+  updated?: Array<LocalTask>;
+  added?: Array<LocalTask>;
+};
+
+export function getTaskDiffFromEditState(base: LocalTask[], next: LocalTask[]) {
+  return next.reduce<Omit<Required<ViewDiff>, "deleted">>(
+    (result, task) => {
+      const thisTaskInBase = base.find((baseTask) => baseTask.id === task.id);
+
+      if (!thisTaskInBase) {
+        result.added.push(task);
+      }
+
+      if (thisTaskInBase && !t.isTimeEqual(thisTaskInBase, task)) {
+        result.updated.push(task);
+      }
+
+      return result;
+    },
+    {
+      updated: [],
+      added: [],
+    },
+  );
+}
+
+export function mapTaskDiffToUpdates(
+  diff: ViewDiff,
+  mode: EditMode,
+  settings: DayPlannerSettings,
+): Update[] {
+  return Object.entries(diff)
+    .flatMap(([type, tasks]) => tasks.map((task) => ({ type, task })))
+    .reduce<Update[]>((result, { type, task }) => {
+      const taskText = t.toString(task, mode);
+
+      // todo: move out to a function
+      if (type === "added") {
+        if (task.location) {
+          // todo: every test should have an operation
+          if (mode === EditMode.SCHEDULE_SEARCH_RESULT) {
+            return result.concat({
+              type: "updated",
+              path: task.location.path,
+              range: {
+                start: task.location.position.start,
+                end: task.location.position.start,
+              },
+              contents: t.getFirstLine(taskText),
+            });
+          }
+
+          return result.concat({
+            type: "created",
+            contents: taskText,
+            path: task.location.path,
+            target: task.location.position?.start?.line,
+          });
+        }
+
+        return result.concat({
+          type: "mdast",
+          path: createDailyNotePath(task.startTime),
+          updateFn: (root: Root) => {
+            const taskRoot = fromMarkdown(taskText);
+            const listItemToInsert = findFirst(taskRoot, checkListItem);
+
+            isNotVoid(listItemToInsert);
+            isListItem(listItemToInsert);
+
+            return insertListItemUnderHeading(
+              root,
+              settings.plannerHeading,
+              listItemToInsert,
+            );
+          },
+        });
+      }
+
+      isNotVoid(task.location);
+
+      const { path, position } = task.location;
+
+      if (type === "deleted") {
+        return result.concat({
+          type: "deleted",
+          path,
+          range: position,
+        });
+      }
+
+      const originalLocationDay = getDateFromPath(path, "day");
+      const needToMoveBetweenNotes =
+        originalLocationDay &&
+        !task.startTime.isSame(originalLocationDay, "day");
+
+      if (!needToMoveBetweenNotes) {
+        return result.concat({
+          type: "updated",
+          path,
+          range: { start: position.start, end: position.start },
+          contents: t.getFirstLine(taskText),
+        });
+      }
+
+      return result.concat(
+        {
+          type: "deleted",
+          path,
+          range: position,
+        },
+        {
+          type: "mdast",
+          // todo: duplication
+          path: createDailyNotePath(task.startTime),
+          updateFn: (root: Root) => {
+            const taskRoot = fromMarkdown(taskText);
+            const listItemToInsert = findFirst(taskRoot, checkListItem);
+
+            isNotVoid(listItemToInsert);
+            isListItem(listItemToInsert);
+
+            return insertListItemUnderHeading(
+              root,
+              settings.plannerHeading,
+              listItemToInsert,
+            );
+          },
+        },
+      );
+    }, []);
 }

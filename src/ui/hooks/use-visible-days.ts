@@ -2,7 +2,7 @@ import { isEqual, uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
 import { derived, type Readable } from "svelte/store";
 
-import { getDayKey } from "../../util/tasks-utils";
+import { getDayKey } from "../../util/task-utils";
 
 export function useVisibleDays(
   ranges: Readable<Record<string, Array<Moment>>>,

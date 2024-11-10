@@ -6,7 +6,7 @@ import { areValidClockMoments, toClockMoments } from "../../util/clock";
 import { unwrap } from "../../util/dataview";
 import { liftToArray } from "../../util/lift";
 import { splitMultiday } from "../../util/moment";
-import { getDayKey } from "../../util/tasks-utils";
+import { getDayKey } from "../../util/task-utils";
 
 function withClockMoments(sTask: STask) {
   return liftToArray(sTask.clocked)

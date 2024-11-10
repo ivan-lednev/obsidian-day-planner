@@ -29,6 +29,8 @@ import { DataviewFacade } from "./service/dataview-facade";
 import {
   applyScopedUpdates,
   createTransaction,
+  getTaskDiffFromEditState,
+  mapTaskDiffToUpdates,
   TransactionWriter,
 } from "./service/diff-writer";
 import { STaskEditor } from "./service/stask-editor";
@@ -49,10 +51,6 @@ import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { getUpdateTrigger } from "./util/store";
-import {
-  getTaskDiffFromEditState,
-  mapTaskDiffToUpdates,
-} from "./util/tasks-utils";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;

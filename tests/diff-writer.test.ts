@@ -11,7 +11,9 @@ import { sortListsRecursivelyUnderHeading } from "../src/mdast/mdast";
 import {
   applyScopedUpdates,
   createTransaction,
+  mapTaskDiffToUpdates,
   TransactionWriter,
+  type ViewDiff,
 } from "../src/service/diff-writer";
 import { VaultFacade } from "../src/service/vault-facade";
 import { defaultSettingsForTests } from "../src/settings";
@@ -19,7 +21,6 @@ import type { LocalTask, WithTime } from "../src/task-types";
 import { EditMode } from "../src/ui/hooks/use-edit/types";
 import { toMinutes } from "../src/util/moment";
 import * as t from "../src/util/task-utils";
-import { type Diff, mapTaskDiffToUpdates } from "../src/util/tasks-utils";
 
 import {
   createInMemoryFile,
@@ -37,7 +38,7 @@ vi.mock("obsidian-daily-notes-interface", () => ({
 }));
 
 async function writeDiff(props: {
-  diff: Diff;
+  diff: ViewDiff;
   files: Array<InMemoryFile>;
   mode: EditMode;
 }) {
@@ -294,7 +295,7 @@ describe("From diff to vault", () => {
     ];
 
     const diff = {
-      created: [
+      added: [
         createTestTask({
           text: `- Task
   Text
@@ -343,7 +344,7 @@ describe("From diff to vault", () => {
     ];
 
     const diff = {
-      created: [
+      added: [
         createTestTask({
           text: "- Task",
           day: moment("2023-01-01"),
@@ -398,7 +399,7 @@ describe("From diff to vault", () => {
     });
 
     const diff = {
-      created: [task],
+      added: [task],
     };
 
     const { vault } = await writeDiff({
@@ -447,7 +448,7 @@ describe("From diff to vault", () => {
     });
 
     const diff = {
-      created: [task],
+      added: [task],
     };
 
     const { vault } = await writeDiff({
@@ -482,7 +483,7 @@ describe("From diff to vault", () => {
       ];
 
       const diff = {
-        created: [
+        added: [
           createTestTask({
             text: "- 11:00 - 12:00 Task 2",
             day: moment("2023-01-01"),

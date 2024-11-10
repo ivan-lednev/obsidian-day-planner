@@ -13,8 +13,13 @@ import type {
 } from "../../../task-types";
 import type { OnUpdateFn } from "../../../types";
 import * as m from "../../../util/moment";
-import { getEndTime, getRenderKey, isWithTime } from "../../../util/task-utils";
-import { getDayKey, getEmptyRecordsForDay } from "../../../util/tasks-utils";
+import {
+  getDayKey,
+  getEmptyTasksForDay,
+  getEndTime,
+  getRenderKey,
+  isWithTime,
+} from "../../../util/task-utils";
 
 import { createEditHandlers } from "./create-edit-handlers";
 import { useCursor } from "./cursor";
@@ -115,7 +120,7 @@ export function useEditContext(props: {
   function getDisplayedTasksForTimeline(day: Moment) {
     return derived(dayToDisplayedTasks, ($dayToDisplayedTasks) => {
       const tasksForDay =
-        $dayToDisplayedTasks[getDayKey(day)] || getEmptyRecordsForDay();
+        $dayToDisplayedTasks[getDayKey(day)] || getEmptyTasksForDay();
 
       const withTime: Array<WithPlacing<WithTime<Task>>> = flow(
         uniqBy(getRenderKey),
