@@ -157,6 +157,22 @@
       </div>
     </SettingItem>
   {/if}
+
+  <div class="controls-section">Time tracker</div>
+
+  <SettingItem>
+    <svelte:fragment slot="name">Show time tracker</svelte:fragment>
+    <div
+      slot="control"
+      class="checkbox-container mod-small"
+      class:is-enabled={$settings.showTimeTracker}
+      onclick={() => {
+        $settings.showTimeTracker = !$settings.showTimeTracker;
+      }}
+    >
+      <input tabindex="0" type="checkbox" />
+    </div>
+  </SettingItem>
 </div>
 
 <style>

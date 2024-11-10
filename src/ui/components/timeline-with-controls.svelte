@@ -28,7 +28,10 @@
   {#snippet children(isUnderCursor)}
     <Ruler visibleHours={getVisibleHours($settings)} />
     <Timeline day={firstDayInRange} {isUnderCursor} />
-    <Timeline day={firstDayInRange} {isUnderCursor} />
+
+    {#if $settings.showTimeTracker}
+      <Timeline day={firstDayInRange} {isUnderCursor} />
+    {/if}
   {/snippet}
 </Scroller>
 

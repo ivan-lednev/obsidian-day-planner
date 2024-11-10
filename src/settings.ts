@@ -48,6 +48,7 @@ export interface DayPlannerSettings {
   showUnscheduledNestedTasks: boolean;
   showNow: boolean;
   showNext: boolean;
+  showTimeTracker: boolean;
   snapStepMinutes: number;
   pluginVersion: string;
   showCompletedTasks: boolean;
@@ -99,6 +100,7 @@ export const defaultSettings: DayPlannerSettings = {
   sortTasksInPlanAfterEdit: false,
   firstDayOfWeek: "monday",
   multiDayRange: "3-days",
+  showTimeTracker: false,
 };
 
 export const defaultSettingsForTests = {
