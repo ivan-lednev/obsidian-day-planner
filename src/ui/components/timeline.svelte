@@ -16,23 +16,27 @@
   import RemoteTimeBlock from "./remote-time-block.svelte";
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
 
-  export let day: Moment;
-  export let isUnderCursor = false;
+  const {
+    day,
+    isUnderCursor = false,
+  }: { day: Moment; isUnderCursor?: boolean } = $props();
 
   const {
     pointerDateTime,
     settings,
-    editContext: { confirmEdit, handlers, getDisplayedTasksForTimeline },
+    editContext: {
+      confirmEdit,
+      handlers: {
+        handleContainerMouseDown,
+        handleResizerMouseDown,
+        handleTaskMouseUp,
+        handleGripMouseDown,
+      },
+      getDisplayedTasksForTimeline,
+    },
   } = getObsidianContext();
 
-  $: ({
-    handleContainerMouseDown,
-    handleResizerMouseDown,
-    handleTaskMouseUp,
-    handleGripMouseDown,
-  } = handlers);
-
-  $: displayedTasksForTimeline = getDisplayedTasksForTimeline(day);
+  const displayedTasksForTimeline = $derived(getDisplayedTasksForTimeline(day));
   let el: HTMLElement | undefined;
 
   function updatePointerOffsetY(event: PointerEvent) {
@@ -63,16 +67,15 @@
   <div
     bind:this={el}
     class="tasks absolute-stretch-x"
-    on:pointerdown={(event) => {
+    onpointerdown={(event) => {
       if (isTouchEvent(event) || event.target !== el) {
         return;
       }
 
       handleContainerMouseDown();
     }}
-    on:pointermove={updatePointerOffsetY}
-    on:pointerup={confirmEdit}
-    on:pointerup|stopPropagation
+    onpointermove={updatePointerOffsetY}
+    onpointerup={confirmEdit}
   >
     {#each $displayedTasksForTimeline.withTime as task (getRenderKey(task))}
       {#if isRemote(task)}
