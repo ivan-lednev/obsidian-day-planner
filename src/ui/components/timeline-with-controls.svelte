@@ -12,7 +12,7 @@
   import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
 
   const dateRange = getDateRangeContext();
-  $: firstDayInRange = $dateRange[0];
+  const firstDayInRange = $derived($dateRange[0]);
 </script>
 
 <div class="controls">
@@ -27,6 +27,7 @@
 <Scroller>
   {#snippet children(isUnderCursor)}
     <Ruler visibleHours={getVisibleHours($settings)} />
+    <Timeline day={firstDayInRange} {isUnderCursor} />
     <Timeline day={firstDayInRange} {isUnderCursor} />
   {/snippet}
 </Scroller>

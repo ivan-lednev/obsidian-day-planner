@@ -42,6 +42,7 @@
   function updatePointerOffsetY(event: PointerEvent) {
     isNotVoid(el);
 
+    // todo: add memo
     const viewportToElOffsetY = el.getBoundingClientRect().top;
     const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
     const newOffsetY = snap(borderTopToPointerOffsetY, $settings);

@@ -24,6 +24,10 @@
     height: fit-content;
   }
 
+  .column:not(:last-child) {
+    border-right: 1px solid var(--background-modifier-border);
+  }
+
   .hour-block {
     flex: 1 0 0;
     border-bottom: 1px solid var(--background-modifier-border);

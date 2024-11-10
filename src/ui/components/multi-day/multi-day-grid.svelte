@@ -202,7 +202,7 @@
     visibleHours={getVisibleHours($settings)}
   />
   {#each $dateRange as day}
-    <div class="day-column" class:weekend={isOnWeekend(day)}>
+    <div class="timeline-sizer" class:weekend={isOnWeekend(day)}>
       <Timeline {day} isUnderCursor={true} />
     </div>
   {/each}
@@ -248,19 +248,14 @@
     border-left: none;
   }
 
-  .day-column {
+  .timeline-sizer {
     display: flex;
-    flex: 1 0 200px;
+    flex: 1 0 var(--timeline-flex-basis);
     flex-direction: column;
 
     height: fit-content;
 
     background-color: var(--background-secondary);
-    border-right: 1px solid var(--background-modifier-border);
-  }
-
-  .day-column:last-child {
-    border-right: none;
   }
 
   .header {
@@ -276,9 +271,9 @@
 
   .header-cell {
     overflow-x: hidden;
-    flex: 1 0 200px;
+    flex: 1 0 var(--timeline-flex-basis);
 
-    width: 200px;
+    width: var(--timeline-flex-basis);
 
     background-color: var(--background-primary);
     border-right: 1px solid var(--background-modifier-border);
@@ -286,7 +281,7 @@
   }
 
   .header-cell:last-of-type {
-    flex: 1 0 calc(200px + var(--scrollbar-width));
+    flex: 1 0 calc(var(--timeline-flex-basis) + var(--scrollbar-width));
     border-right: none;
   }
 
