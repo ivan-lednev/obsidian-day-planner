@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { type Moment } from "moment";
   import { Menu } from "obsidian";
   import { get } from "svelte/store";
   import { slide } from "svelte/transition";
@@ -85,6 +86,10 @@
     });
 
     menu.showAtMouseEvent(event);
+  }
+
+  function getColumnBackgroundColor(day: Moment) {
+    return isOnWeekend(day) ? "var(--background-primary)" : "";
   }
 
   let headerRef: HTMLDivElement | undefined;
@@ -202,9 +207,11 @@
     visibleHours={getVisibleHours($settings)}
   />
   {#each $dateRange as day}
-    <div class="timeline-sizer" class:weekend={isOnWeekend(day)}>
-      <Timeline {day} isUnderCursor={true} />
-    </div>
+    <Timeline
+      --column-background-color={getColumnBackgroundColor(day)}
+      {day}
+      isUnderCursor={true}
+    />
   {/each}
 </Scroller>
 
@@ -246,16 +253,6 @@
     border: 1px solid var(--background-modifier-border);
     border-top: none;
     border-left: none;
-  }
-
-  .timeline-sizer {
-    display: flex;
-    flex: 1 0 var(--timeline-flex-basis);
-    flex-direction: column;
-
-    height: fit-content;
-
-    background-color: var(--background-secondary);
   }
 
   .header {
