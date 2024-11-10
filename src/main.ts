@@ -20,7 +20,7 @@ import {
   fromMarkdown,
   positionContainsPoint,
   sortListsRecursively,
-  sortListsRecursivelyUnderHeading,
+  sortListsRecursivelyInMarkdown,
   toEditorPos,
   toMarkdown,
   toMdastPoint,
@@ -270,11 +270,7 @@ export default class DayPlanner extends Plugin {
             applyScopedUpdates(
               contents,
               this.settings().plannerHeading,
-              (scoped) =>
-                sortListsRecursivelyUnderHeading(
-                  scoped,
-                  this.settings().plannerHeading,
-                ),
+              sortListsRecursivelyInMarkdown,
             )
         : undefined;
 

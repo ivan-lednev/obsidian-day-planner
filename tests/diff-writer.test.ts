@@ -7,7 +7,7 @@ import {
 import { vi, test, expect, describe } from "vitest";
 
 import { defaultDayFormat } from "../src/constants";
-import { sortListsRecursivelyUnderHeading } from "../src/mdast/mdast";
+import { sortListsRecursivelyInMarkdown } from "../src/mdast/mdast";
 import {
   applyScopedUpdates,
   createTransaction,
@@ -41,8 +41,9 @@ async function writeDiff(props: {
   diff: ViewDiff;
   files: Array<InMemoryFile>;
   mode: EditMode;
+  afterEach?: (contents: string) => string;
 }) {
-  const { diff, files, mode } = props;
+  const { diff, files, mode, afterEach } = props;
 
   const getTasksApi = () => {
     throw new Error("Can't access tasks API inside tests");
@@ -55,17 +56,7 @@ async function writeDiff(props: {
   const transaction = createTransaction({
     updates,
     settings: defaultSettingsForTests,
-    afterEach: (contents: string) =>
-      applyScopedUpdates(
-        contents,
-        defaultSettingsForTests.plannerHeading,
-        (scoped) =>
-          sortListsRecursivelyUnderHeading(
-            scoped,
-            // todo: remove heading
-            defaultSettingsForTests.plannerHeading,
-          ),
-      ),
+    afterEach,
   });
   const writer = new TransactionWriter(vaultFacade);
 
@@ -281,8 +272,8 @@ describe("From diff to vault", () => {
     expect(vault.getAbstractFileByPath(tomorrowDailynotePath).contents)
       .toBe(`# Day planner
 
-- 00:00 - 00:30 Moved
 - Other
+- 00:00 - 00:30 Moved
 `);
   });
 
@@ -492,7 +483,17 @@ describe("From diff to vault", () => {
         ],
       };
 
-      const { vault } = await writeDiff({ diff, files, mode: EditMode.DRAG });
+      const { vault } = await writeDiff({
+        diff,
+        files,
+        mode: EditMode.DRAG,
+        afterEach: (contents: string) =>
+          applyScopedUpdates(
+            contents,
+            defaultSettingsForTests.plannerHeading,
+            sortListsRecursivelyInMarkdown,
+          ),
+      });
 
       expect(vault.getAbstractFileByPath("2023-01-01.md").contents)
         .toBe(`# Day planner
@@ -545,7 +546,17 @@ describe("From diff to vault", () => {
         ],
       };
 
-      const { vault } = await writeDiff({ diff, files, mode: EditMode.DRAG });
+      const { vault } = await writeDiff({
+        diff,
+        files,
+        mode: EditMode.DRAG,
+        afterEach: (contents: string) =>
+          applyScopedUpdates(
+            contents,
+            defaultSettingsForTests.plannerHeading,
+            sortListsRecursivelyInMarkdown,
+          ),
+      });
 
       expect(vault.getAbstractFileByPath("2023-01-01.md").contents)
         .toBe(`# Day planner

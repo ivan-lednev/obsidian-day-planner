@@ -27,35 +27,17 @@ export function toMarkdown(nodes: Nodes) {
   );
 }
 
-export function sortListsRecursivelyUnderHeading(
-  contents: string,
-  heading: string,
-) {
-  const mdastRoot = fromMarkdown(contents);
-  const headingWithChildren = findHeadingWithChildren(mdastRoot, heading);
-
-  if (!headingWithChildren) {
-    return contents;
-  }
-
-  const firstNode = headingWithChildren.children.at(0);
-  const lastNode = headingWithChildren.children.at(-1);
-
-  isNotVoid(firstNode?.position?.start?.offset);
-  isNotVoid(lastNode?.position?.end?.offset);
+export function sortListsRecursivelyInMarkdown(contents: string) {
+  const root = fromMarkdown(contents);
 
   const sorted = {
-    ...headingWithChildren,
-    children: headingWithChildren.children.map((child) =>
+    ...root,
+    children: root.children.map((child) =>
       sortListsRecursively(child, compareByTimestampInText),
     ),
   };
 
-  return (
-    contents.substring(0, firstNode.position.start.offset) +
-    toMarkdown(sorted) +
-    contents.substring(lastNode.position.end.offset + 1)
-  );
+  return toMarkdown(sorted);
 }
 
 export function findHeadingWithChildren(

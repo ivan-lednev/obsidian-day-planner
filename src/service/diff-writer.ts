@@ -305,6 +305,9 @@ export function getTaskDiffFromEditState(base: LocalTask[], next: LocalTask[]) {
   );
 }
 
+/**
+ * Turns the changes to a view into a list of updates that can be applied to the vault.
+ */
 export function mapTaskDiffToUpdates(
   diff: ViewDiff,
   mode: EditMode,
