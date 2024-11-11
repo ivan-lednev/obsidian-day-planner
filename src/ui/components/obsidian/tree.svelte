@@ -6,7 +6,12 @@
 
   import RightTriangle from "./right-triangle.svelte";
 
-  const { children, title }: { children: Snippet; title: string } = $props();
+  const {
+    children,
+    title,
+    flair,
+  }: { children: Snippet; title: string; flair?: string } = $props();
+
   let isTreeVisible = $state(false);
 
   const titleColor = $derived(
@@ -18,6 +23,7 @@
   }
 </script>
 
+<!--Partially uses Obsidian's classes for search result matches-->
 <div class="tree-container">
   <div class="tree-item-self is-clickable" onclick={toggleTree}>
     <div
@@ -27,6 +33,11 @@
       <RightTriangle />
     </div>
     <div style:color={titleColor} class="tree-item-inner">{title}</div>
+    {#if flair}
+      <div class="tree-item-flair-outer">
+        <span class="tree-item-flair">{flair}</span>
+      </div>
+    {/if}
   </div>
   {#if isTreeVisible}
     <div transition:slide={createSlide({ axis: "y" })}>

@@ -161,7 +161,8 @@
     </div>
   {/if}
 
-  <Tree title="Active clocks">
+  <!--TODO: use real list for flair-->
+  <Tree flair={String(dummy?.length)} title="Active clocks">
     <BlockList
       --search-results-bg-color="var(--background-primary)"
       list={dummy}
