@@ -57,7 +57,7 @@
     (el: HTMLElement) => hoverPreview(el, task),
   ]}
   on:longpress={() => {
-    navigator.vibrate(vibrationDurationMillis);
+    navigator?.vibrate(vibrationDurationMillis);
     isDragActive.set(true);
     isResizeActive.set(true);
     isResizeFromTopActive.set(true);
