@@ -1,5 +1,6 @@
 <script lang="ts">
   import { offset } from "@floating-ui/dom";
+  import type { Snippet } from "svelte";
 
   import { vibrationDurationMillis } from "../../constants";
   import { getObsidianContext } from "../../context/obsidian-context";
@@ -12,9 +13,17 @@
   import RenderedMarkdown from "./rendered-markdown.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
 
-  export let task: LocalTask;
-  export let onGripMouseDown: EditHandlers["handleUnscheduledTaskGripMouseDown"];
-  export let onMouseUp: () => void;
+  const {
+    task,
+    children,
+    onGripMouseDown,
+    onMouseUp,
+  }: {
+    task: LocalTask;
+    onMouseUp: () => void;
+    onGripMouseDown: EditHandlers["handleUnscheduledTaskGripMouseDown"];
+    children?: Snippet;
+  } = $props();
 
   const {
     editContext: { editOperation },
@@ -40,6 +49,7 @@
   on:pointerup={onMouseUp}
 >
   <RenderedMarkdown {task} />
+  {@render children?.()}
 </TimeBlockBase>
 
 {#if !$editOperation}

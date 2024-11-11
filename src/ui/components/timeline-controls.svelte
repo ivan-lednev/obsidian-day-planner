@@ -5,6 +5,7 @@
     ChevronRight,
     EllipsisVertical,
   } from "lucide-svelte";
+  import { PlaneTakeoff, Clock3 } from "lucide-svelte";
   import { Menu } from "obsidian";
   import { slide } from "svelte/transition";
 
@@ -88,14 +89,14 @@
       day: window.moment(),
       startMinutes: getMinutesSinceMidnight(window.moment()),
       settings: $settings,
-      status: " ",
+      status: "x",
     }),
     t.create({
       day: window.moment(),
       startMinutes: getMinutesSinceMidnight(window.moment()),
       settings: $settings,
       status: " ",
-      text: "dummy clock",
+      text: "- [ ] dummy clock\n      [🕒::2023-01-01 12:00:00]",
     }),
   ];
 </script>
@@ -173,7 +174,12 @@
           onGripMouseDown={() => {}}
           onMouseUp={() => {}}
           {task}
-        />
+        >
+          <div class="properties-wrapper">
+            <Pill key={PlaneTakeoff} value="12:05" />
+            <Pill key={Clock3} value="02:00" />
+          </div>
+        </UnscheduledTimeBlock>
       {/snippet}
     </BlockList>
   </Tree>
@@ -242,5 +248,12 @@
     display: flex;
     gap: var(--size-4-1);
     justify-content: space-between;
+  }
+
+  .properties-wrapper {
+    display: flex;
+    gap: var(--size-4-1);
+    align-items: center;
+    padding: var(--size-4-1);
   }
 </style>
