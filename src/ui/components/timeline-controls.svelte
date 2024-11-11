@@ -203,6 +203,10 @@
     color: var(--text-error);
   }
 
+  .pill-wrapper {
+    padding-bottom: var(--size-4-2);
+  }
+
   .pill-wrapper,
   .header {
     padding-inline: var(--size-4-3);
@@ -211,7 +215,7 @@
   .header {
     display: flex;
     justify-content: space-between;
-    padding-top: var(--size-4-2);
+    padding-block: var(--size-4-2);
   }
 
   .date {
@@ -229,7 +233,6 @@
     display: flex;
     flex: 0 0 auto;
     flex-direction: column;
-    gap: var(--size-4-2);
 
     font-size: var(--font-ui-small);
   }
