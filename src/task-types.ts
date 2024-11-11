@@ -26,6 +26,9 @@ export type WithPlacing<T> = T & {
 };
 
 export type BaseTask = {
+  /** Tasks get an ID on parsing. It is unique to a line in a file, not to a
+   *  block, visible in the UI (because blocks might get split at midnight, etc.).
+   */
   id: string;
   startTime: Moment;
   isAllDayEvent?: boolean;
