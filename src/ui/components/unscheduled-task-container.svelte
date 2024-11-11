@@ -10,14 +10,16 @@
   import TimeBlockBase from "./time-block-base.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
-  export let day: Moment;
+  const { day }: { day: Moment } = $props();
 
   const {
-    editContext: { handlers, getDisplayedTasksForTimeline },
+    editContext: {
+      handlers: { handleTaskMouseUp, handleUnscheduledTaskGripMouseDown },
+      getDisplayedTasksForTimeline,
+    },
   } = getObsidianContext();
 
-  $: ({ handleTaskMouseUp, handleUnscheduledTaskGripMouseDown } = handlers);
-  $: displayedTasksForTimeline = getDisplayedTasksForTimeline(day);
+  const displayedTasksForTimeline = $derived(getDisplayedTasksForTimeline(day));
 </script>
 
 {#if $displayedTasksForTimeline.noTime.length > 0 && $settings.showUncheduledTasks}
