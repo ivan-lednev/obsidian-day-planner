@@ -20,7 +20,7 @@
   export let onGripMouseDown: EditHandlers["handleGripMouseDown"];
   export let onResizerMouseDown: EditHandlers["handleResizerMouseDown"];
   export let onFloatingUiPointerDown: (event: PointerEvent) => void;
-  export let onMouseUp: () => void;
+  export let onpointerup: () => void;
 
   const {
     editContext: { editOperation },
@@ -72,7 +72,7 @@
     resize.handleAnchorPointerLeave(event);
     resizeFromTop.handleAnchorPointerLeave(event);
   }}
-  on:pointerup={onMouseUp}
+  on:pointerup={onpointerup}
 >
   <RenderedMarkdown {task} />
 </ScheduledTimeBlock>

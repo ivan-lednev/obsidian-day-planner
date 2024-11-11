@@ -22,7 +22,7 @@ function getBaseUseTaskProps() {
     currentTime,
     cursorOffsetY,
     onUpdate: vi.fn(),
-    onMouseUp: vi.fn(),
+    onpointerup: vi.fn(),
   };
 }
 

@@ -32,7 +32,7 @@
       {#if isLocal(task)}
         <UnscheduledTimeBlock
           onGripMouseDown={handleUnscheduledTaskGripMouseDown}
-          onMouseUp={() => {
+          onpointerup={() => {
             handleTaskMouseUp(task);
           }}
           {task}

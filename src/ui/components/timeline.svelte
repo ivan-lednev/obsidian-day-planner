@@ -87,7 +87,7 @@
         <LocalTimeBlock
           onFloatingUiPointerDown={updatePointerOffsetY}
           onGripMouseDown={handleGripMouseDown}
-          onMouseUp={() => {
+          onpointerup={() => {
             handleTaskMouseUp(task);
           }}
           onResizerMouseDown={handleResizerMouseDown}

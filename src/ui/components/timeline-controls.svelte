@@ -172,7 +172,7 @@
         <UnscheduledTimeBlock
           --time-block-padding="var(--size-4-1)"
           onGripMouseDown={() => {}}
-          onMouseUp={() => {}}
+          onpointerup={() => {}}
           {task}
         >
           <div class="properties-wrapper">

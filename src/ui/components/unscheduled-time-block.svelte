@@ -17,10 +17,10 @@
     task,
     children,
     onGripMouseDown,
-    onMouseUp,
+    onpointerup,
   }: {
     task: LocalTask;
-    onMouseUp: () => void;
+    onpointerup: (event: PointerEvent) => void;
     onGripMouseDown: EditHandlers["handleUnscheduledTaskGripMouseDown"];
     children?: Snippet;
   } = $props();
@@ -46,7 +46,7 @@
   }}
   on:pointerenter={drag.handleAnchorPointerEnter}
   on:pointerleave={drag.handleAnchorPointerLeave}
-  on:pointerup={onMouseUp}
+  on:pointerup={onpointerup}
 >
   <RenderedMarkdown {task} />
   {@render children?.()}

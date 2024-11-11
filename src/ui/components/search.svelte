@@ -30,7 +30,7 @@
       <UnscheduledTimeBlock
         --time-block-padding="var(--size-4-1)"
         onGripMouseDown={handleSearchResultGripMouseDown}
-        onMouseUp={() => {
+        onpointerup={() => {
           handleTaskMouseUp(task);
         }}
         {task}
