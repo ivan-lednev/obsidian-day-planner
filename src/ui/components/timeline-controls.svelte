@@ -13,8 +13,12 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
+  import type { LocalTask } from "../../task-types";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
+  import { getMinutesSinceMidnight } from "../../util/moment";
+  import * as t from "../../util/task-utils";
 
+  import BlockList from "./block-list.svelte";
   import Callout from "./callout.svelte";
   import ControlButton from "./control-button.svelte";
   import { createSlide } from "./defaults";
@@ -22,6 +26,7 @@
   import Pill from "./pill.svelte";
   import Search from "./search.svelte";
   import SettingsControls from "./settings-controls.svelte";
+  import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   const { workspaceFacade, initWeeklyView, dataviewLoaded, reSync } =
     getObsidianContext();
@@ -77,6 +82,22 @@
 
     menu.showAtMouseEvent(event);
   }
+
+  const dummy = [
+    t.create({
+      day: window.moment(),
+      startMinutes: getMinutesSinceMidnight(window.moment()),
+      settings: $settings,
+      status: " ",
+    }),
+    t.create({
+      day: window.moment(),
+      startMinutes: getMinutesSinceMidnight(window.moment()),
+      settings: $settings,
+      status: " ",
+      text: "dummy clock",
+    }),
+  ];
 </script>
 
 <div class="controls">
@@ -139,6 +160,22 @@
       <SettingsControls />
     </div>
   {/if}
+
+  <Tree title="Active clocks">
+    <BlockList
+      --search-results-bg-color="var(--background-primary)"
+      list={dummy}
+    >
+      {#snippet match(task: LocalTask)}
+        <UnscheduledTimeBlock
+          --time-block-padding="var(--size-4-1)"
+          onGripMouseDown={() => {}}
+          onMouseUp={() => {}}
+          {task}
+        />
+      {/snippet}
+    </BlockList>
+  </Tree>
 
   <Tree title="Search">
     <Search

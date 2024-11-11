@@ -1,6 +1,8 @@
 <script lang="ts">
   import { getObsidianContext } from "../../context/obsidian-context";
+  import type { LocalTask } from "../../task-types";
 
+  import BlockList from "./block-list.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   const {
@@ -22,61 +24,31 @@
   <div class="result-message">
     {$description}
   </div>
-  {#if $result.length > 0}
-    <div class="search-results-scroller">
-      <div class="search-results">
-        {#each $result as foundTimeBlock}
-          <div class="search-result">
-            <UnscheduledTimeBlock
-              --time-block-padding="var(--size-4-1)"
-              onGripMouseDown={handleSearchResultGripMouseDown}
-              onMouseUp={() => {
-                handleTaskMouseUp(foundTimeBlock);
-              }}
-              task={foundTimeBlock}
-            />
-          </div>
-        {/each}
-      </div>
-    </div>
-  {/if}
+
+  <BlockList list={$result}>
+    {#snippet match(task: LocalTask)}
+      <UnscheduledTimeBlock
+        --time-block-padding="var(--size-4-1)"
+        onGripMouseDown={handleSearchResultGripMouseDown}
+        onMouseUp={() => {
+          handleTaskMouseUp(task);
+        }}
+        {task}
+      />
+    {/snippet}
+  </BlockList>
 </div>
 
 <style>
-  .result-message,
-  .search-results {
-    margin: var(--size-4-2) var(--size-4-3);
-  }
-
   input {
     flex-shrink: 0;
     margin: var(--size-4-2) var(--size-4-3) 0;
   }
 
-  .search-result:not(:last-child) {
-    border-bottom: 1px solid var(--background-modifier-border);
-  }
-
   .result-message {
+    margin: var(--size-4-2) var(--size-4-3);
     font-size: var(--font-ui-smaller);
     color: var(--text-faint);
-  }
-
-  .search-results-scroller {
-    overflow-y: auto;
-    border-top: 1px solid var(--background-modifier-border);
-  }
-
-  .search-results {
-    display: flex;
-    flex-direction: column;
-
-    background-color: var(
-      --search-results-bg-color,
-      var(--background-secondary)
-    );
-    border: 1px solid var(--background-modifier-border);
-    border-radius: var(--radius-s);
   }
 
   .search-wrapper {
