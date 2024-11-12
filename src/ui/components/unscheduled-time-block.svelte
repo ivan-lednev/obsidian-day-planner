@@ -21,7 +21,7 @@
   }: {
     task: LocalTask;
     onpointerup: (event: PointerEvent) => void;
-    onGripMouseDown: EditHandlers["handleUnscheduledTaskGripMouseDown"];
+    onGripMouseDown?: EditHandlers["handleUnscheduledTaskGripMouseDown"];
     children?: Snippet;
   } = $props();
 
@@ -52,14 +52,12 @@
   {@render children?.()}
 </TimeBlockBase>
 
-{#if !$editOperation}
-  {#if $isActive}
-    <FloatingUi
-      onPointerLeave={drag.handleFloatingUiPointerLeave}
-      onTapOutside={drag.handleFloatingUiTapOutside}
-      use={[drag.floatingUiSetup]}
-    >
-      <DragControls onMove={() => onGripMouseDown(task)} />
-    </FloatingUi>
-  {/if}
+{#if !$editOperation && $isActive && onGripMouseDown}
+  <FloatingUi
+    onPointerLeave={drag.handleFloatingUiPointerLeave}
+    onTapOutside={drag.handleFloatingUiTapOutside}
+    use={[drag.floatingUiSetup]}
+  >
+    <DragControls onMove={() => onGripMouseDown(task)} />
+  </FloatingUi>
 {/if}

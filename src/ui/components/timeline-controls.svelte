@@ -171,8 +171,30 @@
       {#snippet match(task: LocalTask)}
         <UnscheduledTimeBlock
           --time-block-padding="var(--size-4-1)"
-          onGripMouseDown={() => {}}
-          onpointerup={() => {}}
+          onpointerup={(event) => {
+            const menu = new Menu();
+
+            menu.addItem((item) =>
+              item
+                .setTitle("Stop clock")
+                .setIcon("square")
+                .onClick(() => {}),
+            );
+            menu.addItem((item) => {
+              item
+                .setTitle("Cancel clock")
+                .setIcon("trash-2")
+                .onClick(() => {});
+            });
+            menu.addItem((item) => {
+              item
+                .setTitle("Reveal task in file")
+                .setIcon("file-input")
+                .onClick(() => {});
+            });
+
+            menu.showAtMouseEvent(event);
+          }}
           {task}
         >
           <div class="properties-wrapper">
