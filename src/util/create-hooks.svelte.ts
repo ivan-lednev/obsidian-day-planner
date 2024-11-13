@@ -28,6 +28,7 @@ import { useModPressed } from "../ui/hooks/use-mod-pressed";
 import { useNewlyStartedTasks } from "../ui/hooks/use-newly-started-tasks";
 import { useSearch } from "../ui/hooks/use-search.svelte";
 import { useTasksFromExtraSources } from "../ui/hooks/use-tasks-from-extra-sources";
+import { useTasksWithActiveClockProps } from "../ui/hooks/use-tasks-with-active-clock-props";
 import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "../ui/hooks/use-visible-dataview-tasks";
 import { useVisibleDays } from "../ui/hooks/use-visible-days";
@@ -139,6 +140,11 @@ export function createHooks({
     visibleDailyNotes,
     dataviewFacade,
   });
+
+  const tasksWithActiveClockProps = useTasksWithActiveClockProps({
+    dataviewTasks: tasksFromExtraSources,
+  });
+
   const dataviewTasks = useDataviewTasks({
     listsFromVisibleDailyNotes,
     tasksFromExtraSources,
@@ -180,6 +186,7 @@ export function createHooks({
   });
 
   return {
+    tasksWithActiveClockProps,
     editContext,
     tasksForToday,
     dataviewLoaded,

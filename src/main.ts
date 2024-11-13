@@ -376,6 +376,7 @@ export default class DayPlanner extends Plugin {
       dataviewSyncTrigger,
       search,
       pointerDateTime,
+      tasksWithActiveClockProps,
     } = createHooks({
       app: this.app,
       dataviewFacade: this.dataviewFacade,
@@ -472,6 +473,7 @@ export default class DayPlanner extends Plugin {
       settings,
       settingsSignal: fromStore(settings),
       pointerDateTime,
+      tasksWithActiveClockProps,
     };
 
     const componentContext = new Map<

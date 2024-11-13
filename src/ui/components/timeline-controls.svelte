@@ -16,8 +16,6 @@
   import { settings } from "../../global-store/settings";
   import type { LocalTask } from "../../task-types";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
-  import { getMinutesSinceMidnight } from "../../util/moment";
-  import * as t from "../../util/task-utils";
 
   import BlockList from "./block-list.svelte";
   import Callout from "./callout.svelte";
@@ -29,8 +27,13 @@
   import SettingsControls from "./settings-controls.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
-  const { workspaceFacade, initWeeklyView, dataviewLoaded, reSync } =
-    getObsidianContext();
+  const {
+    workspaceFacade,
+    initWeeklyView,
+    dataviewLoaded,
+    reSync,
+    tasksWithActiveClockProps,
+  } = getObsidianContext();
   const dateRange = getDateRangeContext();
 
   let settingsVisible = $state(false);
@@ -83,22 +86,6 @@
 
     menu.showAtMouseEvent(event);
   }
-
-  const dummy = [
-    t.create({
-      day: window.moment(),
-      startMinutes: getMinutesSinceMidnight(window.moment()),
-      settings: $settings,
-      status: "x",
-    }),
-    t.create({
-      day: window.moment(),
-      startMinutes: getMinutesSinceMidnight(window.moment()),
-      settings: $settings,
-      status: " ",
-      text: "- [ ] dummy clock\n      [🕒::2023-01-01 12:00:00]",
-    }),
-  ];
 </script>
 
 <div class="controls">
@@ -162,11 +149,10 @@
     </div>
   {/if}
 
-  <!--TODO: use real list for flair-->
-  <Tree flair={String(dummy?.length)} title="Active clocks">
+  <Tree flair={String($tasksWithActiveClockProps.length)} title="Active clocks">
     <BlockList
       --search-results-bg-color="var(--background-primary)"
-      list={dummy}
+      list={$tasksWithActiveClockProps}
     >
       {#snippet match(task: LocalTask)}
         <UnscheduledTimeBlock

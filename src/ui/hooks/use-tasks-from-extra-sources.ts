@@ -2,7 +2,7 @@ import { TFile } from "obsidian";
 import { derived, get, type Readable } from "svelte/store";
 
 import { DataviewFacade } from "../../service/dataview-facade";
-import * as query from "../../util/dataview-query";
+import * as q from "../../util/dataview-query";
 
 interface UseTasksFromExtraSourcesProps {
   dataviewSource: Readable<string>;
@@ -26,9 +26,10 @@ export function useTasksFromExtraSources({
         return [];
       }
 
-      const queryFromExtraSources = query.andNot(
+      // todo: this will ignore clocks from daily notes
+      const queryFromExtraSources = q.andNot(
         $dataviewSource,
-        query.anyOf(get(visibleDailyNotes)),
+        q.anyOf(get(visibleDailyNotes)),
       );
 
       return dataviewFacade.getAllTasksFrom(queryFromExtraSources);

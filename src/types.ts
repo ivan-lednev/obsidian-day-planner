@@ -45,6 +45,7 @@ export interface ObsidianContext {
   pointerDateTime: Writable<{ dateTime?: Moment; type?: "dateTime" | "date" }>;
   // todo: searchEngine/timeBlockSearch...
   search: ReturnType<typeof useSearch>;
+  tasksWithActiveClockProps: Readable<LocalTask[]>;
 }
 
 export type ComponentContext = Map<string, unknown>;
