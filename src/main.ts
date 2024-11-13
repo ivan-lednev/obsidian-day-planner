@@ -9,6 +9,7 @@ import {
   createDailyNote,
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
+import type { STask } from "obsidian-dataview";
 import { mount } from "svelte";
 import { fromStore, get, writable, type Writable } from "svelte/store";
 import { isInstanceOf, isNotVoid } from "typed-assert";
@@ -52,6 +53,7 @@ import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimelineView from "./ui/timeline-view";
 import { createUndoNotice } from "./ui/undo-notice";
+import * as c from "./util/clock";
 import { createHooks } from "./util/create-hooks.svelte";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
@@ -375,34 +377,39 @@ export default class DayPlanner extends Plugin {
 
     this.registerEvent(
       this.app.workspace.on("editor-menu", (menu, editor, view) => {
+        let sTask: STask | undefined;
+
         try {
-          this.getSTaskUnderCursor(view);
+          // todo: use editor instead?
+          sTask = this.getSTaskUnderCursor(view);
         } catch {
           return;
         }
 
         menu.addSeparator();
 
-        menu.addItem((item) => {
-          item
-            .setTitle("Clock in")
-            .setIcon("play")
-            .onClick(this.sTaskEditor.clockInUnderCursor);
-        });
+        if (c.hasActiveClockProp(sTask)) {
+          menu.addItem((item) => {
+            item
+              .setTitle("Clock out")
+              .setIcon("square")
+              .onClick(this.sTaskEditor.clockOutUnderCursor);
+          });
 
-        menu.addItem((item) => {
-          item
-            .setTitle("Clock out")
-            .setIcon("square")
-            .onClick(this.sTaskEditor.clockOutUnderCursor);
-        });
-
-        menu.addItem((item) => {
-          item
-            .setTitle("Cancel clock")
-            .setIcon("trash")
-            .onClick(this.sTaskEditor.cancelClockUnderCursor);
-        });
+          menu.addItem((item) => {
+            item
+              .setTitle("Cancel clock")
+              .setIcon("trash")
+              .onClick(this.sTaskEditor.cancelClockUnderCursor);
+          });
+        } else {
+          menu.addItem((item) => {
+            item
+              .setTitle("Clock in")
+              .setIcon("play")
+              .onClick(this.sTaskEditor.clockInUnderCursor);
+          });
+        }
       }),
     );
 
