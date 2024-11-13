@@ -1,11 +1,17 @@
-import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
+import {
+  MarkdownView,
+  Notice,
+  Plugin,
+  WorkspaceLeaf,
+  type MarkdownFileInfo,
+} from "obsidian";
 import {
   createDailyNote,
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
 import { mount } from "svelte";
 import { fromStore, get, writable, type Writable } from "svelte/store";
-import { isNotVoid } from "typed-assert";
+import { isInstanceOf, isNotVoid } from "typed-assert";
 
 import {
   errorContextKey,
@@ -261,6 +267,27 @@ export default class DayPlanner extends Plugin {
     );
   }
 
+  private getSTaskUnderCursor = (view: MarkdownFileInfo) => {
+    isInstanceOf(
+      view,
+      MarkdownView,
+      "You can only get tasks from markdown editor views",
+    );
+
+    const file = view.file;
+
+    isNotVoid(file, "There is no file for view");
+
+    const sTask = this.dataviewFacade.getTaskFromCaretLocation({
+      path: file.path,
+      line: view.editor.getCursor().line,
+    });
+
+    isNotVoid(sTask, "There is no task under cursor");
+
+    return sTask;
+  };
+
   private registerViews() {
     const onUpdate: OnUpdateFn = async (base, next, mode) => {
       const diff = getTaskDiffFromEditState(base, next);
@@ -343,6 +370,39 @@ export default class DayPlanner extends Plugin {
     this.register(
       editContext.cursor.subscribe(({ bodyCursor }) => {
         document.body.style.cursor = bodyCursor;
+      }),
+    );
+
+    this.registerEvent(
+      this.app.workspace.on("editor-menu", (menu, editor, view) => {
+        try {
+          this.getSTaskUnderCursor(view);
+        } catch {
+          return;
+        }
+
+        menu.addSeparator();
+
+        menu.addItem((item) => {
+          item
+            .setTitle("Clock in")
+            .setIcon("play")
+            .onClick(this.sTaskEditor.clockInUnderCursor);
+        });
+
+        menu.addItem((item) => {
+          item
+            .setTitle("Clock out")
+            .setIcon("square")
+            .onClick(this.sTaskEditor.clockOutUnderCursor);
+        });
+
+        menu.addItem((item) => {
+          item
+            .setTitle("Cancel clock")
+            .setIcon("trash")
+            .onClick(this.sTaskEditor.cancelClockUnderCursor);
+        });
       }),
     );
 
