@@ -230,6 +230,24 @@ export default class DayPlanner extends Plugin {
         );
       },
     });
+
+    this.addCommand({
+      id: "clock-in",
+      name: "Clock in",
+      editorCallback: this.sTaskEditor.clockInUnderCursor,
+    });
+
+    this.addCommand({
+      id: "clock-out",
+      name: "Clock out",
+      editorCallback: this.sTaskEditor.clockOutUnderCursor,
+    });
+
+    this.addCommand({
+      id: "cancel-clock",
+      name: "Cancel clock",
+      editorCallback: this.sTaskEditor.cancelClockUnderCursor,
+    });
   }
 
   private async initSettingsStore() {
