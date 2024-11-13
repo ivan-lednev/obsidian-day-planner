@@ -34,16 +34,20 @@ export function toTime([start, end]: ClockMoments): Time {
   };
 }
 
+export function hasClockProp(sTask: STask) {
+  return Object.hasOwn(sTask, clockKey);
+}
+
 export function hasActiveClockProp(sTask: STask) {
-  if (!sTask.clocked) {
+  if (!hasClockProp(sTask)) {
     return false;
   }
 
-  if (Array.isArray(sTask.clocked)) {
-    return sTask.clocked.some(isActiveClockProp);
+  if (Array.isArray(sTask[clockKey])) {
+    return sTask[clockKey].some(isActiveClockProp);
   }
 
-  return isActiveClockProp(sTask.clocked);
+  return isActiveClockProp(sTask[clockKey]);
 }
 
 function isActiveClockProp(clockPropValue: unknown) {

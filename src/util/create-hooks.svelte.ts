@@ -19,6 +19,7 @@ import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
 import { useDateRanges } from "../ui/hooks/use-date-ranges";
+import { withClockMoments } from "../ui/hooks/use-day-to-stasks-with-clock-moments";
 import { useDebounceWithDelay } from "../ui/hooks/use-debounce-with-delay";
 import { useEditContext } from "../ui/hooks/use-edit/use-edit-context";
 import { useIsOnline } from "../ui/hooks/use-is-online";
@@ -33,6 +34,8 @@ import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "../ui/hooks/use-visible-dataview-tasks";
 import { useVisibleDays } from "../ui/hooks/use-visible-days";
 
+import { hasClockProp } from "./clock";
+import * as dv from "./dataview";
 import { getUpdateTrigger } from "./store";
 import { isWithTime } from "./task-utils";
 import { useRemoteTasks } from "./use-remote-tasks";
@@ -144,6 +147,22 @@ export function createHooks({
   const tasksWithActiveClockProps = useTasksWithActiveClockProps({
     dataviewTasks: tasksFromExtraSources,
   });
+
+  const visibleTasksWithClockProps = derived(
+    [tasksFromExtraSources],
+    ([$tasksFromExtraSources]) => {
+      return (
+        $tasksFromExtraSources
+          .filter(hasClockProp)
+          .map(withClockMoments)
+          // todo: simplify
+          .flat()
+          .map(dv.toTaskWithClock)
+      );
+    },
+  );
+
+  visibleTasksWithClockProps.subscribe(console.log);
 
   const dataviewTasks = useDataviewTasks({
     listsFromVisibleDailyNotes,

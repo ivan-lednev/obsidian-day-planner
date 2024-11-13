@@ -12,6 +12,7 @@ import {
 import { getTimeFromLine } from "../parser/parser";
 import type {
   FileLine,
+  LocalTask,
   TaskTokens,
   TaskWithoutComputedDuration,
 } from "../task-types";
@@ -56,6 +57,27 @@ export function getLines(node, result: Array<FileLine> = []) {
   }
 
   return result;
+}
+
+export function toTaskWithClock(props: {
+  sTask: STask;
+  clockMoments: ClockMoments;
+}): LocalTask {
+  const { sTask, clockMoments } = props;
+  const [startTime, endTime] = clockMoments;
+  let durationMinutes = endTime.diff(startTime, "minutes");
+
+  if (durationMinutes < 0) {
+    durationMinutes = defaultDurationMinutes;
+  }
+
+  return {
+    // todo: remove moment
+    ...toUnscheduledTask(sTask, window.moment()),
+    isAllDayEvent: false,
+    startTime: startTime,
+    durationMinutes,
+  };
 }
 
 export function toUnscheduledTask(sTask: STask, day: Moment) {
