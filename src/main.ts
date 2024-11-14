@@ -377,6 +377,7 @@ export default class DayPlanner extends Plugin {
       search,
       pointerDateTime,
       tasksWithActiveClockProps,
+      getDisplayedTasksWithClocksForTimeline,
     } = createHooks({
       app: this.app,
       dataviewFacade: this.dataviewFacade,
@@ -474,6 +475,7 @@ export default class DayPlanner extends Plugin {
       settingsSignal: fromStore(settings),
       pointerDateTime,
       tasksWithActiveClockProps,
+      getDisplayedTasksWithClocksForTimeline,
     };
 
     const componentContext = new Map<

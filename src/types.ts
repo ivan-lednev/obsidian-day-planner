@@ -4,7 +4,7 @@ import type { Readable, Writable } from "svelte/store";
 import type { VaultFacade } from "./service/vault-facade";
 import type { WorkspaceFacade } from "./service/workspace-facade";
 import type { DayPlannerSettings, IcalConfig } from "./settings";
-import type { LocalTask } from "./task-types";
+import type { LocalTask, WithPlacing } from "./task-types";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import type { useSearch } from "./ui/hooks/use-search.svelte";
@@ -46,6 +46,9 @@ export interface ObsidianContext {
   // todo: searchEngine/timeBlockSearch...
   search: ReturnType<typeof useSearch>;
   tasksWithActiveClockProps: Readable<LocalTask[]>;
+  getDisplayedTasksWithClocksForTimeline: (
+    day: Moment,
+  ) => Readable<Array<WithPlacing<LocalTask>>>;
 }
 
 export type ComponentContext = Map<string, unknown>;

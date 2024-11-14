@@ -1,3 +1,4 @@
+import { flow, groupBy, uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
 import { App } from "obsidian";
 import {
@@ -10,6 +11,7 @@ import {
 
 import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
 import { currentTime } from "../global-store/current-time";
+import { addHorizontalPlacing } from "../overlap/overlap";
 import { DataviewFacade } from "../service/dataview-facade";
 import { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
@@ -37,7 +39,12 @@ import { useVisibleDays } from "../ui/hooks/use-visible-days";
 import { hasClockProp } from "./clock";
 import * as dv from "./dataview";
 import { getUpdateTrigger } from "./store";
-import { isWithTime } from "./task-utils";
+import {
+  getDayKey,
+  getEmptyTasksForDay,
+  getRenderKey,
+  isWithTime,
+} from "./task-utils";
 import { useRemoteTasks } from "./use-remote-tasks";
 
 interface CreateHooksProps {
@@ -151,16 +158,31 @@ export function createHooks({
   const visibleTasksWithClockProps = derived(
     [tasksFromExtraSources],
     ([$tasksFromExtraSources]) => {
-      return (
-        $tasksFromExtraSources
-          .filter(hasClockProp)
-          .map(withClockMoments)
-          // todo: simplify
-          .flat()
-          .map(dv.toTaskWithClock)
+      const flatTasksWithClocks = $tasksFromExtraSources
+        .filter(hasClockProp)
+        .map(withClockMoments)
+        // todo: simplify
+        .flat()
+        .map(dv.toTaskWithClock);
+
+      return groupBy(
+        ({ startTime }) => getDayKey(startTime),
+        flatTasksWithClocks,
       );
     },
   );
+
+  function getDisplayedTasksWithClocksForTimeline(day: Moment) {
+    return derived(
+      visibleTasksWithClockProps,
+      ($visibleTasksWithClockProps) => {
+        const tasksForDay =
+          $visibleTasksWithClockProps[getDayKey(day)] || getEmptyTasksForDay();
+
+        return flow(uniqBy(getRenderKey), addHorizontalPlacing)(tasksForDay);
+      },
+    );
+  }
 
   visibleTasksWithClockProps.subscribe(console.log);
 
@@ -218,5 +240,6 @@ export function createHooks({
     search,
     dateRanges,
     pointerDateTime,
+    getDisplayedTasksWithClocksForTimeline,
   };
 }
