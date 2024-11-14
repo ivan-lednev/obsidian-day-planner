@@ -34,9 +34,13 @@
       },
       getDisplayedTasksForTimeline,
     },
+    getDisplayedTasksWithClocksForTimeline,
   } = getObsidianContext();
 
   const displayedTasksForTimeline = $derived(getDisplayedTasksForTimeline(day));
+  const displayedTasksWithClocksForTimeline = $derived(
+    getDisplayedTasksWithClocksForTimeline(day),
+  );
   let el: HTMLElement | undefined;
 
   function updatePointerOffsetY(event: PointerEvent) {
@@ -97,6 +101,24 @@
     {/each}
   </div>
 </Column>
+
+{#if $settings.showTimeTracker}
+  <Column visibleHours={getVisibleHours($settings)}>
+    <div class="tasks absolute-stretch-x">
+      {#each $displayedTasksWithClocksForTimeline as task (getRenderKey(task))}
+        <LocalTimeBlock
+          onFloatingUiPointerDown={updatePointerOffsetY}
+          onGripMouseDown={() => {}}
+          onResizerMouseDown={() => {}}
+          onpointerup={() => {
+            handleTaskMouseUp(task);
+          }}
+          {task}
+        />
+      {/each}
+    </div>
+  </Column>
+{/if}
 
 <style>
   .tasks {

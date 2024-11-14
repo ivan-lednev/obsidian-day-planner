@@ -101,7 +101,11 @@
   }
 </script>
 
-<div bind:this={headerRef} class="header">
+<div
+  bind:this={headerRef}
+  style:--timeline-internal-column-count={$settings.showTimeTracker ? 2 : 1}
+  class="header"
+>
   <div class="header-row day-buttons">
     <div class="corner"></div>
     {#each $dateRange as day}
@@ -256,6 +260,10 @@
   }
 
   .header {
+    --cell-flex-basis: calc(
+      var(--timeline-flex-basis) * var(--timeline-internal-column-count, 1)
+    );
+
     position: relative;
     z-index: 1000;
 
@@ -268,9 +276,9 @@
 
   .header-cell {
     overflow-x: hidden;
-    flex: 1 0 var(--timeline-flex-basis);
+    flex: 1 0 var(--cell-flex-basis);
 
-    width: var(--timeline-flex-basis);
+    width: var(--cell-flex-basis);
 
     background-color: var(--background-primary);
     border-right: 1px solid var(--background-modifier-border);
@@ -278,7 +286,7 @@
   }
 
   .header-cell:last-of-type {
-    flex: 1 0 calc(var(--timeline-flex-basis) + var(--scrollbar-width));
+    flex: 1 0 calc(var(--cell-flex-basis) + var(--scrollbar-width));
     border-right: none;
   }
 
