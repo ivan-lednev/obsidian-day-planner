@@ -75,15 +75,24 @@ export function toTaskWithClock(props: {
     // todo: remove moment
     ...toUnscheduledTask(sTask, window.moment()),
     isAllDayEvent: false,
-    startTime: startTime,
+    startTime,
     durationMinutes,
   };
 }
 
-export function toUnscheduledTask(sTask: STask, day: Moment) {
+export function toTaskWithActiveClock(sTask: STask, startTime: Moment) {
+  // todo: remove duplication
+  return {
+    ...toUnscheduledTask(sTask, startTime),
+    isAllDayEvent: false,
+    startTime,
+  };
+}
+
+export function toUnscheduledTask(sTask: STask, startTime: Moment) {
   return {
     isAllDayEvent: true,
-    startTime: day,
+    startTime,
     durationMinutes: defaultDurationMinutes,
     symbol: sTask.symbol,
     status: sTask.status,

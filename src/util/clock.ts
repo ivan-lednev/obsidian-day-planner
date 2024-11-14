@@ -44,13 +44,13 @@ export function hasActiveClockProp(sTask: STask) {
   }
 
   if (Array.isArray(sTask[clockKey])) {
-    return sTask[clockKey].some(isActiveClockProp);
+    return sTask[clockKey].some(isActiveClockPropValue);
   }
 
-  return isActiveClockProp(sTask[clockKey]);
+  return isActiveClockPropValue(sTask[clockKey]);
 }
 
-function isActiveClockProp(clockPropValue: unknown) {
+export function isActiveClockPropValue(clockPropValue: unknown) {
   return !String(clockPropValue).includes(clockSeparator);
 }
 

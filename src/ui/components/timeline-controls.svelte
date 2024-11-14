@@ -12,7 +12,7 @@
   import { dataviewDownloadLink } from "../../constants";
   import { getDateRangeContext } from "../../context/date-range-context";
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { isToday } from "../../global-store/current-time";
+  import { currentTimeSignal, isToday } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
   import type { LocalTask } from "../../task-types";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
@@ -149,7 +149,11 @@
     </div>
   {/if}
 
-  <Tree flair={String($tasksWithActiveClockProps.length)} title="Active clocks">
+  <Tree
+    flair={String($tasksWithActiveClockProps.length)}
+    isInitiallyOpen
+    title="Active clocks"
+  >
     <BlockList
       --search-results-bg-color="var(--background-primary)"
       list={$tasksWithActiveClockProps}
@@ -184,8 +188,22 @@
           {task}
         >
           <div class="properties-wrapper">
-            <Pill key={PlaneTakeoff} value="12:05" />
-            <Pill key={Clock3} value="02:00" />
+            <Pill
+              key={PlaneTakeoff}
+              value={task.startTime.format($settings.timestampFormat)}
+            />
+
+            <Pill
+              key={Clock3}
+              value={window.moment
+                .utc(
+                  currentTimeSignal.current.diff(
+                    task.startTime,
+                    "milliseconds",
+                  ),
+                )
+                .format($settings.timestampFormat)}
+            />
           </div>
         </UnscheduledTimeBlock>
       {/snippet}
