@@ -58,3 +58,5 @@ export const mdastUtilListIndentationSpaces = new RegExp(
   `^( {4})+(?=${listToken})`,
   "gm",
 );
+
+export const repeatingNewlinesRegExp = /\n+/g;

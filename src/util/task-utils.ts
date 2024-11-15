@@ -27,7 +27,7 @@ import {
 } from "../task-types";
 import { EditMode } from "../ui/hooks/use-edit/types";
 
-import { createListTokens } from "./dataview";
+import { createMarkdownListTokens } from "./dataview";
 import { getId } from "./id";
 import {
   addMinutes,
@@ -140,7 +140,7 @@ export function toString(task: WithTime<LocalTask>, mode: EditMode) {
     task.durationMinutes,
     get(settings).timestampFormat,
   );
-  const listTokens = createListTokens(task);
+  const listTokens = createMarkdownListTokens(task);
   const withUpdatedTimestamp = replaceOrPrependTimestamp(
     firstLine,
     updatedTimestamp,

@@ -1,6 +1,6 @@
 import type { Moment } from "moment";
 import { getDateFromPath } from "obsidian-daily-notes-interface";
-import { DataArray, DateTime, STask } from "obsidian-dataview";
+import { STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
 
 import {
@@ -17,36 +17,32 @@ import type {
   TaskWithoutComputedDuration,
 } from "../task-types";
 
-import { type ClockMoments, toTime } from "./clock";
+import { type ClockMoments } from "./clock";
 import { getId } from "./id";
-import { deleteProps } from "./properties";
-
-export function unwrap<T>(group: ReturnType<DataArray<T>["groupBy"]>) {
-  return group.map(({ key, rows }) => [key, rows.array()]).array();
-}
+import { indent } from "./util";
 
 interface Node {
   text: string;
   symbol: string;
   children: Node[];
   status?: string;
-  scheduled?: DateTime;
 }
 
-export function textToString(node: Node) {
-  const status = node.status ? `[${node.status}] ` : "";
-  return `${node.symbol} ${status}${deleteProps(node.text)}\n`;
+export function textToMarkdown(sTask: Node) {
+  return `${createMarkdownListTokens(sTask)} ${sTask.text}`;
 }
 
-export function toString(node: Node, indentation = "") {
-  let result = `${indentation}${textToString(node)}`;
+const indentationPerLevel = "\t";
 
-  for (const child of node.children) {
-    // todo (minor): handle custom indentation (spaces of differing lengths)
-    result += toString(child, `\t${indentation}`);
-  }
+export function toString(node: Node, parentIndentation = "") {
+  const nodeText = indent(textToMarkdown(node), parentIndentation);
 
-  return result;
+  return node.children.reduce((result, current) => {
+    const indentation = `${indentationPerLevel}${parentIndentation}`;
+
+    return `${result}
+${toString(current, indentation)}`;
+  }, nodeText);
 }
 
 export function getLines(node, result: Array<FileLine> = []) {
@@ -146,21 +142,7 @@ export function getScheduledDay(sTask: STask) {
   return scheduledPropDay || dailyNoteDay;
 }
 
-export function toClockRecord(sTask: STask, clockMoments: ClockMoments) {
-  // TODO: remove duplication
-  return {
-    ...toTime(clockMoments),
-    startTime: clockMoments[0],
-    text: toString(sTask),
-    symbol: "-",
-    location: {
-      path: sTask.path,
-      position: sTask.position,
-    },
-    id: getId(),
-  };
-}
-
+// todo: delete
 export function toMarkdown(sTask: STask) {
   const baseIndent = "\t".repeat(sTask.position.start.col);
   const extraIndent = " ".repeat(indentBeforeTaskParagraph);
@@ -169,8 +151,7 @@ export function toMarkdown(sTask: STask) {
     .split("\n")
     .map((line, i) => {
       if (i === 0) {
-        // TODO: remove duplication
-        return `${baseIndent}${createListTokens(sTask)} ${line}`;
+        return `${baseIndent}${createMarkdownListTokens(sTask)} ${line}`;
       }
 
       return `${baseIndent}${extraIndent}${line}`;
@@ -178,9 +159,16 @@ export function toMarkdown(sTask: STask) {
     .join("\n");
 }
 
-export function createListTokens(task: TaskTokens) {
-  const maybeCheckbox = task.status === undefined ? "" : `[${task.status}]`;
-  return `${task.symbol} ${maybeCheckbox}`.trim();
+function checkbox(status: string) {
+  return `[${status}]`;
+}
+
+export function createMarkdownListTokens(task: TaskTokens) {
+  if (task.status === undefined) {
+    return task.symbol;
+  }
+
+  return `${task.symbol} ${checkbox(task.status)}`;
 }
 
 export function replaceSTaskInFile(

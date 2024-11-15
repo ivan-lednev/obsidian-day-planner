@@ -9,7 +9,7 @@ import {
   withActiveClockCompleted,
   withoutActiveClock,
 } from "../util/clock";
-import { replaceSTaskInFile, toMarkdown } from "../util/dataview";
+import * as dv from "../util/dataview";
 import { locToEditorPosition } from "../util/editor";
 import { withNotice } from "../util/with-notice";
 
@@ -20,19 +20,20 @@ import { WorkspaceFacade } from "./workspace-facade";
 export class STaskEditor {
   clockOut = withNotice(async (sTask: STask) => {
     await this.vaultFacade.editFile(sTask.path, (contents) =>
-      replaceSTaskInFile(
+      dv.replaceSTaskInFile(
         contents,
         sTask,
-        toMarkdown(withActiveClockCompleted(sTask)),
+        dv.toMarkdown(withActiveClockCompleted(sTask)),
       ),
     );
   });
+
   cancelClock = withNotice(async (sTask: STask) => {
     await this.vaultFacade.editFile(sTask.path, (contents) =>
-      replaceSTaskInFile(
+      dv.replaceSTaskInFile(
         contents,
         sTask,
-        toMarkdown(withoutActiveClock(sTask)),
+        dv.toMarkdown(withoutActiveClock(sTask)),
       ),
     );
   });
@@ -69,7 +70,7 @@ export class STaskEditor {
       this.getSTaskUnderCursorFromLastView,
       assertNoActiveClock,
       withActiveClock,
-      toMarkdown,
+      dv.toMarkdown,
       this.replaceSTaskUnderCursor,
     ),
   );
@@ -79,7 +80,7 @@ export class STaskEditor {
       this.getSTaskUnderCursorFromLastView,
       assertActiveClock,
       withActiveClockCompleted,
-      toMarkdown,
+      dv.toMarkdown,
       this.replaceSTaskUnderCursor,
     ),
   );
@@ -89,7 +90,7 @@ export class STaskEditor {
       this.getSTaskUnderCursorFromLastView,
       assertActiveClock,
       withoutActiveClock,
-      toMarkdown,
+      dv.toMarkdown,
       this.replaceSTaskUnderCursor,
     ),
   );

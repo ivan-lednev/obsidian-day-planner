@@ -28,6 +28,6 @@ export function updateProp(
   return `[${key}::${updateFn(previousValue)}]`;
 }
 
-export function deleteProps(line: string) {
-  return line.replaceAll(propRegexp, "").trim();
+export function deleteProps(text: string) {
+  return text.replaceAll(propRegexp, "").trim();
 }

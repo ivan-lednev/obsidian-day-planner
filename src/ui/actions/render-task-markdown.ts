@@ -3,7 +3,9 @@ import type { VaultFacade } from "../../service/vault-facade";
 import type { DayPlannerSettings } from "../../settings";
 import type { LocalTask } from "../../task-types";
 import type { RenderMarkdown } from "../../types";
+import { deleteProps } from "../../util/properties";
 import { getFirstLine, getRenderKey } from "../../util/task-utils";
+import { normalizeNewlines } from "../../util/util";
 
 import { createMemo } from "./memoize-props";
 
@@ -32,7 +34,9 @@ export function renderTaskMarkdown(
   function refresh({ task, settings, renderMarkdown }: RenderedMarkdownProps) {
     cleanUp();
 
-    const displayedText = getDisplayedText(task);
+    const displayedText = normalizeNewlines(
+      deleteProps(getDisplayedText(task)),
+    );
     const onlyFirstLineIfNeeded = settings.showSubtasksInTaskBlocks
       ? displayedText
       : getFirstLine(displayedText);

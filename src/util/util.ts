@@ -1,4 +1,9 @@
+import { map } from "lodash/fp";
 import { isNotVoid } from "typed-assert";
+
+import { repeatingNewlinesRegExp } from "../regexp";
+
+import { lines } from "./clock";
 
 export function isTouchEvent(event: PointerEvent) {
   return ["pen", "touch"].includes(event.pointerType);
@@ -60,4 +65,15 @@ export function updateLine(
   lines[lineNumber] = editFn(originalLine);
 
   return lines.join("\n");
+}
+
+export function normalizeNewlines(text: string) {
+  return text.replaceAll(repeatingNewlinesRegExp, "\n");
+}
+
+export function indent(text: string, indentation: string) {
+  return lines(
+    map((line) => `${indentation}${line}`),
+    text,
+  );
 }

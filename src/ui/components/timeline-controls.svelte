@@ -167,16 +167,18 @@
 
             menu.addItem((item) =>
               item
-                .setTitle("Stop clock")
+                .setTitle("Clock out")
                 .setIcon("square")
                 .onClick(() => {}),
             );
+
             menu.addItem((item) => {
               item
                 .setTitle("Cancel clock")
                 .setIcon("trash-2")
                 .onClick(() => {});
             });
+
             menu.addItem((item) => {
               item
                 .setTitle("Reveal task in file")
