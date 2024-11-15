@@ -8,6 +8,7 @@
   import { PlaneTakeoff, Clock3 } from "lucide-svelte";
   import { Menu } from "obsidian";
   import { slide } from "svelte/transition";
+  import { isNotVoid } from "typed-assert";
 
   import { dataviewDownloadLink } from "../../constants";
   import { getDateRangeContext } from "../../context/date-range-context";
@@ -180,7 +181,17 @@
               item
                 .setTitle("Reveal task in file")
                 .setIcon("file-input")
-                .onClick(() => {});
+                .onClick(async () => {
+                  const { location } = task;
+
+                  // todo: remove when types are fixed
+                  isNotVoid(location);
+
+                  await workspaceFacade.revealLineInFile(
+                    location.path,
+                    location.position?.start?.line,
+                  );
+                });
             });
 
             menu.showAtMouseEvent(event);

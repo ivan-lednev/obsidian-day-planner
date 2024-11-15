@@ -15,25 +15,20 @@ export function useTasksWithActiveClockProps({
   dataviewTasks,
 }: UseActiveClocksProps) {
   return derived([dataviewTasks], ([$dataviewTasks]) => {
-    return (
-      $dataviewTasks
-        .filter(c.hasActiveClockProp)
-        // todo: remove the hack
-        .map((sTask: STask) => {
-          const activeClockPropValue = liftToArray(sTask[clockKey]).find(
-            c.isActiveClockPropValue,
-          );
+    return $dataviewTasks.filter(c.hasActiveClockProp).map((sTask: STask) => {
+      const activeClockPropValue = liftToArray(sTask[clockKey]).find(
+        c.isActiveClockPropValue,
+      );
 
-          isExactly(
-            activeClockPropValue?.isLuxonDateTime,
-            true,
-            `Expected to receive a pre-parsed Luxon date for active clock, received: ${activeClockPropValue}`,
-          );
+      isExactly(
+        activeClockPropValue?.isLuxonDateTime,
+        true,
+        `Expected to receive a pre-parsed Luxon date for active clock, received: ${activeClockPropValue}`,
+      );
 
-          const startTime = window.moment(activeClockPropValue.toJSDate());
+      const startTime = window.moment(activeClockPropValue.toJSDate());
 
-          return dv.toTaskWithActiveClock(sTask, startTime);
-        })
-    );
+      return dv.toTaskWithActiveClock(sTask, startTime);
+    });
   });
 }
