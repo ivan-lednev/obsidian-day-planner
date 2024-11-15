@@ -20,6 +20,7 @@ export const defaultDurationMinutes = 30;
 export const searchResultLimit = 50;
 export const statusBarTextLimit = 15;
 export const indentBeforeTaskParagraph = 6;
+export const indentBeforeListParagraph = 2;
 
 export const reQueryAfterMillis = 200;
 export const undoTimeoutMillis = 8000;

@@ -20,20 +20,20 @@ import { WorkspaceFacade } from "./workspace-facade";
 export class STaskEditor {
   clockOut = withNotice(async (sTask: STask) => {
     await this.vaultFacade.editFile(sTask.path, (contents) =>
-      dv.replaceSTaskInFile(
+      dv.replaceSTaskText(
         contents,
         sTask,
-        dv.toMarkdown(withActiveClockCompleted(sTask)),
+        dv.textToMarkdownWithIndentation(withActiveClockCompleted(sTask)),
       ),
     );
   });
 
   cancelClock = withNotice(async (sTask: STask) => {
     await this.vaultFacade.editFile(sTask.path, (contents) =>
-      dv.replaceSTaskInFile(
+      dv.replaceSTaskText(
         contents,
         sTask,
-        dv.toMarkdown(withoutActiveClock(sTask)),
+        dv.textToMarkdownWithIndentation(withoutActiveClock(sTask)),
       ),
     );
   });
@@ -48,9 +48,13 @@ export class STaskEditor {
     const view = this.workspaceFacade.getActiveMarkdownView();
     const sTask = this.getSTaskUnderCursorFromLastView();
 
+    // Note: we re-calculate indentation when transforming sTasks to markdown, so we
+    //  don't need the original indentation
+    const replacementStart = { ...sTask.position.start, col: 0 };
+
     view.editor.replaceRange(
       newMarkdown,
-      locToEditorPosition(sTask.position.start),
+      locToEditorPosition(replacementStart),
       locToEditorPosition(sTask.position.end),
     );
   };
@@ -70,7 +74,7 @@ export class STaskEditor {
       this.getSTaskUnderCursorFromLastView,
       assertNoActiveClock,
       withActiveClock,
-      dv.toMarkdown,
+      dv.textToMarkdownWithIndentation,
       this.replaceSTaskUnderCursor,
     ),
   );
@@ -80,7 +84,7 @@ export class STaskEditor {
       this.getSTaskUnderCursorFromLastView,
       assertActiveClock,
       withActiveClockCompleted,
-      dv.toMarkdown,
+      dv.textToMarkdownWithIndentation,
       this.replaceSTaskUnderCursor,
     ),
   );
@@ -90,7 +94,7 @@ export class STaskEditor {
       this.getSTaskUnderCursorFromLastView,
       assertActiveClock,
       withoutActiveClock,
-      dv.toMarkdown,
+      dv.textToMarkdownWithIndentation,
       this.replaceSTaskUnderCursor,
     ),
   );

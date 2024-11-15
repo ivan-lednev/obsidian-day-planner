@@ -7,6 +7,7 @@ import {
   defaultDayFormat,
   defaultDayFormatForLuxon,
   defaultDurationMinutes,
+  indentBeforeListParagraph,
   indentBeforeTaskParagraph,
 } from "../constants";
 import { getTimeFromLine } from "../parser/parser";
@@ -19,7 +20,7 @@ import type {
 
 import { type ClockMoments } from "./clock";
 import { getId } from "./id";
-import { indent } from "./util";
+import { indent, indentLines } from "./util";
 
 interface Node {
   text: string;
@@ -28,12 +29,37 @@ interface Node {
   status?: string;
 }
 
+const baseIndentation = "\t";
+
+// todo: account for user settings
+export function createIndentation(level: number) {
+  return baseIndentation.repeat(level);
+}
+
+export function getIndentationForListParagraph(sTask: Node) {
+  const isListItem = sTask.status === undefined;
+
+  return " ".repeat(
+    isListItem ? indentBeforeListParagraph : indentBeforeTaskParagraph,
+  );
+}
+
 export function textToMarkdown(sTask: Node) {
-  return `${createMarkdownListTokens(sTask)} ${sTask.text}`;
+  const indentationForListParagraph = getIndentationForListParagraph(sTask);
+
+  const [firstLine, ...otherLines] = sTask.text.split("\n");
+
+  const withIndentation = [
+    `${createMarkdownListTokens(sTask)} ${firstLine}`,
+    ...indentLines(otherLines, indentationForListParagraph),
+  ];
+
+  return withIndentation.join("\n");
 }
 
 const indentationPerLevel = "\t";
 
+// todo: use createIndentation
 export function toString(node: Node, parentIndentation = "") {
   const nodeText = indent(textToMarkdown(node), parentIndentation);
 
@@ -45,7 +71,7 @@ ${toString(current, indentation)}`;
   }, nodeText);
 }
 
-export function getLines(node, result: Array<FileLine> = []) {
+export function getLines(node: STask, result: Array<FileLine> = []) {
   result.push({ text: node.text, line: node.line, task: node.task });
 
   for (const child of node.children) {
@@ -142,21 +168,11 @@ export function getScheduledDay(sTask: STask) {
   return scheduledPropDay || dailyNoteDay;
 }
 
-// todo: delete
-export function toMarkdown(sTask: STask) {
-  const baseIndent = "\t".repeat(sTask.position.start.col);
-  const extraIndent = " ".repeat(indentBeforeTaskParagraph);
-
-  return sTask.text
-    .split("\n")
-    .map((line, i) => {
-      if (i === 0) {
-        return `${baseIndent}${createMarkdownListTokens(sTask)} ${line}`;
-      }
-
-      return `${baseIndent}${extraIndent}${line}`;
-    })
-    .join("\n");
+export function textToMarkdownWithIndentation(sTask: STask) {
+  return indent(
+    textToMarkdown(sTask),
+    createIndentation(sTask.position.start.col),
+  );
 }
 
 function checkbox(status: string) {
@@ -171,13 +187,12 @@ export function createMarkdownListTokens(task: TaskTokens) {
   return `${task.symbol} ${checkbox(task.status)}`;
 }
 
-export function replaceSTaskInFile(
+export function replaceSTaskText(
   contents: string,
   sTask: STask,
   newText: string,
 ) {
   const lines = contents.split("\n");
-  // todo: this is not going to work: it doesn't consider sub-task lines
   const deleteCount = sTask.position.end.line - sTask.position.start.line + 1;
 
   lines.splice(sTask.position.start.line, deleteCount, newText);

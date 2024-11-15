@@ -95,12 +95,12 @@ export function lines(fn: (lines: string[]) => string[], text: string) {
   return fn(text.split("\n")).join("\n");
 }
 
-export function withActiveClockCompleted(sTask: STask) {
+export function withActiveClockCompleted(task: { text: string }) {
   return {
-    ...sTask,
+    ...task,
     text: lines(
       map((line) => (containsActiveClock(line) ? clockOut(line) : line)),
-      sTask.text,
+      task.text,
     ),
   };
 }

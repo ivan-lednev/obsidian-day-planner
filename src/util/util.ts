@@ -71,9 +71,10 @@ export function normalizeNewlines(text: string) {
   return text.replaceAll(repeatingNewlinesRegExp, "\n");
 }
 
+export function indentLines(lines: string[], indentation: string) {
+  return lines.map((line) => `${indentation}${line}`);
+}
+
 export function indent(text: string, indentation: string) {
-  return lines(
-    map((line) => `${indentation}${line}`),
-    text,
-  );
+  return indentLines(text.split("\n"), indentation).join("\n");
 }
