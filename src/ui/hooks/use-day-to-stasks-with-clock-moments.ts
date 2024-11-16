@@ -4,10 +4,11 @@ import { STask } from "obsidian-dataview";
 import { areValidClockMoments, toClockMoments } from "../../util/clock";
 import { liftToArray } from "../../util/lift";
 import { splitMultiday } from "../../util/moment";
+import { clockKey } from "../../constants";
 
 // todo: move out
 export function withClockMoments(sTask: STask) {
-  return liftToArray(sTask.clocked)
+  return liftToArray(sTask[clockKey])
     .filter(isString)
     .map(toClockMoments)
     .filter(areValidClockMoments)
