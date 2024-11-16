@@ -457,6 +457,32 @@ export default class DayPlanner extends Plugin {
       },
     });
 
+    this.addCommand({
+      id: "jump-to-active-clock",
+      name: "Jump to active clock",
+      callback: () => {
+        const currentTasksWithActiveClockProps = get(tasksWithActiveClockProps);
+
+        if (currentTasksWithActiveClockProps.length === 0) {
+          new Notice("No active clocks found");
+
+          return;
+        }
+
+        const firstTaskWithActiveClockProp =
+          currentTasksWithActiveClockProps[0];
+
+        const { location } = firstTaskWithActiveClockProp;
+
+        isNotVoid(location);
+
+        this.workspaceFacade.revealLineInFile(
+          location.path,
+          location.position?.start?.line,
+        );
+      },
+    });
+
     const defaultObsidianContext: ObsidianContext = {
       search,
       sTaskEditor: this.sTaskEditor,
