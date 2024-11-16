@@ -1,5 +1,8 @@
 <script generics="T" lang="ts">
   import type { Snippet } from "svelte";
+  import { slide } from "svelte/transition";
+
+  import { createSlide } from "./defaults";
 
   // eslint doesn't know about Svelte generics
   // eslint-disable-next-line no-undef
@@ -7,10 +10,16 @@
 </script>
 
 {#if list.length > 0}
-  <div class="search-results-scroller">
+  <div
+    class="search-results-scroller"
+    transition:slide={createSlide({ axis: "y" })}
+  >
     <div class="search-results">
       {#each list as foundTimeBlock}
-        <div class="search-result">
+        <div
+          class="search-result"
+          transition:slide={createSlide({ axis: "y" })}
+        >
           {@render match(foundTimeBlock)}
         </div>
       {/each}
