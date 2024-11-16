@@ -107,6 +107,10 @@
     --column-background-color="hsl(var(--color-accent-hsl), 0.03)"
     visibleHours={getVisibleHours($settings)}
   >
+    {#if $isToday(day)}
+      <Needle autoScrollBlocked={isUnderCursor} showBall={false} />
+    {/if}
+
     <div class="tasks absolute-stretch-x">
       {#each $displayedTasksWithClocksForTimeline as task (getRenderKey(task))}
         <LocalTimeBlock

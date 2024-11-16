@@ -32,6 +32,7 @@ export type BaseTask = {
   id: string;
   startTime: Moment;
   isAllDayEvent?: boolean;
+  truncated?: Side;
 };
 
 export type WithTime<T> = T & {
@@ -44,6 +45,8 @@ export type RemoteTask = BaseTask & {
   rsvpStatus: AttendeePartStat;
   description?: string;
 };
+
+type Side = "top" | "bottom" | "left" | "right";
 
 export interface LocalTask extends TaskTokens, BaseTask {
   text: string;

@@ -1,7 +1,6 @@
 import { flow, groupBy, uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
 import { App } from "obsidian";
-import * as m from "../util/moment";
 import {
   derived,
   fromStore,
@@ -36,6 +35,7 @@ import { useTasksWithActiveClockProps } from "../ui/hooks/use-tasks-with-active-
 import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "../ui/hooks/use-visible-dataview-tasks";
 import { useVisibleDays } from "../ui/hooks/use-visible-days";
+import * as m from "../util/moment";
 
 import { hasClockProp } from "./clock";
 import * as dv from "./dataview";
@@ -162,6 +162,7 @@ export function createHooks({
       $tasksWithActiveClockProps.map((task: LocalTask) => ({
         ...task,
         durationMinutes: m.getDiffInMinutes($currentTime, task.startTime),
+        truncated: "bottom",
       })),
   );
 

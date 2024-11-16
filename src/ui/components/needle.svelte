@@ -5,6 +5,7 @@
   import { getMinutesSinceMidnight } from "../../util/moment";
 
   export let autoScrollBlocked = false;
+  export let showBall: boolean | undefined = true;
 
   let el: HTMLDivElement;
   let coords = timeToTimelineOffset(
@@ -32,7 +33,9 @@
   style:top="{coords}px"
   class="needle absolute-stretch-x"
 ></div>
-<div style:top="{coords}px" class="ball"></div>
+{#if showBall}
+  <div style:top="{coords}px" class="ball"></div>
+{/if}
 
 <style>
   .needle {

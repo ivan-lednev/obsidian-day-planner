@@ -37,6 +37,7 @@
       settingsSignal.current,
     )}
     class="content"
+    class:truncated-bottom={task.truncated === "bottom"}
     on:longpress
     on:pointerenter
     on:pointerleave
@@ -77,5 +78,11 @@
     border: 1px solid var(--time-block-border-color, var(--color-base-50));
     border-radius: var(--radius-s);
     box-shadow: 1px 1px 2px 0 #0000001f;
+  }
+
+  .truncated-bottom {
+    border-bottom-style: dashed;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
   }
 </style>
