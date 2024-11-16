@@ -114,9 +114,6 @@
     <div class="tasks absolute-stretch-x">
       {#each $displayedTasksWithClocksForTimeline as task (getRenderKey(task))}
         <LocalTimeBlock
-          onFloatingUiPointerDown={updatePointerOffsetY}
-          onGripMouseDown={() => {}}
-          onResizerMouseDown={() => {}}
           onpointerup={() => {
             handleTaskMouseUp(task);
           }}
