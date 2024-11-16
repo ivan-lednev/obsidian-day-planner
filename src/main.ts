@@ -298,7 +298,7 @@ export default class DayPlanner extends Plugin {
 
     isNotVoid(file, "There is no file for view");
 
-    const sTask = this.dataviewFacade.getTaskFromCaretLocation({
+    const sTask = this.dataviewFacade.getTaskAtLine({
       path: file.path,
       line: view.editor.getCursor().line,
     });
@@ -459,6 +459,7 @@ export default class DayPlanner extends Plugin {
 
     const defaultObsidianContext: ObsidianContext = {
       search,
+      sTaskEditor: this.sTaskEditor,
       workspaceFacade: this.workspaceFacade,
       initWeeklyView: this.initWeeklyLeaf,
       refreshTasks: this.dataviewFacade.getAllTasksFrom,

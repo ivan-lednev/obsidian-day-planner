@@ -1,6 +1,7 @@
 import type { Moment } from "moment";
 import type { Readable, Writable } from "svelte/store";
 
+import type { STaskEditor } from "./service/stask-editor";
 import type { VaultFacade } from "./service/vault-facade";
 import type { WorkspaceFacade } from "./service/workspace-facade";
 import type { DayPlannerSettings, IcalConfig } from "./settings";
@@ -46,6 +47,7 @@ export interface ObsidianContext {
   // todo: searchEngine/timeBlockSearch...
   search: ReturnType<typeof useSearch>;
   tasksWithActiveClockProps: Readable<LocalTask[]>;
+  sTaskEditor: STaskEditor;
   getDisplayedTasksWithClocksForTimeline: (
     day: Moment,
   ) => Readable<Array<WithPlacing<LocalTask>>>;

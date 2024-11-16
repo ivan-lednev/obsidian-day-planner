@@ -184,8 +184,6 @@ export function createHooks({
     );
   }
 
-  visibleTasksWithClockProps.subscribe(console.log);
-
   const dataviewTasks = useDataviewTasks({
     listsFromVisibleDailyNotes,
     tasksFromExtraSources,

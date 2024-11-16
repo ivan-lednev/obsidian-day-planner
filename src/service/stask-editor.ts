@@ -18,7 +18,12 @@ import type { VaultFacade } from "./vault-facade";
 import { WorkspaceFacade } from "./workspace-facade";
 
 export class STaskEditor {
-  clockOut = withNotice(async (sTask: STask) => {
+  clockOut = withNotice(async (props: { path: string; line: number }) => {
+    const { path, line } = props;
+    const sTask = this.dataviewFacade.getTaskAtLine({ path, line });
+
+    isNotVoid(sTask, `No task found: ${path}:${line}`);
+
     await this.vaultFacade.editFile(sTask.path, (contents) =>
       dv.replaceSTaskText(
         contents,
@@ -60,7 +65,7 @@ export class STaskEditor {
   };
 
   private getSTaskUnderCursorFromLastView = () => {
-    const sTask = this.dataviewFacade.getTaskFromCaretLocation(
+    const sTask = this.dataviewFacade.getTaskAtLine(
       this.workspaceFacade.getLastCaretLocation(),
     );
 

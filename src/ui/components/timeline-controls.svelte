@@ -34,6 +34,7 @@
     dataviewLoaded,
     reSync,
     tasksWithActiveClockProps,
+    sTaskEditor,
   } = getObsidianContext();
   const dateRange = getDateRangeContext();
 
@@ -169,7 +170,21 @@
               item
                 .setTitle("Clock out")
                 .setIcon("square")
-                .onClick(() => {}),
+                .onClick(() => {
+                  const { location } = task;
+
+                  // todo: remove when types are fixed
+                  isNotVoid(location);
+
+                  const {
+                    path,
+                    position: {
+                      start: { line },
+                    },
+                  } = location;
+
+                  sTaskEditor.clockOut({ path, line });
+                }),
             );
 
             menu.addItem((item) => {

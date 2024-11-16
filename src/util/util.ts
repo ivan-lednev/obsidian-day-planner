@@ -1,9 +1,6 @@
-import { map } from "lodash/fp";
 import { isNotVoid } from "typed-assert";
 
 import { repeatingNewlinesRegExp } from "../regexp";
-
-import { lines } from "./clock";
 
 export function isTouchEvent(event: PointerEvent) {
   return ["pen", "touch"].includes(event.pointerType);

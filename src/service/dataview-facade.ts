@@ -12,7 +12,7 @@ export class DataviewFacade {
     return getAPI(this.app)?.pages(source).file.lists.array() || [];
   };
 
-  getTaskFromCaretLocation({ path, line }: { path: string; line: number }) {
+  getTaskAtLine({ path, line }: { path: string; line: number }) {
     return this.getTasksFromPath(path).find(
       (sTask: STask) => sTask.line === line,
     );
