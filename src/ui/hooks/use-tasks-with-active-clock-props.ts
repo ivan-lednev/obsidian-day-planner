@@ -7,13 +7,11 @@ import * as c from "../../util/clock";
 import * as dv from "../../util/dataview";
 import { liftToArray } from "../../util/lift";
 
-interface UseActiveClocksProps {
+export function useTasksWithActiveClockProps(props: {
   dataviewTasks: Readable<STask>;
-}
+}) {
+  const { dataviewTasks } = props;
 
-export function useTasksWithActiveClockProps({
-  dataviewTasks,
-}: UseActiveClocksProps) {
   return derived([dataviewTasks], ([$dataviewTasks]) => {
     return $dataviewTasks.filter(c.hasActiveClockProp).map((sTask: STask) => {
       const activeClockPropValue = liftToArray(sTask[clockKey]).find(

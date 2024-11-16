@@ -1,6 +1,7 @@
 import { flow, groupBy, uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
 import { App } from "obsidian";
+import * as m from "../util/moment";
 import {
   derived,
   fromStore,
@@ -15,7 +16,7 @@ import { addHorizontalPlacing } from "../overlap/overlap";
 import { DataviewFacade } from "../service/dataview-facade";
 import { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
-import type { Task, WithTime } from "../task-types";
+import type { LocalTask, Task, WithTime } from "../task-types";
 import type { OnUpdateFn } from "../types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
@@ -155,15 +156,25 @@ export function createHooks({
     dataviewTasks: tasksFromExtraSources,
   });
 
+  const tasksWithActiveClockPropsAndDurations = derived(
+    [tasksWithActiveClockProps, currentTime],
+    ([$tasksWithActiveClockProps, $currentTime]) =>
+      $tasksWithActiveClockProps.map((task: LocalTask) => ({
+        ...task,
+        durationMinutes: m.getDiffInMinutes($currentTime, task.startTime),
+      })),
+  );
+
   const visibleTasksWithClockProps = derived(
-    [tasksFromExtraSources],
-    ([$tasksFromExtraSources]) => {
+    [tasksFromExtraSources, tasksWithActiveClockPropsAndDurations],
+    ([$tasksFromExtraSources, $tasksWithActiveClockPropsAndDurations]) => {
       const flatTasksWithClocks = $tasksFromExtraSources
         .filter(hasClockProp)
         .map(withClockMoments)
         // todo: simplify
         .flat()
-        .map(dv.toTaskWithClock);
+        .map(dv.toTaskWithClock)
+        .concat($tasksWithActiveClockPropsAndDurations);
 
       return groupBy(
         ({ startTime }) => getDayKey(startTime),
