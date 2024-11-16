@@ -30,7 +30,6 @@
 <style>
   .search-results-scroller {
     overflow-y: auto;
-    border-top: 1px solid var(--background-modifier-border);
   }
 
   .search-results {

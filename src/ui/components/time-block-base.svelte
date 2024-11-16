@@ -21,7 +21,7 @@
     properContrastColors: { normal, muted, faint },
     backgroundColor,
     borderColor,
-  } = useColor({ task });
+  } = $derived(useColor({ task }));
 </script>
 
 <div class="padding">

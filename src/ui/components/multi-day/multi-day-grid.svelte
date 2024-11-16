@@ -30,7 +30,6 @@
   import ResizeableBox from "../resizeable-box.svelte";
   import Ruler from "../ruler.svelte";
   import Scroller from "../scroller.svelte";
-  import Search from "../search.svelte";
   import SettingsControls from "../settings-controls.svelte";
   import Timeline from "../timeline.svelte";
   import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
@@ -199,9 +198,9 @@
     {#if visibleSideControls === "settings"}
       <SettingsControls />
     {/if}
-    {#if visibleSideControls === "search"}
-      <Search />
-    {/if}
+    <!--{#if visibleSideControls === "search"}-->
+    <!--  <Search />-->
+    <!--{/if}-->
   </div>
 {/if}
 

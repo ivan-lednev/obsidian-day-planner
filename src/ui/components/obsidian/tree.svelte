@@ -57,7 +57,6 @@
     display: flex;
     flex: var(--flex);
     flex-direction: column;
-    border-top: 1px solid var(--background-modifier-border);
   }
 
   .tree-item-inner {

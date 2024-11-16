@@ -21,7 +21,6 @@
   import { createSlide } from "./defaults";
   import Tree from "./obsidian/tree.svelte";
   import Pill from "./pill.svelte";
-  import Search from "./search.svelte";
   import SettingsControls from "./settings-controls.svelte";
 
   const {
@@ -154,12 +153,12 @@
     <ActiveClocks --search-results-bg-color="var(--background-primary)" />
   </Tree>
 
-  <Tree title="Search">
-    <Search
-      --search-max-height="35vh"
-      --search-results-bg-color="var(--background-primary)"
-    />
-  </Tree>
+  <!--  <Tree title="Search">-->
+  <!--    <Search-->
+  <!--      &#45;&#45;search-max-height="35vh"-->
+  <!--      &#45;&#45;search-results-bg-color="var(&#45;&#45;background-primary)"-->
+  <!--    />-->
+  <!--  </Tree>-->
 </div>
 
 <style>
