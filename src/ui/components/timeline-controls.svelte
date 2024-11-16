@@ -5,20 +5,17 @@
     ChevronRight,
     EllipsisVertical,
   } from "lucide-svelte";
-  import { PlaneTakeoff, Clock3 } from "lucide-svelte";
   import { Menu } from "obsidian";
   import { slide } from "svelte/transition";
-  import { isNotVoid } from "typed-assert";
 
   import { dataviewDownloadLink } from "../../constants";
   import { getDateRangeContext } from "../../context/date-range-context";
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { currentTimeSignal, isToday } from "../../global-store/current-time";
+  import { isToday } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
-  import type { LocalTask } from "../../task-types";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 
-  import BlockList from "./block-list.svelte";
+  import ActiveClocks from "./active-clocks.svelte";
   import Callout from "./callout.svelte";
   import ControlButton from "./control-button.svelte";
   import { createSlide } from "./defaults";
@@ -26,7 +23,6 @@
   import Pill from "./pill.svelte";
   import Search from "./search.svelte";
   import SettingsControls from "./settings-controls.svelte";
-  import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   const {
     workspaceFacade,
@@ -34,7 +30,6 @@
     dataviewLoaded,
     reSync,
     tasksWithActiveClockProps,
-    sTaskEditor,
   } = getObsidianContext();
   const dateRange = getDateRangeContext();
 
@@ -156,86 +151,7 @@
     isInitiallyOpen
     title="Active clocks"
   >
-    <BlockList
-      --search-results-bg-color="var(--background-primary)"
-      list={$tasksWithActiveClockProps}
-    >
-      {#snippet match(task: LocalTask)}
-        <UnscheduledTimeBlock
-          --time-block-padding="var(--size-4-1)"
-          onpointerup={(event) => {
-            const menu = new Menu();
-
-            menu.addItem((item) =>
-              item
-                .setTitle("Clock out")
-                .setIcon("square")
-                .onClick(() => {
-                  const { location } = task;
-
-                  // todo: remove when types are fixed
-                  isNotVoid(location);
-
-                  const {
-                    path,
-                    position: {
-                      start: { line },
-                    },
-                  } = location;
-
-                  sTaskEditor.clockOut({ path, line });
-                }),
-            );
-
-            menu.addItem((item) => {
-              item
-                .setTitle("Cancel clock")
-                .setIcon("trash-2")
-                .onClick(() => {});
-            });
-
-            menu.addItem((item) => {
-              item
-                .setTitle("Reveal task in file")
-                .setIcon("file-input")
-                .onClick(async () => {
-                  const { location } = task;
-
-                  // todo: remove when types are fixed
-                  isNotVoid(location);
-
-                  await workspaceFacade.revealLineInFile(
-                    location.path,
-                    location.position?.start?.line,
-                  );
-                });
-            });
-
-            menu.showAtMouseEvent(event);
-          }}
-          {task}
-        >
-          <div class="properties-wrapper">
-            <Pill
-              key={PlaneTakeoff}
-              value={task.startTime.format($settings.timestampFormat)}
-            />
-
-            <Pill
-              key={Clock3}
-              value={window.moment
-                .utc(
-                  currentTimeSignal.current.diff(
-                    task.startTime,
-                    "milliseconds",
-                  ),
-                )
-                .format($settings.timestampFormat)}
-            />
-          </div>
-        </UnscheduledTimeBlock>
-      {/snippet}
-    </BlockList>
+    <ActiveClocks --search-results-bg-color="var(--background-primary)" />
   </Tree>
 
   <Tree title="Search">
@@ -302,12 +218,5 @@
     display: flex;
     gap: var(--size-4-1);
     justify-content: space-between;
-  }
-
-  .properties-wrapper {
-    display: flex;
-    gap: var(--size-4-1);
-    align-items: center;
-    padding: var(--size-4-1);
   }
 </style>

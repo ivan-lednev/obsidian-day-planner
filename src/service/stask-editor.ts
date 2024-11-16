@@ -1,5 +1,5 @@
 import { flow } from "lodash/fp";
-import { STask } from "obsidian-dataview";
+import type { STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
 
 import {
@@ -18,30 +18,24 @@ import type { VaultFacade } from "./vault-facade";
 import { WorkspaceFacade } from "./workspace-facade";
 
 export class STaskEditor {
-  clockOut = withNotice(async (props: { path: string; line: number }) => {
-    const { path, line } = props;
-    const sTask = this.dataviewFacade.getTaskAtLine({ path, line });
+  edit = withNotice(
+    async (props: {
+      path: string;
+      line: number;
+      editFn: (sTask: STask) => STask;
+    }) => {
+      const { path, line, editFn } = props;
+      const sTask = this.dataviewFacade.getTaskAtLine({ path, line });
 
-    isNotVoid(sTask, `No task found: ${path}:${line}`);
+      isNotVoid(sTask, `No task found: ${path}:${line}`);
 
-    await this.vaultFacade.editFile(sTask.path, (contents) =>
-      dv.replaceSTaskText(
-        contents,
-        sTask,
-        dv.textToMarkdownWithIndentation(withActiveClockCompleted(sTask)),
-      ),
-    );
-  });
+      const newSTaskMarkdown = dv.textToMarkdownWithIndentation(editFn(sTask));
 
-  cancelClock = withNotice(async (sTask: STask) => {
-    await this.vaultFacade.editFile(sTask.path, (contents) =>
-      dv.replaceSTaskText(
-        contents,
-        sTask,
-        dv.textToMarkdownWithIndentation(withoutActiveClock(sTask)),
-      ),
-    );
-  });
+      await this.vaultFacade.editFile(sTask.path, (contents) =>
+        dv.replaceSTaskText(contents, sTask, newSTaskMarkdown),
+      );
+    },
+  );
 
   constructor(
     private readonly workspaceFacade: WorkspaceFacade,
@@ -74,6 +68,7 @@ export class STaskEditor {
     return sTask;
   };
 
+  // todo: remove duplication
   clockInUnderCursor = withNotice(
     flow(
       this.getSTaskUnderCursorFromLastView,

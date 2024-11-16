@@ -100,3 +100,7 @@ export function getEarliestMoment(moments: Moment[]) {
 export function isOnWeekend(day: Moment) {
   return day.isoWeekday() === 6 || day.isoWeekday() === 7;
 }
+
+export function fromDiff(a: Moment, b: Moment) {
+  return window.moment.utc(b.diff(a, "milliseconds"));
+}
