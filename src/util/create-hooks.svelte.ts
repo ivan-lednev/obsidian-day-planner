@@ -161,7 +161,12 @@ export function createHooks({
     ([$tasksWithActiveClockProps, $currentTime]) =>
       $tasksWithActiveClockProps.map((task: LocalTask) => ({
         ...task,
-        durationMinutes: m.getDiffInMinutes($currentTime, task.startTime),
+        // We keep time resolution to the minute, so that all the elements move
+        //  in sync on the UI when time changes
+        durationMinutes: m.getDiffInMinutes(
+          $currentTime,
+          task.startTime.clone().startOf("minute"),
+        ),
         truncated: "bottom",
       })),
   );
