@@ -234,6 +234,7 @@ export default class DayPlanner extends Plugin {
     this.addCommand({
       id: "clock-in",
       name: "Clock in",
+      // @ts-expect-error
       editorCallback: this.sTaskEditor.clockInUnderCursor,
     });
 
@@ -246,6 +247,7 @@ export default class DayPlanner extends Plugin {
     this.addCommand({
       id: "cancel-clock",
       name: "Cancel clock",
+      // @ts-expect-error
       editorCallback: this.sTaskEditor.cancelClockUnderCursor,
     });
   }
@@ -420,6 +422,7 @@ export default class DayPlanner extends Plugin {
             item
               .setTitle("Cancel clock")
               .setIcon("trash")
+              // @ts-expect-error
               .onClick(this.sTaskEditor.cancelClockUnderCursor);
           });
         } else {
@@ -427,6 +430,7 @@ export default class DayPlanner extends Plugin {
             item
               .setTitle("Clock in")
               .setIcon("play")
+              // @ts-expect-error
               .onClick(this.sTaskEditor.clockInUnderCursor);
           });
         }
