@@ -1,7 +1,12 @@
+Day Planner is a community plugin for [Obsidian](https://obsidian.md/). It adds editable calendar views and basic time-tracking. Day Planner is integrated with
+
+- The core Daily Notes plugin.
+- [the Tasks plugin](https://obsidian.md/plugins?id=obsidian-tasks-plugin)
+- Online calendars
+
 ## Table of contents
 
 - [Table of contents](#table-of-contents)
-- [What it looks like](#what-it-looks-like)
 - [How to use it](#how-to-use-it)
   - [1. Showing events from your daily notes](#1-showing-events-from-your-daily-notes)
   - [2. tasks community plugin integration, showing events from other files in your vault](#2-tasks-community-plugin-integration-showing-events-from-other-files-in-your-vault)
@@ -10,14 +15,13 @@
     - [Where to get an iCloud link](#where-to-get-an-icloud-link)
     - [Where to get an Outlook link](#where-to-get-an-outlook-link)
       - [Alternative](#alternative)
-- [What else you can do](#what-else-you-can-do)
+  - [4. Time tracking (experimental)](#4-time-tracking-experimental)
+    - [Recording clocks](#recording-clocks)
+    - [Clocks in timelines](#clocks-in-timelines)
+    - [Active clocks](#active-clocks)
+    - [Limitations](#limitations)
 - [Note on the old plugin version](#note-on-the-old-plugin-version)
 - [Acknowledgements](#acknowledgements)
-
-## What it looks like
-
-![](assets/ical-timeline-demo.png)
-![](assets/week.png)
 
 ## How to use it
 
@@ -25,18 +29,23 @@
 > Dataview (community plugin, [see in Obsidian](obsidian://show-plugin?id=dataview)) should be installed and enabled for the plugin to work.
 
 To open the timeline in the sidebar:
+
 - Either run the command: `Show Timeline`
-- Or click the timeline icon in the left ribbon: 
+- Or click the timeline icon in the left ribbon
+  - ![](./assets/open-timeline-ribbon-icon.png)
 
 To open multi-day planner:
-- Either run the command: `Show multi-day planner`
-- Or click on the icon in the left ribbon: 
 
-The plugin has 3 distinct 'modes'. That is, it can display tasks from different sources:
+- Either run the command: `Show multi-day planner`
+- Or click on the icon in the left ribbon:
+  - ![](./assets/open-multi-day-view-ribbon-icon.png)
+
+The plugin has 4 distinct 'modes'. That is, it can display records from different sources:
 
 1. Daily notes
-1. Obsidian-tasks
-1. Online calendars
+2. Obsidian-tasks
+3. Online calendars
+4. Dataview clock properties
 
 Let's go over each one of them.
 
@@ -59,6 +68,7 @@ This works out of the box: you write your tasks in a daily note, and they show u
 This mode allows you to see tasks anywhere in the vault with dates added by the [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin).
 
 To make this work,
+
 1. Add a tag like `#task` or a folder to the Dataview source field:
    ![](./assets/dv-source.png)
 1. Add the tag (`#task` in this example) to the file with some tasks
@@ -113,15 +123,40 @@ Here's how the settings look on the web version:
 
 If your organization doesn't let you share your calendar this way, you might try [a different way described in this issue](https://github.com/ivan-lednev/obsidian-day-planner/issues/395).
 
-## What else you can do
+### 4. Time tracking (experimental)
 
-- Observe your progress in the status bar
-- Use the week view for multi-day planning
-- Color tasks based on time
-- Click on the timeline to create tasks
-- Drag tasks to re-schedule
-- Copy tasks
-- Move multiple tasks at once
+> [!Warning]
+> This feature is experimental and can break or change at any time in the near future. You can help to shape this feature by providing your feedback.
+
+You can record time spent on tasks in the form of Dataview properties and then view the records as time blocks, much like planner entries.
+
+#### Recording clocks
+
+Start a clock by right-clicking on a task in the editor:
+![](./assets/clock-in-demo.png)
+
+Stop the clock to record the time spent on a task or cancel it to discard the record:
+![](./assets/clock-out-demo.png)
+
+There is a command for each of the menu items, available in the command palette or as a hotkey:
+![](./assets/clock-commands-demo.png)
+
+#### Clocks in timelines
+
+You can enable an additional timeline column to see the recorded clocks next to your planner:
+![](./assets/show-time-tracker-settings.png)
+
+#### Active clocks
+
+You can see the currently active clocks in the timeline sidebar:
+![](./assets/active-clocks-demo.png)
+
+A right click on an active clock will bring the control menu:
+![](./assets/active-clocks-menu.png)
+
+#### Limitations
+
+- For now clock time blocks are read-only. This is going to be addressed in the future.
 
 ## Note on the old plugin version
 
@@ -131,8 +166,9 @@ If for some reason you still want to use the old version, there are community fo
 
 ## Acknowledgements
 
-- Thanks to [James Lynch](https://github.com/lynchjames) for the original plugin
-- Thanks to [replete](https://github.com/replete), whose fork I initially forked
 - Thanks to [Michael Brenan](https://github.com/blacksmithgu) for Dataview
-- Thanks to [Joshua Tazman Reinier](https://github.com/joshuatazrein) for his plugin, which gave me an idea of how to integrate with Dataview
+- Thanks to [James Lynch](https://github.com/lynchjames) for the original plugin
+- Thanks to [Joshua Tazman Reinier](https://github.com/joshuatazrein) for his plugin that served as an inspiration
 - Thanks to @liamcain for creating daily note utilities and a helpful calendar plugin
+- Thanks to [Emacs Org Mode](https://orgmode.org/) for an idea of text-based time-tracking
+- Thanks to [Toggl Track](https://track.toggl.com/timer) for an idea of a great time-tracking UI
