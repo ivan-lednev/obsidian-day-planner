@@ -40,12 +40,7 @@ import * as m from "../util/moment";
 import { hasClockProp } from "./clock";
 import * as dv from "./dataview";
 import { getUpdateTrigger } from "./store";
-import {
-  getDayKey,
-  getEmptyTasksForDay,
-  getRenderKey,
-  isWithTime,
-} from "./task-utils";
+import { getDayKey, getRenderKey, isWithTime } from "./task-utils";
 import { useRemoteTasks } from "./use-remote-tasks";
 
 interface CreateHooksProps {
@@ -177,7 +172,7 @@ export function createHooks({
       const flatTasksWithClocks = $tasksFromExtraSources
         .filter(hasClockProp)
         .map(withClockMoments)
-        // todo: simplify
+        // todo: simplify, flatmap beforehand
         .flat()
         .map(dv.toTaskWithClock)
         .concat($tasksWithActiveClockPropsAndDurations);
@@ -189,12 +184,12 @@ export function createHooks({
     },
   );
 
+  // todo: remove duplication
   function getDisplayedTasksWithClocksForTimeline(day: Moment) {
     return derived(
       visibleTasksWithClockProps,
       ($visibleTasksWithClockProps) => {
-        const tasksForDay =
-          $visibleTasksWithClockProps[getDayKey(day)] || getEmptyTasksForDay();
+        const tasksForDay = $visibleTasksWithClockProps[getDayKey(day)] || [];
 
         return flow(uniqBy(getRenderKey), addHorizontalPlacing)(tasksForDay);
       },

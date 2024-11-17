@@ -54,6 +54,13 @@
 </script>
 
 <ScheduledTimeBlock
+  {task}
+  use={[
+    drag.anchorSetup,
+    resize.anchorSetup,
+    resizeFromTop.anchorSetup,
+    (el: HTMLElement) => hoverPreview(el, task),
+  ]}
   on:longpress={() => {
     navigator.vibrate?.(vibrationDurationMillis);
     isDragActive.set(true);
@@ -71,13 +78,6 @@
     resizeFromTop.handleAnchorPointerLeave(event);
   }}
   on:pointerup={onpointerup}
-  {task}
-  use={[
-    drag.anchorSetup,
-    resize.anchorSetup,
-    resizeFromTop.anchorSetup,
-    (el: HTMLElement) => hoverPreview(el, task),
-  ]}
 >
   <RenderedMarkdown {task} />
 </ScheduledTimeBlock>

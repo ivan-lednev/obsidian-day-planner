@@ -20,6 +20,7 @@ import type {
 
 import { type ClockMoments } from "./clock";
 import { getId } from "./id";
+import { getFirstLine } from "./task-utils";
 import { indent, indentLines } from "./util";
 
 interface Node {
@@ -131,7 +132,7 @@ export function toUnscheduledTask(sTask: STask, startTime: Moment) {
 
 export function toTask(sTask: STask, day: Moment): TaskWithoutComputedDuration {
   const parsedTime = getTimeFromLine({
-    line: sTask.text,
+    line: getFirstLine(sTask.text),
     day,
   });
 

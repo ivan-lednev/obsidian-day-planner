@@ -4,8 +4,8 @@ import { derived, type Readable } from "svelte/store";
 import { clockKey } from "../../constants";
 import * as c from "../../util/clock";
 import * as dv from "../../util/dataview";
-import { liftToArray } from "../../util/lift";
 import { toTaskWithActiveClock } from "../../util/dataview";
+import { liftToArray } from "../../util/lift";
 
 type TasksWithActiveClockProps = Array<
   ReturnType<typeof toTaskWithActiveClock>
