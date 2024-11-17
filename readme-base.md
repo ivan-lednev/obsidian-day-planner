@@ -103,9 +103,6 @@ To show events from internet calendars like **Google Calendar, iCloud Calendar a
 
 #### Where to get an iCloud link
 
-> [!Note]
-> When you copy the link to your iCloud calendar, make sure to change the `webcal://` protocol to `https://`
-
 [iCloud Calendar instructions](https://www.souladvisor.com/help-centre/how-to-get-icloud-calendar-address-on-mac-in-ical-format)
 
 #### Where to get an Outlook link
@@ -133,25 +130,31 @@ You can record time spent on tasks in the form of Dataview properties and then v
 #### Recording clocks
 
 Start a clock by right-clicking on a task in the editor:
+
 ![](./assets/clock-in-demo.png)
 
 Stop the clock to record the time spent on a task or cancel it to discard the record:
+
 ![](./assets/clock-out-demo.png)
 
 There is a command for each of the menu items, available in the command palette or as a hotkey:
+
 ![](./assets/clock-commands-demo.png)
 
 #### Clocks in timelines
 
 You can enable an additional timeline column to see the recorded clocks next to your planner:
+
 ![](./assets/show-time-tracker-settings.png)
 
 #### Active clocks
 
 You can see the currently active clocks in the timeline sidebar:
+
 ![](./assets/active-clocks-demo.png)
 
 A right click on an active clock will bring the control menu:
+
 ![](./assets/active-clocks-menu.png)
 
 #### Limitations
