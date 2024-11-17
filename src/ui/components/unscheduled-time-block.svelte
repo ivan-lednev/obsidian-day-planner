@@ -41,7 +41,7 @@
   {task}
   use={[drag.anchorSetup]}
   on:longpress={() => {
-    navigator?.vibrate(vibrationDurationMillis);
+    navigator.vibrate?.(vibrationDurationMillis);
     isActive.set(true);
   }}
   on:pointerenter={drag.handleAnchorPointerEnter}
