@@ -8,6 +8,7 @@ You can record time spent on tasks in the form of Dataview properties and then v
 
 - Fixed crash for iOS on drag-and-drop edits (#519)
 - Fixed duplicated timestamps on drag-and-drop edits (#618)
+- Fixed removing task Dataview properties on edits (#370)
 
 ## 0.25.0
 
