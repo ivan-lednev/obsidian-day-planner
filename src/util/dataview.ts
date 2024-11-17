@@ -1,9 +1,11 @@
+import { isString } from "lodash/fp";
 import type { Moment } from "moment";
 import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
 
 import {
+  clockKey,
   defaultDayFormat,
   defaultDayFormatForLuxon,
   defaultDurationMinutes,
@@ -18,8 +20,14 @@ import type {
   TaskWithoutComputedDuration,
 } from "../task-types";
 
-import { type ClockMoments } from "./clock";
+import {
+  areValidClockMoments,
+  type ClockMoments,
+  toClockMoments,
+} from "./clock";
 import { getId } from "./id";
+import { liftToArray } from "./lift";
+import { splitMultiday } from "./moment";
 import { getFirstLine } from "./task-utils";
 import { indent, indentLines } from "./util";
 
@@ -199,4 +207,16 @@ export function replaceSTaskText(
   lines.splice(sTask.position.start.line, deleteCount, newText);
 
   return lines.join("\n");
+}
+
+export function withClockMoments(sTask: STask) {
+  return liftToArray(sTask[clockKey])
+    .filter(isString)
+    .map(toClockMoments)
+    .filter(areValidClockMoments)
+    .flatMap(([start, end]) => splitMultiday(start, end))
+    .map((clockMoments) => ({
+      sTask,
+      clockMoments,
+    }));
 }

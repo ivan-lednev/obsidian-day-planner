@@ -21,7 +21,6 @@ import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
 import { useDateRanges } from "../ui/hooks/use-date-ranges";
-import { withClockMoments } from "../ui/hooks/use-day-to-stasks-with-clock-moments";
 import { useDebounceWithDelay } from "../ui/hooks/use-debounce-with-delay";
 import { useEditContext } from "../ui/hooks/use-edit/use-edit-context";
 import { useIsOnline } from "../ui/hooks/use-is-online";
@@ -39,6 +38,7 @@ import * as m from "../util/moment";
 
 import { hasClockProp } from "./clock";
 import * as dv from "./dataview";
+import { withClockMoments } from "./dataview";
 import { getUpdateTrigger } from "./store";
 import { getDayKey, getRenderKey, isWithTime } from "./task-utils";
 import { useRemoteTasks } from "./use-remote-tasks";
@@ -171,9 +171,7 @@ export function createHooks({
     ([$tasksFromExtraSources, $tasksWithActiveClockPropsAndDurations]) => {
       const flatTasksWithClocks = $tasksFromExtraSources
         .filter(hasClockProp)
-        .map(withClockMoments)
-        // todo: simplify, flatmap beforehand
-        .flat()
+        .flatMap(withClockMoments)
         .map(dv.toTaskWithClock)
         .concat($tasksWithActiveClockPropsAndDurations);
 
