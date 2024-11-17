@@ -50,7 +50,7 @@ export const scheduledPropRegExps = [
   shortScheduledPropRegExp,
 ];
 
-export const propRegexp = /\[([^]]+)::([^]]+)]/g;
+export const propRegexp = /\[([^\]]+)::([^\]]+)\]/g;
 
 export const dashOrNumberWithMultipleSpaces = /(-|\d+[.)])\s+/g;
 export const escapedSquareBracket = /\\\[/g;
