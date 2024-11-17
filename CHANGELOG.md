@@ -2,7 +2,7 @@
 
 ### ✨ New feature: time tracking (experimental)
 
-You can record time spent on tasks in the form of Dataview properties and then view the records as time blocks, much like planner entries. See [the docs for detailed instructions](./README.md#4-time-tracking).
+You can record time spent on tasks in the form of Dataview properties and then view the records as time blocks, much like planner entries. See [the docs for detailed instructions](https://github.com/ivan-lednev/obsidian-day-planner?tab=readme-ov-file#4-time-tracking).
 
 ### 🐞 Fixed issues
 
