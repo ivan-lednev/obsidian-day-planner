@@ -131,31 +131,31 @@ You can record time spent on tasks in the form of Dataview properties and then v
 
 Start a clock by right-clicking on a task in the editor:
 
-![](./assets/clock-in-demo.png)
+<img src="./assets/clock-in-demo.png" width="75%">
 
 Stop the clock to record the time spent on a task or cancel it to discard the record:
 
-![](./assets/clock-out-demo.png)
+<img src="./assets/clock-out-demo.png" width="75%">
 
 There is a command for each of the menu items, available in the command palette or as a hotkey:
 
-![](./assets/clock-commands-demo.png)
+<img src="./assets/clock-commands-demo.png" width="75%">
 
 #### Clocks in timelines
 
 You can enable an additional timeline column to see the recorded clocks next to your planner:
 
-![](./assets/show-time-tracker-settings.png)
+<img src="./assets/show-time-tracker-settings.png" width="75%">
 
 #### Active clocks
 
 You can see the currently active clocks in the timeline sidebar:
 
-![](./assets/active-clocks-demo.png)
+<img src="./assets/active-clocks-demo.png" width="75%">
 
 A right click on an active clock will bring the control menu:
 
-![](./assets/active-clocks-menu.png)
+<img src="./assets/active-clocks-menu.png" width="75%">
 
 #### Limitations
 
