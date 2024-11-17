@@ -15,7 +15,7 @@ Day Planner is a community plugin for [Obsidian](https://obsidian.md/). It adds 
     - [Where to get an iCloud link](#where-to-get-an-icloud-link)
     - [Where to get an Outlook link](#where-to-get-an-outlook-link)
       - [Alternative](#alternative)
-  - [4. Time tracking (experimental)](#4-time-tracking-experimental)
+  - [4. Time tracking](#4-time-tracking)
     - [Recording clocks](#recording-clocks)
     - [Clocks in timelines](#clocks-in-timelines)
     - [Active clocks](#active-clocks)
@@ -120,7 +120,7 @@ Here's how the settings look on the web version:
 
 If your organization doesn't let you share your calendar this way, you might try [a different way described in this issue](https://github.com/ivan-lednev/obsidian-day-planner/issues/395).
 
-### 4. Time tracking (experimental)
+### 4. Time tracking
 
 > [!Warning]
 > This feature is experimental and can break or change at any time in the near future. You can help to shape this feature by providing your feedback.

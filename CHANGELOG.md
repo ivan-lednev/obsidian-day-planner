@@ -1,3 +1,14 @@
+## 0.26.0
+
+### ✨ New feature: time tracking (experimental)
+
+You can record time spent on tasks in the form of Dataview properties and then view the records as time blocks, much like planner entries. See [the docs for detailed instructions](./README.md#4-time-tracking).
+
+### 🐞 Fixed issues
+
+- Fixed crash for iOS on drag-and-drop edits (#519)
+- Fixed duplicated timestamps on drag-and-drop edits (#618)
+
 ## 0.25.0
 
 ### 💥 Breaking changes
