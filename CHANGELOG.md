@@ -1,3 +1,9 @@
+## 0.26.2
+
+### 🐞 Fixed issues
+
+- Fix messing up frontmatter when there is no planner heading in file
+
 ## 0.26.0
 
 ### ✨ New feature: time tracking (experimental)
