@@ -565,5 +565,63 @@ describe("From diff to vault", () => {
 - 11:00 - 11:30 Task 2
 `);
     });
+
+    test("Skips sorting if day planner heading is not found", async () => {
+      vi.mocked(getDailyNoteSettings).mockReturnValue({
+        format: defaultDayFormat,
+        folder: ".",
+      });
+
+      const files = [
+        createInMemoryFile({
+          path: "2023-01-01.md",
+          contents: `- 12:00 - 13:00 Task 2
+- 10:00 - 11:00 Task 1
+`,
+        }),
+      ];
+
+      const diff = {
+        updated: [
+          createTestTask({
+            text: "- 11:00 - 11:30 Task 2",
+            day: moment("2023-01-01"),
+            startMinutes: toMinutes("11:00"),
+            location: {
+              path: "2023-01-01.md",
+              position: {
+                start: {
+                  line: 0,
+                  col: 0,
+                  offset: -1,
+                },
+                end: {
+                  line: 1,
+                  col: -1,
+                  offset: -1,
+                },
+              },
+            },
+          }),
+        ],
+      };
+
+      const { vault } = await writeDiff({
+        diff,
+        files,
+        mode: EditMode.DRAG,
+        afterEach: (contents: string) =>
+          applyScopedUpdates(
+            contents,
+            defaultSettingsForTests.plannerHeading,
+            sortListsRecursivelyInMarkdown,
+          ),
+      });
+
+      expect(vault.getAbstractFileByPath("2023-01-01.md").contents)
+        .toBe(`- 11:00 - 11:30 Task 2
+- 10:00 - 11:00 Task 1
+`);
+    });
   });
 });

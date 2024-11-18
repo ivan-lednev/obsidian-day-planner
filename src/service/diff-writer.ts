@@ -156,23 +156,25 @@ export function applyScopedUpdates(
   headingScope: string,
   updateFn: (scopedContents: string) => string,
 ) {
-  if (headingScope.trim().length > 0) {
-    const heading = findHeading(contents, headingScope);
-
-    if (heading && heading.start) {
-      const lines = contents.split("\n");
-      const beforeHeading = lines.slice(0, heading.start);
-      const afterHeadingIndex = heading.start + heading.length;
-      const toUpdate = lines.slice(heading.start, afterHeadingIndex).join("\n");
-      const afterHeading = lines.slice(afterHeadingIndex);
-
-      const updated = updateFn(toUpdate).split("\n");
-
-      return beforeHeading.concat(updated, afterHeading).join("\n");
-    }
+  if (headingScope.trim().length === 0) {
+    return contents;
   }
 
-  return updateFn(contents);
+  const heading = findHeading(contents, headingScope);
+
+  if (heading?.start === undefined) {
+    return contents;
+  }
+
+  const lines = contents.split("\n");
+  const beforeHeading = lines.slice(0, heading.start);
+  const afterHeadingIndex = heading.start + heading.length;
+  const toUpdate = lines.slice(heading.start, afterHeadingIndex).join("\n");
+  const afterHeading = lines.slice(afterHeadingIndex);
+
+  const updated = updateFn(toUpdate).split("\n");
+
+  return beforeHeading.concat(updated, afterHeading).join("\n");
 }
 
 function findHeadingInLine(line: string) {
