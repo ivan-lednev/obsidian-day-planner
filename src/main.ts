@@ -21,6 +21,7 @@ import {
   viewTypeTimeline,
   viewTypeMultiDay,
 } from "./constants";
+import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import {
   compareByTimestampInText,
@@ -386,6 +387,7 @@ export default class DayPlanner extends Plugin {
       workspaceFacade: this.workspaceFacade,
       settingsStore: this.settingsStore,
       onUpdate,
+      currentTime,
     });
 
     this.syncDataview = () => dataviewSyncTrigger.set({});

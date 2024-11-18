@@ -29,7 +29,7 @@ function createStore({ visibleDays = [moment("2024-09-26")] } = {}) {
   const store = useRemoteTasks({
     isOnline: writable(true),
     visibleDays: writable(visibleDays),
-    syncTrigger,
+    refreshSignal: syncTrigger,
     settings: writable({
       ...defaultSettingsForTests,
       icals: [

@@ -6,33 +6,30 @@ import * as q from "../../util/dataview-query";
 
 interface UseTasksFromExtraSourcesProps {
   dataviewSource: Readable<string>;
-  debouncedTaskUpdateTrigger: Readable<unknown>;
+  refreshSignal: Readable<unknown>;
   visibleDailyNotes: Readable<TFile[]>;
   dataviewFacade: DataviewFacade;
 }
 
 export function useTasksFromExtraSources({
   dataviewSource,
-  debouncedTaskUpdateTrigger,
+  refreshSignal,
   visibleDailyNotes,
   dataviewFacade,
 }: UseTasksFromExtraSourcesProps) {
-  return derived(
-    [dataviewSource, debouncedTaskUpdateTrigger],
-    ([$dataviewSource]) => {
-      const noAdditionalSource = $dataviewSource.trim().length === 0;
+  return derived([dataviewSource, refreshSignal], ([$dataviewSource]) => {
+    const noAdditionalSource = $dataviewSource.trim().length === 0;
 
-      if (noAdditionalSource) {
-        return [];
-      }
+    if (noAdditionalSource) {
+      return [];
+    }
 
-      // todo: this will ignore clocks from daily notes
-      const queryFromExtraSources = q.andNot(
-        $dataviewSource,
-        q.anyOf(get(visibleDailyNotes)),
-      );
+    // todo: this will ignore clocks from daily notes
+    const queryFromExtraSources = q.andNot(
+      $dataviewSource,
+      q.anyOf(get(visibleDailyNotes)),
+    );
 
-      return dataviewFacade.getAllTasksFrom(queryFromExtraSources);
-    },
-  );
+    return dataviewFacade.getAllTasksFrom(queryFromExtraSources);
+  });
 }

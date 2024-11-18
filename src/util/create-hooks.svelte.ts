@@ -6,11 +6,11 @@ import {
   fromStore,
   readable,
   writable,
+  type Readable,
   type Writable,
 } from "svelte/store";
 
 import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
-import { currentTime } from "../global-store/current-time";
 import { addHorizontalPlacing } from "../overlap/overlap";
 import { DataviewFacade } from "../service/dataview-facade";
 import { WorkspaceFacade } from "../service/workspace-facade";
@@ -49,84 +49,60 @@ interface CreateHooksProps {
   workspaceFacade: WorkspaceFacade;
   settingsStore: Writable<DayPlannerSettings>;
   onUpdate: OnUpdateFn;
+  currentTime: Readable<Moment>;
 }
 
 function getDarkModeFlag() {
   return document.body.hasClass("theme-dark");
 }
 
-export function createHooks({
-  app,
-  dataviewFacade,
-  workspaceFacade,
-  settingsStore,
-  onUpdate,
-}: CreateHooksProps) {
-  const dataviewSource = derived(settingsStore, ($settings) => {
-    return $settings.dataviewSource;
-  });
-  const layoutReady = readable(false, (set) => {
-    app.workspace.onLayoutReady(() => set(true));
-  });
-  const pointerDateTime = writable<{
-    dateTime?: Moment;
-    type?: "dateTime" | "date";
-  }>({});
+export type PointerDateTime = Writable<{
+  dateTime?: Moment | undefined;
+  type?: "dateTime" | "date" | undefined;
+}>;
 
-  const isDarkModeStore = readable(getDarkModeFlag(), (set) => {
-    const eventRef = app.workspace.on("css-change", () => {
-      set(getDarkModeFlag());
-    });
-
-    return () => {
-      app.workspace.offref(eventRef);
-    };
-  });
-  const isDarkMode = fromStore(isDarkModeStore);
-
-  const keyDown = useKeyDown();
-  const isModPressed = useModPressed();
-  const isOnline = useIsOnline();
-
-  const dataviewChange = useDataviewChange(app.metadataCache);
-  const dataviewLoaded = useDataviewLoaded(app);
-
-  const icalRefreshTimer = readable(getUpdateTrigger(), (set) => {
-    const interval = setInterval(() => {
-      set(getUpdateTrigger());
-    }, icalRefreshIntervalMillis);
-
-    return () => {
-      clearInterval(interval);
-    };
-  });
-
-  const icalSyncTrigger = writable();
-  const combinedIcalSyncTrigger = derived(
-    [icalRefreshTimer, icalSyncTrigger],
-    getUpdateTrigger,
-  );
-
-  const dateRanges = useDateRanges();
-  const visibleDays = useVisibleDays(dateRanges.ranges);
+function useTasks(props: {
+  settingsStore: Writable<DayPlannerSettings>;
+  combinedIcalSyncTrigger: Readable<object>;
+  debouncedTaskUpdateTrigger: Readable<object>;
+  taskUpdateTrigger: Readable<object>;
+  keyDown: Readable<object>;
+  isOnline: Readable<boolean>;
+  visibleDays: Readable<Moment[]>;
+  layoutReady: Readable<boolean>;
+  dataviewFacade: DataviewFacade;
+  app: App;
+  dataviewSource: Readable<string>;
+  currentTime: Readable<Moment>;
+  workspaceFacade: WorkspaceFacade;
+  onUpdate: OnUpdateFn;
+  pointerDateTime: PointerDateTime;
+}) {
+  const {
+    settingsStore,
+    combinedIcalSyncTrigger,
+    isOnline,
+    visibleDays,
+    layoutReady,
+    debouncedTaskUpdateTrigger,
+    dataviewFacade,
+    app,
+    dataviewSource,
+    currentTime,
+    taskUpdateTrigger,
+    keyDown,
+    workspaceFacade,
+    pointerDateTime,
+    onUpdate,
+  } = props;
 
   const remoteTasks = useRemoteTasks({
     settings: settingsStore,
-    syncTrigger: combinedIcalSyncTrigger,
+    refreshSignal: combinedIcalSyncTrigger,
     isOnline,
     visibleDays,
   });
 
-  const dataviewSyncTrigger = writable();
-  const taskUpdateTrigger = derived(
-    [dataviewChange, dataviewSource, dataviewSyncTrigger],
-    getUpdateTrigger,
-  );
-  const debouncedTaskUpdateTrigger = useDebounceWithDelay(
-    taskUpdateTrigger,
-    keyDown,
-    reQueryAfterMillis,
-  );
   const visibleDailyNotes = useVisibleDailyNotes(
     layoutReady,
     debouncedTaskUpdateTrigger,
@@ -140,9 +116,10 @@ export function createHooks({
     metadataCache: app.metadataCache,
     settings: settingsStore,
   });
+
   const tasksFromExtraSources = useTasksFromExtraSources({
+    refreshSignal: debouncedTaskUpdateTrigger,
     dataviewSource,
-    debouncedTaskUpdateTrigger,
     visibleDailyNotes,
     dataviewFacade,
   });
@@ -199,6 +176,7 @@ export function createHooks({
     tasksFromExtraSources,
     settingsStore,
   });
+
   const localTasks = useVisibleDataviewTasks(dataviewTasks, visibleDays);
 
   const tasksForToday = derived(
@@ -232,6 +210,108 @@ export function createHooks({
     settings: settingsStore,
     tasksForToday,
     currentTime,
+  });
+  return {
+    tasksWithActiveClockProps,
+    getDisplayedTasksWithClocksForTimeline,
+    tasksForToday,
+    search,
+    editContext,
+    newlyStartedTasks,
+  };
+}
+
+export function createHooks({
+  app,
+  dataviewFacade,
+  workspaceFacade,
+  settingsStore,
+  onUpdate,
+  currentTime,
+}: CreateHooksProps) {
+  const dataviewSource = derived(settingsStore, ($settings) => {
+    return $settings.dataviewSource;
+  });
+  const layoutReady = readable(false, (set) => {
+    app.workspace.onLayoutReady(() => set(true));
+  });
+  const pointerDateTime = writable<{
+    dateTime?: Moment;
+    type?: "dateTime" | "date";
+  }>({});
+
+  const isDarkModeStore = readable(getDarkModeFlag(), (set) => {
+    const eventRef = app.workspace.on("css-change", () => {
+      set(getDarkModeFlag());
+    });
+
+    return () => {
+      app.workspace.offref(eventRef);
+    };
+  });
+  const isDarkMode = fromStore(isDarkModeStore);
+
+  const keyDown = useKeyDown();
+  const isModPressed = useModPressed();
+  const isOnline = useIsOnline();
+
+  const dataviewChange = useDataviewChange(app.metadataCache);
+  const dataviewLoaded = useDataviewLoaded(app);
+
+  const icalRefreshTimer = readable(getUpdateTrigger(), (set) => {
+    const interval = setInterval(() => {
+      set(getUpdateTrigger());
+    }, icalRefreshIntervalMillis);
+
+    return () => {
+      clearInterval(interval);
+    };
+  });
+
+  const icalSyncTrigger = writable();
+  const combinedIcalSyncTrigger = derived(
+    [icalRefreshTimer, icalSyncTrigger],
+    getUpdateTrigger,
+  );
+
+  const dateRanges = useDateRanges();
+  const visibleDays = useVisibleDays(dateRanges.ranges);
+
+  const dataviewSyncTrigger = writable();
+  const taskUpdateTrigger = derived(
+    [dataviewChange, dataviewSource, dataviewSyncTrigger],
+    getUpdateTrigger,
+  );
+  const debouncedTaskUpdateTrigger = useDebounceWithDelay(
+    taskUpdateTrigger,
+    keyDown,
+    reQueryAfterMillis,
+  );
+
+  const {
+    tasksWithActiveClockProps,
+    getDisplayedTasksWithClocksForTimeline,
+    tasksForToday,
+    search,
+    editContext,
+    newlyStartedTasks,
+  } = useTasks({
+    settingsStore,
+    combinedIcalSyncTrigger,
+    isOnline,
+    visibleDays,
+    layoutReady,
+    debouncedTaskUpdateTrigger,
+    dataviewFacade,
+    // todo: remove this dep
+    app,
+    dataviewSource,
+    currentTime,
+    taskUpdateTrigger,
+    keyDown,
+    workspaceFacade,
+    onUpdate,
+    pointerDateTime,
   });
 
   return {

@@ -18,17 +18,17 @@ function isVEvent(event: ical.CalendarComponent): event is ical.VEvent {
 
 export function useRemoteTasks(props: {
   settings: Readable<DayPlannerSettings>;
-  syncTrigger: Readable<unknown>;
+  refreshSignal: Readable<unknown>;
   isOnline: Readable<boolean>;
   visibleDays: Readable<Moment[]>;
 }) {
-  const { settings, syncTrigger, isOnline, visibleDays } = props;
+  const { settings, refreshSignal, isOnline, visibleDays } = props;
 
   const previousFetches = new Map<string, Array<WithIcalConfig<ical.VEvent>>>();
   const icals = derived(settings, ($settings) => $settings.icals);
 
   const icalEvents = derived(
-    [icals, isOnline, syncTrigger],
+    [icals, isOnline, refreshSignal],
     (
       [$icals, $isOnline],
       set: (events: Array<WithIcalConfig<ical.VEvent>>) => void,
