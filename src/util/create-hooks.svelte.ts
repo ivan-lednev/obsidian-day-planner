@@ -120,7 +120,6 @@ function useTasks(props: {
   const tasksFromExtraSources = useTasksFromExtraSources({
     refreshSignal: debouncedTaskUpdateTrigger,
     dataviewSource,
-    visibleDailyNotes,
     dataviewFacade,
   });
 

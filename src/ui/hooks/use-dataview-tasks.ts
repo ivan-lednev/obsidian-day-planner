@@ -2,6 +2,7 @@ import { DataArray, STask } from "obsidian-dataview";
 import { derived, type Readable } from "svelte/store";
 
 import type { DayPlannerSettings } from "../../settings";
+import * as dv from "../../util/dataview";
 
 interface UseDataviewTasksProps {
   listsFromVisibleDailyNotes: Readable<DataArray<STask>>;
@@ -17,10 +18,10 @@ export function useDataviewTasks({
   return derived(
     [listsFromVisibleDailyNotes, tasksFromExtraSources, settingsStore],
     ([$listsFromVisibleDailyNotes, $tasksFromExtraSources, $settingsStore]) => {
-      const allTasks = [
+      const allTasks = dv.uniq([
         ...$listsFromVisibleDailyNotes,
         ...$tasksFromExtraSources,
-      ];
+      ]);
 
       return $settingsStore.showCompletedTasks
         ? allTasks

@@ -1,4 +1,4 @@
-import { isString } from "lodash/fp";
+import { isString, uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
 import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { STask } from "obsidian-dataview";
@@ -220,3 +220,7 @@ export function withClockMoments(sTask: STask) {
       clockMoments,
     }));
 }
+
+export const uniq = uniqBy(
+  (task: STask) => `${task.path}::${task.position.start.line}`,
+);
