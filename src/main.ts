@@ -236,18 +236,21 @@ export default class DayPlanner extends Plugin {
 
     this.addCommand({
       id: "clock-in",
+      icon: "play",
       name: "Clock in",
       // @ts-expect-error
       editorCallback: this.sTaskEditor.clockInUnderCursor,
     });
 
     this.addCommand({
+      icon: "square",
       id: "clock-out",
       name: "Clock out",
       editorCallback: this.sTaskEditor.clockOutUnderCursor,
     });
 
     this.addCommand({
+      icon: "trash-2",
       id: "cancel-clock",
       name: "Cancel clock",
       // @ts-expect-error
