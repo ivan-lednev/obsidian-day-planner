@@ -41,7 +41,12 @@
   />
 
   {#if $sourceIsEmpty}
-    <Callout type="warning">Tasks are pulled only from daily notes</Callout>
+    <Callout type="warning"
+      >Tasks are pulled only from daily notes
+      {#if $settings.plannerHeading}
+        under planner heading: "{$settings.plannerHeading}"
+      {/if}
+    </Callout>
   {/if}
 
   {#if $dataviewErrorMessage.length > 0}
