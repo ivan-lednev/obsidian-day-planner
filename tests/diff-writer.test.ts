@@ -455,6 +455,42 @@ describe("From diff to vault", () => {
 `);
   });
 
+  test("Adds a heading to daily notes if there is none", async () => {
+    vi.mocked(getDailyNoteSettings).mockReturnValue({
+      format: defaultDayFormat,
+      folder: ".",
+    });
+
+    const files = [
+      createInMemoryFile({
+        path: "2023-01-01.md",
+        contents: "",
+      }),
+    ];
+
+    const diff = {
+      added: [
+        createTestTask({
+          text: "- 11:00 - 12:00 Task",
+          day: moment("2023-01-01"),
+          startMinutes: toMinutes("11:00"),
+        }),
+      ],
+    };
+
+    const { vault } = await writeDiff({
+      diff,
+      files,
+      mode: EditMode.DRAG,
+    });
+
+    expect(vault.getAbstractFileByPath("2023-01-01.md").contents)
+      .toBe(`# Day planner
+
+- 11:00 - 11:30 Task
+`);
+  });
+
   describe("Sorting by time", () => {
     test("Sorts tasks in plan after edit", async () => {
       vi.mocked(getDailyNoteSettings).mockReturnValue({

@@ -46,6 +46,10 @@ export function toggleCheckbox(line: string) {
   return line.replace("[x]", "[ ]");
 }
 
+export function createHeading(level: number, text: string) {
+  return `${"#".repeat(level)} ${text}`;
+}
+
 export function updateLine(
   contents: string,
   lineNumber: number,

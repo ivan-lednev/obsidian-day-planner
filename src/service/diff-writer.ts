@@ -17,6 +17,7 @@ import type { LocalTask } from "../task-types";
 import { EditMode } from "../ui/hooks/use-edit/types";
 import { createDailyNotePath } from "../util/daily-notes";
 import * as t from "../util/task-utils";
+import { createHeading } from "../util/util";
 
 import type { VaultFacade } from "./vault-facade";
 
@@ -135,17 +136,31 @@ export function createTransaction(props: {
         .reduce(applyRangeUpdate, lines)
         .join("\n");
 
+      // TODO: the knowledge is implicit here: mdast updates are only applied to daily notes
       if (mdastUpdates.length > 0) {
         result = applyScopedUpdates(
           result,
           settings.plannerHeading,
           (contents) => applyMdastUpdates(contents, mdastUpdates),
+          { createHeading: true, settings },
         );
       }
 
       return afterEach ? afterEach(result) : result;
     },
   }));
+}
+
+// todo: move to markdown
+function appendHeading(contents: string, heading: string) {
+  let result = contents;
+
+  if (contents.length > 0) {
+    result = result.trimEnd();
+    result = result.concat("\n", "\n");
+  }
+
+  return result.concat(heading, "\n", "\n");
 }
 
 /**
@@ -155,6 +170,7 @@ export function applyScopedUpdates(
   contents: string,
   headingScope: string,
   updateFn: (scopedContents: string) => string,
+  settings?: { createHeading: boolean; settings: DayPlannerSettings },
 ) {
   if (headingScope.trim().length === 0) {
     return contents;
@@ -163,6 +179,16 @@ export function applyScopedUpdates(
   const heading = findHeading(contents, headingScope);
 
   if (heading?.start === undefined) {
+    if (settings?.createHeading) {
+      const { plannerHeadingLevel, plannerHeading } = settings.settings;
+      const withHeading = appendHeading(
+        contents,
+        createHeading(plannerHeadingLevel, plannerHeading),
+      );
+
+      return applyScopedUpdates(withHeading, headingScope, updateFn);
+    }
+
     return contents;
   }
 
