@@ -2,7 +2,6 @@ import { App, SuggestModal } from "obsidian";
 
 type Suggestion = { text: string };
 
-// todo: move to file
 export class SingleSuggestModal extends SuggestModal<Suggestion> {
   constructor(
     private readonly props: {
@@ -44,4 +43,3 @@ export class SingleSuggestModal extends SuggestModal<Suggestion> {
     });
   }
 }
-
