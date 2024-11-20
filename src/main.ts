@@ -1,4 +1,5 @@
 import {
+  App,
   MarkdownView,
   Notice,
   Plugin,
@@ -9,7 +10,7 @@ import {
   createDailyNote,
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
-import type { STask } from "obsidian-dataview";
+import { type STask } from "obsidian-dataview";
 import { mount } from "svelte";
 import { fromStore, get, writable, type Writable } from "svelte/store";
 import { isInstanceOf, isNotVoid } from "typed-assert";
@@ -61,6 +62,9 @@ import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { getUpdateTrigger } from "./util/store";
+import { createDumpMetadataCommand } from "./dump-metadata";
+import { EditMode } from "./ui/hooks/use-edit/types";
+import { SingleSuggestModal } from "./ui/SingleSuggestModal";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -314,6 +318,89 @@ export default class DayPlanner extends Plugin {
   private registerViews() {
     const onUpdate: OnUpdateFn = async (base, next, mode) => {
       const diff = getTaskDiffFromEditState(base, next);
+
+      if (mode === EditMode.CREATE) {
+        const modalOutput = new Promise((resolve) => {
+
+        })
+        const created = diff.added[0];
+
+        isNotVoid(created);
+
+        new SingleSuggestModal({
+          app: this.app,
+          getDescriptionText: (value) =>
+            value.trim().length === 0
+              ? "Start typing to create a task"
+              : `Create "${value}"`,
+          onChooseSuggestion: async ({ text }) => {
+            // todo: remove duplication
+            const updates = mapTaskDiffToUpdates(
+              { added: [{ ...created, text }] },
+              mode,
+              this.settings(),
+            );
+            const afterEach = this.settings().sortTasksInPlanAfterEdit
+              ? (contents: string) =>
+                  applyScopedUpdates(
+                    contents,
+                    this.settings().plannerHeading,
+                    sortListsRecursivelyInMarkdown,
+                  )
+              : undefined;
+
+            const transaction = createTransaction({
+              updates,
+              afterEach,
+              settings: this.settings(),
+            });
+            const updatePaths = [
+              ...new Set([...transaction.map(({ path }) => path)]),
+            ];
+            const needToCreate = this.getPathsToCreate(updatePaths);
+
+            if (needToCreate.length > 0) {
+              const confirmed = await askForConfirmation({
+                app: this.app,
+                title: "Need to create files",
+                text: `The following files need to be created: ${needToCreate.join("; ")}`,
+                cta: "Create",
+              });
+
+              if (!confirmed) {
+                new Notice("Edit canceled");
+                this.syncDataview?.();
+
+                return;
+              }
+
+              await Promise.all(
+                needToCreate.map(async (path) => {
+                  const date = getDateFromPath(path, "day");
+
+                  isNotVoid(date);
+
+                  await createDailyNote(date);
+                }),
+              );
+            }
+
+            await this.transationWriter.writeTransaction(transaction);
+
+            this.currentUndoNotice?.hide();
+            this.currentUndoNotice = createUndoNotice(
+              this.transationWriter.undo,
+            );
+          },
+          onClose: () => {
+            // todo: remove duplication
+            this.syncDataview?.();
+          },
+        }).open();
+
+        return;
+      }
+
       const updates = mapTaskDiffToUpdates(diff, mode, this.settings());
       const afterEach = this.settings().sortTasksInPlanAfterEdit
         ? (contents: string) =>
@@ -329,9 +416,11 @@ export default class DayPlanner extends Plugin {
         afterEach,
         settings: this.settings(),
       });
+
       const updatePaths = [
         ...new Set([...transaction.map(({ path }) => path)]),
       ];
+
       const needToCreate = this.getPathsToCreate(updatePaths);
 
       if (needToCreate.length > 0) {
@@ -487,6 +576,13 @@ export default class DayPlanner extends Plugin {
           location.position?.start?.line,
         );
       },
+    });
+
+    //todo: show only in dev mode
+    this.addCommand({
+      id: "dump-metadata",
+      name: "Dump metadata to files",
+      callback: createDumpMetadataCommand(this.app),
     });
 
     const defaultObsidianContext: ObsidianContext = {
