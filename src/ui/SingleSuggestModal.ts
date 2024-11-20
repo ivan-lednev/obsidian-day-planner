@@ -36,10 +36,12 @@ export class SingleSuggestModal extends SuggestModal<Suggestion> {
     this.props.onChooseSuggestion(item);
   }
 
-  onClose() {
-    super.onClose();
-
-    this.props.onClose();
+  close() {
+    // Note: we need to be able to run onChooseSuggestion before onClose
+    window.setTimeout(() => {
+      this.props.onClose();
+      super.close();
+    });
   }
 }
 

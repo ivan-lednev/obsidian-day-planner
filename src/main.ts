@@ -1,5 +1,4 @@
 import {
-  App,
   MarkdownView,
   Notice,
   Plugin,
@@ -50,9 +49,11 @@ import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { askForConfirmation } from "./ui/confirmation-modal";
+import { EditMode } from "./ui/hooks/use-edit/types";
 import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
+import { SingleSuggestModal } from "./ui/SingleSuggestModal";
 import TimelineView from "./ui/timeline-view";
 import { createUndoNotice } from "./ui/undo-notice";
 import * as c from "./util/clock";
@@ -62,9 +63,6 @@ import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { getUpdateTrigger } from "./util/store";
-import { createDumpMetadataCommand } from "./dump-metadata";
-import { EditMode } from "./ui/hooks/use-edit/types";
-import { SingleSuggestModal } from "./ui/SingleSuggestModal";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -316,89 +314,44 @@ export default class DayPlanner extends Plugin {
   };
 
   private registerViews() {
+    const onEditCanceled = () => {
+      new Notice("Edit canceled");
+
+      // We need to manually reset tasks to the initial state
+      this.syncDataview?.();
+    };
+
     const onUpdate: OnUpdateFn = async (base, next, mode) => {
       const diff = getTaskDiffFromEditState(base, next);
 
       if (mode === EditMode.CREATE) {
-        const modalOutput = new Promise((resolve) => {
-
-        })
         const created = diff.added[0];
 
         isNotVoid(created);
 
-        new SingleSuggestModal({
-          app: this.app,
-          getDescriptionText: (value) =>
-            value.trim().length === 0
-              ? "Start typing to create a task"
-              : `Create "${value}"`,
-          onChooseSuggestion: async ({ text }) => {
-            // todo: remove duplication
-            const updates = mapTaskDiffToUpdates(
-              { added: [{ ...created, text }] },
-              mode,
-              this.settings(),
-            );
-            const afterEach = this.settings().sortTasksInPlanAfterEdit
-              ? (contents: string) =>
-                  applyScopedUpdates(
-                    contents,
-                    this.settings().plannerHeading,
-                    sortListsRecursivelyInMarkdown,
-                  )
-              : undefined;
+        const modalOutput: string | undefined = await new Promise((resolve) => {
+          new SingleSuggestModal({
+            app: this.app,
+            getDescriptionText: (value) =>
+              value.trim().length === 0
+                ? "Start typing to create a task"
+                : `Create item "${value}"`,
+            onChooseSuggestion: async ({ text }) => {
+              resolve(text);
+            },
+            onClose: () => {
+              resolve(undefined);
+            },
+          }).open();
+        });
 
-            const transaction = createTransaction({
-              updates,
-              afterEach,
-              settings: this.settings(),
-            });
-            const updatePaths = [
-              ...new Set([...transaction.map(({ path }) => path)]),
-            ];
-            const needToCreate = this.getPathsToCreate(updatePaths);
+        if (!modalOutput) {
+          onEditCanceled();
 
-            if (needToCreate.length > 0) {
-              const confirmed = await askForConfirmation({
-                app: this.app,
-                title: "Need to create files",
-                text: `The following files need to be created: ${needToCreate.join("; ")}`,
-                cta: "Create",
-              });
+          return;
+        }
 
-              if (!confirmed) {
-                new Notice("Edit canceled");
-                this.syncDataview?.();
-
-                return;
-              }
-
-              await Promise.all(
-                needToCreate.map(async (path) => {
-                  const date = getDateFromPath(path, "day");
-
-                  isNotVoid(date);
-
-                  await createDailyNote(date);
-                }),
-              );
-            }
-
-            await this.transationWriter.writeTransaction(transaction);
-
-            this.currentUndoNotice?.hide();
-            this.currentUndoNotice = createUndoNotice(
-              this.transationWriter.undo,
-            );
-          },
-          onClose: () => {
-            // todo: remove duplication
-            this.syncDataview?.();
-          },
-        }).open();
-
-        return;
+        diff.added[0] = { ...created, text: modalOutput };
       }
 
       const updates = mapTaskDiffToUpdates(diff, mode, this.settings());
@@ -432,8 +385,7 @@ export default class DayPlanner extends Plugin {
         });
 
         if (!confirmed) {
-          new Notice("Edit canceled");
-          this.syncDataview?.();
+          onEditCanceled();
 
           return;
         }
