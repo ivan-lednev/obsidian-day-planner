@@ -1,3 +1,10 @@
+## 0.26.3
+
+### 🐞 Fixed issues
+
+- Fix tasks not added to daily note when there is no planner heading inside it
+- Fix clocks from daily notes not showing up in timeline & active clocks
+
 ## 0.26.2
 
 ### 🐞 Fixed issues
