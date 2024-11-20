@@ -1,3 +1,10 @@
+## 0.27.0
+
+### ✨ New features
+
+- Edit text in the command palette before task creation
+- Add descriptive icons to clock commands, so that they are easier to use in the mobile toolbar
+
 ## 0.26.3
 
 ### 🐞 Fixed issues
