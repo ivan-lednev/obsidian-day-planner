@@ -61,7 +61,7 @@ export type PointerDateTime = Writable<{
   type?: "dateTime" | "date" | undefined;
 }>;
 
-function useTasks(props: {
+export function useTasks(props: {
   settingsStore: Writable<DayPlannerSettings>;
   combinedIcalSyncTrigger: Readable<object>;
   debouncedTaskUpdateTrigger: Readable<object>;
@@ -71,6 +71,7 @@ function useTasks(props: {
   visibleDays: Readable<Moment[]>;
   layoutReady: Readable<boolean>;
   dataviewFacade: DataviewFacade;
+  // todo: replace with metadata cache
   app: App;
   dataviewSource: Readable<string>;
   currentTime: Readable<Moment>;
@@ -210,6 +211,7 @@ function useTasks(props: {
     tasksForToday,
     currentTime,
   });
+
   return {
     tasksWithActiveClockProps,
     getDisplayedTasksWithClocksForTimeline,

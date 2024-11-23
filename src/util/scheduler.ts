@@ -29,6 +29,10 @@ const cancelJob =
     clearTimeout(id);
   });
 
+/**
+ * A scheduler accepts a list of tasks (a batch) and reports back when all of them are done.
+ * If a new batch of tasks is added, the scheduler will discard the previous batch and run the new one.
+ */
 export function createBackgroundBatchScheduler<T>(
   onFinish: (results: T[]) => void,
 ) {
@@ -54,13 +58,6 @@ export function createBackgroundBatchScheduler<T>(
     if (tasks.length > 0) {
       currentTaskHandle = enqueueJob(runTaskQueue);
     } else {
-      performance.mark("batch-end");
-      // const { duration } = performance.measure(
-      //   "batch",
-      //   "batch-start",
-      //   "batch-end",
-      // );
-
       onFinish(results);
       currentTaskHandle = null;
     }
