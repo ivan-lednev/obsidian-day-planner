@@ -1,15 +1,38 @@
 import { App } from "obsidian";
-import { getAPI, STask } from "obsidian-dataview";
+import { getAPI, STask, type DataviewApi } from "obsidian-dataview";
+import {
+  type Scheduler,
+  createBackgroundBatchScheduler,
+} from "../util/scheduler";
 
 export class DataviewFacade {
-  constructor(private readonly app: App) {}
+  private readonly scheduler: Scheduler<STask[]> =
+    createBackgroundBatchScheduler({
+      timeRemainingLowerLimit: 5,
+    });
 
-  getAllTasksFrom = (source: string) => {
-    return getAPI(this.app)?.pages(source).file.tasks.array() || [];
+  constructor(private readonly getDataview: () => DataviewApi | undefined) {}
+
+  getAllTasksFrom = async (source: string) => {
+    return new Promise<STask[]>((resolve) => {
+      const paths: string[] = this.getDataview()?.pagePaths(source).array();
+
+      const pageQueries: Array<() => STask[]> = paths.map(
+        (path) => () => this.getDataview()?.page(path)?.file.tasks.array(),
+      );
+
+      this.scheduler.enqueueTasks(pageQueries, (results) => {
+        resolve(results.flat());
+      });
+    });
+  };
+
+  legacy_getAllTasksFrom = (source: string) => {
+    return this.getDataview()?.pages(source).file.tasks.array() || [];
   };
 
   getAllListsFrom = (source: string) => {
-    return getAPI(this.app)?.pages(source).file.lists.array() || [];
+    return this.getDataview()?.pages(source).file.lists.array() || [];
   };
 
   getTaskAtLine({ path, line }: { path: string; line: number }) {
@@ -19,6 +42,6 @@ export class DataviewFacade {
   }
 
   private getTasksFromPath = (path: string): STask[] => {
-    return getAPI(this.app)?.page(path)?.file.tasks || [];
+    return this.getDataview()?.page(path)?.file.tasks || [];
   };
 }

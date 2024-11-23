@@ -10,7 +10,9 @@ import type { WithIcalConfig } from "../types";
 
 import { canHappenAfter, icalEventToTasks } from "./ical";
 import { getEarliestMoment } from "./moment";
-import { createBackgroundBatchScheduler } from "./scheduler";
+import {
+  createBackgroundBatchScheduler,
+} from "./scheduler";
 
 function isVEvent(event: ical.CalendarComponent): event is ical.VEvent {
   return event.type === "VEVENT";
@@ -93,12 +95,13 @@ export function useRemoteTasks(props: {
   const tasksFromEvents = readable<Array<ReturnType<typeof icalEventToTasks>>>(
     [],
     (set) => {
-      const scheduler =
-        createBackgroundBatchScheduler<ReturnType<typeof icalEventToTasks>>(
-          set,
-        );
+      const scheduler = createBackgroundBatchScheduler<
+        ReturnType<typeof icalEventToTasks>
+      >({ timeRemainingLowerLimit: 10 });
 
-      return schedulerQueue.subscribe(scheduler.enqueueTasks);
+      return schedulerQueue.subscribe((next) => {
+        scheduler.enqueueTasks(next, set);
+      });
     },
   );
 

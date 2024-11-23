@@ -34,9 +34,10 @@ export function useSearch(props: {
       return [];
     }
 
+    // todo: use async
     return (
       dataviewFacade
-        .getAllTasksFrom(currentSource)
+        .legacy_getAllTasksFrom(currentSource)
         .filter((task) => {
           return task.text.toLowerCase().includes(currentQuery);
         })

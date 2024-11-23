@@ -139,7 +139,7 @@ export function useTasks(props: {
           $currentTime,
           task.startTime.clone().startOf("minute"),
         ),
-        truncated: "bottom",
+        truncated: "bottom" as const,
       })),
   );
 

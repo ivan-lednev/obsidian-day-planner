@@ -1,6 +1,7 @@
 import { derived, type Readable } from "svelte/store";
 
 import { DataviewFacade } from "../../service/dataview-facade";
+import type { STask } from "obsidian-dataview";
 
 interface UseTasksFromExtraSourcesProps {
   dataviewSource: Readable<string>;
@@ -13,13 +14,17 @@ export function useTasksFromExtraSources({
   refreshSignal,
   dataviewFacade,
 }: UseTasksFromExtraSourcesProps) {
-  return derived([dataviewSource, refreshSignal], ([$dataviewSource]) => {
-    const noAdditionalSource = $dataviewSource.trim().length === 0;
+  return derived(
+    [dataviewSource, refreshSignal],
+    ([$dataviewSource], set: (tasks: STask[]) => void) => {
+      dataviewFacade
+        .getAllTasksFrom($dataviewSource)
+        .then(set, (reason) => {
+          console.error("Failed to fetch tasks from dataview source: ", reason);
 
-    if (noAdditionalSource) {
-      return [];
-    }
-
-    return dataviewFacade.getAllTasksFrom($dataviewSource);
-  });
+          set([]);
+        });
+    },
+    [],
+  );
 }

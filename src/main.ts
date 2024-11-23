@@ -9,7 +9,7 @@ import {
   createDailyNote,
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
-import { type STask } from "obsidian-dataview";
+import { getAPI, type STask } from "obsidian-dataview";
 import { mount } from "svelte";
 import { fromStore, get, writable, type Writable } from "svelte/store";
 import { isInstanceOf, isNotVoid } from "typed-assert";
@@ -86,7 +86,7 @@ export default class DayPlanner extends Plugin {
       this.app.workspace,
       this.vaultFacade,
     );
-    this.dataviewFacade = new DataviewFacade(this.app);
+    this.dataviewFacade = new DataviewFacade(() => getAPI(this.app));
     this.sTaskEditor = new STaskEditor(
       this.workspaceFacade,
       this.vaultFacade,
@@ -545,7 +545,7 @@ export default class DayPlanner extends Plugin {
       sTaskEditor: this.sTaskEditor,
       workspaceFacade: this.workspaceFacade,
       initWeeklyView: this.initWeeklyLeaf,
-      refreshTasks: this.dataviewFacade.getAllTasksFrom,
+      refreshTasks: this.dataviewFacade.legacy_getAllTasksFrom,
       dataviewLoaded,
       renderMarkdown: createRenderMarkdown(this.app),
       toggleCheckboxInFile: this.vaultFacade.toggleCheckboxInFile,
