@@ -44,6 +44,7 @@ export function createBackgroundBatchScheduler<T>(props: {
   let tasks: Array<() => T> = [];
   let currentTaskHandle: number | null = null;
   let currentOnFinish: (results: T[]) => void;
+  let currentOnCancel: (() => void) | undefined;
 
   function runTaskQueue(deadline: IdleDeadline) {
     while (
@@ -69,13 +70,16 @@ export function createBackgroundBatchScheduler<T>(props: {
   function enqueueTasks(
     newTasks: Array<() => T>,
     onFinish: (results: T[]) => void,
+    onCancel?: () => void,
   ) {
-    currentOnFinish = onFinish;
-
     if (currentTaskHandle) {
       cancelJob(currentTaskHandle);
+      currentOnCancel?.();
       currentTaskHandle = null;
     }
+
+    currentOnFinish = onFinish;
+    currentOnCancel = onCancel;
 
     tasks = newTasks;
     results = [];

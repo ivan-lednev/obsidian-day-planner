@@ -18,10 +18,9 @@ export function useDataviewTasks({
   return derived(
     [listsFromVisibleDailyNotes, tasksFromExtraSources, settingsStore],
     ([$listsFromVisibleDailyNotes, $tasksFromExtraSources, $settingsStore]) => {
-      const allTasks = dv.uniq([
-        ...$listsFromVisibleDailyNotes,
-        ...$tasksFromExtraSources,
-      ]);
+      const allTasks = dv.uniq(
+        $listsFromVisibleDailyNotes.concat($tasksFromExtraSources),
+      );
 
       return $settingsStore.showCompletedTasks
         ? allTasks

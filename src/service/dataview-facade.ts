@@ -1,5 +1,5 @@
-import { App } from "obsidian";
-import { getAPI, STask, type DataviewApi } from "obsidian-dataview";
+import { STask, type DataviewApi } from "obsidian-dataview";
+
 import {
   type Scheduler,
   createBackgroundBatchScheduler,
@@ -18,7 +18,8 @@ export class DataviewFacade {
       const paths: string[] = this.getDataview()?.pagePaths(source).array();
 
       const pageQueries: Array<() => STask[]> = paths.map(
-        (path) => () => this.getDataview()?.page(path)?.file.tasks.array(),
+        (path) => () =>
+          this.getDataview()?.page(path)?.file.tasks.array() || [],
       );
 
       this.scheduler.enqueueTasks(pageQueries, (results) => {
@@ -27,6 +28,7 @@ export class DataviewFacade {
     });
   };
 
+  // todo: remove
   legacy_getAllTasksFrom = (source: string) => {
     return this.getDataview()?.pages(source).file.tasks.array() || [];
   };

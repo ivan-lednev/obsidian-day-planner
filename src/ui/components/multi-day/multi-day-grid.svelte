@@ -16,6 +16,7 @@
     getPreviousWorkWeek,
   } from "../../../util/range";
   import * as r from "../../../util/range";
+  import Search from "../../components/search.svelte";
   import ControlButton from "../control-button.svelte";
   import { createSlide } from "../defaults";
   import {
@@ -198,9 +199,9 @@
     {#if visibleSideControls === "settings"}
       <SettingsControls />
     {/if}
-    <!--{#if visibleSideControls === "search"}-->
-    <!--  <Search />-->
-    <!--{/if}-->
+    {#if visibleSideControls === "search"}
+      <Search />
+    {/if}
   </div>
 {/if}
 

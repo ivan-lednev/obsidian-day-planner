@@ -65,8 +65,6 @@ export function useTasks(props: {
   settingsStore: Writable<DayPlannerSettings>;
   combinedIcalSyncTrigger: Readable<object>;
   debouncedTaskUpdateTrigger: Readable<object>;
-  taskUpdateTrigger: Readable<object>;
-  keyDown: Readable<object>;
   isOnline: Readable<boolean>;
   visibleDays: Readable<Moment[]>;
   layoutReady: Readable<boolean>;
@@ -90,8 +88,6 @@ export function useTasks(props: {
     app,
     dataviewSource,
     currentTime,
-    taskUpdateTrigger,
-    keyDown,
     workspaceFacade,
     pointerDateTime,
     onUpdate,
@@ -190,10 +186,8 @@ export function useTasks(props: {
   );
 
   const search = useSearch({
-    dataviewFacade,
+    dataviewTasks: tasksFromExtraSources,
     dataviewSource,
-    taskUpdateTrigger,
-    keyDown,
   });
 
   const editContext = useEditContext({
@@ -308,8 +302,6 @@ export function createHooks({
     app,
     dataviewSource,
     currentTime,
-    taskUpdateTrigger,
-    keyDown,
     workspaceFacade,
     onUpdate,
     pointerDateTime,

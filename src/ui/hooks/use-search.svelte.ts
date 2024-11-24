@@ -1,65 +1,53 @@
-import { derived, get, writable, type Readable } from "svelte/store";
+import type { STask } from "obsidian-dataview";
+import { derived, writable, type Readable } from "svelte/store";
 
 import { searchResultLimit } from "../../constants";
-import type { DataviewFacade } from "../../service/dataview-facade";
 import * as dv from "../../util/dataview";
-import { getUpdateTrigger } from "../../util/store";
-
-import { useDebounceWithDelay } from "./use-debounce-with-delay";
 
 export function useSearch(props: {
-  dataviewFacade: DataviewFacade;
+  dataviewTasks: Readable<Array<STask>>;
   dataviewSource: Readable<string>;
-  taskUpdateTrigger: Readable<unknown>;
-  keyDown: Readable<unknown>;
 }) {
-  const { dataviewFacade, dataviewSource, taskUpdateTrigger, keyDown } = props;
+  const { dataviewSource, dataviewTasks } = props;
 
-  const sourceSignal = dataviewSource;
   const query = writable("");
-  const updateSignal = derived([taskUpdateTrigger, query], getUpdateTrigger);
-  // todo: pass through update signal
-  const debouncedSearchSignal = useDebounceWithDelay(
-    updateSignal,
-    keyDown,
-    250,
+
+  const matchedStasks = derived(
+    [query, dataviewTasks, dataviewSource],
+    ([$query, $dataviewTasks]) =>
+      $query.trim().length === 0
+        ? []
+        : $dataviewTasks.filter((task) =>
+            task.text.toLowerCase().includes($query),
+          ),
   );
 
-  const result = derived(debouncedSearchSignal, () => {
-    // todo: pass through update signal and remove this
-    const currentQuery = get(query).toLowerCase();
-    const currentSource = get(sourceSignal);
+  const description = derived(
+    [query, matchedStasks],
+    ([$query, $matchedStasks]) => {
+      if ($query.trim().length === 0) {
+        return "Empty";
+      }
 
-    if (currentQuery.trim().length === 0) {
-      return [];
-    }
+      if ($matchedStasks.length === 0) {
+        return "No matches";
+      }
 
-    // todo: use async
+      if ($matchedStasks.length > searchResultLimit) {
+        return `Limited to ${searchResultLimit} entries. Try refining your search.`;
+      }
+
+      return `${$matchedStasks.length} matches`;
+    },
+  );
+
+  const result = derived(matchedStasks, ($matchedStasks) => {
     return (
-      dataviewFacade
-        .legacy_getAllTasksFrom(currentSource)
-        .filter((task) => {
-          return task.text.toLowerCase().includes(currentQuery);
-        })
+      $matchedStasks
+        .slice(0, searchResultLimit)
         // todo: remove moment
         .map((task) => dv.toUnscheduledTask(task, window.moment()))
     );
-  });
-
-  const description = derived([query, result], ([$query, $result]) => {
-    if ($query.trim().length === 0) {
-      return "Empty";
-    }
-
-    if ($result.length === 0) {
-      return "No matches";
-    }
-
-    if ($result.length > searchResultLimit) {
-      return `The matches are limited to ${searchResultLimit} entries. Try refining your search.`;
-    }
-
-    return `${$result.length} matches`;
   });
 
   return {
