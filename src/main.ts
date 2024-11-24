@@ -63,6 +63,8 @@ import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { getUpdateTrigger } from "./util/store";
+import { store } from "./store";
+import { icalRefreshRequested } from "./globalSlice";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -503,6 +505,8 @@ export default class DayPlanner extends Plugin {
       id: "re-sync",
       name: "Re-sync tasks",
       callback: async () => {
+        store.dispatch(icalRefreshRequested());
+
         icalSyncTrigger.set(getUpdateTrigger());
       },
     });
@@ -560,6 +564,7 @@ export default class DayPlanner extends Plugin {
       pointerDateTime,
       tasksWithActiveClockProps,
       getDisplayedTasksWithClocksForTimeline,
+      dispatch: store.dispatch,
     };
 
     const componentContext = new Map<

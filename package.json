@@ -71,6 +71,7 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.6.11",
+    "@reduxjs/toolkit": "^2.3.0",
     "@testing-library/dom": "^10.4.0",
     "chroma-js": "^3.0.0",
     "fraction.js": "4.3.7",

@@ -10,6 +10,7 @@ import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import type { useSearch } from "./ui/hooks/use-search.svelte";
 import { createShowPreview } from "./util/create-show-preview";
+import { type AppDispatch, store } from "./store";
 
 export type OnUpdateFn = (
   base: Array<LocalTask>,
@@ -51,6 +52,7 @@ export interface ObsidianContext {
   getDisplayedTasksWithClocksForTimeline: (
     day: Moment,
   ) => Readable<Array<WithPlacing<LocalTask>>>;
+  dispatch: AppDispatch;
 }
 
 export type ComponentContext = Map<string, unknown>;
