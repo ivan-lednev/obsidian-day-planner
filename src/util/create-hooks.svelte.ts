@@ -2,6 +2,14 @@ import { flow, groupBy, uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
 import { App } from "obsidian";
 import {
+  darkModeUpdated,
+  layoutReady as layoutReadyAction,
+  keyDown as keyDownAction,
+  networkStatusChanged,
+  dataviewChange as dataviewChangeAction,
+  icalRefreshRequested,
+} from "../globalSlice";
+import {
   derived,
   fromStore,
   readable,
@@ -42,6 +50,8 @@ import { withClockMoments } from "./dataview";
 import { getUpdateTrigger } from "./store";
 import { getDayKey, getRenderKey, isWithTime } from "./task-utils";
 import { useRemoteTasks } from "./use-remote-tasks";
+import type { AppDispatch } from "../store";
+import type DayPlanner from "../main";
 
 interface CreateHooksProps {
   app: App;
@@ -50,16 +60,18 @@ interface CreateHooksProps {
   settingsStore: Writable<DayPlannerSettings>;
   onUpdate: OnUpdateFn;
   currentTime: Readable<Moment>;
+  dispatch: AppDispatch;
+  plugin: DayPlanner;
 }
 
 function getDarkModeFlag() {
   return document.body.hasClass("theme-dark");
 }
 
-export type PointerDateTime = Writable<{
-  dateTime?: Moment | undefined;
-  type?: "dateTime" | "date" | undefined;
-}>;
+export type PointerDateTime = {
+  dateTime?: Moment;
+  type?: "dateTime" | "date";
+};
 
 export function useTasks(props: {
   settingsStore: Writable<DayPlannerSettings>;
@@ -75,7 +87,7 @@ export function useTasks(props: {
   currentTime: Readable<Moment>;
   workspaceFacade: WorkspaceFacade;
   onUpdate: OnUpdateFn;
-  pointerDateTime: PointerDateTime;
+  pointerDateTime: Writable<PointerDateTime>;
 }) {
   const {
     settingsStore,
@@ -223,17 +235,21 @@ export function createHooks({
   settingsStore,
   onUpdate,
   currentTime,
+  dispatch,
+  plugin,
 }: CreateHooksProps) {
   const dataviewSource = derived(settingsStore, ($settings) => {
     return $settings.dataviewSource;
   });
+
   const layoutReady = readable(false, (set) => {
     app.workspace.onLayoutReady(() => set(true));
   });
-  const pointerDateTime = writable<{
-    dateTime?: Moment;
-    type?: "dateTime" | "date";
-  }>({});
+  app.workspace.onLayoutReady(() => {
+    dispatch(layoutReadyAction());
+  });
+
+  const pointerDateTime = writable<PointerDateTime>({});
 
   const isDarkModeStore = readable(getDarkModeFlag(), (set) => {
     const eventRef = app.workspace.on("css-change", () => {
@@ -245,12 +261,37 @@ export function createHooks({
     };
   });
   const isDarkMode = fromStore(isDarkModeStore);
+  plugin.registerEvent(
+    app.workspace.on("css-change", () => {
+      dispatch(darkModeUpdated(getDarkModeFlag()));
+    }),
+  );
 
   const keyDown = useKeyDown();
+  plugin.registerDomEvent(document, "keydown", () => {
+    dispatch(keyDownAction());
+  });
+
   const isModPressed = useModPressed();
+  // todo:
+
   const isOnline = useIsOnline();
+  plugin.registerDomEvent(window, "online", () => {
+    dispatch(networkStatusChanged({ isOnline: true }));
+  });
+  plugin.registerDomEvent(window, "offline", () => {
+    dispatch(networkStatusChanged({ isOnline: false }));
+  });
 
   const dataviewChange = useDataviewChange(app.metadataCache);
+  plugin.registerEvent(
+    app.metadataCache.on(
+      // @ts-expect-error
+      "dataview:metadata-change",
+      () => dispatch(dataviewChangeAction()),
+    ),
+  );
+
   const dataviewLoaded = useDataviewLoaded(app);
 
   const icalRefreshTimer = readable(getUpdateTrigger(), (set) => {
@@ -262,6 +303,11 @@ export function createHooks({
       clearInterval(interval);
     };
   });
+  plugin.registerInterval(
+    window.setInterval(() => {
+      dispatch(icalRefreshRequested());
+    }, icalRefreshIntervalMillis),
+  );
 
   const icalSyncTrigger = writable();
   const combinedIcalSyncTrigger = derived(

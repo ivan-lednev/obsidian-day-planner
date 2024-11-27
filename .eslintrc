@@ -50,6 +50,12 @@
     }
   ],
   "rules": {
+    "no-constant-condition": [
+      "error",
+      {
+        "checkLoops": "allExceptWhileTrue"
+      }
+    ],
     // todo: Reenable once https://github.com/import-js/eslint-plugin-import/issues/1479 is fixed.
     "import/no-duplicates": "off",
     "svelte/valid-compile": "off",

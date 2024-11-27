@@ -4,21 +4,35 @@
 
   import BlockList from "./block-list.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
+  import { useSelector } from "../../use-selector";
+  import {
+    queryUpdated,
+    selectLimitedSearchResult,
+    selectQuery,
+    selectSearchDescription,
+  } from "../../search-slice";
 
   const {
-    search: { query, result, description },
     editContext: {
       handlers: { handleSearchResultGripMouseDown, handleTaskMouseUp },
     },
+    dispatch,
   } = getObsidianContext();
+
+  const result = useSelector(selectLimitedSearchResult);
+  const description = useSelector(selectSearchDescription);
+  const query = useSelector(selectQuery);
 </script>
 
 <div class="search-wrapper">
   <input
+    oninput={(event) => {
+      dispatch(queryUpdated(event.currentTarget.value));
+    }}
+    value={$query}
     placeholder="Search for tasks across the vault"
     spellcheck="false"
     type="text"
-    bind:value={$query}
   />
 
   <div class="result-message">

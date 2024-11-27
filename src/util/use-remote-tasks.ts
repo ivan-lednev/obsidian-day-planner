@@ -12,7 +12,7 @@ import { useIdleDerived } from "../ui/hooks/use-idle-derived";
 import { canHappenAfter, icalEventToTasks } from "./ical";
 import { getEarliestMoment } from "./moment";
 
-function isVEvent(event: ical.CalendarComponent): event is ical.VEvent {
+export function isVEvent(event: ical.CalendarComponent): event is ical.VEvent {
   return event.type === "VEVENT";
 }
 

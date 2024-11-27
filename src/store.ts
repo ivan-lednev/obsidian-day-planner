@@ -2,24 +2,28 @@ import type { Action, Selector, ThunkAction } from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
 import { globalSlice } from "./globalSlice";
 import { listenerMiddleware } from "./listenerMiddleware";
+import { searchSlice } from "./search-slice";
 
-const rootReducer = combineSlices(globalSlice);
+const rootReducer = combineSlices(globalSlice, searchSlice);
 
 export type RootState = ReturnType<typeof rootReducer>;
 
-export const makeStore = (preloadedState?: Partial<RootState>) => {
+export const makeStore = (props: {
+  preloadedState?: Partial<RootState>;
+  middleware: any;
+}) => {
+  const { preloadedState, middleware } = props;
+
   return configureStore({
     reducer: rootReducer,
-    middleware: (getDefaultMiddleware) => {
-      return getDefaultMiddleware().concat(listenerMiddleware.middleware);
-    },
+    middleware,
     preloadedState,
   });
 };
 
-export const store = makeStore();
+// export const store = makeStore();
 
-export type AppStore = typeof store;
+export type AppStore = ReturnType<typeof makeStore>;
 export type AppDispatch = AppStore["dispatch"];
 export type AppThunk<ThunkReturnType = void> = ThunkAction<
   ThunkReturnType,
@@ -27,21 +31,3 @@ export type AppThunk<ThunkReturnType = void> = ThunkAction<
   unknown,
   Action
 >;
-
-export function useSelector(select: Selector, onChange) {
-  let currentState;
-
-  function handleChange() {
-    let nextState = select(store.getState());
-
-    if (nextState !== currentState) {
-      currentState = nextState;
-      onChange(currentState);
-    }
-  }
-
-  const unsubscribe = store.subscribe(handleChange);
-  handleChange();
-
-  return currentState;
-}
