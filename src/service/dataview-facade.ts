@@ -28,13 +28,8 @@ export class DataviewFacade {
     });
   };
 
-  // todo: remove
-  legacy_getAllTasksFrom = (source: string) => {
-    return this.getDataview()?.pages(source).file.tasks.array() || [];
-  };
-
-  getAllListsFrom = (source: string) => {
-    return this.getDataview()?.pages(source).file.lists.array() || [];
+  getPathsFrom = (source: string) => {
+    return this.getDataview()?.pages(source).file.path.array() || [];
   };
 
   getTaskAtLine({ path, line }: { path: string; line: number }) {
@@ -43,7 +38,6 @@ export class DataviewFacade {
     );
   }
 
-  private getTasksFromPath = (path: string): STask[] => {
-    return this.getDataview()?.page(path)?.file.tasks || [];
-  };
+  getTasksFromPath = (path: string): STask[] =>
+    this.getDataview()?.page(path)?.file.tasks.array() || [];
 }

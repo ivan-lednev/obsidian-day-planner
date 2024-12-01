@@ -637,13 +637,16 @@ export default class DayPlanner extends Plugin {
 
     const dataviewPageParseMinimalTimeMillis = 5;
 
+    // todo: move listeners out
     listenerMiddleware.startListening({
       actionCreator: dataviewListenerStarted,
       effect: async (action, listenerApi) => {
         listenerApi.unsubscribe();
 
         // todo: move types out
-        const { getDataview }: { getDataview: () => DataviewApi } =
+        const {
+          dataviewFacade,
+        }: { getDataview: () => DataviewApi; dataviewFacade: DataviewFacade } =
           listenerApi.extra;
 
         // todo: move scheduler out
@@ -668,10 +671,9 @@ export default class DayPlanner extends Plugin {
 
           const { dataviewSource } = selectSettings(currentState);
 
-          const pagePaths =
-            getDataview()?.pagePaths(dataviewSource).array() || [];
+          const pagePaths = dataviewFacade.getPathsFrom(dataviewSource);
           const tasks = pagePaths.map(
-            (path) => () => getDataview()?.page(path)?.file.tasks.array() || [],
+            (path) => () => dataviewFacade.getTasksFromPath(path),
           );
 
           scheduler.enqueueTasks(tasks, (results) => {
