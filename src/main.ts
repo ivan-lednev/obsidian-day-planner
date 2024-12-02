@@ -52,9 +52,14 @@ import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
 import { settingsUpdated } from "./settings-slice";
-import { type AppStore, makeStore } from "./store";
+import {
+  type AppDispatch,
+  type AppStore,
+  makeStore,
+  type RootState,
+} from "./store";
 import { createGetTasksApi } from "./tasks-plugin";
-import type { ObsidianContext, OnUpdateFn } from "./types";
+import type { ObsidianContext, OnUpdateFn, ReduxExtraArgument } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { askForConfirmation } from "./ui/confirmation-modal";
 import { EditMode } from "./ui/hooks/use-edit/types";
@@ -619,7 +624,14 @@ export default class DayPlanner extends Plugin {
       },
     });
 
-    initDataviewListeners(listenerMiddleware.startListening);
+    // todo: add extra
+    const startAppListening = listenerMiddleware.startListening.withTypes<
+      RootState,
+      AppDispatch,
+      ReduxExtraArgument
+    >();
+
+    initDataviewListeners(startAppListening);
 
     this.store = makeStore({
       middleware: (getDefaultMiddleware) => {

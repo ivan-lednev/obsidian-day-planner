@@ -1,6 +1,7 @@
 import type { Moment } from "moment";
 import type { Readable, Writable } from "svelte/store";
 
+import type { DataviewFacade } from "./service/dataview-facade";
 import type { STaskEditor } from "./service/stask-editor";
 import type { VaultFacade } from "./service/vault-facade";
 import type { WorkspaceFacade } from "./service/workspace-facade";
@@ -70,3 +71,7 @@ declare global {
 export type WithIcalConfig<T> = T & { calendar: IcalConfig };
 
 export type DateRange = Writable<Moment[]> & { untrack: () => void };
+
+export type ReduxExtraArgument = {
+  dataviewFacade: DataviewFacade;
+};

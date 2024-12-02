@@ -3,16 +3,17 @@ import {
   isAnyOf,
   type Action,
   type PayloadAction,
+  type TypedStartListening,
 } from "@reduxjs/toolkit";
 import type { STask } from "obsidian-dataview";
 
 import { createAppSlice } from "./createAppSlice";
-import { DataviewFacade } from "./service/dataview-facade";
 import {
   checkDataviewSourceChanged,
   selectDataviewSource,
 } from "./settings-slice";
-import type { RootState } from "./store";
+import type { AppDispatch, RootState } from "./store";
+import type { ReduxExtraArgument } from "./types";
 import { createBackgroundBatchScheduler } from "./util/scheduler";
 
 interface DataviewSliceState {
@@ -59,17 +60,19 @@ export const { selectDataviewTasks } = dataviewSlice.selectors;
 
 const dataviewPageParseMinimalTimeMillis = 5;
 
-// todo: fix types
-export function initDataviewListeners(startListening) {
+export function initDataviewListeners(
+  startListening: TypedStartListening<
+    RootState,
+    AppDispatch,
+    ReduxExtraArgument
+  >,
+) {
   startListening({
     actionCreator: dataviewListenerStarted,
     effect: async (action, listenerApi) => {
       listenerApi.unsubscribe();
 
-      // todo: move types out
-      const { dataviewFacade }: { dataviewFacade: DataviewFacade } =
-        listenerApi.extra;
-
+      const { dataviewFacade } = listenerApi.extra;
       const scheduler = createBackgroundBatchScheduler({
         timeRemainingLowerLimit: dataviewPageParseMinimalTimeMillis,
       });
