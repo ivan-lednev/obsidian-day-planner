@@ -10,7 +10,6 @@ import { type AppDispatch, type AppStore } from "./store";
 import type { LocalTask, WithPlacing } from "./task-types";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
-import type { useSearch } from "./ui/hooks/use-search.svelte";
 import { createShowPreview } from "./util/create-show-preview";
 
 export type OnUpdateFn = (
@@ -46,8 +45,6 @@ export interface ObsidianContext {
   settings: Writable<DayPlannerSettings>;
   settingsSignal: { current: DayPlannerSettings };
   pointerDateTime: Writable<{ dateTime?: Moment; type?: "dateTime" | "date" }>;
-  // todo: searchEngine/timeBlockSearch...
-  search: ReturnType<typeof useSearch>;
   tasksWithActiveClockProps: Readable<LocalTask[]>;
   sTaskEditor: STaskEditor;
   getDisplayedTasksWithClocksForTimeline: (

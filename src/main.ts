@@ -437,7 +437,6 @@ export default class DayPlanner extends Plugin {
       isDarkMode,
       dateRanges,
       dataviewSyncTrigger,
-      search,
       pointerDateTime,
       tasksWithActiveClockProps,
       getDisplayedTasksWithClocksForTimeline,
@@ -561,7 +560,6 @@ export default class DayPlanner extends Plugin {
     // });
 
     const defaultObsidianContext: ObsidianContext = {
-      search,
       sTaskEditor: this.sTaskEditor,
       workspaceFacade: this.workspaceFacade,
       initWeeklyView: this.initWeeklyLeaf,
@@ -616,20 +614,17 @@ export default class DayPlanner extends Plugin {
   }
 
   private setUpReduxStore() {
-    const listenerMiddleware = createListenerMiddleware({
+    const listenerMiddleware = createListenerMiddleware<
+      RootState,
+      AppDispatch,
+      ReduxExtraArgument
+    >({
       extra: {
         dataviewFacade: this.dataviewFacade,
       },
     });
 
-    // todo: add extra
-    const startAppListening = listenerMiddleware.startListening.withTypes<
-      RootState,
-      AppDispatch,
-      ReduxExtraArgument
-    >();
-
-    initDataviewListeners(startAppListening);
+    initDataviewListeners(listenerMiddleware.startListening);
 
     this.store = makeStore({
       middleware: (getDefaultMiddleware) => {

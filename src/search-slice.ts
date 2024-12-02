@@ -37,7 +37,11 @@ const selectSearchResult = createSelector(
       return [];
     }
 
-    return result.filter((task) => task.text.toLowerCase().includes(query));
+    const normalizedQuery = query.toLowerCase();
+
+    return result.filter((task) =>
+      task.text.toLowerCase().includes(normalizedQuery),
+    );
   },
 );
 

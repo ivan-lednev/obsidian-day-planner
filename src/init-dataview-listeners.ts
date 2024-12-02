@@ -16,6 +16,16 @@ import { createBackgroundBatchScheduler } from "./util/scheduler";
 
 const dataviewPageParseMinimalTimeMillis = 5;
 
+function checkIfDataviewUpdateNeeded(action: Action, currentState: RootState) {
+  return (
+    isAnyOf(
+      dataviewListenerStopped,
+      dataviewRefreshRequested,
+      dataviewChange,
+    )(action) || checkDataviewSourceChanged(action, currentState)
+  );
+}
+
 export function initDataviewListeners(startListening: StartListeningFn) {
   startListening({
     actionCreator: dataviewListenerStarted,
@@ -27,19 +37,10 @@ export function initDataviewListeners(startListening: StartListeningFn) {
         timeRemainingLowerLimit: dataviewPageParseMinimalTimeMillis,
       });
 
-      function checkUpdateRequired(action: Action, currentState: RootState) {
-        return (
-          isAnyOf(
-            dataviewListenerStopped,
-            dataviewRefreshRequested,
-            dataviewChange,
-          )(action) || checkDataviewSourceChanged(action, currentState)
-        );
-      }
-
       while (true) {
-        const [action, currentState] =
-          await listenerApi.take(checkUpdateRequired);
+        const [action, currentState] = await listenerApi.take(
+          checkIfDataviewUpdateNeeded,
+        );
 
         if (action.type === dataviewListenerStopped.type) {
           listenerApi.subscribe();
