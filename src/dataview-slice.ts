@@ -1,9 +1,18 @@
-import { createAction, isAnyOf, type PayloadAction } from "@reduxjs/toolkit";
+import {
+  createAction,
+  isAnyOf,
+  type Action,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import type { STask } from "obsidian-dataview";
 
 import { createAppSlice } from "./createAppSlice";
-import { selectSettings } from "./globalSlice";
 import { DataviewFacade } from "./service/dataview-facade";
+import {
+  checkDataviewSourceChanged,
+  selectDataviewSource,
+} from "./settings-slice";
+import type { RootState } from "./store";
 import { createBackgroundBatchScheduler } from "./util/scheduler";
 
 interface DataviewSliceState {
@@ -51,7 +60,7 @@ export const { selectDataviewTasks } = dataviewSlice.selectors;
 const dataviewPageParseMinimalTimeMillis = 5;
 
 // todo: fix types
-export function startDataviewListeners(startListening) {
+export function initDataviewListeners(startListening) {
   startListening({
     actionCreator: dataviewListenerStarted,
     effect: async (action, listenerApi) => {
@@ -65,18 +74,26 @@ export function startDataviewListeners(startListening) {
         timeRemainingLowerLimit: dataviewPageParseMinimalTimeMillis,
       });
 
-      while (true) {
-        // todo: react to settings
-        const [action, currentState] = await listenerApi.take(
-          isAnyOf(dataviewRefreshRequested, dataviewListenerStopped),
+      function checkUpdateRequired(action: Action, currentState: RootState) {
+        return (
+          isAnyOf(
+            dataviewListenerStopped,
+            dataviewRefreshRequested,
+            dataviewChange,
+          )(action) || checkDataviewSourceChanged(action, currentState)
         );
+      }
+
+      while (true) {
+        const [action, currentState] =
+          await listenerApi.take(checkUpdateRequired);
 
         if (action.type === dataviewListenerStopped.type) {
           listenerApi.subscribe();
           break;
         }
 
-        const { dataviewSource } = selectSettings(currentState);
+        const dataviewSource = selectDataviewSource(currentState);
 
         const pagePaths = dataviewFacade.getPathsFrom(dataviewSource);
         const tasks = pagePaths.map(

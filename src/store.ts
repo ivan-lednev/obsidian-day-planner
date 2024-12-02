@@ -4,8 +4,14 @@ import { combineSlices, configureStore } from "@reduxjs/toolkit";
 import { dataviewSlice } from "./dataview-slice";
 import { globalSlice } from "./globalSlice";
 import { searchSlice } from "./search-slice";
+import { settingsSlice } from "./settings-slice";
 
-const rootReducer = combineSlices(globalSlice, searchSlice, dataviewSlice);
+const rootReducer = combineSlices(
+  globalSlice,
+  searchSlice,
+  dataviewSlice,
+  settingsSlice,
+);
 
 export type RootState = ReturnType<typeof rootReducer>;
 

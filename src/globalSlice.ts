@@ -2,7 +2,6 @@ import { createAction, type PayloadAction } from "@reduxjs/toolkit";
 import ical from "node-ical";
 
 import { createAppSlice } from "./createAppSlice";
-import { type DayPlannerSettings, defaultSettings } from "./settings";
 import type { WithIcalConfig } from "./types";
 import type { PointerDateTime } from "./util/create-hooks.svelte";
 
@@ -14,7 +13,6 @@ interface ObsidianSliceState {
   isDarkMode: boolean;
   modPressed: boolean;
   isOnline: boolean;
-  settings: DayPlannerSettings;
 }
 
 const initialState: ObsidianSliceState = {
@@ -24,7 +22,6 @@ const initialState: ObsidianSliceState = {
   isDarkMode: false,
   modPressed: false,
   isOnline: window.navigator.onLine,
-  settings: defaultSettings,
   pointerDateTime: {},
 };
 
@@ -32,16 +29,6 @@ export const globalSlice = createAppSlice({
   name: "obsidian",
   initialState,
   reducers: (create) => ({
-    settingsUpdated: create.reducer(
-      (state, action: PayloadAction<Partial<DayPlannerSettings>>) => {
-        state.settings = { ...state.settings, ...action.payload };
-      },
-    ),
-    settingsLoaded: create.reducer(
-      (state, action: PayloadAction<DayPlannerSettings>) => {
-        state.settings = action.payload;
-      },
-    ),
     icalEventsUpdated: create.reducer(
       (
         state,
@@ -89,8 +76,6 @@ export const globalSlice = createAppSlice({
   }),
   selectors: {
     selectIsOnline: (state) => state.isOnline,
-    selectDataviewSource: (state) => state.settings.dataviewSource,
-    selectSettings: (state) => state.settings,
     selectVisibleDays: (state) => {
       const days = Object.values(state.dateRanges).flat();
 
@@ -108,7 +93,6 @@ export const icalListenerStarted = createAction("obsidian/icalListenerStarted");
 export const icalListenerStopped = createAction("obsidian/icalListenerStopped");
 
 export const {
-  settingsUpdated,
   darkModeUpdated,
   layoutReady,
   modDown,
@@ -117,12 +101,6 @@ export const {
   icalEventsUpdated,
   dateRangeClosed,
   dateRangeOpened,
-  settingsLoaded,
 } = globalSlice.actions;
 
-export const {
-  selectDataviewSource,
-  selectSettings,
-  selectVisibleDays,
-  selectIsOnline,
-} = globalSlice.selectors;
+export const { selectVisibleDays, selectIsOnline } = globalSlice.selectors;

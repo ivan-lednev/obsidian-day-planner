@@ -24,11 +24,11 @@ import {
 } from "./constants";
 import {
   dataviewListenerStarted,
-  startDataviewListeners,
+  initDataviewListeners,
 } from "./dataview-slice";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
-import { icalRefreshRequested, settingsUpdated } from "./globalSlice";
+import { icalRefreshRequested } from "./globalSlice";
 import {
   compareByTimestampInText,
   fromMarkdown,
@@ -51,6 +51,7 @@ import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
+import { settingsUpdated } from "./settings-slice";
 import { type AppStore, makeStore } from "./store";
 import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn } from "./types";
@@ -618,7 +619,7 @@ export default class DayPlanner extends Plugin {
       },
     });
 
-    startDataviewListeners(listenerMiddleware.startListening);
+    initDataviewListeners(listenerMiddleware.startListening);
 
     this.store = makeStore({
       middleware: (getDefaultMiddleware) => {
