@@ -1,10 +1,15 @@
-import type { Action, ThunkAction } from "@reduxjs/toolkit";
+import type {
+  Action,
+  ThunkAction,
+  TypedStartListening,
+} from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
 
 import { dataviewSlice } from "./dataview-slice";
 import { globalSlice } from "./globalSlice";
 import { searchSlice } from "./search-slice";
 import { settingsSlice } from "./settings-slice";
+import type { ReduxExtraArgument } from "./types";
 
 const rootReducer = combineSlices(
   globalSlice,
@@ -36,4 +41,9 @@ export type AppThunk<ThunkReturnType = void> = ThunkAction<
   RootState,
   unknown,
   Action
+>;
+export type StartListeningFn = TypedStartListening<
+  RootState,
+  AppDispatch,
+  ReduxExtraArgument
 >;

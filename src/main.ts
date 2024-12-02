@@ -22,13 +22,11 @@ import {
   viewTypeTimeline,
   viewTypeMultiDay,
 } from "./constants";
-import {
-  dataviewListenerStarted,
-  initDataviewListeners,
-} from "./dataview-slice";
+import { dataviewListenerStarted } from "./dataview-slice";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import { icalRefreshRequested } from "./globalSlice";
+import { initDataviewListeners } from "./init-dataview-listeners";
 import {
   compareByTimestampInText,
   fromMarkdown,
