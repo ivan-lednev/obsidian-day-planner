@@ -3,7 +3,6 @@ import { isAnyOf, type Action } from "@reduxjs/toolkit";
 import {
   dataviewChange,
   dataviewListenerStarted,
-  dataviewListenerStopped,
   dataviewRefreshRequested,
   dataviewTasksUpdated,
 } from "./dataview-slice";
@@ -18,11 +17,8 @@ const dataviewPageParseMinimalTimeMillis = 5;
 
 function checkIfDataviewUpdateNeeded(action: Action, currentState: RootState) {
   return (
-    isAnyOf(
-      dataviewListenerStopped,
-      dataviewRefreshRequested,
-      dataviewChange,
-    )(action) || checkDataviewSourceChanged(action, currentState)
+    isAnyOf(dataviewRefreshRequested, dataviewChange)(action) ||
+    checkDataviewSourceChanged(action, currentState)
   );
 }
 
@@ -38,14 +34,9 @@ export function initDataviewListeners(startListening: StartListeningFn) {
       });
 
       while (true) {
-        const [action, currentState] = await listenerApi.take(
+        const [, currentState] = await listenerApi.take(
           checkIfDataviewUpdateNeeded,
         );
-
-        if (action.type === dataviewListenerStopped.type) {
-          listenerApi.subscribe();
-          break;
-        }
 
         const dataviewSource = selectDataviewSource(currentState);
 

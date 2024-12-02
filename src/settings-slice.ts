@@ -29,13 +29,15 @@ export const settingsSlice = createAppSlice({
   }),
   selectors: {
     selectDataviewSource: (state) => state.settings.dataviewSource,
+    selectIcals: (state) => state.settings.icals,
     selectSettings: (state) => state.settings,
   },
 });
 
 export const { settingsUpdated, settingsLoaded } = settingsSlice.actions;
 
-export const { selectDataviewSource, selectSettings } = settingsSlice.selectors;
+export const { selectDataviewSource, selectSettings, selectIcals } =
+  settingsSlice.selectors;
 
 export const checkDataviewSourceChanged =
   createSelectorChangePredicate(selectDataviewSource);

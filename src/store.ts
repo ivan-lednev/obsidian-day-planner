@@ -10,12 +10,14 @@ import { globalSlice } from "./globalSlice";
 import { searchSlice } from "./search-slice";
 import { settingsSlice } from "./settings-slice";
 import type { ReduxExtraArgument } from "./types";
+import { icalSlice } from "./ical-slice";
 
 const rootReducer = combineSlices(
   globalSlice,
   searchSlice,
   dataviewSlice,
   settingsSlice,
+  icalSlice,
 );
 
 export type RootState = ReturnType<typeof rootReducer>;

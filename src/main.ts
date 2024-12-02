@@ -26,7 +26,9 @@ import { dataviewListenerStarted } from "./dataview-slice";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import { icalRefreshRequested } from "./globalSlice";
+import { icalListenerStarted } from "./ical-slice";
 import { initDataviewListeners } from "./init-dataview-listeners";
+import { initIcalListeners } from "./init-remote-calendars-listeners";
 import {
   compareByTimestampInText,
   fromMarkdown,
@@ -625,6 +627,7 @@ export default class DayPlanner extends Plugin {
     });
 
     initDataviewListeners(listenerMiddleware.startListening);
+    initIcalListeners(listenerMiddleware.startListening);
 
     this.store = makeStore({
       middleware: (getDefaultMiddleware) => {
@@ -633,6 +636,7 @@ export default class DayPlanner extends Plugin {
     });
 
     this.store.dispatch(dataviewListenerStarted());
+    this.store.dispatch(icalListenerStarted());
 
     this.register(() => {
       listenerMiddleware.clearListeners();
