@@ -1,3 +1,4 @@
+import { createListenerMiddleware } from "@reduxjs/toolkit";
 import {
   MarkdownView,
   Notice,
@@ -9,7 +10,7 @@ import {
   createDailyNote,
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
-import { getAPI, type DataviewApi, type STask } from "obsidian-dataview";
+import { getAPI, type STask } from "obsidian-dataview";
 import { mount } from "svelte";
 import { fromStore, get, writable, type Writable } from "svelte/store";
 import { isInstanceOf, isNotVoid } from "typed-assert";
@@ -21,8 +22,13 @@ import {
   viewTypeTimeline,
   viewTypeMultiDay,
 } from "./constants";
+import {
+  dataviewListenerStarted,
+  startDataviewListeners,
+} from "./dataview-slice";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
+import { icalRefreshRequested, settingsUpdated } from "./globalSlice";
 import {
   compareByTimestampInText,
   fromMarkdown,
@@ -45,6 +51,7 @@ import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
+import { type AppStore, makeStore } from "./store";
 import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
@@ -63,20 +70,6 @@ import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { getUpdateTrigger } from "./util/store";
-import { type AppStore, makeStore } from "./store";
-import {
-  dataviewListenerStarted,
-  dataviewListenerStopped,
-  dataviewRefreshRequested,
-  dataviewTasksUpdated,
-  icalRefreshRequested,
-  selectSettings,
-  settingsUpdated,
-} from "./globalSlice";
-import { listenerMiddleware } from "./listenerMiddleware";
-import { createListenerMiddleware, isAnyOf } from "@reduxjs/toolkit";
-import { createBackgroundBatchScheduler } from "./util/scheduler";
-import { queryUpdated } from "./search-slice";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -91,9 +84,10 @@ export default class DayPlanner extends Plugin {
   private store!: AppStore;
 
   async onload() {
-    await this.initSettingsStore();
-
+    this.dataviewFacade = new DataviewFacade(() => getAPI(this.app));
     this.setUpReduxStore();
+
+    await this.initSettingsStore();
 
     const getTasksApi = createGetTasksApi(this.app);
 
@@ -103,7 +97,6 @@ export default class DayPlanner extends Plugin {
       this.app.workspace,
       this.vaultFacade,
     );
-    this.dataviewFacade = new DataviewFacade(() => getAPI(this.app));
     this.sTaskEditor = new STaskEditor(
       this.workspaceFacade,
       this.vaultFacade,
@@ -123,10 +116,6 @@ export default class DayPlanner extends Plugin {
 
     await this.handleNewPluginVersion();
     await this.initTimelineLeafSilently();
-
-    // this.app.workspace.onLayoutReady(() => {
-    //   this.setUpReduxStore();
-    // });
   }
 
   async onunload() {
@@ -625,61 +614,15 @@ export default class DayPlanner extends Plugin {
   private setUpReduxStore() {
     const listenerMiddleware = createListenerMiddleware({
       extra: {
-        getDataview: () => getAPI(this.app),
+        dataviewFacade: this.dataviewFacade,
       },
     });
+
+    startDataviewListeners(listenerMiddleware.startListening);
 
     this.store = makeStore({
       middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware().concat(listenerMiddleware.middleware);
-      },
-    });
-
-    const dataviewPageParseMinimalTimeMillis = 5;
-
-    // todo: move listeners out
-    listenerMiddleware.startListening({
-      actionCreator: dataviewListenerStarted,
-      effect: async (action, listenerApi) => {
-        listenerApi.unsubscribe();
-
-        // todo: move types out
-        const {
-          dataviewFacade,
-        }: { getDataview: () => DataviewApi; dataviewFacade: DataviewFacade } =
-          listenerApi.extra;
-
-        // todo: move scheduler out
-        const scheduler = createBackgroundBatchScheduler({
-          timeRemainingLowerLimit: dataviewPageParseMinimalTimeMillis,
-        });
-
-        while (true) {
-          // todo: react to settings
-          const [action, currentState] = await listenerApi.take(
-            isAnyOf(
-              dataviewRefreshRequested,
-              dataviewListenerStopped,
-              queryUpdated,
-            ),
-          );
-
-          if (action.type === dataviewListenerStopped.type) {
-            listenerApi.subscribe();
-            break;
-          }
-
-          const { dataviewSource } = selectSettings(currentState);
-
-          const pagePaths = dataviewFacade.getPathsFrom(dataviewSource);
-          const tasks = pagePaths.map(
-            (path) => () => dataviewFacade.getTasksFromPath(path),
-          );
-
-          scheduler.enqueueTasks(tasks, (results) => {
-            listenerApi.dispatch(dataviewTasksUpdated(results.flat()));
-          });
-        }
       },
     });
 

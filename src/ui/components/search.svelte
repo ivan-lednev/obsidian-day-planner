@@ -1,16 +1,16 @@
 <script lang="ts">
   import { getObsidianContext } from "../../context/obsidian-context";
-  import type { LocalTask } from "../../task-types";
-
-  import BlockList from "./block-list.svelte";
-  import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
-  import { useSelector } from "../../use-selector";
   import {
     queryUpdated,
     selectLimitedSearchResult,
     selectQuery,
     selectSearchDescription,
   } from "../../search-slice";
+  import type { LocalTask } from "../../task-types";
+  import { useSelector } from "../../use-selector";
+
+  import BlockList from "./block-list.svelte";
+  import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   const {
     editContext: {
@@ -29,10 +29,10 @@
     oninput={(event) => {
       dispatch(queryUpdated(event.currentTarget.value));
     }}
-    value={$query}
     placeholder="Search for tasks across the vault"
     spellcheck="false"
     type="text"
+    value={$query}
   />
 
   <div class="result-message">

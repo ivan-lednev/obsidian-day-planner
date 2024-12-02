@@ -5,12 +5,12 @@ import type { STaskEditor } from "./service/stask-editor";
 import type { VaultFacade } from "./service/vault-facade";
 import type { WorkspaceFacade } from "./service/workspace-facade";
 import type { DayPlannerSettings, IcalConfig } from "./settings";
+import { type AppDispatch, type AppStore } from "./store";
 import type { LocalTask, WithPlacing } from "./task-types";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import type { useSearch } from "./ui/hooks/use-search.svelte";
 import { createShowPreview } from "./util/create-show-preview";
-import { type AppDispatch, type AppStore, store } from "./store";
 
 export type OnUpdateFn = (
   base: Array<LocalTask>,

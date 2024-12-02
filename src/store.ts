@@ -1,15 +1,17 @@
-import type { Action, Selector, ThunkAction } from "@reduxjs/toolkit";
+import type { Action, ThunkAction } from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
+
+import { dataviewSlice } from "./dataview-slice";
 import { globalSlice } from "./globalSlice";
-import { listenerMiddleware } from "./listenerMiddleware";
 import { searchSlice } from "./search-slice";
 
-const rootReducer = combineSlices(globalSlice, searchSlice);
+const rootReducer = combineSlices(globalSlice, searchSlice, dataviewSlice);
 
 export type RootState = ReturnType<typeof rootReducer>;
 
 export const makeStore = (props: {
   preloadedState?: Partial<RootState>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   middleware: any;
 }) => {
   const { preloadedState, middleware } = props;
@@ -20,8 +22,6 @@ export const makeStore = (props: {
     preloadedState,
   });
 };
-
-// export const store = makeStore();
 
 export type AppStore = ReturnType<typeof makeStore>;
 export type AppDispatch = AppStore["dispatch"];
