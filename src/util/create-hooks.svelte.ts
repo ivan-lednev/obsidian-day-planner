@@ -38,7 +38,6 @@ import { useKeyDown } from "../ui/hooks/use-key-down";
 import { useListsFromVisibleDailyNotes } from "../ui/hooks/use-lists-from-visible-daily-notes";
 import { useModPressed } from "../ui/hooks/use-mod-pressed";
 import { useNewlyStartedTasks } from "../ui/hooks/use-newly-started-tasks";
-import { useSearch } from "../ui/hooks/use-search.svelte";
 import { useTasksFromExtraSources } from "../ui/hooks/use-tasks-from-extra-sources";
 import { useTasksWithActiveClockProps } from "../ui/hooks/use-tasks-with-active-clock-props";
 import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
@@ -197,11 +196,6 @@ export function useTasks(props: {
     },
   );
 
-  const search = useSearch({
-    dataviewTasks: tasksFromExtraSources,
-    dataviewSource,
-  });
-
   const editContext = useEditContext({
     workspaceFacade,
     onUpdate,
@@ -222,7 +216,6 @@ export function useTasks(props: {
     tasksWithActiveClockProps,
     getDisplayedTasksWithClocksForTimeline,
     tasksForToday,
-    search,
     editContext,
     newlyStartedTasks,
   };
@@ -333,7 +326,6 @@ export function createHooks({
     tasksWithActiveClockProps,
     getDisplayedTasksWithClocksForTimeline,
     tasksForToday,
-    search,
     editContext,
     newlyStartedTasks,
   } = useTasks({
@@ -364,7 +356,6 @@ export function createHooks({
     dataviewSyncTrigger,
     isOnline,
     isDarkMode,
-    search,
     dateRanges,
     pointerDateTime,
     getDisplayedTasksWithClocksForTimeline,
