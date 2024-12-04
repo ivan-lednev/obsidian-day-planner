@@ -1,7 +1,7 @@
 import { createAction, type PayloadAction } from "@reduxjs/toolkit";
 import type { STask } from "obsidian-dataview";
 
-import { createAppSlice } from "./createAppSlice";
+import { createAppSlice } from "../create-app-slice";
 
 interface DataviewSliceState {
   dataviewTasks: Array<STask>;
@@ -39,5 +39,4 @@ export const dataviewListenerStarted = createAction(
 );
 
 export const { dataviewChange, dataviewTasksUpdated } = dataviewSlice.actions;
-
 export const { selectDataviewTasks } = dataviewSlice.selectors;

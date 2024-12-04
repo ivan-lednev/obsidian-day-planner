@@ -1,17 +1,18 @@
 import { isAnyOf, type Action } from "@reduxjs/toolkit";
 
+import { createBackgroundBatchScheduler } from "../../util/scheduler";
+import {
+  checkDataviewSourceChanged,
+  selectDataviewSource,
+} from "../settings-slice";
+import type { RootState, StartListeningFn } from "../store";
+
 import {
   dataviewChange,
   dataviewListenerStarted,
   dataviewRefreshRequested,
   dataviewTasksUpdated,
 } from "./dataview-slice";
-import {
-  checkDataviewSourceChanged,
-  selectDataviewSource,
-} from "./settings-slice";
-import type { RootState, StartListeningFn } from "./store";
-import { createBackgroundBatchScheduler } from "./util/scheduler";
 
 const dataviewPageParseMinimalTimeMillis = 5;
 

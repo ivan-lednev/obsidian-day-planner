@@ -1,9 +1,9 @@
 import { createAction, type PayloadAction } from "@reduxjs/toolkit";
 import ical from "node-ical";
 
-import { createAppSlice } from "./createAppSlice";
-import type { RemoteTask } from "./task-types";
-import type { WithIcalConfig } from "./types";
+import type { RemoteTask } from "../../task-types";
+import type { WithIcalConfig } from "../../types";
+import { createAppSlice } from "../create-app-slice";
 
 interface IcalState {
   icalEvents: Array<WithIcalConfig<ical.VEvent>>;

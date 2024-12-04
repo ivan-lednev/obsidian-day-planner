@@ -5,9 +5,9 @@
     selectLimitedSearchResult,
     selectQuery,
     selectSearchDescription,
-  } from "../../search-slice";
+  } from "../../redux/search-slice";
+  import { useSelector } from "../../redux/use-selector";
   import type { LocalTask } from "../../task-types";
-  import { useSelector } from "../../use-selector";
 
   import BlockList from "./block-list.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";

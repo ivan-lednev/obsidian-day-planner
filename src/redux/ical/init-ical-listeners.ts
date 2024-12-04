@@ -2,7 +2,18 @@ import { isEmpty } from "lodash/fp";
 import ical from "node-ical";
 import { request } from "obsidian";
 
-import { selectVisibleDays } from "./globalSlice";
+import type { IcalConfig } from "../../settings";
+import type { RemoteTask, WithTime } from "../../task-types";
+import type { WithIcalConfig } from "../../types";
+import { canHappenAfter, icalEventToTasks } from "../../util/ical";
+import { getEarliestMoment } from "../../util/moment";
+import { createBackgroundBatchScheduler } from "../../util/scheduler";
+import { isVEvent } from "../../util/use-remote-tasks";
+import { selectVisibleDays } from "../global-slice";
+import { selectIcals } from "../settings-slice";
+import type { StartListeningFn } from "../store";
+import { createSelectorChangePredicate } from "../util";
+
 import {
   icalEventsUpdated,
   icalListenerStarted,
@@ -10,16 +21,6 @@ import {
   remoteTasksUpdated,
   selectIcalEvents,
 } from "./ical-slice";
-import { createSelectorChangePredicate } from "./redux-util";
-import type { IcalConfig } from "./settings";
-import { selectIcals } from "./settings-slice";
-import type { StartListeningFn } from "./store";
-import type { RemoteTask, WithTime } from "./task-types";
-import type { WithIcalConfig } from "./types";
-import { canHappenAfter, icalEventToTasks } from "./util/ical";
-import { getEarliestMoment } from "./util/moment";
-import { createBackgroundBatchScheduler } from "./util/scheduler";
-import { isVEvent } from "./util/use-remote-tasks";
 
 const icalParseLowerLimit = 10;
 

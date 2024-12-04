@@ -2,10 +2,11 @@ import { createAction, type PayloadAction } from "@reduxjs/toolkit";
 import moment from "moment";
 import ical from "node-ical";
 
-import { defaultDayFormat } from "./constants";
-import { createAppSlice } from "./createAppSlice";
-import type { WithIcalConfig } from "./types";
-import type { PointerDateTime } from "./util/create-hooks.svelte";
+import { defaultDayFormat } from "../constants";
+import type { WithIcalConfig } from "../types";
+import type { PointerDateTime } from "../util/create-hooks.svelte.js";
+
+import { createAppSlice } from "./create-app-slice";
 
 interface ObsidianSliceState {
   pointerDateTime: PointerDateTime;

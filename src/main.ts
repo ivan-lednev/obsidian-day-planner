@@ -22,13 +22,8 @@ import {
   viewTypeTimeline,
   viewTypeMultiDay,
 } from "./constants";
-import { dataviewListenerStarted } from "./dataview-slice";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
-import { icalRefreshRequested } from "./globalSlice";
-import { icalListenerStarted } from "./ical-slice";
-import { initDataviewListeners } from "./init-dataview-listeners";
-import { initIcalListeners } from "./init-ical-listeners";
 import {
   compareByTimestampInText,
   fromMarkdown,
@@ -39,6 +34,18 @@ import {
   toMarkdown,
   toMdastPoint,
 } from "./mdast/mdast";
+import { dataviewListenerStarted } from "./redux/dataview/dataview-slice";
+import { initDataviewListeners } from "./redux/dataview/init-dataview-listeners";
+import { icalRefreshRequested } from "./redux/global-slice";
+import { icalListenerStarted } from "./redux/ical/ical-slice";
+import { initIcalListeners } from "./redux/ical/init-ical-listeners";
+import { settingsUpdated } from "./redux/settings-slice";
+import {
+  type AppDispatch,
+  type AppStore,
+  makeStore,
+  type RootState,
+} from "./redux/store";
 import { DataviewFacade } from "./service/dataview-facade";
 import {
   applyScopedUpdates,
@@ -51,13 +58,6 @@ import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
-import { settingsUpdated } from "./settings-slice";
-import {
-  type AppDispatch,
-  type AppStore,
-  makeStore,
-  type RootState,
-} from "./store";
 import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn, ReduxExtraArgument } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";

@@ -1,12 +1,12 @@
 import type { Moment } from "moment";
 import type { Readable, Writable } from "svelte/store";
 
+import { type AppDispatch, type AppStore } from "./redux/store";
 import type { DataviewFacade } from "./service/dataview-facade";
 import type { STaskEditor } from "./service/stask-editor";
 import type { VaultFacade } from "./service/vault-facade";
 import type { WorkspaceFacade } from "./service/workspace-facade";
 import type { DayPlannerSettings, IcalConfig } from "./settings";
-import { type AppDispatch, type AppStore } from "./store";
 import type { LocalTask, WithPlacing } from "./task-types";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";

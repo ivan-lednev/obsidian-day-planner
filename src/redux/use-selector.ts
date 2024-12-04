@@ -1,7 +1,8 @@
 import type { Selector } from "@reduxjs/toolkit";
 import { type Readable, type Subscriber } from "svelte/store";
 
-import { getObsidianContext } from "./context/obsidian-context";
+import { getObsidianContext } from "../context/obsidian-context";
+
 import { type RootState } from "./store";
 
 const defaultEqualityFn = <T>(a: T, b: T) => a === b;

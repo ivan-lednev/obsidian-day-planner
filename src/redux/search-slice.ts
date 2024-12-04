@@ -1,9 +1,10 @@
 import { createSelector, type PayloadAction } from "@reduxjs/toolkit";
 
-import { searchResultLimit } from "./constants";
-import { createAppSlice } from "./createAppSlice";
-import { selectDataviewTasks } from "./dataview-slice";
-import * as dv from "./util/dataview";
+import { searchResultLimit } from "../constants";
+import * as dv from "../util/dataview";
+
+import { createAppSlice } from "./create-app-slice";
+import { selectDataviewTasks } from "./dataview/dataview-slice";
 
 interface SearchSliceState {
   query: string;

@@ -11,20 +11,20 @@ import {
 } from "svelte/store";
 
 import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
-import { dataviewChange as dataviewChangeAction } from "../dataview-slice";
+import type DayPlanner from "../main";
+import { addHorizontalPlacing } from "../overlap/overlap";
+import { dataviewChange as dataviewChangeAction } from "../redux/dataview/dataview-slice";
 import {
   darkModeUpdated,
   layoutReady as layoutReadyAction,
   keyDown as keyDownAction,
   networkStatusChanged,
   icalRefreshRequested,
-} from "../globalSlice";
-import type DayPlanner from "../main";
-import { addHorizontalPlacing } from "../overlap/overlap";
+} from "../redux/global-slice";
+import type { AppDispatch } from "../redux/store";
 import { DataviewFacade } from "../service/dataview-facade";
 import { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
-import type { AppDispatch } from "../store";
 import type { LocalTask, Task, WithTime } from "../task-types";
 import type { OnUpdateFn } from "../types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
