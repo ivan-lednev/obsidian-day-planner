@@ -7,10 +7,10 @@ import { combineSlices, configureStore } from "@reduxjs/toolkit";
 
 import { dataviewSlice } from "./dataview-slice";
 import { globalSlice } from "./globalSlice";
+import { icalSlice } from "./ical-slice";
 import { searchSlice } from "./search-slice";
 import { settingsSlice } from "./settings-slice";
 import type { ReduxExtraArgument } from "./types";
-import { icalSlice } from "./ical-slice";
 
 const rootReducer = combineSlices(
   globalSlice,

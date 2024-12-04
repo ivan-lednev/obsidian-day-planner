@@ -224,3 +224,57 @@ export function withClockMoments(sTask: STask) {
 export const uniq = uniqBy(
   (task: STask) => `${task.path}::${task.position.start.line}`,
 );
+
+export function createSTask(props: Partial<STask>) {
+  return {
+    ...baseSTask,
+    ...props,
+  };
+}
+
+export const baseSTask: STask = {
+  symbol: "-",
+  link: {
+    path: "fixture-vault/tasks.md",
+    embed: false,
+    type: "file",
+  },
+  section: {
+    path: "fixture-vault/tasks.md",
+    embed: false,
+    type: "file",
+  },
+  text: "Task text",
+  tags: [],
+  line: 0,
+  lineCount: 1,
+  list: 0,
+  outlinks: [],
+  path: "fixture-vault/tasks.md",
+  children: [],
+  task: true,
+  annotated: false,
+  position: {
+    start: {
+      line: 0,
+      col: 0,
+      offset: 0,
+    },
+    end: {
+      line: 0,
+      col: 15,
+      offset: 15,
+    },
+  },
+  subtasks: [],
+  real: true,
+  header: {
+    path: "fixture-vault/tasks.md",
+    embed: false,
+    type: "file",
+  },
+  status: " ",
+  checked: false,
+  completed: false,
+  fullyCompleted: false,
+};

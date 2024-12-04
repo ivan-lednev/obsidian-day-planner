@@ -1,6 +1,8 @@
 import { createAction, type PayloadAction } from "@reduxjs/toolkit";
+import moment from "moment";
 import ical from "node-ical";
 
+import { defaultDayFormat } from "./constants";
 import { createAppSlice } from "./createAppSlice";
 import type { WithIcalConfig } from "./types";
 import type { PointerDateTime } from "./util/create-hooks.svelte";
@@ -15,7 +17,7 @@ interface ObsidianSliceState {
   isOnline: boolean;
 }
 
-const initialState: ObsidianSliceState = {
+export const initialState: ObsidianSliceState = {
   icalEvents: [],
   dateRanges: {},
   layoutReady: false,
@@ -79,7 +81,9 @@ export const globalSlice = createAppSlice({
     selectVisibleDays: (state) => {
       const days = Object.values(state.dateRanges).flat();
 
-      return [...new Set(days)].sort();
+      return [...new Set(days)]
+        .sort()
+        .map((it) => moment(it, defaultDayFormat));
     },
   },
 });

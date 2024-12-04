@@ -32,13 +32,10 @@ export const dataviewSlice = createAppSlice({
 });
 
 export const dataviewRefreshRequested = createAction(
-  "obsidian/dataviewRefreshRequested",
+  "dataview/dataviewRefreshRequested",
 );
 export const dataviewListenerStarted = createAction(
-  "obsidian/dataviewListenerStarted",
-);
-export const dataviewListenerStopped = createAction(
-  "obsidian/dataviewListenerStopped",
+  "dataview/dataviewListenerStarted",
 );
 
 export const { dataviewChange, dataviewTasksUpdated } = dataviewSlice.actions;

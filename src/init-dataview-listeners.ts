@@ -38,8 +38,9 @@ export function initDataviewListeners(startListening: StartListeningFn) {
           checkIfDataviewUpdateNeeded,
         );
 
-        const dataviewSource = selectDataviewSource(currentState);
+        // TODO: lists from daily notes go here
 
+        const dataviewSource = selectDataviewSource(currentState);
         const pagePaths = dataviewFacade.getPathsFrom(dataviewSource);
         const tasks = pagePaths.map(
           (path) => () => dataviewFacade.getTasksFromPath(path),

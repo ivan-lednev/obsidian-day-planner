@@ -8,7 +8,7 @@ interface SettingsSliceState {
   settings: DayPlannerSettings;
 }
 
-const initialState: SettingsSliceState = {
+export const initialState: SettingsSliceState = {
   settings: defaultSettings,
 };
 

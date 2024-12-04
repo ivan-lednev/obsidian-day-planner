@@ -28,7 +28,7 @@ import { settings } from "./global-store/settings";
 import { icalRefreshRequested } from "./globalSlice";
 import { icalListenerStarted } from "./ical-slice";
 import { initDataviewListeners } from "./init-dataview-listeners";
-import { initIcalListeners } from "./init-remote-calendars-listeners";
+import { initIcalListeners } from "./init-ical-listeners";
 import {
   compareByTimestampInText,
   fromMarkdown,
