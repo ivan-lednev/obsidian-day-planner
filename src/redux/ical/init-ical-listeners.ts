@@ -15,9 +15,9 @@ import type { StartListeningFn } from "../store";
 import { createSelectorChangePredicate } from "../util";
 
 import {
-  icalEventsUpdated,
   icalListenerStarted,
   icalRefreshRequested,
+  icalsFetched,
   remoteTasksUpdated,
   selectIcalEvents,
 } from "./ical-slice";
@@ -26,30 +26,23 @@ const icalParseLowerLimit = 10;
 
 const checkVisibleDaysChanged =
   createSelectorChangePredicate(selectVisibleDays);
+const checkIcalEventsChanged = createSelectorChangePredicate(selectIcalEvents);
 
 function createCachingFetcher() {
-  const previousFetches = new Map<string, Array<WithIcalConfig<ical.VEvent>>>();
+  const previousFetches = new Map<string, string>();
 
-  return async (calendar: IcalConfig) => {
-    try {
-      const response = await request({
-        url: calendar.url,
-      });
+  return async (url: string) => {
+    // try {
+    const response = await request({ url });
 
-      const parsed = ical.parseICS(response);
-      const veventsWithCalendar = Object.values(parsed)
-        .filter(isVEvent)
-        .map((icalEvent) => ({
-          ...icalEvent,
-          calendar,
-        }));
+    previousFetches.set(url, response);
 
-      previousFetches.set(calendar.url, veventsWithCalendar);
-
-      return veventsWithCalendar;
-    } catch {
-      return previousFetches.get(calendar.url) || [];
-    }
+    return response;
+    // } catch {
+    //   const fallback = previousFetches.get(icalConfig.url) || "";
+    //
+    //   return { icalConfig, text: fallback };
+    // }
   };
 }
 
@@ -66,13 +59,18 @@ export function initIcalListeners(startListening: StartListeningFn) {
           icalRefreshRequested.match,
         );
 
-        const icals = selectIcals(currentState).filter(
+        const icalConfigs = selectIcals(currentState).filter(
           (ical) => ical.url.trim().length > 0,
         );
 
-        const allEvents = await Promise.all(icals.map(fetcher));
+        const fetched = await Promise.all(
+          icalConfigs.map(async (icalConfig) => ({
+            icalConfig,
+            text: await fetcher(icalConfig.url),
+          })),
+        );
 
-        listenerApi.dispatch(icalEventsUpdated(allEvents.flat()));
+        listenerApi.dispatch(icalsFetched(fetched));
       }
     },
   });
@@ -89,7 +87,7 @@ export function initIcalListeners(startListening: StartListeningFn) {
       while (true) {
         const [, currentState] = await listenerApi.take(
           (action, currentState) =>
-            icalEventsUpdated.match(action) ||
+            checkIcalEventsChanged(action, currentState) ||
             checkVisibleDaysChanged(action, currentState),
         );
 
@@ -115,7 +113,8 @@ export function initIcalListeners(startListening: StartListeningFn) {
             .flat()
             .filter((task): task is RemoteTask | WithTime<RemoteTask> =>
               Boolean(task),
-            );
+            )
+            .map((it) => ({ ...it, startTime: it.startTime.toISOString() }));
 
           listenerApi.dispatch(remoteTasksUpdated(remoteTasks));
         });

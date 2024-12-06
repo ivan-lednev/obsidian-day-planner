@@ -98,7 +98,66 @@ describe("Dataview", () => {
 });
 
 describe("ical", () => {
-  test.todo("RSVP status appears in tasks");
+  test("RSVP status appears in tasks", async () => {
+    vi.mocked(request).mockReturnValue(
+      getIcalFixture("google-tentative-attendee"),
+    );
+
+    // todo: abstract away initialization
+    const listenerMiddleware = createListenerMiddleware<
+      RootState,
+      AppDispatch,
+      ReduxExtraArgument
+    >({
+      extra: {
+        dataviewFacade: new FakeDataviewFacade(),
+      },
+    });
+
+    initDataviewListeners(listenerMiddleware.startListening);
+    initIcalListeners(listenerMiddleware.startListening);
+
+    const store = makeStore({
+      preloadedState: {
+        obsidian: {
+          ...initialGlobalState,
+          dateRanges: { key: ["2024-09-26"] },
+        },
+        settings: {
+          settings: {
+            ...defaultSettingsForTests,
+            icals: [
+              {
+                name: "Test",
+                url: "https://example.com",
+                color: "#ff0000",
+                email: "bishop1860@gmail.com",
+              },
+            ],
+          },
+        },
+      },
+      middleware: (getDefaultMiddleware) => {
+        return getDefaultMiddleware().concat(listenerMiddleware.middleware);
+      },
+    });
+
+    const { dispatch } = store;
+
+    dispatch(icalListenerStarted());
+    dispatch(icalRefreshRequested());
+
+    await vi.waitUntil(() => selectRemoteTasks(store.getState()).length > 0);
+
+    const remoteTasks = selectRemoteTasks(store.getState());
+
+    expect(remoteTasks).toEqual([
+      expect.objectContaining({
+        summary: "tentative-status",
+        rsvpStatus: "TENTATIVE",
+      }),
+    ]);
+  });
 
   test.todo(
     "RSVP status gets pulled from params if email is not in CN (common name)",
@@ -127,7 +186,7 @@ describe("ical", () => {
       preloadedState: {
         obsidian: {
           ...initialGlobalState,
-          dateRanges: { key: ["2024-09-27", "2024-09-28"] },
+          dateRanges: { key: ["2024-09-25", "2024-09-26", "2024-09-27"] },
         },
         settings: {
           settings: {
@@ -154,6 +213,13 @@ describe("ical", () => {
 
     await vi.waitUntil(() => selectRemoteTasks(store.getState()).length > 0);
 
+    vi.mocked(request).mockImplementationOnce(() => {
+      throw new Error("Request failed");
+    });
+
+    dispatch(icalRefreshRequested());
+
+    await vi.waitFor(() => expect(request).toHaveBeenCalledTimes(2));
     const remoteTasks = selectRemoteTasks(store.getState());
 
     expect(remoteTasks).toHaveLength(1);

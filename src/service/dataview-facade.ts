@@ -32,6 +32,10 @@ export class DataviewFacade {
     return this.getDataview()?.pages(source).file.path.array() || [];
   };
 
+  getAllListsFrom = (source: string) => {
+    return this.getDataview()?.pages(source).file.lists.array() || [];
+  };
+
   getTaskAtLine({ path, line }: { path: string; line: number }) {
     return this.getTasksFromPath(path).find(
       (sTask: STask) => sTask.line === line,
