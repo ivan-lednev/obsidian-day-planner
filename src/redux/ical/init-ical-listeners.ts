@@ -32,17 +32,15 @@ function createCachingFetcher() {
   const previousFetches = new Map<string, string>();
 
   return async (url: string) => {
-    // try {
-    const response = await request({ url });
+    try {
+      const response = await request({ url });
 
-    previousFetches.set(url, response);
+      previousFetches.set(url, response);
 
-    return response;
-    // } catch {
-    //   const fallback = previousFetches.get(icalConfig.url) || "";
-    //
-    //   return { icalConfig, text: fallback };
-    // }
+      return response;
+    } catch {
+      return previousFetches.get(url) || "";
+    }
   };
 }
 
