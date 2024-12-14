@@ -32,6 +32,7 @@ export const fallbackPartStat = "NEEDS-ACTION";
 export const mdastUtilNumberOfSpacesInTab = 4;
 
 export const dataviewDownloadLink = "https://obsidian.md/plugins?id=dataview";
+export const floatingUiOffset = 4;
 
 export const icons = [
   "any-key",

@@ -22,10 +22,7 @@ export function isEventRelated(
   );
 }
 
-export function isOutside(
-  event: PointerEvent,
-  container: HTMLElement | null,
-) {
+export function isOutside(event: PointerEvent, container: HTMLElement | null) {
   if (!container) {
     return false;
   }

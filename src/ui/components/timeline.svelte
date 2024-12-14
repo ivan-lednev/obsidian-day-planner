@@ -29,7 +29,6 @@
       handlers: {
         handleContainerMouseDown,
         handleResizerMouseDown,
-        handleTaskMouseUp,
         handleGripMouseDown,
       },
       getDisplayedTasksForTimeline,
@@ -88,13 +87,11 @@
           <RemoteTimeBlock {task} />
         </ScheduledTimeBlock>
       {:else}
+        <!--TODO: Time block should not know about the controls-->
         <LocalTimeBlock
           onFloatingUiPointerDown={updatePointerOffsetY}
           onGripMouseDown={handleGripMouseDown}
           onResizerMouseDown={handleResizerMouseDown}
-          onpointerup={() => {
-            handleTaskMouseUp(task);
-          }}
           {task}
         />
       {/if}
@@ -113,12 +110,7 @@
 
     <div class="tasks absolute-stretch-x">
       {#each $displayedTasksWithClocksForTimeline as task (getRenderKey(task))}
-        <LocalTimeBlock
-          onpointerup={() => {
-            handleTaskMouseUp(task);
-          }}
-          {task}
-        />
+        <LocalTimeBlock {task} />
       {/each}
     </div>
   </Column>

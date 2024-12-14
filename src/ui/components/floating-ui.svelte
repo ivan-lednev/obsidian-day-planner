@@ -1,9 +1,9 @@
 <script lang="ts">
+  import { type Snippet } from "svelte";
   import { portal } from "svelte-portal";
 
   import type { ActionArray } from "../actions/use-actions";
   import { useActions } from "../actions/use-actions";
-  import { type Snippet } from "svelte";
 
   interface Props {
     children: Snippet;
