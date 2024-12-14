@@ -20,19 +20,24 @@
   style:touch-action="none"
   class="expanding-controls"
   class:active={isActive}
-  on:pointermove|preventDefault
-  on:pointerup={() => {
+  onpointerup={(event) => {
+    if (isTouchEvent(event)) {
+      isActive = !isActive;
+    }
+  }}
+  onpointerenter={(event) => {
+    if (isTouchEvent(event)) {
+      return;
+    }
+
     isActive = true;
   }}
-  on:pointerenter={(event) => {
-    if (!isTouchEvent(event)) {
-      isActive = true;
+  onpointerleave={(event) => {
+    if (isTouchEvent(event)) {
+      return;
     }
-  }}
-  on:pointerleave={(event) => {
-    if (!isTouchEvent(event)) {
-      isActive = false;
-    }
+
+    isActive = false;
   }}
 >
   <!--  TODO: remove hardcoded values-->
