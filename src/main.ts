@@ -540,6 +540,7 @@ export default class DayPlanner extends Plugin {
     //   callback: createDumpMetadataCommand(this.app),
     // });
 
+
     const defaultObsidianContext: ObsidianContext = {
       search,
       sTaskEditor: this.sTaskEditor,
@@ -560,6 +561,7 @@ export default class DayPlanner extends Plugin {
       pointerDateTime,
       tasksWithActiveClockProps,
       getDisplayedTasksWithClocksForTimeline,
+      // expandingControlsDefaultWidth,
     };
 
     const componentContext = new Map<

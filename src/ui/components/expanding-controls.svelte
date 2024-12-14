@@ -16,7 +16,6 @@
 </script>
 
 <div
-  style:flex-direction={reverse ? "row-reverse" : "row"}
   style:touch-action="none"
   class="expanding-controls"
   class:active={isActive}
@@ -41,6 +40,9 @@
   }}
 >
   <!--  TODO: remove hardcoded values-->
+  {#if reverse}
+    {@render initial()}
+  {/if}
   {#if isActive}
     <div
       class="expanded-wrapper"
@@ -49,7 +51,9 @@
       {@render expanded()}
     </div>
   {/if}
-  {@render initial()}
+  {#if !reverse}
+    {@render initial()}
+  {/if}
 </div>
 
 <style>
@@ -60,8 +64,6 @@
   }
 
   .expanding-controls {
-    flex-direction: var(--expanding-controls-flex-direction, row);
-
     padding: var(--size-2-1);
 
     background-color: var(--background-primary);

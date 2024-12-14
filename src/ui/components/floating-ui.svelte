@@ -3,23 +3,31 @@
 
   import type { ActionArray } from "../actions/use-actions";
   import { useActions } from "../actions/use-actions";
+  import { type Snippet } from "svelte";
 
-  export let use: ActionArray = [];
-  export let onPointerLeave: (event: PointerEvent) => void;
-  export let onTapOutside: (event: PointerEvent) => void;
-  export let onPointerDown: (event: PointerEvent) => void = () => {};
+  interface Props {
+    children: Snippet;
+    use?: ActionArray;
+    onPointerDown?: (event: PointerEvent) => void;
+    onpointerup?: (event: PointerEvent) => void;
+  }
+
+  let {
+    children,
+    use = [],
+    onPointerDown = () => {},
+    onpointerup = () => {},
+  }: Props = $props();
 </script>
-
-<svelte:body on:pointerdown={onTapOutside} />
 
 <div
   class="floating-ui"
-  on:pointerleave={onPointerLeave}
-  on:pointerdown={onPointerDown}
+  onpointerdown={onPointerDown}
+  {onpointerup}
   use:portal
   use:useActions={use}
 >
-  <slot />
+  {@render children()}
 </div>
 
 <style>
