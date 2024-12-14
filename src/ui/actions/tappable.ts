@@ -27,6 +27,16 @@ export function tappable(el: HTMLElement) {
     }
   });
 
+  gesture.on("panstart", (event) => {
+    pressed = true;
+
+    console.log("panstart", event);
+  });
+
+  gesture.on("panmove", (event) => {
+    console.log("panmove", gesture.touchMoveY);
+  });
+
   return {
     destroy() {
       gesture.destroy();

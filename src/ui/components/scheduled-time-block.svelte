@@ -31,11 +31,6 @@
   --time-block-width={width}
   {task}
   {use}
-  on:tap
-  on:longpress
-  on:pointerup
-  on:pointerenter
-  on:pointerleave
 >
   {@render children()}
 </TimeBlockBase>

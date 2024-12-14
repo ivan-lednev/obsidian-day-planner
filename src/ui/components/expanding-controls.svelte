@@ -1,66 +1,72 @@
 <script lang="ts">
-  import { fade } from "svelte/transition";
+  import type { Snippet } from "svelte";
+  import { slide } from "svelte/transition";
 
-  import { useHoverOrTap } from "../hooks/use-hover-or-tap";
+  import { isTouchEvent } from "../../util/util";
 
-  export let reverse: boolean | undefined = false;
+  interface Props {
+    reverse?: boolean;
+    initial: Snippet;
+    expanded: Snippet;
+  }
 
-  const {
-    isActive,
-    handlePointerDown,
-    handlePointerEnter,
-    handlePointerLeave,
-  } = useHoverOrTap();
+  export const { reverse = false, initial, expanded }: Props = $props();
+
+  let isActive = $state(false);
 </script>
 
 <div
   style:flex-direction={reverse ? "row-reverse" : "row"}
   style:touch-action="none"
   class="expanding-controls"
-  class:active={$isActive}
+  class:active={isActive}
   on:pointermove|preventDefault
-  on:pointerdown
-  on:pointerdown={handlePointerDown}
-  on:pointerenter={handlePointerEnter}
-  on:pointerleave={handlePointerLeave}
+  on:pointerup={() => {
+    isActive = true;
+  }}
+  on:pointerenter={(event) => {
+    if (!isTouchEvent(event)) {
+      isActive = true;
+    }
+  }}
+  on:pointerleave={(event) => {
+    if (!isTouchEvent(event)) {
+      isActive = false;
+    }
+  }}
 >
-  {#if $isActive}
-    <div style="display: flex" in:fade={{ duration: 300 }}>
-      <slot />
+  <!--  TODO: remove hardcoded values-->
+  {#if isActive}
+    <div
+      class="expanded-wrapper"
+      transition:slide={{ duration: 200, axis: "x" }}
+    >
+      {@render expanded()}
     </div>
   {/if}
-  <div
-    style:display={$isActive ? "none" : "block"}
-    class="circle"
-    in:fade={{ duration: 300 }}
-  ></div>
+  {@render initial()}
 </div>
 
 <style>
-  .circle {
-    padding: var(--size-4-1);
-    opacity: 0.3;
-    background-color: var(--color-accent);
-    border-radius: 50%;
+  .expanded-wrapper,
+  .expanding-controls {
+    display: flex;
+    gap: var(--size-2-1);
   }
 
   .expanding-controls {
-    overflow: hidden;
-    display: flex;
     flex-direction: var(--expanding-controls-flex-direction, row);
-    align-items: center;
-    justify-content: center;
 
-    min-width: 32px;
-    min-height: 32px;
+    padding: var(--size-2-1);
 
-    border-radius: 4px;
-  }
-
-  .active {
-    min-width: auto;
-    min-height: auto;
     background-color: var(--background-primary);
     border: 1px solid var(--background-modifier-border);
+
+    /* todo: remove hardcoded values */
+
+    border-radius: 4px;
+
+    /* todo: remove hardcoded values */
+    box-shadow: 2px 2px 4px 0 #0000001f;
   }
 </style>
