@@ -20,11 +20,6 @@
   style:touch-action="none"
   class="expanding-controls"
   class:active={isActive}
-  onpointerup={(event) => {
-    if (isTouchEvent(event)) {
-      isActive = !isActive;
-    }
-  }}
   onpointerenter={(event) => {
     if (isTouchEvent(event)) {
       return;
@@ -38,6 +33,11 @@
     }
 
     isActive = false;
+  }}
+  onpointerup={(event) => {
+    if (isTouchEvent(event)) {
+      isActive = !isActive;
+    }
   }}
 >
   <!--  TODO: remove hardcoded values-->

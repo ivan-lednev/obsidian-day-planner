@@ -30,7 +30,7 @@
     style:--text-muted={muted}
     style:--text-normal={normal}
     style:--time-block-bg-color={backgroundColor}
-    style:--time-block-border-color={borderColor}
+    style:--time-block-border-color="var(--time-block-border-color-override, {borderColor})"
     style:background-color={getColorOverride(
       task,
       isDarkMode.current,
@@ -66,6 +66,8 @@
   }
 
   .content {
+    --default-box-shadow: 1px 1px 2px 0 #0000001f;
+
     position: relative;
 
     flex: 1 0 0;
@@ -77,7 +79,7 @@
 
     border: 1px solid var(--time-block-border-color, var(--color-base-50));
     border-radius: var(--radius-s);
-    box-shadow: 1px 1px 2px 0 #0000001f;
+    box-shadow: var(--time-block-box-shadow, var(--default-box-shadow));
   }
 
   .truncated-bottom {

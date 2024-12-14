@@ -38,6 +38,10 @@
   });
 
   let isDragActive = false;
+
+  $: timeBlockBoxShadow = isDragActive
+    ? "var(--shadow-stationary), var(--shadow-border-accent)"
+    : "";
 </script>
 
 <!--<svelte:body-->
@@ -48,6 +52,8 @@
 <!--/>-->
 
 <ScheduledTimeBlock
+  --time-block-border-color-override={isDragActive ? "var(--color-accent)" : ""}
+  --time-block-box-shadow={timeBlockBoxShadow}
   {task}
   use={[
     drag.anchorSetup,
