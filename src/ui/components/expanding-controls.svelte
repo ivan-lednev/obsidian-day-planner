@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import { slide } from "svelte/transition";
+  import { slide, fade } from "svelte/transition";
 
   import { isTouchEvent } from "../../util/util";
 
   import { createSlide } from "./defaults";
+  import { transitionDurationShort } from "../../constants";
 
   interface Props {
     isActive: boolean;
@@ -24,6 +25,7 @@
 </script>
 
 <div
+  transition:fade|global={{ duration: transitionDurationShort }}
   style:touch-action="none"
   style:flex-direction={reverse ? "row-reverse" : "row"}
   class="expanding-controls"
@@ -74,12 +76,7 @@
 
     background-color: var(--background-primary);
     border: 1px solid var(--background-modifier-border);
-
-    /* todo: remove hardcoded values */
-
-    border-radius: 4px;
-
-    /* todo: remove hardcoded values */
-    box-shadow: 2px 2px 4px 0 #0000001f;
+    border-radius: var(--size-4-1);
+    box-shadow: var(--floating-controls-shadow);
   }
 </style>

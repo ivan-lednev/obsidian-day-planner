@@ -23,9 +23,7 @@
     left: 0;
 
     display: flex;
-
-    /* TODO: move to variable */
-    flex: 0 0 30px;
+    flex: 0 0 var(--time-ruler-width);
     flex-direction: column;
 
     height: fit-content;

@@ -120,20 +120,14 @@
   --shadow-drag: 0px 2px 10px rgba(0, 0, 0, 0.1);
   --shadow-border-accent: 0 0 0 2px var(--color-accent);
 
+
   display: flex;
   flex-direction: column;
   padding: 0;
 }
 
 body {
-  --expanding-controls-border-width: 1px;
-  --expanding-controls-padding: var(--size-2-1);
-  --expanding-controls-icon-padding-inline: var(--size-4-2);
-
-  --expanding-controls-default-width: calc(
-    var(--expanding-controls-border-width) + var(--expanding-controls-padding) +
-      var(--expanding-controls-icon-padding-inline) + (var(--icon-size) / 2)
-  );
+  --floating-controls-shadow: 0px 2px 10px rgba(0, 0, 0, 0.07);
 }
 
 [data-type="planner-weekly"] {
