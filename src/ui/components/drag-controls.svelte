@@ -11,14 +11,17 @@
   import BlockControlButton from "./block-control-button.svelte";
   import ExpandingControls from "./expanding-controls.svelte";
 
+  export let isActive: boolean;
+  export let setIsActive: (value: boolean) => void;
   export let onMove: (event: PointerEvent) => void;
   export let onMoveWithNeighbors: (event: PointerEvent) => void = () => {};
   export let onCopy: (event: PointerEvent) => void = () => {};
   export let onMoveWithShrink: (event: PointerEvent) => void = () => {};
+  // TODO: return this handler
   export let onPointerDown: (event: PointerEvent) => void = () => {};
 </script>
 
-<ExpandingControls>
+<ExpandingControls {isActive} {setIsActive}>
   {#snippet initial()}
     <BlockControlButton
       cursor="grab"

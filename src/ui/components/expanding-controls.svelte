@@ -3,20 +3,28 @@
   import { slide } from "svelte/transition";
 
   import { isTouchEvent } from "../../util/util";
+  import { createSlide } from "./defaults";
 
   interface Props {
+    isActive: boolean;
+    setIsActive: (value: boolean) => void;
     reverse?: boolean;
     initial: Snippet;
     expanded: Snippet;
   }
 
-  export const { reverse = false, initial, expanded }: Props = $props();
-
-  let isActive = $state(false);
+  export const {
+    isActive,
+    setIsActive,
+    reverse = false,
+    initial,
+    expanded,
+  }: Props = $props();
 </script>
 
 <div
   style:touch-action="none"
+  style:flex-direction={reverse ? "row-reverse" : "row"}
   class="expanding-controls"
   class:active={isActive}
   onpointerenter={(event) => {
@@ -24,36 +32,27 @@
       return;
     }
 
-    isActive = true;
+    setIsActive(true);
   }}
   onpointerleave={(event) => {
     if (isTouchEvent(event)) {
       return;
     }
 
-    isActive = false;
+    setIsActive(false);
   }}
   onpointerup={(event) => {
     if (isTouchEvent(event)) {
-      isActive = !isActive;
+      setIsActive(!isActive);
     }
   }}
 >
-  <!--  TODO: remove hardcoded values-->
-  {#if reverse}
-    {@render initial()}
-  {/if}
   {#if isActive}
-    <div
-      class="expanded-wrapper"
-      transition:slide={{ duration: 200, axis: "x" }}
-    >
+    <div class="expanded-wrapper" transition:slide={createSlide({ axis: "x" })}>
       {@render expanded()}
     </div>
   {/if}
-  {#if !reverse}
-    {@render initial()}
-  {/if}
+  {@render initial()}
 </div>
 
 <style>
@@ -65,6 +64,12 @@
 
   .expanding-controls {
     padding: var(--size-2-1);
+
+    /* Note: this prevents jitter and losing hover state when a floating UI
+    container has a slide animation that stretches it from right to left. */
+    position: var(--expanding-controls-position, static);
+    right: 0;
+    bottom: 0;
 
     background-color: var(--background-primary);
     border: 1px solid var(--background-modifier-border);

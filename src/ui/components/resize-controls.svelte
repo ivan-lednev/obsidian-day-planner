@@ -6,6 +6,8 @@
   import BlockControlButton from "./block-control-button.svelte";
   import ExpandingControls from "./expanding-controls.svelte";
 
+  export let isActive: boolean;
+  export let setIsActive: (value: boolean) => void;
   export let onResize: (event: PointerEvent) => void;
   export let onResizeWithNeighbors: (event: PointerEvent) => void;
   export let onResizeWithShrink: (event: PointerEvent) => void;
@@ -13,7 +15,12 @@
   export let reverse: boolean | undefined = false;
 </script>
 
-<ExpandingControls {reverse} on:pointerdown={onPointerDown}>
+<ExpandingControls
+  {isActive}
+  {reverse}
+  {setIsActive}
+  on:pointerdown={onPointerDown}
+>
   {#snippet initial()}
     <BlockControlButton
       cursor="grab"

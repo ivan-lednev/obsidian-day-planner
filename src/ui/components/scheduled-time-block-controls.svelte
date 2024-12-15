@@ -25,9 +25,9 @@
 
   interface Props {
     anchor: Snippet<[AnchorProps]>;
-    onGripMouseDown?: EditHandlers["handleGripMouseDown"];
-    onResizerMouseDown?: EditHandlers["handleResizerMouseDown"];
-    onFloatingUiPointerDown?: (event: PointerEvent) => void;
+    onGripMouseDown: EditHandlers["handleGripMouseDown"];
+    onResizerMouseDown: EditHandlers["handleResizerMouseDown"];
+    onFloatingUiPointerDown: (event: PointerEvent) => void;
     task: WithPlacing<LocalTask>;
   }
 
@@ -43,13 +43,21 @@
     editContext: { editOperation },
   } = getObsidianContext();
 
-  let isDragActive = $state(false);
-  let isResizeActive = $state(false);
+  let isActive = $state(false);
+  let focusedControl = $state<"grip" | "resize">();
+
+  function setIsDragActive(isActive: boolean) {
+    focusedControl = isActive ? "grip" : undefined;
+  }
 
   const drag = useFloatingUi({
     middleware: [offset({ mainAxis: floatingUiOffset })],
     placement: "top-end",
   });
+
+  function setIsResizeActive(newValue: boolean) {
+    focusedControl = newValue ? "resize" : undefined;
+  }
 
   const resize = useFloatingUi({
     middleware: [offset(createOffsetFnWithFrozenCrossAxis())],
@@ -63,21 +71,18 @@
     resize.anchorSetup,
     createGestures({
       ontap: () => {
-        isDragActive = true;
-        isResizeActive = true;
+        isActive = true;
       },
     }),
     pointerUpOutside(() => {
-      isDragActive = false;
-      isResizeActive = false;
+      isActive = false;
     }),
   ],
-  isActive: isDragActive || isResizeActive,
+  isActive,
 })}
 
-<!--TODO: remove onFloatingUiPointerDown-->
-{#if !$editOperation && onFloatingUiPointerDown}
-  {#if isDragActive && onGripMouseDown}
+{#if !$editOperation && isActive}
+  {#if !focusedControl || focusedControl === "grip"}
     <FloatingUi
       onPointerDown={onFloatingUiPointerDown}
       onpointerup={(event) => {
@@ -86,6 +91,7 @@
       use={[drag.floatingUiSetup]}
     >
       <DragControls
+        isActive={focusedControl === "grip"}
         onCopy={() => {
           onGripMouseDown(t.copy(task), EditMode.DRAG);
         }}
@@ -96,29 +102,31 @@
         onMoveWithShrink={() => {
           onGripMouseDown(task, EditMode.DRAG_AND_SHRINK_OTHERS);
         }}
+        setIsActive={setIsDragActive}
+        --expanding-controls-position="absolute"
       />
     </FloatingUi>
   {/if}
 
-  {#if onResizerMouseDown}
-    {#if isResizeActive}
-      <FloatingUi
-        onPointerDown={onFloatingUiPointerDown}
-        use={[resize.floatingUiSetup]}
-      >
-        <ResizeControls
-          onResize={() => {
-            onResizerMouseDown(task, EditMode.RESIZE);
-          }}
-          onResizeWithNeighbors={() => {
-            onResizerMouseDown(task, EditMode.RESIZE_AND_SHIFT_OTHERS);
-          }}
-          onResizeWithShrink={() => {
-            onResizerMouseDown(task, EditMode.RESIZE_AND_SHRINK_OTHERS);
-          }}
-          reverse
-        />
-      </FloatingUi>
-    {/if}
+  {#if !focusedControl || focusedControl === "resize"}
+    <FloatingUi
+      onPointerDown={onFloatingUiPointerDown}
+      use={[resize.floatingUiSetup]}
+    >
+      <ResizeControls
+        isActive={focusedControl === "resize"}
+        onResize={() => {
+          onResizerMouseDown(task, EditMode.RESIZE);
+        }}
+        onResizeWithNeighbors={() => {
+          onResizerMouseDown(task, EditMode.RESIZE_AND_SHIFT_OTHERS);
+        }}
+        onResizeWithShrink={() => {
+          onResizerMouseDown(task, EditMode.RESIZE_AND_SHRINK_OTHERS);
+        }}
+        reverse
+        setIsActive={setIsResizeActive}
+      />
+    </FloatingUi>
   {/if}
 {/if}
