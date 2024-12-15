@@ -3,7 +3,6 @@
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import type { Task } from "../../task-types";
-  import { tappable } from "../actions/tappable";
   import type { ActionArray } from "../actions/use-actions";
   import { useActions } from "../actions/use-actions";
   import { getColorOverride } from "../hooks/get-color-override";
@@ -38,12 +37,6 @@
     )}
     class="content"
     class:truncated-bottom={task.truncated === "bottom"}
-    on:longpress
-    on:pointerenter
-    on:pointerleave
-    on:pointerup
-    on:tap
-    use:tappable
     use:useActions={use}
   >
     {@render children()}
