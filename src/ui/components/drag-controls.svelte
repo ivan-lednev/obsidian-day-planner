@@ -44,23 +44,35 @@
     <BlockControlButton
       cursor="grab"
       label="Copy block"
-      on:pointerdown={() => handleGripMouseDown(t.copy(task), EditMode.DRAG)}
+      use={[
+        createGestures({
+          onpanmove: () => handleGripMouseDown(t.copy(task), EditMode.DRAG),
+        }),
+      ]}
     >
       <Copy class="svg-icon" />
     </BlockControlButton>
     <BlockControlButton
       cursor="grab"
       label="Move block and push neighboring blocks"
-      on:pointerdown={() =>
-        handleGripMouseDown(task, EditMode.DRAG_AND_SHIFT_OTHERS)}
+      use={[
+        createGestures({
+          onpanmove: () =>
+            handleGripMouseDown(task, EditMode.DRAG_AND_SHIFT_OTHERS),
+        }),
+      ]}
     >
       <ArrowDownToLine class="svg-icon" />
     </BlockControlButton>
     <BlockControlButton
       cursor="grab"
       label="Move block and shrink neighboring blocks"
-      on:pointerdown={() =>
-        handleGripMouseDown(task, EditMode.DRAG_AND_SHRINK_OTHERS)}
+      use={[
+        createGestures({
+          onpanmove: () =>
+            handleGripMouseDown(task, EditMode.DRAG_AND_SHRINK_OTHERS),
+        }),
+      ]}
     >
       <FoldVertical class="svg-icon" />
     </BlockControlButton>

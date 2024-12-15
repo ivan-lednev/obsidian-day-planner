@@ -44,28 +44,36 @@
     <BlockControlButton
       cursor="grab"
       label="Resize block and push neighboring blocks"
-      on:pointerdown={() => {
-        handleResizerMouseDown(
-          task,
-          fromTop
-            ? EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS
-            : EditMode.RESIZE_AND_SHIFT_OTHERS,
-        );
-      }}
+      use={[
+        createGestures({
+          onpanmove: () => {
+            handleResizerMouseDown(
+              task,
+              fromTop
+                ? EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS
+                : EditMode.RESIZE_AND_SHIFT_OTHERS,
+            );
+          },
+        }),
+      ]}
     >
       <ArrowDownToLine class="svg-icon" />
     </BlockControlButton>
     <BlockControlButton
       cursor="grab"
       label="Resize block and shrink neighboring blocks"
-      on:pointerdown={() => {
-        handleResizerMouseDown(
-          task,
-          fromTop
-            ? EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS
-            : EditMode.RESIZE_AND_SHRINK_OTHERS,
-        );
-      }}
+      use={[
+        createGestures({
+          onpanmove: () => {
+            handleResizerMouseDown(
+              task,
+              fromTop
+                ? EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS
+                : EditMode.RESIZE_AND_SHRINK_OTHERS,
+            );
+          },
+        }),
+      ]}
     >
       <FoldVertical class="svg-icon" />
     </BlockControlButton>
