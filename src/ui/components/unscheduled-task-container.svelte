@@ -6,6 +6,8 @@
   import { settings } from "../../global-store/settings";
   import { isLocal } from "../../task-types";
 
+  import DragControls from "./drag-controls.svelte";
+  import FloatingControls from "./floating-controls.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
@@ -13,10 +15,7 @@
   const { day }: { day: Moment } = $props();
 
   const {
-    editContext: {
-      handlers: { handleTaskMouseUp, handleUnscheduledTaskGripMouseDown },
-      getDisplayedTasksForTimeline,
-    },
+    editContext: { getDisplayedTasksForTimeline },
   } = getObsidianContext();
 
   const displayedTasksForTimeline = $derived(getDisplayedTasksForTimeline(day));
@@ -30,13 +29,19 @@
   >
     {#each $displayedTasksForTimeline.noTime as task}
       {#if isLocal(task)}
-        <UnscheduledTimeBlock
-          onGripMouseDown={handleUnscheduledTaskGripMouseDown}
-          onpointerup={() => {
-            handleTaskMouseUp(task);
-          }}
-          {task}
-        />
+        <FloatingControls>
+          {#snippet anchor({ actions, isActive })}
+            <UnscheduledTimeBlock {task} use={actions} />
+          {/snippet}
+          {#snippet topEnd({ isActive, setIsActive })}
+            <DragControls
+              --expanding-controls-position="absolute"
+              {isActive}
+              {setIsActive}
+              {task}
+            />
+          {/snippet}
+        </FloatingControls>
       {:else}
         <TimeBlockBase {task}>
           <RemoteTimeBlock {task} />
