@@ -15,6 +15,7 @@
   const { use = [], isActive = false, task }: Props = $props();
 </script>
 
+<!-- TODO: remove custom props once Redux handles this -->
 <ScheduledTimeBlock
   --time-block-border-color-override={isActive ? "var(--color-accent)" : ""}
   --time-block-box-shadow={isActive

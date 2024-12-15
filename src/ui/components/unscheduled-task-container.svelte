@@ -30,8 +30,18 @@
     {#each $displayedTasksForTimeline.noTime as task}
       {#if isLocal(task)}
         <FloatingControls>
+          <!-- TODO: remove custom props once Redux handles this -->
           {#snippet anchor({ actions, isActive })}
-            <UnscheduledTimeBlock {task} use={actions} />
+            <UnscheduledTimeBlock
+              {task}
+              use={actions}
+              --time-block-border-color-override={isActive
+                ? "var(--color-accent)"
+                : ""}
+              --time-block-box-shadow={isActive
+                ? "var(--shadow-stationary), var(--shadow-border-accent)"
+                : ""}
+            />
           {/snippet}
           {#snippet topEnd({ isActive, setIsActive })}
             <DragControls
