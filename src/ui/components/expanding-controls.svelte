@@ -25,7 +25,7 @@
 </script>
 
 <div
-  transition:fade|global={{ duration: transitionDurationShort }}
+  transition:fade={{ duration: transitionDurationShort }}
   style:touch-action="none"
   style:flex-direction={reverse ? "row-reverse" : "row"}
   class="expanding-controls"
