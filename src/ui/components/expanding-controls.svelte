@@ -3,6 +3,7 @@
   import { slide } from "svelte/transition";
 
   import { isTouchEvent } from "../../util/util";
+
   import { createSlide } from "./defaults";
 
   interface Props {
@@ -63,13 +64,13 @@
   }
 
   .expanding-controls {
-    padding: var(--size-2-1);
-
     /* Note: this prevents jitter and losing hover state when a floating UI
     container has a slide animation that stretches it from right to left. */
     position: var(--expanding-controls-position, static);
     right: 0;
     bottom: 0;
+
+    padding: var(--size-2-1);
 
     background-color: var(--background-primary);
     border: 1px solid var(--background-modifier-border);

@@ -11,9 +11,12 @@
   import { isTouchEvent } from "../../util/util";
 
   import Column from "./column.svelte";
+  import DragControls from "./drag-controls.svelte";
+  import FloatingControls from "./floating-controls.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Needle from "./needle.svelte";
   import RemoteTimeBlock from "./remote-time-block.svelte";
+  import ResizeControls from "./resize-controls.svelte";
   import ScheduledTimeBlock from "./scheduled-time-block.svelte";
 
   const {
@@ -26,11 +29,7 @@
     settings,
     editContext: {
       confirmEdit,
-      handlers: {
-        handleContainerMouseDown,
-        handleResizerMouseDown,
-        handleGripMouseDown,
-      },
+      handlers: { handleContainerMouseDown },
       getDisplayedTasksForTimeline,
     },
     getDisplayedTasksWithClocksForTimeline,
@@ -87,13 +86,25 @@
           <RemoteTimeBlock {task} />
         </ScheduledTimeBlock>
       {:else}
-        <!--TODO: Time block should not know about the controls-->
-        <LocalTimeBlock
-          onFloatingUiPointerDown={updatePointerOffsetY}
-          onGripMouseDown={handleGripMouseDown}
-          onResizerMouseDown={handleResizerMouseDown}
-          {task}
-        />
+        <FloatingControls>
+          {#snippet anchor({ actions, isActive })}
+            <LocalTimeBlock {isActive} {task} use={actions} />
+          {/snippet}
+          {#snippet topEnd({ isActive, setIsActive })}
+            <DragControls
+              --expanding-controls-position="absolute"
+              {isActive}
+              {setIsActive}
+              {task}
+            />
+          {/snippet}
+          {#snippet bottom({ isActive, setIsActive })}
+            <ResizeControls {isActive} reverse {setIsActive} {task} />
+          {/snippet}
+          {#snippet top({ isActive, setIsActive })}
+            <ResizeControls fromTop {isActive} reverse {setIsActive} {task} />
+          {/snippet}
+        </FloatingControls>
       {/if}
     {/each}
   </div>

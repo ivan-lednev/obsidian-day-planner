@@ -1,4 +1,5 @@
 import { isNotVoid } from "typed-assert";
+
 import { floatingUiOffset } from "../constants";
 
 export function createOffsetFnWithFrozenCrossAxis() {

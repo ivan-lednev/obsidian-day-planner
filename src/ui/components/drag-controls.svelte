@@ -6,19 +6,24 @@
     Copy,
   } from "lucide-svelte";
 
+  import { getObsidianContext } from "../../context/obsidian-context";
+  import type { LocalTask } from "../../task-types";
+  import * as t from "../../util/task-utils";
   import { createGestures } from "../actions/gestures";
+  import { EditMode } from "../hooks/use-edit/types";
 
   import BlockControlButton from "./block-control-button.svelte";
   import ExpandingControls from "./expanding-controls.svelte";
 
   export let isActive: boolean;
   export let setIsActive: (value: boolean) => void;
-  export let onMove: (event: PointerEvent) => void;
-  export let onMoveWithNeighbors: (event: PointerEvent) => void = () => {};
-  export let onCopy: (event: PointerEvent) => void = () => {};
-  export let onMoveWithShrink: (event: PointerEvent) => void = () => {};
-  // TODO: return this handler
-  export let onPointerDown: (event: PointerEvent) => void = () => {};
+  export let task: LocalTask;
+
+  const {
+    editContext: {
+      handlers: { handleGripMouseDown },
+    },
+  } = getObsidianContext();
 </script>
 
 <ExpandingControls {isActive} {setIsActive}>
@@ -28,7 +33,7 @@
       label="Move block"
       use={[
         createGestures({
-          onpanmove: onMove,
+          onpanmove: () => handleGripMouseDown(task, EditMode.DRAG),
         }),
       ]}
     >
@@ -36,32 +41,28 @@
     </BlockControlButton>
   {/snippet}
   {#snippet expanded()}
-    {#if onCopy}
-      <BlockControlButton
-        cursor="grab"
-        label="Copy block"
-        on:pointerdown={onCopy}
-      >
-        <Copy class="svg-icon" />
-      </BlockControlButton>
-    {/if}
-    {#if onMoveWithNeighbors}
-      <BlockControlButton
-        cursor="grab"
-        label="Move block and push neighboring blocks"
-        on:pointerdown={onMoveWithNeighbors}
-      >
-        <ArrowDownToLine class="svg-icon" />
-      </BlockControlButton>
-    {/if}
-    {#if onMoveWithShrink}
-      <BlockControlButton
-        cursor="grab"
-        label="Move block and shrink neighboring blocks"
-        on:pointerdown={onMoveWithShrink}
-      >
-        <FoldVertical class="svg-icon" />
-      </BlockControlButton>
-    {/if}
+    <BlockControlButton
+      cursor="grab"
+      label="Copy block"
+      on:pointerdown={() => handleGripMouseDown(t.copy(task), EditMode.DRAG)}
+    >
+      <Copy class="svg-icon" />
+    </BlockControlButton>
+    <BlockControlButton
+      cursor="grab"
+      label="Move block and push neighboring blocks"
+      on:pointerdown={() =>
+        handleGripMouseDown(task, EditMode.DRAG_AND_SHIFT_OTHERS)}
+    >
+      <ArrowDownToLine class="svg-icon" />
+    </BlockControlButton>
+    <BlockControlButton
+      cursor="grab"
+      label="Move block and shrink neighboring blocks"
+      on:pointerdown={() =>
+        handleGripMouseDown(task, EditMode.DRAG_AND_SHRINK_OTHERS)}
+    >
+      <FoldVertical class="svg-icon" />
+    </BlockControlButton>
   {/snippet}
 </ExpandingControls>

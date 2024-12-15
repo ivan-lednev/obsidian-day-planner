@@ -8,25 +8,13 @@
   interface Props {
     children: Snippet;
     use?: ActionArray;
-    onPointerDown?: (event: PointerEvent) => void;
     onpointerup?: (event: PointerEvent) => void;
   }
 
-  let {
-    children,
-    use = [],
-    onPointerDown = () => {},
-    onpointerup = () => {},
-  }: Props = $props();
+  let { children, use = [], onpointerup = () => {} }: Props = $props();
 </script>
 
-<div
-  class="floating-ui"
-  onpointerdown={onPointerDown}
-  {onpointerup}
-  use:portal
-  use:useActions={use}
->
+<div class="floating-ui" {onpointerup} use:portal use:useActions={use}>
   {@render children()}
 </div>
 
