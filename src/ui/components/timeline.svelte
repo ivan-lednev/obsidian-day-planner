@@ -15,9 +15,11 @@
   import FloatingControls from "./floating-controls.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Needle from "./needle.svelte";
-  import RemoteTimeBlock from "./remote-time-block.svelte";
+  import PositionedTimeBlock from "./positioned-time-block.svelte";
+  import RemoteTimeBlockContent from "./remote-time-block-content.svelte";
   import ResizeControls from "./resize-controls.svelte";
-  import ScheduledTimeBlock from "./scheduled-time-block.svelte";
+  import Selectable from "./selectable.svelte";
+  import TimeBlockBase from "./time-block-base.svelte";
 
   const {
     day,
@@ -82,29 +84,47 @@
   >
     {#each $displayedTasksForTimeline.withTime as task (getRenderKey(task))}
       {#if isRemote(task)}
-        <ScheduledTimeBlock {task}>
-          <RemoteTimeBlock {task} />
-        </ScheduledTimeBlock>
+        <PositionedTimeBlock {task}>
+          <TimeBlockBase {task}>
+            <RemoteTimeBlockContent {task} />
+          </TimeBlockBase>
+        </PositionedTimeBlock>
       {:else}
-        <FloatingControls>
-          {#snippet anchor({ actions, isActive })}
-            <LocalTimeBlock {isActive} {task} use={actions} />
+        <Selectable>
+          {#snippet children({ use: selectableActions, isSelected })}
+            <FloatingControls isAnchorActive={isSelected}>
+              {#snippet anchor({ actions: floatingControlsActions })}
+                <PositionedTimeBlock {task}>
+                  <LocalTimeBlock
+                    isActive={isSelected}
+                    {task}
+                    use={[...selectableActions, ...floatingControlsActions]}
+                  />
+                </PositionedTimeBlock>
+              {/snippet}
+              {#snippet topEnd({ isActive, setIsActive })}
+                <DragControls
+                  --expanding-controls-position="absolute"
+                  {isActive}
+                  {setIsActive}
+                  {task}
+                />
+              {/snippet}
+              {#snippet bottom({ isActive, setIsActive })}
+                <ResizeControls {isActive} reverse {setIsActive} {task} />
+              {/snippet}
+              {#snippet top({ isActive, setIsActive })}
+                <ResizeControls
+                  fromTop
+                  {isActive}
+                  reverse
+                  {setIsActive}
+                  {task}
+                />
+              {/snippet}
+            </FloatingControls>
           {/snippet}
-          {#snippet topEnd({ isActive, setIsActive })}
-            <DragControls
-              --expanding-controls-position="absolute"
-              {isActive}
-              {setIsActive}
-              {task}
-            />
-          {/snippet}
-          {#snippet bottom({ isActive, setIsActive })}
-            <ResizeControls {isActive} reverse {setIsActive} {task} />
-          {/snippet}
-          {#snippet top({ isActive, setIsActive })}
-            <ResizeControls fromTop {isActive} reverse {setIsActive} {task} />
-          {/snippet}
-        </FloatingControls>
+        </Selectable>
       {/if}
     {/each}
   </div>
@@ -121,7 +141,17 @@
 
     <div class="tasks absolute-stretch-x">
       {#each $displayedTasksWithClocksForTimeline as task (getRenderKey(task))}
-        <LocalTimeBlock {task} />
+        <Selectable>
+          {#snippet children({ use: selectableActions, isSelected })}
+            <PositionedTimeBlock {task}>
+              <LocalTimeBlock
+                isActive={isSelected}
+                {task}
+                use={selectableActions}
+              />
+            </PositionedTimeBlock>
+          {/snippet}
+        </Selectable>
       {/each}
     </div>
   </Column>

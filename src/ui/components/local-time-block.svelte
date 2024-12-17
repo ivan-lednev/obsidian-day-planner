@@ -1,28 +1,36 @@
 <script lang="ts">
-  import type { LocalTask, WithPlacing, WithTime } from "../../task-types";
-  import { hoverPreview } from "../actions/hover-preview";
+  import type { Snippet } from "svelte";
+
+  import type { LocalTask } from "../../task-types";
   import type { HTMLActionArray } from "../actions/use-actions";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
-  import ScheduledTimeBlock from "./scheduled-time-block.svelte";
+  import TimeBlockBase from "./time-block-base.svelte";
 
-  interface Props {
-    task: WithPlacing<WithTime<LocalTask>>;
+  const {
+    task,
+    children,
+    isActive = false,
+    use = [],
+    onpointerup,
+  }: {
     isActive?: boolean;
+    task: LocalTask;
+    children?: Snippet;
     use?: HTMLActionArray;
-  }
-
-  const { use = [], isActive = false, task }: Props = $props();
+    onpointerup?: (event: PointerEvent) => void;
+  } = $props();
 </script>
 
-<!-- TODO: remove custom props once Redux handles this -->
-<ScheduledTimeBlock
+<TimeBlockBase
   --time-block-border-color-override={isActive ? "var(--color-accent)" : ""}
   --time-block-box-shadow={isActive
     ? "var(--shadow-stationary), var(--shadow-border-accent)"
     : ""}
+  {onpointerup}
   {task}
-  use={[...use, hoverPreview(task)]}
+  {use}
 >
   <RenderedMarkdown {task} />
-</ScheduledTimeBlock>
+  {@render children?.()}
+</TimeBlockBase>

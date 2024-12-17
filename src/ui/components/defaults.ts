@@ -1,4 +1,5 @@
 import { cubicInOut } from "svelte/easing";
+
 import { transitionDurationShort } from "../../constants";
 
 export function createSlide(props: { axis: "x" | "y" }) {

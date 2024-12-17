@@ -8,9 +8,10 @@
 
   import DragControls from "./drag-controls.svelte";
   import FloatingControls from "./floating-controls.svelte";
-  import RemoteTimeBlock from "./remote-time-block.svelte";
+  import LocalTimeBlock from "./local-time-block.svelte";
+  import RemoteTimeBlockContent from "./remote-time-block-content.svelte";
+  import Selectable from "./selectable.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
-  import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   const { day }: { day: Moment } = $props();
 
@@ -29,32 +30,30 @@
   >
     {#each $displayedTasksForTimeline.noTime as task}
       {#if isLocal(task)}
-        <FloatingControls>
-          <!-- TODO: remove custom props once Redux handles this -->
-          {#snippet anchor({ actions, isActive })}
-            <UnscheduledTimeBlock
-              {task}
-              use={actions}
-              --time-block-border-color-override={isActive
-                ? "var(--color-accent)"
-                : ""}
-              --time-block-box-shadow={isActive
-                ? "var(--shadow-stationary), var(--shadow-border-accent)"
-                : ""}
-            />
+        <Selectable>
+          {#snippet children({ use: selectableActions, isSelected })}
+            <FloatingControls isAnchorActive={isSelected}>
+              {#snippet anchor({ actions: floatingControlsActions })}
+                <LocalTimeBlock
+                  isActive={isSelected}
+                  {task}
+                  use={[...selectableActions, ...floatingControlsActions]}
+                />
+              {/snippet}
+              {#snippet topEnd({ isActive, setIsActive })}
+                <DragControls
+                  --expanding-controls-position="absolute"
+                  {isActive}
+                  {setIsActive}
+                  {task}
+                />
+              {/snippet}
+            </FloatingControls>
           {/snippet}
-          {#snippet topEnd({ isActive, setIsActive })}
-            <DragControls
-              --expanding-controls-position="absolute"
-              {isActive}
-              {setIsActive}
-              {task}
-            />
-          {/snippet}
-        </FloatingControls>
+        </Selectable>
       {:else}
         <TimeBlockBase {task}>
-          <RemoteTimeBlock {task} />
+          <RemoteTimeBlockContent {task} />
         </TimeBlockBase>
       {/if}
     {/each}

@@ -2,10 +2,10 @@
   import type { Snippet } from "svelte";
   import { slide, fade } from "svelte/transition";
 
+  import { transitionDurationShort } from "../../constants";
   import { isTouchEvent } from "../../util/util";
 
   import { createSlide } from "./defaults";
-  import { transitionDurationShort } from "../../constants";
 
   interface Props {
     isActive: boolean;
@@ -25,7 +25,6 @@
 </script>
 
 <div
-  transition:fade={{ duration: transitionDurationShort }}
   style:touch-action="none"
   style:flex-direction={reverse ? "row-reverse" : "row"}
   class="expanding-controls"
@@ -49,6 +48,7 @@
       setIsActive(!isActive);
     }
   }}
+  transition:fade={{ duration: transitionDurationShort }}
 >
   {#if isActive}
     <div class="expanded-wrapper" transition:slide={createSlide({ axis: "x" })}>

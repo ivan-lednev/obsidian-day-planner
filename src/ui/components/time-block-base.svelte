@@ -8,11 +8,14 @@
   import { getColorOverride } from "../hooks/get-color-override";
   import { useColor } from "../hooks/use-color.svelte";
 
-  const {
-    children,
-    task,
-    use = [],
-  }: { children: Snippet; task: Task; use?: ActionArray } = $props();
+  interface Props {
+    children: Snippet;
+    task: Task;
+    use?: ActionArray;
+    onpointerup?: (event: PointerEvent) => void;
+  }
+
+  const { onpointerup, children, task, use = [] }: Props = $props();
 
   const { isDarkMode, settingsSignal } = getObsidianContext();
 
@@ -37,6 +40,7 @@
     )}
     class="content"
     class:truncated-bottom={task.truncated === "bottom"}
+    {onpointerup}
     use:useActions={use}
   >
     {@render children()}

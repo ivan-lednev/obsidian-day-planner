@@ -9,9 +9,7 @@
 
 <div class="remote-task-content">
   <div
-    style="
-
---ribbon-color: {task.calendar.color}"
+    style:--ribbon-color={task.calendar.color}
     class="ribbon"
     class:declined
     class:tentative

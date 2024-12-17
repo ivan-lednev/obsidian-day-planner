@@ -6,12 +6,9 @@
   import type { ActionArray } from "../actions/use-actions";
   import { useTaskVisuals } from "../hooks/use-task-visuals";
 
-  import TimeBlockBase from "./time-block-base.svelte";
-
   const {
     children,
     task,
-    use = [],
   }: {
     children: Snippet;
     task: WithPlacing<WithTime<Task>>;
@@ -23,14 +20,13 @@
   );
 </script>
 
-<TimeBlockBase
-  --time-block-height={$height}
-  --time-block-left={left}
-  --time-block-position="absolute"
-  --time-block-top={$offset}
-  --time-block-width={width}
-  {task}
-  {use}
+<svelte-css-wrapper
+  style:display="contents"
+  style:--time-block-height={$height}
+  style:--time-block-left={left}
+  style:--time-block-position="absolute"
+  style:--time-block-top={$offset}
+  style:--time-block-width={width}
 >
   {@render children()}
-</TimeBlockBase>
+</svelte-css-wrapper>

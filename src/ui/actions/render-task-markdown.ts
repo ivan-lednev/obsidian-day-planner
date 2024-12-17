@@ -1,4 +1,5 @@
 import { on } from "svelte/events";
+
 import { getDisplayedText } from "../../parser/parser";
 import type { VaultFacade } from "../../service/vault-facade";
 import type { DayPlannerSettings } from "../../settings";

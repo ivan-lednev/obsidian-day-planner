@@ -4,8 +4,6 @@
 
   import { floatingUiOffset } from "../../constants";
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { createGestures } from "../actions/gestures";
-  import { pointerUpOutside } from "../actions/pointer-up-outside";
   import { type HTMLActionArray } from "../actions/use-actions";
   import { createOffsetFnWithFrozenCrossAxis } from "../floating-ui-util";
   import { useFloatingUi } from "../hooks/use-floating-ui";
@@ -14,7 +12,6 @@
 
   interface AnchorProps {
     actions: HTMLActionArray;
-    isActive: boolean;
   }
 
   interface FloatingUiProps {
@@ -29,15 +26,15 @@
     topEnd: Snippet<[FloatingUiProps]>;
     bottom?: Snippet<[FloatingUiProps]>;
     top?: Snippet<[FloatingUiProps]>;
+    isAnchorActive: boolean;
   }
 
-  const { anchor, topEnd, bottom, top }: Props = $props();
+  const { anchor, topEnd, bottom, top, isAnchorActive }: Props = $props();
 
   const {
     editContext: { editOperation },
   } = getObsidianContext();
 
-  let isActive = $state(false);
   let activeControl = $state<ActiveControl>();
 
   function createSetActiveControl(control: ActiveControl) {
@@ -71,19 +68,10 @@
     topEndFloatingUi.anchorSetup,
     bottomFloatingUi.anchorSetup,
     topFloatingUi.anchorSetup,
-    createGestures({
-      ontap: () => {
-        isActive = true;
-      },
-    }),
-    pointerUpOutside(() => {
-      isActive = false;
-    }),
   ],
-  isActive,
 })}
 
-{#if !$editOperation && isActive}
+{#if !$editOperation && isAnchorActive}
   {#if !activeControl || activeControl === "top-end"}
     <FloatingUi
       onpointerup={stopPropagation}
