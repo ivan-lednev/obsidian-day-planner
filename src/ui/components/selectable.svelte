@@ -29,4 +29,12 @@
   ];
 </script>
 
+<svelte:body
+  onkeydown={(event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      isSelected = false;
+    }
+  }}
+/>
+
 {@render children({ isSelected, use })}
