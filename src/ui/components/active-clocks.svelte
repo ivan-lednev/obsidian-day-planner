@@ -11,6 +11,7 @@
   import BlockList from "./block-list.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Pill from "./pill.svelte";
+  import Selectable from "./selectable.svelte";
 
   const { workspaceFacade, tasksWithActiveClockProps, sTaskEditor } =
     getObsidianContext();
@@ -18,30 +19,36 @@
 
 <BlockList list={$tasksWithActiveClockProps}>
   {#snippet match(task: LocalTask)}
-    <LocalTimeBlock
-      --time-block-padding="var(--size-4-1)"
-      onpointerup={(event) =>
-        createActiveClockMenu({
-          event,
-          task,
-          sTaskEditor,
-          workspaceFacade,
-        })}
-      {task}
-    >
-      <div class="properties-wrapper">
-        <Pill
-          key={PlaneTakeoff}
-          value={task.startTime.format($settings.timestampFormat)}
-        />
-        <Pill
-          key={Clock3}
-          value={m
-            .fromDiff(task.startTime, currentTimeSignal.current)
-            .format($settings.timestampFormat)}
-        />
-      </div>
-    </LocalTimeBlock>
+    <Selectable>
+      {#snippet children({ use: selectableActions, isSelected })}
+        <LocalTimeBlock
+          --time-block-padding="var(--size-4-1)"
+          isActive={isSelected}
+          onpointerup={(event) =>
+            createActiveClockMenu({
+              event,
+              task,
+              sTaskEditor,
+              workspaceFacade,
+            })}
+          {task}
+          use={selectableActions}
+        >
+          <div class="properties-wrapper">
+            <Pill
+              key={PlaneTakeoff}
+              value={task.startTime.format($settings.timestampFormat)}
+            />
+            <Pill
+              key={Clock3}
+              value={m
+                .fromDiff(task.startTime, currentTimeSignal.current)
+                .format($settings.timestampFormat)}
+            />
+          </div>
+        </LocalTimeBlock>
+      {/snippet}
+    </Selectable>
   {/snippet}
 </BlockList>
 
