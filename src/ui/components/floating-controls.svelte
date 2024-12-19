@@ -11,6 +11,7 @@
   import { useFloatingUi } from "../hooks/use-floating-ui";
 
   import FloatingUi from "./floating-ui.svelte";
+  import ShowActiveOrAll from "./show-active-or-all.svelte";
 
   interface AnchorProps {
     actions: HTMLActionArray;
@@ -34,20 +35,6 @@
     editContext: { editOperation },
   } = getObsidianContext();
 
-  let activeControl = $state<ActiveControl>();
-
-  function createSetActiveControl(control: ActiveControl) {
-    return (isActive: boolean) => {
-      activeControl = isActive ? control : undefined;
-    };
-  }
-
-  const placementToRenderProp = {
-    "top-end": "topEnd",
-    "top-start": "top",
-    "bottom-start": "bottom",
-  } as const;
-
   let actions: HTMLActionArray = [];
 
   function createAnchoredFloatingUi(options: Partial<ComputePositionConfig>) {
@@ -58,42 +45,42 @@
 
     isNotVoid(placement);
 
-    return {
-      use: [ui.floatingUiSetup],
-      name: placementToRenderProp[placement],
-    };
+    return [ui.floatingUiSetup];
   }
 
   const controls = [
-    createAnchoredFloatingUi({
-      middleware: [offset({ mainAxis: floatingUiOffset })],
-      placement: "top-end",
-    }),
-    createAnchoredFloatingUi({
-      middleware: [offset(createOffsetFnWithFrozenCrossAxis())],
-      placement: "bottom-start",
-    }),
-    createAnchoredFloatingUi({
-      middleware: [offset(createOffsetFnWithFrozenCrossAxis())],
-      placement: "top-start",
-    }),
+    {
+      use: createAnchoredFloatingUi({
+        middleware: [offset({ mainAxis: floatingUiOffset })],
+        placement: "top-end",
+      }),
+      name: "topEnd",
+    },
+    {
+      use: createAnchoredFloatingUi({
+        middleware: [offset(createOffsetFnWithFrozenCrossAxis())],
+        placement: "bottom-start",
+      }),
+      name: "bottom",
+    },
+    {
+      use: createAnchoredFloatingUi({
+        middleware: [offset(createOffsetFnWithFrozenCrossAxis())],
+        placement: "top-start",
+      }),
+      name: "top",
+    },
   ];
 </script>
 
 {@render anchor({ actions })}
 
 {#if !$editOperation && active}
-  {#each controls as { name, use }}
-    {#if !activeControl || activeControl === name}
-      <FloatingUi
-        onpointerup={(event) => event.stopPropagation()}
-        use={[...use]}
-      >
-        {@render snippets?.[name]?.({
-          isActive: activeControl === name,
-          setIsActive: createSetActiveControl(name),
-        })}
+  <ShowActiveOrAll blocks={controls}>
+    {#snippet block({ isActive, setIsActive, name, use })}
+      <FloatingUi onpointerup={(event) => event.stopPropagation()} {use}>
+        {@render snippets?.[name]?.({ isActive, setIsActive })}
       </FloatingUi>
-    {/if}
-  {/each}
+    {/snippet}
+  </ShowActiveOrAll>
 {/if}

@@ -1,11 +1,11 @@
 <script lang="ts">
   import { type Snippet } from "svelte";
 
+  import { MouseButton, vibrationDurationMillis } from "../../constants";
   import { isTouchEvent } from "../../util/util";
   import { createGestures } from "../actions/gestures";
   import { pointerUpOutside } from "../actions/pointer-up-outside";
   import type { HTMLActionArray } from "../actions/use-actions";
-  import { MouseButton, vibrationDurationMillis } from "../../constants";
 
   type SelectionState = "primary" | "secondary" | "none";
 
