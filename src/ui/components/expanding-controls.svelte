@@ -2,7 +2,10 @@
   import type { Snippet } from "svelte";
   import { slide, fade } from "svelte/transition";
 
-  import { transitionDurationShort } from "../../constants";
+  import {
+    transitionDurationShort,
+    vibrationDurationMillis,
+  } from "../../constants";
   import { isTouchEvent } from "../../util/util";
 
   import { createSlide } from "./defaults";
@@ -17,11 +20,16 @@
 
   export const {
     isActive,
-    setIsActive,
+    setIsActive: baseSetIsActive,
     reverse = false,
     initial,
     expanded,
   }: Props = $props();
+
+  function setIsActive(isActive: boolean) {
+    navigator.vibrate?.(vibrationDurationMillis);
+    baseSetIsActive(isActive);
+  }
 </script>
 
 <div
