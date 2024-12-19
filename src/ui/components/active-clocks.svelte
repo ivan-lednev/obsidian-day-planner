@@ -19,20 +19,22 @@
 
 <BlockList list={$tasksWithActiveClockProps}>
   {#snippet match(task: LocalTask)}
-    <Selectable>
-      {#snippet children({ use: selectableActions, isSelected })}
+    <Selectable
+      onSecondarySelect={(event) =>
+        createActiveClockMenu({
+          event,
+          task,
+          sTaskEditor,
+          workspaceFacade,
+        })}
+    >
+      {#snippet children({ use, onpointerup, state })}
         <LocalTimeBlock
           --time-block-padding="var(--size-4-1)"
-          isActive={isSelected}
-          onpointerup={(event) =>
-            createActiveClockMenu({
-              event,
-              task,
-              sTaskEditor,
-              workspaceFacade,
-            })}
+          isActive={state === "secondary"}
+          {onpointerup}
           {task}
-          use={selectableActions}
+          {use}
         >
           <div class="properties-wrapper">
             <Pill

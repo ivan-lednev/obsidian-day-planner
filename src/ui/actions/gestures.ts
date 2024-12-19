@@ -11,18 +11,32 @@ export function createGestures(props: {
   const { ontap, onlongpress, onpanstart, onpanend, onpanmove, options } =
     props;
 
+  let pressed = false;
+
   return (el: HTMLElement) => {
     const gesture = new TinyGesture(el, options);
 
     gesture.on("tap", (event) => {
+      if (pressed) {
+        return;
+      }
+
       ontap?.(event);
     });
 
     gesture.on("longpress", (event) => {
+      pressed = true;
+
       onlongpress?.(event);
     });
 
     gesture.on("panend", (event) => {
+      if (pressed) {
+        setTimeout(() => {
+          pressed = false;
+        });
+      }
+
       onpanend?.(event);
     });
 

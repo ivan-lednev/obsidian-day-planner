@@ -7,7 +7,7 @@ import type { LocalTask } from "../task-types";
 import * as c from "../util/clock";
 
 export function createActiveClockMenu(props: {
-  event: PointerEvent;
+  event: PointerEvent | MouseEvent | TouchEvent;
   task: LocalTask;
   sTaskEditor: STaskEditor;
   workspaceFacade: WorkspaceFacade;

@@ -25,10 +25,10 @@
 
   type Props = {
     anchor: Snippet<[AnchorProps]>;
-    isAnchorActive: boolean;
+    active: boolean;
   } & Partial<Record<ActiveControl, Snippet<[FloatingUiProps]>>>;
 
-  const { anchor, isAnchorActive, ...snippets }: Props = $props();
+  const { active, anchor, ...snippets }: Props = $props();
 
   const {
     editContext: { editOperation },
@@ -42,21 +42,17 @@
     };
   }
 
-  function isControlShown(control: ActiveControl) {
-    return !activeControl || activeControl === control;
-  }
-
   const placementToRenderProp = {
     "top-end": "topEnd",
     "top-start": "top",
     "bottom-start": "bottom",
   } as const;
 
-  let anchorActions: HTMLActionArray = [];
+  let actions: HTMLActionArray = [];
 
   function createAnchoredFloatingUi(options: Partial<ComputePositionConfig>) {
     const ui = useFloatingUi(options);
-    anchorActions.push(ui.anchorSetup);
+    actions.push(ui.anchorSetup);
 
     const { placement } = options;
 
@@ -84,11 +80,11 @@
   ];
 </script>
 
-{@render anchor({ actions: anchorActions })}
+{@render anchor({ actions })}
 
-{#if !$editOperation && isAnchorActive}
+{#if !$editOperation && active}
   {#each controls as { name, use }}
-    {#if isControlShown(name)}
+    {#if !activeControl || activeControl === name}
       <FloatingUi
         onpointerup={(event) => event.stopPropagation()}
         use={[...use]}

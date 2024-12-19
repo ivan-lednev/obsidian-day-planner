@@ -9,6 +9,7 @@
   import { minutesToMomentOfDay } from "../../util/moment";
   import { getRenderKey, offsetYToMinutes } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
+  import { createTimeBlockMenu } from "../time-block-menu";
 
   import Column from "./column.svelte";
   import DragControls from "./drag-controls.svelte";
@@ -33,6 +34,7 @@
       confirmEdit,
       handlers: { handleContainerMouseDown },
       getDisplayedTasksForTimeline,
+      editOperation,
     },
     getDisplayedTasksWithClocksForTimeline,
   } = getObsidianContext();
@@ -90,15 +92,20 @@
           </TimeBlockBase>
         </PositionedTimeBlock>
       {:else}
-        <Selectable>
-          {#snippet children({ use: selectableActions, isSelected })}
-            <FloatingControls isAnchorActive={isSelected}>
-              {#snippet anchor({ actions: floatingControlsActions })}
+        <Selectable
+          onSecondarySelect={createTimeBlockMenu}
+          selectionBlocked={Boolean($editOperation)}
+        >
+          {#snippet children(selectable)}
+            <FloatingControls active={selectable.state === "primary"}>
+              {#snippet anchor(floatingControls)}
                 <PositionedTimeBlock {task}>
                   <LocalTimeBlock
-                    isActive={isSelected}
+                    isActive={selectable.state !== "none" ||
+                      $editOperation?.task.id === task.id}
+                    onpointerup={selectable.onpointerup}
                     {task}
-                    use={[...selectableActions, ...floatingControlsActions]}
+                    use={[...selectable.use, ...floatingControls.actions]}
                   />
                 </PositionedTimeBlock>
               {/snippet}
@@ -141,17 +148,9 @@
 
     <div class="tasks absolute-stretch-x">
       {#each $displayedTasksWithClocksForTimeline as task (getRenderKey(task))}
-        <Selectable>
-          {#snippet children({ use: selectableActions, isSelected })}
-            <PositionedTimeBlock {task}>
-              <LocalTimeBlock
-                isActive={isSelected}
-                {task}
-                use={selectableActions}
-              />
-            </PositionedTimeBlock>
-          {/snippet}
-        </Selectable>
+        <PositionedTimeBlock {task}>
+          <LocalTimeBlock {task} />
+        </PositionedTimeBlock>
       {/each}
     </div>
   </Column>

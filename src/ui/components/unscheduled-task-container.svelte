@@ -5,6 +5,7 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { settings } from "../../global-store/settings";
   import { isLocal } from "../../task-types";
+  import { createTimeBlockMenu } from "../time-block-menu";
 
   import DragControls from "./drag-controls.svelte";
   import FloatingControls from "./floating-controls.svelte";
@@ -16,7 +17,7 @@
   const { day }: { day: Moment } = $props();
 
   const {
-    editContext: { getDisplayedTasksForTimeline },
+    editContext: { getDisplayedTasksForTimeline, editOperation },
   } = getObsidianContext();
 
   const displayedTasksForTimeline = $derived(getDisplayedTasksForTimeline(day));
@@ -30,14 +31,18 @@
   >
     {#each $displayedTasksForTimeline.noTime as task}
       {#if isLocal(task)}
-        <Selectable>
-          {#snippet children({ use: selectableActions, isSelected })}
-            <FloatingControls isAnchorActive={isSelected}>
-              {#snippet anchor({ actions: floatingControlsActions })}
+        <Selectable
+          onSecondarySelect={createTimeBlockMenu}
+          selectionBlocked={Boolean($editOperation)}
+        >
+          {#snippet children(selectable)}
+            <FloatingControls active={selectable.state === "primary"}>
+              {#snippet anchor(floatingControls)}
                 <LocalTimeBlock
-                  isActive={isSelected}
+                  isActive={selectable.state !== "none"}
+                  onpointerup={selectable.onpointerup}
                   {task}
-                  use={[...selectableActions, ...floatingControlsActions]}
+                  use={[...selectable.use, ...floatingControls.actions]}
                 />
               {/snippet}
               {#snippet topEnd({ isActive, setIsActive })}

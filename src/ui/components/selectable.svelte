@@ -1,40 +1,94 @@
 <script lang="ts">
   import { type Snippet } from "svelte";
 
+  import { isTouchEvent } from "../../util/util";
   import { createGestures } from "../actions/gestures";
   import { pointerUpOutside } from "../actions/pointer-up-outside";
   import type { HTMLActionArray } from "../actions/use-actions";
+  import { MouseButton, vibrationDurationMillis } from "../../constants";
+
+  type SelectionState = "primary" | "secondary" | "none";
 
   interface ChildrenProps {
-    isSelected: boolean;
     use: HTMLActionArray;
+    state: SelectionState;
+    onpointerup: (event: PointerEvent) => void;
   }
 
   interface Props {
     children: Snippet<[ChildrenProps]>;
+    selectionBlocked?: boolean;
+    onSecondarySelect?: (event: MouseEvent | PointerEvent | TouchEvent) => void;
   }
 
-  const { children }: Props = $props();
-  let isSelected = $state(false);
+  const {
+    children,
+    onSecondarySelect,
+    selectionBlocked = false,
+  }: Props = $props();
+
+  let state = $state<SelectionState>("none");
+
+  function setSelection(newState: SelectionState) {
+    if (newState !== "none") {
+      if (selectionBlocked) {
+        return;
+      }
+
+      console.log("vibrate");
+      navigator.vibrate?.(vibrationDurationMillis);
+    }
+
+    state = newState;
+  }
+
+  function clear() {
+    setSelection("none");
+  }
+
+  function setPrimary() {
+    setSelection("primary");
+  }
+
+  function setSecondary(event: PointerEvent | MouseEvent | TouchEvent) {
+    setSelection("secondary");
+    onSecondarySelect?.(event);
+  }
 
   const use = [
     createGestures({
       ontap: () => {
-        isSelected = true;
+        setPrimary();
       },
+      onlongpress: (event) => {
+        setSecondary(event);
+      },
+      options: { mouseSupport: false },
     }),
     pointerUpOutside(() => {
-      isSelected = false;
+      clear();
     }),
   ];
+
+  function handlePointerUp(event: PointerEvent) {
+    if (isTouchEvent(event)) {
+      return;
+    }
+
+    if (event.button === MouseButton.LEFT) {
+      setPrimary();
+    } else if (event.button === MouseButton.RIGHT) {
+      setSecondary(event);
+    }
+  }
 </script>
 
 <svelte:body
   onkeydown={(event: KeyboardEvent) => {
     if (event.key === "Escape") {
-      isSelected = false;
+      clear();
     }
   }}
 />
 
-{@render children({ isSelected, use })}
+{@render children({ use, state, onpointerup: handlePointerUp })}

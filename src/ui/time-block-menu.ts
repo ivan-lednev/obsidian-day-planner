@@ -1,6 +1,6 @@
 import { Menu } from "obsidian";
 
-export function createTimeBlockMenu(event: PointerEvent) {
+export function createTimeBlockMenu(event: MouseEvent | TouchEvent) {
   const menu = new Menu();
 
   menu.addItem((item) => {
@@ -10,5 +10,7 @@ export function createTimeBlockMenu(event: PointerEvent) {
       .onClick(() => {});
   });
 
+  // Obsidian works fine with touch events, but its TypeScript definitions don't reflect that.
+  // @ts-expect-error
   menu.showAtMouseEvent(event);
 }

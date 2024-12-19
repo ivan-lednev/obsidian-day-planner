@@ -35,6 +35,11 @@ export const mdastUtilNumberOfSpacesInTab = 4;
 export const dataviewDownloadLink = "https://obsidian.md/plugins?id=dataview";
 export const floatingUiOffset = 8;
 
+export enum MouseButton {
+  LEFT = 0,
+  RIGHT = 2,
+}
+
 export const icons = [
   "any-key",
   "audio-file",
