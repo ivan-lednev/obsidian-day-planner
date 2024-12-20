@@ -35,7 +35,6 @@
         return;
       }
 
-      console.log("vibrate");
       navigator.vibrate?.(vibrationDurationMillis);
     }
 
@@ -65,9 +64,7 @@
       },
       options: { mouseSupport: false },
     }),
-    pointerUpOutside(() => {
-      clear();
-    }),
+    pointerUpOutside(clear),
   ];
 
   function handlePointerUp(event: PointerEvent) {

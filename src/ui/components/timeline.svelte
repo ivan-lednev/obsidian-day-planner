@@ -59,6 +59,7 @@
     );
     const dateTime = minutesToMomentOfDay(minutes, day);
 
+    // todo: this should be derived
     pointerDateTime.set({
       dateTime,
       type: "dateTime",
