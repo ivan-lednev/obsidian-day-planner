@@ -1,66 +1,90 @@
 <script lang="ts">
-  import { fade } from "svelte/transition";
+  import type { Snippet } from "svelte";
+  import { slide, fade } from "svelte/transition";
 
-  import { useHoverOrTap } from "../hooks/use-hover-or-tap";
+  import {
+    transitionDurationShort,
+    vibrationDurationMillis,
+  } from "../../constants";
+  import { isTouchEvent } from "../../util/util";
 
-  export let reverse: boolean | undefined = false;
+  import { createSlide } from "./defaults";
 
-  const {
+  interface Props {
+    isActive: boolean;
+    setIsActive: (value: boolean) => void;
+    reverse?: boolean;
+    initial: Snippet;
+    expanded: Snippet;
+  }
+
+  export const {
     isActive,
-    handlePointerDown,
-    handlePointerEnter,
-    handlePointerLeave,
-  } = useHoverOrTap();
+    setIsActive: baseSetIsActive,
+    reverse = false,
+    initial,
+    expanded,
+  }: Props = $props();
+
+  function setIsActive(isActive: boolean) {
+    navigator.vibrate?.(vibrationDurationMillis);
+    baseSetIsActive(isActive);
+  }
 </script>
 
 <div
-  style:flex-direction={reverse ? "row-reverse" : "row"}
   style:touch-action="none"
+  style:flex-direction={reverse ? "row-reverse" : "row"}
   class="expanding-controls"
-  class:active={$isActive}
-  on:pointermove|preventDefault
-  on:pointerdown
-  on:pointerdown={handlePointerDown}
-  on:pointerenter={handlePointerEnter}
-  on:pointerleave={handlePointerLeave}
+  class:active={isActive}
+  onpointerenter={(event) => {
+    if (isTouchEvent(event)) {
+      return;
+    }
+
+    setIsActive(true);
+  }}
+  onpointerleave={(event) => {
+    if (isTouchEvent(event)) {
+      return;
+    }
+
+    setIsActive(false);
+  }}
+  onpointerup={(event) => {
+    if (isTouchEvent(event)) {
+      setIsActive(!isActive);
+    }
+  }}
+  transition:fade={{ duration: transitionDurationShort }}
 >
-  {#if $isActive}
-    <div style="display: flex" in:fade={{ duration: 300 }}>
-      <slot />
+  {#if isActive}
+    <div class="expanded-wrapper" transition:slide={createSlide({ axis: "x" })}>
+      {@render expanded()}
     </div>
   {/if}
-  <div
-    style:display={$isActive ? "none" : "block"}
-    class="circle"
-    in:fade={{ duration: 300 }}
-  ></div>
+  {@render initial()}
 </div>
 
 <style>
-  .circle {
-    padding: var(--size-4-1);
-    opacity: 0.3;
-    background-color: var(--color-accent);
-    border-radius: 50%;
+  .expanded-wrapper,
+  .expanding-controls {
+    display: flex;
+    gap: var(--size-2-1);
   }
 
   .expanding-controls {
-    overflow: hidden;
-    display: flex;
-    flex-direction: var(--expanding-controls-flex-direction, row);
-    align-items: center;
-    justify-content: center;
+    /* Note: this prevents jitter and losing hover state when a floating UI
+    container has a slide animation that stretches it from right to left. */
+    position: var(--expanding-controls-position, static);
+    right: 0;
+    bottom: 0;
 
-    min-width: 32px;
-    min-height: 32px;
+    padding: var(--size-2-1);
 
-    border-radius: 4px;
-  }
-
-  .active {
-    min-width: auto;
-    min-height: auto;
     background-color: var(--background-primary);
     border: 1px solid var(--background-modifier-border);
+    border-radius: var(--size-4-1);
+    box-shadow: var(--floating-controls-shadow);
   }
 </style>

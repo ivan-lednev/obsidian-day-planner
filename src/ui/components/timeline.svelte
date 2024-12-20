@@ -9,12 +9,18 @@
   import { minutesToMomentOfDay } from "../../util/moment";
   import { getRenderKey, offsetYToMinutes } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
+  import { createTimeBlockMenu } from "../time-block-menu";
 
   import Column from "./column.svelte";
+  import DragControls from "./drag-controls.svelte";
+  import FloatingControls from "./floating-controls.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Needle from "./needle.svelte";
-  import RemoteTimeBlock from "./remote-time-block.svelte";
-  import ScheduledTimeBlock from "./scheduled-time-block.svelte";
+  import PositionedTimeBlock from "./positioned-time-block.svelte";
+  import RemoteTimeBlockContent from "./remote-time-block-content.svelte";
+  import ResizeControls from "./resize-controls.svelte";
+  import Selectable from "./selectable.svelte";
+  import TimeBlockBase from "./time-block-base.svelte";
 
   const {
     day,
@@ -26,13 +32,9 @@
     settings,
     editContext: {
       confirmEdit,
-      handlers: {
-        handleContainerMouseDown,
-        handleResizerMouseDown,
-        handleTaskMouseUp,
-        handleGripMouseDown,
-      },
+      handlers: { handleContainerMouseDown },
       getDisplayedTasksForTimeline,
+      editOperation,
     },
     getDisplayedTasksWithClocksForTimeline,
   } = getObsidianContext();
@@ -57,6 +59,7 @@
     );
     const dateTime = minutesToMomentOfDay(minutes, day);
 
+    // todo: this should be derived
     pointerDateTime.set({
       dateTime,
       type: "dateTime",
@@ -84,19 +87,52 @@
   >
     {#each $displayedTasksForTimeline.withTime as task (getRenderKey(task))}
       {#if isRemote(task)}
-        <ScheduledTimeBlock {task}>
-          <RemoteTimeBlock {task} />
-        </ScheduledTimeBlock>
+        <PositionedTimeBlock {task}>
+          <TimeBlockBase {task}>
+            <RemoteTimeBlockContent {task} />
+          </TimeBlockBase>
+        </PositionedTimeBlock>
       {:else}
-        <LocalTimeBlock
-          onFloatingUiPointerDown={updatePointerOffsetY}
-          onGripMouseDown={handleGripMouseDown}
-          onResizerMouseDown={handleResizerMouseDown}
-          onpointerup={() => {
-            handleTaskMouseUp(task);
-          }}
-          {task}
-        />
+        <Selectable
+          onSecondarySelect={createTimeBlockMenu}
+          selectionBlocked={Boolean($editOperation)}
+        >
+          {#snippet children(selectable)}
+            <FloatingControls active={selectable.state === "primary"}>
+              {#snippet anchor(floatingControls)}
+                <PositionedTimeBlock {task}>
+                  <LocalTimeBlock
+                    isActive={selectable.state !== "none" ||
+                      $editOperation?.task.id === task.id}
+                    onpointerup={selectable.onpointerup}
+                    {task}
+                    use={[...selectable.use, ...floatingControls.actions]}
+                  />
+                </PositionedTimeBlock>
+              {/snippet}
+              {#snippet topEnd({ isActive, setIsActive })}
+                <DragControls
+                  --expanding-controls-position="absolute"
+                  {isActive}
+                  {setIsActive}
+                  {task}
+                />
+              {/snippet}
+              {#snippet bottom({ isActive, setIsActive })}
+                <ResizeControls {isActive} reverse {setIsActive} {task} />
+              {/snippet}
+              {#snippet top({ isActive, setIsActive })}
+                <ResizeControls
+                  fromTop
+                  {isActive}
+                  reverse
+                  {setIsActive}
+                  {task}
+                />
+              {/snippet}
+            </FloatingControls>
+          {/snippet}
+        </Selectable>
       {/if}
     {/each}
   </div>
@@ -113,12 +149,9 @@
 
     <div class="tasks absolute-stretch-x">
       {#each $displayedTasksWithClocksForTimeline as task (getRenderKey(task))}
-        <LocalTimeBlock
-          onpointerup={() => {
-            handleTaskMouseUp(task);
-          }}
-          {task}
-        />
+        <PositionedTimeBlock {task}>
+          <LocalTimeBlock {task} />
+        </PositionedTimeBlock>
       {/each}
     </div>
   </Column>

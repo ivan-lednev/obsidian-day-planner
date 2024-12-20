@@ -3,17 +3,19 @@
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import type { Task } from "../../task-types";
-  import { tappable } from "../actions/tappable";
   import type { ActionArray } from "../actions/use-actions";
   import { useActions } from "../actions/use-actions";
   import { getColorOverride } from "../hooks/get-color-override";
   import { useColor } from "../hooks/use-color.svelte";
 
-  const {
-    children,
-    task,
-    use = [],
-  }: { children: Snippet; task: Task; use?: ActionArray } = $props();
+  interface Props {
+    children: Snippet;
+    task: Task;
+    use?: ActionArray;
+    onpointerup?: (event: PointerEvent) => void;
+  }
+
+  const { onpointerup, children, task, use = [] }: Props = $props();
 
   const { isDarkMode, settingsSignal } = getObsidianContext();
 
@@ -30,7 +32,7 @@
     style:--text-muted={muted}
     style:--text-normal={normal}
     style:--time-block-bg-color={backgroundColor}
-    style:--time-block-border-color={borderColor}
+    style:--time-block-border-color="var(--time-block-border-color-override, {borderColor})"
     style:background-color={getColorOverride(
       task,
       isDarkMode.current,
@@ -38,12 +40,7 @@
     )}
     class="content"
     class:truncated-bottom={task.truncated === "bottom"}
-    on:longpress
-    on:pointerenter
-    on:pointerleave
-    on:pointerup
-    on:tap
-    use:tappable
+    {onpointerup}
     use:useActions={use}
   >
     {@render children()}
@@ -66,6 +63,8 @@
   }
 
   .content {
+    --default-box-shadow: 1px 1px 2px 0 #0000001f;
+
     position: relative;
 
     flex: 1 0 0;
@@ -77,7 +76,7 @@
 
     border: 1px solid var(--time-block-border-color, var(--color-base-50));
     border-radius: var(--radius-s);
-    box-shadow: 1px 1px 2px 0 #0000001f;
+    box-shadow: var(--time-block-box-shadow, var(--default-box-shadow));
   }
 
   .truncated-bottom {

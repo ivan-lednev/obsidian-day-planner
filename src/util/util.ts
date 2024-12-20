@@ -22,6 +22,18 @@ export function isEventRelated(
   );
 }
 
+export function isOutside(event: PointerEvent, container: HTMLElement | null) {
+  if (!container) {
+    return false;
+  }
+
+  return (
+    event.target !== container &&
+    event.target instanceof Node &&
+    !container.contains(event.target)
+  );
+}
+
 export function isTapOutside(
   event: PointerEvent,
   container: HTMLElement | null,

@@ -115,9 +115,18 @@
   --shadow-right: 2px 0px 2px var(--shadow-color);
   --shadow-bottom: 0px 2px 2px var(--shadow-color);
 
+  // Copied from Canvas
+  --shadow-stationary: 0px 0.5px 1px 0.5px rgba(0, 0, 0, 0.1);
+  --shadow-drag: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  --shadow-border-accent: 0 0 0 2px var(--color-accent);
+
   display: flex;
   flex-direction: column;
   padding: 0;
+}
+
+body {
+  --floating-controls-shadow: 0px 2px 10px rgba(0, 0, 0, 0.07);
 }
 
 [data-type="planner-weekly"] {

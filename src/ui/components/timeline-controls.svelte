@@ -1,10 +1,5 @@
 <script lang="ts">
-  import {
-    Settings,
-    ChevronLeft,
-    ChevronRight,
-    EllipsisVertical,
-  } from "lucide-svelte";
+  import { EllipsisVertical } from "lucide-svelte";
   import { Menu } from "obsidian";
   import { slide } from "svelte/transition";
 
@@ -19,6 +14,12 @@
   import Callout from "./callout.svelte";
   import ControlButton from "./control-button.svelte";
   import { createSlide } from "./defaults";
+  import {
+    Settings,
+    ChevronLeft,
+    ChevronRight,
+    CalendarArrowUp,
+  } from "./lucide";
   import Tree from "./obsidian/tree.svelte";
   import Pill from "./pill.svelte";
   import SettingsControls from "./settings-controls.svelte";
@@ -38,6 +39,10 @@
     settingsVisible = !settingsVisible;
   }
 
+  function goToToday() {
+    $dateRange = [window.moment()];
+  }
+
   async function goBack() {
     const previousDay = $dateRange[0].clone().subtract(1, "day");
 
@@ -50,7 +55,7 @@
     $dateRange = [nextDay];
   }
 
-  async function goToToday() {
+  async function goToNoteForToday() {
     const noteForToday = await createDailyNoteIfNeeded(window.moment());
 
     await workspaceFacade.openFileInEditor(noteForToday);
@@ -77,7 +82,7 @@
       item
         .setTitle("Open today's daily note")
         .setIcon("pencil")
-        .onClick(goToToday);
+        .onClick(goToNoteForToday);
     });
 
     menu.showAtMouseEvent(event);
@@ -89,35 +94,33 @@
     <ControlButton onclick={handleReSyncClick}>
       <EllipsisVertical class="svg-icon" />
     </ControlButton>
-    <div class="day-controls">
-      <ControlButton label="Go to previous day" onclick={goBack}>
-        <ChevronLeft class="svg-icon" />
-      </ControlButton>
-
-      <ControlButton
-        classes={$isToday($dateRange[0]) ? "today" : ""}
-        label="Go to file"
-        onclick={async () => {
-          const note = await createDailyNoteIfNeeded($dateRange[0]);
-          await workspaceFacade.openFileInEditor(note);
-        }}
+    <ControlButton label="Go to today" onclick={goToToday}>
+      <CalendarArrowUp />
+    </ControlButton>
+    <ControlButton label="Go to previous day" onclick={goBack}>
+      <ChevronLeft />
+    </ControlButton>
+    <ControlButton label="Go to next day" onclick={goForward}>
+      <ChevronRight />
+    </ControlButton>
+    <ControlButton
+      classes={$isToday($dateRange[0]) ? "today" : ""}
+      label="Go to file"
+      onclick={async () => {
+        const note = await createDailyNoteIfNeeded($dateRange[0]);
+        await workspaceFacade.openFileInEditor(note);
+      }}
+    >
+      <span class={`date ${$isToday($dateRange[0]) ? "today" : ""}`}
+        >{$dateRange[0].format($settings.timelineDateFormat)}</span
       >
-        <span class={`date ${$isToday($dateRange[0]) ? "today" : ""}`}
-          >{$dateRange[0].format($settings.timelineDateFormat)}</span
-        >
-      </ControlButton>
-
-      <ControlButton label="Go to next day" onclick={goForward}>
-        <ChevronRight class="svg-icon" />
-      </ControlButton>
-    </div>
-
+    </ControlButton>
     <ControlButton
       isActive={settingsVisible}
       label="Settings"
       onclick={toggleSettings}
     >
-      <Settings class="svg-icon" />
+      <Settings />
     </ControlButton>
   </div>
   <div class="pill-wrapper">
@@ -189,9 +192,16 @@
   }
 
   .header {
-    display: flex;
-    justify-content: space-between;
+    --header-start-items-count: 5;
+
+    display: grid;
+    grid-template-columns: repeat(var(--header-start-items-count), auto) 1fr;
+    gap: var(--size-2-1);
     padding-block: var(--size-4-2);
+  }
+
+  .header > :global(*):last-child {
+    justify-self: end;
   }
 
   .date {

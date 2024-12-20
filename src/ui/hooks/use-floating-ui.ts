@@ -3,54 +3,15 @@ import {
   computePosition,
   type ComputePositionConfig,
 } from "@floating-ui/dom";
-import type { SvelteComponentTyped } from "svelte";
-import { writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
-import { isEventRelated, isTapOutside, isTouchEvent } from "../../util/util";
-
-export interface FloatingUiOptions<Props extends Record<string, unknown>> {
-  when: boolean;
-  Component: typeof SvelteComponentTyped<Props>;
-  props: Props;
+export interface FloatingUiOptions {
   options: Partial<ComputePositionConfig>;
 }
 
 export function useFloatingUi(options: Partial<ComputePositionConfig>) {
   let anchor: HTMLElement | null = null;
   let floatingUi: HTMLElement | null = null;
-
-  const isActive = writable(false);
-
-  function handleFloatingUiPointerLeave(event: PointerEvent) {
-    if (isTouchEvent(event) || isEventRelated(event, anchor)) {
-      return;
-    }
-
-    isActive.set(false);
-  }
-
-  function handleAnchorPointerEnter(event: PointerEvent) {
-    if (isTouchEvent(event)) {
-      return;
-    }
-
-    isActive.set(true);
-  }
-
-  function handleAnchorPointerLeave(event: PointerEvent) {
-    if (isTouchEvent(event) || isEventRelated(event, floatingUi)) {
-      return;
-    }
-
-    isActive.set(false);
-  }
-
-  function handleFloatingUiTapOutside(event: PointerEvent) {
-    if (isTapOutside(event, floatingUi)) {
-      isActive.set(false);
-    }
-  }
 
   function anchorSetup(el: HTMLElement) {
     anchor = el;
@@ -93,12 +54,7 @@ export function useFloatingUi(options: Partial<ComputePositionConfig>) {
   }
 
   return {
-    handleFloatingUiTapOutside,
-    handleFloatingUiPointerLeave,
-    handleAnchorPointerEnter,
-    handleAnchorPointerLeave,
     anchorSetup,
     floatingUiSetup,
-    isActive,
   };
 }

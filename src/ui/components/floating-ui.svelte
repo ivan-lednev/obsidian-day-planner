@@ -1,25 +1,21 @@
 <script lang="ts">
+  import { type Snippet } from "svelte";
   import { portal } from "svelte-portal";
 
   import type { ActionArray } from "../actions/use-actions";
   import { useActions } from "../actions/use-actions";
 
-  export let use: ActionArray = [];
-  export let onPointerLeave: (event: PointerEvent) => void;
-  export let onTapOutside: (event: PointerEvent) => void;
-  export let onPointerDown: (event: PointerEvent) => void = () => {};
+  interface Props {
+    children: Snippet;
+    use?: ActionArray;
+    onpointerup?: (event: PointerEvent) => void;
+  }
+
+  let { children, use = [], onpointerup = () => {} }: Props = $props();
 </script>
 
-<svelte:body on:pointerdown={onTapOutside} />
-
-<div
-  class="floating-ui"
-  on:pointerleave={onPointerLeave}
-  on:pointerdown={onPointerDown}
-  use:portal
-  use:useActions={use}
->
-  <slot />
+<div class="floating-ui" {onpointerup} use:portal use:useActions={use}>
+  {@render children()}
 </div>
 
 <style>

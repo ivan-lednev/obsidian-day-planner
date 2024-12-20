@@ -1,3 +1,5 @@
+import { on } from "svelte/events";
+
 import { getDisplayedText } from "../../parser/parser";
 import type { VaultFacade } from "../../service/vault-facade";
 import type { DayPlannerSettings } from "../../settings";
@@ -14,6 +16,12 @@ interface RenderedMarkdownProps {
   settings: DayPlannerSettings;
   renderMarkdown: RenderMarkdown;
   toggleCheckboxInFile: VaultFacade["toggleCheckboxInFile"];
+}
+
+function stopPropagationOnCheckbox(event: Event) {
+  if (event.target instanceof HTMLElement && event.target.dataset.line) {
+    event.stopPropagation();
+  }
 }
 
 export function renderTaskMarkdown(
@@ -74,8 +82,11 @@ export function renderTaskMarkdown(
       await initial.toggleCheckboxInFile(task.location.path, Number(line));
     }
 
-    el.addEventListener("pointerup", handlePointerUp);
-    onDestroy.push(() => el.removeEventListener("pointerup", handlePointerUp));
+    onDestroy.push(
+      on(el, "pointerup", handlePointerUp),
+      on(el, "mouseup", stopPropagationOnCheckbox),
+      on(el, "touchend", stopPropagationOnCheckbox),
+    );
   }
 
   refresh(initial);

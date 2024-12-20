@@ -1,5 +1,6 @@
 import { get, type Readable, type Writable } from "svelte/store";
 
+import { vibrationDurationMillis } from "../../../constants";
 import type { LocalTask } from "../../../task-types";
 import type { OnUpdateFn } from "../../../types";
 
@@ -19,6 +20,7 @@ export function useEditActions({
   onUpdate,
 }: UseEditActionsProps) {
   function startEdit(operation: EditOperation) {
+    navigator.vibrate?.(vibrationDurationMillis);
     editOperation.set(operation);
   }
 

@@ -10,11 +10,11 @@
   import type { LocalTask } from "../../task-types";
 
   import BlockList from "./block-list.svelte";
-  import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
+  import LocalTimeBlock from "./local-time-block.svelte";
 
   const {
     editContext: {
-      handlers: { handleSearchResultGripMouseDown, handleTaskMouseUp },
+      handlers: { handleTaskMouseUp },
     },
     dispatch,
   } = getObsidianContext();
@@ -41,9 +41,8 @@
 
   <BlockList list={$result}>
     {#snippet match(task: LocalTask)}
-      <UnscheduledTimeBlock
+      <LocalTimeBlock
         --time-block-padding="var(--size-4-1)"
-        onGripMouseDown={handleSearchResultGripMouseDown}
         onpointerup={() => {
           handleTaskMouseUp(task);
         }}

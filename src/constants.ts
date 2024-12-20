@@ -25,6 +25,7 @@ export const indentBeforeListParagraph = 2;
 export const reQueryAfterMillis = 200;
 export const undoTimeoutMillis = 8000;
 export const vibrationDurationMillis = 100;
+export const transitionDurationShort = 150;
 
 export const icalRefreshIntervalMillis = 5 * 60 * 1000;
 export const fallbackPartStat = "NEEDS-ACTION";
@@ -32,6 +33,12 @@ export const fallbackPartStat = "NEEDS-ACTION";
 export const mdastUtilNumberOfSpacesInTab = 4;
 
 export const dataviewDownloadLink = "https://obsidian.md/plugins?id=dataview";
+export const floatingUiOffset = 8;
+
+export enum MouseButton {
+  LEFT = 0,
+  RIGHT = 2,
+}
 
 export const icons = [
   "any-key",
