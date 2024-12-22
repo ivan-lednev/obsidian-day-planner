@@ -1,5 +1,8 @@
-import { createAction, type PayloadAction } from "@reduxjs/toolkit";
-import moment from "moment";
+import {
+  createAction,
+  createSelector,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import ical from "node-ical";
 
 import { defaultDayFormat } from "../constants";
@@ -87,11 +90,7 @@ export const globalSlice = createAppSlice({
   }),
   selectors: {
     selectIsOnline: (state) => state.isOnline,
-    selectVisibleDays: (state) => {
-      return [...new Set(state.visibleDays)]
-        .sort()
-        .map((it) => moment(it, defaultDayFormat));
-    },
+    selectVisibleDays: (state) => state.visibleDays,
   },
 });
 
@@ -100,8 +99,6 @@ export const keyDown = createAction("obsidian/keyDown");
 export const icalRefreshRequested = createAction(
   "obsidian/icalRefreshRequested",
 );
-export const icalListenerStarted = createAction("obsidian/icalListenerStarted");
-export const icalListenerStopped = createAction("obsidian/icalListenerStopped");
 
 export const {
   darkModeUpdated,
@@ -116,3 +113,12 @@ export const {
 } = globalSlice.actions;
 
 export const { selectVisibleDays, selectIsOnline } = globalSlice.selectors;
+
+export const selectSortedDedupedVisibleDays = createSelector(
+  selectVisibleDays,
+  (days) => {
+    return [...new Set(days)]
+      .sort()
+      .map((it) => window.moment(it, defaultDayFormat));
+  },
+);

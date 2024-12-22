@@ -5,7 +5,10 @@ import type { RemoteTask, WithTime } from "../../task-types";
 import { canHappenAfter, icalEventToTasks } from "../../util/ical";
 import { getEarliestMoment } from "../../util/moment";
 import { createBackgroundBatchScheduler } from "../../util/scheduler";
-import { selectVisibleDays } from "../global-slice";
+import {
+  selectSortedDedupedVisibleDays,
+  selectVisibleDays,
+} from "../global-slice";
 import { selectIcals } from "../settings-slice";
 import type { StartListeningFn } from "../store";
 import { createSelectorChangePredicate } from "../util";
@@ -65,7 +68,7 @@ export function createIcalParseListener(props: {
 
   return async (action, listenerApi) => {
     const icalEvents = selectIcalEvents(listenerApi.getState());
-    const visibleDays = selectVisibleDays(listenerApi.getState());
+    const visibleDays = selectSortedDedupedVisibleDays(listenerApi.getState());
 
     if (isEmpty(icalEvents) || isEmpty(visibleDays)) {
       return;

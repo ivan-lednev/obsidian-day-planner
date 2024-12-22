@@ -10,7 +10,7 @@ import {
   type Writable,
 } from "svelte/store";
 
-import { icalRefreshIntervalMillis, reQueryAfterMillis } from "../constants";
+import { reQueryAfterMillis } from "../constants";
 import type DayPlanner from "../main";
 import { addHorizontalPlacing } from "../overlap/overlap";
 import { dataviewChange as dataviewChangeAction } from "../redux/dataview/dataview-slice";
@@ -19,7 +19,6 @@ import {
   layoutReady as layoutReadyAction,
   keyDown as keyDownAction,
   networkStatusChanged,
-  icalRefreshRequested,
 } from "../redux/global-slice";
 import { selectRemoteTasks } from "../redux/ical/ical-slice";
 import type { AppDispatch } from "../redux/store";
@@ -76,7 +75,6 @@ export type PointerDateTime = {
 
 export function useTasks(props: {
   settingsStore: Writable<DayPlannerSettings>;
-  combinedIcalSyncTrigger: Readable<object>;
   debouncedTaskUpdateTrigger: Readable<object>;
   isOnline: Readable<boolean>;
   visibleDays: Readable<Moment[]>;
@@ -285,27 +283,6 @@ export function createHooks({
 
   const dataviewLoaded = useDataviewLoaded(app);
 
-  const icalRefreshTimer = readable(getUpdateTrigger(), (set) => {
-    const interval = setInterval(() => {
-      set(getUpdateTrigger());
-    }, icalRefreshIntervalMillis);
-
-    return () => {
-      clearInterval(interval);
-    };
-  });
-  plugin.registerInterval(
-    window.setInterval(() => {
-      dispatch(icalRefreshRequested());
-    }, icalRefreshIntervalMillis),
-  );
-
-  const icalSyncTrigger = writable();
-  const combinedIcalSyncTrigger = derived(
-    [icalRefreshTimer, icalSyncTrigger],
-    getUpdateTrigger,
-  );
-
   const dateRanges = useDateRanges();
   const visibleDays = useVisibleDays(dateRanges.ranges);
 
@@ -328,7 +305,6 @@ export function createHooks({
     newlyStartedTasks,
   } = useTasks({
     settingsStore,
-    combinedIcalSyncTrigger,
     isOnline,
     visibleDays,
     layoutReady,
@@ -351,7 +327,6 @@ export function createHooks({
     dataviewLoaded,
     newlyStartedTasks,
     isModPressed,
-    icalSyncTrigger,
     dataviewSyncTrigger,
     isOnline,
     isDarkMode,

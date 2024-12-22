@@ -22,6 +22,7 @@ import {
   viewTypeTimeline,
   viewTypeMultiDay,
   icalParseLowerLimit,
+  icalRefreshIntervalMillis,
 } from "./constants";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
@@ -36,6 +37,7 @@ import {
   toMdastPoint,
 } from "./mdast/mdast";
 import { icalRefreshRequested, visibleDaysUpdated } from "./redux/global-slice";
+import { icalsFetched, initialIcalState } from "./redux/ical/ical-slice";
 import {
   checkIcalEventsChanged,
   checkVisibleDaysChanged,
@@ -62,7 +64,11 @@ import {
 import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
-import { type DayPlannerSettings, defaultSettings } from "./settings";
+import {
+  type DayPlannerSettings,
+  defaultSettings,
+  type PluginData,
+} from "./settings";
 import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn, ReduxExtraArgument } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
@@ -81,7 +87,6 @@ import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { createBackgroundBatchScheduler } from "./util/scheduler";
-import { getUpdateTrigger } from "./util/store";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -97,9 +102,13 @@ export default class DayPlanner extends Plugin {
 
   async onload() {
     this.dataviewFacade = new DataviewFacade(() => getAPI(this.app));
-    this.setUpReduxStore();
+    const initialPluginData: PluginData = {
+      ...defaultSettings,
+      ...(await this.loadData()),
+    };
 
-    await this.initSettingsStore();
+    await this.setUpReduxStore(initialPluginData);
+    await this.initSettingsStore(initialPluginData);
 
     const getTasksApi = createGetTasksApi(this.app);
 
@@ -117,13 +126,7 @@ export default class DayPlanner extends Plugin {
 
     this.registerViews();
     this.registerCommands();
-
-    this.addRibbonIcon(
-      "calendar-range",
-      "Open Timeline",
-      this.initTimelineLeaf,
-    );
-    this.addRibbonIcon("table-2", "Open Multi-Day View", this.initWeeklyLeaf);
+    this.addRibbonIcons();
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
 
     await this.handleNewPluginVersion();
@@ -135,6 +138,15 @@ export default class DayPlanner extends Plugin {
       this.detachLeavesOfType(viewTypeTimeline),
       this.detachLeavesOfType(viewTypeMultiDay),
     ]);
+  }
+
+  addRibbonIcons() {
+    this.addRibbonIcon(
+      "calendar-range",
+      "Open Timeline",
+      this.initTimelineLeaf,
+    );
+    this.addRibbonIcon("table-2", "Open Multi-Day View", this.initWeeklyLeaf);
   }
 
   initWeeklyLeaf = async () => {
@@ -280,9 +292,7 @@ export default class DayPlanner extends Plugin {
     });
   }
 
-  private async initSettingsStore() {
-    const initialSettings = { ...defaultSettings, ...(await this.loadData()) };
-
+  private async initSettingsStore(initialSettings: DayPlannerSettings) {
     settings.set(initialSettings);
 
     this.register(
@@ -441,7 +451,6 @@ export default class DayPlanner extends Plugin {
       dataviewLoaded,
       isModPressed,
       newlyStartedTasks,
-      icalSyncTrigger,
       isOnline,
       isDarkMode,
       dateRanges,
@@ -539,8 +548,6 @@ export default class DayPlanner extends Plugin {
       name: "Re-sync tasks",
       callback: async () => {
         this.store.dispatch(icalRefreshRequested());
-
-        icalSyncTrigger.set(getUpdateTrigger());
       },
     });
 
@@ -588,7 +595,7 @@ export default class DayPlanner extends Plugin {
       editContext,
       showPreview: createShowPreview(this.app),
       isModPressed,
-      reSync: () => icalSyncTrigger.set(getUpdateTrigger()),
+      reSync: () => this.store.dispatch(icalRefreshRequested()),
       isOnline,
       isDarkMode,
       settings,
@@ -632,7 +639,7 @@ export default class DayPlanner extends Plugin {
     );
   }
 
-  private setUpReduxStore() {
+  private async setUpReduxStore(pluginData: PluginData) {
     const listenerMiddleware = createListenerMiddleware<
       RootState,
       AppDispatch,
@@ -659,7 +666,20 @@ export default class DayPlanner extends Plugin {
       }),
     });
 
+    listenerMiddleware.startListening({
+      actionCreator: icalsFetched,
+      effect: async (action) => {
+        await this.saveData({ ...this.settings(), rawIcals: action.payload });
+      },
+    });
+
     this.store = makeStore({
+      preloadedState: {
+        ical: {
+          ...initialIcalState,
+          plainTextIcals: pluginData.rawIcals,
+        },
+      },
       middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware().concat(listenerMiddleware.middleware);
       },
@@ -668,5 +688,11 @@ export default class DayPlanner extends Plugin {
     this.register(() => {
       listenerMiddleware.clearListeners();
     });
+
+    this.registerInterval(
+      window.setInterval(() => {
+        this.store.dispatch(icalRefreshRequested());
+      }, icalRefreshIntervalMillis),
+    );
   }
 }

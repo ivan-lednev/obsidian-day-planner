@@ -11,27 +11,27 @@ import type { WithIcalConfig } from "../../types";
 import { createAppSlice } from "../create-app-slice";
 
 export type RawIcal = { icalConfig: IcalConfig; text: string };
-export type RemoteTask_v2 = RemoteTask & { startTime: string };
+export type SerializedRemoteTask = RemoteTask & { startTime: string };
 
 interface IcalState {
   icalEvents: Array<WithIcalConfig<ical.VEvent>>;
   plainTextIcals: Array<RawIcal>;
-  remoteTasks: Array<RemoteTask_v2>;
+  serializedRemoteTasks: Array<SerializedRemoteTask>;
 }
 
 export function isVEvent(event: ical.CalendarComponent): event is ical.VEvent {
   return event.type === "VEVENT";
 }
 
-const initialState: IcalState = {
+export const initialIcalState: IcalState = {
   icalEvents: [],
   plainTextIcals: [],
-  remoteTasks: [],
+  serializedRemoteTasks: [],
 };
 
 export const icalSlice = createAppSlice({
   name: "ical",
-  initialState,
+  initialState: initialIcalState,
   reducers: (create) => ({
     icalsFetched: create.reducer(
       (state, action: PayloadAction<Array<RawIcal>>) => {
@@ -39,18 +39,13 @@ export const icalSlice = createAppSlice({
       },
     ),
     remoteTasksUpdated: create.reducer(
-      (state, action: PayloadAction<Array<RemoteTask_v2>>) => {
-        state.remoteTasks = action.payload;
+      (state, action: PayloadAction<Array<SerializedRemoteTask>>) => {
+        state.serializedRemoteTasks = action.payload;
       },
     ),
   }),
   selectors: {
-    selectRemoteTasks: (state) => {
-      return state.remoteTasks.map((it) => ({
-        ...it,
-        startTime: window.moment(it.startTime),
-      }));
-    },
+    selectSerializedRemoteTasks: (state) => state.serializedRemoteTasks,
     selectPlainTextIcals: (state) => state.plainTextIcals,
   },
 });
@@ -59,7 +54,8 @@ export const icalRefreshRequested = createAction("ical/icalRefreshRequested");
 export const icalListenerStarted = createAction("ical/icalListenerStarted");
 
 export const { remoteTasksUpdated, icalsFetched } = icalSlice.actions;
-export const { selectRemoteTasks, selectPlainTextIcals } = icalSlice.selectors;
+export const { selectPlainTextIcals } = icalSlice.selectors;
+const { selectSerializedRemoteTasks } = icalSlice.selectors;
 
 // todo: better naming
 export const selectIcalEvents = createSelector(
@@ -77,4 +73,13 @@ export const selectIcalEvents = createSelector(
           }));
       },
     ),
+);
+
+export const selectRemoteTasks = createSelector(
+  selectSerializedRemoteTasks,
+  (serializedRemoteTasks) =>
+    serializedRemoteTasks.map((it) => ({
+      ...it,
+      startTime: window.moment(it.startTime),
+    })),
 );

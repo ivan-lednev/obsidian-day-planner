@@ -1,6 +1,7 @@
 import type { HexString } from "obsidian";
 
 import { defaultDayFormat } from "./constants";
+import type { RawIcal } from "./redux/ical/ical-slice";
 
 export interface IcalConfig {
   name: string;
@@ -62,6 +63,12 @@ export interface DayPlannerSettings {
   firstDayOfWeek: (typeof firstDaysOfWeek)[number];
   multiDayRange: "full-week" | "work-week" | "3-days";
 }
+
+export interface Cache {
+  rawIcals: Array<RawIcal>;
+}
+
+export type PluginData = DayPlannerSettings & Cache;
 
 export const defaultSettings: DayPlannerSettings = {
   snapStepMinutes: 10,
