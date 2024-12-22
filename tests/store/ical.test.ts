@@ -1,22 +1,24 @@
-import {
-  type AppDispatch,
-  makeStore,
-  type RootState,
-} from "../../src/redux/store";
-import type { ReduxExtraArgument } from "../../src/types";
+import { createListenerMiddleware } from "@reduxjs/toolkit";
+import { request } from "obsidian";
+import { describe, expect, test, vi } from "vitest";
+
 import { initDataviewListeners } from "../../src/redux/dataview/init-dataview-listeners";
-import { initIcalListeners } from "../../src/redux/ical/init-ical-listeners";
 import { initialState as initialGlobalState } from "../../src/redux/global-slice";
-import { defaultSettingsForTests } from "../../src/settings";
 import {
   icalListenerStarted,
   icalRefreshRequested,
   selectRemoteTasks,
 } from "../../src/redux/ical/ical-slice";
+import { initIcalListeners } from "../../src/redux/ical/init-ical-listeners";
+import {
+  type AppDispatch,
+  makeStore,
+  type RootState,
+} from "../../src/redux/store";
+import { defaultSettingsForTests } from "../../src/settings";
+import type { ReduxExtraArgument } from "../../src/types";
+
 import { FakeDataviewFacade, getIcalFixture } from "./redux.test";
-import { describe, expect, test, vi } from "vitest";
-import { request } from "obsidian";
-import { createListenerMiddleware } from "@reduxjs/toolkit";
 
 vi.mock("obsidian", () => ({
   request: vi.fn(),

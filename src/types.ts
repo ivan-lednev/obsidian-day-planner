@@ -2,6 +2,7 @@ import type { Moment } from "moment";
 import type { Readable, Writable } from "svelte/store";
 
 import { type AppDispatch, type AppStore } from "./redux/store";
+import type { createUseSelector } from "./redux/use-selector";
 import type { DataviewFacade } from "./service/dataview-facade";
 import type { STaskEditor } from "./service/stask-editor";
 import type { VaultFacade } from "./service/vault-facade";
@@ -52,6 +53,7 @@ export interface ObsidianContext {
   ) => Readable<Array<WithPlacing<LocalTask>>>;
   dispatch: AppDispatch;
   store: AppStore;
+  useSelector: ReturnType<typeof createUseSelector>;
 }
 
 export type ComponentContext = Map<string, unknown>;

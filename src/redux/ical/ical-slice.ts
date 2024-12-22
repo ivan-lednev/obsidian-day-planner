@@ -5,11 +5,10 @@ import {
 } from "@reduxjs/toolkit";
 import ical from "node-ical";
 
+import type { IcalConfig } from "../../settings";
 import type { RemoteTask } from "../../task-types";
 import type { WithIcalConfig } from "../../types";
 import { createAppSlice } from "../create-app-slice";
-import { isVEvent } from "../../util/use-remote-tasks";
-import type { IcalConfig } from "../../settings";
 
 export type RawIcal = { icalConfig: IcalConfig; text: string };
 export type RemoteTask_v2 = RemoteTask & { startTime: string };
@@ -18,6 +17,10 @@ interface IcalState {
   icalEvents: Array<WithIcalConfig<ical.VEvent>>;
   plainTextIcals: Array<RawIcal>;
   remoteTasks: Array<RemoteTask_v2>;
+}
+
+export function isVEvent(event: ical.CalendarComponent): event is ical.VEvent {
+  return event.type === "VEVENT";
 }
 
 const initialState: IcalState = {
@@ -42,7 +45,12 @@ export const icalSlice = createAppSlice({
     ),
   }),
   selectors: {
-    selectRemoteTasks: (state) => state.remoteTasks,
+    selectRemoteTasks: (state) => {
+      return state.remoteTasks.map((it) => ({
+        ...it,
+        startTime: window.moment(it.startTime),
+      }));
+    },
     selectPlainTextIcals: (state) => state.plainTextIcals,
   },
 });

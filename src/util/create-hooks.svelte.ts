@@ -21,7 +21,9 @@ import {
   networkStatusChanged,
   icalRefreshRequested,
 } from "../redux/global-slice";
+import { selectRemoteTasks } from "../redux/ical/ical-slice";
 import type { AppDispatch } from "../redux/store";
+import { createUseSelector } from "../redux/use-selector";
 import { DataviewFacade } from "../service/dataview-facade";
 import { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
@@ -50,7 +52,6 @@ import * as dv from "./dataview";
 import { withClockMoments } from "./dataview";
 import { getUpdateTrigger } from "./store";
 import { getDayKey, getRenderKey, isWithTime } from "./task-utils";
-import { useRemoteTasks } from "./use-remote-tasks";
 
 interface CreateHooksProps {
   app: App;
@@ -61,6 +62,7 @@ interface CreateHooksProps {
   currentTime: Readable<Moment>;
   dispatch: AppDispatch;
   plugin: DayPlanner;
+  useSelector: ReturnType<typeof createUseSelector>;
 }
 
 function getDarkModeFlag() {
@@ -87,11 +89,10 @@ export function useTasks(props: {
   workspaceFacade: WorkspaceFacade;
   onUpdate: OnUpdateFn;
   pointerDateTime: Writable<PointerDateTime>;
+  useSelector: ReturnType<typeof createUseSelector>;
 }) {
   const {
     settingsStore,
-    combinedIcalSyncTrigger,
-    isOnline,
     visibleDays,
     layoutReady,
     debouncedTaskUpdateTrigger,
@@ -102,14 +103,10 @@ export function useTasks(props: {
     workspaceFacade,
     pointerDateTime,
     onUpdate,
+    useSelector,
   } = props;
 
-  const remoteTasks = useRemoteTasks({
-    settings: settingsStore,
-    refreshSignal: combinedIcalSyncTrigger,
-    isOnline,
-    visibleDays,
-  });
+  const remoteTasks = useSelector(selectRemoteTasks);
 
   const visibleDailyNotes = useVisibleDailyNotes(
     layoutReady,
@@ -230,6 +227,7 @@ export function createHooks({
   currentTime,
   dispatch,
   plugin,
+  useSelector,
 }: CreateHooksProps) {
   const dataviewSource = derived(settingsStore, ($settings) => {
     return $settings.dataviewSource;
@@ -343,6 +341,7 @@ export function createHooks({
     workspaceFacade,
     onUpdate,
     pointerDateTime,
+    useSelector,
   });
 
   return {
@@ -359,5 +358,6 @@ export function createHooks({
     dateRanges,
     pointerDateTime,
     getDisplayedTasksWithClocksForTimeline,
+    visibleDays,
   };
 }

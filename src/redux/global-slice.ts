@@ -16,6 +16,7 @@ interface ObsidianSliceState {
   isDarkMode: boolean;
   modPressed: boolean;
   isOnline: boolean;
+  visibleDays: string[];
 }
 
 export const initialState: ObsidianSliceState = {
@@ -26,6 +27,8 @@ export const initialState: ObsidianSliceState = {
   modPressed: false,
   isOnline: window.navigator.onLine,
   pointerDateTime: {},
+  // todo: remove after date ranges are migrated to Redux
+  visibleDays: [],
 };
 
 export const globalSlice = createAppSlice({
@@ -76,13 +79,16 @@ export const globalSlice = createAppSlice({
     dateRangeClosed: create.reducer((state, action: PayloadAction<string>) => {
       delete state.dateRanges[action.payload];
     }),
+    visibleDaysUpdated: create.reducer(
+      (state, action: PayloadAction<string[]>) => {
+        state.visibleDays = action.payload;
+      },
+    ),
   }),
   selectors: {
     selectIsOnline: (state) => state.isOnline,
     selectVisibleDays: (state) => {
-      const days = Object.values(state.dateRanges).flat();
-
-      return [...new Set(days)]
+      return [...new Set(state.visibleDays)]
         .sort()
         .map((it) => moment(it, defaultDayFormat));
     },
@@ -106,6 +112,7 @@ export const {
   icalEventsUpdated,
   dateRangeClosed,
   dateRangeOpened,
+  visibleDaysUpdated,
 } = globalSlice.actions;
 
 export const { selectVisibleDays, selectIsOnline } = globalSlice.selectors;

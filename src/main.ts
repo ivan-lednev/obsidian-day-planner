@@ -21,6 +21,7 @@ import {
   viewTypeReleaseNotes,
   viewTypeTimeline,
   viewTypeMultiDay,
+  icalParseLowerLimit,
 } from "./constants";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
@@ -34,11 +35,14 @@ import {
   toMarkdown,
   toMdastPoint,
 } from "./mdast/mdast";
-import { dataviewListenerStarted } from "./redux/dataview/dataview-slice";
-import { initDataviewListeners } from "./redux/dataview/init-dataview-listeners";
-import { icalRefreshRequested } from "./redux/global-slice";
-import { icalListenerStarted } from "./redux/ical/ical-slice";
-import { initIcalListeners } from "./redux/ical/init-ical-listeners";
+import { icalRefreshRequested, visibleDaysUpdated } from "./redux/global-slice";
+import {
+  checkIcalEventsChanged,
+  checkVisibleDaysChanged,
+  createCachingFetcher,
+  createIcalFetchListener,
+  createIcalParseListener,
+} from "./redux/ical/init-ical-listeners";
 import { settingsUpdated } from "./redux/settings-slice";
 import {
   type AppDispatch,
@@ -46,6 +50,7 @@ import {
   makeStore,
   type RootState,
 } from "./redux/store";
+import { createUseSelector } from "./redux/use-selector";
 import { DataviewFacade } from "./service/dataview-facade";
 import {
   applyScopedUpdates,
@@ -75,6 +80,7 @@ import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
+import { createBackgroundBatchScheduler } from "./util/scheduler";
 import { getUpdateTrigger } from "./util/store";
 
 export default class DayPlanner extends Plugin {
@@ -428,6 +434,7 @@ export default class DayPlanner extends Plugin {
       this.currentUndoNotice = createUndoNotice(this.transationWriter.undo);
     };
 
+    const useSelector = createUseSelector(this.store);
     const {
       editContext,
       tasksForToday,
@@ -442,6 +449,7 @@ export default class DayPlanner extends Plugin {
       pointerDateTime,
       tasksWithActiveClockProps,
       getDisplayedTasksWithClocksForTimeline,
+      visibleDays,
     } = createHooks({
       app: this.app,
       dataviewFacade: this.dataviewFacade,
@@ -451,6 +459,7 @@ export default class DayPlanner extends Plugin {
       currentTime,
       dispatch: this.store.dispatch,
       plugin: this,
+      useSelector,
     });
 
     this.syncDataview = () => dataviewSyncTrigger.set({});
@@ -459,6 +468,13 @@ export default class DayPlanner extends Plugin {
     this.register(
       editContext.cursor.subscribe(({ bodyCursor }) => {
         document.body.style.cursor = bodyCursor;
+      }),
+    );
+    this.register(
+      visibleDays.subscribe((days) => {
+        this.store.dispatch(
+          visibleDaysUpdated(days.map((it) => it.toISOString())),
+        );
       }),
     );
 
@@ -582,6 +598,7 @@ export default class DayPlanner extends Plugin {
       getDisplayedTasksWithClocksForTimeline,
       dispatch: this.store.dispatch,
       store: this.store,
+      useSelector,
     };
 
     const componentContext = new Map<
@@ -626,17 +643,27 @@ export default class DayPlanner extends Plugin {
       },
     });
 
-    initDataviewListeners(listenerMiddleware.startListening);
-    initIcalListeners(listenerMiddleware.startListening);
+    listenerMiddleware.startListening({
+      actionCreator: icalRefreshRequested,
+      effect: createIcalFetchListener({ fetcher: createCachingFetcher() }),
+    });
+
+    listenerMiddleware.startListening({
+      predicate: (action, currentState) =>
+        checkIcalEventsChanged(action, currentState) ||
+        checkVisibleDaysChanged(action, currentState),
+      effect: createIcalParseListener({
+        scheduler: createBackgroundBatchScheduler({
+          timeRemainingLowerLimit: icalParseLowerLimit,
+        }),
+      }),
+    });
 
     this.store = makeStore({
       middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware().concat(listenerMiddleware.middleware);
       },
     });
-
-    this.store.dispatch(dataviewListenerStarted());
-    this.store.dispatch(icalListenerStarted());
 
     this.register(() => {
       listenerMiddleware.clearListeners();

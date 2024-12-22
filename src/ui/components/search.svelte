@@ -6,13 +6,13 @@
     selectQuery,
     selectSearchDescription,
   } from "../../redux/search-slice";
-  import { useSelector } from "../../redux/use-selector";
   import type { LocalTask } from "../../task-types";
 
   import BlockList from "./block-list.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
 
   const {
+    useSelector,
     editContext: {
       handlers: { handleTaskMouseUp },
     },
