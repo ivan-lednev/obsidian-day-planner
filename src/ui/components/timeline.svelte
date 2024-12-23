@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { Moment } from "moment";
+  import { get } from "svelte/store";
   import { isNotVoid } from "typed-assert";
 
+  import { vibrationDurationMillis } from "../../constants";
   import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
@@ -9,6 +11,7 @@
   import { minutesToMomentOfDay } from "../../util/moment";
   import { getRenderKey, offsetYToMinutes } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
+  import { createGestures } from "../actions/gestures";
   import { createTimeBlockMenu } from "../time-block-menu";
 
   import Column from "./column.svelte";
@@ -45,12 +48,22 @@
   );
   let el: HTMLElement | undefined;
 
+  function getClientY(event: PointerEvent | MouseEvent | TouchEvent) {
+    if (event instanceof PointerEvent || event instanceof MouseEvent) {
+      return event.clientY;
+    }
+
+    const firstTouch = event.touches[0];
+
+    return firstTouch.pageY;
+  }
+
   function updatePointerOffsetY(event: PointerEvent) {
     isNotVoid(el);
 
     // todo: add memo
     const viewportToElOffsetY = el.getBoundingClientRect().top;
-    const borderTopToPointerOffsetY = event.clientY - viewportToElOffsetY;
+    const borderTopToPointerOffsetY = getClientY(event) - viewportToElOffsetY;
     const newOffsetY = snap(borderTopToPointerOffsetY, $settings);
     const minutes = offsetYToMinutes(
       newOffsetY,
@@ -65,6 +78,29 @@
       type: "dateTime",
     });
   }
+
+  const timelineGestures = createGestures({
+    onlongpress: (event) => {
+      if (event.target !== el) {
+        return;
+      }
+
+      updatePointerOffsetY(event);
+      navigator.vibrate?.(vibrationDurationMillis);
+      handleContainerMouseDown();
+    },
+    onpanmove: (event) => {
+      if (get(editOperation)) {
+        updatePointerOffsetY(event);
+      }
+    },
+    onpanend: () => {
+      if (get(editOperation)) {
+        confirmEdit();
+      }
+    },
+    options: { mouseSupport: false },
+  });
 </script>
 
 <Column visibleHours={getVisibleHours($settings)}>
@@ -84,6 +120,7 @@
     }}
     onpointermove={updatePointerOffsetY}
     onpointerup={confirmEdit}
+    use:timelineGestures
   >
     {#each $displayedTasksForTimeline.withTime as task (getRenderKey(task))}
       {#if isRemote(task)}

@@ -90,6 +90,7 @@ export function createIcalParseListener(props: {
         .filter((task): task is RemoteTask | WithTime<RemoteTask> =>
           Boolean(task),
         )
+        // todo: t.serialize(), t.deserialize()
         .map((it) => ({ ...it, startTime: it.startTime.toISOString() }));
 
       listenerApi.dispatch(remoteTasksUpdated(remoteTasks));

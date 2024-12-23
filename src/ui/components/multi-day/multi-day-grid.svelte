@@ -205,7 +205,7 @@
   </div>
 {/if}
 
-<Scroller className="multiday-main-content" on:scroll={handleScroll}>
+<Scroller className="multiday-main-content" onscroll={handleScroll}>
   <Ruler
     --ruler-box-shadow="var(--shadow-right)"
     visibleHours={getVisibleHours($settings)}

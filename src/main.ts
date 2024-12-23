@@ -677,7 +677,7 @@ export default class DayPlanner extends Plugin {
       preloadedState: {
         ical: {
           ...initialIcalState,
-          plainTextIcals: pluginData.rawIcals,
+          plainTextIcals: pluginData.rawIcals || [],
         },
       },
       middleware: (getDefaultMiddleware) => {
