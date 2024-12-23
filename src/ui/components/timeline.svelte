@@ -62,15 +62,18 @@
     pointerDate.set(day.format(defaultDayFormat));
   }
 
+  function handleContainerPointerDown(event: PointerEvent) {
+    updatePointerOffsetY(event);
+    handleContainerMouseDown();
+  }
+
   const timelineGestures = createGestures({
     onlongpress: (event) => {
       if (event.target !== el) {
         return;
       }
 
-      updatePointerOffsetY(event);
-      navigator.vibrate?.(vibrationDurationMillis);
-      handleContainerMouseDown();
+      handleContainerPointerDown(event);
     },
     onpanmove: (event) => {
       if (get(editOperation)) {
@@ -99,7 +102,7 @@
         return;
       }
 
-      handleContainerMouseDown();
+      handleContainerPointerDown(event);
     }}
     onpointermove={updatePointerOffsetY}
     onpointerup={confirmEdit}
