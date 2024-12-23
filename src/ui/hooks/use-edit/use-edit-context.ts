@@ -11,7 +11,7 @@ import type {
   WithPlacing,
   WithTime,
 } from "../../../task-types";
-import type { OnUpdateFn } from "../../../types";
+import type { OnUpdateFn, PointerDateTime } from "../../../types";
 import * as m from "../../../util/moment";
 import {
   getDayKey,
@@ -51,7 +51,7 @@ export function useEditContext(props: {
   settings: Readable<DayPlannerSettings>;
   localTasks: Readable<LocalTask[]>;
   remoteTasks: Readable<Task[]>;
-  pointerDateTime: Writable<{ dateTime?: Moment; type?: "dateTime" | "date" }>;
+  pointerDateTime: Readable<PointerDateTime>;
 }) {
   const {
     workspaceFacade,

@@ -3,14 +3,14 @@
   import { get } from "svelte/store";
   import { isNotVoid } from "typed-assert";
 
-  import { vibrationDurationMillis } from "../../constants";
+  import { defaultDayFormat, vibrationDurationMillis } from "../../constants";
   import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { isRemote } from "../../task-types";
   import { minutesToMomentOfDay } from "../../util/moment";
   import { getRenderKey, offsetYToMinutes } from "../../util/task-utils";
-  import { isTouchEvent } from "../../util/util";
+  import { getIsomorphicClientY, isTouchEvent } from "../../util/util";
   import { createGestures } from "../actions/gestures";
   import { createTimeBlockMenu } from "../time-block-menu";
 
@@ -31,7 +31,8 @@
   }: { day: Moment; isUnderCursor?: boolean } = $props();
 
   const {
-    pointerDateTime,
+    pointerOffsetY,
+    pointerDate,
     settings,
     editContext: {
       confirmEdit,
@@ -46,37 +47,19 @@
   const displayedTasksWithClocksForTimeline = $derived(
     getDisplayedTasksWithClocksForTimeline(day),
   );
+
   let el: HTMLElement | undefined;
-
-  function getClientY(event: PointerEvent | MouseEvent | TouchEvent) {
-    if (event instanceof PointerEvent || event instanceof MouseEvent) {
-      return event.clientY;
-    }
-
-    const firstTouch = event.touches[0];
-
-    return firstTouch.pageY;
-  }
 
   function updatePointerOffsetY(event: PointerEvent) {
     isNotVoid(el);
 
-    // todo: add memo
     const viewportToElOffsetY = el.getBoundingClientRect().top;
-    const borderTopToPointerOffsetY = getClientY(event) - viewportToElOffsetY;
+    const borderTopToPointerOffsetY =
+      getIsomorphicClientY(event) - viewportToElOffsetY;
     const newOffsetY = snap(borderTopToPointerOffsetY, $settings);
-    const minutes = offsetYToMinutes(
-      newOffsetY,
-      $settings.zoomLevel,
-      $settings.startHour,
-    );
-    const dateTime = minutesToMomentOfDay(minutes, day);
 
-    // todo: this should be derived
-    pointerDateTime.set({
-      dateTime,
-      type: "dateTime",
-    });
+    pointerOffsetY.set(newOffsetY);
+    pointerDate.set(day.format(defaultDayFormat));
   }
 
   const timelineGestures = createGestures({

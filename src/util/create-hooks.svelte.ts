@@ -10,7 +10,7 @@ import {
   type Writable,
 } from "svelte/store";
 
-import { reQueryAfterMillis } from "../constants";
+import { defaultDayFormat, reQueryAfterMillis } from "../constants";
 import type DayPlanner from "../main";
 import { addHorizontalPlacing } from "../overlap/overlap";
 import { dataviewChange as dataviewChangeAction } from "../redux/dataview/dataview-slice";
@@ -27,7 +27,7 @@ import { DataviewFacade } from "../service/dataview-facade";
 import { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
 import type { LocalTask, Task, WithTime } from "../task-types";
-import type { OnUpdateFn } from "../types";
+import type { OnUpdateFn, PointerDateTime } from "../types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDataviewTasks } from "../ui/hooks/use-dataview-tasks";
@@ -50,7 +50,13 @@ import { hasClockProp } from "./clock";
 import * as dv from "./dataview";
 import { withClockMoments } from "./dataview";
 import { getUpdateTrigger } from "./store";
-import { getDayKey, getRenderKey, isWithTime } from "./task-utils";
+import {
+  getDayKey,
+  getRenderKey,
+  isWithTime,
+  offsetYToMinutes,
+} from "./task-utils";
+import { minutesToMomentOfDay } from "../util/moment";
 
 interface CreateHooksProps {
   app: App;
@@ -68,11 +74,6 @@ function getDarkModeFlag() {
   return document.body.hasClass("theme-dark");
 }
 
-export type PointerDateTime = {
-  dateTime?: Moment;
-  type?: "dateTime" | "date";
-};
-
 export function useTasks(props: {
   settingsStore: Writable<DayPlannerSettings>;
   debouncedTaskUpdateTrigger: Readable<object>;
@@ -86,7 +87,7 @@ export function useTasks(props: {
   currentTime: Readable<Moment>;
   workspaceFacade: WorkspaceFacade;
   onUpdate: OnUpdateFn;
-  pointerDateTime: Writable<PointerDateTime>;
+  pointerDateTime: Readable<PointerDateTime>;
   useSelector: ReturnType<typeof createUseSelector>;
 }) {
   const {
@@ -238,7 +239,30 @@ export function createHooks({
     dispatch(layoutReadyAction());
   });
 
-  const pointerDateTime = writable<PointerDateTime>({});
+  const pointerOffsetY = writable(0);
+  const pointerDate = writable<string>(
+    window.moment().format(defaultDayFormat),
+  );
+
+  const pointerDateTime = derived(
+    [pointerOffsetY, pointerDate, settingsStore],
+    ([$pointerOffsetY, $pointerDate, $settingsStore]) => {
+      const minutesSinceMidnight = offsetYToMinutes(
+        $pointerOffsetY,
+        $settingsStore.zoomLevel,
+        $settingsStore.startHour,
+      );
+      const dateTime = minutesToMomentOfDay(
+        minutesSinceMidnight,
+        window.moment($pointerDate),
+      );
+
+      return {
+        dateTime,
+        type: "dateTime",
+      };
+    },
+  );
 
   const isDarkModeStore = readable(getDarkModeFlag(), (set) => {
     const eventRef = app.workspace.on("css-change", () => {
@@ -321,6 +345,7 @@ export function createHooks({
   });
 
   return {
+    pointerOffsetY,
     tasksWithActiveClockProps,
     editContext,
     tasksForToday,
@@ -334,5 +359,6 @@ export function createHooks({
     pointerDateTime,
     getDisplayedTasksWithClocksForTimeline,
     visibleDays,
+    pointerDate,
   };
 }

@@ -6,6 +6,18 @@ export function isTouchEvent(event: PointerEvent) {
   return ["pen", "touch"].includes(event.pointerType);
 }
 
+export function getIsomorphicClientY(
+  event: PointerEvent | MouseEvent | TouchEvent,
+) {
+  if (event instanceof PointerEvent || event instanceof MouseEvent) {
+    return event.clientY;
+  }
+
+  const firstTouch = event.touches[0];
+
+  return firstTouch.pageY;
+}
+
 export function isEventRelated(
   event: PointerEvent,
   otherNode: HTMLElement | null,
@@ -28,22 +40,6 @@ export function isOutside(event: PointerEvent, container: HTMLElement | null) {
   }
 
   return (
-    event.target !== container &&
-    event.target instanceof Node &&
-    !container.contains(event.target)
-  );
-}
-
-export function isTapOutside(
-  event: PointerEvent,
-  container: HTMLElement | null,
-) {
-  if (!container) {
-    return false;
-  }
-
-  return (
-    isTouchEvent(event) &&
     event.target !== container &&
     event.target instanceof Node &&
     !container.contains(event.target)

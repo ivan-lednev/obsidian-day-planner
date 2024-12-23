@@ -11,13 +11,14 @@ import * as t from "../../../util/task-utils";
 
 import type { EditOperation } from "./types";
 import { EditMode } from "./types";
+import type { PointerDateTime } from "../../../types";
 
 export interface UseEditHandlersProps {
   startEdit: (operation: EditOperation) => void;
   workspaceFacade: WorkspaceFacade;
   editOperation: Writable<EditOperation | undefined>;
   settings: Readable<DayPlannerSettings>;
-  pointerDateTime: Writable<{ dateTime?: Moment; type?: "dateTime" | "date" }>;
+  pointerDateTime: Readable<PointerDateTime>;
 }
 
 export function createEditHandlers({

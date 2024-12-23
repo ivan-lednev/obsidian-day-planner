@@ -30,6 +30,12 @@ export interface Overlap {
 export type CleanUp = () => void;
 export type RenderMarkdown = (el: HTMLElement, markdown: string) => CleanUp;
 
+export type PointerDateTime = {
+  dateTime?: Moment;
+  type?: "dateTime" | "date";
+};
+
+
 export interface ObsidianContext {
   workspaceFacade: WorkspaceFacade;
   initWeeklyView: () => Promise<void>;
@@ -45,7 +51,9 @@ export interface ObsidianContext {
   isDarkMode: { current: boolean };
   settings: Writable<DayPlannerSettings>;
   settingsSignal: { current: DayPlannerSettings };
-  pointerDateTime: Writable<{ dateTime?: Moment; type?: "dateTime" | "date" }>;
+  pointerDateTime: Readable<PointerDateTime>;
+  pointerOffsetY: Writable<number>;
+  pointerDate: Writable<string>;
   tasksWithActiveClockProps: Readable<LocalTask[]>;
   sTaskEditor: STaskEditor;
   getDisplayedTasksWithClocksForTimeline: (
