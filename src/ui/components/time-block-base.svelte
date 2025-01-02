@@ -38,8 +38,7 @@
       isDarkMode.current,
       settingsSignal.current,
     )}
-    class="content"
-    class:truncated-bottom={task.truncated === "bottom"}
+    class={["content", { "truncated-bottom": task.truncated === "bottom" }]}
     {onpointerup}
     use:useActions={use}
   >

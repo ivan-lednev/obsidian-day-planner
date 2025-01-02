@@ -109,7 +109,7 @@
   <div class="header-row day-buttons">
     <div class="corner"></div>
     {#each $dateRange as day}
-      <div class="header-cell" class:today={$isToday(day)}>
+      <div class={["header-cell", $isToday(day) && "today"]}>
         <ControlButton
           --color={$isToday(day) ? "white" : "var(--icon-color)"}
           label="Open note for day"

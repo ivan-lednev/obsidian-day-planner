@@ -1,4 +1,8 @@
-<div class="setting-item">
+<script lang="ts">
+  const props = $props();
+</script>
+
+<div class={["setting-item", props.class]}>
   <div class="setting-item-info">
     <div class="setting-item-name">
       <slot name="name" />

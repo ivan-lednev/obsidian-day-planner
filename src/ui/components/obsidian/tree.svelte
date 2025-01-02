@@ -33,8 +33,11 @@
 <div class="tree-container">
   <div class="tree-item-self is-clickable" onclick={toggleTree}>
     <div
-      class="tree-item-icon collapse-icon"
-      class:is-collapsed={!isTreeVisible}
+      class={[
+        "tree-item-icon",
+        "collapse-icon",
+        !isTreeVisible && "is-collapsed",
+      ]}
     >
       <RightTriangle />
     </div>

@@ -19,8 +19,7 @@
 </script>
 
 <div
-  class="clickable-icon {classes}"
-  class:is-active={isActive}
+  class={["clickable-icon", classes, { "is-active": isActive }]}
   aria-disabled={disabled}
   aria-label={label}
   {onclick}

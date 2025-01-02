@@ -10,15 +10,13 @@
 <div class="remote-task-content">
   <div
     style:--ribbon-color={task.calendar.color}
-    class="ribbon"
-    class:declined
-    class:tentative
+    class={["ribbon", { declined, tentative }]}
   ></div>
   <div class="planner-sticky-block-content">
     <span class="calendar-name">
       {task.calendar.name}
     </span>
-    <span class="summary" class:declined>
+    <span class={["summary", { declined }]}>
       {task.summary}
     </span>
   </div>

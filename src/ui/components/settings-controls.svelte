@@ -82,12 +82,15 @@
       on:input={handleZoomLevelInput}
     />
   </SettingItem>
-  <SettingItem>
+  <SettingItem class="mod-toggle">
     <svelte:fragment slot="name">Auto-scroll to now</svelte:fragment>
     <div
       slot="control"
-      class="checkbox-container mod-small"
-      class:is-enabled={$settings.centerNeedle}
+      class={[
+        "checkbox-container",
+        "mod-small",
+        { "is-enabled": $settings.centerNeedle },
+      ]}
       onclick={() => {
         $settings.centerNeedle = !$settings.centerNeedle;
       }}
@@ -96,12 +99,15 @@
     </div>
   </SettingItem>
 
-  <SettingItem>
+  <SettingItem class="mod-toggle">
     <svelte:fragment slot="name">Show completed tasks</svelte:fragment>
     <div
       slot="control"
-      class="checkbox-container mod-small"
-      class:is-enabled={$settings.showCompletedTasks}
+      class={[
+        "checkbox-container",
+        "mod-small",
+        { "is-enabled": $settings.showCompletedTasks },
+      ]}
       onclick={() => {
         $settings.showCompletedTasks = !$settings.showCompletedTasks;
       }}
@@ -110,12 +116,15 @@
     </div>
   </SettingItem>
 
-  <SettingItem>
+  <SettingItem class="mod-toggle">
     <svelte:fragment slot="name">Show subtasks in task blocks</svelte:fragment>
     <div
       slot="control"
-      class="checkbox-container mod-small"
-      class:is-enabled={$settings.showSubtasksInTaskBlocks}
+      class={[
+        "checkbox-container",
+        "mod-small",
+        { "is-enabled": $settings.showSubtasksInTaskBlocks },
+      ]}
       onclick={() => {
         // We create a new object to trigger immediate update in the timeline view
         settings.update((previous) => ({
@@ -130,12 +139,15 @@
 
   <div class="controls-section">Unscheduled tasks</div>
 
-  <SettingItem>
+  <SettingItem class="mod-toggle">
     <svelte:fragment slot="name">Show unscheduled tasks</svelte:fragment>
     <div
       slot="control"
-      class="checkbox-container mod-small"
-      class:is-enabled={$settings.showUncheduledTasks}
+      class={[
+        "checkbox-container",
+        "mod-small",
+        { "is-enabled": $settings.showUncheduledTasks },
+      ]}
       onclick={() => {
         $settings.showUncheduledTasks = !$settings.showUncheduledTasks;
       }}
@@ -145,14 +157,17 @@
   </SettingItem>
 
   {#if $settings.showUncheduledTasks}
-    <SettingItem>
+    <SettingItem class="mod-toggle">
       <svelte:fragment slot="name"
         >Show unscheduled sub-tasks as separate blocks
       </svelte:fragment>
       <div
         slot="control"
-        class="checkbox-container mod-small"
-        class:is-enabled={$settings.showUnscheduledNestedTasks}
+        class={[
+          "checkbox-container",
+          "mod-small",
+          { "is-enabled": $settings.showUnscheduledNestedTasks },
+        ]}
         onclick={() => {
           $settings.showUnscheduledNestedTasks =
             !$settings.showUnscheduledNestedTasks;
@@ -165,12 +180,15 @@
 
   <div class="controls-section">Time tracker</div>
 
-  <SettingItem>
+  <SettingItem class="mod-toggle">
     <svelte:fragment slot="name">Show time tracker</svelte:fragment>
     <div
       slot="control"
-      class="checkbox-container mod-small"
-      class:is-enabled={$settings.showTimeTracker}
+      class={[
+        "checkbox-container",
+        "mod-small",
+        { "is-enabled": $settings.showTimeTracker },
+      ]}
       onclick={() => {
         $settings.showTimeTracker = !$settings.showTimeTracker;
       }}

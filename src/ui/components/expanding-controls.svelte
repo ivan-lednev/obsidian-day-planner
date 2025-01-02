@@ -35,8 +35,7 @@
 <div
   style:touch-action="none"
   style:flex-direction={reverse ? "row-reverse" : "row"}
-  class="expanding-controls"
-  class:active={isActive}
+  class={["expanding-controls", { active: isActive }]}
   onpointerenter={(event) => {
     if (isTouchEvent(event)) {
       return;
