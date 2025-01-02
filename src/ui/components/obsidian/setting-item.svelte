@@ -5,11 +5,11 @@
 <div class={["setting-item", props.class]}>
   <div class="setting-item-info">
     <div class="setting-item-name">
-      <slot name="name" />
+      {@render props.name()}
     </div>
   </div>
   <div class="setting-item-control">
-    <slot name="control" />
+    {@render props.control()}
   </div>
 </div>
 

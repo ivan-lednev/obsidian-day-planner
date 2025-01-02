@@ -64,137 +64,158 @@
 </div>
 <div class="settings">
   <SettingItem>
-    <svelte:fragment slot="name">Start hour</svelte:fragment>
-    <Dropdown
-      slot="control"
-      value={String($settings.startHour)}
-      values={startHourOptions}
-      on:input={handleStartHourInput}
-    />
+    {#snippet name()}
+      Start hour
+    {/snippet}
+    {#snippet control()}
+      <Dropdown
+        value={String($settings.startHour)}
+        values={startHourOptions}
+        on:input={handleStartHourInput}
+      />
+    {/snippet}
   </SettingItem>
 
   <SettingItem>
-    <svelte:fragment slot="name">Zoom</svelte:fragment>
-    <Dropdown
-      slot="control"
-      value={String($settings.zoomLevel)}
-      values={zoomLevelOptions}
-      on:input={handleZoomLevelInput}
-    />
+    {#snippet name()}
+      Zoom
+    {/snippet}
+    {#snippet control()}
+      <Dropdown
+        value={String($settings.zoomLevel)}
+        values={zoomLevelOptions}
+        on:input={handleZoomLevelInput}
+      />
+    {/snippet}
   </SettingItem>
   <SettingItem class="mod-toggle">
-    <svelte:fragment slot="name">Auto-scroll to now</svelte:fragment>
-    <div
-      slot="control"
-      class={[
-        "checkbox-container",
-        "mod-small",
-        { "is-enabled": $settings.centerNeedle },
-      ]}
-      onclick={() => {
-        $settings.centerNeedle = !$settings.centerNeedle;
-      }}
-    >
-      <input tabindex="0" type="checkbox" />
-    </div>
-  </SettingItem>
-
-  <SettingItem class="mod-toggle">
-    <svelte:fragment slot="name">Show completed tasks</svelte:fragment>
-    <div
-      slot="control"
-      class={[
-        "checkbox-container",
-        "mod-small",
-        { "is-enabled": $settings.showCompletedTasks },
-      ]}
-      onclick={() => {
-        $settings.showCompletedTasks = !$settings.showCompletedTasks;
-      }}
-    >
-      <input tabindex="0" type="checkbox" />
-    </div>
+    {#snippet name()}
+      Auto-scroll to now
+    {/snippet}
+    {#snippet control()}
+      <div
+        class={[
+          "checkbox-container",
+          "mod-small",
+          { "is-enabled": $settings.centerNeedle },
+        ]}
+        onclick={() => {
+          $settings.centerNeedle = !$settings.centerNeedle;
+        }}
+      >
+        <input tabindex="0" type="checkbox" />
+      </div>
+    {/snippet}
   </SettingItem>
 
   <SettingItem class="mod-toggle">
-    <svelte:fragment slot="name">Show subtasks in task blocks</svelte:fragment>
-    <div
-      slot="control"
-      class={[
-        "checkbox-container",
-        "mod-small",
-        { "is-enabled": $settings.showSubtasksInTaskBlocks },
-      ]}
-      onclick={() => {
-        // We create a new object to trigger immediate update in the timeline view
-        settings.update((previous) => ({
-          ...previous,
-          showSubtasksInTaskBlocks: !previous.showSubtasksInTaskBlocks,
-        }));
-      }}
-    >
-      <input tabindex="0" type="checkbox" />
-    </div>
+    {#snippet name()}
+      Show completed tasks
+    {/snippet}
+    {#snippet control()}
+      <div
+        class={[
+          "checkbox-container",
+          "mod-small",
+          { "is-enabled": $settings.showCompletedTasks },
+        ]}
+        onclick={() => {
+          $settings.showCompletedTasks = !$settings.showCompletedTasks;
+        }}
+      >
+        <input tabindex="0" type="checkbox" />
+      </div>
+    {/snippet}
+  </SettingItem>
+
+  <SettingItem class="mod-toggle">
+    {#snippet name()}
+      Show subtasks in task blocks
+    {/snippet}
+    {#snippet control()}
+      <div
+        class={[
+          "checkbox-container",
+          "mod-small",
+          { "is-enabled": $settings.showSubtasksInTaskBlocks },
+        ]}
+        onclick={() => {
+          settings.update((previous) => ({
+            ...previous,
+            showSubtasksInTaskBlocks: !previous.showSubtasksInTaskBlocks,
+          }));
+        }}
+      >
+        <input tabindex="0" type="checkbox" />
+      </div>
+    {/snippet}
   </SettingItem>
 
   <div class="controls-section">Unscheduled tasks</div>
 
   <SettingItem class="mod-toggle">
-    <svelte:fragment slot="name">Show unscheduled tasks</svelte:fragment>
-    <div
-      slot="control"
-      class={[
-        "checkbox-container",
-        "mod-small",
-        { "is-enabled": $settings.showUncheduledTasks },
-      ]}
-      onclick={() => {
-        $settings.showUncheduledTasks = !$settings.showUncheduledTasks;
-      }}
-    >
-      <input tabindex="0" type="checkbox" />
-    </div>
-  </SettingItem>
-
-  {#if $settings.showUncheduledTasks}
-    <SettingItem class="mod-toggle">
-      <svelte:fragment slot="name"
-        >Show unscheduled sub-tasks as separate blocks
-      </svelte:fragment>
+    {#snippet name()}
+      Show unscheduled tasks
+    {/snippet}
+    {#snippet control()}
       <div
-        slot="control"
         class={[
           "checkbox-container",
           "mod-small",
-          { "is-enabled": $settings.showUnscheduledNestedTasks },
+          { "is-enabled": $settings.showUncheduledTasks },
         ]}
         onclick={() => {
-          $settings.showUnscheduledNestedTasks =
-            !$settings.showUnscheduledNestedTasks;
+          $settings.showUncheduledTasks = !$settings.showUncheduledTasks;
         }}
       >
         <input tabindex="0" type="checkbox" />
       </div>
+    {/snippet}
+  </SettingItem>
+
+  {#if $settings.showUncheduledTasks}
+    <SettingItem class="mod-toggle">
+      {#snippet name()}
+        Show unscheduled sub-tasks as separate blocks
+      {/snippet}
+      {#snippet control()}
+        <div
+          class={[
+            "checkbox-container",
+            "mod-small",
+            { "is-enabled": $settings.showUnscheduledNestedTasks },
+          ]}
+          onclick={() => {
+            $settings.showUnscheduledNestedTasks =
+              !$settings.showUnscheduledNestedTasks;
+          }}
+        >
+          <input tabindex="0" type="checkbox" />
+        </div>
+      {/snippet}
     </SettingItem>
   {/if}
 
   <div class="controls-section">Time tracker</div>
 
   <SettingItem class="mod-toggle">
-    <svelte:fragment slot="name">Show time tracker</svelte:fragment>
-    <div
-      slot="control"
-      class={[
-        "checkbox-container",
-        "mod-small",
-        { "is-enabled": $settings.showTimeTracker },
-      ]}
-      onclick={() => {
-        $settings.showTimeTracker = !$settings.showTimeTracker;
-      }}
-    >
-      <input tabindex="0" type="checkbox" />
-    </div>
+    {#snippet name()}
+      Show time tracker
+    {/snippet}
+    {#snippet control()}
+      <div
+        class={[
+          "checkbox-container",
+          "mod-small",
+          { "is-enabled": $settings.showTimeTracker },
+        ]}
+        onclick={() => {
+          $settings.showTimeTracker = !$settings.showTimeTracker;
+        }}
+      >
+        <input tabindex="0" type="checkbox" />
+      </div>
+    {/snippet}
   </SettingItem>
 </div>
 
