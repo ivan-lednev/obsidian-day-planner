@@ -6,8 +6,9 @@
   - <a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
 
-Day Planner is a community plugin for [Obsidian](https://obsidian.md/). It adds editable calendar views and basic time-tracking. Day Planner is integrated with
-
+Day Planner is a community plugin for [Obsidian](https://obsidian.md/).
+It adds editable calendar views and basic time-tracking. 
+###### Day Planner is integrated with:
 - The core Daily Notes plugin.
 - [the Tasks plugin](https://obsidian.md/plugins?id=obsidian-tasks-plugin)
 - Online calendars
