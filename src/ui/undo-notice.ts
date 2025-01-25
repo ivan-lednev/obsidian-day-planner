@@ -20,7 +20,5 @@ export function createUndoNotice(onpointerup: () => void) {
     undoTimeoutMillis,
   );
 
-  notice.noticeEl.addClass("planner-undo-notice");
-
   return notice;
 }

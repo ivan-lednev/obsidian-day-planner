@@ -213,7 +213,7 @@ body {
   background-color: var(--color-accent);
 }
 
-.planner-undo-notice {
+.notice:has(.undo-timeout-bar) {
   position: relative;
   overflow: hidden;
 }
