@@ -3,13 +3,12 @@
   import { get } from "svelte/store";
   import { isNotVoid } from "typed-assert";
 
-  import { defaultDayFormat, vibrationDurationMillis } from "../../constants";
+  import { defaultDayFormat } from "../../constants";
   import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { isRemote } from "../../task-types";
-  import { minutesToMomentOfDay } from "../../util/moment";
-  import { getRenderKey, offsetYToMinutes } from "../../util/task-utils";
+  import { getRenderKey } from "../../util/task-utils";
   import { getIsomorphicClientY, isTouchEvent } from "../../util/util";
   import { createGestures } from "../actions/gestures";
   import { createTimeBlockMenu } from "../time-block-menu";
@@ -80,11 +79,7 @@
         updatePointerOffsetY(event);
       }
     },
-    onpanend: () => {
-      if (get(editOperation)) {
-        confirmEdit();
-      }
-    },
+    onpanend: confirmEdit,
     options: { mouseSupport: false },
   });
 </script>

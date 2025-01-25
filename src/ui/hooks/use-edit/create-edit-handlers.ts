@@ -1,4 +1,3 @@
-import type { Moment } from "moment/moment";
 import { getDateFromPath } from "obsidian-daily-notes-interface";
 import type { Readable, Writable } from "svelte/store";
 import { get } from "svelte/store";
@@ -6,12 +5,12 @@ import { get } from "svelte/store";
 import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
 import type { LocalTask, WithTime } from "../../../task-types";
+import type { PointerDateTime } from "../../../types";
 import { getMinutesSinceMidnight } from "../../../util/moment";
 import * as t from "../../../util/task-utils";
 
 import type { EditOperation } from "./types";
 import { EditMode } from "./types";
-import type { PointerDateTime } from "../../../types";
 
 export interface UseEditHandlersProps {
   startEdit: (operation: EditOperation) => void;

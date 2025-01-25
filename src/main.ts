@@ -490,6 +490,7 @@ export default class DayPlanner extends Plugin {
     );
 
     this.registerEvent(
+      // todo: move out
       this.app.workspace.on("editor-menu", (menu, editor, view) => {
         let sTask: STask | undefined;
 

@@ -6,8 +6,7 @@ import {
 import ical from "node-ical";
 
 import { defaultDayFormat } from "../constants";
-import type { WithIcalConfig } from "../types";
-import type { PointerDateTime } from "../util/create-hooks.svelte.js";
+import type { PointerDateTime, WithIcalConfig } from "../types";
 
 import { createAppSlice } from "./create-app-slice";
 

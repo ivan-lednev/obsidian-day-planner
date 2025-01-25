@@ -1,6 +1,6 @@
 import { flow, uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
-import { derived, type Readable, type Writable, writable } from "svelte/store";
+import { derived, type Readable, writable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../../overlap/overlap";
 import { WorkspaceFacade } from "../../../service/workspace-facade";

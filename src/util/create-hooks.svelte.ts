@@ -45,6 +45,7 @@ import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "../ui/hooks/use-visible-dataview-tasks";
 import { useVisibleDays } from "../ui/hooks/use-visible-days";
 import * as m from "../util/moment";
+import { minutesToMomentOfDay } from "../util/moment";
 
 import { hasClockProp } from "./clock";
 import * as dv from "./dataview";
@@ -56,7 +57,6 @@ import {
   isWithTime,
   offsetYToMinutes,
 } from "./task-utils";
-import { minutesToMomentOfDay } from "../util/moment";
 
 interface CreateHooksProps {
   app: App;
