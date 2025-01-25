@@ -8,8 +8,10 @@
     classes,
     onclick,
     children,
+    ...rest
   }: {
     label?: string;
+    class?: object;
     isActive?: boolean;
     disabled?: boolean;
     classes?: string;
@@ -19,7 +21,7 @@
 </script>
 
 <div
-  class={["clickable-icon", classes, { "is-active": isActive }]}
+  class={["clickable-icon", classes, rest.class, { "is-active": isActive }]}
   aria-disabled={disabled}
   aria-label={label}
   {onclick}

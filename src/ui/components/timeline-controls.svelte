@@ -91,20 +91,23 @@
 
 <div class="controls">
   <div class="header">
-    <ControlButton onclick={handleReSyncClick}>
-      <EllipsisVertical class="svg-icon" />
-    </ControlButton>
-    <ControlButton label="Go to today" onclick={goToToday}>
-      <CalendarArrowUp />
-    </ControlButton>
-    <ControlButton label="Go to previous day" onclick={goBack}>
-      <ChevronLeft />
-    </ControlButton>
-    <ControlButton label="Go to next day" onclick={goForward}>
-      <ChevronRight />
-    </ControlButton>
+    <div class="buttons-left">
+      <ControlButton onclick={handleReSyncClick}>
+        <EllipsisVertical class="svg-icon" />
+      </ControlButton>
+      <ControlButton label="Go to today" onclick={goToToday}>
+        <CalendarArrowUp />
+      </ControlButton>
+      <ControlButton label="Go to previous day" onclick={goBack}>
+        <ChevronLeft />
+      </ControlButton>
+      <ControlButton label="Go to next day" onclick={goForward}>
+        <ChevronRight />
+      </ControlButton>
+    </div>
+
     <ControlButton
-      classes={$isToday($dateRange[0]) ? "today" : ""}
+      class={{ today: $isToday($dateRange[0]) }}
       label="Go to file"
       onclick={async () => {
         const note = await createDailyNoteIfNeeded($dateRange[0]);
@@ -115,13 +118,16 @@
         >{$dateRange[0].format($settings.timelineDateFormat)}</span
       >
     </ControlButton>
-    <ControlButton
-      isActive={settingsVisible}
-      label="Settings"
-      onclick={toggleSettings}
-    >
-      <Settings />
-    </ControlButton>
+
+    <div class="buttons-right">
+      <ControlButton
+        isActive={settingsVisible}
+        label="Settings"
+        onclick={toggleSettings}
+      >
+        <Settings />
+      </ControlButton>
+    </div>
   </div>
   <div class="pill-wrapper">
     <Pill
@@ -191,12 +197,18 @@
     padding-inline: var(--size-4-3);
   }
 
-  .header {
-    --header-start-items-count: 5;
+  .buttons-left {
+    display: flex;
+  }
 
-    display: grid;
-    grid-template-columns: repeat(var(--header-start-items-count), auto) 1fr;
+  .header,
+  .buttons-left {
     gap: var(--size-2-1);
+  }
+
+  .header {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     padding-block: var(--size-4-2);
   }
 
