@@ -50,6 +50,7 @@ export interface DayPlannerSettings {
   showNow: boolean;
   showNext: boolean;
   showTimeTracker: boolean;
+  showActiveClocks: boolean;
   snapStepMinutes: number;
   pluginVersion: string;
   showCompletedTasks: boolean;
@@ -108,6 +109,7 @@ export const defaultSettings: DayPlannerSettings = {
   firstDayOfWeek: "monday",
   multiDayRange: "3-days",
   showTimeTracker: false,
+  showActiveClocks: false,
 };
 
 export const defaultSettingsForTests = {

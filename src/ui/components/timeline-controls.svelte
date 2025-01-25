@@ -129,15 +129,18 @@
       </ControlButton>
     </div>
   </div>
-  <div class="pill-wrapper">
-    <Pill
-      key="filter"
-      onpointerup={() => {
-        settingsVisible = true;
-      }}
-      value={$settings.dataviewSource}
-    />
-  </div>
+
+  {#if $settings.dataviewSource}
+    <div class="pill-wrapper">
+      <Pill
+        key="filter"
+        onpointerup={() => {
+          settingsVisible = true;
+        }}
+        value={$settings.dataviewSource}
+      />
+    </div>
+  {/if}
 
   {#if !$dataviewLoaded}
     <Callout --callout-margin-inline="var(--size-4-3)" type="error">
@@ -154,13 +157,15 @@
     </div>
   {/if}
 
-  <Tree
-    flair={String($tasksWithActiveClockProps.length)}
-    isInitiallyOpen
-    title="Active clocks"
-  >
-    <ActiveClocks --search-results-bg-color="var(--background-primary)" />
-  </Tree>
+  {#if $settings.showActiveClocks}
+    <Tree
+      flair={String($tasksWithActiveClockProps.length)}
+      isInitiallyOpen
+      title="Active clocks"
+    >
+      <ActiveClocks --search-results-bg-color="var(--background-primary)" />
+    </Tree>
+  {/if}
 
   <!--  <Tree title="Search">-->
   <!--    <Search-->
