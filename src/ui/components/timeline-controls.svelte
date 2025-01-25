@@ -190,7 +190,15 @@
   }
 
   .date {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     padding-inline: var(--size-4-4);
+
+    font-size: var(--font-ui-small);
+    font-weight: var(--font-medium);
+    color: var(--text-normal);
   }
 
   :global(.mod-error) {
@@ -225,16 +233,6 @@
     justify-self: end;
   }
 
-  .date {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: var(--font-ui-small);
-    font-weight: var(--font-medium);
-    color: var(--text-normal);
-  }
-
   .controls {
     overflow: hidden;
     display: flex;
@@ -242,11 +240,5 @@
     flex-direction: column;
 
     font-size: var(--font-ui-small);
-  }
-
-  .day-controls {
-    display: flex;
-    gap: var(--size-4-1);
-    justify-content: space-between;
   }
 </style>

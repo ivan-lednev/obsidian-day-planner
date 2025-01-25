@@ -11,11 +11,8 @@
 
   const { refreshTasks } = getObsidianContext();
 
-  const {
-    sourceIsEmpty,
-    errorMessage: dataviewErrorMessage,
-    dataviewSourceInput,
-  } = useDataviewSource({ refreshTasks });
+  const { errorMessage: dataviewErrorMessage, dataviewSourceInput } =
+    useDataviewSource({ refreshTasks });
 
   const startHourOptions = range(0, 13).map(String);
   const zoomLevelOptions = range(1, 9).map(String);

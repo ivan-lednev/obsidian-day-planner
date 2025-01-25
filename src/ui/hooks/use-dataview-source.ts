@@ -1,6 +1,6 @@
 import { debounce } from "obsidian";
 import { onDestroy } from "svelte";
-import { derived, get, writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 
 import { settings } from "../../global-store/settings";
 
@@ -9,10 +9,6 @@ interface UseDataviewSourceProps {
 }
 
 export function useDataviewSource({ refreshTasks }: UseDataviewSourceProps) {
-  const sourceIsEmpty = derived(
-    settings,
-    ($settings) => $settings.dataviewSource.trim().length === 0,
-  );
   const dataviewSourceInput = writable(get(settings).dataviewSource);
   const errorMessage = writable("");
 
@@ -45,7 +41,6 @@ export function useDataviewSource({ refreshTasks }: UseDataviewSourceProps) {
   });
 
   return {
-    sourceIsEmpty,
     errorMessage,
     dataviewSourceInput,
   };

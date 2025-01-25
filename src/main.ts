@@ -449,6 +449,7 @@ export default class DayPlanner extends Plugin {
       editContext,
       tasksForToday,
       dataviewLoaded,
+      dataviewChange,
       isModPressed,
       newlyStartedTasks,
       isOnline,
@@ -474,20 +475,9 @@ export default class DayPlanner extends Plugin {
     });
 
     this.syncDataview = () => dataviewSyncTrigger.set({});
+
     this.registerDomEvent(window, "blur", editContext.cancelEdit);
     this.registerDomEvent(document, "pointerup", editContext.cancelEdit);
-    this.register(
-      editContext.cursor.subscribe(({ bodyCursor }) => {
-        document.body.style.cursor = bodyCursor;
-      }),
-    );
-    this.register(
-      visibleDays.subscribe((days) => {
-        this.store.dispatch(
-          visibleDaysUpdated(days.map((it) => it.toISOString())),
-        );
-      }),
-    );
 
     this.registerEvent(
       // todo: move out
@@ -527,6 +517,30 @@ export default class DayPlanner extends Plugin {
               .onClick(this.sTaskEditor.clockInUnderCursor);
           });
         }
+      }),
+    );
+
+    this.register(
+      dataviewChange.subscribe(() => {
+        if (get(editContext.editOperation) === undefined) {
+          return;
+        }
+
+        editContext.cancelEdit();
+
+        new Notice("Tasks updated externally; edit canceled");
+      }),
+    );
+    this.register(
+      editContext.cursor.subscribe(({ bodyCursor }) => {
+        document.body.style.cursor = bodyCursor;
+      }),
+    );
+    this.register(
+      visibleDays.subscribe((days) => {
+        this.store.dispatch(
+          visibleDaysUpdated(days.map((it) => it.toISOString())),
+        );
       }),
     );
 

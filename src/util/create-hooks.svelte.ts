@@ -360,5 +360,6 @@ export function createHooks({
     getDisplayedTasksWithClocksForTimeline,
     visibleDays,
     pointerDate,
+    dataviewChange,
   };
 }

@@ -35,7 +35,6 @@ export type PointerDateTime = {
   type?: "dateTime" | "date";
 };
 
-
 export interface ObsidianContext {
   workspaceFacade: WorkspaceFacade;
   initWeeklyView: () => Promise<void>;
