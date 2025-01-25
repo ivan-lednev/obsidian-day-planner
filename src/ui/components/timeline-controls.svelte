@@ -114,7 +114,7 @@
         await workspaceFacade.openFileInEditor(note);
       }}
     >
-      <span class={`date ${$isToday($dateRange[0]) ? "today" : ""}`}
+      <span class={["date", $isToday($dateRange[0]) && "today"]}
         >{$dateRange[0].format($settings.timelineDateFormat)}</span
       >
     </ControlButton>
@@ -189,6 +189,10 @@
     color: white;
   }
 
+  .date {
+    padding-inline: var(--size-4-4);
+  }
+
   :global(.mod-error) {
     color: var(--text-error);
   }
@@ -213,7 +217,7 @@
 
   .header {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr auto 1fr;
     padding-block: var(--size-4-2);
   }
 
