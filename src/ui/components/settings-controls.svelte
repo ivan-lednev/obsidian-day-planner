@@ -32,22 +32,12 @@
 </script>
 
 <div class="dataview-source">
-  Include additional files, folders and tags with a Dataview source:
   <input
     placeholder={`-#archived and -"notes/personal"`}
     spellcheck="false"
     type="text"
     bind:value={$dataviewSourceInput}
   />
-
-  {#if $sourceIsEmpty}
-    <Callout type="warning"
-      >Tasks are pulled only from daily notes
-      {#if $settings.plannerHeading}
-        under planner heading: "{$settings.plannerHeading}"
-      {/if}
-    </Callout>
-  {/if}
 
   {#if $dataviewErrorMessage.length > 0}
     <Callout type="error">
@@ -58,7 +48,7 @@
   <Callout type="info">
     <a
       href="https://blacksmithgu.github.io/obsidian-dataview/reference/sources/"
-      >Dataview source reference</a
+      >Filter syntax reference</a
     >
   </Callout>
 </div>
