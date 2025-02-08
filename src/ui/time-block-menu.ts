@@ -1,13 +1,35 @@
 import { Menu } from "obsidian";
+import type { LocalTask } from "../task-types";
+import type { WorkspaceFacade } from "src/service/workspace-facade";
+import { isNotVoid } from "typed-assert";
 
-export function createTimeBlockMenu(event: MouseEvent | TouchEvent) {
+export function createTimeBlockMenu(props: {
+  event: MouseEvent | TouchEvent;
+  task: LocalTask;
+  workspaceFacade: WorkspaceFacade;
+}) {
+  const { event, task, workspaceFacade } = props;
+  const { location } = task;
+
+  // todo: remove when types are fixed
+  isNotVoid(location);
+
+  const {
+    path,
+    position: {
+      start: { line }
+    }
+  } = location;
+
   const menu = new Menu();
 
   menu.addItem((item) => {
     item
       .setTitle("Reveal task in file")
       .setIcon("file-input")
-      .onClick(() => {});
+      .onClick(async () => {
+        await workspaceFacade.revealLineInFile(path, line);
+      });
   });
 
   // Obsidian works fine with touch events, but its TypeScript definitions don't reflect that.
