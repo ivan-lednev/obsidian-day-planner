@@ -14,7 +14,7 @@ import { useDateRanges } from "./hooks/use-date-ranges";
 
 export default class MultiDayView extends ItemView {
   private static readonly defaultDisplayText = "Multi-Day View";
-  navigation = false;
+  navigation = true;
   private multiDayComponent?: typeof MultiDayGrid;
   private headerActionsComponent?: HeaderActions;
   private dateRange?: DateRange;
