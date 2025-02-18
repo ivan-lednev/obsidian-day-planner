@@ -44,6 +44,7 @@
   {/snippet}
   {#snippet expanded()}
     <BlockControlButton
+      isWarning
       label="Delete block"
       use={[
         (el) => {
