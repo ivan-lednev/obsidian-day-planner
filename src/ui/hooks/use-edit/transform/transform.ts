@@ -11,6 +11,7 @@ import { toSpliced } from "../../../../util/to-spliced";
 import { EditMode, type EditOperation, type TaskTransformer } from "../types";
 
 import { create } from "./create";
+import { deleteTask } from "./delete";
 import { drag } from "./drag";
 import { dragAndShiftOthers } from "./drag-and-shift-others";
 import { dragAndShrinkOthers } from "./drag-and-shrink-others";
@@ -29,6 +30,7 @@ const transformers: Record<EditMode, TaskTransformer> = {
   [EditMode.DRAG_AND_SHIFT_OTHERS]: dragAndShiftOthers,
   [EditMode.DRAG_AND_SHRINK_OTHERS]: dragAndShrinkOthers,
   [EditMode.CREATE]: create,
+  [EditMode.DELETE]: deleteTask,
   [EditMode.RESIZE]: resize,
   [EditMode.RESIZE_AND_SHIFT_OTHERS]: resizeAndShiftOthers,
   [EditMode.RESIZE_FROM_TOP]: resizeFromTop,

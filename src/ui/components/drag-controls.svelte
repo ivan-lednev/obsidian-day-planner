@@ -4,7 +4,9 @@
     ArrowDownToLine,
     GripVertical,
     Copy,
+    Trash2,
   } from "lucide-svelte";
+  import { on } from "svelte/events";
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import type { LocalTask } from "../../task-types";
@@ -41,6 +43,18 @@
     </BlockControlButton>
   {/snippet}
   {#snippet expanded()}
+    <BlockControlButton
+      label="Delete block"
+      use={[
+        (el) => {
+          on(el, "pointerdown", () =>
+            handleGripMouseDown(task, EditMode.DELETE),
+          );
+        },
+      ]}
+    >
+      <Trash2 class="svg-icon" />
+    </BlockControlButton>
     <BlockControlButton
       cursor="grab"
       label="Copy block"
