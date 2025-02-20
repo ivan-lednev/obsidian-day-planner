@@ -11,7 +11,7 @@ import type { DayPlannerSettings, IcalConfig } from "./settings";
 import type { LocalTask, WithPlacing } from "./task-types";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
-import { createShowPreview } from "./util/create-show-preview";
+import { createShowPreview, type ShowPreview } from "./util/create-show-preview";
 
 export type OnUpdateFn = (
   base: Array<LocalTask>,
@@ -43,7 +43,7 @@ export interface ObsidianContext {
   renderMarkdown: RenderMarkdown;
   toggleCheckboxInFile: VaultFacade["toggleCheckboxInFile"];
   editContext: ReturnType<typeof useEditContext>;
-  showPreview: ReturnType<typeof createShowPreview>;
+  showPreview: ShowPreview;
   isModPressed: Readable<boolean>;
   reSync: () => void;
   isOnline: Readable<boolean>;

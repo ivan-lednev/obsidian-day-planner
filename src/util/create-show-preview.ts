@@ -14,3 +14,5 @@ export const createShowPreview =
 
     app.workspace.trigger("link-hover", {}, el, path, "", previewLocation);
   };
+
+export type ShowPreview = ReturnType<typeof createShowPreview>;

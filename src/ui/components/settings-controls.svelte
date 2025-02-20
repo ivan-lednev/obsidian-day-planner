@@ -117,7 +117,7 @@
 
   <SettingItem class="mod-toggle">
     {#snippet name()}
-      Show subtasks in task blocks
+      Show full list content
     {/snippet}
     {#snippet control()}
       <div
@@ -163,7 +163,7 @@
   {#if $settings.showUncheduledTasks}
     <SettingItem class="mod-toggle">
       {#snippet name()}
-        Show unscheduled sub-tasks as separate blocks
+        Show sub-tasks as blocks
       {/snippet}
       {#snippet control()}
         <div

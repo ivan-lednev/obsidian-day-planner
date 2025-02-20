@@ -41,6 +41,7 @@
     },
     getDisplayedTasksWithClocksForTimeline,
     workspaceFacade,
+    showPreview,
   } = getObsidianContext();
 
   const displayedTasksForTimeline = $derived(getDisplayedTasksForTimeline(day));
@@ -114,7 +115,7 @@
       {:else}
         <Selectable
           onSecondarySelect={(event) =>
-            createTimeBlockMenu({ event, task, workspaceFacade })}
+            createTimeBlockMenu({ event, task, workspaceFacade, showPreview })}
           selectionBlocked={Boolean($editOperation)}
         >
           {#snippet children(selectable)}

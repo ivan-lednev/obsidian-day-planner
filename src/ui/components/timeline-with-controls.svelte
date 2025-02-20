@@ -17,12 +17,7 @@
 
 <div class="controls">
   <TimelineControls />
-  <ResizeableBox className="timeline-box">
-    {#snippet children(startEdit)}
-      <UnscheduledTaskContainer day={firstDayInRange} />
-      <ResizeHandle on:mousedown={startEdit} />
-    {/snippet}
-  </ResizeableBox>
+  <UnscheduledTaskContainer day={firstDayInRange} />
 </div>
 <Scroller>
   {#snippet children(isUnderCursor)}
