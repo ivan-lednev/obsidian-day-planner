@@ -312,25 +312,30 @@ export type ViewDiff = {
 };
 
 export function getTaskDiffFromEditState(base: LocalTask[], next: LocalTask[]) {
-  return next.reduce<Omit<Required<ViewDiff>, "deleted">>(
-    (result, task) => {
-      const thisTaskInBase = base.find((baseTask) => baseTask.id === task.id);
+  return {
+    deleted: base.filter(
+      (baseTask) => !next.some((task) => baseTask.id === task.id),
+    ),
+    ...next.reduce<Omit<Required<ViewDiff>, "deleted">>(
+      (result, task) => {
+        const thisTaskInBase = base.find((baseTask) => baseTask.id === task.id);
 
-      if (!thisTaskInBase) {
-        result.added.push(task);
-      }
+        if (!thisTaskInBase) {
+          result.added.push(task);
+        }
 
-      if (thisTaskInBase && !t.isTimeEqual(thisTaskInBase, task)) {
-        result.updated.push(task);
-      }
+        if (thisTaskInBase && !t.isTimeEqual(thisTaskInBase, task)) {
+          result.updated.push(task);
+        }
 
-      return result;
-    },
-    {
-      updated: [],
-      added: [],
-    },
-  );
+        return result;
+      },
+      {
+        updated: [],
+        added: [],
+      },
+    ),
+  };
 }
 
 /**
