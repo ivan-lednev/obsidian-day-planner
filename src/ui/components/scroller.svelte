@@ -4,20 +4,25 @@
   const {
     children,
     className,
-  }: { children: Snippet<[boolean]>; className?: string } = $props();
+    onscroll,
+  }: {
+    children: Snippet<[boolean]>;
+    className?: string;
+    onscroll?: (event: Event) => void;
+  } = $props();
 
   let isUnderCursor = $state(false);
 </script>
 
 <div
   class="scroller {className}"
-  on:mouseenter={() => {
+  onmouseenter={() => {
     isUnderCursor = true;
   }}
-  on:mouseleave={() => {
+  onmouseleave={() => {
     isUnderCursor = false;
   }}
-  on:scroll
+  {onscroll}
 >
   {@render children(isUnderCursor)}
 </div>

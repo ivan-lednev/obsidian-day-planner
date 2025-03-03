@@ -26,7 +26,7 @@
   } = getObsidianContext();
 </script>
 
-<ExpandingControls {isActive} {setIsActive}>
+<ExpandingControls baseSetIsActive={setIsActive} {isActive}>
   {#snippet initial()}
     <BlockControlButton
       cursor="grab"
