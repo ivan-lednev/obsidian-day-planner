@@ -96,6 +96,7 @@ function icalEventToTask(
     calendar: icalEvent.calendar,
     summary: icalEvent.summary || "(No title)",
     startTime: startTimeAdjusted,
+    description: icalEvent.description || "",
     rsvpStatus,
   };
 

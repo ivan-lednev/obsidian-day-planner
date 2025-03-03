@@ -49,6 +49,7 @@ import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { askForConfirmation } from "./ui/confirmation-modal";
+import { openDetailsModal } from "./ui/details-modal";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
@@ -442,6 +443,16 @@ export default class DayPlanner extends Plugin {
         document.body.style.cursor = bodyCursor;
       }),
     );
+
+    // Click on remote events to show details
+    this.registerDomEvent(document, "click", (e) => {
+      const el = e.target as HTMLElement;
+      if (!el || !el.classList.contains("remote-task-content")) return;
+      openDetailsModal(this.app, {
+        summary: el.getAttribute("task-summary"),
+        description: el.getAttribute("task-description"),
+      });
+    });
 
     this.registerEvent(
       this.app.workspace.on("editor-menu", (menu, editor, view) => {

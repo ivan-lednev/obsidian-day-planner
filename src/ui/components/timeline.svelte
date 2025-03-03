@@ -5,7 +5,7 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
-  import { isRemote } from "../../task-types";
+  import { isRemote, type Task } from "../../task-types";
   import { minutesToMomentOfDay } from "../../util/moment";
   import { getRenderKey, offsetYToMinutes } from "../../util/task-utils";
   import { isTouchEvent } from "../../util/util";
@@ -103,7 +103,7 @@
                 <PositionedTimeBlock {task}>
                   <LocalTimeBlock
                     isActive={selectable.state !== "none" ||
-                      $editOperation?.task.id === task.id}
+                      $editOperation?.task.id === (task as Task).id}
                     onpointerup={selectable.onpointerup}
                     {task}
                     use={[...selectable.use, ...floatingControls.actions]}

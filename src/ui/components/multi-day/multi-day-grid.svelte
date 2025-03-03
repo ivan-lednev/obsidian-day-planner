@@ -205,7 +205,7 @@
   </div>
 {/if}
 
-<Scroller className="multiday-main-content" on:scroll={handleScroll}>
+<Scroller className="multiday-main-content" onscroll={handleScroll}>
   <Ruler
     --ruler-box-shadow="var(--shadow-right)"
     visibleHours={getVisibleHours($settings)}
@@ -293,10 +293,6 @@
   .today {
     color: white;
     background-color: var(--color-accent);
-  }
-
-  .weekend {
-    background-color: var(--background-primary);
   }
 
   .side-controls-container {

@@ -7,9 +7,14 @@
   const declined = task.rsvpStatus === "DECLINED";
 </script>
 
-<div class="remote-task-content">
+<div
+  class="remote-task-content"
+  task-description={task.description}
+  task-summary={task.summary}
+>
   <div
     style:--ribbon-color={task.calendar.color}
+    style:pointer-events="none;"
     class="ribbon"
     class:declined
     class:tentative

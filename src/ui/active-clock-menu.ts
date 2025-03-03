@@ -57,5 +57,5 @@ export function createActiveClockMenu(props: {
       });
   });
 
-  menu.showAtMouseEvent(event);
+  menu.showAtMouseEvent(event as MouseEvent);
 }
