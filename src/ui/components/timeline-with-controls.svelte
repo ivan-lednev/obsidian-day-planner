@@ -3,8 +3,6 @@
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
 
-  import ResizeHandle from "./resize-handle.svelte";
-  import ResizeableBox from "./resizeable-box.svelte";
   import Ruler from "./ruler.svelte";
   import Scroller from "./scroller.svelte";
   import TimelineControls from "./timeline-controls.svelte";

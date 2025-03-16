@@ -255,9 +255,4 @@
     font-size: var(--font-ui-small);
     font-weight: var(--font-medium);
   }
-
-  .settings,
-  .dataview-source {
-    margin-inline: var(--size-4-3);
-  }
 </style>

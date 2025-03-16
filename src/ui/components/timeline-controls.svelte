@@ -143,7 +143,7 @@
   {/if}
 
   {#if !$dataviewLoaded}
-    <Callout --callout-margin-inline="var(--size-4-3)" type="error">
+    <Callout type="error">
       <span>
         You need to install and enable
         <a href={dataviewDownloadLink}>Dataview</a>
@@ -157,16 +157,6 @@
     </div>
   {/if}
 
-  {#if $settings.showActiveClocks}
-    <Tree
-      flair={String($tasksWithActiveClockProps.length)}
-      isInitiallyOpen
-      title="Active clocks"
-    >
-      <ActiveClocks --search-results-bg-color="var(--background-primary)" />
-    </Tree>
-  {/if}
-
   <!--  <Tree title="Search">-->
   <!--    <Search-->
   <!--      &#45;&#45;search-max-height="35vh"-->
@@ -174,6 +164,16 @@
   <!--    />-->
   <!--  </Tree>-->
 </div>
+
+{#if $settings.showActiveClocks}
+  <Tree
+    flair={String($tasksWithActiveClockProps.length)}
+    isInitiallyOpen
+    title="Active clocks"
+  >
+    <ActiveClocks --search-results-bg-color="var(--background-primary)" />
+  </Tree>
+{/if}
 
 <style>
   :global(.active-filter) {
@@ -194,8 +194,6 @@
     align-items: center;
     justify-content: center;
 
-    padding-inline: var(--size-4-4);
-
     font-size: var(--font-ui-small);
     font-weight: var(--font-medium);
     color: var(--text-normal);
@@ -203,15 +201,6 @@
 
   :global(.mod-error) {
     color: var(--text-error);
-  }
-
-  .pill-wrapper {
-    padding-bottom: var(--size-4-2);
-  }
-
-  .pill-wrapper,
-  .header {
-    padding-inline: var(--size-4-3);
   }
 
   .buttons-left {
@@ -226,7 +215,6 @@
   .header {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
-    padding-block: var(--size-4-2);
   }
 
   .header > :global(*):last-child {
@@ -238,6 +226,9 @@
     display: flex;
     flex: 0 0 auto;
     flex-direction: column;
+    gap: var(--size-4-2);
+
+    padding: var(--size-4-2) var(--size-4-3);
 
     font-size: var(--font-ui-small);
   }
