@@ -42,7 +42,6 @@
     display: flex;
     gap: var(--size-4-1);
 
-    margin-inline: var(--callout-margin-inline);
     padding: var(--size-4-2);
 
     color: rgb(var(--callout-color));

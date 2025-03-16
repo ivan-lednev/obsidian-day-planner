@@ -152,17 +152,10 @@
   {/if}
 
   {#if settingsVisible}
-    <div transition:slide={createSlide({ axis: "y" })}>
+    <div class="settings-wrapper" transition:slide={createSlide({ axis: "y" })}>
       <SettingsControls />
     </div>
   {/if}
-
-  <!--  <Tree title="Search">-->
-  <!--    <Search-->
-  <!--      &#45;&#45;search-max-height="35vh"-->
-  <!--      &#45;&#45;search-results-bg-color="var(&#45;&#45;background-primary)"-->
-  <!--    />-->
-  <!--  </Tree>-->
 </div>
 
 {#if $settings.showActiveClocks}
@@ -231,5 +224,11 @@
     padding: var(--size-4-2) var(--size-4-3);
 
     font-size: var(--font-ui-small);
+  }
+
+  .settings-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4-2);
   }
 </style>
