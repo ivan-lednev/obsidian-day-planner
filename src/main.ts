@@ -10,7 +10,7 @@ import {
   createDailyNote,
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
-import { getAPI, type STask } from "obsidian-dataview";
+import { getAPI } from "obsidian-dataview";
 import { mount } from "svelte";
 import { fromStore, get, writable, type Writable } from "svelte/store";
 import { isInstanceOf, isNotVoid } from "typed-assert";
@@ -73,6 +73,7 @@ import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn, ReduxExtraArgument } from "./types";
 import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { askForConfirmation } from "./ui/confirmation-modal";
+import { createEditorMenuCallback } from "./ui/editor-menu";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
@@ -80,7 +81,6 @@ import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import { SingleSuggestModal } from "./ui/SingleSuggestModal";
 import TimelineView from "./ui/timeline-view";
 import { createUndoNotice } from "./ui/undo-notice";
-import * as c from "./util/clock";
 import { createHooks } from "./util/create-hooks.svelte";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
@@ -329,7 +329,7 @@ export default class DayPlanner extends Plugin {
     );
   }
 
-  private getSTaskUnderCursor = (view: MarkdownFileInfo) => {
+  getSTaskUnderCursor = (view: MarkdownFileInfo) => {
     isInstanceOf(
       view,
       MarkdownView,
@@ -479,45 +479,14 @@ export default class DayPlanner extends Plugin {
     this.registerDomEvent(window, "blur", editContext.cancelEdit);
     this.registerDomEvent(document, "pointerup", editContext.cancelEdit);
 
+    const handleEditorMenu = createEditorMenuCallback({
+      sTaskEditor: this.sTaskEditor,
+      plugin: this,
+    });
+
     this.registerEvent(
       // todo: move out
-      this.app.workspace.on("editor-menu", (menu, editor, view) => {
-        let sTask: STask | undefined;
-
-        try {
-          // todo: use editor instead?
-          sTask = this.getSTaskUnderCursor(view);
-        } catch {
-          return;
-        }
-
-        menu.addSeparator();
-
-        if (c.hasActiveClockProp(sTask)) {
-          menu.addItem((item) => {
-            item
-              .setTitle("Clock out")
-              .setIcon("square")
-              .onClick(this.sTaskEditor.clockOutUnderCursor);
-          });
-
-          menu.addItem((item) => {
-            item
-              .setTitle("Cancel clock")
-              .setIcon("trash")
-              // @ts-expect-error
-              .onClick(this.sTaskEditor.cancelClockUnderCursor);
-          });
-        } else {
-          menu.addItem((item) => {
-            item
-              .setTitle("Clock in")
-              .setIcon("play")
-              // @ts-expect-error
-              .onClick(this.sTaskEditor.clockInUnderCursor);
-          });
-        }
-      }),
+      this.app.workspace.on("editor-menu", handleEditorMenu),
     );
 
     this.register(
