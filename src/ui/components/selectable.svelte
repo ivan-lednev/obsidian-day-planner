@@ -46,10 +46,22 @@
   }
 
   function setPrimary() {
+    if (state === "primary") {
+      setSelection("none");
+
+      return;
+    }
+
     setSelection("primary");
   }
 
   function setSecondary(event: PointerEvent | MouseEvent | TouchEvent) {
+    if (state === "secondary") {
+      setSelection("none");
+
+      return;
+    }
+
     setSelection("secondary");
     onSecondarySelect?.(event);
   }
