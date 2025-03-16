@@ -5,7 +5,7 @@ import type { DayPlannerSettings } from "../../../../settings";
 import { type LocalTask, type WithTime } from "../../../../task-types";
 import {
   getMinutesSinceMidnight,
-  minutesToMomentOfDay,
+  minutesToMomentOfDay
 } from "../../../../util/moment";
 import { toSpliced } from "../../../../util/to-spliced";
 import { EditMode, type EditOperation, type TaskTransformer } from "../types";
@@ -17,12 +17,13 @@ import { dragAndShrinkOthers } from "./drag-and-shrink-others";
 import { resize, resizeFromTop } from "./resize";
 import {
   resizeAndShiftOthers,
-  resizeFromTopAndShiftOthers,
+  resizeFromTopAndShiftOthers
 } from "./resize-and-shift-others";
 import {
   resizeAndShrinkOthers,
-  resizeFromTopAndShrinkOthers,
+  resizeFromTopAndShrinkOthers
 } from "./resize-and-shrink-others";
+import * as t from "../../../../util/task-utils";
 
 const transformers: Record<EditMode, TaskTransformer> = {
   [EditMode.DRAG]: drag,
@@ -35,7 +36,7 @@ const transformers: Record<EditMode, TaskTransformer> = {
   [EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS]: resizeFromTopAndShiftOthers,
   [EditMode.RESIZE_AND_SHRINK_OTHERS]: resizeAndShrinkOthers,
   [EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS]: resizeFromTopAndShrinkOthers,
-  [EditMode.SCHEDULE_SEARCH_RESULT]: drag,
+  [EditMode.SCHEDULE_SEARCH_RESULT]: drag
 };
 
 function isSingleDayMode(mode: EditMode) {
@@ -45,7 +46,7 @@ function isSingleDayMode(mode: EditMode) {
     EditMode.RESIZE_AND_SHRINK_OTHERS,
     EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS,
     EditMode.RESIZE_AND_SHIFT_OTHERS,
-    EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS,
+    EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS
   ].includes(mode);
 }
 
@@ -57,7 +58,7 @@ export function transform(
   baseline: LocalTask[],
   operation: EditOperation,
   settings: DayPlannerSettings,
-  pointerDateTime: { dateTime?: Moment; type?: "dateTime" | "date" },
+  pointerDateTime: { dateTime?: Moment; type?: "dateTime" | "date" }
 ) {
   const dateTime = pointerDateTime.dateTime;
 
@@ -84,8 +85,8 @@ export function transform(
         ...found,
         startTime: minutesToMomentOfDay(
           getMinutesSinceMidnight(found.startTime),
-          dateTime,
-        ),
+          dateTime
+        )
       };
     }
 
@@ -95,8 +96,8 @@ export function transform(
       ...operation.task,
       startTime: minutesToMomentOfDay(
         getMinutesSinceMidnight(operation.task.startTime),
-        dateTime,
-      ),
+        dateTime
+      )
     });
   }
 
@@ -108,6 +109,6 @@ export function transform(
     operation.task,
     getMinutesSinceMidnight(dateTime),
     settings,
-    dateTime,
-  );
+    dateTime
+  ).map((task) => ({ ...task, text: t.toString(task, operation.mode) }));
 }
