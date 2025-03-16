@@ -52,3 +52,5 @@ export function useDateRanges() {
     ranges,
   };
 }
+
+export type DateRanges = ReturnType<typeof useDateRanges>;

@@ -1,5 +1,6 @@
 import type { Moment } from "moment";
-import { derived, type Readable } from "svelte/store";
+import { mount, unmount } from "svelte";
+import { derived, type Readable, type Writable } from "svelte/store";
 
 import { statusBarTextLimit } from "../../constants";
 import { currentTime } from "../../global-store/current-time";
@@ -7,6 +8,11 @@ import type { Task, WithTime } from "../../task-types";
 import { ellipsis } from "../../util/ellipsis";
 import { getDiffInMinutes } from "../../util/moment";
 import { getEndTime, getOneLineSummary } from "../../util/task-utils";
+import StatusBarWidget from "../components/status-bar-widget.svelte";
+
+import type { DateRanges } from "./use-date-ranges";
+
+import type DayPlanner from "src/main";
 
 interface UseStatusBarWidgetProps {
   tasksForToday: Readable<Array<WithTime<Task>>>;
@@ -29,6 +35,34 @@ export function minutesToTimestamp(minutes: number) {
   return window.moment
     .utc(window.moment.duration(minutes, "minutes").asMilliseconds())
     .format("HH:mm");
+}
+
+export function mountStatusBarWidget(props: {
+  plugin: DayPlanner;
+  errorStore: Writable<Error | undefined>;
+  dateRanges: DateRanges;
+  tasksForToday: Readable<Array<WithTime<Task>>>;
+}) {
+  const { plugin, tasksForToday, errorStore, dateRanges } = props;
+
+  const statusBarWidgetContainer = plugin.addStatusBarItem();
+
+  const { untrack } = dateRanges.trackRange([window.moment()]);
+
+  const component = mount(StatusBarWidget, {
+    target: statusBarWidgetContainer,
+    props: {
+      onClick: plugin.initTimelineLeaf,
+      tasksForToday,
+      errorStore,
+    },
+  });
+
+  return async () => {
+    untrack();
+
+    await unmount(component);
+  };
 }
 
 export function useStatusBarWidget({ tasksForToday }: UseStatusBarWidgetProps) {

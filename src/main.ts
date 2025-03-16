@@ -11,7 +11,6 @@ import {
   getDateFromPath,
 } from "obsidian-daily-notes-interface";
 import { getAPI } from "obsidian-dataview";
-import { mount } from "svelte";
 import { fromStore, get, writable, type Writable } from "svelte/store";
 import { isInstanceOf, isNotVoid } from "typed-assert";
 
@@ -71,10 +70,10 @@ import {
 } from "./settings";
 import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn, ReduxExtraArgument } from "./types";
-import StatusBarWidget from "./ui/components/status-bar-widget.svelte";
 import { askForConfirmation } from "./ui/confirmation-modal";
 import { createEditorMenuCallback } from "./ui/editor-menu";
 import { EditMode } from "./ui/hooks/use-edit/types";
+import { mountStatusBarWidget } from "./ui/hooks/use-status-bar-widget";
 import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
@@ -358,6 +357,7 @@ export default class DayPlanner extends Plugin {
       this.syncDataview?.();
     };
 
+    // todo: move out
     const onUpdate: OnUpdateFn = async (base, next, mode) => {
       const diff = getTaskDiffFromEditState(base, next);
 
@@ -515,14 +515,14 @@ export default class DayPlanner extends Plugin {
 
     const errorStore = writable<Error | undefined>();
 
-    mount(StatusBarWidget, {
-      target: this.addStatusBarItem(),
-      props: {
-        onClick: this.initTimelineLeaf,
-        tasksForToday,
-        errorStore,
-      },
+    const destroyStatusBarWidget = mountStatusBarWidget({
+      plugin: this,
+      errorStore,
+      dateRanges,
+      tasksForToday,
     });
+
+    this.register(destroyStatusBarWidget);
 
     this.register(
       newlyStartedTasks.subscribe((value) =>
