@@ -47,12 +47,11 @@
     position: absolute;
     z-index: 1000;
 
-    width: 12px;
+    width: var(--size-4-1);
     height: 12px;
     margin-top: -5px;
-    margin-left: -6px;
 
     background: var(--color-accent);
-    border-radius: 50%;
+    border-radius: var(--radius-s);
   }
 </style>
