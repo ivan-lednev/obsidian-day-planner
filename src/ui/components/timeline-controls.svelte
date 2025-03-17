@@ -10,7 +10,6 @@
   import { settings } from "../../global-store/settings";
   import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 
-  import ActiveClocks from "./active-clocks.svelte";
   import Callout from "./callout.svelte";
   import ControlButton from "./control-button.svelte";
   import { createSlide } from "./defaults";
@@ -20,17 +19,11 @@
     ChevronRight,
     CalendarArrowUp,
   } from "./lucide";
-  import Tree from "./obsidian/tree.svelte";
   import Pill from "./pill.svelte";
   import SettingsControls from "./settings-controls.svelte";
 
-  const {
-    workspaceFacade,
-    initWeeklyView,
-    dataviewLoaded,
-    reSync,
-    tasksWithActiveClockProps,
-  } = getObsidianContext();
+  const { workspaceFacade, initWeeklyView, dataviewLoaded, reSync } =
+    getObsidianContext();
   const dateRange = getDateRangeContext();
 
   let settingsVisible = $state(false);
@@ -157,16 +150,6 @@
     </div>
   {/if}
 </div>
-
-{#if $settings.showActiveClocks}
-  <Tree
-    flair={String($tasksWithActiveClockProps.length)}
-    isInitiallyOpen
-    title="Active clocks"
-  >
-    <ActiveClocks --search-results-bg-color="var(--background-primary)" />
-  </Tree>
-{/if}
 
 <style>
   :global(.active-filter) {

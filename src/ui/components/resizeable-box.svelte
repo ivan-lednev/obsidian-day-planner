@@ -2,10 +2,8 @@
   import { type Snippet } from "svelte";
   import { isNotVoid } from "typed-assert";
 
-  const {
-    children,
-    className,
-  }: { children: Snippet<[() => void]>; className?: string } = $props();
+  const props: { children: Snippet<[() => void]>; class?: object | string } =
+    $props();
 
   let el: HTMLDivElement | undefined;
 
@@ -50,6 +48,6 @@
 />
 <svelte:window on:blur={handleBlur} />
 
-<div bind:this={el} style:height style:max-height="25vh" class={className}>
-  {@render children(startEdit)}
+<div bind:this={el} style:height style:max-height="25vh" class={props.class}>
+  {@render props.children(startEdit)}
 </div>
