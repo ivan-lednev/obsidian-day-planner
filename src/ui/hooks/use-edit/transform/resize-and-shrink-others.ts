@@ -37,8 +37,9 @@ export function resizeAndShrinkOthers(
       const previous = last(result) || updated;
       const currentNeedsToShrink =
         getEndMinutes(previous) > getMinutesSinceMidnight(current.startTime);
-
-      if (currentNeedsToShrink) {
+      const isSameDay = current.location!.path === updated.location!.path;
+    
+      if (currentNeedsToShrink && isSameDay) {
         const newCurrentStartMinutes = getEndMinutes(previous);
         const newCurrentDurationMinutes =
           getEndMinutes(current) - newCurrentStartMinutes;
@@ -99,8 +100,9 @@ export function resizeFromTopAndShrinkOthers(
       const currentNeedsToShrink =
         getMinutesSinceMidnight(nextInTimeline.startTime) <
         getEndMinutes(current);
+      const isSameDay = current.location!.path === updated.location!.path;
 
-      if (currentNeedsToShrink) {
+      if (currentNeedsToShrink && isSameDay) {
         const currentNeedsToMove =
           getMinutesSinceMidnight(nextInTimeline.startTime) -
             getMinutesSinceMidnight(current.startTime) <
