@@ -89,9 +89,9 @@ export function resizeFromTopAndShiftOthers(
     .reduce<WithTime<LocalTask>[]>((result, current) => {
       const nextInTimeline = last(result) || updated;
 
-      const nextOverlapsPrevious = getMinutesSinceMidnight(nextInTimeline.startTime) < getEndMinutes(current);
+      const nextOverlapsCurrent = getMinutesSinceMidnight(nextInTimeline.startTime) < getEndMinutes(current);
       const isSameDay = current.location!.path === updated.location!.path;
-      if (nextOverlapsPrevious && isSameDay) {
+      if (nextOverlapsCurrent && isSameDay) {
         return [
           ...result,
           {
