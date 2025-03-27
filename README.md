@@ -1,3 +1,12 @@
+## changes
+
+- conditionally removes timestamps in render-task-markdown based on the task decoration toggle (showTimestampInTaskBlock)
+- to do this, also edited removeTimestampFromStart function and looseTimestampAtStartOfLineRegExp const
+	- looseTimestampAtStartOfLineRegExp edited to get timestamp even if there are task/list markers in front of them
+	- removeTimestampFromStart brought into the render thing based on showTimestampInTaskBlock 
+
+# original README
+
 - 🗳️ [Add '👍' reactions under the issues important to you.](https://github.com/ivan-lednev/obsidian-day-planner/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc) This helps me prioritize my work
 - 🪲 [Report bugs and suggest features](https://github.com/ivan-lednev/obsidian-day-planner/issues)
 - ❓ [Ask questions](https://github.com/ivan-lednev/obsidian-day-planner/discussions/new?category=q-a)

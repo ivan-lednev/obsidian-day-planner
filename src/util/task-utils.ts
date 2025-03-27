@@ -258,7 +258,10 @@ export function removeListTokens(text: string) {
 }
 
 export function removeTimestampFromStart(text: string) {
-  return text.replace(looseTimestampAtStartOfLineRegExp, "");
+  return text.replace(
+    looseTimestampAtStartOfLineRegExp,
+    (_, taskmarker) => taskmarker ?? "",
+  );
 }
 
 export function isTimeEqual(a: LocalTask, b: LocalTask) {

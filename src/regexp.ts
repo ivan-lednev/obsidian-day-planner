@@ -26,9 +26,10 @@ export const headingRegExp = /^(#+)\s/;
 export const obsidianBlockIdRegExp = /\s\^[a-z1-9-]+$/i;
 
 export const looseTimestampAtStartOfLineRegExp = new RegExp(
-  `^(?<start>${time})(?:${durationSeparator}(?<end>${time}))?`,
+  `^(?<taskmarker>\\s*[-+*]\\s*\\[[ x]\\]\\s*)?(?<start>${time})(?:${durationSeparator}(?<end>${time}))?`,
   "im",
 );
+
 export const strictTimestampAnywhereInLineRegExp = new RegExp(
   `(?<start>${strictTime})(?:${durationSeparator}(?<end>${strictTime}))?`,
   "im",
