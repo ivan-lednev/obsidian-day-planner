@@ -12,7 +12,7 @@ export const createShowPreview =
       scroll: line,
     };
 
-    app.workspace.trigger("link-hover", {}, el, path, "", previewLocation);
+    app.workspace.trigger("hover-link", {}, el, path, "", previewLocation);
   };
 
 export type ShowPreview = ReturnType<typeof createShowPreview>;
