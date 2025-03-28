@@ -110,11 +110,12 @@
   style:--timeline-internal-column-count={$settings.showTimeTracker ? 2 : 1}
   class="header"
 >
-  <div class="header-row day-buttons">
+  <div class={["header-row", "day-buttons"]}>
     <div class="corner"></div>
     {#each $dateRange as day}
       <div class={["header-cell", $isToday(day) && "today"]}>
         <ControlButton
+          --border-radius="0"
           --color={$isToday(day) ? "white" : "var(--icon-color)"}
           label="Open note for day"
           onclick={async () => await workspaceFacade.openFileForDay(day)}
