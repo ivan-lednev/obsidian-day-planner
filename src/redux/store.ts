@@ -1,5 +1,7 @@
 import type {
   Action,
+  ConfigureStoreOptions,
+  ListenerEffect,
   ThunkAction,
   TypedStartListening,
 } from "@reduxjs/toolkit";
@@ -23,11 +25,14 @@ const rootReducer = combineSlices(
 
 export type RootState = ReturnType<typeof rootReducer>;
 
-export const makeStore = (props: {
-  preloadedState?: Partial<RootState>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  middleware: any;
-}) => {
+export const makeStore = (
+  props: Omit<
+    ConfigureStoreOptions<RootState>,
+    "preloadedState" | "reducer"
+  > & {
+    preloadedState?: Partial<RootState>;
+  },
+) => {
   const { preloadedState, middleware } = props;
 
   return configureStore({
@@ -50,3 +55,4 @@ export type StartListeningFn = TypedStartListening<
   AppDispatch,
   ReduxExtraArgument
 >;
+export type AppListenerEffect = ListenerEffect<Action, RootState, AppDispatch>;

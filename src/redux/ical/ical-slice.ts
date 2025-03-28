@@ -11,9 +11,11 @@ import type { WithIcalConfig } from "../../types";
 import { createAppSlice } from "../create-app-slice";
 
 export type RawIcal = { icalConfig: IcalConfig; text: string };
-export type SerializedRemoteTask = RemoteTask & { startTime: string };
+export type SerializedRemoteTask = Omit<RemoteTask, "startTime"> & {
+  startTime: string;
+};
 
-interface IcalState {
+export interface IcalState {
   icalEvents: Array<WithIcalConfig<ical.VEvent>>;
   plainTextIcals: Array<RawIcal>;
   serializedRemoteTasks: Array<SerializedRemoteTask>;

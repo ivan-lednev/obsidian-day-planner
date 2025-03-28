@@ -41,7 +41,7 @@ export class FakeDataviewFacade extends DataviewFacade {
 describe("Search", () => {
   test("Filters tasks with simple substring match", () => {
     const store = makeStore({
-      middleware: () => [],
+      middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
       preloadedState: {
         dataview: {
           dataviewLoaded: true,

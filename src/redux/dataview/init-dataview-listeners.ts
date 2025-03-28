@@ -44,7 +44,7 @@ export function initDataviewListeners(startListening: StartListeningFn) {
         const dataviewSource = selectDataviewSource(currentState);
         const pagePaths = dataviewFacade.getPathsFrom(dataviewSource);
         const tasks = pagePaths.map(
-          (path) => () => dataviewFacade.getTasksFromPath(path),
+          (path: string) => () => dataviewFacade.getTasksFromPath(path),
         );
 
         scheduler.enqueueTasks(tasks, (results) => {

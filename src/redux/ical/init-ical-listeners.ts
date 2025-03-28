@@ -10,7 +10,7 @@ import {
   selectVisibleDays,
 } from "../global-slice";
 import { selectIcals } from "../settings-slice";
-import type { StartListeningFn } from "../store";
+import type { AppListenerEffect, StartListeningFn } from "../store";
 import { createSelectorChangePredicate } from "../util";
 
 import {
@@ -42,7 +42,7 @@ export function createCachingFetcher() {
 
 export function createIcalFetchListener(props: {
   fetcher: (url: string) => Promise<string>;
-}) {
+}): AppListenerEffect {
   const { fetcher } = props;
 
   return async (action, listenerApi) => {
@@ -61,7 +61,11 @@ export function createIcalFetchListener(props: {
   };
 }
 
-export function createIcalParseListener(props: { scheduler: Scheduler }) {
+export type IcalParseTaskResult = RemoteTask | RemoteTask[] | undefined;
+
+export function createIcalParseListener(props: {
+  scheduler: Scheduler<IcalParseTaskResult>;
+}): AppListenerEffect {
   const { scheduler } = props;
 
   return async (action, listenerApi) => {

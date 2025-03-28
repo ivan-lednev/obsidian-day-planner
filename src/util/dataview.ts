@@ -69,7 +69,7 @@ export function textToMarkdown(sTask: Node) {
 const indentationPerLevel = "\t";
 
 // todo: use createIndentation
-export function toString(node: Node, parentIndentation = "") {
+export function toString(node: Node, parentIndentation = ""): string {
   const nodeText = indent(textToMarkdown(node), parentIndentation);
 
   return node.children.reduce((result, current) => {

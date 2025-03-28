@@ -57,5 +57,6 @@ export function createActiveClockMenu(props: {
       });
   });
 
-  menu.showAtMouseEvent(event);
+  // The method is asking for a MouseEvent, but it works just fine on mobile
+  menu.showAtMouseEvent(event as MouseEvent);
 }

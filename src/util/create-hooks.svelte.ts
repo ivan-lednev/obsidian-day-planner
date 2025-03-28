@@ -246,7 +246,7 @@ export function createHooks({
 
   const pointerDateTime = derived(
     [pointerOffsetY, pointerDate, settingsStore],
-    ([$pointerOffsetY, $pointerDate, $settingsStore]) => {
+    ([$pointerOffsetY, $pointerDate, $settingsStore]): PointerDateTime => {
       const minutesSinceMidnight = offsetYToMinutes(
         $pointerOffsetY,
         $settingsStore.zoomLevel,

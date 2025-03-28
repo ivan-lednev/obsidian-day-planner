@@ -36,13 +36,18 @@ import {
   toMdastPoint,
 } from "./mdast/mdast";
 import { icalRefreshRequested, visibleDaysUpdated } from "./redux/global-slice";
-import { icalsFetched, initialIcalState } from "./redux/ical/ical-slice";
+import {
+  icalsFetched,
+  initialIcalState,
+  type IcalState,
+} from "./redux/ical/ical-slice";
 import {
   checkIcalEventsChanged,
   checkVisibleDaysChanged,
   createCachingFetcher,
   createIcalFetchListener,
   createIcalParseListener,
+  type IcalParseTaskResult,
 } from "./redux/ical/init-ical-listeners";
 import { settingsUpdated } from "./redux/settings-slice";
 import {
@@ -638,14 +643,20 @@ export default class DayPlanner extends Plugin {
       },
     });
 
-    listenerMiddleware.startListening({
+    const startAppListening = listenerMiddleware.startListening.withTypes<
+      RootState,
+      AppDispatch
+    >();
+
+    startAppListening({
       actionCreator: icalRefreshRequested,
       effect: createIcalFetchListener({ fetcher: createCachingFetcher() }),
     });
 
-    const icalParseScheduler = createBackgroundBatchScheduler({
-      timeRemainingLowerLimit: icalParseLowerLimit,
-    });
+    const icalParseScheduler =
+      createBackgroundBatchScheduler<IcalParseTaskResult>({
+        timeRemainingLowerLimit: icalParseLowerLimit,
+      });
     const icalParseListener = createIcalParseListener({
       scheduler: icalParseScheduler,
     });
@@ -664,12 +675,14 @@ export default class DayPlanner extends Plugin {
       },
     });
 
+    const icalStateWithCachedRawIcals: IcalState = {
+      ...initialIcalState,
+      plainTextIcals: pluginData.rawIcals || [],
+    };
+
     this.store = makeStore({
       preloadedState: {
-        ical: {
-          ...initialIcalState,
-          plainTextIcals: pluginData.rawIcals || [],
-        },
+        ical: icalStateWithCachedRawIcals,
       },
       middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware().concat(listenerMiddleware.middleware);

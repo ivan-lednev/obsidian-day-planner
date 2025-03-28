@@ -28,21 +28,24 @@ import type { EditOperation } from "./types";
 import { useEditActions } from "./use-edit-actions";
 
 function groupByDay(tasks: Task[]) {
-  return tasks.reduce((result, task) => {
-    const key = getDayKey(task.startTime);
+  return tasks.reduce<Record<string, { withTime: Task[]; noTime: Task[] }>>(
+    (result, task) => {
+      const key = getDayKey(task.startTime);
 
-    if (!result[key]) {
-      result[key] = { withTime: [], noTime: [] };
-    }
+      if (!result[key]) {
+        result[key] = { withTime: [], noTime: [] };
+      }
 
-    if (task.isAllDayEvent) {
-      result[key].noTime.push(task);
-    } else {
-      result[key].withTime.push(task);
-    }
+      if (task.isAllDayEvent) {
+        result[key].noTime.push(task);
+      } else {
+        result[key].withTime.push(task);
+      }
 
-    return result;
-  }, {});
+      return result;
+    },
+    {},
+  );
 }
 
 export function useEditContext(props: {
