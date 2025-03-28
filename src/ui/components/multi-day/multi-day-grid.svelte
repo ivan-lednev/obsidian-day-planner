@@ -33,7 +33,7 @@
   import Scroller from "../scroller.svelte";
   import SettingsControls from "../settings-controls.svelte";
   import Timeline from "../timeline.svelte";
-  import UnscheduledTaskContainer from "../unscheduled-task-container.svelte";
+  import UnscheduledTimeBlock from "../unscheduled-time-block.svelte";
 
   const {
     workspaceFacade,
@@ -133,8 +133,10 @@
         {#each $dateRange as day}
           {@const tasks = fromStore(getDisplayedTasksForTimeline(day))}
 
-          <div class="header-cell">
-            <UnscheduledTaskContainer tasks={tasks.current.noTime} />
+          <div class={["header-cell", "block-wrapper"]}>
+            {#each tasks.current.noTime as task}
+              <UnscheduledTimeBlock {task} />
+            {/each}
           </div>
         {/each}
         <ResizeHandle on:mousedown={startEdit} />
@@ -288,11 +290,14 @@
     flex: 1 0 var(--cell-flex-basis);
 
     width: var(--cell-flex-basis);
-    padding: var(--size-2-1);
 
     background-color: var(--background-primary);
     border-right: 1px solid var(--background-modifier-border);
     border-bottom: 1px solid var(--background-modifier-border);
+  }
+
+  .block-wrapper {
+    padding: var(--size-2-1);
   }
 
   .header-cell:last-of-type {

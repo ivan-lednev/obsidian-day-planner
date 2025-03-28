@@ -3,8 +3,10 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
+  import type { LocalTask } from "../../task-types";
 
   import ActiveClocks from "./active-clocks.svelte";
+  import BlockList from "./block-list.svelte";
   import Tree from "./obsidian/tree.svelte";
   import ResizeHandle from "./resize-handle.svelte";
   import ResizeableBox from "./resizeable-box.svelte";
@@ -12,7 +14,7 @@
   import Scroller from "./scroller.svelte";
   import TimelineControls from "./timeline-controls.svelte";
   import Timeline from "./timeline.svelte";
-  import UnscheduledTaskContainer from "./unscheduled-task-container.svelte";
+  import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   const dateRange = getDateRangeContext();
   const firstDayInRange = $derived($dateRange[0]);
@@ -46,12 +48,24 @@
       isInitiallyOpen
       title="Unscheduled tasks"
     >
-      <ResizeableBox class="unscheduled-task-container">
-        {#snippet children(startEdit)}
-          <UnscheduledTaskContainer tasks={$displayedTasksForTimeline.noTime} />
-          <ResizeHandle on:mousedown={startEdit} />
-        {/snippet}
-      </ResizeableBox>
+      {#if $displayedTasksForTimeline.noTime.length > 0}
+        <ResizeableBox class="unscheduled-task-container">
+          {#snippet children(startEdit)}
+            <BlockList
+              --search-results-bg-color="var(--background-primary)"
+              list={$displayedTasksForTimeline.noTime}
+            >
+              {#snippet match(task: LocalTask)}
+                <UnscheduledTimeBlock
+                  --time-block-padding="var(--size-4-1)"
+                  {task}
+                />
+              {/snippet}
+            </BlockList>
+            <ResizeHandle on:mousedown={startEdit} />
+          {/snippet}
+        </ResizeableBox>
+      {/if}
     </Tree>
   {/if}
 </div>
@@ -76,6 +90,5 @@
 
   :global(.unscheduled-task-container) {
     overflow: auto;
-    padding: var(--size-4-1);
   }
 </style>
