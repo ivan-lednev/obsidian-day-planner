@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { RemoteTask, WithPlacing, WithTime } from "../../task-types";
+  import type { RemoteTask } from "../../task-types";
 
-  export let task: WithPlacing<WithTime<RemoteTask>>;
+  export let task: RemoteTask;
 
   const tentative = task.rsvpStatus === "TENTATIVE";
   const declined = task.rsvpStatus === "DECLINED";

@@ -3,7 +3,7 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
-  import type { LocalTask } from "../../task-types";
+  import type { Task } from "../../task-types";
 
   import ActiveClocks from "./active-clocks.svelte";
   import BlockList from "./block-list.svelte";
@@ -55,7 +55,7 @@
               --search-results-bg-color="var(--background-primary)"
               list={$displayedTasksForTimeline.noTime}
             >
-              {#snippet match(task: LocalTask)}
+              {#snippet match(task: Task)}
                 <UnscheduledTimeBlock
                   --time-block-padding="var(--size-4-1)"
                   {task}

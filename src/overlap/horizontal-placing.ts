@@ -9,3 +9,5 @@ export function getHorizontalPlacing(overlap?: Overlap) {
     xOffsetPercent,
   };
 }
+
+export type HorizontalPlacing = ReturnType<typeof getHorizontalPlacing>;

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { isLocal, type LocalTask } from "../../task-types";
+  import { isLocal, type Task } from "../../task-types";
   import { createTimeBlockMenu } from "../time-block-menu";
 
   import DragControls from "./drag-controls.svelte";
@@ -10,7 +10,7 @@
   import Selectable from "./selectable.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
 
-  const { task }: { task: LocalTask; class?: string } = $props();
+  const { task }: { task: Task; class?: string } = $props();
 
   const {
     editContext: { editOperation },

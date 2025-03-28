@@ -2,7 +2,7 @@ import type { Moment } from "moment";
 import type { AttendeePartStat } from "node-ical";
 import type { Pos } from "obsidian";
 
-import type { getHorizontalPlacing } from "./overlap/horizontal-placing";
+import type { HorizontalPlacing } from "./overlap/horizontal-placing";
 import type { IcalConfig } from "./settings";
 
 export interface TaskLocation {
@@ -22,7 +22,7 @@ export interface FileLine {
 }
 
 export type WithPlacing<T> = T & {
-  placing: ReturnType<typeof getHorizontalPlacing>;
+  placing: HorizontalPlacing;
 };
 
 export type BaseTask = {

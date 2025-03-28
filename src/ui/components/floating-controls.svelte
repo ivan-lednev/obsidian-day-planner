@@ -6,7 +6,10 @@
 
   import { floatingUiOffset } from "../../constants";
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { type HTMLActionArray } from "../actions/use-actions";
+  import {
+    type ActionArray,
+    type HTMLActionArray,
+  } from "../actions/use-actions";
   import { createOffsetFnWithFrozenCrossAxis } from "../floating-ui-util";
   import { useFloatingUi } from "../hooks/use-floating-ui";
 
@@ -48,7 +51,7 @@
     return [ui.floatingUiSetup];
   }
 
-  const controls = [
+  const controls: Array<{ name: ActiveControl; use: ActionArray }> = [
     {
       use: createAnchoredFloatingUi({
         middleware: [offset({ mainAxis: floatingUiOffset })],

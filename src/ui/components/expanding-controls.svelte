@@ -10,25 +10,19 @@
 
   import { createSlide } from "./defaults";
 
-  interface Props {
+  const props: {
     isActive: boolean;
     setIsActive: (value: boolean) => void;
     reverse?: boolean;
     initial: Snippet;
     expanded: Snippet;
-  }
+  } = $props();
 
-  export const {
-    isActive,
-    setIsActive: baseSetIsActive,
-    reverse = false,
-    initial,
-    expanded,
-  }: Props = $props();
+  export const { isActive, reverse = false, initial, expanded } = props;
 
   function setIsActive(isActive: boolean) {
     navigator.vibrate?.(vibrationDurationMillis);
-    baseSetIsActive(isActive);
+    props.setIsActive(isActive);
   }
 </script>
 
