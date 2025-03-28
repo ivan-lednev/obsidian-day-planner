@@ -6,14 +6,17 @@ import type { LocalTask } from "../../task-types";
 export function hoverPreview(task: LocalTask) {
   return (el: HTMLElement) => {
     const { isModPressed, showPreview } = getObsidianContext();
+    let currentEvent: MouseEvent | undefined;
 
     const hovering = writable(false);
 
-    function handleMouseEnter() {
+    function handleMouseEnter(event: MouseEvent) {
+      currentEvent = event;
       hovering.set(true);
     }
 
-    function handleMouseLeave() {
+    function handleMouseLeave(event: MouseEvent) {
+      currentEvent = undefined;
       hovering.set(false);
     }
 
@@ -28,9 +31,10 @@ export function hoverPreview(task: LocalTask) {
     );
 
     const unsubscribe = shouldShowPreview.subscribe((newValue) => {
-      if (newValue && task.location?.path) {
+      if (newValue && task.location?.path && currentEvent) {
         showPreview(
           el,
+          currentEvent,
           task.location.path,
           task.location.position?.start?.line,
         );

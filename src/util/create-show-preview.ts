@@ -2,17 +2,20 @@ import { App } from "obsidian";
 
 export const createShowPreview =
   (app: App) =>
-  (el: HTMLElement, path: string, line = 0) => {
+  (el: HTMLElement, event: MouseEvent, path: string, line = 0) => {
     // @ts-ignore
     if (!app.internalPlugins.plugins["page-preview"].enabled) {
       return;
     }
 
-    const previewLocation = {
-      scroll: line,
-    };
-
-    app.workspace.trigger("hover-link", {}, el, path, "", previewLocation);
+    app.workspace.trigger("hover-link", {
+      event,
+      source: "search",
+      hoverParent: el,
+      targetEl: el,
+      linktext: path,
+      state: { scroll: line },
+    });
   };
 
 export type ShowPreview = ReturnType<typeof createShowPreview>;

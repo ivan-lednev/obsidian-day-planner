@@ -2,6 +2,7 @@
   import type { Snippet } from "svelte";
 
   import type { LocalTask } from "../../task-types";
+  import { hoverPreview } from "../actions/hover-preview";
   import type { HTMLActionArray } from "../actions/use-actions";
 
   import RenderedMarkdown from "./rendered-markdown.svelte";
@@ -29,7 +30,7 @@
     : ""}
   {onpointerup}
   {task}
-  {use}
+  use={[...use, hoverPreview(task)]}
 >
   <RenderedMarkdown {task} />
   {@render children?.()}
