@@ -643,15 +643,18 @@ export default class DayPlanner extends Plugin {
       effect: createIcalFetchListener({ fetcher: createCachingFetcher() }),
     });
 
+    const icalParseScheduler = createBackgroundBatchScheduler({
+      timeRemainingLowerLimit: icalParseLowerLimit,
+    });
+    const icalParseListener = createIcalParseListener({
+      scheduler: icalParseScheduler,
+    });
+
     listenerMiddleware.startListening({
       predicate: (action, currentState) =>
         checkIcalEventsChanged(action, currentState) ||
         checkVisibleDaysChanged(action, currentState),
-      effect: createIcalParseListener({
-        scheduler: createBackgroundBatchScheduler({
-          timeRemainingLowerLimit: icalParseLowerLimit,
-        }),
-      }),
+      effect: icalParseListener,
     });
 
     listenerMiddleware.startListening({
