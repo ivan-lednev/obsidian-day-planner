@@ -7,7 +7,7 @@
     "build": "vite build --mode=production",
     "dev": "vite build --mode=development --watch",
     "format": "eslint --fix src tests && stylelint --fix src/**/*.svelte && prettier --write src tests",
-    "lint": "concurrently --kill-others-on-fail --names \"prettier,eslint,stylelint,typescript,svelte-check\" \"prettier --check src\" \"eslint src\" \"stylelint src/**/*.svelte\" \"npm run typescript\" \"svelte-check src/\"",
+    "lint": "concurrently --kill-others-on-fail --names \"prettier,eslint,stylelint,typescript,svelte-check,test\" \"prettier --check src\" \"eslint src\" \"stylelint src/**/*.svelte\" \"npm run typescript\" \"svelte-check src/\" \"npm run test\"",
     "typescript": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
