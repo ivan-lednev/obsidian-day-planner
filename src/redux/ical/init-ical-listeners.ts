@@ -4,7 +4,7 @@ import { request } from "obsidian";
 import type { RemoteTask, WithTime } from "../../task-types";
 import { canHappenAfter, icalEventToTasks } from "../../util/ical";
 import { getEarliestMoment } from "../../util/moment";
-import { createBackgroundBatchScheduler } from "../../util/scheduler";
+import { type Scheduler } from "../../util/scheduler";
 import {
   selectSortedDedupedVisibleDays,
   selectVisibleDays,
@@ -61,9 +61,7 @@ export function createIcalFetchListener(props: {
   };
 }
 
-export function createIcalParseListener(props: {
-  scheduler: ReturnType<typeof createBackgroundBatchScheduler>;
-}) {
+export function createIcalParseListener(props: { scheduler: Scheduler }) {
   const { scheduler } = props;
 
   return async (action, listenerApi) => {
