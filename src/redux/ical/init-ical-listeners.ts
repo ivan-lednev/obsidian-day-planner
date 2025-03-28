@@ -10,7 +10,7 @@ import {
   selectVisibleDays,
 } from "../global-slice";
 import { selectIcals } from "../settings-slice";
-import type { AppListenerEffect, StartListeningFn } from "../store";
+import type { AppListenerEffect } from "../store";
 import { createSelectorChangePredicate } from "../util";
 
 import {
@@ -98,8 +98,4 @@ export function createIcalParseListener(props: {
       listenerApi.dispatch(remoteTasksUpdated(remoteTasks));
     });
   };
-}
-
-export function initIcalListeners(startListening: StartListeningFn) {
-  // todo: remove
 }

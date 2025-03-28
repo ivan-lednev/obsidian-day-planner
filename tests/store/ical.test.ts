@@ -1,22 +1,14 @@
-import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { request } from "obsidian";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { initDataviewListeners } from "../../src/redux/dataview/init-dataview-listeners";
 import { initialState as initialGlobalState } from "../../src/redux/global-slice";
 import {
   icalRefreshRequested,
   selectRemoteTasks,
 } from "../../src/redux/ical/ical-slice";
-import { initIcalListeners } from "../../src/redux/ical/init-ical-listeners";
 import { initListenerMiddleware } from "../../src/redux/listener-middleware";
-import {
-  type AppDispatch,
-  makeStore,
-  type RootState,
-} from "../../src/redux/store";
+import { makeStore } from "../../src/redux/store";
 import { defaultSettingsForTests } from "../../src/settings";
-import type { ReduxExtraArgument } from "../../src/types";
 
 import { FakeDataviewFacade, getIcalFixture } from "./redux.test";
 
@@ -59,6 +51,10 @@ function makeStoreForTests() {
 }
 
 describe("ical", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   test("RSVP status appears in tasks", async () => {
     vi.mocked(request).mockReturnValue(
       getIcalFixture("google-tentative-attendee"),
@@ -84,54 +80,16 @@ describe("ical", () => {
     "RSVP status gets pulled from params if email is not in CN (common name)",
   );
 
-  test.skip("Falls back on previous values if fetching a calendar fails", async () => {
+  test("Falls back on previous values if fetching a calendar fails", async () => {
     vi.mocked(request).mockReturnValue(
       getIcalFixture("google-tentative-attendee"),
     );
 
-    // todo: abstract away initialization
-    const listenerMiddleware = createListenerMiddleware<
-      RootState,
-      AppDispatch,
-      ReduxExtraArgument
-    >({
-      extra: {
-        dataviewFacade: new FakeDataviewFacade(),
-      },
-    });
-
-    initDataviewListeners(listenerMiddleware.startListening);
-    initIcalListeners(listenerMiddleware.startListening);
-
-    const store = makeStore({
-      preloadedState: {
-        obsidian: {
-          ...initialGlobalState,
-          dateRanges: { key: ["2024-09-25", "2024-09-26", "2024-09-27"] },
-        },
-        settings: {
-          settings: {
-            ...defaultSettingsForTests,
-            icals: [
-              {
-                name: "Test",
-                url: "https://example.com",
-                color: "#ff0000",
-              },
-            ],
-          },
-        },
-      },
-      middleware: (getDefaultMiddleware) => {
-        return getDefaultMiddleware().concat(listenerMiddleware.middleware);
-      },
-    });
-
-    const { dispatch } = store;
+    const { dispatch, getState } = makeStoreForTests();
 
     dispatch(icalRefreshRequested());
 
-    await vi.waitUntil(() => selectRemoteTasks(store.getState()).length > 0);
+    await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
 
     vi.mocked(request).mockImplementationOnce(() => {
       throw new Error("Request failed");
@@ -140,7 +98,7 @@ describe("ical", () => {
     dispatch(icalRefreshRequested());
 
     await vi.waitFor(() => expect(request).toHaveBeenCalledTimes(2));
-    const remoteTasks = selectRemoteTasks(store.getState());
+    const remoteTasks = selectRemoteTasks(getState());
 
     expect(remoteTasks).toHaveLength(1);
   });
