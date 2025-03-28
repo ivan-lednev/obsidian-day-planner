@@ -11,6 +11,7 @@
   import BlockList from "./block-list.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Pill from "./pill.svelte";
+  import Properties from "./Properties.svelte";
   import Selectable from "./selectable.svelte";
 
   const { workspaceFacade, tasksWithActiveClockProps, sTaskEditor } =
@@ -36,7 +37,7 @@
           {task}
           {use}
         >
-          <div class="properties-wrapper">
+          <Properties>
             <Pill
               key={PlaneTakeoff}
               value={task.startTime.format($settings.timestampFormat)}
@@ -47,18 +48,9 @@
                 .fromDiff(task.startTime, currentTimeSignal.current)
                 .format($settings.timestampFormat)}
             />
-          </div>
+          </Properties>
         </LocalTimeBlock>
       {/snippet}
     </Selectable>
   {/snippet}
 </BlockList>
-
-<style>
-  .properties-wrapper {
-    display: flex;
-    gap: var(--size-4-1);
-    align-items: center;
-    padding: var(--size-4-1);
-  }
-</style>
