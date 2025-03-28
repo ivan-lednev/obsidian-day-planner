@@ -1,4 +1,5 @@
 import { MetadataCache, TFile, type HeadingCache, type Pos } from "obsidian";
+import type { SListEntry } from "obsidian-dataview";
 import { derived, type Readable } from "svelte/store";
 
 import { DataviewFacade } from "../../service/dataview-facade";
@@ -103,22 +104,25 @@ export function useListsFromVisibleDailyNotes(props: {
         ]),
       );
 
-      return allLists.reduce((result, list) => {
-        const breadcrumbs = getHeadingBreadcrumbs(
-          list.position,
-          pathToHeadingMetadata[list.path],
-        );
+      return allLists.reduce<SListEntry[]>(
+        (result: SListEntry[], list: SListEntry) => {
+          const breadcrumbs = getHeadingBreadcrumbs(
+            list.position,
+            pathToHeadingMetadata[list.path],
+          );
 
-        const isUnderPlannerHeading = breadcrumbs.some(
-          ({ heading }) => heading === $settings.plannerHeading,
-        );
+          const isUnderPlannerHeading = breadcrumbs.some(
+            ({ heading }) => heading === $settings.plannerHeading,
+          );
 
-        if (isUnderPlannerHeading) {
-          result.push(list);
-        }
+          if (isUnderPlannerHeading) {
+            result.push(list);
+          }
 
-        return result;
-      }, []);
+          return result;
+        },
+        [],
+      );
     },
   );
 }

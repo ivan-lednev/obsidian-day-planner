@@ -5,7 +5,6 @@ import type { RemoteTask, WithTime } from "../../task-types";
 import { canHappenAfter, icalEventToTasks } from "../../util/ical";
 import { getEarliestMoment } from "../../util/moment";
 import { type Scheduler } from "../../util/scheduler";
-import * as t from "../../util/task-utils";
 import {
   selectSortedDedupedVisibleDays,
   selectVisibleDays,
