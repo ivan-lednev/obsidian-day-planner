@@ -310,10 +310,6 @@
     background-color: var(--color-accent);
   }
 
-  .weekend {
-    background-color: var(--background-primary);
-  }
-
   .side-controls-wrapper {
     grid-column: 3;
     grid-row: span 2;

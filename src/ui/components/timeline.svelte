@@ -50,7 +50,7 @@
 
   let el: HTMLElement | undefined;
 
-  function updatePointerOffsetY(event: PointerEvent) {
+  function updatePointerOffsetY(event: MouseEvent | TouchEvent) {
     isNotVoid(el);
 
     const viewportToElOffsetY = el.getBoundingClientRect().top;
@@ -62,7 +62,7 @@
     pointerDate.set(day.format(defaultDayFormat));
   }
 
-  function handleContainerPointerDown(event: PointerEvent) {
+  function handleContainerPointerDown(event: MouseEvent | TouchEvent) {
     updatePointerOffsetY(event);
     handleContainerMouseDown();
   }
