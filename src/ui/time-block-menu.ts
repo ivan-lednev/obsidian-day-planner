@@ -1,8 +1,10 @@
 import { Menu } from "obsidian";
-import type { LocalTask } from "../task-types";
-import type { WorkspaceFacade } from "src/service/workspace-facade";
 import { isNotVoid } from "typed-assert";
+
+import type { LocalTask } from "../task-types";
 import type { ShowPreview } from "../util/create-show-preview";
+
+import type { WorkspaceFacade } from "src/service/workspace-facade";
 
 export function createTimeBlockMenu(props: {
   event: MouseEvent | TouchEvent;
@@ -19,8 +21,8 @@ export function createTimeBlockMenu(props: {
   const {
     path,
     position: {
-      start: { line }
-    }
+      start: { line },
+    },
   } = location;
 
   const menu = new Menu();
@@ -31,7 +33,7 @@ export function createTimeBlockMenu(props: {
       .setIcon("eye")
       .onClick(() => {
         showPreview(event.target, path, line);
-      })
+      }),
   );
 
   menu.addItem((item) => {

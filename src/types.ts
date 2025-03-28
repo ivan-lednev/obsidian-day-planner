@@ -11,7 +11,7 @@ import type { DayPlannerSettings, IcalConfig } from "./settings";
 import type { LocalTask, WithPlacing } from "./task-types";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
-import { createShowPreview, type ShowPreview } from "./util/create-show-preview";
+import { type ShowPreview } from "./util/create-show-preview";
 
 export type OnUpdateFn = (
   base: Array<LocalTask>,
