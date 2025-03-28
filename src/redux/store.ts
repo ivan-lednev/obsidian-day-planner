@@ -55,4 +55,8 @@ export type StartListeningFn = TypedStartListening<
   AppDispatch,
   ReduxExtraArgument
 >;
-export type AppListenerEffect = ListenerEffect<Action, RootState, AppDispatch>;
+export type AppListenerEffect<A extends Action = Action> = ListenerEffect<
+  A,
+  RootState,
+  AppDispatch
+>;

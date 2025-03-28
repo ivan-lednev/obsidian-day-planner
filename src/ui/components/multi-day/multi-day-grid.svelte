@@ -317,8 +317,10 @@
   .side-controls-wrapper {
     grid-column: 3;
     grid-row: span 2;
+
     width: min(320px, 50vw);
-    border-left: 1px solid var(--background-modifier-border);
     padding-inline: var(--size-4-3);
+
+    border-left: 1px solid var(--background-modifier-border);
   }
 </style>

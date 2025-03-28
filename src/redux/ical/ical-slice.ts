@@ -53,7 +53,6 @@ export const icalSlice = createAppSlice({
 });
 
 export const icalRefreshRequested = createAction("ical/icalRefreshRequested");
-export const icalListenerStarted = createAction("ical/icalListenerStarted");
 
 export const { remoteTasksUpdated, icalsFetched } = icalSlice.actions;
 export const { selectPlainTextIcals } = icalSlice.selectors;

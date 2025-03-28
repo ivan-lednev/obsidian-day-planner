@@ -1,4 +1,3 @@
-import { createListenerMiddleware } from "@reduxjs/toolkit";
 import {
   MarkdownView,
   Notice,
@@ -20,7 +19,6 @@ import {
   viewTypeReleaseNotes,
   viewTypeTimeline,
   viewTypeMultiDay,
-  icalParseLowerLimit,
   icalRefreshIntervalMillis,
 } from "./constants";
 import { currentTime } from "./global-store/current-time";
@@ -35,27 +33,15 @@ import {
   toMarkdown,
   toMdastPoint,
 } from "./mdast/mdast";
-import { icalRefreshRequested, visibleDaysUpdated } from "./redux/global-slice";
+import { visibleDaysUpdated } from "./redux/global-slice";
 import {
-  icalsFetched,
   initialIcalState,
   type IcalState,
+  icalRefreshRequested,
 } from "./redux/ical/ical-slice";
-import {
-  checkIcalEventsChanged,
-  checkVisibleDaysChanged,
-  createCachingFetcher,
-  createIcalFetchListener,
-  createIcalParseListener,
-  type IcalParseTaskResult,
-} from "./redux/ical/init-ical-listeners";
+import { initListenerMiddleware } from "./redux/listener-middleware";
 import { settingsUpdated } from "./redux/settings-slice";
-import {
-  type AppDispatch,
-  type AppStore,
-  makeStore,
-  type RootState,
-} from "./redux/store";
+import { type AppStore, makeStore } from "./redux/store";
 import { createUseSelector } from "./redux/use-selector";
 import { DataviewFacade } from "./service/dataview-facade";
 import {
@@ -74,7 +60,7 @@ import {
   type PluginData,
 } from "./settings";
 import { createGetTasksApi } from "./tasks-plugin";
-import type { ObsidianContext, OnUpdateFn, ReduxExtraArgument } from "./types";
+import type { ObsidianContext, OnUpdateFn } from "./types";
 import { askForConfirmation } from "./ui/confirmation-modal";
 import { createEditorMenuCallback } from "./ui/editor-menu";
 import { EditMode } from "./ui/hooks/use-edit/types";
@@ -90,7 +76,6 @@ import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
-import { createBackgroundBatchScheduler } from "./util/scheduler";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -633,45 +618,12 @@ export default class DayPlanner extends Plugin {
   }
 
   private async setUpReduxStore(pluginData: PluginData) {
-    const listenerMiddleware = createListenerMiddleware<
-      RootState,
-      AppDispatch,
-      ReduxExtraArgument
-    >({
+    const listenerMiddleware = initListenerMiddleware({
       extra: {
         dataviewFacade: this.dataviewFacade,
       },
-    });
-
-    const startAppListening = listenerMiddleware.startListening.withTypes<
-      RootState,
-      AppDispatch
-    >();
-
-    startAppListening({
-      actionCreator: icalRefreshRequested,
-      effect: createIcalFetchListener({ fetcher: createCachingFetcher() }),
-    });
-
-    const icalParseScheduler =
-      createBackgroundBatchScheduler<IcalParseTaskResult>({
-        timeRemainingLowerLimit: icalParseLowerLimit,
-      });
-    const icalParseListener = createIcalParseListener({
-      scheduler: icalParseScheduler,
-    });
-
-    listenerMiddleware.startListening({
-      predicate: (action, currentState) =>
-        checkIcalEventsChanged(action, currentState) ||
-        checkVisibleDaysChanged(action, currentState),
-      effect: icalParseListener,
-    });
-
-    listenerMiddleware.startListening({
-      actionCreator: icalsFetched,
-      effect: async (action) => {
-        await this.saveData({ ...this.settings(), rawIcals: action.payload });
+      onIcalsFetched: async (rawIcals) => {
+        await this.saveData({ ...this.settings(), rawIcals });
       },
     });
 

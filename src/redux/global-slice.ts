@@ -95,10 +95,6 @@ export const globalSlice = createAppSlice({
 
 export const keyDown = createAction("obsidian/keyDown");
 
-export const icalRefreshRequested = createAction(
-  "obsidian/icalRefreshRequested",
-);
-
 export const {
   darkModeUpdated,
   layoutReady,

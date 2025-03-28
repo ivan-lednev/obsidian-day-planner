@@ -5,11 +5,11 @@ import { describe, expect, test, vi } from "vitest";
 import { initDataviewListeners } from "../../src/redux/dataview/init-dataview-listeners";
 import { initialState as initialGlobalState } from "../../src/redux/global-slice";
 import {
-  icalListenerStarted,
   icalRefreshRequested,
   selectRemoteTasks,
 } from "../../src/redux/ical/ical-slice";
 import { initIcalListeners } from "../../src/redux/ical/init-ical-listeners";
+import { initListenerMiddleware } from "../../src/redux/listener-middleware";
 import {
   type AppDispatch,
   makeStore,
@@ -25,24 +25,18 @@ vi.mock("obsidian", () => ({
 }));
 
 function makeStoreForTests() {
-  const listenerMiddleware = createListenerMiddleware<
-    RootState,
-    AppDispatch,
-    ReduxExtraArgument
-  >({
+  const listenerMiddleware = initListenerMiddleware({
     extra: {
       dataviewFacade: new FakeDataviewFacade(),
     },
+    onIcalsFetched: async () => {},
   });
 
-  initDataviewListeners(listenerMiddleware.startListening);
-  initIcalListeners(listenerMiddleware.startListening);
-
-  const store = makeStore({
+  return makeStore({
     preloadedState: {
       obsidian: {
         ...initialGlobalState,
-        dateRanges: { key: ["2024-09-26"] },
+        visibleDays: ["2024-09-26"],
       },
       settings: {
         settings: {
@@ -62,12 +56,6 @@ function makeStoreForTests() {
       return getDefaultMiddleware().concat(listenerMiddleware.middleware);
     },
   });
-
-  const { dispatch, getState } = store;
-
-  dispatch(icalListenerStarted());
-
-  return { dispatch, getState };
 }
 
 describe("ical", () => {
@@ -141,7 +129,6 @@ describe("ical", () => {
 
     const { dispatch } = store;
 
-    dispatch(icalListenerStarted());
     dispatch(icalRefreshRequested());
 
     await vi.waitUntil(() => selectRemoteTasks(store.getState()).length > 0);
