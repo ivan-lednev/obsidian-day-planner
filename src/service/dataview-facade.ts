@@ -44,9 +44,4 @@ export class DataviewFacade {
 
   getTasksFromPath = (path: string): STask[] =>
     this.getDataview()?.page(path)?.file.tasks.array() || [];
-
-  // todo: remove
-  legacy_getAllTasksFrom = (source: string) => {
-    return this.getDataview()?.pages(source).file.tasks.array() || [];
-  };
 }

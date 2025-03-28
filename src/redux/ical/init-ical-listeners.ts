@@ -5,6 +5,7 @@ import type { RemoteTask, WithTime } from "../../task-types";
 import { canHappenAfter, icalEventToTasks } from "../../util/ical";
 import { getEarliestMoment } from "../../util/moment";
 import { type Scheduler } from "../../util/scheduler";
+import * as t from "../../util/task-utils";
 import {
   selectSortedDedupedVisibleDays,
   selectVisibleDays,
@@ -16,13 +17,14 @@ import { createSelectorChangePredicate } from "../util";
 import {
   icalsFetched,
   remoteTasksUpdated,
-  selectIcalEvents,
+  selectAllIcalEventsWithIcalConfigs,
 } from "./ical-slice";
 
 export const checkVisibleDaysChanged =
   createSelectorChangePredicate(selectVisibleDays);
-export const checkIcalEventsChanged =
-  createSelectorChangePredicate(selectIcalEvents);
+export const checkIcalEventsChanged = createSelectorChangePredicate(
+  selectAllIcalEventsWithIcalConfigs,
+);
 
 export function createCachingFetcher() {
   const previousFetches = new Map<string, string>();
@@ -69,7 +71,9 @@ export function createIcalParseListener(props: {
   const { scheduler } = props;
 
   return async (action, listenerApi) => {
-    const icalEvents = selectIcalEvents(listenerApi.getState());
+    const icalEvents = selectAllIcalEventsWithIcalConfigs(
+      listenerApi.getState(),
+    );
     const visibleDays = selectSortedDedupedVisibleDays(listenerApi.getState());
 
     if (isEmpty(icalEvents) || isEmpty(visibleDays)) {

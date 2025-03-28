@@ -8,6 +8,7 @@ import ical from "node-ical";
 import type { IcalConfig } from "../../settings";
 import type { RemoteTask } from "../../task-types";
 import type { WithIcalConfig } from "../../types";
+import * as t from "../../util/task-utils";
 import { createAppSlice } from "../create-app-slice";
 
 export type RawIcal = { icalConfig: IcalConfig; text: string };
@@ -58,8 +59,7 @@ export const { remoteTasksUpdated, icalsFetched } = icalSlice.actions;
 export const { selectPlainTextIcals } = icalSlice.selectors;
 const { selectSerializedRemoteTasks } = icalSlice.selectors;
 
-// todo: better naming
-export const selectIcalEvents = createSelector(
+export const selectAllIcalEventsWithIcalConfigs = createSelector(
   selectPlainTextIcals,
   (rawIcals) =>
     rawIcals.flatMap(
