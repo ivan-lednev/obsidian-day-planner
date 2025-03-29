@@ -35,6 +35,8 @@
   import Timeline from "../timeline.svelte";
   import UnscheduledTimeBlock from "../unscheduled-time-block.svelte";
 
+  import MultiDayRow from "./multi-day-row.svelte";
+
   const {
     workspaceFacade,
     settings,
@@ -124,6 +126,11 @@
         </ControlButton>
       </div>
     {/each}
+  </div>
+
+  <div class="header-row">
+    <div class="corner"></div>
+    <MultiDayRow />
   </div>
 
   {#if $settings.showUncheduledTasks}
@@ -216,7 +223,7 @@
   </div>
 {/if}
 
-<Scroller className="multiday-main-content" onscroll={handleScroll}>
+<Scroller className="multi-day-main-content" onscroll={handleScroll}>
   <Ruler
     --ruler-box-shadow="var(--shadow-right)"
     visibleHours={getVisibleHours($settings)}
@@ -252,7 +259,7 @@
     border-left: 1px solid var(--background-modifier-border);
   }
 
-  :global(.multiday-main-content) {
+  :global(.multi-day-main-content) {
     grid-row: 2;
   }
 

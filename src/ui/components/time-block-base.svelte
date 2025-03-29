@@ -38,7 +38,7 @@
       isDarkMode.current,
       settingsSignal.current,
     )}
-    class={["content", { "truncated-bottom": task.truncated === "bottom" }]}
+    class={["content", task.truncated === "bottom" && "truncated-bottom"]}
     {onpointerup}
     use:useActions={use}
   >
@@ -53,6 +53,7 @@
     left: var(--time-block-left, 0);
 
     display: flex;
+    grid-column: var(--time-block-grid-column, unset);
 
     width: var(--time-block-width, 100%);
     height: var(--time-block-height, auto);
