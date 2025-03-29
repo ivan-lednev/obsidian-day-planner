@@ -65,9 +65,6 @@ export type TaskWithoutComputedDuration = Omit<LocalTask, "durationMinutes"> &
 
 export type Task = LocalTask | RemoteTask;
 
-// todo: remove, this does nothing
-export type TimeBlock = Omit<WithTime<BaseTask>, "startMinutes">;
-
 export function isRemote<T extends Task>(task: T): task is T & RemoteTask {
   return Object.hasOwn(task, "calendar");
 }

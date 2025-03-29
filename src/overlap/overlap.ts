@@ -2,7 +2,7 @@ import Fraction from "fraction.js";
 import { partition } from "lodash/fp";
 import { isNotVoid } from "typed-assert";
 
-import type { TimeBlock } from "../task-types";
+import type { BaseTask, WithTime } from "../task-types";
 import type { Overlap } from "../types";
 import { getMinutesSinceMidnight } from "../util/moment";
 import { getEndMinutes } from "../util/task-utils";
@@ -12,7 +12,9 @@ import { getHorizontalPlacing } from "./horizontal-placing";
 const empty = "empty";
 const taken = "taken";
 
-export function computeOverlap(items: Array<TimeBlock>): Map<string, Overlap> {
+export function computeOverlap(
+  items: Array<WithTime<BaseTask>>,
+): Map<string, Overlap> {
   return items.reduce((overlapLookup, item) => {
     const overlapGroup = getItemsOverlappingItemAndEachOther(item, items);
 
@@ -21,8 +23,8 @@ export function computeOverlap(items: Array<TimeBlock>): Map<string, Overlap> {
 }
 
 function getItemsOverlappingItemAndEachOther(
-  item: TimeBlock,
-  items: Array<TimeBlock>,
+  item: WithTime<BaseTask>,
+  items: Array<WithTime<BaseTask>>,
 ) {
   return items
     .reduce(
@@ -47,7 +49,7 @@ function getItemsOverlappingItemAndEachOther(
 }
 
 function computeOverlapForGroup(
-  overlapGroup: Array<TimeBlock>,
+  overlapGroup: Array<WithTime<BaseTask>>,
   previousLookup: Map<string, Overlap>,
 ) {
   const newLookup = new Map([...previousLookup]);
@@ -121,7 +123,7 @@ function computeOverlapForGroup(
   return newLookup;
 }
 
-function overlaps(a: TimeBlock, b: TimeBlock) {
+function overlaps(a: WithTime<BaseTask>, b: WithTime<BaseTask>) {
   const [early, late] =
     getMinutesSinceMidnight(a.startTime) < getMinutesSinceMidnight(b.startTime)
       ? [a, b]
@@ -130,7 +132,7 @@ function overlaps(a: TimeBlock, b: TimeBlock) {
   return getEndMinutes(early) > getMinutesSinceMidnight(late.startTime);
 }
 
-export function addHorizontalPlacing(blocks: Array<TimeBlock>) {
+export function addHorizontalPlacing(blocks: Array<WithTime<BaseTask>>) {
   if (blocks.length === 0) {
     return [];
   }
