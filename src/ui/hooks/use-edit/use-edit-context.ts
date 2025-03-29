@@ -103,7 +103,14 @@ export function useEditContext(props: {
       const combinedTasks = $remoteTasks.concat($tasksWithPendingUpdate);
 
       const split: Task[] = combinedTasks.flatMap((task): Task[] | Task => {
-        if (!isWithTime(task)) {
+        if (!isWithTime(task) || task.isAllDayEvent) {
+          return task;
+        }
+
+        const daySpan = getEndTime(task).diff(task.startTime, "days");
+
+        // If a task spans more than 24 hours, it goes to the multi-day row
+        if (daySpan > 1) {
           return task;
         }
 

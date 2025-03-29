@@ -91,21 +91,13 @@ function icalEventToTask(
   const isAllDayEvent = icalEvent.datetype === "date";
   const rsvpStatus = getRsvpStatus(icalEvent, icalEvent.calendar.email);
 
-  const base = {
+  return {
     id: getId(),
     calendar: icalEvent.calendar,
     summary: icalEvent.summary || "(No title)",
     startTime: startTimeAdjusted,
     rsvpStatus,
-  };
-
-  if (isAllDayEvent) {
-    return { ...base, isAllDayEvent: true };
-  }
-
-  return {
-    ...base,
-    isAllDayEvent: false,
+    isAllDayEvent,
     durationMinutes:
       (icalEvent.end.getTime() - icalEvent.start.getTime()) / 1000 / 60,
   };
