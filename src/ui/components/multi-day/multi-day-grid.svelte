@@ -1,7 +1,6 @@
 <script lang="ts">
   import { type Moment } from "moment";
-  import { Menu } from "obsidian";
-  import { fromStore, get } from "svelte/store";
+  import { fromStore } from "svelte/store";
   import { slide } from "svelte/transition";
 
   import { getDateRangeContext } from "../../../context/date-range-context";
@@ -16,6 +15,7 @@
     getPreviousWorkWeek,
   } from "../../../util/range";
   import * as r from "../../../util/range";
+  import { createColumnChangeMenu } from "../../column-change-menu";
   import Search from "../../components/search.svelte";
   import ControlButton from "../control-button.svelte";
   import { createSlide } from "../defaults";
@@ -51,47 +51,6 @@
   function toggleSideControls(toggledControls: SideControls) {
     visibleSideControls =
       visibleSideControls === toggledControls ? "none" : toggledControls;
-  }
-
-  function handleColumnChange(event: MouseEvent) {
-    const currentMode = get(settings).multiDayRange;
-    const menu = new Menu();
-
-    menu.addItem((item) =>
-      item
-        .setTitle("Full week")
-        .setChecked(currentMode === "full-week")
-        .onClick(() => {
-          settings.update((previous) => ({
-            ...previous,
-            multiDayRange: "full-week",
-          }));
-        }),
-    );
-    menu.addItem((item) => {
-      item
-        .setTitle("Work week")
-        .setChecked(currentMode === "work-week")
-        .onClick(() => {
-          settings.update((previous) => ({
-            ...previous,
-            multiDayRange: "work-week",
-          }));
-        });
-    });
-    menu.addItem((item) => {
-      item
-        .setTitle("3 days")
-        .setChecked(currentMode === "3-days")
-        .onClick(() => {
-          settings.update((previous) => ({
-            ...previous,
-            multiDayRange: "3-days",
-          }));
-        });
-    });
-
-    menu.showAtMouseEvent(event);
   }
 
   function getColumnBackgroundColor(day: Moment) {
@@ -167,7 +126,10 @@
     <Settings />
   </ControlButton>
 
-  <ControlButton label="Change columns" onclick={handleColumnChange}>
+  <ControlButton
+    label="Change columns"
+    onclick={(event) => createColumnChangeMenu({ event, settings })}
+  >
     <Columns3 />
   </ControlButton>
 

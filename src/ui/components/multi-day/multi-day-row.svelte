@@ -1,13 +1,13 @@
 <script lang="ts">
   import { fromStore } from "svelte/store";
-  import type { Task, WithTime } from "../../../task-types";
 
   import { getDateRangeContext } from "../../../context/date-range-context";
   import { getObsidianContext } from "../../../context/obsidian-context";
-  import UnscheduledTimeBlock from "../unscheduled-time-block.svelte";
+  import type { Task, WithTime } from "../../../task-types";
   import { isLocal, type RemoteTask } from "../../../task-types";
   import { isWithTime } from "../../../util/task-utils";
   import * as t from "../../../util/task-utils";
+  import UnscheduledTimeBlock from "../unscheduled-time-block.svelte";
 
   const {
     editContext: { getDisplayedTasksForTimeline },
