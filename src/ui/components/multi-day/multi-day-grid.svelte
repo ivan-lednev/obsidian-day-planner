@@ -1,6 +1,5 @@
 <script lang="ts">
   import { type Moment } from "moment";
-  import { fromStore } from "svelte/store";
   import { slide } from "svelte/transition";
 
   import { getDateRangeContext } from "../../../context/date-range-context";
@@ -33,15 +32,10 @@
   import Scroller from "../scroller.svelte";
   import SettingsControls from "../settings-controls.svelte";
   import Timeline from "../timeline.svelte";
-  import UnscheduledTimeBlock from "../unscheduled-time-block.svelte";
 
   import MultiDayRow from "./multi-day-row.svelte";
 
-  const {
-    workspaceFacade,
-    settings,
-    editContext: { getDisplayedTasksForTimeline },
-  } = getObsidianContext();
+  const { workspaceFacade, settings } = getObsidianContext();
   const dateRange = getDateRangeContext();
 
   type SideControls = "none" | "settings" | "search";
@@ -87,24 +81,11 @@
     {/each}
   </div>
 
-  <div class="header-row">
-    <div class="corner"></div>
-    <MultiDayRow />
-  </div>
-
   {#if $settings.showUncheduledTasks}
     <ResizeableBox class="header-row">
       {#snippet children(startEdit)}
         <div class="corner"></div>
-        {#each $dateRange as day}
-          {@const tasks = fromStore(getDisplayedTasksForTimeline(day))}
-
-          <div class={["header-cell", "block-wrapper"]}>
-            {#each tasks.current.noTime as task}
-              <UnscheduledTimeBlock {task} />
-            {/each}
-          </div>
-        {/each}
+        <MultiDayRow />
         <ResizeHandle on:mousedown={startEdit} />
       {/snippet}
     </ResizeableBox>
@@ -263,10 +244,6 @@
     background-color: var(--background-primary);
     border-right: 1px solid var(--background-modifier-border);
     border-bottom: 1px solid var(--background-modifier-border);
-  }
-
-  .block-wrapper {
-    padding: var(--size-2-1);
   }
 
   .header-cell:last-of-type {

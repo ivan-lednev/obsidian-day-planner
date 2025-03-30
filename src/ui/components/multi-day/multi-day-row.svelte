@@ -52,6 +52,7 @@
 
 <div class="multi-day-row">
   {#each $tasks as task}
+    <!--TODO: move out to a filter function-->
     {#if task.isAllDayEvent}
       <UnscheduledTimeBlock
         --time-block-grid-column="{getColumnIndex(task)} / span {getSpan(task)}"
