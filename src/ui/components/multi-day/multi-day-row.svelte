@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { fromStore } from "svelte/store";
-
   import { getDateRangeContext } from "../../../context/date-range-context";
   import { getObsidianContext } from "../../../context/obsidian-context";
   import type { Task, WithTime } from "../../../task-types";
@@ -10,17 +8,15 @@
   import UnscheduledTimeBlock from "../unscheduled-time-block.svelte";
 
   const {
-    editContext: { getDisplayedTasksForMultiDayRow },
+    editContext: { getDisplayedAllDayTasksForMultiDayRow },
   } = getObsidianContext();
 
   const dateRange = getDateRangeContext();
-  const dateRangeSignal = fromStore(dateRange);
 
-  // todo: remove store wrappers
   const tasks = $derived(
-    getDisplayedTasksForMultiDayRow({
-      start: dateRangeSignal.current[0],
-      end: dateRangeSignal.current[dateRangeSignal.current.length - 1],
+    getDisplayedAllDayTasksForMultiDayRow({
+      start: $dateRange[0],
+      end: $dateRange[$dateRange.length - 1],
     }),
   );
 
@@ -52,13 +48,10 @@
 
 <div class="multi-day-row">
   {#each $tasks as task}
-    <!--TODO: move out to a filter function-->
-    {#if task.isAllDayEvent}
-      <UnscheduledTimeBlock
-        --time-block-grid-column="{getColumnIndex(task)} / span {getSpan(task)}"
-        {task}
-      />
-    {/if}
+    <UnscheduledTimeBlock
+      --time-block-grid-column="{getColumnIndex(task)} / span {getSpan(task)}"
+      {task}
+    />
   {/each}
 </div>
 

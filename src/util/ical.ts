@@ -8,6 +8,7 @@ import type { WithIcalConfig } from "../types";
 
 import { getId } from "./id";
 import { liftToArray } from "./lift";
+import * as m from "./moment";
 
 export function canHappenAfter(icalEvent: ical.VEvent, date: Date) {
   if (!icalEvent.rrule) {
@@ -92,8 +93,10 @@ function onceOffIcalEventToTaskForRange(
   const eventEnd = window.moment(icalEvent.end);
 
   if (
-    eventStart.isBetween(startOfFirstDay, endOfLastDay) ||
-    eventEnd.isBetween(startOfFirstDay, endOfLastDay)
+    m.doRangesOverlap(
+      { start: startOfFirstDay, end: endOfLastDay },
+      { start: eventStart, end: eventEnd },
+    )
   ) {
     return icalEventToTask(icalEvent, icalEvent.start);
   }

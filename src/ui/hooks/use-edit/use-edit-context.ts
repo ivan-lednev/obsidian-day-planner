@@ -121,16 +121,38 @@ export function useEditContext(props: {
     return groupByDay(split);
   });
 
-  function getDisplayedTasksForMultiDayRow(range: {
+  function getDisplayedAllDayTasksForMultiDayRow(range: {
     start: Moment;
     end: Moment;
   }) {
-    return derived(combinedTasks, ($combinedTasks) =>
-      $combinedTasks.map(
-        (task): Task =>
-          t.isWithTime(task) ? t.truncateToRange(task, range) : task,
-      ),
-    );
+    return derived(combinedTasks, ($combinedTasks) => {
+      const startOfRange = range.start.clone().startOf("day");
+      const endOfRange = range.end.clone().endOf("day");
+
+      return $combinedTasks
+        .filter((task) => {
+          // TODO: a limitation to be removed later
+          if (!task.isAllDayEvent) {
+            return false;
+          }
+
+          if ("durationMinutes" in task) {
+            return m.doRangesOverlap(
+              { start: startOfRange, end: endOfRange },
+              {
+                start: task.startTime,
+                end: t.getEndTime(task),
+              },
+            );
+          }
+
+          return m.isWithinRange(task.startTime, range);
+        })
+        .map(
+          (task): Task =>
+            t.isWithTime(task) ? t.truncateToRange(task, range) : task,
+        );
+    });
   }
 
   function getDisplayedTasksForTimeline(day: Moment) {
@@ -158,6 +180,6 @@ export function useEditContext(props: {
     cancelEdit,
     editOperation,
     getDisplayedTasksForTimeline,
-    getDisplayedTasksForMultiDayRow,
+    getDisplayedAllDayTasksForMultiDayRow,
   };
 }

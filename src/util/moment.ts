@@ -131,3 +131,14 @@ export function getNonOverlappingDayRanges(days: Moment[]): DayRange[] {
       return ranges;
     }, []);
 }
+
+export function isWithinRange(someMoment: Moment, range: DayRange) {
+  return (
+    someMoment.isSameOrAfter(range.start) &&
+    someMoment.isSameOrBefore(range.end)
+  );
+}
+
+export function doRangesOverlap(a: DayRange, b: DayRange) {
+  return a.start.isSameOrBefore(b.end) && a.end.isSameOrAfter(b.start);
+}
