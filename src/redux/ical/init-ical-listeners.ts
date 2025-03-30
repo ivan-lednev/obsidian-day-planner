@@ -2,8 +2,11 @@ import { isEmpty } from "lodash/fp";
 import { request } from "obsidian";
 
 import type { RemoteTask, WithTime } from "../../task-types";
-import { canHappenAfter, icalEventToTasks } from "../../util/ical";
-import { getEarliestMoment } from "../../util/moment";
+import { canHappenAfter, icalEventToTasksForRange } from "../../util/ical";
+import {
+  getEarliestMoment,
+  getNonOverlappingDayRanges,
+} from "../../util/moment";
 import { type Scheduler } from "../../util/scheduler";
 import {
   selectSortedDedupedVisibleDays,
@@ -73,23 +76,34 @@ export function createIcalParseListener(props: {
     const icalEvents = selectAllIcalEventsWithIcalConfigs(
       listenerApi.getState(),
     );
-    const visibleDays = selectSortedDedupedVisibleDays(listenerApi.getState());
 
-    if (isEmpty(icalEvents) || isEmpty(visibleDays)) {
+    if (isEmpty(icalEvents)) {
       return;
     }
 
+    const visibleDays = selectSortedDedupedVisibleDays(listenerApi.getState());
+
+    if (isEmpty(visibleDays)) {
+      return;
+    }
+
+    const sortedVisibleRanges = getNonOverlappingDayRanges(visibleDays);
     const earliestDay = getEarliestMoment(visibleDays);
     const startOfEarliestDay = earliestDay.clone().startOf("day").toDate();
+
     const relevantIcalEvents = icalEvents.filter((icalEvent) =>
       canHappenAfter(icalEvent, startOfEarliestDay),
     );
 
-    const queue = relevantIcalEvents.flatMap((icalEvent) =>
-      visibleDays.map((day) => () => icalEventToTasks(icalEvent, day)),
+    const taskComputationQueue = relevantIcalEvents.flatMap((icalEvent) =>
+      sortedVisibleRanges.map(
+        ({ start, end }) =>
+          () =>
+            icalEventToTasksForRange(icalEvent, start, end),
+      ),
     );
 
-    scheduler.enqueueTasks(queue, (tasksFromEvents) => {
+    scheduler.enqueueTasks(taskComputationQueue, (tasksFromEvents) => {
       const remoteTasks = tasksFromEvents
         .flat()
         .filter((task): task is RemoteTask | WithTime<RemoteTask> =>

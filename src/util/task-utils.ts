@@ -35,6 +35,7 @@ import {
   minutesToMoment,
   minutesToMomentOfDay,
 } from "./moment";
+import * as m from "./moment";
 
 export function getEndMinutes(task: {
   startTime: Moment;
@@ -255,6 +256,25 @@ export function removeListTokens(text: string) {
   return text
     .replace(listTokenWithSpacesRegExp, "")
     .replace(checkboxRegExp, "");
+}
+
+export function truncateToRange(task: WithTime<Task>, range: m.DayRange) {
+  const start = task.startTime.clone().startOf("day");
+  const end = getEndTime(task).clone().endOf("day");
+
+  const truncatedStart = start.isAfter(range.start)
+    ? start
+    : range.start.clone().startOf("day");
+
+  const truncatedEnd = end.isBefore(range.end)
+    ? end
+    : range.end.clone().endOf("day");
+
+  return {
+    ...task,
+    startTime: truncatedStart,
+    durationMinutes: m.getDiffInMinutes(truncatedStart, truncatedEnd),
+  };
 }
 
 export function removeTimestampFromStart(text: string) {

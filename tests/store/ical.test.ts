@@ -7,7 +7,7 @@ import {
   selectRemoteTasks,
 } from "../../src/redux/ical/ical-slice";
 import { initListenerMiddleware } from "../../src/redux/listener-middleware";
-import { makeStore } from "../../src/redux/store";
+import { makeStore, type RootState } from "../../src/redux/store";
 import { defaultSettingsForTests } from "../../src/settings";
 
 import { FakeDataviewFacade, getIcalFixture } from "./redux.test";
@@ -16,7 +16,29 @@ vi.mock("obsidian", () => ({
   request: vi.fn(),
 }));
 
-function makeStoreForTests() {
+const defaultPreloadedStateForTests: Partial<RootState> = {
+  obsidian: {
+    ...initialGlobalState,
+    visibleDays: ["2024-09-26"],
+  },
+  settings: {
+    settings: {
+      ...defaultSettingsForTests,
+      icals: [
+        {
+          name: "Test",
+          url: "https://example.com",
+          color: "#ff0000",
+          email: "bishop1860@gmail.com",
+        },
+      ],
+    },
+  },
+};
+
+function makeStoreForTests(props?: { preloadedState?: Partial<RootState> }) {
+  const { preloadedState = defaultPreloadedStateForTests } = props || {};
+
   const listenerMiddleware = initListenerMiddleware({
     extra: {
       dataviewFacade: new FakeDataviewFacade(),
@@ -25,25 +47,7 @@ function makeStoreForTests() {
   });
 
   return makeStore({
-    preloadedState: {
-      obsidian: {
-        ...initialGlobalState,
-        visibleDays: ["2024-09-26"],
-      },
-      settings: {
-        settings: {
-          ...defaultSettingsForTests,
-          icals: [
-            {
-              name: "Test",
-              url: "https://example.com",
-              color: "#ff0000",
-              email: "bishop1860@gmail.com",
-            },
-          ],
-        },
-      },
-    },
+    preloadedState,
     middleware: (getDefaultMiddleware) => {
       return getDefaultMiddleware().concat(listenerMiddleware.middleware);
     },
@@ -102,6 +106,39 @@ describe("ical", () => {
 
     expect(remoteTasks).toHaveLength(1);
   });
+
+  test.each([[["2024-10-13"]], [["2024-10-12"]]])(
+    "Shows multi-day tasks that start before or after the visible range, row $#",
+    async (visibleDays) => {
+      vi.mocked(request).mockReturnValue(
+        getIcalFixture("google-event-stretching-2-days"),
+      );
+
+      const { dispatch, getState } = makeStoreForTests({
+        preloadedState: {
+          ...defaultPreloadedStateForTests,
+          obsidian: {
+            ...initialGlobalState,
+            visibleDays,
+          },
+        },
+      });
+
+      dispatch(icalRefreshRequested());
+
+      await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
+
+      const remoteTasks = selectRemoteTasks(getState());
+
+      expect(remoteTasks).toHaveLength(1);
+    },
+  );
+
+  test.todo("Recurrence overrides outside of the range are ignored");
+
+  test.todo(
+    "Recurrence overrides show up if they occur on the same day as one of the recurrences",
+  );
 
   test.todo("Deleted recurrences don't show up as tasks");
 

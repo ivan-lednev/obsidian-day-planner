@@ -10,10 +10,18 @@
   import UnscheduledTimeBlock from "../unscheduled-time-block.svelte";
 
   const {
-    editContext: { getDisplayedTasksForTimeline },
+    editContext: { getDisplayedTasksForMultiDayRow },
   } = getObsidianContext();
 
   const dateRange = getDateRangeContext();
+  const dateRangeSignal = fromStore(dateRange);
+
+  const tasks = $derived(
+    getDisplayedTasksForMultiDayRow({
+      start: dateRangeSignal.current[0],
+      end: dateRangeSignal.current[dateRangeSignal.current.length - 1],
+    }),
+  );
 
   function getDaySpanFromDurationMinutes(remoteTask: WithTime<RemoteTask>) {
     return t.getEndTime(remoteTask).diff(remoteTask.startTime, "days");
@@ -26,18 +34,27 @@
 
     return getDaySpanFromDurationMinutes(task);
   }
+
+  function getColumnIndex(task: Task) {
+    const foundIndex = $dateRange.findIndex((date) =>
+      date.isSame(task.startTime, "day"),
+    );
+
+    if (foundIndex > -1) {
+      return foundIndex + 1;
+    }
+
+    // the task starts before the first day in the range
+    return 1;
+  }
 </script>
 
 <div class="multi-day-row">
-  {#each $dateRange as day, dayIndex}
-    {@const tasks = fromStore(getDisplayedTasksForTimeline(day))}
-
-    {#each tasks.current.noTime as task}
-      <UnscheduledTimeBlock
-        --time-block-grid-column="{dayIndex + 1} / span {getSpan(task)}"
-        {task}
-      />
-    {/each}
+  {#each $tasks as task}
+    <UnscheduledTimeBlock
+      --time-block-grid-column="{getColumnIndex(task)} / span {getSpan(task)}"
+      {task}
+    />
   {/each}
 </div>
 
@@ -47,7 +64,11 @@
     grid-auto-flow: column;
 
     /* TODO: move to CSS variables */
-    grid-template-columns: repeat(7, 200px);
+    grid-template-columns: repeat(7, minmax(var(--cell-flex-basis), 1fr)) var(
+        --scrollbar-width
+      );
+    flex: 1 0 0;
+
     border-bottom: 1px solid var(--background-modifier-border);
   }
 </style>

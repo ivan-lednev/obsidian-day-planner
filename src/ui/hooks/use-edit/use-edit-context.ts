@@ -13,13 +13,7 @@ import type {
 } from "../../../task-types";
 import type { OnUpdateFn, PointerDateTime } from "../../../types";
 import * as m from "../../../util/moment";
-import {
-  getDayKey,
-  getEmptyTasksForDay,
-  getEndTime,
-  getRenderKey,
-  isWithTime,
-} from "../../../util/task-utils";
+import * as t from "../../../util/task-utils";
 
 import { createEditHandlers } from "./create-edit-handlers";
 import { useCursor } from "./cursor";
@@ -30,7 +24,7 @@ import { useEditActions } from "./use-edit-actions";
 function groupByDay(tasks: Task[]) {
   return tasks.reduce<Record<string, { withTime: Task[]; noTime: Task[] }>>(
     (result, task) => {
-      const key = getDayKey(task.startTime);
+      const key = t.getDayKey(task.startTime);
 
       if (!result[key]) {
         result[key] = { withTime: [], noTime: [] };
@@ -96,44 +90,55 @@ export function useEditContext(props: {
     settings,
   });
 
-  // todo: move this grouping out of the hook, they're not related
-  const dayToDisplayedTasks = derived(
+  const combinedTasks = derived(
     [remoteTasks, tasksWithPendingUpdate],
-    ([$remoteTasks, $tasksWithPendingUpdate]) => {
-      const combinedTasks = $remoteTasks.concat($tasksWithPendingUpdate);
-
-      const split: Task[] = combinedTasks.flatMap((task): Task[] | Task => {
-        if (!isWithTime(task) || task.isAllDayEvent) {
-          return task;
-        }
-
-        const daySpan = getEndTime(task).diff(task.startTime, "days");
-
-        // If a task spans more than 24 hours, it goes to the multi-day row
-        if (daySpan > 1) {
-          return task;
-        }
-
-        const chunks = m.splitMultiday(task.startTime, getEndTime(task));
-
-        return chunks.map(([startTime, endTime]) => ({
-          ...task,
-          startTime,
-          durationMinutes: m.getDiffInMinutes(startTime, endTime),
-        }));
-      });
-
-      return groupByDay(split);
-    },
+    ([$remoteTasks, $tasksWithPendingUpdate]) =>
+      $remoteTasks.concat($tasksWithPendingUpdate),
   );
+
+  const dayToDisplayedTasks = derived(combinedTasks, ($combinedTasks) => {
+    const split: Task[] = $combinedTasks.flatMap((task): Task[] | Task => {
+      if (!t.isWithTime(task) || task.isAllDayEvent) {
+        return task;
+      }
+
+      const daySpan = t.getEndTime(task).diff(task.startTime, "days");
+
+      // If a task spans more than 24 hours, it goes to the multi-day row
+      if (daySpan > 1) {
+        return task;
+      }
+
+      const chunks = m.splitMultiday(task.startTime, t.getEndTime(task));
+
+      return chunks.map(([startTime, endTime]) => ({
+        ...task,
+        startTime,
+        durationMinutes: m.getDiffInMinutes(startTime, endTime),
+      }));
+    });
+
+    return groupByDay(split);
+  });
+
+  function getDisplayedTasksForMultiDayRow(range: {
+    start: Moment;
+    end: Moment;
+  }) {
+    return derived(combinedTasks, ($combinedTasks) =>
+      $combinedTasks.flatMap((task): Task[] | Task =>
+        t.isWithTime(task) ? t.truncateToRange(task, range) : task,
+      ),
+    );
+  }
 
   function getDisplayedTasksForTimeline(day: Moment) {
     return derived(dayToDisplayedTasks, ($dayToDisplayedTasks) => {
       const tasksForDay =
-        $dayToDisplayedTasks[getDayKey(day)] || getEmptyTasksForDay();
+        $dayToDisplayedTasks[t.getDayKey(day)] || t.getEmptyTasksForDay();
 
       const withTime: Array<WithPlacing<WithTime<Task>>> = flow(
-        uniqBy(getRenderKey),
+        uniqBy(t.getRenderKey),
         addHorizontalPlacing,
       )(tasksForDay.withTime);
 
@@ -152,5 +157,6 @@ export function useEditContext(props: {
     cancelEdit,
     editOperation,
     getDisplayedTasksForTimeline,
+    getDisplayedTasksForMultiDayRow,
   };
 }

@@ -40,43 +40,66 @@ function hasExceptionForDate(icalEvent: ical.VEvent, date: Date) {
   return Object.keys(icalEvent.exdate).includes(getIcalDayKey(date));
 }
 
-export function icalEventToTasks(
+export function icalEventToTasksForRange(
   icalEvent: WithIcalConfig<ical.VEvent>,
-  day: Moment,
+  start: Moment,
+  end: Moment,
 ) {
-  if (icalEvent.rrule) {
-    const startOfDay = day.clone().startOf("day").toDate();
-    const endOfDay = day.clone().endOf("day").toDate();
-
-    const recurrenceOverrides = Object.values(icalEvent?.recurrences || {}).map(
-      (recurrence) =>
-        icalEventToTask(
-          { ...recurrence, calendar: icalEvent.calendar },
-          recurrence.start,
-        ),
-    );
-
-    const recurrences = icalEvent.rrule
-      ?.between(startOfDay, endOfDay)
-      .filter(
-        (date) =>
-          !hasRecurrenceOverrideForDate(icalEvent, date) &&
-          !hasExceptionForDate(icalEvent, date),
-      )
-      .map((date) => icalEventToTask(icalEvent, date));
-
-    return [...recurrences, ...recurrenceOverrides];
+  if (!icalEvent.rrule) {
+    return onceOffIcalEventToTaskForRange(icalEvent, start, end);
   }
 
-  const eventStart = window.moment(icalEvent.start);
-  const startsOnVisibleDay = day.isSame(eventStart, "day");
+  const tasksFromRecurrenceOverrides = Object.values(
+    icalEvent?.recurrences || {},
+  ).reduce<RemoteTask[]>((result, override) => {
+    const task = onceOffIcalEventToTaskForRange(
+      { ...override, calendar: icalEvent.calendar },
+      start,
+      end,
+    );
 
-  if (startsOnVisibleDay) {
+    if (task) {
+      result.push(task);
+    }
+
+    return result;
+  }, []);
+
+  const recurrences = icalEvent.rrule
+    .between(start.toDate(), end.toDate()) // Node: this calculation is very slow
+    .filter(
+      (date) =>
+        !hasRecurrenceOverrideForDate(icalEvent, date) &&
+        !hasExceptionForDate(icalEvent, date),
+    );
+
+  const tasksFromRecurrences = recurrences.map((date) =>
+    icalEventToTask(icalEvent, date),
+  );
+
+  return tasksFromRecurrences.concat(tasksFromRecurrenceOverrides);
+}
+
+// todo: test edge cases
+function onceOffIcalEventToTaskForRange(
+  icalEvent: WithIcalConfig<ical.VEvent>,
+  start: Moment,
+  end: Moment,
+) {
+  const startOfFirstDay = start.clone().startOf("day");
+  const endOfLastDay = end.clone().endOf("day");
+  const eventStart = window.moment(icalEvent.start);
+  const eventEnd = window.moment(icalEvent.end);
+
+  if (
+    eventStart.isBetween(startOfFirstDay, endOfLastDay) ||
+    eventEnd.isBetween(startOfFirstDay, endOfLastDay)
+  ) {
     return icalEventToTask(icalEvent, icalEvent.start);
   }
 }
 
-function icalEventToTask(
+export function icalEventToTask(
   icalEvent: WithIcalConfig<ical.VEvent>,
   date: Date,
 ): RemoteTask | WithTime<RemoteTask> {
