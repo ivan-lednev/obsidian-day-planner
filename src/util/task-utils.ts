@@ -262,19 +262,26 @@ export function truncateToRange(task: WithTime<Task>, range: m.DayRange) {
   const start = task.startTime.clone().startOf("day");
   const end = getEndTime(task).clone().endOf("day");
 
-  const truncatedStart = start.isAfter(range.start)
-    ? start
-    : range.start.clone().startOf("day");
+  const startOfRange = range.start.clone().startOf("day");
+  const endOfRange = range.end.clone().endOf("day");
 
-  const truncatedEnd = end.isBefore(range.end)
-    ? end
-    : range.end.clone().endOf("day");
+  const truncatedBase = { ...task };
 
-  return {
-    ...task,
-    startTime: truncatedStart,
-    durationMinutes: m.getDiffInMinutes(truncatedStart, truncatedEnd),
-  };
+  if (start.isBefore(startOfRange)) {
+    truncatedBase.startTime = startOfRange;
+    truncatedBase.truncated = [...(truncatedBase.truncated ?? []), "left"];
+  }
+
+  if (end.isAfter(endOfRange)) {
+    truncatedBase.durationMinutes = m.getDiffInMinutes(
+      truncatedBase.startTime,
+      endOfRange,
+    );
+
+    truncatedBase.truncated = [...(truncatedBase.truncated ?? []), "right"];
+  }
+
+  return truncatedBase;
 }
 
 export function removeTimestampFromStart(text: string) {

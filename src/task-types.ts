@@ -32,7 +32,7 @@ export type BaseTask = {
   id: string;
   startTime: Moment;
   isAllDayEvent?: boolean;
-  truncated?: Side;
+  truncated?: Side[];
 };
 
 export type WithTime<T> = T & {

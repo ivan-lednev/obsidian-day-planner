@@ -38,7 +38,11 @@
       isDarkMode.current,
       settingsSignal.current,
     )}
-    class={["content", task.truncated === "bottom" && "truncated-bottom"]}
+    class={[
+      "content",
+      task.truncated?.includes("left") && "truncated-left",
+      task.truncated?.includes("right") && "truncated-right",
+    ]}
     {onpointerup}
     use:useActions={use}
   >
@@ -79,9 +83,17 @@
     box-shadow: var(--time-block-box-shadow, var(--default-box-shadow));
   }
 
-  .truncated-bottom {
-    border-bottom-style: dashed;
-    border-bottom-right-radius: 0;
+  .truncated-left {
+    border-left-style: dashed;
+    border-left-width: 2px;
+    border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+  }
+
+  .truncated-right {
+    border-right-style: dashed;
+    border-right-width: 2px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
   }
 </style>
