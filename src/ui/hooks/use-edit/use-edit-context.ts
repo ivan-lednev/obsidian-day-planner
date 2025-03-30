@@ -126,8 +126,9 @@ export function useEditContext(props: {
     end: Moment;
   }) {
     return derived(combinedTasks, ($combinedTasks) =>
-      $combinedTasks.flatMap((task): Task[] | Task =>
-        t.isWithTime(task) ? t.truncateToRange(task, range) : task,
+      $combinedTasks.map(
+        (task): Task =>
+          t.isWithTime(task) ? t.truncateToRange(task, range) : task,
       ),
     );
   }

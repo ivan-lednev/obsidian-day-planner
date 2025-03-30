@@ -16,6 +16,7 @@
   const dateRange = getDateRangeContext();
   const dateRangeSignal = fromStore(dateRange);
 
+  // todo: remove store wrappers
   const tasks = $derived(
     getDisplayedTasksForMultiDayRow({
       start: dateRangeSignal.current[0],
@@ -51,10 +52,12 @@
 
 <div class="multi-day-row">
   {#each $tasks as task}
-    <UnscheduledTimeBlock
-      --time-block-grid-column="{getColumnIndex(task)} / span {getSpan(task)}"
-      {task}
-    />
+    {#if task.isAllDayEvent}
+      <UnscheduledTimeBlock
+        --time-block-grid-column="{getColumnIndex(task)} / span {getSpan(task)}"
+        {task}
+      />
+    {/if}
   {/each}
 </div>
 
@@ -62,8 +65,6 @@
   .multi-day-row {
     display: grid;
     grid-auto-flow: column;
-
-    /* TODO: move to CSS variables */
     grid-template-columns: repeat(7, minmax(var(--cell-flex-basis), 1fr)) var(
         --scrollbar-width
       );
