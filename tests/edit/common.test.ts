@@ -202,6 +202,8 @@ describe("drag one & common edit mechanics", () => {
   });
 
   describe("Multi-day rows", () => {
-    test.todo("");
+    test.todo(
+      "Tasks that go over the range get truncated at the end of the range (and not on the day before)",
+    );
   });
 });

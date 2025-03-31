@@ -263,7 +263,8 @@ export function truncateToRange(task: WithTime<Task>, range: m.DayRange) {
   const end = getEndTime(task).clone().endOf("day");
 
   const startOfRange = range.start.clone().startOf("day");
-  const endOfRange = range.end.clone().endOf("day");
+  // todo: remove the hack
+  const endOfRange = range.end.clone().add(1, "day").startOf("day");
 
   const truncatedBase = { ...task };
 

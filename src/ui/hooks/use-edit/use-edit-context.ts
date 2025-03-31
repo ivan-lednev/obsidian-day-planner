@@ -126,7 +126,8 @@ export function useEditContext(props: {
     ([$combinedTasks]) =>
       (range: m.DayRange) => {
         const startOfRange = range.start.clone().startOf("day");
-        const endOfRange = range.end.clone().endOf("day");
+        // todo: define what a range is
+        const endOfRange = range.end.clone().add(1, "day").startOf("day");
 
         return $combinedTasks
           .filter((task) => {
