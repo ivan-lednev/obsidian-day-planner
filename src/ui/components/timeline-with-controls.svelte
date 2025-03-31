@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { derived } from "svelte/store";
+
   import { getDateRangeContext } from "../../context/date-range-context";
   import { getObsidianContext } from "../../context/obsidian-context";
   import { getVisibleHours } from "../../global-store/derived-settings";
@@ -22,13 +24,15 @@
   } = getObsidianContext();
 
   const dateRange = getDateRangeContext();
-  const firstDayInRange = $derived($dateRange[0]);
+  const firstDayInRange = $dateRange[0];
 
-  const tasks = $derived(
-    getDisplayedAllDayTasksForMultiDayRow({
-      start: $dateRange[0],
-      end: $dateRange[$dateRange.length - 1],
-    }),
+  const tasks = derived(
+    [getDisplayedAllDayTasksForMultiDayRow, dateRange],
+    ([$getTasks, $range]) =>
+      $getTasks({
+        start: $range[0],
+        end: $range[$range.length - 1],
+      }),
   );
 </script>
 

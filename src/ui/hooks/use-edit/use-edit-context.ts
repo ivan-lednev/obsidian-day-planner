@@ -121,39 +121,38 @@ export function useEditContext(props: {
     return groupByDay(split);
   });
 
-  function getDisplayedAllDayTasksForMultiDayRow(range: {
-    start: Moment;
-    end: Moment;
-  }) {
-    return derived(combinedTasks, ($combinedTasks) => {
-      const startOfRange = range.start.clone().startOf("day");
-      const endOfRange = range.end.clone().endOf("day");
+  const getDisplayedAllDayTasksForMultiDayRow = derived(
+    [combinedTasks],
+    ([$combinedTasks]) =>
+      (range: m.DayRange) => {
+        const startOfRange = range.start.clone().startOf("day");
+        const endOfRange = range.end.clone().endOf("day");
 
-      return $combinedTasks
-        .filter((task) => {
-          // TODO: a limitation to be removed later
-          if (!task.isAllDayEvent) {
-            return false;
-          }
+        return $combinedTasks
+          .filter((task) => {
+            // TODO: a limitation to be removed later
+            if (!task.isAllDayEvent) {
+              return false;
+            }
 
-          if ("durationMinutes" in task) {
-            return m.doRangesOverlap(
-              { start: startOfRange, end: endOfRange },
-              {
-                start: task.startTime,
-                end: t.getEndTime(task),
-              },
-            );
-          }
+            if ("durationMinutes" in task) {
+              return m.doRangesOverlap(
+                { start: startOfRange, end: endOfRange },
+                {
+                  start: task.startTime,
+                  end: t.getEndTime(task),
+                },
+              );
+            }
 
-          return m.isWithinRange(task.startTime, range);
-        })
-        .map(
-          (task): Task =>
-            t.isWithTime(task) ? t.truncateToRange(task, range) : task,
-        );
-    });
-  }
+            return m.isWithinRange(task.startTime, range);
+          })
+          .map(
+            (task): Task =>
+              t.isWithTime(task) ? t.truncateToRange(task, range) : task,
+          );
+      },
+  );
 
   function getDisplayedTasksForTimeline(day: Moment) {
     return derived(dayToDisplayedTasks, ($dayToDisplayedTasks) => {

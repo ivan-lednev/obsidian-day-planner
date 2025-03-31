@@ -84,6 +84,8 @@ describe("ical", () => {
     "RSVP status gets pulled from params if email is not in CN (common name)",
   );
 
+  test.todo("Description appears in tasks");
+
   test("Falls back on previous values if fetching a calendar fails", async () => {
     vi.mocked(request).mockReturnValue(
       getIcalFixture("google-tentative-attendee"),
@@ -107,9 +109,9 @@ describe("ical", () => {
     expect(remoteTasks).toHaveLength(1);
   });
 
-  test.each([[["2024-10-13"]], [["2024-10-12"]]])(
+  test.each([["2024-10-13"], ["2024-10-12"]])(
     "Shows multi-day tasks that start before or after the visible range, row $#",
-    async (visibleDays) => {
+    async (...visibleDays) => {
       vi.mocked(request).mockReturnValue(
         getIcalFixture("google-event-stretching-2-days"),
       );
@@ -133,6 +135,8 @@ describe("ical", () => {
       expect(remoteTasks).toHaveLength(1);
     },
   );
+
+  test.todo("Events don't get duplicated if they fall within 2 ranges");
 
   test.todo("Recurrence overrides outside of the range are ignored");
 

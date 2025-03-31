@@ -200,4 +200,8 @@ describe("drag one & common edit mechanics", () => {
       });
     });
   });
+
+  describe("Multi-day rows", () => {
+    test.todo("");
+  });
 });

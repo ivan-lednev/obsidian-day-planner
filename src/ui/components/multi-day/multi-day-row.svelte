@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { derived } from "svelte/store";
+
   import { getDateRangeContext } from "../../../context/date-range-context";
   import { getObsidianContext } from "../../../context/obsidian-context";
   import type { Task, WithTime } from "../../../task-types";
@@ -13,11 +15,13 @@
 
   const dateRange = getDateRangeContext();
 
-  const tasks = $derived(
-    getDisplayedAllDayTasksForMultiDayRow({
-      start: $dateRange[0],
-      end: $dateRange[$dateRange.length - 1],
-    }),
+  const tasks = derived(
+    [getDisplayedAllDayTasksForMultiDayRow, dateRange],
+    ([$getTasks, $range]) =>
+      $getTasks({
+        start: $range[0],
+        end: $range[$range.length - 1],
+      }),
   );
 
   function getDaySpanFromDurationMinutes(remoteTask: WithTime<RemoteTask>) {

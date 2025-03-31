@@ -59,6 +59,7 @@ This document describes how to make a code contribution to the repo.
 
 ### UI, Svelte guidelines
 
-- Pull all the logic from components into custom stores
-  - Reason: this makes testing much easier
-  - Hooks are custom Svelte stores. They let you 'hook into' Svelte's reactive system. I brought this naming convention from React, because it's simple and useful. A hook is any function that manipulates stores. It starts with `use`, like `useEditContext`.
+- Use redux-toolkit for new features
+- Pull as much logic as possible from components. This makes testing much easier
+- Do not mix stores and runes
+- Do not use deprecated reactivity APIs (e.g. reactive blocks (`$:`))
