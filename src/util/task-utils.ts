@@ -269,6 +269,11 @@ export function truncateToRange(task: WithTime<Task>, range: m.DayRange) {
   const truncatedBase = { ...task };
 
   if (start.isBefore(startOfRange)) {
+    truncatedBase.durationMinutes = getEndTime(task).diff(
+      startOfRange,
+      "minutes",
+    );
+
     truncatedBase.startTime = startOfRange;
     truncatedBase.truncated = [...(truncatedBase.truncated ?? []), "left"];
   }

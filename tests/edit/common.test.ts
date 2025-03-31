@@ -215,20 +215,20 @@ describe("drag one & common edit mechanics", () => {
     };
 
     test.each([
-      // {
-      //   description:
-      //     "Tasks that start before the range don't show their full length",
-      //   task: multiDayTask,
-      //   range: {
-      //     start: moment("2023-01-06 00:00"),
-      //     end: moment("2023-01-10 00:00"),
-      //   },
-      //   result: {
-      //     startTime: moment("2023-01-06 00:00"),
-      //     durationMinutes: daysToMinutes(3),
-      //     truncated: ["left"],
-      //   },
-      // },
+      {
+        description:
+          "Tasks that start before the range don't show their full length",
+        task: multiDayTask,
+        range: {
+          start: moment("2023-01-06 00:00"),
+          end: moment("2023-01-10 00:00"),
+        },
+        result: {
+          startTime: moment("2023-01-06 00:00"),
+          durationMinutes: daysToMinutes(3),
+          truncated: ["left"],
+        },
+      },
       {
         description:
           "Tasks that go over the range get truncated at the end of the range (and not on the day before)",
