@@ -203,8 +203,6 @@
     position: relative;
     z-index: 1000;
 
-    /* width: max-content; */
-
     overflow-x: hidden;
     display: flex;
 
