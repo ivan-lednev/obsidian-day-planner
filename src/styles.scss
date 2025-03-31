@@ -138,7 +138,11 @@ body {
   .view-content {
     display: grid;
     grid-template-columns: 1fr auto auto;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "dates sidebar settings"
+      "multiday sidebar settings"
+      "timelines sidebar settings";
   }
 
   .view-actions {

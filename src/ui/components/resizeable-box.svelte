@@ -2,10 +2,14 @@
   import { type Snippet } from "svelte";
   import { isNotVoid } from "typed-assert";
 
-  const props: { children: Snippet<[() => void]>; class?: object | string } =
-    $props();
-
-  let el: HTMLDivElement | undefined;
+  let {
+    el = $bindable(),
+    ...props
+  }: {
+    children: Snippet<[() => void]>;
+    class?: object | string;
+    el?: HTMLDivElement;
+  } = $props();
 
   let customHeight = $state(0);
   const height = $derived(customHeight === 0 ? "auto" : `${customHeight}px`);

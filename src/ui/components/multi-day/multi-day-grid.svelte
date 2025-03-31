@@ -52,45 +52,59 @@
   }
 
   let headerRef: HTMLDivElement | undefined;
+  let daysRef: HTMLDivElement | undefined;
+  let multiDayRowRef: HTMLDivElement | undefined = $state();
 
   function handleScroll(event: Event) {
-    if (headerRef && event.target instanceof Element) {
-      headerRef.scrollLeft = event.target.scrollLeft;
+    if (event.target instanceof Element) {
+      if (headerRef) {
+        headerRef.scrollLeft = event.target.scrollLeft;
+      }
+
+      if (daysRef) {
+        daysRef.scrollLeft = event.target.scrollLeft;
+      }
+
+      if (multiDayRowRef) {
+        multiDayRowRef.scrollLeft = event.target.scrollLeft;
+      }
     }
   }
 </script>
 
 <div
-  bind:this={headerRef}
+  bind:this={daysRef}
   style:--timeline-internal-column-count={$settings.showTimeTracker ? 2 : 1}
-  class="header"
+  class={["dp-header-row", "day-buttons"]}
 >
-  <div class={["header-row", "day-buttons"]}>
-    <div class="corner"></div>
-    {#each $dateRange as day}
-      <div class={["header-cell", $isToday(day) && "today"]}>
-        <ControlButton
-          --border-radius="0"
-          --color={$isToday(day) ? "white" : "var(--icon-color)"}
-          label="Open note for day"
-          onclick={async () => await workspaceFacade.openFileForDay(day)}
-        >
-          {day.format($settings.timelineDateFormat)}
-        </ControlButton>
-      </div>
-    {/each}
-  </div>
-
-  {#if $settings.showUncheduledTasks}
-    <ResizeableBox class="header-row">
-      {#snippet children(startEdit)}
-        <div class="corner"></div>
-        <MultiDayRow />
-        <ResizeHandle on:mousedown={startEdit} />
-      {/snippet}
-    </ResizeableBox>
-  {/if}
+  <div class="corner"></div>
+  {#each $dateRange as day}
+    <div class={["header-cell", $isToday(day) && "today"]}>
+      <ControlButton
+        --border-radius="0"
+        --color={$isToday(day) ? "white" : "var(--icon-color)"}
+        label="Open note for day"
+        onclick={async () => await workspaceFacade.openFileForDay(day)}
+      >
+        {day.format($settings.timelineDateFormat)}
+      </ControlButton>
+    </div>
+  {/each}
 </div>
+
+{#if $settings.showUncheduledTasks}
+  <ResizeableBox
+    --timeline-internal-column-count={$settings.showTimeTracker ? 2 : 1}
+    class={["dp-header-row", "multi-day-row-wrapper"]}
+    bind:el={multiDayRowRef}
+  >
+    {#snippet children(startEdit)}
+      <div class="corner"></div>
+      <MultiDayRow />
+      <ResizeHandle on:mousedown={startEdit} />
+    {/snippet}
+  </ResizeableBox>
+{/if}
 
 <div class="controls-sidebar">
   <ControlButton
@@ -181,19 +195,35 @@
 </Scroller>
 
 <style>
-  :global(.header-row) {
+  :global(.dp-header-row) {
+    --cell-flex-basis: calc(
+      var(--timeline-flex-basis) * var(--timeline-internal-column-count, 1)
+    );
+
     position: relative;
+    z-index: 1000;
+
+    /* width: max-content; */
+
+    overflow-x: hidden;
     display: flex;
+
+    box-shadow: var(--shadow-bottom);
   }
 
   .day-buttons {
+    grid-area: dates;
     font-size: var(--font-ui-small);
+  }
+
+  :global(.multi-day-row-wrapper) {
+    grid-area: multiday;
+    border-bottom: 1px solid var(--background-modifier-border);
   }
 
   .controls-sidebar {
     display: flex;
-    grid-column: 2;
-    grid-row: 1 / 3;
+    grid-area: sidebar;
     flex-direction: column;
     gap: var(--size-4-2);
 
@@ -203,7 +233,7 @@
   }
 
   :global(.multi-day-main-content) {
-    grid-row: 2;
+    grid-area: timelines;
   }
 
   .corner {
@@ -218,21 +248,6 @@
     border: 1px solid var(--background-modifier-border);
     border-top: none;
     border-left: none;
-  }
-
-  .header {
-    --cell-flex-basis: calc(
-      var(--timeline-flex-basis) * var(--timeline-internal-column-count, 1)
-    );
-
-    position: relative;
-    z-index: 1000;
-
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
-
-    box-shadow: var(--shadow-bottom);
   }
 
   .header-cell {
@@ -257,12 +272,9 @@
   }
 
   .side-controls-wrapper {
-    grid-column: 3;
-    grid-row: span 2;
-
+    grid-area: settings;
     width: min(320px, 50vw);
     padding-inline: var(--size-4-3);
-
     border-left: 1px solid var(--background-modifier-border);
   }
 </style>
