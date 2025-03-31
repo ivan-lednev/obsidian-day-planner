@@ -18,7 +18,7 @@
     expanded: Snippet;
   } = $props();
 
-  export const { isActive, reverse = false, initial, expanded } = props;
+  const { isActive, reverse = false, initial, expanded } = $derived(props);
 
   function setIsActive(isActive: boolean) {
     navigator.vibrate?.(vibrationDurationMillis);
