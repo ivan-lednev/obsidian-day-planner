@@ -39,10 +39,16 @@ export function setUp({
   settings = defaultSettingsForTests,
 } = {}) {
   const props = createProps({ tasks, settings });
-  const { handlers, dayToDisplayedTasks, confirmEdit } = useEditContext(props);
+  const {
+    handlers,
+    dayToDisplayedTasks,
+    getDisplayedAllDayTasksForMultiDayRow,
+    confirmEdit,
+  } = useEditContext(props);
 
   // this prevents the store from resetting;
   dayToDisplayedTasks.subscribe(noop);
+  getDisplayedAllDayTasksForMultiDayRow.subscribe(noop);
 
   function moveCursorTo(dateTime: Moment) {
     props.pointerDateTime.set({
@@ -54,6 +60,7 @@ export function setUp({
     handlers,
     moveCursorTo,
     dayToDisplayedTasks,
+    getDisplayedAllDayTasksForMultiDayRow,
     confirmEdit,
     props,
   };

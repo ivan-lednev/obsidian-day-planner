@@ -202,8 +202,61 @@ describe("drag one & common edit mechanics", () => {
   });
 
   describe("Multi-day rows", () => {
-    test.todo(
+    test.skip(
       "Tasks that go over the range get truncated at the end of the range (and not on the day before)",
+      async () => {
+        const task = {
+          ...baseTask,
+          isAllDayEvent: true,
+          startTime: moment("2023-01-01 23:00"),
+          durationMinutes: 60 * 24 * 3,
+          id: "1",
+        };
+
+        const { getDisplayedAllDayTasksForMultiDayRow } = setUp({
+          tasks: [task],
+        });
+
+        expect(
+          get(getDisplayedAllDayTasksForMultiDayRow)({
+            start: moment("2023-01-02 00:00"),
+            end: moment("2023-01-05 00:00"),
+          }),
+        ).toMatchObject([
+          {
+            startTime: moment("2023-01-02 00:00"),
+            durationMinutes: 60 * 24 * 2,
+            truncated: ["left"],
+          },
+        ]);
+      },
     );
+
+    test("Tasks that start before the range don't show their full length", async () => {
+      const task = {
+        ...baseTask,
+        isAllDayEvent: true,
+        startTime: moment("2023-01-02 00:00"),
+        durationMinutes: 60 * 24 * 3,
+        id: "1",
+      };
+
+      const { getDisplayedAllDayTasksForMultiDayRow } = setUp({
+        tasks: [task],
+      });
+
+      expect(
+        get(getDisplayedAllDayTasksForMultiDayRow)({
+          start: moment("2023-01-01 00:00"),
+          end: moment("2023-01-03 00:00"),
+        }),
+      ).toMatchObject([
+        {
+          startTime: moment("2023-01-02 00:00"),
+          durationMinutes: 60 * 24 * 2,
+          truncated: ["right"],
+        },
+      ]);
+    });
   });
 });

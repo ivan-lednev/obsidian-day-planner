@@ -86,6 +86,8 @@ describe("ical", () => {
 
   test.todo("Description appears in tasks");
 
+  test.todo("Location gets passed to an event");
+
   test("Falls back on previous values if fetching a calendar fails", async () => {
     vi.mocked(request).mockReturnValue(
       getIcalFixture("google-tentative-attendee"),
@@ -138,17 +140,15 @@ describe("ical", () => {
 
   test.todo("Events don't get duplicated if they fall within 2 ranges");
 
-  test.todo("Recurrence overrides outside of the range are ignored");
-
   test.todo(
     "Recurrence overrides show up if they occur on the same day as one of the recurrences",
   );
 
   test.todo("Deleted recurrences don't show up as tasks");
 
-  test.todo("Location gets passed to an event");
-
   test.todo("Yearly recurrences do not show up every month");
 
-  test.todo("Time zones get calculated correctly");
+  describe("Time zones", () => {
+    test.todo("Time zones get calculated correctly");
+  });
 });
