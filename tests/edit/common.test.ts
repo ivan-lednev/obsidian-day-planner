@@ -202,60 +202,55 @@ describe("drag one & common edit mechanics", () => {
   });
 
   describe("Multi-day rows", () => {
-    test.skip(
-      "Tasks that go over the range get truncated at the end of the range (and not on the day before)",
-      async () => {
-        const task = {
-          ...baseTask,
-          isAllDayEvent: true,
-          startTime: moment("2023-01-01 23:00"),
-          durationMinutes: 60 * 24 * 3,
-          id: "1",
-        };
+    function daysToMinutes(days: number) {
+      return days * 60 * 24;
+    }
 
-        const { getDisplayedAllDayTasksForMultiDayRow } = setUp({
-          tasks: [task],
-        });
+    const multiDayTask = {
+      ...baseTask,
+      isAllDayEvent: true,
+      startTime: moment("2023-01-05 00:00"),
+      durationMinutes: daysToMinutes(4),
+      id: "1",
+    };
 
-        expect(
-          get(getDisplayedAllDayTasksForMultiDayRow)({
-            start: moment("2023-01-02 00:00"),
-            end: moment("2023-01-05 00:00"),
-          }),
-        ).toMatchObject([
-          {
-            startTime: moment("2023-01-02 00:00"),
-            durationMinutes: 60 * 24 * 2,
-            truncated: ["left"],
-          },
-        ]);
+    test.each([
+      // {
+      //   description:
+      //     "Tasks that start before the range don't show their full length",
+      //   task: multiDayTask,
+      //   range: {
+      //     start: moment("2023-01-06 00:00"),
+      //     end: moment("2023-01-10 00:00"),
+      //   },
+      //   result: {
+      //     startTime: moment("2023-01-06 00:00"),
+      //     durationMinutes: daysToMinutes(3),
+      //     truncated: ["left"],
+      //   },
+      // },
+      {
+        description:
+          "Tasks that go over the range get truncated at the end of the range (and not on the day before)",
+        task: multiDayTask,
+        range: {
+          start: moment("2023-01-03 00:00"),
+          end: moment("2023-01-07 00:00"),
+        },
+        result: {
+          startTime: moment("2023-01-05 00:00"),
+          // Note: ranges are end-inclusive
+          durationMinutes: daysToMinutes(3),
+          truncated: ["right"],
+        },
       },
-    );
-
-    test("Tasks that start before the range don't show their full length", async () => {
-      const task = {
-        ...baseTask,
-        isAllDayEvent: true,
-        startTime: moment("2023-01-02 00:00"),
-        durationMinutes: 60 * 24 * 3,
-        id: "1",
-      };
-
+    ])("$description", async ({ task, range, result }) => {
       const { getDisplayedAllDayTasksForMultiDayRow } = setUp({
         tasks: [task],
       });
 
-      expect(
-        get(getDisplayedAllDayTasksForMultiDayRow)({
-          start: moment("2023-01-01 00:00"),
-          end: moment("2023-01-03 00:00"),
-        }),
-      ).toMatchObject([
-        {
-          startTime: moment("2023-01-02 00:00"),
-          durationMinutes: 60 * 24 * 2,
-          truncated: ["right"],
-        },
+      expect(get(getDisplayedAllDayTasksForMultiDayRow)(range)).toMatchObject([
+        result,
       ]);
     });
   });
