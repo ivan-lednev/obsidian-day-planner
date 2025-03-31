@@ -67,7 +67,6 @@
         --scrollbar-width
       );
     flex: 1 0 0;
-
-    border-bottom: 1px solid var(--background-modifier-border);
+    align-self: flex-start;
   }
 </style>
