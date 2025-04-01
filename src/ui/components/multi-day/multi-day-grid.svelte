@@ -33,6 +33,7 @@
   import SettingsControls from "../settings-controls.svelte";
   import Timeline from "../timeline.svelte";
 
+  import ColumnTracksOverlay from "./ColumnTracksOverlay.svelte";
   import MultiDayRow from "./multi-day-row.svelte";
 
   const { workspaceFacade, settings } = getObsidianContext();
@@ -51,22 +52,22 @@
     return isOnWeekend(day) ? "var(--background-primary)" : "";
   }
 
-  let headerRef: HTMLDivElement | undefined;
   let daysRef: HTMLDivElement | undefined;
   let multiDayRowRef: HTMLDivElement | undefined = $state();
+  let multiDayRowBordersRef: HTMLDivElement | undefined = $state();
 
   function handleScroll(event: Event) {
     if (event.target instanceof Element) {
-      if (headerRef) {
-        headerRef.scrollLeft = event.target.scrollLeft;
-      }
-
       if (daysRef) {
         daysRef.scrollLeft = event.target.scrollLeft;
       }
 
       if (multiDayRowRef) {
         multiDayRowRef.scrollLeft = event.target.scrollLeft;
+      }
+
+      if (multiDayRowBordersRef) {
+        multiDayRowBordersRef.scrollLeft = event.target.scrollLeft;
       }
     }
   }
@@ -102,6 +103,7 @@
       <div bind:this={multiDayRowRef} class="multi-day-row-wrapper">
         <MultiDayRow />
       </div>
+      <ColumnTracksOverlay columnCount={7} bind:el={multiDayRowBordersRef} />
       <ResizeHandle on:mousedown={startEdit} />
     {/snippet}
   </ResizeableBox>
@@ -208,6 +210,7 @@
   }
 
   .multi-day-row-wrapper {
+    position: relative;
     overflow: hidden scroll;
     display: flex;
     flex: 1 0 0;

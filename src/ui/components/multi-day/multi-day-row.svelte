@@ -57,11 +57,6 @@
       {task}
     />
   {/each}
-  <div class="borders">
-    {#each Array.from({ length: 7 }) as _, index}
-      <div style:grid-column={index + 1} class="border"></div>
-    {/each}
-  </div>
 </div>
 
 <style>
@@ -74,18 +69,6 @@
     grid-auto-flow: column;
     grid-template-columns: var(--multi-day-row-columns);
     flex: 1 0 0;
-  }
-
-  .borders {
-    position: absolute;
-    z-index: -1;
-    inset: 0;
-
-    display: grid;
-    grid-template-columns: var(--multi-day-row-columns);
-  }
-
-  .border {
-    border-right: 1px solid var(--background-modifier-border);
+    align-self: flex-start;
   }
 </style>
