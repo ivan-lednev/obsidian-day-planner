@@ -95,12 +95,13 @@
 {#if $settings.showUncheduledTasks}
   <ResizeableBox
     --timeline-internal-column-count={$settings.showTimeTracker ? 2 : 1}
-    class={["dp-header-row", "multi-day-row-wrapper"]}
-    bind:el={multiDayRowRef}
+    class={["dp-header-row", "horizontal-resize-box-wrapper"]}
   >
     {#snippet children(startEdit)}
       <div class="corner"></div>
-      <MultiDayRow />
+      <div bind:this={multiDayRowRef} class="multi-day-row-wrapper">
+        <MultiDayRow />
+      </div>
       <ResizeHandle on:mousedown={startEdit} />
     {/snippet}
   </ResizeableBox>
@@ -200,13 +201,16 @@
       var(--timeline-flex-basis) * var(--timeline-internal-column-count, 1)
     );
 
-    position: relative;
     z-index: 1000;
-
     overflow-x: hidden;
     display: flex;
-
     box-shadow: var(--shadow-bottom);
+  }
+
+  .multi-day-row-wrapper {
+    overflow: hidden scroll;
+    display: flex;
+    flex: 1 0 0;
   }
 
   .day-buttons {
@@ -214,7 +218,8 @@
     font-size: var(--font-ui-small);
   }
 
-  :global(.multi-day-row-wrapper) {
+  :global(.horizontal-resize-box-wrapper) {
+    position: relative;
     grid-area: multiday;
     border-bottom: 1px solid var(--background-modifier-border);
   }

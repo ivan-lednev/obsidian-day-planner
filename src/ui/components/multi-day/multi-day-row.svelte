@@ -63,9 +63,7 @@
   .multi-day-row {
     display: grid;
     grid-auto-flow: column;
-    grid-template-columns: repeat(7, minmax(var(--cell-flex-basis), 1fr)) var(
-        --scrollbar-width
-      );
+    grid-template-columns: repeat(7, minmax(var(--cell-flex-basis), 1fr));
     flex: 1 0 0;
     align-self: flex-start;
   }
