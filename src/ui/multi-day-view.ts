@@ -117,8 +117,6 @@ export default class MultiDayView extends ItemView {
   }
 
   async onClose() {
-    this.dateRange?.untrack();
-
     if (this.multiDayComponent) {
       unmount(this.multiDayComponent);
     }
@@ -126,6 +124,8 @@ export default class MultiDayView extends ItemView {
     if (this.headerActionsComponent) {
       unmount(this.headerActionsComponent);
     }
+
+    this.dateRange?.untrack();
   }
 
   private updateTabTitleAndHeader = (range: Moment[]) => {
