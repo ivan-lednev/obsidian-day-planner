@@ -6,7 +6,11 @@ import type { DayPlannerSettings } from "../../settings";
 import type { LocalTask } from "../../task-types";
 import type { RenderMarkdown } from "../../types";
 import { deleteProps } from "../../util/properties";
-import { getFirstLine, getRenderKey } from "../../util/task-utils";
+import {
+  getFirstLine,
+  getRenderKey,
+  removeTimestampFromStart,
+} from "../../util/task-utils";
 import { normalizeNewlines } from "../../util/util";
 
 import { createMemo } from "./memoize-props";
@@ -45,11 +49,16 @@ export function renderTaskMarkdown(
     const displayedText = normalizeNewlines(
       deleteProps(getDisplayedText(task)),
     );
-    const onlyFirstLineIfNeeded = settings.showSubtasksInTaskBlocks
+
+    let finalText = settings.showSubtasksInTaskBlocks
       ? displayedText
       : getFirstLine(displayedText);
 
-    onDestroy.push(renderMarkdown(el, onlyFirstLineIfNeeded));
+    if (!settings.showTimestampInTaskBlock) {
+      finalText = removeTimestampFromStart(finalText);
+    }
+
+    onDestroy.push(renderMarkdown(el, finalText));
 
     if (!task.lines) {
       return;
