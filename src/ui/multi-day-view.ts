@@ -1,6 +1,6 @@
 import type { Moment } from "moment";
 import { ItemView, WorkspaceLeaf } from "obsidian";
-import { mount, unmount } from "svelte";
+import { mount, type SvelteComponent, unmount } from "svelte";
 import { derived, get, type Writable } from "svelte/store";
 
 import { dateRangeContextKey, viewTypeMultiDay } from "../constants";
@@ -15,7 +15,7 @@ import { useDateRanges } from "./hooks/use-date-ranges";
 export default class MultiDayView extends ItemView {
   private static readonly defaultDisplayText = "Multi-Day View";
   navigation = true;
-  private multiDayComponent?: typeof MultiDayGrid;
+  private multiDayComponent?: SvelteComponent;
   private headerActionsComponent?: HeaderActions;
   private dateRange?: DateRange;
 
@@ -96,8 +96,8 @@ export default class MultiDayView extends ItemView {
       [dateRangeContextKey, this.dateRange],
     ]);
 
-    // @ts-expect-error
-    this.weekComponent = mount(MultiDayGrid, {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.multiDayComponent = mount(MultiDayGrid as any, {
       target: contentEl,
       context,
     });
@@ -118,11 +118,11 @@ export default class MultiDayView extends ItemView {
 
   async onClose() {
     if (this.multiDayComponent) {
-      unmount(this.multiDayComponent);
+      await unmount(this.multiDayComponent);
     }
 
     if (this.headerActionsComponent) {
-      unmount(this.headerActionsComponent);
+      await unmount(this.headerActionsComponent);
     }
 
     this.dateRange?.untrack();

@@ -62,10 +62,10 @@ export default class TimelineView extends ItemView {
   }
 
   async onClose() {
-    this.dateRange?.untrack();
-
     if (this.timeline) {
-      unmount(this.timeline);
+      await unmount(this.timeline);
     }
+
+    this.dateRange?.untrack();
   }
 }
