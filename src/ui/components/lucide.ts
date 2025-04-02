@@ -27,4 +27,5 @@ export const AlertTriangle = obsidianIcon(lucideSvelte.AlertTriangle);
 export const Info = obsidianIcon(lucideSvelte.Info);
 export const Zap = obsidianIcon(lucideSvelte.Zap);
 export const RefreshCwOff = obsidianIcon(lucideSvelte.RefreshCwOff);
+export const GripHorizontal = obsidianIcon(lucideSvelte.GripHorizontal);
 /* eslint-enable @typescript-eslint/naming-convention */

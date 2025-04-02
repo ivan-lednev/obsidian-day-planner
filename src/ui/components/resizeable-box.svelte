@@ -2,6 +2,8 @@
   import { type Snippet } from "svelte";
   import { isNotVoid } from "typed-assert";
 
+  import { getIsomorphicClientY } from "../../util/util";
+
   let {
     el = $bindable(),
     ...props
@@ -33,7 +35,7 @@
     editingHeight = false;
   }
 
-  function handleMouseMove(event: MouseEvent) {
+  function handleMove(event: MouseEvent | TouchEvent) {
     if (!editingHeight) {
       return;
     }
@@ -42,16 +44,24 @@
 
     const viewportToElOffsetY = el.getBoundingClientRect().top;
 
-    customHeight = event.clientY - viewportToElOffsetY;
+    customHeight = getIsomorphicClientY(event) - viewportToElOffsetY;
   }
 </script>
 
 <svelte:document
-  on:mousemove={handleMouseMove}
+  on:mousemove={handleMove}
+  on:touchmove={handleMove}
   on:pointerup|capture={stopEdit}
 />
 <svelte:window on:blur={handleBlur} />
 
-<div bind:this={el} style:height style:max-height="25vh" class={props.class}>
+<div bind:this={el} style:height class={[props.class, "resizeable-box"]}>
   {@render props.children(startEdit)}
 </div>
+
+<style>
+  .resizeable-box {
+    min-height: var(--icon-size);
+    max-height: 25vh;
+  }
+</style>

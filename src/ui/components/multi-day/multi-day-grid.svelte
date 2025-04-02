@@ -24,9 +24,9 @@
     ChevronRight,
     CalendarArrowUp,
     Columns3,
+    GripHorizontal,
     Search as SearchIcon,
   } from "../lucide";
-  import ResizeHandle from "../resize-handle.svelte";
   import ResizeableBox from "../resizeable-box.svelte";
   import Ruler from "../ruler.svelte";
   import Scroller from "../scroller.svelte";
@@ -99,12 +99,17 @@
     class={["dp-header-row", "horizontal-resize-box-wrapper"]}
   >
     {#snippet children(startEdit)}
-      <div class="corner"></div>
+      <div class="corner">
+        <GripHorizontal
+          class="horizontal-grip"
+          onpointerdown={startEdit}
+          ontouchstart={startEdit}
+        />
+      </div>
       <div bind:this={multiDayRowRef} class="multi-day-row-wrapper">
         <MultiDayRow />
       </div>
       <ColumnTracksOverlay columnCount={7} bind:el={multiDayRowBordersRef} />
-      <ResizeHandle on:mousedown={startEdit} />
     {/snippet}
   </ResizeableBox>
 {/if}
@@ -209,6 +214,17 @@
     box-shadow: var(--shadow-bottom);
   }
 
+  :global(.horizontal-grip) {
+    flex: 0 0 auto;
+    color: var(--icon-color);
+    opacity: var(--icon-opacity);
+  }
+
+  :global(.horizontal-grip:hover) {
+    cursor: grab;
+    opacity: var(--icon-opacity-hover);
+  }
+
   .multi-day-row-wrapper {
     position: relative;
     overflow: hidden scroll;
@@ -248,7 +264,10 @@
     top: 0;
     left: 0;
 
+    display: flex;
     flex: 0 0 var(--time-ruler-width);
+    flex-direction: column-reverse;
+    align-items: center;
 
     background-color: var(--background-primary);
     border: 1px solid var(--background-modifier-border);
