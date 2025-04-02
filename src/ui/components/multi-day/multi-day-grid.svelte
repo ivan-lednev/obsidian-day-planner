@@ -14,6 +14,7 @@
     getPreviousWorkWeek,
   } from "../../../util/range";
   import * as r from "../../../util/range";
+  import { createResizeAction } from "../../actions/create-resize-action";
   import { createColumnChangeMenu } from "../../column-change-menu";
   import Search from "../../components/search.svelte";
   import ControlButton from "../control-button.svelte";
@@ -27,13 +28,12 @@
     GripHorizontal,
     Search as SearchIcon,
   } from "../lucide";
-  import ResizeableBox from "../resizeable-box.svelte";
   import Ruler from "../ruler.svelte";
   import Scroller from "../scroller.svelte";
   import SettingsControls from "../settings-controls.svelte";
   import Timeline from "../timeline.svelte";
 
-  import ColumnTracksOverlay from "./ColumnTracksOverlay.svelte";
+  import ColumnTracksOverlay from "./column-tracks-overlay.svelte";
   import MultiDayRow from "./multi-day-row.svelte";
 
   const { workspaceFacade, settings } = getObsidianContext();
@@ -55,30 +55,54 @@
   let daysRef: HTMLDivElement | undefined;
   let multiDayRowRef: HTMLDivElement | undefined = $state();
   let multiDayRowBordersRef: HTMLDivElement | undefined = $state();
+  let rulerRef: HTMLDivElement | undefined = $state();
 
   function handleScroll(event: Event) {
-    if (event.target instanceof Element) {
-      if (daysRef) {
-        daysRef.scrollLeft = event.target.scrollLeft;
-      }
+    if (!(event.target instanceof Element)) {
+      return;
+    }
 
-      if (multiDayRowRef) {
-        multiDayRowRef.scrollLeft = event.target.scrollLeft;
-      }
+    if (daysRef) {
+      daysRef.scrollLeft = event.target.scrollLeft;
+    }
 
-      if (multiDayRowBordersRef) {
-        multiDayRowBordersRef.scrollLeft = event.target.scrollLeft;
-      }
+    if (multiDayRowRef) {
+      multiDayRowRef.scrollLeft = event.target.scrollLeft;
+    }
+
+    if (multiDayRowBordersRef) {
+      multiDayRowBordersRef.scrollLeft = event.target.scrollLeft;
+    }
+
+    if (rulerRef) {
+      rulerRef.scrollTop = event.target.scrollTop;
     }
   }
+
+  const { startResizing, resizeAction } = createResizeAction();
 </script>
+
+<div class="corner">
+  <GripHorizontal
+    class="horizontal-grip"
+    onmousedown={startResizing}
+    ontouchstart={startResizing}
+  />
+</div>
+
+<div bind:this={rulerRef} class="ruler">
+  <Ruler
+    --ruler-box-shadow="var(--shadow-right)"
+    visibleHours={getVisibleHours($settings)}
+  />
+  <div class="scrollbar-filler"></div>
+</div>
 
 <div
   bind:this={daysRef}
   style:--timeline-internal-column-count={$settings.showTimeTracker ? 2 : 1}
   class={["dp-header-row", "day-buttons"]}
 >
-  <div class="corner"></div>
   {#each $dateRange as day}
     <div class={["header-cell", $isToday(day) && "today"]}>
       <ControlButton
@@ -94,24 +118,16 @@
 </div>
 
 {#if $settings.showUncheduledTasks}
-  <ResizeableBox
-    --timeline-internal-column-count={$settings.showTimeTracker ? 2 : 1}
+  <div
+    style:--timeline-internal-column-count={$settings.showTimeTracker ? 2 : 1}
     class={["dp-header-row", "horizontal-resize-box-wrapper"]}
+    use:resizeAction
   >
-    {#snippet children(startEdit)}
-      <div class="corner">
-        <GripHorizontal
-          class="horizontal-grip"
-          onpointerdown={startEdit}
-          ontouchstart={startEdit}
-        />
-      </div>
-      <div bind:this={multiDayRowRef} class="multi-day-row-wrapper">
-        <MultiDayRow />
-      </div>
-      <ColumnTracksOverlay columnCount={7} bind:el={multiDayRowBordersRef} />
-    {/snippet}
-  </ResizeableBox>
+    <div bind:this={multiDayRowRef} class="multi-day-row-wrapper">
+      <MultiDayRow />
+    </div>
+    <ColumnTracksOverlay columnCount={7} bind:el={multiDayRowBordersRef} />
+  </div>
 {/if}
 
 <div class="controls-sidebar">
@@ -189,10 +205,6 @@
 {/if}
 
 <Scroller className="multi-day-main-content" onscroll={handleScroll}>
-  <Ruler
-    --ruler-box-shadow="var(--shadow-right)"
-    visibleHours={getVisibleHours($settings)}
-  />
   {#each $dateRange as day}
     <Timeline
       --column-background-color={getColumnBackgroundColor(day)}
@@ -212,6 +224,17 @@
     overflow-x: hidden;
     display: flex;
     box-shadow: var(--shadow-bottom);
+  }
+
+  .ruler {
+    z-index: 500;
+    overflow-y: hidden;
+    grid-area: ruler;
+    box-shadow: var(--shadow-bottom);
+  }
+
+  .scrollbar-filler {
+    height: var(--scrollbar-width);
   }
 
   :global(.horizontal-grip) {
@@ -259,20 +282,17 @@
   }
 
   .corner {
-    position: sticky;
-    z-index: 100;
-    top: 0;
-    left: 0;
+    z-index: 1000;
 
     display: flex;
-    flex: 0 0 var(--time-ruler-width);
+    grid-area: corner;
     flex-direction: column-reverse;
     align-items: center;
 
     background-color: var(--background-primary);
-    border: 1px solid var(--background-modifier-border);
-    border-top: none;
-    border-left: none;
+    border-right: 1px solid var(--background-modifier-border);
+    border-bottom: 1px solid var(--background-modifier-border);
+    box-shadow: var(--shadow-bottom);
   }
 
   .header-cell {

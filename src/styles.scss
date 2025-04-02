@@ -107,7 +107,6 @@
 
 [data-type="planner-timeline"] .view-content,
 [data-type="planner-weekly"] .view-content {
-  --time-ruler-width: 30px;
   --scrollbar-width: 12px;
   --timeline-flex-basis: 240px;
 
@@ -137,12 +136,11 @@ body {
 
   .view-content {
     display: grid;
-    grid-template-columns: 1fr auto auto;
     grid-template-rows: auto auto 1fr;
     grid-template-areas:
-      "dates sidebar settings"
-      "multiday sidebar settings"
-      "timelines sidebar settings";
+      "corner dates sidebar settings"
+      "corner multiday sidebar settings"
+      "ruler timelines sidebar settings";
   }
 
   .view-actions {

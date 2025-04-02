@@ -15,7 +15,7 @@
   .wrapper {
     position: absolute;
     z-index: -1;
-    inset: 0 var(--scrollbar-width) 0 var(--time-ruler-width);
+    inset: 0 var(--scrollbar-width) 0 0;
 
     overflow-x: hidden;
     display: grid;
