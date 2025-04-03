@@ -36,9 +36,9 @@ export function resizeAndShiftOthers(
     (result, current) => {
       const previous = last(result) || updated;
 
-      if (
-        getEndMinutes(previous) > getMinutesSinceMidnight(current.startTime)
-      ) {
+      const isSameDay = current.location!.path === updated.location!.path;
+      const currentOverlapsPrevious = getEndMinutes(previous) > getMinutesSinceMidnight(current.startTime);
+      if (currentOverlapsPrevious && isSameDay) {
         return [
           ...result,
           {
@@ -89,10 +89,9 @@ export function resizeFromTopAndShiftOthers(
     .reduce<WithTime<LocalTask>[]>((result, current) => {
       const nextInTimeline = last(result) || updated;
 
-      if (
-        getMinutesSinceMidnight(nextInTimeline.startTime) <
-        getEndMinutes(current)
-      ) {
+      const nextOverlapsCurrent = getMinutesSinceMidnight(nextInTimeline.startTime) < getEndMinutes(current);
+      const isSameDay = current.location!.path === updated.location!.path;
+      if (nextOverlapsCurrent && isSameDay) {
         return [
           ...result,
           {
