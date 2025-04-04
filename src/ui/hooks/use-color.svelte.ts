@@ -17,15 +17,25 @@ const defaultBorderColor = "var(--color-base-50)";
 export function useColor({ task }: UseColorProps) {
   const { settingsSignal, isDarkMode } = getObsidianContext();
 
-  const endTime = $derived(
-    t.isWithTime(task)
-      ? t.getEndTime(task)
-      : task.startTime.clone().endOf("day"),
-  );
+  const relationToNow = $derived.by(() => {
+    if (task.isAllDayEvent) {
+      return getRelationToNow(
+        currentTimeSignal.current,
+        task.startTime.clone().startOf("day"),
+        task.startTime.clone().endOf("day"),
+      );
+    }
 
-  const relationToNow = $derived(
-    getRelationToNow(currentTimeSignal.current, task.startTime, endTime),
-  );
+    if (t.isWithTime(task)) {
+      return getRelationToNow(
+        currentTimeSignal.current,
+        task.startTime,
+        t.getEndTime(task),
+      );
+    }
+
+    return "present";
+  });
 
   const colorScale = $derived.by(() => {
     const { timelineStartColor, timelineEndColor } = settingsSignal.current;
@@ -64,7 +74,9 @@ export function useColor({ task }: UseColorProps) {
   });
 
   const borderColor = $derived(
-    relationToNow === "present" ? "var(--color-accent)" : defaultBorderColor,
+    relationToNow === "present" && !task.isAllDayEvent
+      ? "var(--color-accent)"
+      : defaultBorderColor,
   );
 
   const properContrastColors = $derived.by(() => {
