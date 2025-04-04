@@ -14,7 +14,7 @@
     getPreviousWorkWeek,
   } from "../../../util/range";
   import * as r from "../../../util/range";
-  import { createResizeAction } from "../../actions/create-resize-action";
+  import { createResizeState } from "../../actions/create-resize-state";
   import { createColumnChangeMenu } from "../../column-change-menu";
   import Search from "../../components/search.svelte";
   import ControlButton from "../control-button.svelte";
@@ -79,15 +79,17 @@
     }
   }
 
-  const { startResizing, resizeAction } = createResizeAction();
+  const { startResizing, resizeAction } = createResizeState();
 </script>
 
 <div class="corner">
-  <GripHorizontal
-    class="horizontal-grip"
-    onmousedown={startResizing}
-    ontouchstart={startResizing}
-  />
+  {#if $settings.showUncheduledTasks}
+    <GripHorizontal
+      class="horizontal-grip"
+      onmousedown={startResizing}
+      ontouchstart={startResizing}
+    />
+  {/if}
 </div>
 
 <div bind:this={rulerRef} class="ruler">
