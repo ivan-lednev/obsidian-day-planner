@@ -51,12 +51,7 @@ import { hasClockProp } from "./clock";
 import * as dv from "./dataview";
 import { withClockMoments } from "./dataview";
 import { getUpdateTrigger } from "./store";
-import {
-  getDayKey,
-  getRenderKey,
-  isWithTime,
-  offsetYToMinutes,
-} from "./task-utils";
+import { getDayKey, getRenderKey, offsetYToMinutes } from "./task-utils";
 
 interface CreateHooksProps {
   app: App;
@@ -182,12 +177,12 @@ export function useTasks(props: {
 
   const localTasks = useVisibleDataviewTasks(dataviewTasks, visibleDays);
 
-  const tasksForToday = derived(
+  const tasksWithTimeForToday = derived(
     [localTasks, remoteTasks, currentTime],
     ([$localTasks, $remoteTasks, $currentTime]) => {
       return [...$localTasks, ...$remoteTasks].filter(
         (task): task is WithTime<Task> =>
-          task.startTime.isSame($currentTime, "day") && isWithTime(task),
+          task.startTime.isSame($currentTime, "day") && !task.isAllDayEvent,
       );
     },
   );
@@ -204,14 +199,14 @@ export function useTasks(props: {
 
   const newlyStartedTasks = useNewlyStartedTasks({
     settings: settingsStore,
-    tasksForToday,
+    tasksWithTimeForToday,
     currentTime,
   });
 
   return {
     tasksWithActiveClockProps,
     getDisplayedTasksWithClocksForTimeline,
-    tasksForToday,
+    tasksWithTimeForToday,
     editContext,
     newlyStartedTasks,
   };
@@ -324,7 +319,7 @@ export function createHooks({
   const {
     tasksWithActiveClockProps,
     getDisplayedTasksWithClocksForTimeline,
-    tasksForToday,
+    tasksWithTimeForToday,
     editContext,
     newlyStartedTasks,
   } = useTasks({
@@ -348,7 +343,7 @@ export function createHooks({
     pointerOffsetY,
     tasksWithActiveClockProps,
     editContext,
-    tasksForToday,
+    tasksWithTimeForToday,
     dataviewLoaded,
     newlyStartedTasks,
     isModPressed,

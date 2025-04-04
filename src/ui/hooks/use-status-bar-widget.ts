@@ -15,7 +15,7 @@ import type { DateRanges } from "./use-date-ranges";
 import type DayPlanner from "src/main";
 
 interface UseStatusBarWidgetProps {
-  tasksForToday: Readable<Array<WithTime<Task>>>;
+  tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
 }
 
 interface Widget {
@@ -41,9 +41,9 @@ export function mountStatusBarWidget(props: {
   plugin: DayPlanner;
   errorStore: Writable<Error | undefined>;
   dateRanges: DateRanges;
-  tasksForToday: Readable<Array<WithTime<Task>>>;
+  tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
 }) {
-  const { plugin, tasksForToday, errorStore, dateRanges } = props;
+  const { plugin, tasksWithTimeForToday, errorStore, dateRanges } = props;
 
   const statusBarWidgetContainer = plugin.addStatusBarItem();
 
@@ -53,7 +53,7 @@ export function mountStatusBarWidget(props: {
     target: statusBarWidgetContainer,
     props: {
       onClick: plugin.initTimelineLeaf,
-      tasksForToday,
+      tasksWithTimeForToday,
       errorStore,
     },
   });
@@ -65,18 +65,20 @@ export function mountStatusBarWidget(props: {
   };
 }
 
-export function useStatusBarWidget({ tasksForToday }: UseStatusBarWidgetProps) {
+export function useStatusBarWidget({
+  tasksWithTimeForToday,
+}: UseStatusBarWidgetProps) {
   return derived(
-    [tasksForToday, currentTime],
-    ([$tasksForToday, $currentTime]) => {
-      const currentItem = $tasksForToday.find(
+    [tasksWithTimeForToday, currentTime],
+    ([$tasksWithTimeForToday, $currentTime]) => {
+      const currentItem = $tasksWithTimeForToday.find(
         (item) =>
           item.startTime.isBefore($currentTime) &&
           getEndTime(item).isAfter($currentTime),
       );
 
       // TODO: add tests
-      const nextItem = $tasksForToday
+      const nextItem = $tasksWithTimeForToday
         .slice()
         // todo: remote dupilcation
         .sort((a, b) => a.startTime.diff(b.startTime))

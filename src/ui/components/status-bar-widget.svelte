@@ -6,10 +6,10 @@
   import { useStatusBarWidget } from "../hooks/use-status-bar-widget";
 
   export let onClick: () => Promise<void>;
-  export let tasksForToday: Readable<Array<WithTime<Task>>>;
+  export let tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
   export let errorStore: Readable<Error | undefined>;
 
-  const statusBarProps = useStatusBarWidget({ tasksForToday });
+  const statusBarProps = useStatusBarWidget({ tasksWithTimeForToday });
 
   $: ({ showNow, showNext, progressIndicator, timestampFormat } = $settings);
   $: ({ current, next } = $statusBarProps);

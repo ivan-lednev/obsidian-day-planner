@@ -437,7 +437,7 @@ export default class DayPlanner extends Plugin {
     const useSelector = createUseSelector(this.store);
     const {
       editContext,
-      tasksForToday,
+      tasksWithTimeForToday,
       dataviewLoaded,
       dataviewChange,
       isModPressed,
@@ -509,7 +509,7 @@ export default class DayPlanner extends Plugin {
       plugin: this,
       errorStore,
       dateRanges,
-      tasksForToday,
+      tasksWithTimeForToday,
     });
 
     this.register(destroyStatusBarWidget);

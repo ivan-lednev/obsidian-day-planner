@@ -9,11 +9,11 @@ import { getEndTime, getNotificationKey } from "../../util/task-utils";
 interface UseNewlyStartedTasksProps {
   settings: Readable<DayPlannerSettings>;
   currentTime: Readable<Moment>;
-  tasksForToday: Readable<Array<WithTime<Task>>>;
+  tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
 }
 
 export function useNewlyStartedTasks(props: UseNewlyStartedTasksProps) {
-  const { settings, currentTime, tasksForToday } = props;
+  const { settings, currentTime, tasksWithTimeForToday } = props;
   let previousTasksInProgress: Array<WithTime<Task>> = [];
 
   return derived([settings, currentTime], ([$settings, $currentTime]) => {
@@ -21,7 +21,7 @@ export function useNewlyStartedTasks(props: UseNewlyStartedTasksProps) {
       return [];
     }
 
-    const tasksInProgress = get(tasksForToday).filter((task) => {
+    const tasksInProgress = get(tasksWithTimeForToday).filter((task) => {
       return (
         task.startTime.isBefore($currentTime) &&
         getEndTime(task).isAfter($currentTime)
