@@ -179,11 +179,13 @@ export function useTasks(props: {
 
   const tasksWithTimeForToday = derived(
     [localTasks, remoteTasks, currentTime],
-    ([$localTasks, $remoteTasks, $currentTime]) => {
-      return [...$localTasks, ...$remoteTasks].filter(
-        (task): task is WithTime<Task> =>
-          task.startTime.isSame($currentTime, "day") && !task.isAllDayEvent,
-      );
+    ([$localTasks, $remoteTasks, $currentTime]: [Task[], Task[], Moment]) => {
+      return $localTasks
+        .concat($remoteTasks)
+        .filter(
+          (task): task is WithTime<Task> =>
+            task.startTime.isSame($currentTime, "day") && !task.isAllDayEvent,
+        );
     },
   );
 

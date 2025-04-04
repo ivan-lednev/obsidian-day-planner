@@ -50,7 +50,7 @@
   }
 </script>
 
-<div class="multi-day-row">
+<div style:--column-count={$dateRange.length} class="multi-day-row">
   {#each $tasks as task}
     <UnscheduledTimeBlock
       --time-block-grid-column="{getColumnIndex(task)} / span {getSpan(task)}"
@@ -61,13 +61,14 @@
 
 <style>
   .multi-day-row {
-    --multi-day-row-columns: repeat(7, minmax(var(--cell-flex-basis), 1fr));
-
     position: relative;
 
     display: grid;
     grid-auto-flow: column;
-    grid-template-columns: var(--multi-day-row-columns);
+    grid-template-columns: repeat(
+      var(--column-count),
+      minmax(var(--cell-flex-basis), 1fr)
+    );
     flex: 1 0 0;
     align-self: flex-start;
   }

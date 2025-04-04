@@ -5,7 +5,7 @@
   }: { el?: HTMLDivElement; columnCount: number } = $props();
 </script>
 
-<div bind:this={el} class="wrapper">
+<div bind:this={el} style:--column-count={columnCount} class="wrapper">
   {#each Array.from({ length: columnCount }) as _, index}
     <div style:grid-column={index + 1} class="border"></div>
   {/each}
@@ -19,7 +19,10 @@
 
     overflow-x: hidden;
     display: grid;
-    grid-template-columns: repeat(7, minmax(var(--cell-flex-basis), 1fr));
+    grid-template-columns: repeat(
+      var(--column-count),
+      minmax(var(--cell-flex-basis), 1fr)
+    );
   }
 
   .border {

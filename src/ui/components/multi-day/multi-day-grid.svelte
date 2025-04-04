@@ -131,7 +131,10 @@
     <div bind:this={multiDayRowRef} class="multi-day-row-wrapper">
       <MultiDayRow />
     </div>
-    <ColumnTracksOverlay columnCount={7} bind:el={multiDayRowBordersRef} />
+    <ColumnTracksOverlay
+      columnCount={$dateRange.length}
+      bind:el={multiDayRowBordersRef}
+    />
   </div>
 {/if}
 
