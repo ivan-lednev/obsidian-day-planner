@@ -38,6 +38,7 @@
     padding-inline: var(--size-4-1);
 
     font-size: var(--font-ui-smaller);
+    font-weight: var(--font-semibold);
     color: var(--text-muted);
 
     border-bottom: 1px solid var(--background-modifier-border);

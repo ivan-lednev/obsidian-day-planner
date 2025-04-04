@@ -318,6 +318,8 @@
 
     width: var(--cell-flex-basis);
 
+    font-weight: var(--font-semibold);
+
     background-color: var(--background-primary);
     border-right: 1px solid var(--background-modifier-border);
     border-bottom: 1px solid var(--background-modifier-border);
