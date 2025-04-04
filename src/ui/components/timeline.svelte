@@ -183,7 +183,6 @@
     display: flex;
     flex-direction: column;
 
-    margin-right: 10px;
-    margin-left: 10px;
+    margin-inline: var(--size-4-2);
   }
 </style>

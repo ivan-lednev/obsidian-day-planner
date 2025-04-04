@@ -139,9 +139,9 @@ body {
     grid-template-rows: auto auto 1fr;
     grid-template-columns: auto 1fr auto auto;
     grid-template-areas:
-      "corner dates sidebar settings"
-      "corner multiday sidebar settings"
-      "ruler timelines sidebar settings";
+      "corner dates settings"
+      "corner multiday settings"
+      "ruler timelines settings";
   }
 
   .view-actions {

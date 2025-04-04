@@ -132,66 +132,6 @@
   </div>
 {/if}
 
-<div class="controls-sidebar">
-  <ControlButton
-    isActive={visibleSideControls === "search"}
-    onclick={() => toggleSideControls("search")}
-  >
-    <SearchIcon />
-  </ControlButton>
-
-  <ControlButton
-    isActive={visibleSideControls === "settings"}
-    onclick={() => toggleSideControls("settings")}
-  >
-    <Settings />
-  </ControlButton>
-
-  <ControlButton
-    label="Change columns"
-    onclick={(event) => createColumnChangeMenu({ event, settings })}
-  >
-    <Columns3 />
-  </ControlButton>
-
-  <ControlButton
-    label="Show current period"
-    onclick={() => {
-      dateRange.set(
-        r.createRange($settings.multiDayRange, $settings.firstDayOfWeek),
-      );
-    }}
-  >
-    <CalendarArrowUp />
-  </ControlButton>
-
-  <ControlButton
-    label="Show next period"
-    onclick={() => {
-      dateRange.update(
-        $settings.multiDayRange === "work-week"
-          ? ([firstDay]) => getNextWorkWeek(firstDay)
-          : getNextAdjacentRange,
-      );
-    }}
-  >
-    <ChevronRight />
-  </ControlButton>
-
-  <ControlButton
-    label="Show previous period"
-    onclick={() => {
-      dateRange.update(
-        $settings.multiDayRange === "work-week"
-          ? ([firstDay]) => getPreviousWorkWeek(firstDay)
-          : getPreviousAdjacentRange,
-      );
-    }}
-  >
-    <ChevronLeft />
-  </ControlButton>
-</div>
-
 {#if visibleSideControls !== "none"}
   <div
     class="side-controls-wrapper"
@@ -206,15 +146,77 @@
   </div>
 {/if}
 
-<Scroller className="multi-day-main-content" onscroll={handleScroll}>
-  {#each $dateRange as day}
-    <Timeline
-      --column-background-color={getColumnBackgroundColor(day)}
-      {day}
-      isUnderCursor={true}
-    />
-  {/each}
-</Scroller>
+<div class="multi-day-main-content">
+  <Scroller onscroll={handleScroll}>
+    {#each $dateRange as day}
+      <Timeline
+        --column-background-color={getColumnBackgroundColor(day)}
+        {day}
+        isUnderCursor={true}
+      />
+    {/each}
+  </Scroller>
+
+  <div class="controls-sidebar">
+    <ControlButton
+      isActive={visibleSideControls === "search"}
+      onclick={() => toggleSideControls("search")}
+    >
+      <SearchIcon />
+    </ControlButton>
+
+    <ControlButton
+      isActive={visibleSideControls === "settings"}
+      onclick={() => toggleSideControls("settings")}
+    >
+      <Settings />
+    </ControlButton>
+
+    <ControlButton
+      label="Change columns"
+      onclick={(event) => createColumnChangeMenu({ event, settings })}
+    >
+      <Columns3 />
+    </ControlButton>
+
+    <ControlButton
+      label="Show current period"
+      onclick={() => {
+        dateRange.set(
+          r.createRange($settings.multiDayRange, $settings.firstDayOfWeek),
+        );
+      }}
+    >
+      <CalendarArrowUp />
+    </ControlButton>
+
+    <ControlButton
+      label="Show next period"
+      onclick={() => {
+        dateRange.update(
+          $settings.multiDayRange === "work-week"
+            ? ([firstDay]) => getNextWorkWeek(firstDay)
+            : getNextAdjacentRange,
+        );
+      }}
+    >
+      <ChevronRight />
+    </ControlButton>
+
+    <ControlButton
+      label="Show previous period"
+      onclick={() => {
+        dateRange.update(
+          $settings.multiDayRange === "work-week"
+            ? ([firstDay]) => getPreviousWorkWeek(firstDay)
+            : getPreviousAdjacentRange,
+        );
+      }}
+    >
+      <ChevronLeft />
+    </ControlButton>
+  </div>
+</div>
 
 <style>
   :global(.dp-header-row) {
@@ -269,18 +271,28 @@
   }
 
   .controls-sidebar {
+    position: absolute;
+    top: 0;
+    right: var(--scrollbar-width);
+
     display: flex;
-    grid-area: sidebar;
     flex-direction: column;
     gap: var(--size-4-2);
+    align-self: flex-start;
 
     padding: var(--size-4-2) var(--size-4-1);
 
+    background-color: var(--background-primary);
     border-left: 1px solid var(--background-modifier-border);
+    border-bottom-left-radius: var(--radius-m);
+    box-shadow: var(--input-shadow);
   }
 
-  :global(.multi-day-main-content) {
+  .multi-day-main-content {
+    position: relative;
+    display: flex;
     grid-area: timelines;
+    flex-direction: column;
   }
 
   .corner {
