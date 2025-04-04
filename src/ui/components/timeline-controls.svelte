@@ -100,15 +100,19 @@
     </div>
 
     <ControlButton
-      class={{ today: $isToday($dateRange[0]) }}
       label="Go to file"
       onclick={async () => {
         const note = await createDailyNoteIfNeeded($dateRange[0]);
+
         await workspaceFacade.openFileInEditor(note);
       }}
     >
-      <span class={["date", $isToday($dateRange[0]) && "today"]}
-        >{$dateRange[0].format($settings.timelineDateFormat)}</span
+      <span class="date">
+        {#if $isToday($dateRange[0])}
+          🔵
+        {/if}
+
+        {$dateRange[0].format($settings.timelineDateFormat)}</span
       >
     </ControlButton>
 
@@ -159,10 +163,6 @@
   :global(.today),
   :global(.today:hover) {
     background-color: var(--color-accent);
-  }
-
-  .date.today {
-    color: white;
   }
 
   .date {

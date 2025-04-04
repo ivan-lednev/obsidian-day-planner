@@ -106,13 +106,16 @@
   class={["dp-header-row", "day-buttons"]}
 >
   {#each $dateRange as day}
-    <div class={["header-cell", $isToday(day) && "today"]}>
+    <div class="header-cell">
       <ControlButton
         --border-radius="0"
-        --color={$isToday(day) ? "white" : "var(--icon-color)"}
         label="Open note for day"
         onclick={async () => await workspaceFacade.openFileForDay(day)}
       >
+        {#if $isToday(day)}
+          🔵
+        {/if}
+
         {day.format($settings.timelineDateFormat)}
       </ControlButton>
     </div>
@@ -323,11 +326,6 @@
   .header-cell:last-of-type {
     flex: 1 0 calc(var(--cell-flex-basis) + var(--scrollbar-width));
     border-right: none;
-  }
-
-  .today {
-    color: white;
-    background-color: var(--color-accent);
   }
 
   .side-controls-wrapper {
