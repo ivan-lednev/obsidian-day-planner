@@ -2,7 +2,7 @@ import { TFile, Vault } from "obsidian";
 import { isInstanceOf } from "typed-assert";
 
 import type { TasksApiV1 } from "../tasks-plugin";
-import { toggleCheckbox, updateLine } from "../util/util";
+import { toggleCheckbox, updateLine } from "../util/markdown";
 
 export class VaultFacade {
   constructor(

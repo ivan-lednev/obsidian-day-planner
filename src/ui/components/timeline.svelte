@@ -8,8 +8,8 @@
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { isRemote } from "../../task-types";
+  import { getIsomorphicClientY, isTouchEvent } from "../../util/dom";
   import { getRenderKey } from "../../util/task-utils";
-  import { getIsomorphicClientY, isTouchEvent } from "../../util/util";
   import { createGestures } from "../actions/gestures";
   import { createTimeBlockMenu } from "../time-block-menu";
 
@@ -105,22 +105,20 @@
     use:timelineGestures
   >
     {#each $displayedTasksForTimeline.withTime as task (getRenderKey(task))}
-      {#if isRemote(task)}
-        <PositionedTimeBlock {task}>
+      <PositionedTimeBlock {task}>
+        {#if isRemote(task)}
           <TimeBlockBase {task}>
             <RemoteTimeBlockContent {task} />
           </TimeBlockBase>
-        </PositionedTimeBlock>
-      {:else}
-        <Selectable
-          onSecondarySelect={(event) =>
-            createTimeBlockMenu({ event, task, workspaceFacade })}
-          selectionBlocked={Boolean($editOperation)}
-        >
-          {#snippet children(selectable)}
-            <FloatingControls active={selectable.state === "primary"}>
-              {#snippet anchor(floatingControls)}
-                <PositionedTimeBlock {task}>
+        {:else}
+          <Selectable
+            onSecondarySelect={(event) =>
+              createTimeBlockMenu({ event, task, workspaceFacade })}
+            selectionBlocked={Boolean($editOperation)}
+          >
+            {#snippet children(selectable)}
+              <FloatingControls active={selectable.state === "primary"}>
+                {#snippet anchor(floatingControls)}
                   <LocalTimeBlock
                     isActive={selectable.state !== "none" ||
                       $editOperation?.task.id === task.id}
@@ -128,32 +126,32 @@
                     {task}
                     use={[...selectable.use, ...floatingControls.actions]}
                   />
-                </PositionedTimeBlock>
-              {/snippet}
-              {#snippet topEnd({ isActive, setIsActive })}
-                <DragControls
-                  --expanding-controls-position="absolute"
-                  {isActive}
-                  {setIsActive}
-                  {task}
-                />
-              {/snippet}
-              {#snippet bottom({ isActive, setIsActive })}
-                <ResizeControls {isActive} reverse {setIsActive} {task} />
-              {/snippet}
-              {#snippet top({ isActive, setIsActive })}
-                <ResizeControls
-                  fromTop
-                  {isActive}
-                  reverse
-                  {setIsActive}
-                  {task}
-                />
-              {/snippet}
-            </FloatingControls>
-          {/snippet}
-        </Selectable>
-      {/if}
+                {/snippet}
+                {#snippet topEnd({ isActive, setIsActive })}
+                  <DragControls
+                    --expanding-controls-position="absolute"
+                    {isActive}
+                    {setIsActive}
+                    {task}
+                  />
+                {/snippet}
+                {#snippet bottom({ isActive, setIsActive })}
+                  <ResizeControls {isActive} reverse {setIsActive} {task} />
+                {/snippet}
+                {#snippet top({ isActive, setIsActive })}
+                  <ResizeControls
+                    fromTop
+                    {isActive}
+                    reverse
+                    {setIsActive}
+                    {task}
+                  />
+                {/snippet}
+              </FloatingControls>
+            {/snippet}
+          </Selectable>
+        {/if}
+      </PositionedTimeBlock>
     {/each}
   </div>
 </Column>

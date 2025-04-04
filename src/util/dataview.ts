@@ -27,9 +27,9 @@ import {
 } from "./clock";
 import { getId } from "./id";
 import { liftToArray } from "./lift";
+import { indent, indentLines } from "./markdown";
 import { splitMultiday } from "./moment";
 import { getFirstLine } from "./task-utils";
-import { indent, indentLines } from "./util";
 
 interface Node {
   text: string;

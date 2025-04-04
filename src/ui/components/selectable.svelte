@@ -2,7 +2,7 @@
   import { type Snippet } from "svelte";
 
   import { MouseButton, vibrationDurationMillis } from "../../constants";
-  import { isTouchEvent } from "../../util/util";
+  import { isTouchEvent } from "../../util/dom";
   import { createGestures } from "../actions/gestures";
   import { pointerUpOutside } from "../actions/pointer-up-outside";
   import type { HTMLActionArray } from "../actions/use-actions";

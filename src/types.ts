@@ -1,3 +1,4 @@
+import type Fraction from "fraction.js";
 import type { Moment } from "moment";
 import type { Readable, Writable } from "svelte/store";
 
@@ -25,6 +26,7 @@ export interface Overlap {
   columns: number;
   span: number;
   start: number;
+  fraction?: Fraction;
 }
 
 export type CleanUp = () => void;

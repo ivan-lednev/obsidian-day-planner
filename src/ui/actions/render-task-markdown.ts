@@ -5,9 +5,9 @@ import type { VaultFacade } from "../../service/vault-facade";
 import type { DayPlannerSettings } from "../../settings";
 import type { LocalTask } from "../../task-types";
 import type { RenderMarkdown } from "../../types";
-import { deleteProps } from "../../util/properties";
+import { deleteProps } from "../../util/dataview-props";
+import { normalizeNewlines } from "../../util/markdown";
 import { getFirstLine, getRenderKey } from "../../util/task-utils";
-import { normalizeNewlines } from "../../util/util";
 
 import { createMemo } from "./memoize-props";
 

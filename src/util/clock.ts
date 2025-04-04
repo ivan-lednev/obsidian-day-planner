@@ -4,8 +4,8 @@ import { STask } from "obsidian-dataview";
 
 import { clockFormat, clockKey, clockSeparator } from "../constants";
 
+import { createProp, updateProp } from "./dataview-props";
 import { getDiffInMinutes, getMinutesSinceMidnight } from "./moment";
-import { createProp, updateProp } from "./properties";
 
 interface Time {
   startMinutes: number;

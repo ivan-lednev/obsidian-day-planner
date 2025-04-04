@@ -1,7 +1,7 @@
 import { on } from "svelte/events";
 import { isNotVoid } from "typed-assert";
 
-import { getIsomorphicClientY } from "../../util/util";
+import { getIsomorphicClientY } from "../../util/dom";
 
 export function createResizeAction() {
   const onDestroyCallbacks: Array<() => void> = [];

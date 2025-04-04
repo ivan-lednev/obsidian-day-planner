@@ -16,8 +16,8 @@ import type { DayPlannerSettings } from "../settings";
 import type { LocalTask } from "../task-types";
 import { EditMode } from "../ui/hooks/use-edit/types";
 import { createDailyNotePath } from "../util/daily-notes";
+import { createHeading } from "../util/markdown";
 import * as t from "../util/task-utils";
-import { createHeading } from "../util/util";
 
 import type { VaultFacade } from "./vault-facade";
 

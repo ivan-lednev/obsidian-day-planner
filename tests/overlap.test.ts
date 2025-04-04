@@ -267,3 +267,102 @@ test("stops at first occupied slot from previous group", () => {
     ]),
   );
 });
+
+/*
+ ┌─────┐┌────┐┌─────┐┌───┐
+ │ 1   ││2   ││3    ││4  │
+ │     ││    ││     ││   │
+ │     ││    ││     ││   │
+ │     │└────┘│     │└───┘
+ │     │┌────┐│     │
+ │     ││5   ││     │
+ │     ││    ││     │
+ └─────┘└────┘└─────┘
+ */
+test.skip("items in the second overlap group are placed correctly when overlapping 2 other elements", () => {
+  expect(
+    computeOverlap([
+      { id: "1", startTime: moment("2023-01-01 00:01"), durationMinutes: 5 },
+      { id: "2", startTime: moment("2023-01-01 00:01"), durationMinutes: 2 },
+      { id: "3", startTime: moment("2023-01-01 00:01"), durationMinutes: 5 },
+      { id: "4", startTime: moment("2023-01-01 00:01"), durationMinutes: 2 },
+      { id: "5", startTime: moment("2023-01-01 00:04"), durationMinutes: 2 },
+    ]),
+  ).toEqual(
+    new Map([
+      ["1", { start: 0, span: 1, columns: 4 }],
+      ["2", { start: 1, span: 1, columns: 4 }],
+      ["3", { start: 2, span: 1, columns: 4 }],
+      ["4", { start: 3, span: 1, columns: 4 }],
+      ["5", { start: 1, span: 1, columns: 4 }],
+    ]),
+  );
+});
+
+/*
+ ┌─────┐┌────┐┌─────┐┌───┐
+ │ 1   ││2   ││3    ││4  │
+ │     ││    ││     ││   │
+ │     ││    ││     ││   │
+ │     │└────┘└─────┘│   │
+ │     │┌───────────┐│   │
+ │     ││5          ││   │
+ │     ││           ││   │
+ └─────┘└───────────┘└───┘
+ */
+test.skip("items in a second group occupy all the available space", () => {
+  expect(
+    computeOverlap([
+      { id: "1", startTime: moment("2023-01-01 00:01"), durationMinutes: 5 },
+      { id: "2", startTime: moment("2023-01-01 00:01"), durationMinutes: 2 },
+      { id: "3", startTime: moment("2023-01-01 00:01"), durationMinutes: 2 },
+      { id: "4", startTime: moment("2023-01-01 00:01"), durationMinutes: 5 },
+      { id: "5", startTime: moment("2023-01-01 00:04"), durationMinutes: 2 },
+    ]),
+  ).toEqual(
+    new Map([
+      ["1", { start: 0, span: 1, columns: 4 }],
+      ["2", { start: 1, span: 1, columns: 4 }],
+      ["3", { start: 2, span: 1, columns: 4 }],
+      ["4", { start: 3, span: 1, columns: 4 }],
+      ["5", { start: 1, span: 2, columns: 4 }],
+    ]),
+  );
+});
+
+/*
+ ┌────────┐┌──────────┐
+ │        ││          │
+ │        ││          │
+ │        ││          │
+ │        │└──────────┘
+ │        │┌──┐┌──┐┌──┐
+ │        ││  ││  ││  │
+ │        ││  ││  ││  │
+ │        │└──┘│  │└──┘
+ │        │┌──┐│  │
+ │        ││  ││  │
+ │        ││  ││  │
+ └────────┘└──┘└──┘
+*/
+test.skip("3 overlap groups", () => {
+  expect(
+    computeOverlap([
+      { id: "1", startTime: moment("2023-01-01 00:01"), durationMinutes: 10 },
+      { id: "2", startTime: moment("2023-01-01 00:01"), durationMinutes: 2 },
+      { id: "3", startTime: moment("2023-01-01 00:03"), durationMinutes: 2 },
+      { id: "4", startTime: moment("2023-01-01 00:03"), durationMinutes: 10 },
+      { id: "5", startTime: moment("2023-01-01 00:03"), durationMinutes: 2 },
+      { id: "6", startTime: moment("2023-01-01 00:05"), durationMinutes: 2 },
+    ]),
+  ).toEqual(
+    new Map([
+      ["1", { start: 0, span: 1, columns: 2 }],
+      ["2", { start: 1, span: 1, columns: 2 }],
+      ["3", { start: 3, span: 1, columns: 6 }],
+      ["4", { start: 4, span: 1, columns: 6 }],
+      ["5", { start: 5, span: 1, columns: 6 }],
+      ["6", { start: 3, span: 1, columns: 6 }],
+    ]),
+  );
+});

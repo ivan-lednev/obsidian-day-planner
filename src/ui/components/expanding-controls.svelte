@@ -6,7 +6,7 @@
     transitionDurationShort,
     vibrationDurationMillis,
   } from "../../constants";
-  import { isTouchEvent } from "../../util/util";
+  import { isTouchEvent } from "../../util/dom";
 
   import { createSlide } from "./defaults";
 

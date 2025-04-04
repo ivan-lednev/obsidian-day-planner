@@ -2,7 +2,7 @@
   import { type Snippet } from "svelte";
   import { isNotVoid } from "typed-assert";
 
-  import { getIsomorphicClientY } from "../../util/util";
+  import { getIsomorphicClientY } from "../../util/dom";
 
   let {
     el = $bindable(),

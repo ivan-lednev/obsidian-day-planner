@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { isLocal, type Task } from "../../task-types";
+  import { isRemote, type Task } from "../../task-types";
   import { createTimeBlockMenu } from "../time-block-menu";
 
   import DragControls from "./drag-controls.svelte";
@@ -18,7 +18,11 @@
   } = getObsidianContext();
 </script>
 
-{#if isLocal(task)}
+{#if isRemote(task)}
+  <TimeBlockBase {task}>
+    <RemoteTimeBlockContent {task} />
+  </TimeBlockBase>
+{:else}
   <Selectable
     onSecondarySelect={(event) =>
       createTimeBlockMenu({ event, task, workspaceFacade })}
@@ -45,8 +49,4 @@
       </FloatingControls>
     {/snippet}
   </Selectable>
-{:else}
-  <TimeBlockBase {task}>
-    <RemoteTimeBlockContent {task} />
-  </TimeBlockBase>
 {/if}

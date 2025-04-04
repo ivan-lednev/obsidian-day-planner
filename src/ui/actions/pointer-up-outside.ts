@@ -1,12 +1,12 @@
 import { on } from "svelte/events";
 import { isNotVoid } from "typed-assert";
 
-import { isOutside } from "../../util/util";
+import { isEventOutside } from "../../util/dom";
 
 export function pointerUpOutside(fn: (event: PointerEvent) => void) {
   return (el: HTMLElement) => {
     const off = on(document.body, "pointerup", (event) => {
-      if (isOutside(event, el)) {
+      if (isEventOutside(event, el)) {
         fn(event);
       }
     });
@@ -37,7 +37,7 @@ export function createPointerUpOutsideAction(
     }
 
     bodyTeardownFn = on(document.body, "pointerup", (event) => {
-      if (Array.from(registry).every((el) => isOutside(event, el))) {
+      if (Array.from(registry).every((el) => isEventOutside(event, el))) {
         fn(event);
       }
     });
