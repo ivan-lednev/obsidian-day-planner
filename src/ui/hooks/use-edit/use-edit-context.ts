@@ -138,11 +138,13 @@ export function useEditContext(props: {
 
             if ("durationMinutes" in task) {
               return m.doRangesOverlap(
-                { start: startOfRange, end: endOfRange },
+                // todo: rename to "inner or taskRange
+                // todo: add tests
                 {
                   start: task.startTime,
                   end: t.getEndTime(task),
                 },
+                { start: startOfRange, end: endOfRange },
               );
             }
 

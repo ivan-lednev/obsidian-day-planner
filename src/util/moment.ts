@@ -138,11 +138,10 @@ function compareMomentsEarliestFirst(a: Moment, b: Moment) {
 
 export function isWithinRange(someMoment: Moment, range: DayRange) {
   return (
-    someMoment.isSameOrAfter(range.start) &&
-    someMoment.isSameOrBefore(range.end)
+    someMoment.isSameOrAfter(range.start) && someMoment.isBefore(range.end)
   );
 }
 
 export function doRangesOverlap(a: DayRange, b: DayRange) {
-  return a.start.isSameOrBefore(b.end) && a.end.isSameOrAfter(b.start);
+  return a.start.isBefore(b.end) && a.end.isSameOrAfter(b.start);
 }

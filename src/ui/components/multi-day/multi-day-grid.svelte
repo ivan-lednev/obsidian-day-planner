@@ -289,8 +289,8 @@
     padding: var(--size-4-2) var(--size-4-1);
 
     background-color: var(--background-primary);
-    border-left: 1px solid var(--background-modifier-border);
     border-bottom: 1px solid var(--background-modifier-border);
+    border-left: 1px solid var(--background-modifier-border);
     border-bottom-left-radius: var(--radius-m);
     box-shadow: var(--input-shadow);
   }
