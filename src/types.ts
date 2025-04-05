@@ -33,8 +33,8 @@ export type CleanUp = () => void;
 export type RenderMarkdown = (el: HTMLElement, markdown: string) => CleanUp;
 
 export type PointerDateTime = {
-  dateTime?: Moment;
-  type?: "dateTime" | "date";
+  dateTime: Moment;
+  type: "dateTime" | "date";
 };
 
 export interface ObsidianContext {
@@ -52,9 +52,7 @@ export interface ObsidianContext {
   isDarkMode: { current: boolean };
   settings: Writable<DayPlannerSettings>;
   settingsSignal: { current: DayPlannerSettings };
-  pointerDateTime: Readable<PointerDateTime>;
-  pointerOffsetY: Writable<number>;
-  pointerDate: Writable<string>;
+  pointerDateTime: Writable<PointerDateTime>;
   tasksWithActiveClockProps: Readable<LocalTask[]>;
   sTaskEditor: STaskEditor;
   getDisplayedTasksWithClocksForTimeline: (

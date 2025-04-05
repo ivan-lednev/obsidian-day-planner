@@ -3,13 +3,13 @@
   import { get } from "svelte/store";
   import { isNotVoid } from "typed-assert";
 
-  import { defaultDayFormat } from "../../constants";
   import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { isRemote } from "../../task-types";
   import { getIsomorphicClientY, isTouchEvent } from "../../util/dom";
-  import { getRenderKey } from "../../util/task-utils";
+  import { minutesToMomentOfDay } from "../../util/moment";
+  import { getRenderKey, offsetYToMinutes } from "../../util/task-utils";
   import { createGestures } from "../actions/gestures";
   import { createTimeBlockMenu } from "../time-block-menu";
 
@@ -30,8 +30,6 @@
   }: { day: Moment; isUnderCursor?: boolean } = $props();
 
   const {
-    pointerOffsetY,
-    pointerDate,
     settings,
     editContext: {
       confirmEdit,
@@ -39,8 +37,10 @@
       getDisplayedTasksForTimeline,
       editOperation,
     },
+    pointerDateTime,
     getDisplayedTasksWithClocksForTimeline,
     workspaceFacade,
+    settingsSignal,
   } = getObsidianContext();
 
   const displayedTasksForTimeline = $derived(getDisplayedTasksForTimeline(day));
@@ -58,8 +58,17 @@
       getIsomorphicClientY(event) - viewportToElOffsetY;
     const newOffsetY = snap(borderTopToPointerOffsetY, $settings);
 
-    pointerOffsetY.set(newOffsetY);
-    pointerDate.set(day.format(defaultDayFormat));
+    const minutesSinceMidnight = offsetYToMinutes(
+      newOffsetY,
+      settingsSignal.current.zoomLevel,
+      settingsSignal.current.startHour,
+    );
+    const dateTime = minutesToMomentOfDay(
+      minutesSinceMidnight,
+      window.moment(day),
+    );
+    // todo: might hurt perf. Need to check for identity of time not to run on every change of coords
+    pointerDateTime.set({ dateTime, type: "dateTime" });
   }
 
   function handleContainerPointerDown(event: MouseEvent | TouchEvent) {

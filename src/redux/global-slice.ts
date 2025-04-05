@@ -6,12 +6,11 @@ import {
 import ical from "node-ical";
 
 import { defaultDayFormat } from "../constants";
-import type { PointerDateTime, WithIcalConfig } from "../types";
+import type { WithIcalConfig } from "../types";
 
 import { createAppSlice } from "./create-app-slice";
 
 interface ObsidianSliceState {
-  pointerDateTime: PointerDateTime;
   icalEvents: Array<WithIcalConfig<ical.VEvent>>;
   dateRanges: Record<string, string[]>;
   layoutReady: boolean;
@@ -28,7 +27,6 @@ export const initialState: ObsidianSliceState = {
   isDarkMode: false,
   modPressed: false,
   isOnline: window.navigator.onLine,
-  pointerDateTime: {},
   // todo: remove after date ranges are migrated to Redux
   visibleDays: [],
 };
@@ -50,11 +48,6 @@ export const globalSlice = createAppSlice({
     layoutReady: create.reducer((state) => {
       state.layoutReady = true;
     }),
-    pointerDateTime: create.reducer(
-      (state, action: PayloadAction<PointerDateTime>) => {
-        state.pointerDateTime = action.payload;
-      },
-    ),
     darkModeUpdated: create.reducer((state, action: PayloadAction<boolean>) => {
       state.isDarkMode = action.payload;
     }),

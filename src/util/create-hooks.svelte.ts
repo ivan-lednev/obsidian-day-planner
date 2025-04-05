@@ -10,7 +10,7 @@ import {
   type Writable,
 } from "svelte/store";
 
-import { defaultDayFormat, reQueryAfterMillis } from "../constants";
+import { reQueryAfterMillis } from "../constants";
 import type DayPlanner from "../main";
 import { addHorizontalPlacing } from "../overlap/overlap";
 import { dataviewChange as dataviewChangeAction } from "../redux/dataview/dataview-slice";
@@ -45,13 +45,12 @@ import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "../ui/hooks/use-visible-dataview-tasks";
 import { useVisibleDays } from "../ui/hooks/use-visible-days";
 import * as m from "../util/moment";
-import { minutesToMomentOfDay } from "../util/moment";
 
 import { hasClockProp } from "./clock";
 import * as dv from "./dataview";
 import { withClockMoments } from "./dataview";
 import { getUpdateTrigger } from "./store";
-import { getDayKey, getRenderKey, offsetYToMinutes } from "./task-utils";
+import { getDayKey, getRenderKey } from "./task-utils";
 
 interface CreateHooksProps {
   app: App;
@@ -236,30 +235,10 @@ export function createHooks({
     dispatch(layoutReadyAction());
   });
 
-  const pointerOffsetY = writable(0);
-  const pointerDate = writable<string>(
-    window.moment().format(defaultDayFormat),
-  );
-
-  const pointerDateTime = derived(
-    [pointerOffsetY, pointerDate, settingsStore],
-    ([$pointerOffsetY, $pointerDate, $settingsStore]): PointerDateTime => {
-      const minutesSinceMidnight = offsetYToMinutes(
-        $pointerOffsetY,
-        $settingsStore.zoomLevel,
-        $settingsStore.startHour,
-      );
-      const dateTime = minutesToMomentOfDay(
-        minutesSinceMidnight,
-        window.moment($pointerDate),
-      );
-
-      return {
-        dateTime,
-        type: "dateTime",
-      };
-    },
-  );
+  const pointerDateTime = writable<PointerDateTime>({
+    dateTime: window.moment(),
+    type: "dateTime",
+  });
 
   const isDarkModeStore = readable(getDarkModeFlag(), (set) => {
     const eventRef = app.workspace.on("css-change", () => {
@@ -342,7 +321,6 @@ export function createHooks({
   });
 
   return {
-    pointerOffsetY,
     tasksWithActiveClockProps,
     editContext,
     tasksWithTimeForToday,
@@ -356,7 +334,6 @@ export function createHooks({
     pointerDateTime,
     getDisplayedTasksWithClocksForTimeline,
     visibleDays,
-    pointerDate,
     dataviewChange,
   };
 }

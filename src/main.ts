@@ -450,8 +450,6 @@ export default class DayPlanner extends Plugin {
       tasksWithActiveClockProps,
       getDisplayedTasksWithClocksForTimeline,
       visibleDays,
-      pointerOffsetY,
-      pointerDate,
     } = createHooks({
       app: this.app,
       dataviewFacade: this.dataviewFacade,
@@ -577,8 +575,6 @@ export default class DayPlanner extends Plugin {
       settings,
       settingsSignal: fromStore(settings),
       pointerDateTime,
-      pointerDate,
-      pointerOffsetY,
       tasksWithActiveClockProps,
       getDisplayedTasksWithClocksForTimeline,
       dispatch: this.store.dispatch,

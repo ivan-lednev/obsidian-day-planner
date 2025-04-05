@@ -30,7 +30,10 @@ function createProps({
     workspaceFacade,
     localTasks: writable(tasks),
     remoteTasks: writable([]),
-    pointerDateTime: writable({ dateTime: moment("2023-01-01 00:00") }),
+    pointerDateTime: writable({
+      dateTime: moment("2023-01-01 00:00"),
+      type: "dateTime" as const,
+    }),
   };
 }
 
@@ -53,6 +56,7 @@ export function setUp({
   function moveCursorTo(dateTime: Moment) {
     props.pointerDateTime.set({
       dateTime,
+      type: "dateTime",
     });
   }
 
