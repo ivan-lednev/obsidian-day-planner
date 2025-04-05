@@ -71,5 +71,5 @@ export function isRemote<T extends Task>(task: T): task is T & RemoteTask {
 }
 
 export function isLocal(task: Task): task is LocalTask {
-  return Object.hasOwn(task, "location");
+  return Object.hasOwn(task, "text");
 }
