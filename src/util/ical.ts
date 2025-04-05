@@ -122,6 +122,8 @@ export function icalEventToTask(
     id: getId(),
     calendar: icalEvent.calendar,
     summary: icalEvent.summary || "(No title)",
+    description: icalEvent.description,
+    location: icalEvent.location,
     startTime: startTimeAdjusted,
     rsvpStatus,
     isAllDayEvent,

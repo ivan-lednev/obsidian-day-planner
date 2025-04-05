@@ -1,3 +1,5 @@
+import { sanitizeHTMLToDom } from "obsidian";
+
 export function isTouchEvent(event: PointerEvent) {
   return ["pen", "touch"].includes(event.pointerType);
 }
@@ -43,4 +45,16 @@ export function isEventOutside(
     event.target instanceof Node &&
     !container.contains(event.target)
   );
+}
+
+export function mountSanitized(el: HTMLElement, html: string) {
+  if (!html) {
+    return;
+  }
+
+  el.empty();
+
+  const fragment = sanitizeHTMLToDom(html);
+
+  el.appendChild(fragment);
 }

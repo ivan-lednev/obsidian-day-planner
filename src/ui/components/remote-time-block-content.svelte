@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { RemoteTask } from "../../task-types";
+  import { mountHtmlAction } from "../actions/mount-html.svelte";
 
-  export let task: RemoteTask;
+  const { task }: { task: RemoteTask } = $props();
 
   const tentative = task.rsvpStatus === "TENTATIVE";
   const declined = task.rsvpStatus === "DECLINED";
@@ -16,13 +17,33 @@
     <span class="calendar-name">
       {task.calendar.name}
     </span>
+
     <span class={["summary", { declined }]}>
       {task.summary}
     </span>
+
+    {#if task.location}
+      <div class="location">
+        📍 {task.location}
+      </div>
+    {/if}
+
+    {#if task.description}
+      <div
+        class="rendered-description"
+        use:mountHtmlAction={task.description}
+      ></div>
+    {/if}
   </div>
 </div>
 
 <style>
+  .rendered-description :global(ul),
+  .rendered-description :global(ol) {
+    margin: 0.2em;
+    padding-inline-start: 20px;
+  }
+
   .calendar-name {
     color: var(--text-muted);
   }

@@ -59,7 +59,7 @@ describe("ical", () => {
     vi.clearAllMocks();
   });
 
-  test("RSVP status appears in tasks", async () => {
+  test("Tasks contain RSVP status, description, location", async () => {
     vi.mocked(request).mockReturnValue(
       getIcalFixture("google-tentative-attendee"),
     );
@@ -75,6 +75,8 @@ describe("ical", () => {
     expect(remoteTasks).toEqual([
       expect.objectContaining({
         summary: "tentative-status",
+        description: "tentative-description",
+        location: "Mount Everest",
         rsvpStatus: "TENTATIVE",
       }),
     ]);
@@ -83,8 +85,6 @@ describe("ical", () => {
   test.todo(
     "RSVP status gets pulled from params if email is not in CN (common name)",
   );
-
-  test.todo("Description appears in tasks");
 
   test.todo("Location gets passed to an event");
 

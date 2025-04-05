@@ -44,6 +44,7 @@ export type RemoteTask = BaseTask & {
   summary: string;
   rsvpStatus: AttendeePartStat;
   description?: string;
+  location?: string;
 };
 
 type Side = "top" | "bottom" | "left" | "right";
