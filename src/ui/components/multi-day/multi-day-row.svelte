@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { derived } from "svelte/store";
+  import { fromStore } from "svelte/store";
 
   import { getDateRangeContext } from "../../../context/date-range-context";
   import { getObsidianContext } from "../../../context/obsidian-context";
@@ -9,19 +9,19 @@
   import * as t from "../../../util/task-utils";
   import UnscheduledTimeBlock from "../unscheduled-time-block.svelte";
 
-  const {
-    editContext: { getDisplayedAllDayTasksForMultiDayRow },
-  } = getObsidianContext();
+  const { editContext } = getObsidianContext();
+  const getDisplayedAllDayTasksForMultiDayRow = fromStore(
+    editContext.getDisplayedAllDayTasksForMultiDayRow,
+  );
 
-  const dateRange = getDateRangeContext();
+  const dateRange = fromStore(getDateRangeContext());
+  const firstDayInRange = $derived(dateRange.current[0]);
 
-  const tasks = derived(
-    [getDisplayedAllDayTasksForMultiDayRow, dateRange],
-    ([$getTasks, $range]) =>
-      $getTasks({
-        start: $range[0],
-        end: $range[$range.length - 1],
-      }),
+  const displayedAllDayTasks = $derived(
+    getDisplayedAllDayTasksForMultiDayRow.current({
+      start: firstDayInRange,
+      end: dateRange.current[dateRange.current.length - 1],
+    }),
   );
 
   function getDaySpanFromDurationMinutes(remoteTask: WithTime<RemoteTask>) {
@@ -37,7 +37,7 @@
   }
 
   function getColumnIndex(task: Task) {
-    const foundIndex = $dateRange.findIndex((date) =>
+    const foundIndex = dateRange.current.findIndex((date) =>
       date.isSame(task.startTime, "day"),
     );
 
@@ -50,8 +50,8 @@
   }
 </script>
 
-<div style:--column-count={$dateRange.length} class="multi-day-row">
-  {#each $tasks as task}
+<div style:--column-count={dateRange.current.length} class="multi-day-row">
+  {#each displayedAllDayTasks as task}
     <UnscheduledTimeBlock
       --time-block-grid-column="{getColumnIndex(task)} / span {getSpan(task)}"
       {task}

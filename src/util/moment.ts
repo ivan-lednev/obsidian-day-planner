@@ -142,6 +142,12 @@ export function isWithinRange(someMoment: Moment, range: DayRange) {
   );
 }
 
-export function doRangesOverlap(a: DayRange, b: DayRange) {
-  return a.start.isBefore(b.end) && a.end.isSameOrAfter(b.start);
+export function doesOverlapWithRange(
+  target: DayRange,
+  rangeEndExclusive: DayRange,
+) {
+  return (
+    target.start.isBefore(rangeEndExclusive.end) &&
+    target.end.isSameOrAfter(rangeEndExclusive.start)
+  );
 }

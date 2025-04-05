@@ -35,7 +35,7 @@
     flex: 1 0 0;
     flex-direction: row-reverse;
 
-    padding-inline: var(--size-4-1);
+    padding-inline: var(--size-4-2);
 
     font-size: var(--font-ui-smaller);
     font-weight: var(--font-semibold);

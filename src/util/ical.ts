@@ -87,15 +87,16 @@ function onceOffIcalEventToTaskForRange(
   start: Moment,
   end: Moment,
 ) {
-  const startOfFirstDay = start.clone().startOf("day");
-  const endOfLastDay = end.clone().endOf("day");
+  const startOfRange = start.clone().startOf("day");
+  const endOfRangeExclusive = end.clone().add(1, "day").startOf("day");
+
   const eventStart = window.moment(icalEvent.start);
   const eventEnd = window.moment(icalEvent.end);
 
   if (
-    m.doRangesOverlap(
-      { start: startOfFirstDay, end: endOfLastDay },
+    m.doesOverlapWithRange(
       { start: eventStart, end: eventEnd },
+      { start: startOfRange, end: endOfRangeExclusive },
     )
   ) {
     return icalEventToTask(icalEvent, icalEvent.start);

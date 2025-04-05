@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { derived } from "svelte/store";
+  import { fromStore } from "svelte/store";
 
   import { getDateRangeContext } from "../../context/date-range-context";
   import { getObsidianContext } from "../../context/obsidian-context";
@@ -18,21 +18,19 @@
   import Timeline from "./timeline.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
-  const {
-    editContext: { getDisplayedAllDayTasksForMultiDayRow },
-    tasksWithActiveClockProps,
-  } = getObsidianContext();
+  const { editContext, tasksWithActiveClockProps } = getObsidianContext();
+  const getDisplayedAllDayTasksForMultiDayRow = fromStore(
+    editContext.getDisplayedAllDayTasksForMultiDayRow,
+  );
 
-  const dateRange = getDateRangeContext();
-  const firstDayInRange = $dateRange[0];
+  const dateRange = fromStore(getDateRangeContext());
+  const firstDayInRange = $derived(dateRange.current[0]);
 
-  const tasks = derived(
-    [getDisplayedAllDayTasksForMultiDayRow, dateRange],
-    ([$getTasks, $range]) =>
-      $getTasks({
-        start: $range[0],
-        end: $range[$range.length - 1],
-      }),
+  const displayedAllDayTasks = $derived(
+    getDisplayedAllDayTasksForMultiDayRow.current({
+      start: firstDayInRange,
+      end: dateRange.current[dateRange.current.length - 1],
+    }),
   );
 </script>
 
@@ -51,16 +49,16 @@
 
   {#if $settings.showUncheduledTasks}
     <Tree
-      flair={String($tasks.length)}
+      flair={String(displayedAllDayTasks.length)}
       isInitiallyOpen
       title="Unscheduled tasks"
     >
-      {#if $tasks.length > 0}
+      {#if displayedAllDayTasks.length > 0}
         <ResizeableBox class="unscheduled-task-container">
           {#snippet children(startEdit)}
             <BlockList
               --search-results-bg-color="var(--background-primary)"
-              list={$tasks}
+              list={displayedAllDayTasks}
             >
               {#snippet match(task: Task)}
                 <UnscheduledTimeBlock
