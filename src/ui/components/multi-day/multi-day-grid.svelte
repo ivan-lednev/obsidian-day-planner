@@ -26,7 +26,6 @@
     CalendarArrowUp,
     Columns3,
     GripHorizontal,
-    Search as SearchIcon,
   } from "../lucide";
   import Ruler from "../ruler.svelte";
   import Scroller from "../scroller.svelte";
@@ -164,12 +163,12 @@
   </Scroller>
 
   <div class="controls-sidebar">
-    <ControlButton
-      isActive={visibleSideControls === "search"}
-      onclick={() => toggleSideControls("search")}
-    >
-      <SearchIcon />
-    </ControlButton>
+    <!--    <ControlButton-->
+    <!--      isActive={visibleSideControls === "search"}-->
+    <!--      onclick={() => toggleSideControls("search")}-->
+    <!--    >-->
+    <!--      <SearchIcon />-->
+    <!--    </ControlButton>-->
 
     <ControlButton
       isActive={visibleSideControls === "settings"}
