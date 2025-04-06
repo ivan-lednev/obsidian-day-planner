@@ -56,6 +56,8 @@ export function isWithTime<T extends Task>(task: T): task is WithTime<T> {
   return Object.hasOwn(task, "startTime") || !task.isAllDayEvent;
 }
 
+const keySeparator = ":";
+
 export function getRenderKey(task: WithTime<Task> | Task) {
   const key: string[] = [];
 
@@ -70,19 +72,42 @@ export function getRenderKey(task: WithTime<Task> | Task) {
     key.push(task.calendar.name, task.summary);
   } else {
     key.push(task.text, String(task.isGhost ? "ghost" : ""));
+
+    if (task.location) {
+      const {
+        path,
+        position: {
+          start: { line },
+        },
+      } = task.location;
+
+      key.push(path, String(line));
+    }
   }
 
-  return key.join("::");
+  return key.join(keySeparator);
 }
 
 export function getNotificationKey(task: WithTime<Task>) {
+  const key: string[] = [];
+
   if (isRemote(task)) {
-    return `${task.calendar.name}::${getMinutesSinceMidnight(task.startTime)}:${task.durationMinutes}::${task.summary}`;
+    key.push(
+      task.calendar.name,
+      String(getMinutesSinceMidnight(task.startTime)),
+      String(task.durationMinutes),
+      task.summary,
+    );
+  } else {
+    key.push(
+      task.location?.path ?? "blank",
+      String(getMinutesSinceMidnight(task.startTime)),
+      String(task.durationMinutes),
+      task.text,
+    );
   }
 
-  return `${task.location?.path ?? "blank"}::${getMinutesSinceMidnight(task.startTime)}::${
-    task.durationMinutes
-  }::${task.text}`;
+  return key.join(keySeparator);
 }
 
 /**
@@ -169,6 +194,7 @@ export function toString(task: WithTime<LocalTask>, mode: EditMode) {
 ${otherLines}`;
 }
 
+// todo: move to properties
 export function updateScheduledPropInText(text: string, dayKey: string) {
   return text
     .replace(shortScheduledPropRegExp, `$1${dayKey}`)
@@ -188,10 +214,12 @@ export function appendText(taskText: string, toAppend: string) {
   return taskText + toAppend;
 }
 
+// todo: move to properties
 export function addTasksPluginProp(text: string, prop: string) {
   return appendText(text, ` ${prop}`);
 }
 
+// todo: move out
 export function offsetYToMinutes(
   offsetY: number,
   zoomLevel: number,
@@ -236,6 +264,7 @@ export function create(props: {
   };
 }
 
+// todo: move to text.ts
 export function getFirstLine(text: string) {
   return text.split("\n")[0];
 }
@@ -246,15 +275,18 @@ export function getOneLineSummary(task: Task) {
   }
 
   return flow(
+    getFirstLine,
     removeListTokens,
     removeTimestampFromStart,
-  )(getFirstLine(task.text));
+  )(task.text);
 }
 
+// todo: move to text.ts
 export function getLinesAfterFirst(text: string) {
   return text.split("\n").slice(1).join("\n");
 }
 
+// todo: move to markdown.ts
 export function removeListTokens(text: string) {
   return text
     .replace(listTokenWithSpacesRegExp, "")

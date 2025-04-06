@@ -5,7 +5,6 @@
   import { getObsidianContext } from "../../../context/obsidian-context";
   import type { Task, WithTime } from "../../../task-types";
   import { isLocal, type RemoteTask } from "../../../task-types";
-  import { isWithTime } from "../../../util/task-utils";
   import * as t from "../../../util/task-utils";
   import UnscheduledTimeBlock from "../unscheduled-time-block.svelte";
 
@@ -29,7 +28,7 @@
   }
 
   function getSpan(task: Task) {
-    if (isLocal(task) || !isWithTime(task)) {
+    if (isLocal(task) || !t.isWithTime(task)) {
       return 1;
     }
 
@@ -51,7 +50,7 @@
 </script>
 
 <div style:--column-count={dateRange.current.length} class="multi-day-row">
-  {#each displayedAllDayTasks as task}
+  {#each displayedAllDayTasks as task (t.getRenderKey(task))}
     <UnscheduledTimeBlock
       --time-block-grid-column="{getColumnIndex(task)} / span {getSpan(task)}"
       {task}
