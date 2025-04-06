@@ -87,8 +87,6 @@ export function getNotificationKey(task: WithTime<Task>) {
 /**
  * Tasks with date prop are copied under the original task, tasks from daily
  * notes get sent under a heading based on the new date.
- *
- * @param original
  */
 export function copy(original: WithTime<LocalTask>): WithTime<LocalTask> {
   let location: TaskLocation | undefined;

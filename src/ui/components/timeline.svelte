@@ -6,23 +6,16 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
-  import { isRemote } from "../../task-types";
   import { getIsomorphicClientY, isTouchEvent } from "../../util/dom";
   import { minutesToMomentOfDay } from "../../util/moment";
   import { getRenderKey, offsetYToMinutes } from "../../util/task-utils";
   import { createGestures } from "../actions/gestures";
-  import { createTimeBlockMenu } from "../time-block-menu";
 
   import Column from "./column.svelte";
-  import DragControls from "./drag-controls.svelte";
-  import FloatingControls from "./floating-controls.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Needle from "./needle.svelte";
   import PositionedTimeBlock from "./positioned-time-block.svelte";
-  import RemoteTimeBlockContent from "./remote-time-block-content.svelte";
-  import ResizeControls from "./resize-controls.svelte";
-  import Selectable from "./selectable.svelte";
-  import TimeBlockBase from "./time-block-base.svelte";
+  import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   const {
     day,
@@ -115,51 +108,7 @@
   >
     {#each $displayedTasksForTimeline.withTime as task (getRenderKey(task))}
       <PositionedTimeBlock {task}>
-        {#if isRemote(task)}
-          <TimeBlockBase {task}>
-            <RemoteTimeBlockContent {task} />
-          </TimeBlockBase>
-        {:else}
-          <Selectable
-            onSecondarySelect={(event) =>
-              createTimeBlockMenu({ event, task, workspaceFacade })}
-            selectionBlocked={Boolean($editOperation)}
-          >
-            {#snippet children(selectable)}
-              <FloatingControls active={selectable.state === "primary"}>
-                {#snippet anchor(floatingControls)}
-                  <LocalTimeBlock
-                    isActive={selectable.state !== "none" ||
-                      $editOperation?.task.id === task.id}
-                    onpointerup={selectable.onpointerup}
-                    {task}
-                    use={[...selectable.use, ...floatingControls.actions]}
-                  />
-                {/snippet}
-                {#snippet topEnd({ isActive, setIsActive })}
-                  <DragControls
-                    --expanding-controls-position="absolute"
-                    {isActive}
-                    {setIsActive}
-                    {task}
-                  />
-                {/snippet}
-                {#snippet bottom({ isActive, setIsActive })}
-                  <ResizeControls {isActive} reverse {setIsActive} {task} />
-                {/snippet}
-                {#snippet top({ isActive, setIsActive })}
-                  <ResizeControls
-                    fromTop
-                    {isActive}
-                    reverse
-                    {setIsActive}
-                    {task}
-                  />
-                {/snippet}
-              </FloatingControls>
-            {/snippet}
-          </Selectable>
-        {/if}
+        <UnscheduledTimeBlock {task} />
       </PositionedTimeBlock>
     {/each}
   </div>

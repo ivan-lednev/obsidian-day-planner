@@ -1,21 +1,12 @@
 <script lang="ts">
-  import { getObsidianContext } from "../../context/obsidian-context";
   import { isRemote, type Task } from "../../task-types";
-  import { createTimeBlockMenu } from "../time-block-menu";
 
-  import DragControls from "./drag-controls.svelte";
-  import FloatingControls from "./floating-controls.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import RemoteTimeBlockContent from "./remote-time-block-content.svelte";
-  import Selectable from "./selectable.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
+  import TimeBlockControls from "./time-block-controls.svelte";
 
   const { task }: { task: Task; class?: string } = $props();
-
-  const {
-    editContext: { editOperation },
-    workspaceFacade,
-  } = getObsidianContext();
 </script>
 
 {#if isRemote(task)}
@@ -23,30 +14,9 @@
     <RemoteTimeBlockContent {task} />
   </TimeBlockBase>
 {:else}
-  <Selectable
-    onSecondarySelect={(event) =>
-      createTimeBlockMenu({ event, task, workspaceFacade })}
-    selectionBlocked={Boolean($editOperation)}
-  >
-    {#snippet children(selectable)}
-      <FloatingControls active={selectable.state === "primary"}>
-        {#snippet anchor(floatingControls)}
-          <LocalTimeBlock
-            isActive={selectable.state !== "none"}
-            onpointerup={selectable.onpointerup}
-            {task}
-            use={[...selectable.use, ...floatingControls.actions]}
-          />
-        {/snippet}
-        {#snippet topEnd({ isActive, setIsActive })}
-          <DragControls
-            --expanding-controls-position="absolute"
-            {isActive}
-            {setIsActive}
-            {task}
-          />
-        {/snippet}
-      </FloatingControls>
+  <TimeBlockControls {task}>
+    {#snippet timeBlock({ isActive, onPointerUp, use })}
+      <LocalTimeBlock {isActive} onpointerup={onPointerUp} {task} {use} />
     {/snippet}
-  </Selectable>
+  </TimeBlockControls>
 {/if}
