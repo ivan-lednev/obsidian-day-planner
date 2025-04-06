@@ -93,7 +93,8 @@
     const pixelsPerDay = containerWidth / totalDays;
 
     const indexOfDayHoveredOver = Math.floor(
-      (event.clientX - viewportToElOffsetX) / pixelsPerDay,
+      (event.clientX - viewportToElOffsetX + multiDayRowRef.scrollLeft) /
+        pixelsPerDay,
     );
 
     pointerDateTime.set({
@@ -151,6 +152,7 @@
     class={["dp-header-row", "horizontal-resize-box-wrapper"]}
     use:resizeAction
   >
+    <!--Note: we need this wrapper to listen to pointer events on the whole height of the row-->
     <div
       bind:this={multiDayRowRef}
       class="multi-day-row-wrapper"
