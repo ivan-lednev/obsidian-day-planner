@@ -344,10 +344,11 @@ export function mapTaskDiffToUpdates(
   return Object.entries(diff)
     .flatMap(([type, tasks]) => tasks.map((task) => ({ type, task })))
     .reduce<Update[]>((result, { type, task }) => {
-      const taskText = t.toString(task, mode);
+      const taskTextWithUpdatedProps = t.toString(task, mode);
 
       // todo: move out to a function
       if (type === "added") {
+        // todo: remove implicit assumption about obsidian-tasks vs daily notes tasks
         if (task.location) {
           // todo: every test should have an operation
           if (mode === EditMode.SCHEDULE_SEARCH_RESULT) {
@@ -358,13 +359,13 @@ export function mapTaskDiffToUpdates(
                 start: task.location.position.start,
                 end: task.location.position.start,
               },
-              contents: t.getFirstLine(taskText),
+              contents: t.getFirstLine(taskTextWithUpdatedProps),
             });
           }
 
           return result.concat({
             type: "created",
-            contents: taskText,
+            contents: taskTextWithUpdatedProps,
             path: task.location.path,
             target: task.location.position?.start?.line,
           });
@@ -374,7 +375,7 @@ export function mapTaskDiffToUpdates(
           type: "mdast",
           path: createDailyNotePath(task.startTime),
           updateFn: (root: Root) => {
-            const taskRoot = fromMarkdown(taskText);
+            const taskRoot = fromMarkdown(taskTextWithUpdatedProps);
             const listItemToInsert = findFirst(taskRoot, checkListItem);
 
             isNotVoid(listItemToInsert);
@@ -411,7 +412,7 @@ export function mapTaskDiffToUpdates(
           type: "updated",
           path,
           range: { start: position.start, end: position.start },
-          contents: t.getFirstLine(taskText),
+          contents: t.getFirstLine(taskTextWithUpdatedProps),
         });
       }
 
@@ -426,7 +427,7 @@ export function mapTaskDiffToUpdates(
           // todo: duplication
           path: createDailyNotePath(task.startTime),
           updateFn: (root: Root) => {
-            const taskRoot = fromMarkdown(taskText);
+            const taskRoot = fromMarkdown(taskTextWithUpdatedProps);
             const listItemToInsert = findFirst(taskRoot, checkListItem);
 
             isNotVoid(listItemToInsert);

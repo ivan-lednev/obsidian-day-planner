@@ -74,6 +74,7 @@
   style:--column-count={dateRange.current.length}
   class="multi-day-row"
   onpointermove={handlePointerMove}
+  onpointerup={editContext.confirmEdit}
 >
   {#each displayedAllDayTasks as task}
     <UnscheduledTimeBlock

@@ -16,6 +16,7 @@ import {
   scheduledPropRegExp,
   scheduledPropRegExps,
   shortScheduledPropRegExp,
+  strictTimestampAnywhereInLineRegExp,
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
 import {
@@ -132,7 +133,7 @@ export function getDayKey(day: Moment) {
 }
 
 export function toString(task: WithTime<LocalTask>, mode: EditMode) {
-  const firstLine = removeListTokens(getFirstLine(task.text));
+  const firstLineWithoutListTokens = removeListTokens(getFirstLine(task.text));
 
   const updatedTimestamp = createTimestamp(
     getMinutesSinceMidnight(task.startTime),
@@ -140,12 +141,13 @@ export function toString(task: WithTime<LocalTask>, mode: EditMode) {
     get(settings).timestampFormat,
   );
   const listTokens = createMarkdownListTokens(task);
-  const withUpdatedTimestamp = replaceOrPrependTimestamp(
-    firstLine,
-    updatedTimestamp,
-  );
+
+  const withUpdatedOrDeletedTimestamp = task.isAllDayEvent
+    ? removeTimestamp(firstLineWithoutListTokens)
+    : replaceOrPrependTimestamp(firstLineWithoutListTokens, updatedTimestamp);
+
   let updatedFirstLineText = updateScheduledPropInText(
-    withUpdatedTimestamp,
+    withUpdatedOrDeletedTimestamp,
     getDayKey(task.startTime),
   );
 
@@ -291,9 +293,21 @@ export function removeTimestampFromStart(text: string) {
   return text.replace(looseTimestampAtStartOfLineRegExp, "");
 }
 
+export function removeTimestamp(text: string) {
+  const withoutTimestampAtStart = removeTimestampFromStart(text);
+  const withoutTimestampInMiddle = withoutTimestampAtStart.replace(
+    strictTimestampAnywhereInLineRegExp,
+    "",
+  );
+
+  return withoutTimestampInMiddle.replace(/\s+/g, " ");
+}
+
 export function isTimeEqual(a: LocalTask, b: LocalTask) {
   return (
-    a.startTime.isSame(b.startTime) && a.durationMinutes === b.durationMinutes
+    a.startTime.isSame(b.startTime) &&
+    a.durationMinutes === b.durationMinutes &&
+    a.isAllDayEvent === b.isAllDayEvent
   );
 }
 
