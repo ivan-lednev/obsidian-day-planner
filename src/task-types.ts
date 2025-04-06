@@ -55,7 +55,6 @@ export interface LocalTask extends TaskTokens, BaseTask {
 
   // todo: move out to InMemoryTask
   location?: TaskLocation;
-  isGhost?: boolean;
 
   // todo: move to Time
   durationMinutes: number;

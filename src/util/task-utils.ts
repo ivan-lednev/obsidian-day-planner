@@ -71,7 +71,7 @@ export function getRenderKey(task: WithTime<Task> | Task) {
   if (isRemote(task)) {
     key.push(task.calendar.name, task.summary);
   } else {
-    key.push(task.text, String(task.isGhost ? "ghost" : ""));
+    key.push(task.text);
 
     if (task.location) {
       const {
@@ -132,9 +132,8 @@ export function copy(original: WithTime<LocalTask>): WithTime<LocalTask> {
 
   return {
     ...original,
-    id: getId(),
-    isGhost: true,
     location,
+    id: getId(),
   };
 }
 

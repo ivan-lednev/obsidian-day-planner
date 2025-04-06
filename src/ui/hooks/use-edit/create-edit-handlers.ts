@@ -45,7 +45,7 @@ export function createEditHandlers({
     });
 
     startEdit({
-      task: { ...newTask, isGhost: true },
+      task: newTask,
       mode: EditMode.CREATE,
     });
   }
