@@ -53,7 +53,7 @@
 
   let daysRef: HTMLDivElement | undefined;
   let multiDayRowRef: HTMLDivElement | undefined = $state();
-  let multiDayRowBordersRef: HTMLDivElement | undefined = $state();
+  let columnTrackOverlayEl: HTMLDivElement | undefined = $state();
   let rulerRef: HTMLDivElement | undefined = $state();
 
   function handleScroll(event: Event) {
@@ -69,8 +69,8 @@
       multiDayRowRef.scrollLeft = event.target.scrollLeft;
     }
 
-    if (multiDayRowBordersRef) {
-      multiDayRowBordersRef.scrollLeft = event.target.scrollLeft;
+    if (columnTrackOverlayEl) {
+      columnTrackOverlayEl.scrollLeft = event.target.scrollLeft;
     }
 
     if (rulerRef) {
@@ -132,7 +132,7 @@
     </div>
     <ColumnTracksOverlay
       columnCount={$dateRange.length}
-      bind:el={multiDayRowBordersRef}
+      bind:el={columnTrackOverlayEl}
     />
   </div>
 {/if}

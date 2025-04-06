@@ -6,7 +6,7 @@ import { currentTime } from "../src/global-store/current-time";
 import { settings } from "../src/global-store/settings";
 import { useTaskVisuals } from "../src/ui/hooks/use-task-visuals";
 
-import { baseTask } from "./edit/util/test-utils";
+import { baseTask } from "./edit/util/fixtures";
 
 vi.mock("obsidian", () => {
   return {};

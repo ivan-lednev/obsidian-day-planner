@@ -4,9 +4,8 @@ import { test, expect, describe } from "vitest";
 
 import { EditMode } from "../../src/ui/hooks/use-edit/types";
 
-import { dayKey, nextDayKey } from "./util/fixtures";
+import { baseTask, dayKey, nextDayKey, threeTasks } from "./util/fixtures";
 import { setUp } from "./util/setup";
-import { baseTask, threeTasks } from "./util/test-utils";
 
 describe("drag one & common edit mechanics", () => {
   test("after edit confirmation, tasks freeze and stop reacting to cursor", async () => {

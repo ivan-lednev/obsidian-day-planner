@@ -5,10 +5,7 @@ import {
   WorkspaceLeaf,
   type MarkdownFileInfo,
 } from "obsidian";
-import {
-  createDailyNote,
-  getDateFromPath,
-} from "obsidian-daily-notes-interface";
+import {} from "obsidian-daily-notes-interface";
 import { getAPI } from "obsidian-dataview";
 import { fromStore, get, writable, type Writable } from "svelte/store";
 import { isInstanceOf, isNotVoid } from "typed-assert";
@@ -21,6 +18,7 @@ import {
   viewTypeMultiDay,
   icalRefreshIntervalMillis,
 } from "./constants";
+import { createUpdateHandler } from "./create-update-handler";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import {
@@ -28,7 +26,6 @@ import {
   fromMarkdown,
   positionContainsPoint,
   sortListsRecursively,
-  sortListsRecursivelyInMarkdown,
   toEditorPos,
   toMarkdown,
   toMdastPoint,
@@ -44,13 +41,7 @@ import { settingsUpdated } from "./redux/settings-slice";
 import { type AppStore, makeStore } from "./redux/store";
 import { createUseSelector } from "./redux/use-selector";
 import { DataviewFacade } from "./service/dataview-facade";
-import {
-  applyScopedUpdates,
-  createTransaction,
-  getTaskDiffFromEditState,
-  mapTaskDiffToUpdates,
-  TransactionWriter,
-} from "./service/diff-writer";
+import { TransactionWriter } from "./service/diff-writer";
 import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
@@ -61,16 +52,12 @@ import {
 } from "./settings";
 import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn } from "./types";
-import { askForConfirmation } from "./ui/confirmation-modal";
 import { createEditorMenuCallback } from "./ui/editor-menu";
-import { EditMode } from "./ui/hooks/use-edit/types";
 import { mountStatusBarWidget } from "./ui/hooks/use-status-bar-widget";
 import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
-import { SingleSuggestModal } from "./ui/SingleSuggestModal";
 import TimelineView from "./ui/timeline-view";
-import { createUndoNotice } from "./ui/undo-notice";
 import { createHooks } from "./util/create-hooks.svelte";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
@@ -310,14 +297,6 @@ export default class DayPlanner extends Plugin {
     });
   };
 
-  private getPathsToCreate(paths: string[]) {
-    return paths.reduce<string[]>(
-      (result, path) =>
-        this.vaultFacade.checkFileExists(path) ? result : result.concat(path),
-      [],
-    );
-  }
-
   getSTaskUnderCursor = (view: MarkdownFileInfo) => {
     isInstanceOf(
       view,
@@ -340,99 +319,19 @@ export default class DayPlanner extends Plugin {
   };
 
   private registerViews() {
-    const onEditCanceled = () => {
-      new Notice("Edit canceled");
+    const onUpdate: OnUpdateFn = createUpdateHandler({
+      app: this.app,
+      settings: this.settings,
+      transactionWriter: this.transationWriter,
+      vaultFacade: this.vaultFacade,
+      onEditCanceled: () => {
+        new Notice("Edit canceled");
 
-      // We need to manually reset tasks to the initial state
-      this.syncDataview?.();
-    };
-
-    // todo: move out
-    const onUpdate: OnUpdateFn = async (base, next, mode) => {
-      const diff = getTaskDiffFromEditState(base, next);
-
-      if (mode === EditMode.CREATE) {
-        const created = diff.added[0];
-
-        isNotVoid(created);
-
-        const modalOutput: string | undefined = await new Promise((resolve) => {
-          new SingleSuggestModal({
-            app: this.app,
-            getDescriptionText: (value) =>
-              value.trim().length === 0
-                ? "Start typing to create a task"
-                : `Create item "${value}"`,
-            onChooseSuggestion: async ({ text }) => {
-              resolve(text);
-            },
-            onClose: () => {
-              resolve(undefined);
-            },
-          }).open();
-        });
-
-        if (!modalOutput) {
-          onEditCanceled();
-
-          return;
-        }
-
-        diff.added[0] = { ...created, text: modalOutput };
-      }
-
-      const updates = mapTaskDiffToUpdates(diff, mode, this.settings());
-      const afterEach = this.settings().sortTasksInPlanAfterEdit
-        ? (contents: string) =>
-            applyScopedUpdates(
-              contents,
-              this.settings().plannerHeading,
-              sortListsRecursivelyInMarkdown,
-            )
-        : undefined;
-
-      const transaction = createTransaction({
-        updates,
-        afterEach,
-        settings: this.settings(),
-      });
-
-      const updatePaths = [
-        ...new Set([...transaction.map(({ path }) => path)]),
-      ];
-
-      const needToCreate = this.getPathsToCreate(updatePaths);
-
-      if (needToCreate.length > 0) {
-        const confirmed = await askForConfirmation({
-          app: this.app,
-          title: "Need to create files",
-          text: `The following files need to be created: ${needToCreate.join("; ")}`,
-          cta: "Create",
-        });
-
-        if (!confirmed) {
-          onEditCanceled();
-
-          return;
-        }
-
-        await Promise.all(
-          needToCreate.map(async (path) => {
-            const date = getDateFromPath(path, "day");
-
-            isNotVoid(date);
-
-            await createDailyNote(date);
-          }),
-        );
-      }
-
-      await this.transationWriter.writeTransaction(transaction);
-
-      this.currentUndoNotice?.hide();
-      this.currentUndoNotice = createUndoNotice(this.transationWriter.undo);
-    };
+        // We need to manually reset tasks to the initial state
+        // todo: use an optimistic update
+        this.syncDataview?.();
+      },
+    });
 
     const useSelector = createUseSelector(this.store);
     const {

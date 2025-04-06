@@ -6,6 +6,7 @@ import { defaultSettingsForTests } from "../../src/settings";
 import { EditMode } from "../../src/ui/hooks/use-edit/types";
 
 import {
+  baseTask,
   baseTasks,
   dayKey,
   emptyTasks,
@@ -13,7 +14,6 @@ import {
   tasksWithUnscheduledTask,
 } from "./util/fixtures";
 import { setUp } from "./util/setup";
-import { baseTask } from "./util/test-utils";
 
 describe("moving tasks between containers", () => {
   test("with no edit operation in progress, nothing happens on mouse move", () => {

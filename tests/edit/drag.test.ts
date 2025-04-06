@@ -5,9 +5,8 @@ import { test, expect, describe } from "vitest";
 import { defaultSettingsForTests } from "../../src/settings";
 import { EditMode } from "../../src/ui/hooks/use-edit/types";
 
-import { dayKey } from "./util/fixtures";
+import { baseTask, dayKey, threeTasks } from "./util/fixtures";
 import { setUp } from "./util/setup";
-import { baseTask, threeTasks } from "./util/test-utils";
 
 describe("drag", () => {
   test("when drag starts, target task reacts to cursor", () => {
