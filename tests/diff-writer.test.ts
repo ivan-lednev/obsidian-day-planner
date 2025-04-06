@@ -80,6 +80,7 @@ function createTestTask(
     day = moment(),
     status,
   } = props;
+
   return t.create({
     settings: { ...defaultSettingsForTests, eventFormatOnCreation: "bullet" },
     day,
@@ -454,6 +455,8 @@ describe("From diff to vault", () => {
 - [ ] Play bowling
 `);
   });
+
+  test.todo("Removes time from newly all-day tasks");
 
   test("Adds a heading to daily notes if there is none", async () => {
     vi.mocked(getDailyNoteSettings).mockReturnValue({

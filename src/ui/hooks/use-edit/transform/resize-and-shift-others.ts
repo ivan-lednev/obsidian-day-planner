@@ -1,9 +1,9 @@
 import { last } from "lodash";
-import type { Moment } from "moment";
 import { isNotVoid } from "typed-assert";
 
 import type { DayPlannerSettings } from "../../../../settings";
 import type { LocalTask, WithTime } from "../../../../task-types";
+import type { PointerDateTime } from "../../../../types";
 import {
   getMinutesSinceMidnight,
   minutesToMomentOfDay,
@@ -17,7 +17,7 @@ export function resizeAndShiftOthers(
   editTarget: WithTime<LocalTask>,
   cursorTime: number,
   settings: DayPlannerSettings,
-  day?: Moment,
+  pointerDateTime?: PointerDateTime,
 ): WithTime<LocalTask>[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
   const task = baseline[index];
@@ -29,7 +29,12 @@ export function resizeAndShiftOthers(
 
   const updated = {
     ...task,
-    durationMinutes: getDurationMinutes(task, cursorTime, settings, day),
+    durationMinutes: getDurationMinutes(
+      task,
+      cursorTime,
+      settings,
+      pointerDateTime?.dateTime,
+    ),
   };
 
   const updatedFollowing = following.reduce<WithTime<LocalTask>[]>(

@@ -32,7 +32,6 @@
     },
     pointerDateTime,
     getDisplayedTasksWithClocksForTimeline,
-    workspaceFacade,
     settingsSignal,
   } = getObsidianContext();
 
@@ -43,7 +42,7 @@
 
   let el: HTMLElement | undefined;
 
-  function updatePointerOffsetY(event: MouseEvent | TouchEvent) {
+  function updatePointerDateTime(event: MouseEvent | TouchEvent) {
     isNotVoid(el);
 
     const viewportToElOffsetY = el.getBoundingClientRect().top;
@@ -65,7 +64,7 @@
   }
 
   function handleContainerPointerDown(event: MouseEvent | TouchEvent) {
-    updatePointerOffsetY(event);
+    updatePointerDateTime(event);
     handleContainerMouseDown();
   }
 
@@ -79,7 +78,7 @@
     },
     onpanmove: (event) => {
       if (get(editOperation)) {
-        updatePointerOffsetY(event);
+        updatePointerDateTime(event);
       }
     },
     onpanend: confirmEdit,
@@ -102,7 +101,7 @@
 
       handleContainerPointerDown(event);
     }}
-    onpointermove={updatePointerOffsetY}
+    onpointermove={updatePointerDateTime}
     onpointerup={confirmEdit}
     use:timelineGestures
   >

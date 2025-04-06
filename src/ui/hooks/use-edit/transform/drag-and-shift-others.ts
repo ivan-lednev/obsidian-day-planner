@@ -1,6 +1,7 @@
 import { last } from "lodash";
 import { isNotVoid } from "typed-assert";
 
+import type { DayPlannerSettings } from "../../../../settings";
 import type { LocalTask, WithTime } from "../../../../task-types";
 import {
   getMinutesSinceMidnight,
@@ -8,10 +9,14 @@ import {
 } from "../../../../util/moment";
 import { getEndMinutes } from "../../../../util/task-utils";
 
+import type { PointerDateTime } from "src/types";
+
 export function dragAndShiftOthers(
   baseline: WithTime<LocalTask>[],
   editTarget: WithTime<LocalTask>,
   cursorTime: number,
+  settings: DayPlannerSettings,
+  pointerDateTime: PointerDateTime,
 ): WithTime<LocalTask>[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
   const task = baseline[index];
@@ -23,7 +28,7 @@ export function dragAndShiftOthers(
 
   const updated = {
     ...task,
-    isAllDayEvent: false,
+    isAllDayEvent: pointerDateTime.type === "date",
     startTime: minutesToMomentOfDay(cursorTime, task.startTime),
   };
 

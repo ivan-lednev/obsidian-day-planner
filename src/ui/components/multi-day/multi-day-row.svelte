@@ -9,7 +9,7 @@
   import * as t from "../../../util/task-utils";
   import UnscheduledTimeBlock from "../unscheduled-time-block.svelte";
 
-  const { editContext } = getObsidianContext();
+  const { editContext, pointerDateTime } = getObsidianContext();
   const getDisplayedAllDayTasksForMultiDayRow = fromStore(
     editContext.getDisplayedAllDayTasksForMultiDayRow,
   );
@@ -48,9 +48,33 @@
     // the task starts before the first day in the range
     return 1;
   }
+
+  let el: HTMLElement | undefined;
+
+  function handlePointerMove(event: PointerEvent) {
+    if (!el || event.target !== el) {
+      return;
+    }
+
+    const containerWidth = el.scrollWidth;
+    const totalDays = dateRange.current.length;
+    const pixelsPerDay = containerWidth / totalDays;
+
+    const indexOfDayHoveredOver = Math.floor(event.offsetX / pixelsPerDay);
+
+    pointerDateTime.set({
+      dateTime: dateRange.current[indexOfDayHoveredOver],
+      type: "date",
+    });
+  }
 </script>
 
-<div style:--column-count={dateRange.current.length} class="multi-day-row">
+<div
+  bind:this={el}
+  style:--column-count={dateRange.current.length}
+  class="multi-day-row"
+  onpointermove={handlePointerMove}
+>
   {#each displayedAllDayTasks as task}
     <UnscheduledTimeBlock
       --time-block-grid-column="{getColumnIndex(task)} / span {getSpan(task)}"

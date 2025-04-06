@@ -3,7 +3,7 @@ export function toSpliced<T>(array: T[], index: number, el: T) {
     throw new Error(`Cannot use negative indexes for splicing`);
   }
 
-  const copy = [...array];
+  const copy = array.slice();
   copy[index] = el;
 
   return copy;

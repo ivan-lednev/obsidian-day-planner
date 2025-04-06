@@ -3,6 +3,7 @@ import { isNotVoid } from "typed-assert";
 
 import type { DayPlannerSettings } from "../../../../settings";
 import type { LocalTask, WithTime } from "../../../../task-types";
+import type { PointerDateTime } from "../../../../types";
 import {
   getMinutesSinceMidnight,
   minutesToMomentOfDay,
@@ -14,6 +15,7 @@ export function dragAndShrinkOthers(
   editTarget: WithTime<LocalTask>,
   cursorTime: number,
   settings: DayPlannerSettings,
+  pointerDateTime: PointerDateTime,
 ): WithTime<LocalTask>[] {
   const index = baseline.findIndex((task) => task.id === editTarget.id);
   const task = baseline[index];
@@ -25,7 +27,7 @@ export function dragAndShrinkOthers(
 
   const updated = {
     ...task,
-    isAllDayEvent: false,
+    isAllDayEvent: pointerDateTime.type === "date",
     startTime: minutesToMomentOfDay(cursorTime, task.startTime),
   };
 

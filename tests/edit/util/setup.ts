@@ -10,6 +10,7 @@ import {
   defaultSettingsForTests,
 } from "../../../src/settings";
 import type { LocalTask } from "../../../src/task-types";
+import type { PointerDateTime } from "../../../src/types";
 import { useEditContext } from "../../../src/ui/hooks/use-edit/use-edit-context";
 
 import { baseTasks } from "./fixtures";
@@ -30,9 +31,9 @@ function createProps({
     workspaceFacade,
     localTasks: writable(tasks),
     remoteTasks: writable([]),
-    pointerDateTime: writable({
+    pointerDateTime: writable<PointerDateTime>({
       dateTime: moment("2023-01-01 00:00"),
-      type: "dateTime" as const,
+      type: "dateTime",
     }),
   };
 }
@@ -53,10 +54,13 @@ export function setUp({
   dayToDisplayedTasks.subscribe(noop);
   getDisplayedAllDayTasksForMultiDayRow.subscribe(noop);
 
-  function moveCursorTo(dateTime: Moment) {
+  function moveCursorTo(
+    dateTime: Moment,
+    type: "date" | "dateTime" = "dateTime",
+  ) {
     props.pointerDateTime.set({
       dateTime,
-      type: "dateTime",
+      type,
     });
   }
 
