@@ -1,5 +1,6 @@
 <script lang="ts">
   import { type Moment } from "moment";
+  import { get } from "svelte/store";
   import { slide } from "svelte/transition";
 
   import { getDateRangeContext } from "../../../context/date-range-context";
@@ -35,7 +36,8 @@
   import ColumnTracksOverlay from "./column-tracks-overlay.svelte";
   import MultiDayRow from "./multi-day-row.svelte";
 
-  const { workspaceFacade, settings } = getObsidianContext();
+  const { workspaceFacade, settings, pointerDateTime, editContext } =
+    getObsidianContext();
   const dateRange = getDateRangeContext();
 
   type SideControls = "none" | "settings" | "search";
@@ -76,6 +78,28 @@
     if (rulerRef) {
       rulerRef.scrollTop = event.target.scrollTop;
     }
+  }
+
+  function handlePointerMove(event: PointerEvent) {
+    if (!multiDayRowRef) {
+      return;
+    }
+
+    const currentDateRange = get(dateRange);
+
+    const viewportToElOffsetX = multiDayRowRef.getBoundingClientRect().left;
+    const containerWidth = multiDayRowRef.scrollWidth;
+    const totalDays = currentDateRange.length;
+    const pixelsPerDay = containerWidth / totalDays;
+
+    const indexOfDayHoveredOver = Math.floor(
+      (event.clientX - viewportToElOffsetX) / pixelsPerDay,
+    );
+
+    pointerDateTime.set({
+      dateTime: currentDateRange[indexOfDayHoveredOver],
+      type: "date",
+    });
   }
 
   const { startResizing, resizeAction } = createResizeState();
@@ -127,7 +151,12 @@
     class={["dp-header-row", "horizontal-resize-box-wrapper"]}
     use:resizeAction
   >
-    <div bind:this={multiDayRowRef} class="multi-day-row-wrapper">
+    <div
+      bind:this={multiDayRowRef}
+      class="multi-day-row-wrapper"
+      onpointermove={handlePointerMove}
+      onpointerup={editContext.confirmEdit}
+    >
       <MultiDayRow />
     </div>
     <ColumnTracksOverlay
