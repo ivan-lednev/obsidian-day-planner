@@ -209,6 +209,7 @@ export function create(props: {
   text?: string;
   location?: TaskLocation;
   status?: string;
+  isAllDayEvent?: boolean;
 }): WithTime<LocalTask> {
   const {
     day,
@@ -217,6 +218,7 @@ export function create(props: {
     location,
     text = "New item",
     status,
+    isAllDayEvent = false,
   } = props;
 
   return {
@@ -225,6 +227,7 @@ export function create(props: {
     durationMinutes: settings.defaultDurationMinutes,
     text,
     startTime: minutesToMomentOfDay(startMinutes, day),
+    isAllDayEvent,
     symbol: "-",
     status:
       status || settings.eventFormatOnCreation === "task"
@@ -300,7 +303,7 @@ export function removeTimestamp(text: string) {
     "",
   );
 
-  return withoutTimestampInMiddle.replace(/\s+/g, " ");
+  return withoutTimestampInMiddle.trim().replace(/\s+/g, " ");
 }
 
 export function isTimeEqual(a: LocalTask, b: LocalTask) {

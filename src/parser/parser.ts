@@ -19,6 +19,7 @@ function execTimestampPatterns(line: string) {
   const trimmed = line.trim();
 
   return (
+    // todo: never use exec
     looseTimestampAtStartOfLineRegExp.exec(trimmed) ||
     strictTimestampAnywhereInLineRegExp.exec(trimmed)
   );

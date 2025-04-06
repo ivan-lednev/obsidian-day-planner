@@ -71,6 +71,7 @@ function createTestTask(
     day?: Moment;
     startMinutes?: number;
     status?: string;
+    isAllDayEvent?: boolean;
   },
 ) {
   const {
@@ -79,12 +80,14 @@ function createTestTask(
     text = "",
     day = moment(),
     status,
+    isAllDayEvent = false,
   } = props;
 
   return t.create({
     settings: { ...defaultSettingsForTests, eventFormatOnCreation: "bullet" },
     day,
     startMinutes,
+    isAllDayEvent,
     text,
     location,
     status,
@@ -456,7 +459,55 @@ describe("From diff to vault", () => {
 `);
   });
 
-  test.todo("Removes time from newly all-day tasks");
+  test("Removes time from newly all-day tasks", async () => {
+    const files = [
+      createInMemoryFile({
+        path: "tasks.md",
+        contents: `- [ ] Buy milk
+- [ ] 20:00 - 20:30 Listen to music ⏳ 2023-01-01
+- [ ] Play bowling
+`,
+      }),
+    ];
+    const task = createTestTask({
+      status: " ",
+      text: "- [ ] 20:00 - 20:30 Listen to music ⏳ 2023-01-01",
+      isAllDayEvent: true,
+      day: moment("2023-01-01"),
+      startMinutes: toMinutes("20:00"),
+      location: {
+        path: "tasks.md",
+        position: {
+          start: {
+            line: 1,
+            col: 0,
+            offset: -1,
+          },
+          end: {
+            line: 1,
+            col: -1,
+            offset: -1,
+          },
+        },
+      },
+    });
+
+    const diff = {
+      updated: [task],
+    };
+
+    const { vault } = await writeDiff({
+      diff,
+      files,
+      mode: EditMode.SCHEDULE_SEARCH_RESULT,
+    });
+
+    expect(vault.getAbstractFileByPath("tasks.md").contents)
+      .toBe(`- [ ] Buy milk
+- [ ] Listen to music ⏳ 2023-01-01
+- [ ] Play bowling
+`);
+  });
 
   test("Adds a heading to daily notes if there is none", async () => {
     vi.mocked(getDailyNoteSettings).mockReturnValue({
