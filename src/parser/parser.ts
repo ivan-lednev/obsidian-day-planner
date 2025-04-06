@@ -6,12 +6,12 @@ import {
   looseTimestampAtStartOfLineRegExp,
 } from "../regexp";
 import type { LocalTask } from "../task-types";
-import { getDiffInMinutes } from "../util/moment";
 import {
   getFirstLine,
   getLinesAfterFirst,
   removeListTokens,
-} from "../util/task-utils";
+} from "../util/markdown";
+import { getDiffInMinutes } from "../util/moment";
 
 import { parseTimestamp } from "./timestamp";
 

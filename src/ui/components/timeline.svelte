@@ -6,9 +6,13 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
-  import { getIsomorphicClientY, isTouchEvent } from "../../util/dom";
+  import {
+    getIsomorphicClientY,
+    isTouchEvent,
+    offsetYToMinutes,
+  } from "../../util/dom";
   import { minutesToMomentOfDay } from "../../util/moment";
-  import { getRenderKey, offsetYToMinutes } from "../../util/task-utils";
+  import { getRenderKey } from "../../util/task-utils";
   import { createGestures } from "../actions/gestures";
 
   import Column from "./column.svelte";

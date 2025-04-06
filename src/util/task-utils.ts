@@ -8,12 +8,8 @@ import { defaultDayFormat } from "../constants";
 import { settings } from "../global-store/settings";
 import { replaceOrPrependTimestamp } from "../parser/parser";
 import {
-  checkboxRegExp,
-  keylessScheduledPropRegExp,
-  listTokenWithSpacesRegExp,
   looseTimestampAtStartOfLineRegExp,
   obsidianBlockIdRegExp,
-  scheduledPropRegExp,
   scheduledPropRegExps,
   shortScheduledPropRegExp,
   strictTimestampAnywhereInLineRegExp,
@@ -22,6 +18,7 @@ import type { DayPlannerSettings } from "../settings";
 import {
   isRemote,
   type LocalTask,
+  type RemoteTask,
   type Task,
   type TaskLocation,
   type WithTime,
@@ -30,13 +27,15 @@ import { EditMode } from "../ui/hooks/use-edit/types";
 
 import { createMarkdownListTokens } from "./dataview";
 import { getId } from "./id";
+import { getFirstLine, getLinesAfterFirst, removeListTokens } from "./markdown";
+import * as m from "./moment";
 import {
   addMinutes,
   getMinutesSinceMidnight,
   minutesToMoment,
   minutesToMomentOfDay,
 } from "./moment";
-import * as m from "./moment";
+import { addTasksPluginProp, updateScheduledPropInText } from "./props";
 
 export function getEndMinutes(task: {
   startTime: Moment;
@@ -58,7 +57,19 @@ export function isWithTime<T extends Task>(task: T): task is WithTime<T> {
 
 const keySeparator = ":";
 
+function getRemoteTaskIdentity(task: RemoteTask) {
+  const key: string[] = [];
+
+  key.push(task.calendar.name, task.startTime.toISOString(), task.summary);
+
+  return key.join(keySeparator);
+}
+
 export function getRenderKey(task: WithTime<Task> | Task) {
+  if (isRemote(task)) {
+    return getRemoteTaskIdentity(task);
+  }
+
   const key: string[] = [];
 
   if (isWithTime(task)) {
@@ -68,44 +79,35 @@ export function getRenderKey(task: WithTime<Task> | Task) {
     );
   }
 
-  if (isRemote(task)) {
-    key.push(task.calendar.name, task.summary);
-  } else {
-    key.push(task.text);
+  if (task.location) {
+    const {
+      path,
+      position: {
+        start: { line },
+      },
+    } = task.location;
 
-    if (task.location) {
-      const {
-        path,
-        position: {
-          start: { line },
-        },
-      } = task.location;
-
-      key.push(path, String(line));
-    }
+    key.push(path, String(line));
   }
+
+  key.push(task.text);
 
   return key.join(keySeparator);
 }
 
 export function getNotificationKey(task: WithTime<Task>) {
+  if (isRemote(task)) {
+    return getRemoteTaskIdentity(task);
+  }
+
   const key: string[] = [];
 
-  if (isRemote(task)) {
-    key.push(
-      task.calendar.name,
-      String(getMinutesSinceMidnight(task.startTime)),
-      String(task.durationMinutes),
-      task.summary,
-    );
-  } else {
-    key.push(
-      task.location?.path ?? "blank",
-      String(getMinutesSinceMidnight(task.startTime)),
-      String(task.durationMinutes),
-      task.text,
-    );
-  }
+  key.push(
+    task.location?.path ?? "blank",
+    String(getMinutesSinceMidnight(task.startTime)),
+    String(task.durationMinutes),
+    task.text,
+  );
 
   return key.join(keySeparator);
 }
@@ -193,14 +195,6 @@ export function toString(task: WithTime<LocalTask>, mode: EditMode) {
 ${otherLines}`;
 }
 
-// todo: move to properties
-export function updateScheduledPropInText(text: string, dayKey: string) {
-  return text
-    .replace(shortScheduledPropRegExp, `$1${dayKey}`)
-    .replace(scheduledPropRegExp, `$1${dayKey}$2`)
-    .replace(keylessScheduledPropRegExp, `$1${dayKey}$2`);
-}
-
 export function appendText(taskText: string, toAppend: string) {
   const blockIdMatch = obsidianBlockIdRegExp.exec(taskText);
 
@@ -211,22 +205,6 @@ export function appendText(taskText: string, toAppend: string) {
   }
 
   return taskText + toAppend;
-}
-
-// todo: move to properties
-export function addTasksPluginProp(text: string, prop: string) {
-  return appendText(text, ` ${prop}`);
-}
-
-// todo: move out
-export function offsetYToMinutes(
-  offsetY: number,
-  zoomLevel: number,
-  startHour: number,
-) {
-  const hiddenHoursSize = startHour * 60 * zoomLevel;
-
-  return (offsetY + hiddenHoursSize) / zoomLevel;
 }
 
 export function create(props: {
@@ -263,11 +241,6 @@ export function create(props: {
   };
 }
 
-// todo: move to text.ts
-export function getFirstLine(text: string) {
-  return text.split("\n")[0];
-}
-
 export function getOneLineSummary(task: Task) {
   if (isRemote(task)) {
     return task.summary;
@@ -278,18 +251,6 @@ export function getOneLineSummary(task: Task) {
     removeListTokens,
     removeTimestampFromStart,
   )(task.text);
-}
-
-// todo: move to text.ts
-export function getLinesAfterFirst(text: string) {
-  return text.split("\n").slice(1).join("\n");
-}
-
-// todo: move to markdown.ts
-export function removeListTokens(text: string) {
-  return text
-    .replace(listTokenWithSpacesRegExp, "")
-    .replace(checkboxRegExp, "");
 }
 
 export function truncateToRange(task: WithTime<Task>, range: m.DayRange) {

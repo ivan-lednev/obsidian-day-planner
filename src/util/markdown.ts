@@ -1,6 +1,10 @@
 import { isNotVoid } from "typed-assert";
 
-import { repeatingNewlinesRegExp } from "../regexp";
+import {
+  checkboxRegExp,
+  listTokenWithSpacesRegExp,
+  repeatingNewlinesRegExp,
+} from "../regexp";
 
 export function toggleCheckbox(line: string) {
   if (line.includes("[ ]")) {
@@ -42,4 +46,18 @@ export function indentLines(lines: string[], indentation: string) {
 
 export function indent(text: string, indentation: string) {
   return indentLines(text.split("\n"), indentation).join("\n");
+}
+
+export function getFirstLine(text: string) {
+  return text.split("\n")[0];
+}
+
+export function getLinesAfterFirst(text: string) {
+  return text.split("\n").slice(1).join("\n");
+}
+
+export function removeListTokens(text: string) {
+  return text
+    .replace(listTokenWithSpacesRegExp, "")
+    .replace(checkboxRegExp, "");
 }

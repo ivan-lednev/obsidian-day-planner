@@ -58,3 +58,13 @@ export function mountSanitized(el: HTMLElement, html: string) {
 
   el.appendChild(fragment);
 }
+
+export function offsetYToMinutes(
+  offsetY: number,
+  zoomLevel: number,
+  startHour: number,
+) {
+  const hiddenHoursSize = startHour * 60 * zoomLevel;
+
+  return (offsetY + hiddenHoursSize) / zoomLevel;
+}

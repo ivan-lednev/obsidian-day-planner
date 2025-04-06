@@ -16,7 +16,7 @@ import type { DayPlannerSettings } from "../settings";
 import type { LocalTask } from "../task-types";
 import { EditMode } from "../ui/hooks/use-edit/types";
 import { createDailyNotePath } from "../util/daily-notes";
-import { createHeading } from "../util/markdown";
+import { createHeading, getFirstLine } from "../util/markdown";
 import * as t from "../util/task-utils";
 
 import type { VaultFacade } from "./vault-facade";
@@ -359,7 +359,7 @@ export function mapTaskDiffToUpdates(
                 start: task.location.position.start,
                 end: task.location.position.start,
               },
-              contents: t.getFirstLine(taskTextWithUpdatedProps),
+              contents: getFirstLine(taskTextWithUpdatedProps),
             });
           }
 
@@ -412,7 +412,7 @@ export function mapTaskDiffToUpdates(
           type: "updated",
           path,
           range: { start: position.start, end: position.start },
-          contents: t.getFirstLine(taskTextWithUpdatedProps),
+          contents: getFirstLine(taskTextWithUpdatedProps),
         });
       }
 

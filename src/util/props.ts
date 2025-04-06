@@ -1,4 +1,11 @@
-import { propRegexp } from "../regexp";
+import {
+  keylessScheduledPropRegExp,
+  propRegexp,
+  scheduledPropRegExp,
+  shortScheduledPropRegExp,
+} from "../regexp";
+
+import { appendText } from "./task-utils";
 
 export function createProp(
   key: string,
@@ -30,4 +37,15 @@ export function updateProp(
 
 export function deleteProps(text: string) {
   return text.replaceAll(propRegexp, "").trim();
+}
+
+export function updateScheduledPropInText(text: string, dayKey: string) {
+  return text
+    .replace(shortScheduledPropRegExp, `$1${dayKey}`)
+    .replace(scheduledPropRegExp, `$1${dayKey}$2`)
+    .replace(keylessScheduledPropRegExp, `$1${dayKey}$2`);
+}
+
+export function addTasksPluginProp(text: string, prop: string) {
+  return appendText(text, ` ${prop}`);
 }
