@@ -18,10 +18,12 @@
   import Timeline from "./timeline.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
-  const { editContext, tasksWithActiveClockProps } = getObsidianContext();
+  const { editContext, tasksWithActiveClockProps, pointerDateTime } =
+    getObsidianContext();
   const getDisplayedAllDayTasksForMultiDayRow = fromStore(
     editContext.getDisplayedAllDayTasksForMultiDayRow,
   );
+  const editOperation = fromStore(editContext.editOperation);
 
   const dateRange = fromStore(getDateRangeContext());
   const firstDayInRange = $derived(dateRange.current[0]);
@@ -32,6 +34,13 @@
       end: dateRange.current[dateRange.current.length - 1],
     }),
   );
+
+  function handleResizeableBoxPointerMove() {
+    pointerDateTime.set({
+      dateTime: dateRange.current[0],
+      type: "date",
+    });
+  }
 </script>
 
 <div class="controls">
@@ -53,20 +62,30 @@
       isInitiallyOpen
       title="Unscheduled tasks"
     >
-      {#if displayedAllDayTasks.length > 0}
-        <ResizeableBox class="unscheduled-task-container">
+      {#if editOperation.current || displayedAllDayTasks.length > 0}
+        <ResizeableBox
+          class="unscheduled-task-container"
+          onpointermove={handleResizeableBoxPointerMove}
+          onpointerup={editContext.confirmEdit}
+        >
           {#snippet children(startEdit)}
-            <BlockList
-              --search-results-bg-color="var(--background-primary)"
-              list={displayedAllDayTasks}
-            >
-              {#snippet match(task: Task)}
-                <UnscheduledTimeBlock
-                  --time-block-padding="var(--size-4-1)"
-                  {task}
-                />
-              {/snippet}
-            </BlockList>
+            {#if editOperation.current && displayedAllDayTasks.length === 0}
+              <div class="edit-prompt">
+                Drag blocks here to schedule all-day tasks
+              </div>
+            {:else if displayedAllDayTasks.length > 0}
+              <BlockList
+                --search-results-bg-color="var(--background-primary)"
+                list={displayedAllDayTasks}
+              >
+                {#snippet match(task: Task)}
+                  <UnscheduledTimeBlock
+                    --time-block-padding="var(--size-4-1)"
+                    {task}
+                  />
+                {/snippet}
+              </BlockList>
+            {/if}
             <ResizeHandle on:mousedown={startEdit} />
           {/snippet}
         </ResizeableBox>
@@ -95,5 +114,16 @@
 
   :global(.unscheduled-task-container) {
     overflow: auto;
+  }
+
+  .edit-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: var(--size-4-2);
+
+    font-size: var(--font-ui-small);
+    color: var(--text-faint);
   }
 </style>

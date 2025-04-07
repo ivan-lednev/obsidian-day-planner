@@ -9,6 +9,8 @@
     ...props
   }: {
     children: Snippet<[() => void]>;
+    onpointermove?: (event: PointerEvent) => void;
+    onpointerup?: (event: PointerEvent) => void;
     class?: object | string;
     el?: HTMLDivElement;
   } = $props();
@@ -55,7 +57,13 @@
 />
 <svelte:window on:blur={handleBlur} />
 
-<div bind:this={el} style:height class={[props.class, "resizeable-box"]}>
+<div
+  bind:this={el}
+  style:height
+  class={[props.class, "resizeable-box"]}
+  onpointermove={props.onpointermove}
+  onpointerup={props.onpointerup}
+>
   {@render props.children(startEdit)}
 </div>
 

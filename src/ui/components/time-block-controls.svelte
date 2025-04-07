@@ -3,7 +3,6 @@
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { type LocalTask } from "../../task-types";
-  import * as t from "../../util/task-utils";
   import type { HTMLActionArray } from "../actions/use-actions";
   import { createTimeBlockMenu } from "../time-block-menu";
 
@@ -58,13 +57,13 @@
       {/snippet}
 
       {#snippet bottom({ isActive, setIsActive })}
-        {#if t.isWithTime(task)}
+        {#if !task.isAllDayEvent}
           <ResizeControls {isActive} reverse {setIsActive} {task} />
         {/if}
       {/snippet}
 
       {#snippet top({ isActive, setIsActive })}
-        {#if t.isWithTime(task)}
+        {#if !task.isAllDayEvent}
           <ResizeControls fromTop {isActive} reverse {setIsActive} {task} />
         {/if}
       {/snippet}

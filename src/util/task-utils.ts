@@ -51,6 +51,7 @@ export function getEndTime(task: {
   return task.startTime.clone().add(task.durationMinutes, "minutes");
 }
 
+// todo: remove this inconsistency
 export function isWithTime<T extends Task>(task: T): task is WithTime<T> {
   return Object.hasOwn(task, "startTime") || !task.isAllDayEvent;
 }

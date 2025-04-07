@@ -26,12 +26,14 @@ export type WithPlacing<T> = T & {
 };
 
 export type BaseTask = {
-  /** Tasks get an ID on parsing. It is unique to a line in a file, not to a
-   *  block, visible in the UI (because blocks might get split at midnight, etc.).
+  /**
+   * Tasks get an ID on parsing. It is unique to a line in a file, not to a
+   * block, visible in the UI (because blocks might get split at midnight, etc.).
    */
   id: string;
   startTime: Moment;
   isAllDayEvent?: boolean;
+  // TODO: move to TimeBlockView
   truncated?: Side[];
 };
 
@@ -39,13 +41,13 @@ export type WithTime<T> = T & {
   durationMinutes: number;
 };
 
-export type RemoteTask = BaseTask & {
+export interface RemoteTask extends BaseTask {
   calendar: IcalConfig;
   summary: string;
   rsvpStatus: AttendeePartStat;
   description?: string;
   location?: string;
-};
+}
 
 type Side = "top" | "bottom" | "left" | "right";
 

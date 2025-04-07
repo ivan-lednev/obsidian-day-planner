@@ -52,29 +52,32 @@
     >
       <Copy class="svg-icon" />
     </BlockControlButton>
-    <BlockControlButton
-      cursor="grab"
-      label="Move block and push neighboring blocks"
-      use={[
-        createGestures({
-          onpanmove: () =>
-            handleGripMouseDown(task, EditMode.DRAG_AND_SHIFT_OTHERS),
-        }),
-      ]}
-    >
-      <ArrowDownToLine class="svg-icon" />
-    </BlockControlButton>
-    <BlockControlButton
-      cursor="grab"
-      label="Move block and shrink neighboring blocks"
-      use={[
-        createGestures({
-          onpanmove: () =>
-            handleGripMouseDown(task, EditMode.DRAG_AND_SHRINK_OTHERS),
-        }),
-      ]}
-    >
-      <FoldVertical class="svg-icon" />
-    </BlockControlButton>
+
+    {#if !task.isAllDayEvent}
+      <BlockControlButton
+        cursor="grab"
+        label="Move block and push neighboring blocks"
+        use={[
+          createGestures({
+            onpanmove: () =>
+              handleGripMouseDown(task, EditMode.DRAG_AND_SHIFT_OTHERS),
+          }),
+        ]}
+      >
+        <ArrowDownToLine class="svg-icon" />
+      </BlockControlButton>
+      <BlockControlButton
+        cursor="grab"
+        label="Move block and shrink neighboring blocks"
+        use={[
+          createGestures({
+            onpanmove: () =>
+              handleGripMouseDown(task, EditMode.DRAG_AND_SHRINK_OTHERS),
+          }),
+        ]}
+      >
+        <FoldVertical class="svg-icon" />
+      </BlockControlButton>
+    {/if}
   {/snippet}
 </ExpandingControls>
