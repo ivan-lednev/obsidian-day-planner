@@ -107,35 +107,6 @@ export function fromDiff(a: Moment, b: Moment) {
 
 export type DayRange = { start: Moment; end: Moment };
 
-export function getNonOverlappingDayRanges(days: Moment[]): DayRange[] {
-  if (days.length === 0) {
-    return [];
-  }
-
-  return days
-    .map((d) => d.clone().startOf("day"))
-    .sort(compareMomentsEarliestFirst)
-    .reduce<DayRange[]>((ranges, current) => {
-      if (ranges.length === 0) {
-        return [{ start: current, end: current }];
-      }
-
-      const lastRange = ranges[ranges.length - 1];
-
-      if (current.diff(lastRange.end, "days") === 1) {
-        lastRange.end = current;
-      } else if (current.diff(lastRange.end, "days") > 1) {
-        ranges.push({ start: current, end: current });
-      }
-
-      return ranges;
-    }, []);
-}
-
-function compareMomentsEarliestFirst(a: Moment, b: Moment) {
-  return a.valueOf() - b.valueOf();
-}
-
 export function isWithinRange(someMoment: Moment, range: DayRange) {
   return (
     someMoment.isSameOrAfter(range.start) && someMoment.isBefore(range.end)

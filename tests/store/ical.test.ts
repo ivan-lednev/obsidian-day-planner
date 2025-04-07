@@ -86,8 +86,6 @@ describe("ical", () => {
     "RSVP status gets pulled from params if email is not in CN (common name)",
   );
 
-  test.todo("Location gets passed to an event");
-
   test("Falls back on previous values if fetching a calendar fails", async () => {
     vi.mocked(request).mockReturnValue(
       getIcalFixture("google-tentative-attendee"),
@@ -111,11 +109,14 @@ describe("ical", () => {
     expect(remoteTasks).toHaveLength(1);
   });
 
-  test.each([["2024-10-13"], ["2024-10-12"]])(
+  test.each([
+    ["2024-10-15", "2024-10-16"],
+    ["2024-10-11", "2024-10-12"],
+  ])(
     "Shows multi-day tasks that start before or after the visible range, row $#",
     async (...visibleDays) => {
       vi.mocked(request).mockReturnValue(
-        getIcalFixture("google-event-stretching-2-days"),
+        getIcalFixture("google-event-stretching-5-days"),
       );
 
       const { dispatch, getState } = makeStoreForTests({
@@ -138,7 +139,29 @@ describe("ical", () => {
     },
   );
 
-  test.todo("Events don't get duplicated if they fall within 2 ranges");
+  test("Events don't get duplicated if they fall within 2 separate ranges", async () => {
+    vi.mocked(request).mockReturnValue(
+      getIcalFixture("google-event-stretching-5-days"),
+    );
+
+    const { dispatch, getState } = makeStoreForTests({
+      preloadedState: {
+        ...defaultPreloadedStateForTests,
+        obsidian: {
+          ...initialGlobalState,
+          visibleDays: ["2024-10-12", "2024-10-16"],
+        },
+      },
+    });
+
+    dispatch(icalRefreshRequested());
+
+    await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
+
+    const remoteTasks = selectRemoteTasks(getState());
+
+    expect(remoteTasks).toHaveLength(1);
+  });
 
   test.todo(
     "Recurrence overrides show up if they occur on the same day as one of the recurrences",
