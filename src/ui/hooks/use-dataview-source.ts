@@ -3,26 +3,28 @@ import { onDestroy } from "svelte";
 import { get, writable } from "svelte/store";
 
 import { settings } from "../../global-store/settings";
+import type { RefreshDataviewFn } from "../../types";
 
-interface UseDataviewSourceProps {
-  refreshTasks: (dataviewSource: string) => void;
-}
-
-export function useDataviewSource({ refreshTasks }: UseDataviewSourceProps) {
+export function useDataviewSource(props: {
+  refreshDataviewFn: RefreshDataviewFn;
+}) {
+  const { refreshDataviewFn } = props;
   const dataviewSourceInput = writable(get(settings).dataviewSource);
   const errorMessage = writable("");
 
-  function validate(source: string) {
+  async function validate(source: string) {
     try {
-      refreshTasks(source);
+      await refreshDataviewFn(source);
+
       return "";
     } catch (error) {
       return String(error);
     }
   }
 
-  function tryUpdateSettings(source: string) {
-    const validationError = validate(source);
+  async function tryUpdateSettings(source: string) {
+    const validationError = await validate(source);
+
     errorMessage.set(validationError);
 
     if (validationError.length === 0) {

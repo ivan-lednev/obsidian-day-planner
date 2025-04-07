@@ -9,10 +9,10 @@
   import Dropdown from "./obsidian/dropdown.svelte";
   import SettingItem from "./obsidian/setting-item.svelte";
 
-  const { refreshTasks } = getObsidianContext();
+  const { refreshDataviewFn } = getObsidianContext();
 
   const { errorMessage: dataviewErrorMessage, dataviewSourceInput } =
-    useDataviewSource({ refreshTasks });
+    useDataviewSource({ refreshDataviewFn });
 
   const startHourOptions = range(0, 13).map(String);
   const zoomLevelOptions = range(1, 9).map(String);

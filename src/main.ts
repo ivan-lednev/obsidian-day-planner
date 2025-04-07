@@ -461,7 +461,7 @@ export default class DayPlanner extends Plugin {
       sTaskEditor: this.sTaskEditor,
       workspaceFacade: this.workspaceFacade,
       initWeeklyView: this.initWeeklyLeaf,
-      refreshTasks: this.dataviewFacade.getAllTasksFrom,
+      refreshDataviewFn: this.dataviewFacade.getAllTasksFrom,
       dataviewLoaded,
       renderMarkdown: createRenderMarkdown(this.app),
       toggleCheckboxInFile: this.vaultFacade.toggleCheckboxInFile,

@@ -83,6 +83,7 @@ export function transform(
       };
     }
 
+    // todo: use Array.prototype.with
     updatedTasks = toSpliced(baseline, indexOfEditedTask, taskWithCorrectDay);
   } else {
     updatedTasks = baseline.concat({

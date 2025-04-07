@@ -102,6 +102,7 @@ function applyRangeUpdate(lines: string[], rangeUpdate: RangeUpdate) {
     const indentation = result[startLine].substring(0, startCol);
     const updatedLine = indentation + rangeUpdate.contents;
 
+    // todo: use Array.prototype.with
     result.splice(startLine, 1, updatedLine);
   } else if (rangeUpdate.type === "deleted") {
     result.splice(startLine, count);
