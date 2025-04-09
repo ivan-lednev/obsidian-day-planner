@@ -10,7 +10,6 @@ import {
   type Writable,
 } from "svelte/store";
 
-import { reQueryAfterMillis } from "../constants";
 import type DayPlanner from "../main";
 import { addHorizontalPlacing } from "../overlap/overlap";
 import { dataviewChange as dataviewChangeAction } from "../redux/dataview/dataview-slice";
@@ -36,10 +35,8 @@ import { useDebounceWithDelay } from "../ui/hooks/use-debounce-with-delay";
 import { useEditContext } from "../ui/hooks/use-edit/use-edit-context";
 import { useIsOnline } from "../ui/hooks/use-is-online";
 import { useKeyDown } from "../ui/hooks/use-key-down";
-import { useListsFromVisibleDailyNotes } from "../ui/hooks/use-lists-from-visible-daily-notes";
 import { useModPressed } from "../ui/hooks/use-mod-pressed";
 import { useNewlyStartedTasks } from "../ui/hooks/use-newly-started-tasks";
-import { useTasksFromExtraSources } from "../ui/hooks/use-tasks-from-extra-sources";
 import { useTasksWithActiveClockProps } from "../ui/hooks/use-tasks-with-active-clock-props";
 import { useVisibleDailyNotes } from "../ui/hooks/use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "../ui/hooks/use-visible-dataview-tasks";
@@ -77,7 +74,6 @@ export function useTasks(props: {
   dataviewFacade: DataviewFacade;
   // todo: replace with metadata cache
   app: App;
-  dataviewSource: Readable<string>;
   currentTime: Readable<Moment>;
   workspaceFacade: WorkspaceFacade;
   onUpdate: OnUpdateFn;
@@ -91,7 +87,6 @@ export function useTasks(props: {
     debouncedTaskUpdateTrigger,
     dataviewFacade,
     app,
-    dataviewSource,
     currentTime,
     workspaceFacade,
     pointerDateTime,
@@ -107,22 +102,16 @@ export function useTasks(props: {
     visibleDays,
   );
 
-  const listsFromVisibleDailyNotes = useListsFromVisibleDailyNotes({
-    visibleDailyNotes,
-    debouncedTaskUpdateTrigger,
+  const dataviewTasks = useDataviewTasks({
     dataviewFacade,
     metadataCache: app.metadataCache,
     settings: settingsStore,
-  });
-
-  const tasksFromExtraSources = useTasksFromExtraSources({
+    visibleDailyNotes,
     refreshSignal: debouncedTaskUpdateTrigger,
-    dataviewSource,
-    dataviewFacade,
   });
 
   const tasksWithActiveClockProps = useTasksWithActiveClockProps({
-    dataviewTasks: tasksFromExtraSources,
+    dataviewTasks,
   });
 
   const tasksWithActiveClockPropsAndDurations = derived(
@@ -141,9 +130,9 @@ export function useTasks(props: {
   );
 
   const visibleTasksWithClockProps = derived(
-    [tasksFromExtraSources, tasksWithActiveClockPropsAndDurations],
-    ([$tasksFromExtraSources, $tasksWithActiveClockPropsAndDurations]) => {
-      const flatTasksWithClocks = $tasksFromExtraSources
+    [dataviewTasks, tasksWithActiveClockPropsAndDurations],
+    ([$dataviewTasks, $tasksWithActiveClockPropsAndDurations]) => {
+      const flatTasksWithClocks = $dataviewTasks
         .filter(hasClockProp)
         .flatMap(withClockMoments)
         .map(dv.toTaskWithClock)
@@ -167,12 +156,6 @@ export function useTasks(props: {
       },
     );
   }
-
-  const dataviewTasks = useDataviewTasks({
-    listsFromVisibleDailyNotes,
-    tasksFromExtraSources,
-    settingsStore,
-  });
 
   const localTasks = useVisibleDataviewTasks(dataviewTasks, visibleDays);
 
@@ -312,7 +295,6 @@ export function createHooks({
     dataviewFacade,
     // todo: remove this dep
     app,
-    dataviewSource,
     currentTime,
     workspaceFacade,
     onUpdate,
