@@ -199,8 +199,7 @@ describe("ical", () => {
     ]);
   });
 
-  // TODO: failing because of timezone confusion
-  test.skip("Deleted recurrences don't show up as tasks", async () => {
+  test("Deleted recurrences don't show up as tasks", async () => {
     vi.mocked(request).mockReturnValue(
       getIcalFixture("google-deleted-recurrence"),
     );
