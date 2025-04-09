@@ -9,7 +9,6 @@ import { vi, test, expect, describe } from "vitest";
 import { defaultDayFormat } from "../src/constants";
 import { sortListsRecursivelyInMarkdown } from "../src/mdast/mdast";
 import {
-  applyScopedUpdates,
   createTransaction,
   mapTaskDiffToUpdates,
   TransactionWriter,
@@ -19,6 +18,7 @@ import { VaultFacade } from "../src/service/vault-facade";
 import { defaultSettingsForTests } from "../src/settings";
 import type { LocalTask, WithTime } from "../src/task-types";
 import { EditMode } from "../src/ui/hooks/use-edit/types";
+import { applyScopedUpdates } from "../src/util/markdown";
 import { toMinutes } from "../src/util/moment";
 import * as t from "../src/util/task-utils";
 

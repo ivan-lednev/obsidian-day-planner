@@ -27,7 +27,13 @@ import {
 } from "./clock";
 import { getId } from "./id";
 import { liftToArray } from "./lift";
-import { getFirstLine, indent, indentLines } from "./markdown";
+import {
+  checkbox,
+  createIndentation,
+  getFirstLine,
+  indent,
+  indentLines,
+} from "./markdown";
 import { splitMultiday } from "./moment";
 
 interface Node {
@@ -35,13 +41,6 @@ interface Node {
   symbol: string;
   children: Node[];
   status?: string;
-}
-
-const baseIndentation = "\t";
-
-// todo: account for user settings
-export function createIndentation(level: number) {
-  return baseIndentation.repeat(level);
 }
 
 export function getIndentationForListParagraph(sTask: Node) {
@@ -181,10 +180,6 @@ export function textToMarkdownWithIndentation(sTask: STask) {
     textToMarkdown(sTask),
     createIndentation(sTask.position.start.col),
   );
-}
-
-function checkbox(status: string) {
-  return `[${status}]`;
 }
 
 export function createMarkdownListTokens(task: TaskTokens) {

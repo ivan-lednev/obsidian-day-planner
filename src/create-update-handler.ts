@@ -7,7 +7,6 @@ import { isNotVoid } from "typed-assert";
 
 import { sortListsRecursivelyInMarkdown } from "./mdast/mdast";
 import {
-  applyScopedUpdates,
   createTransaction,
   getTaskDiffFromEditState,
   mapTaskDiffToUpdates,
@@ -20,6 +19,7 @@ import { askForConfirmation } from "./ui/confirmation-modal";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { SingleSuggestModal } from "./ui/SingleSuggestModal";
 import { createUndoNotice } from "./ui/undo-notice";
+import { applyScopedUpdates } from "./util/markdown";
 
 async function getTextFromUser(app: App): Promise<string | undefined> {
   return new Promise((resolve) => {

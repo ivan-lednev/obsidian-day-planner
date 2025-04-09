@@ -11,12 +11,11 @@ import {
   isListItem,
   toMarkdown,
 } from "../mdast/mdast";
-import { headingRegExp } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
 import type { LocalTask } from "../task-types";
 import { EditMode } from "../ui/hooks/use-edit/types";
 import { createDailyNotePath } from "../util/daily-notes";
-import { createHeading, getFirstLine } from "../util/markdown";
+import { applyScopedUpdates, getFirstLine } from "../util/markdown";
 import * as t from "../util/task-utils";
 
 import type { VaultFacade } from "./vault-facade";
@@ -150,110 +149,6 @@ export function createTransaction(props: {
       return afterEach ? afterEach(result) : result;
     },
   }));
-}
-
-// todo: move to markdown
-function appendHeading(contents: string, heading: string) {
-  let result = contents;
-
-  if (contents.length > 0) {
-    result = result.trimEnd();
-    result = result.concat("\n", "\n");
-  }
-
-  return result.concat(heading, "\n", "\n");
-}
-
-/**
- * We need to limit our updatess to the scope of the heading because mdast-util-to-markdown breaks invalid markdown that we see in user templates.
- */
-export function applyScopedUpdates(
-  contents: string,
-  headingScope: string,
-  updateFn: (scopedContents: string) => string,
-  settings?: { createHeading: boolean; settings: DayPlannerSettings },
-) {
-  if (headingScope.trim().length === 0) {
-    return contents;
-  }
-
-  const heading = findHeading(contents, headingScope);
-
-  if (heading?.start === undefined) {
-    if (settings?.createHeading) {
-      const { plannerHeadingLevel, plannerHeading } = settings.settings;
-      const withHeading = appendHeading(
-        contents,
-        createHeading(plannerHeadingLevel, plannerHeading),
-      );
-
-      return applyScopedUpdates(withHeading, headingScope, updateFn);
-    }
-
-    return contents;
-  }
-
-  const lines = contents.split("\n");
-  const beforeHeading = lines.slice(0, heading.start);
-  const afterHeadingIndex = heading.start + heading.length;
-  const toUpdate = lines.slice(heading.start, afterHeadingIndex).join("\n");
-  const afterHeading = lines.slice(afterHeadingIndex);
-
-  const updated = updateFn(toUpdate).split("\n");
-
-  return beforeHeading.concat(updated, afterHeading).join("\n");
-}
-
-function findHeadingInLine(line: string) {
-  const headingMatch = headingRegExp.exec(line);
-
-  if (!headingMatch) {
-    return undefined;
-  }
-
-  const [, tokens] = headingMatch;
-
-  return { level: tokens.length };
-}
-
-function findHeading(text: string, headingText: string) {
-  const lines = text.split("\n");
-
-  const result: {
-    start: number | undefined;
-    length: number;
-    level: number;
-  } = {
-    start: undefined,
-    length: 0,
-    level: 0,
-  };
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const heading = findHeadingInLine(line);
-    const insideHeading = result.start !== undefined;
-
-    if (insideHeading) {
-      if (heading && heading.level <= result.level) {
-        return result;
-      }
-
-      result.length++;
-    } else {
-      if (heading && line.includes(headingText)) {
-        result.start = i;
-        result.level = heading.level;
-        result.length = 1;
-      }
-    }
-  }
-
-  if (result.start === undefined) {
-    return undefined;
-  }
-
-  return result;
 }
 
 function applyMdastUpdates(text: string, updates: MdastUpdate[]) {
