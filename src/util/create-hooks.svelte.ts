@@ -277,7 +277,7 @@ export function createHooks({
   const debouncedTaskUpdateTrigger = useDebounceWithDelay(
     taskUpdateTrigger,
     keyDown,
-    reQueryAfterMillis,
+    0,
   );
 
   const {
