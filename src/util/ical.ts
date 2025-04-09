@@ -67,7 +67,7 @@ export function icalEventToTasksForRange(
   }, []);
 
   const recurrences = icalEvent.rrule
-    .between(start.toDate(), end.toDate()) // Node: this calculation is very slow
+    .between(start.toDate(), end.toDate()) // Note: this calculation is very slow
     .filter(
       (date) =>
         !hasRecurrenceOverrideForDate(icalEvent, date) &&

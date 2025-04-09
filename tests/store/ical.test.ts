@@ -82,6 +82,7 @@ describe("ical", () => {
     ]);
   });
 
+  // NOTE: Microsoft doesn't contain Attendee field
   test.todo(
     "RSVP status gets pulled from params if email is not in CN (common name)",
   );
@@ -163,15 +164,113 @@ describe("ical", () => {
     expect(remoteTasks).toHaveLength(1);
   });
 
-  test.todo(
-    "Recurrence overrides show up if they occur on the same day as one of the recurrences",
-  );
+  // todo: failing because of timezone confusion
+  test.skip("A recurrent 2-day event occupies exactly 2 days", async () => {
+    vi.mocked(request).mockReturnValue(
+      getIcalFixture("google-2-day-event-every-wed"),
+    );
 
-  test.todo("Deleted recurrences don't show up as tasks");
+    const { dispatch, getState } = makeStoreForTests({
+      preloadedState: {
+        ...defaultPreloadedStateForTests,
+        obsidian: {
+          ...initialGlobalState,
+          visibleDays: [
+            "2025-04-07",
+            "2025-04-08",
+            "2025-04-09",
+            "2025-04-10",
+            "2025-04-11",
+          ],
+        },
+      },
+    });
 
-  test.todo("Yearly recurrences do not show up every month");
+    dispatch(icalRefreshRequested());
+
+    await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
+
+    const remoteTasks = selectRemoteTasks(getState());
+
+    expect(remoteTasks).toEqual([
+      expect.objectContaining({
+        durationMinutes: 60 * 24 * 2,
+      }),
+    ]);
+  });
+
+  // TODO: failing because of timezone confusion
+  test.skip("Deleted recurrences don't show up as tasks", async () => {
+    vi.mocked(request).mockReturnValue(
+      getIcalFixture("google-deleted-recurrence"),
+    );
+
+    const { dispatch, getState } = makeStoreForTests({
+      preloadedState: {
+        ...defaultPreloadedStateForTests,
+        obsidian: {
+          ...initialGlobalState,
+          visibleDays: ["2025-04-09", "2025-04-10", "2025-04-11", "2025-04-12"],
+        },
+      },
+    });
+
+    dispatch(icalRefreshRequested());
+
+    await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
+
+    const remoteTasks = selectRemoteTasks(getState());
+
+    expect(remoteTasks).toHaveLength(2);
+
+    expect(remoteTasks[0].startTime).toEqual(
+      window.moment("2025-04-09T00:00:00.000Z"),
+    );
+    expect(remoteTasks[1].startTime).toEqual(
+      window.moment("2025-04-11T00:00:00.000Z"),
+    );
+  });
+
+  test("Yearly recurrences do not show up every month", async () => {
+    vi.mocked(request).mockReturnValue(
+      getIcalFixture("google-yearly-recurrence"),
+    );
+
+    const { dispatch, getState } = makeStoreForTests({
+      preloadedState: {
+        ...defaultPreloadedStateForTests,
+        obsidian: {
+          ...initialGlobalState,
+          visibleDays: [
+            "2025-04-09",
+            "2025-05-08",
+            "2025-05-09",
+            "2025-05-10",
+            "2026-04-08",
+            "2026-04-09",
+            "2026-04-10",
+          ],
+        },
+      },
+    });
+
+    dispatch(icalRefreshRequested());
+
+    await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
+
+    const remoteTasks = selectRemoteTasks(getState());
+
+    expect(remoteTasks).toHaveLength(2);
+
+    expect(remoteTasks[0].startTime).toEqual(
+      window.moment("2025-04-09T00:00:00.000Z"),
+    );
+    expect(remoteTasks[1].startTime).toEqual(
+      window.moment("2026-04-09T00:00:00.000Z"),
+    );
+  });
 
   describe("Time zones", () => {
-    test.todo("Time zones get calculated correctly");
+    test.todo("Time zones get calculated correctly for recurrences");
   });
 });
