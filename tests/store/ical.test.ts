@@ -16,10 +16,12 @@ vi.mock("obsidian", () => ({
   request: vi.fn(),
 }));
 
+const defaultVisibleDays = ["2024-09-26"];
+
 const defaultPreloadedStateForTests: Partial<RootState> = {
   obsidian: {
     ...initialGlobalState,
-    visibleDays: ["2024-09-26"],
+    visibleDays: defaultVisibleDays,
   },
   settings: {
     settings: {
@@ -54,23 +56,45 @@ function makeStoreForTests(props?: { preloadedState?: Partial<RootState> }) {
   });
 }
 
+async function setUp(props: {
+  icalFixtureFileName: string;
+  visibleDays?: string[];
+}) {
+  const { icalFixtureFileName, visibleDays = defaultVisibleDays } = props;
+
+  vi.mocked(request).mockReturnValue(getIcalFixture(icalFixtureFileName));
+
+  const { dispatch, getState } = makeStoreForTests({
+    preloadedState: {
+      ...defaultPreloadedStateForTests,
+      obsidian: {
+        ...initialGlobalState,
+        visibleDays,
+      },
+    },
+  });
+
+  dispatch(icalRefreshRequested());
+
+  await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
+
+  return {
+    remoteTasks: selectRemoteTasks(getState()),
+    dispatch,
+    getState,
+  };
+}
+
 describe("ical", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test("Tasks contain RSVP status, description, location", async () => {
-    vi.mocked(request).mockReturnValue(
-      getIcalFixture("google-tentative-attendee"),
-    );
-
-    const { dispatch, getState } = makeStoreForTests();
-
-    dispatch(icalRefreshRequested());
-
-    await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
-
-    const remoteTasks = selectRemoteTasks(getState());
+    const { remoteTasks } = await setUp({
+      icalFixtureFileName: "google-tentative-attendee",
+      visibleDays: ["2024-09-26"],
+    });
 
     expect(remoteTasks).toEqual([
       expect.objectContaining({
@@ -88,15 +112,9 @@ describe("ical", () => {
   );
 
   test("Falls back on previous values if fetching a calendar fails", async () => {
-    vi.mocked(request).mockReturnValue(
-      getIcalFixture("google-tentative-attendee"),
-    );
-
-    const { dispatch, getState } = makeStoreForTests();
-
-    dispatch(icalRefreshRequested());
-
-    await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
+    const { dispatch, getState } = await setUp({
+      icalFixtureFileName: "google-tentative-attendee",
+    });
 
     vi.mocked(request).mockImplementationOnce(() => {
       throw new Error("Request failed");
@@ -116,81 +134,37 @@ describe("ical", () => {
   ])(
     "Shows multi-day tasks that start before or after the visible range, row $#",
     async (...visibleDays) => {
-      vi.mocked(request).mockReturnValue(
-        getIcalFixture("google-event-stretching-5-days"),
-      );
-
-      const { dispatch, getState } = makeStoreForTests({
-        preloadedState: {
-          ...defaultPreloadedStateForTests,
-          obsidian: {
-            ...initialGlobalState,
-            visibleDays,
-          },
-        },
+      const { remoteTasks } = await setUp({
+        icalFixtureFileName: "google-event-stretching-5-days",
+        visibleDays,
       });
-
-      dispatch(icalRefreshRequested());
-
-      await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
-
-      const remoteTasks = selectRemoteTasks(getState());
 
       expect(remoteTasks).toHaveLength(1);
     },
   );
 
   test("Events don't get duplicated if they fall within 2 separate ranges", async () => {
-    vi.mocked(request).mockReturnValue(
-      getIcalFixture("google-event-stretching-5-days"),
-    );
-
-    const { dispatch, getState } = makeStoreForTests({
-      preloadedState: {
-        ...defaultPreloadedStateForTests,
-        obsidian: {
-          ...initialGlobalState,
-          visibleDays: ["2024-10-12", "2024-10-16"],
-        },
-      },
+    const { remoteTasks } = await setUp({
+      icalFixtureFileName: "google-event-stretching-5-days",
+      visibleDays: ["2024-10-12", "2024-10-16"],
     });
-
-    dispatch(icalRefreshRequested());
-
-    await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
-
-    const remoteTasks = selectRemoteTasks(getState());
 
     expect(remoteTasks).toHaveLength(1);
   });
 
-  // todo: failing because of timezone confusion
-  test.skip("A recurrent 2-day event occupies exactly 2 days", async () => {
-    vi.mocked(request).mockReturnValue(
-      getIcalFixture("google-2-day-event-every-wed"),
-    );
-
-    const { dispatch, getState } = makeStoreForTests({
-      preloadedState: {
-        ...defaultPreloadedStateForTests,
-        obsidian: {
-          ...initialGlobalState,
-          visibleDays: [
-            "2025-04-07",
-            "2025-04-08",
-            "2025-04-09",
-            "2025-04-10",
-            "2025-04-11",
-          ],
-        },
-      },
+  // todo: failing because of timezone confusion, need to deal in floating times
+  // need to avoid this:`["2025-03-26T00:00:00.000Z", "2025-03-27T23:00:00.000Z"]`
+  test.skip("A recurrent 2-day event spans exactly 2 days", async () => {
+    const { remoteTasks } = await setUp({
+      icalFixtureFileName: "google-2-day-event-every-wed",
+      visibleDays: [
+        "2025-04-07",
+        "2025-04-08",
+        "2025-04-09",
+        "2025-04-10",
+        "2025-04-11",
+      ],
     });
-
-    dispatch(icalRefreshRequested());
-
-    await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
-
-    const remoteTasks = selectRemoteTasks(getState());
 
     expect(remoteTasks).toEqual([
       expect.objectContaining({
@@ -200,25 +174,10 @@ describe("ical", () => {
   });
 
   test("Deleted recurrences don't show up as tasks", async () => {
-    vi.mocked(request).mockReturnValue(
-      getIcalFixture("google-deleted-recurrence"),
-    );
-
-    const { dispatch, getState } = makeStoreForTests({
-      preloadedState: {
-        ...defaultPreloadedStateForTests,
-        obsidian: {
-          ...initialGlobalState,
-          visibleDays: ["2025-04-09", "2025-04-10", "2025-04-11", "2025-04-12"],
-        },
-      },
+    const { remoteTasks } = await setUp({
+      icalFixtureFileName: "google-deleted-recurrence",
+      visibleDays: ["2025-04-09", "2025-04-10", "2025-04-11", "2025-04-12"],
     });
-
-    dispatch(icalRefreshRequested());
-
-    await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
-
-    const remoteTasks = selectRemoteTasks(getState());
 
     expect(remoteTasks).toHaveLength(2);
 
@@ -231,33 +190,18 @@ describe("ical", () => {
   });
 
   test("Yearly recurrences do not show up every month", async () => {
-    vi.mocked(request).mockReturnValue(
-      getIcalFixture("google-yearly-recurrence"),
-    );
-
-    const { dispatch, getState } = makeStoreForTests({
-      preloadedState: {
-        ...defaultPreloadedStateForTests,
-        obsidian: {
-          ...initialGlobalState,
-          visibleDays: [
-            "2025-04-09",
-            "2025-05-08",
-            "2025-05-09",
-            "2025-05-10",
-            "2026-04-08",
-            "2026-04-09",
-            "2026-04-10",
-          ],
-        },
-      },
+    const { remoteTasks } = await setUp({
+      icalFixtureFileName: "google-yearly-recurrence",
+      visibleDays: [
+        "2025-04-09",
+        "2025-05-08",
+        "2025-05-09",
+        "2025-05-10",
+        "2026-04-08",
+        "2026-04-09",
+        "2026-04-10",
+      ],
     });
-
-    dispatch(icalRefreshRequested());
-
-    await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
-
-    const remoteTasks = selectRemoteTasks(getState());
 
     expect(remoteTasks).toHaveLength(2);
 
@@ -269,7 +213,9 @@ describe("ical", () => {
     );
   });
 
-  describe("Time zones", () => {
-    test.todo("Time zones get calculated correctly for recurrences");
+  test.todo("Recurrences show up at the same time as the original task");
+
+  describe("Daylight savings time", () => {
+    test.todo("Base case");
   });
 });
