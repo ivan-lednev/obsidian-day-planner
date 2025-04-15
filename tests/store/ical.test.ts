@@ -177,7 +177,7 @@ describe("ical", () => {
   test("Deleted recurrences don't show up as tasks", async () => {
     const { remoteTasks } = await setUp({
       icalFixtureFileName: "google-deleted-recurrence",
-      visibleDays: ["2025-04-09", "2025-04-10", "2025-04-11", "2025-04-12"],
+      visibleDays: ["2025-04-09", "2025-04-10", "2025-04-11"],
     });
 
     expect(remoteTasks).toHaveLength(2);
@@ -214,6 +214,16 @@ describe("ical", () => {
     );
   });
 
+  test("Last visible day is inclusive, i.e. events happening on the last day of the range get displayed", async () => {
+    const { remoteTasks } = await setUp({
+      icalFixtureFileName: "google-recurring-with-exception-and-location",
+      visibleDays: ["2024-09-29"],
+    });
+
+    expect(remoteTasks).toHaveLength(1);
+  });
+
+  // NOTE: this test will break on the newest version of node-ical, so we'll need it
   test.todo("Recurrences show up at the same time as the original task");
 
   describe("Daylight savings time", () => {

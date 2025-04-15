@@ -61,7 +61,7 @@ const keySeparator = ":";
 function getRemoteTaskIdentity(task: RemoteTask) {
   const key: string[] = [];
 
-  key.push(task.calendar.name, task.startTime.toISOString(), task.summary);
+  key.push(task.calendar.name, task.startTime.toISOString(false), task.summary);
 
   return key.join(keySeparator);
 }

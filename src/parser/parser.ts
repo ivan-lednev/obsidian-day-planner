@@ -34,7 +34,6 @@ export function testTimestampPatterns(line: string) {
   );
 }
 
-// todo: move to `timestamp.ts`
 export function replaceOrPrependTimestamp(line: string, timestamp: string) {
   if (looseTimestampAtStartOfLineRegExp.test(line)) {
     return line.replace(looseTimestampAtStartOfLineRegExp, timestamp);

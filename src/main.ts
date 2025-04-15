@@ -395,7 +395,9 @@ export default class DayPlanner extends Plugin {
     this.register(
       visibleDays.subscribe((days) => {
         this.store.dispatch(
-          visibleDaysUpdated(days.map((it) => it.toISOString())),
+          // without the offset, an event right of UTC is going to be displayed as the previous day
+          // a visible day in my zone is 2025-04-15, but in UTC it's 2025-04-14T22:00:00, and getDayKey returns 2025-04-14
+          visibleDaysUpdated(days.map((it) => it.toISOString(true))),
         );
       }),
     );

@@ -1,6 +1,6 @@
 import { flow, groupBy, uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
-import { App } from "obsidian";
+import { App, MetadataCache } from "obsidian";
 import {
   derived,
   fromStore,
@@ -10,6 +10,7 @@ import {
   type Writable,
 } from "svelte/store";
 
+import { reQueryAfterMillis } from "../constants";
 import type DayPlanner from "../main";
 import { addHorizontalPlacing } from "../overlap/overlap";
 import { dataviewChange as dataviewChangeAction } from "../redux/dataview/dataview-slice";
@@ -48,7 +49,6 @@ import * as dv from "./dataview";
 import { withClockMoments } from "./dataview";
 import { getUpdateTrigger } from "./store";
 import { getDayKey, getRenderKey } from "./task-utils";
-import { reQueryAfterMillis } from "../constants";
 
 interface CreateHooksProps {
   app: App;
@@ -73,8 +73,7 @@ export function useTasks(props: {
   visibleDays: Readable<Moment[]>;
   layoutReady: Readable<boolean>;
   dataviewFacade: DataviewFacade;
-  // todo: replace with metadata cache
-  app: App;
+  metadataCache: MetadataCache;
   currentTime: Readable<Moment>;
   workspaceFacade: WorkspaceFacade;
   onUpdate: OnUpdateFn;
@@ -87,7 +86,7 @@ export function useTasks(props: {
     layoutReady,
     debouncedTaskUpdateTrigger,
     dataviewFacade,
-    app,
+    metadataCache,
     currentTime,
     workspaceFacade,
     pointerDateTime,
@@ -105,7 +104,7 @@ export function useTasks(props: {
 
   const dataviewTasks = useDataviewTasks({
     dataviewFacade,
-    metadataCache: app.metadataCache,
+    metadataCache,
     settings: settingsStore,
     visibleDailyNotes,
     refreshSignal: debouncedTaskUpdateTrigger,
@@ -294,8 +293,7 @@ export function createHooks({
     layoutReady,
     debouncedTaskUpdateTrigger,
     dataviewFacade,
-    // todo: remove this dep
-    app,
+    metadataCache: app.metadataCache,
     currentTime,
     workspaceFacade,
     onUpdate,
