@@ -48,6 +48,7 @@ import * as dv from "./dataview";
 import { withClockMoments } from "./dataview";
 import { getUpdateTrigger } from "./store";
 import { getDayKey, getRenderKey } from "./task-utils";
+import { reQueryAfterMillis } from "../constants";
 
 interface CreateHooksProps {
   app: App;
@@ -277,7 +278,7 @@ export function createHooks({
   const debouncedTaskUpdateTrigger = useDebounceWithDelay(
     taskUpdateTrigger,
     keyDown,
-    0,
+    reQueryAfterMillis,
   );
 
   const {
