@@ -152,8 +152,9 @@ describe("ical", () => {
     expect(remoteTasks).toHaveLength(1);
   });
 
-  // todo: failing because of timezone confusion, need to deal in floating times
-  // need to avoid this:`["2025-03-26T00:00:00.000Z", "2025-03-27T23:00:00.000Z"]`
+  // TODO: check out https://github.com/jens-maus/node-ical/issues/36
+  //  this odd behavior comes from the 'fix' to that bug
+  //  need to avoid this:`["2025-03-26T00:00:00.000Z", "2025-03-27T23:00:00.000Z"]`
   test.skip("A recurrent 2-day event spans exactly 2 days", async () => {
     const { remoteTasks } = await setUp({
       icalFixtureFileName: "google-2-day-event-every-wed",
