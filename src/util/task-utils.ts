@@ -192,8 +192,14 @@ export function toString(task: WithTime<LocalTask>, mode: EditMode) {
 
   const otherLines = getLinesAfterFirst(task.text);
 
-  return `${listTokens} ${updatedFirstLineText}
-${otherLines}`;
+  let result = `${listTokens} ${updatedFirstLineText}`;
+
+  if (otherLines) {
+    result += "\n";
+    result += otherLines;
+  }
+
+  return result;
 }
 
 export function appendText(taskText: string, toAppend: string) {

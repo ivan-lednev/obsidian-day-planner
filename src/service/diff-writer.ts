@@ -288,7 +288,15 @@ export function mapTaskDiffToUpdates(
 
       isNotVoid(task.location);
 
-      const { path, position } = task.location;
+      const { path } = task.location;
+      const firstLine = task.location.position.start.line;
+      const lineSpan = taskTextWithUpdatedProps.split("\n").length - 1;
+      const lastLine = firstLine + lineSpan;
+
+      const position = {
+        start: task.location.position.start,
+        end: { line: lastLine, col: 0 },
+      };
 
       if (type === "deleted") {
         return result.concat({

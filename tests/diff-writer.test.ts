@@ -113,6 +113,9 @@ describe("From diff to vault", () => {
     const diff = {
       deleted: [
         createTestTask({
+          text: `- Task
+  Text
+    - Subtask`,
           location: {
             path: "file-1",
             position: {
