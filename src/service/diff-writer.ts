@@ -229,6 +229,115 @@ export function getTaskDiffFromEditState(base: LocalTask[], next: LocalTask[]) {
   );
 }
 
+function mapTaskDiffToUpdate(props: {
+  type: string;
+  task: LocalTask;
+  mode: EditMode;
+  settings: DayPlannerSettings;
+}): Update | Update[] {
+  const { type, task, mode, settings } = props;
+  const taskTextWithUpdatedProps = t.toString(task, mode);
+
+  if (type === "added") {
+    if (task.location) {
+      if (mode === EditMode.SCHEDULE_SEARCH_RESULT) {
+        return {
+          type: "updated",
+          path: task.location.path,
+          range: {
+            start: task.location.position.start,
+            end: task.location.position.start,
+          },
+          contents: getFirstLine(taskTextWithUpdatedProps),
+        };
+      }
+
+      return {
+        type: "created",
+        contents: taskTextWithUpdatedProps,
+        path: task.location.path,
+        target: task.location.position?.start?.line,
+      };
+    }
+
+    return {
+      type: "mdast",
+      path: createDailyNotePath(task.startTime),
+      updateFn: (root: Root) => {
+        const taskRoot = fromMarkdown(taskTextWithUpdatedProps);
+        const listItemToInsert = findFirst(taskRoot, checkListItem);
+
+        isNotVoid(listItemToInsert);
+        isListItem(listItemToInsert);
+
+        return insertListItemUnderHeading(
+          root,
+          settings.plannerHeading,
+          listItemToInsert,
+        );
+      },
+    };
+  }
+
+  isNotVoid(task.location);
+
+  const { path } = task.location;
+  const firstLine = task.location.position.start.line;
+  const lineSpan = taskTextWithUpdatedProps.split("\n").length - 1;
+  const lastLine = firstLine + lineSpan;
+
+  const position = {
+    start: task.location.position.start,
+    end: { line: lastLine, col: 0 },
+  };
+
+  if (type === "deleted") {
+    return {
+      type: "deleted",
+      path,
+      range: position,
+    };
+  }
+
+  const originalLocationDay = getDateFromPath(path, "day");
+  const needToMoveBetweenNotes =
+    originalLocationDay && !task.startTime.isSame(originalLocationDay, "day");
+
+  if (!needToMoveBetweenNotes) {
+    return {
+      type: "updated",
+      path,
+      range: { start: position.start, end: position.start },
+      contents: getFirstLine(taskTextWithUpdatedProps),
+    };
+  }
+
+  return [
+    {
+      type: "deleted",
+      path,
+      range: position,
+    },
+    {
+      type: "mdast",
+      path: createDailyNotePath(task.startTime),
+      updateFn: (root: Root) => {
+        const taskRoot = fromMarkdown(taskTextWithUpdatedProps);
+        const listItemToInsert = findFirst(taskRoot, checkListItem);
+
+        isNotVoid(listItemToInsert);
+        isListItem(listItemToInsert);
+
+        return insertListItemUnderHeading(
+          root,
+          settings.plannerHeading,
+          listItemToInsert,
+        );
+      },
+    },
+  ];
+}
+
 /**
  * Turns the changes to a view into a list of updates that can be applied to the vault.
  */
@@ -240,110 +349,13 @@ export function mapTaskDiffToUpdates(
   return Object.entries(diff)
     .flatMap(([type, tasks]) => tasks.map((task) => ({ type, task })))
     .reduce<Update[]>((result, { type, task }) => {
-      const taskTextWithUpdatedProps = t.toString(task, mode);
+      const updates = mapTaskDiffToUpdate({
+        type,
+        task,
+        mode,
+        settings,
+      });
 
-      // todo: move out to a function
-      if (type === "added") {
-        // todo: remove implicit assumption about obsidian-tasks vs daily notes tasks
-        if (task.location) {
-          // todo: every test should have an operation
-          if (mode === EditMode.SCHEDULE_SEARCH_RESULT) {
-            return result.concat({
-              type: "updated",
-              path: task.location.path,
-              range: {
-                start: task.location.position.start,
-                end: task.location.position.start,
-              },
-              contents: getFirstLine(taskTextWithUpdatedProps),
-            });
-          }
-
-          return result.concat({
-            type: "created",
-            contents: taskTextWithUpdatedProps,
-            path: task.location.path,
-            target: task.location.position?.start?.line,
-          });
-        }
-
-        return result.concat({
-          type: "mdast",
-          path: createDailyNotePath(task.startTime),
-          updateFn: (root: Root) => {
-            const taskRoot = fromMarkdown(taskTextWithUpdatedProps);
-            const listItemToInsert = findFirst(taskRoot, checkListItem);
-
-            isNotVoid(listItemToInsert);
-            isListItem(listItemToInsert);
-
-            return insertListItemUnderHeading(
-              root,
-              settings.plannerHeading,
-              listItemToInsert,
-            );
-          },
-        });
-      }
-
-      isNotVoid(task.location);
-
-      const { path } = task.location;
-      const firstLine = task.location.position.start.line;
-      const lineSpan = taskTextWithUpdatedProps.split("\n").length - 1;
-      const lastLine = firstLine + lineSpan;
-
-      const position = {
-        start: task.location.position.start,
-        end: { line: lastLine, col: 0 },
-      };
-
-      if (type === "deleted") {
-        return result.concat({
-          type: "deleted",
-          path,
-          range: position,
-        });
-      }
-
-      const originalLocationDay = getDateFromPath(path, "day");
-      const needToMoveBetweenNotes =
-        originalLocationDay &&
-        !task.startTime.isSame(originalLocationDay, "day");
-
-      if (!needToMoveBetweenNotes) {
-        return result.concat({
-          type: "updated",
-          path,
-          range: { start: position.start, end: position.start },
-          contents: getFirstLine(taskTextWithUpdatedProps),
-        });
-      }
-
-      return result.concat(
-        {
-          type: "deleted",
-          path,
-          range: position,
-        },
-        {
-          type: "mdast",
-          // todo: duplication
-          path: createDailyNotePath(task.startTime),
-          updateFn: (root: Root) => {
-            const taskRoot = fromMarkdown(taskTextWithUpdatedProps);
-            const listItemToInsert = findFirst(taskRoot, checkListItem);
-
-            isNotVoid(listItemToInsert);
-            isListItem(listItemToInsert);
-
-            return insertListItemUnderHeading(
-              root,
-              settings.plannerHeading,
-              listItemToInsert,
-            );
-          },
-        },
-      );
+      return result.concat(updates);
     }, []);
 }
