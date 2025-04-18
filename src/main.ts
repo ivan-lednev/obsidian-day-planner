@@ -333,12 +333,15 @@ export default class DayPlanner extends Plugin {
       },
     });
 
+    const onEditAborted = () => {
+      new Notice("Tasks changed externally; edit canceled");
+    };
+
     const useSelector = createUseSelector(this.store);
     const {
       editContext,
       tasksWithTimeForToday,
       dataviewLoaded,
-      dataviewChange,
       isModPressed,
       newlyStartedTasks,
       isOnline,
@@ -355,6 +358,7 @@ export default class DayPlanner extends Plugin {
       workspaceFacade: this.workspaceFacade,
       settingsStore: this.settingsStore,
       onUpdate,
+      onEditAborted,
       currentTime,
       dispatch: this.store.dispatch,
       plugin: this,
@@ -376,17 +380,6 @@ export default class DayPlanner extends Plugin {
       this.app.workspace.on("editor-menu", handleEditorMenu),
     );
 
-    this.register(
-      dataviewChange.subscribe(() => {
-        if (get(editContext.editOperation) === undefined) {
-          return;
-        }
-
-        editContext.cancelEdit();
-
-        new Notice("Tasks updated externally; edit canceled");
-      }),
-    );
     this.register(
       editContext.cursor.subscribe(({ bodyCursor }) => {
         document.body.style.cursor = bodyCursor;

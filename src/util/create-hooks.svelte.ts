@@ -23,7 +23,7 @@ import { createUseSelector } from "../redux/use-selector";
 import { DataviewFacade } from "../service/dataview-facade";
 import { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
-import type { OnUpdateFn, PointerDateTime } from "../types";
+import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../types";
 import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDateRanges } from "../ui/hooks/use-date-ranges";
@@ -42,6 +42,7 @@ interface CreateHooksProps {
   workspaceFacade: WorkspaceFacade;
   settingsStore: Writable<DayPlannerSettings>;
   onUpdate: OnUpdateFn;
+  onEditAborted: OnEditAbortedFn;
   currentTime: Readable<Moment>;
   dispatch: AppDispatch;
   plugin: DayPlanner;
@@ -58,6 +59,7 @@ export function createHooks({
   workspaceFacade,
   settingsStore,
   onUpdate,
+  onEditAborted,
   currentTime,
   dispatch,
   plugin,
@@ -143,6 +145,7 @@ export function createHooks({
     editContext,
     newlyStartedTasks,
   } = useTasks({
+    dataviewChange,
     settingsStore,
     isOnline,
     visibleDays,
@@ -153,6 +156,7 @@ export function createHooks({
     currentTime,
     workspaceFacade,
     onUpdate,
+    onEditAborted,
     pointerDateTime,
     useSelector,
   });

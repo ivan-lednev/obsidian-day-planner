@@ -223,6 +223,8 @@ describe("ical", () => {
     expect(remoteTasks).toHaveLength(1);
   });
 
+  test.todo("Recurring workday all-day tasks do not show up on Sunday");
+
   // NOTE: this test will break on the newest version of node-ical, so we'll need it
   test.todo("Recurrences show up at the same time as the original task");
 

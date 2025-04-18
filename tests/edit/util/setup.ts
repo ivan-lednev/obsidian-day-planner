@@ -23,12 +23,15 @@ function createProps({
   settings: DayPlannerSettings;
 }) {
   const onUpdate = vi.fn();
+  const onEditAborted = vi.fn();
   const workspaceFacade = vi.fn() as unknown as WorkspaceFacade;
 
   return {
     settings: writable(settings),
     onUpdate,
+    onEditAborted,
     workspaceFacade,
+    abortEditTrigger: writable(),
     localTasks: writable(tasks),
     remoteTasks: writable([]),
     pointerDateTime: writable<PointerDateTime>({

@@ -16,7 +16,6 @@ export function useVisibleDataviewTasks(
   return derived(
     [visibleDays, dataviewTasks, settings],
     ([$visibleDays, $dataviewTasks, $settings]) => {
-      // todo: this looks wrong
       const dayToSTasks = groupBy(getScheduledDay, $dataviewTasks);
 
       return $visibleDays.reduce<LocalTask[]>((result, day) => {

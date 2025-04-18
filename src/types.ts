@@ -20,6 +20,8 @@ export type OnUpdateFn = (
   mode: EditMode,
 ) => Promise<void>;
 
+export type OnEditAbortedFn = () => void;
+
 export type RelationToNow = "past" | "present" | "future";
 
 export interface Overlap {

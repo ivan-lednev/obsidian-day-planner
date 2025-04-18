@@ -3,6 +3,7 @@ import { get } from "svelte/store";
 import { test, expect, describe } from "vitest";
 
 import { EditMode } from "../../src/ui/hooks/use-edit/types";
+import { getUpdateTrigger } from "../../src/util/store";
 
 import { baseTask, dayKey, nextDayKey, threeTasks } from "./util/fixtures";
 import { setUp } from "./util/setup";
@@ -29,6 +30,19 @@ describe("drag one & common edit mechanics", () => {
         ],
       },
     });
+  });
+
+  test("Edits are interruptible", async () => {
+    const { handlers, props, confirmEdit } = setUp({
+      tasks: threeTasks,
+    });
+
+    handlers.handleGripMouseDown(threeTasks[1], EditMode.DRAG);
+    props.abortEditTrigger.set(getUpdateTrigger());
+
+    await confirmEdit();
+
+    expect(props.onEditAborted).toHaveBeenCalledTimes(1);
   });
 
   test.skip("when a task is set to its current time, nothing happens", async () => {

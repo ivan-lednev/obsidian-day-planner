@@ -11,7 +11,11 @@ import type {
   WithPlacing,
   WithTime,
 } from "../../../task-types";
-import type { OnUpdateFn, PointerDateTime } from "../../../types";
+import type {
+  OnEditAbortedFn,
+  OnUpdateFn,
+  PointerDateTime,
+} from "../../../types";
 import * as m from "../../../util/moment";
 import * as t from "../../../util/task-utils";
 
@@ -49,17 +53,36 @@ export function useEditContext(props: {
   localTasks: Readable<LocalTask[]>;
   remoteTasks: Readable<Task[]>;
   pointerDateTime: Readable<PointerDateTime>;
+  abortEditTrigger: Readable<unknown>;
+  onEditAborted: OnEditAbortedFn;
 }) {
   const {
     workspaceFacade,
+    onEditAborted,
     onUpdate,
     settings,
     localTasks,
     remoteTasks,
     pointerDateTime,
+    abortEditTrigger,
   } = props;
 
-  const editOperation = writable<EditOperation | undefined>();
+  const editOperation = writable<EditOperation | undefined>(
+    undefined,
+    (set, updateEditOperation) => {
+      const unsubscribe = abortEditTrigger.subscribe(() => {
+        updateEditOperation((currentEditOperation) => {
+          if (currentEditOperation !== undefined) {
+            onEditAborted();
+          }
+
+          return undefined;
+        });
+      });
+
+      return unsubscribe;
+    },
+  );
   const cursor = useCursor(editOperation);
 
   const baselineTasks = writable<LocalTask[]>([], (set) => {

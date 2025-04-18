@@ -10,11 +10,12 @@ import { DataviewFacade } from "../../service/dataview-facade";
 import { WorkspaceFacade } from "../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../settings";
 import type { LocalTask, Task, WithTime } from "../../task-types";
-import type { OnUpdateFn, PointerDateTime } from "../../types";
+import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../../types";
 import { hasClockProp } from "../../util/clock";
 import * as dv from "../../util/dataview";
 import { withClockMoments } from "../../util/dataview";
 import * as m from "../../util/moment";
+import { getUpdateTrigger } from "../../util/store";
 import { getDayKey, getRenderKey } from "../../util/task-utils";
 
 import { useDataviewTasks } from "./use-dataview-tasks";
@@ -35,8 +36,10 @@ export function useTasks(props: {
   currentTime: Readable<Moment>;
   workspaceFacade: WorkspaceFacade;
   onUpdate: OnUpdateFn;
+  onEditAborted: OnEditAbortedFn;
   pointerDateTime: Readable<PointerDateTime>;
   useSelector: ReturnType<typeof createUseSelector>;
+  dataviewChange: Readable<unknown>;
 }) {
   const {
     settingsStore,
@@ -48,7 +51,9 @@ export function useTasks(props: {
     currentTime,
     workspaceFacade,
     pointerDateTime,
+    dataviewChange,
     onUpdate,
+    onEditAborted,
     useSelector,
   } = props;
 
@@ -126,13 +131,20 @@ export function useTasks(props: {
     },
   );
 
+  const abortEditTrigger = derived(
+    [localTasks, dataviewChange],
+    getUpdateTrigger,
+  );
+
   const editContext = useEditContext({
     workspaceFacade,
     onUpdate,
+    onEditAborted,
     settings: settingsStore,
     localTasks,
     remoteTasks,
     pointerDateTime,
+    abortEditTrigger,
   });
 
   const newlyStartedTasks = useNewlyStartedTasks({
