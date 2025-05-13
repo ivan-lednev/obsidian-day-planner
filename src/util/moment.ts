@@ -105,20 +105,17 @@ export function fromDiff(a: Moment, b: Moment) {
   return window.moment.utc(b.diff(a, "milliseconds"));
 }
 
-export type DayRange = { start: Moment; end: Moment };
+export type Range = { start: Moment; end: Moment };
 
-export function isWithinRange(someMoment: Moment, range: DayRange) {
+export function isWithinRange(someMoment: Moment, range: Range) {
   return (
     someMoment.isSameOrAfter(range.start) && someMoment.isBefore(range.end)
   );
 }
 
-export function doesOverlapWithRange(
-  target: DayRange,
-  rangeEndExclusive: DayRange,
-) {
+export function doesOverlapWithRange(target: Range, rangeEndExclusive: Range) {
   return (
     target.start.isBefore(rangeEndExclusive.end) &&
-    target.end.isSameOrAfter(rangeEndExclusive.start)
+    target.end.isAfter(rangeEndExclusive.start)
   );
 }

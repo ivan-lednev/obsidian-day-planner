@@ -16,6 +16,7 @@ import {
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
 import {
+  type BaseTask,
   isRemote,
   type LocalTask,
   type RemoteTask,
@@ -260,7 +261,7 @@ export function getOneLineSummary(task: Task) {
   )(task.text);
 }
 
-export function truncateToRange(task: WithTime<Task>, range: m.DayRange) {
+export function truncateToRange(task: WithTime<Task>, range: m.Range) {
   const start = task.startTime.clone().startOf("day");
   const end = getEndTime(task).clone().endOf("day");
 
@@ -315,4 +316,26 @@ export function isTimeEqual(a: LocalTask, b: LocalTask) {
 
 export function hasDateFromProp(task: LocalTask) {
   return scheduledPropRegExps.some((regexp) => regexp.test(task.text));
+}
+
+export function clamp<T extends WithTime<BaseTask>>(
+  timeBlock: T,
+  start: Moment,
+  end: Moment,
+): T {
+  const clampedStartTime = timeBlock.startTime.isBefore(start)
+    ? start
+    : timeBlock.startTime;
+  const endTime = getEndTime(timeBlock);
+  const clampedEndTime = endTime.isAfter(end) ? end : endTime;
+  const clampedDurationMinutes = clampedEndTime.diff(
+    clampedStartTime,
+    "minutes",
+  );
+
+  return {
+    ...timeBlock,
+    startTime: clampedStartTime,
+    durationMinutes: clampedDurationMinutes,
+  };
 }

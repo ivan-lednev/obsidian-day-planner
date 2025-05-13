@@ -441,13 +441,14 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
     );
 
     new Setting(containerEl)
-      .setName("Current task progress indicator")
+      .setName("Task progress indicator")
       .addDropdown((component) =>
         component
           .addOptions({
-            bar: "bar",
-            pie: "pie",
-            none: "none",
+            ["mini-timeline"]: "Mini-timeline",
+            bar: "Bar",
+            pie: "Pie",
+            none: "None",
           })
           .setValue(String(this.plugin.settings().progressIndicator))
           .onChange((value) => {

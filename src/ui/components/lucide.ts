@@ -28,4 +28,7 @@ export const Info = obsidianIcon(lucideSvelte.Info);
 export const Zap = obsidianIcon(lucideSvelte.Zap);
 export const RefreshCwOff = obsidianIcon(lucideSvelte.RefreshCwOff);
 export const GripHorizontal = obsidianIcon(lucideSvelte.GripHorizontal);
+export const Play = obsidianIcon(lucideSvelte.Play);
+export const SkipForward = obsidianIcon(lucideSvelte.SkipForward);
+export const StepForward = obsidianIcon(lucideSvelte.StepForward);
 /* eslint-enable @typescript-eslint/naming-convention */

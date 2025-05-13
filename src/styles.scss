@@ -31,6 +31,7 @@
 .status-bar-item.plugin-obsidian-day-planner {
   display: flex;
   gap: var(--size-2-2);
+  padding-block: 0;
 }
 
 .day-planner-progress-bar {
@@ -47,6 +48,7 @@
 
 .day-planner-progress-value {
   background-color: var(--color-accent);
+  height: 100%;
 }
 
 .day-planner-progress-value.green,

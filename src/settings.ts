@@ -25,7 +25,7 @@ export const firstDaysOfWeek = [
 ] as const;
 
 export interface DayPlannerSettings {
-  progressIndicator: "pie" | "bar" | "none";
+  progressIndicator: "mini-timeline" | "pie" | "bar" | "none";
   showTaskNotification: boolean;
   zoomLevel: number;
   timelineIcon: string;
@@ -73,7 +73,7 @@ export type PluginData = DayPlannerSettings & Cache;
 
 export const defaultSettings: DayPlannerSettings = {
   snapStepMinutes: 10,
-  progressIndicator: "bar",
+  progressIndicator: "mini-timeline",
   showTaskNotification: false,
   zoomLevel: 2,
   timelineIcon: "calendar-with-checkmark",

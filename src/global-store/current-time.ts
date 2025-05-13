@@ -1,10 +1,12 @@
 import type { Moment } from "moment";
 import { derived, fromStore, readable } from "svelte/store";
 
+const currentTimeRefreshIntervalMillis = 5 * 1000;
+
 export const currentTime = readable<Moment>(window.moment(), (set) => {
   const interval = setInterval(() => {
     set(window.moment());
-  }, 1000);
+  }, currentTimeRefreshIntervalMillis);
 
   return () => {
     clearInterval(interval);

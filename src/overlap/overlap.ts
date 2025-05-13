@@ -2,7 +2,7 @@ import Fraction from "fraction.js";
 import { partition } from "lodash/fp";
 import { isNotVoid } from "typed-assert";
 
-import type { BaseTask, WithTime } from "../task-types";
+import type { BaseTask, WithPlacing, WithTime } from "../task-types";
 import type { Overlap } from "../types";
 import { getMinutesSinceMidnight } from "../util/moment";
 import { getEndMinutes } from "../util/task-utils";
@@ -132,7 +132,9 @@ function overlaps(a: WithTime<BaseTask>, b: WithTime<BaseTask>) {
   return getEndMinutes(early) > getMinutesSinceMidnight(late.startTime);
 }
 
-export function addHorizontalPlacing(blocks: Array<WithTime<BaseTask>>) {
+export function addHorizontalPlacing<T extends WithTime<BaseTask>>(
+  blocks: Array<T>,
+): Array<WithPlacing<T>> {
   if (blocks.length === 0) {
     return [];
   }

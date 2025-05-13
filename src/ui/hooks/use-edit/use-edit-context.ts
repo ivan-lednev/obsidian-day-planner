@@ -147,7 +147,7 @@ export function useEditContext(props: {
   const getDisplayedAllDayTasksForMultiDayRow = derived(
     [combinedTasks],
     ([$combinedTasks]) =>
-      (range: m.DayRange) => {
+      (range: m.Range) => {
         const startOfRange = range.start.clone().startOf("day");
         const endOfRange = range.end.clone().add(1, "day").startOf("day");
 

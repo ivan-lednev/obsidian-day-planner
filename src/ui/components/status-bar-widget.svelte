@@ -1,21 +1,32 @@
 <script lang="ts">
-  import type { Readable } from "svelte/store";
+  import { fromStore, type Readable } from "svelte/store";
 
-  import { settings } from "../../global-store/settings";
-  import type { Task, WithTime } from "../../task-types";
+  import { settingsSignal } from "../../global-store/settings";
+  import { type Task, type WithTime } from "../../task-types";
   import { useStatusBarWidget } from "../hooks/use-status-bar-widget";
 
-  export let onClick: () => Promise<void>;
-  export let tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
-  export let errorStore: Readable<Error | undefined>;
+  import { SkipForward, Play } from "./lucide";
+  import MiniTimeline from "./mini-timeline.svelte";
 
-  const statusBarProps = useStatusBarWidget({ tasksWithTimeForToday });
+  const {
+    onClick,
+    tasksWithTimeForToday,
+    errorStore,
+  }: {
+    onClick: () => Promise<void>;
+    tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
+    errorStore: Readable<Error | undefined>;
+  } = $props();
 
-  $: ({ showNow, showNext, progressIndicator, timestampFormat } = $settings);
-  $: ({ current, next } = $statusBarProps);
+  const { current, next } = $derived(
+    fromStore(useStatusBarWidget({ tasksWithTimeForToday })).current,
+  );
+
+  const { showNow, showNext, progressIndicator, timestampFormat } = $derived(
+    settingsSignal.current,
+  );
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="root" onclick={onClick}>
   {#if $errorStore}
     😵 Error in Day Planner (click to see)
@@ -23,11 +34,22 @@
     <span class="status-bar-item-segment">All done</span>
   {:else}
     {#if showNow && current}
-      <span class="status-bar-item-segment"
-        >Now: {current.text} (-{current.timeLeft}, till {current.endTime.format(
+      <span class="status-bar-item-segment">
+        <Play class="status-bar-item-icon" />
+        {current.text} (-{current.timeLeft}, till {current.endTime.format(
           timestampFormat,
-        )})</span
-      >
+        )})
+      </span>
+    {/if}
+
+    {#if showNext && next}
+      <span class="status-bar-item-segment">
+        <SkipForward class="status-bar-item-icon" />
+        {next.text} (in {next.timeToNext})
+      </span>
+    {/if}
+
+    {#if showNow && current}
       {#if progressIndicator === "pie"}
         <div
           class="status-bar-item-segment progress-pie day-planner"
@@ -42,16 +64,29 @@
         </div>
       {/if}
     {/if}
-    {#if showNext && next}
-      <span class="status-bar-item-segment"
-        >Next: {next.text} (in {next.timeToNext})</span
-      >
-    {/if}
+  {/if}
+
+  {#if progressIndicator === "mini-timeline"}
+    <MiniTimeline {tasksWithTimeForToday} />
   {/if}
 </div>
 
 <style>
   .root {
     display: contents;
+  }
+
+  .root :global(.status-bar-item-icon) {
+    display: inline-flex;
+  }
+
+  .status-bar-item-segment {
+    display: flex;
+    gap: var(--size-2-1);
+    align-items: center;
+  }
+
+  .status-bar-item-segment.progress-pie {
+    display: block;
   }
 </style>

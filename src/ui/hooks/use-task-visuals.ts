@@ -14,8 +14,8 @@ export function useTaskVisuals(
   task: WithPlacing<WithTime<Task>>,
   { settings }: UseTaskVisualsProps,
 ) {
-  const width = `${task.placing?.widthPercent || 100}%`;
-  const left = `${task.placing?.xOffsetPercent || 0}%`;
+  const width = `${task.placing?.spanPercent || 100}%`;
+  const left = `${task.placing?.offsetPercent || 0}%`;
 
   const offset = derived(settings, ($settings) => {
     const number =

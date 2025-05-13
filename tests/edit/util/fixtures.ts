@@ -16,8 +16,8 @@ export const baseTask: WithPlacing<WithTime<LocalTask>> = {
   durationMinutes: 60,
   text: "text",
   placing: {
-    xOffsetPercent: 0,
-    widthPercent: 100,
+    offsetPercent: 0,
+    spanPercent: 100,
   },
   location: {
     path: "path",
