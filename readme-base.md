@@ -40,7 +40,13 @@ To open multi-day planner:
 - Or click on the icon in the left ribbon:
   - ![](./assets/open-multi-day-view-ribbon-icon.png)
 
-The plugin has 4 distinct 'modes'. That is, it can display records from different sources:
+You can overview the upcoming 3 hours in the mini-timeline in the status bar:
+
+<img src="./assets/mini-timeline-demo.png" width="100%">
+
+If there are remote tasks, the blocks will be colored accordingly.
+
+The plugin can display records from different sources:
 
 1. Daily notes
 2. Obsidian-tasks
@@ -54,7 +60,7 @@ Let's go over each one of them.
 > [!Warning]
 > Either the core 'Daily Notes' (core plugin) or the 'Periodic Notes' (community plugin, [see in Obsidian](obsidian://show-plugin?id=periodic-notes)) should be enabled. This is what allows day-planner to 'see' and interact with your daily notes.
 
-This works out of the box: you write your tasks in a daily note, and they show up on the timeline:
+Write your tasks in a daily note, and they show up on the timeline:
 
 ```md
 # Day planner
@@ -66,6 +72,7 @@ This works out of the box: you write your tasks in a daily note, and they show u
 ### 2. [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin) integration, showing events from other files in your vault
 
 You can see tasks anywhere in the vault with dates added by the [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin). This also works out of the box for all the files in the vault. You only need to add the `scheduled` property to a task in one of the formats:
+
 - Shorthand, added by [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin): `⏳ 2021-08-29`
   - Note that this plugin has a handy modal for adding these properties
 - Full Dataview-like property: `[scheduled:: 2021-08-29]`
