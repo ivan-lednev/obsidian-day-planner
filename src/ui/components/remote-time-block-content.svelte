@@ -54,6 +54,7 @@
 
     height: 100%;
     padding: var(--size-2-1) var(--size-4-1);
+    padding-bottom: 0;
     padding-left: calc(4px + var(--size-4-2));
 
     color: var(--text-normal);
