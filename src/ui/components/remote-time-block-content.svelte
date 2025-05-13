@@ -38,6 +38,12 @@
 </div>
 
 <style>
+  .location,
+  .rendered-description {
+    font-size: var(--font-ui-smaller);
+    color: var(--text-muted);
+  }
+
   .rendered-description :global(:is(ul, ol)) {
     margin: 0.2em;
     padding-inline-start: 20px;
