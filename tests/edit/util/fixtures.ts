@@ -57,5 +57,10 @@ export const threeTasks: WithPlacing<WithTime<LocalTask>>[] = [
     startTime: moment("2023-01-01 03:00"),
   },
 ];
+export const threeTasksOverTwoDays: WithTime<LocalTask>[] = [
+  baseTask,
+  { ...baseTask, id: "2", startTime: moment("2023-01-01 01:00") },
+  { ...baseTask, id: "3", startTime: moment("2023-01-02 02:00") },
+];
 export const baseTasks: Array<WithTime<LocalTask>> = [baseTask];
 export const tasksWithUnscheduledTask: Array<LocalTask> = [unscheduledTask];

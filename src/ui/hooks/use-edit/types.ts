@@ -1,6 +1,4 @@
-import type { DayPlannerSettings } from "../../../settings";
 import type { LocalTask, WithTime } from "../../../task-types";
-import type { PointerDateTime } from "../../../types";
 
 export enum EditMode {
   DRAG = "DRAG",
@@ -20,13 +18,3 @@ export interface EditOperation {
   task: WithTime<LocalTask>;
   mode: EditMode;
 }
-
-export type TaskTransformer = (
-  baseline: WithTime<LocalTask>[],
-  // TODO: pass only id
-  editTarget: WithTime<LocalTask>,
-  // TODO: remove
-  cursorTime: number,
-  settings: DayPlannerSettings,
-  pointerDateTime: PointerDateTime,
-) => WithTime<LocalTask>[];

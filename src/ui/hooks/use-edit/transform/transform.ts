@@ -1,42 +1,16 @@
 import { isNotVoid } from "typed-assert";
 
 import type { DayPlannerSettings } from "../../../../settings";
-import { type LocalTask, type WithTime } from "../../../../task-types";
+import { type LocalTask } from "../../../../task-types";
 import type { PointerDateTime } from "../../../../types";
 import {
   getMinutesSinceMidnight,
   minutesToMomentOfDay,
 } from "../../../../util/moment";
-import { toSpliced } from "../../../../util/to-spliced";
-import { EditMode, type EditOperation, type TaskTransformer } from "../types";
+import * as t from "../../../../util/task-utils";
+import { EditMode, type EditOperation } from "../types";
 
-import { create } from "./create";
-import { drag } from "./drag";
-import { dragAndShiftOthers } from "./drag-and-shift-others";
-import { dragAndShrinkOthers } from "./drag-and-shrink-others";
-import { resize, resizeFromTop } from "./resize";
-import {
-  resizeAndShiftOthers,
-  resizeFromTopAndShiftOthers,
-} from "./resize-and-shift-others";
-import {
-  resizeAndShrinkOthers,
-  resizeFromTopAndShrinkOthers,
-} from "./resize-and-shrink-others";
-
-const transformers: Record<EditMode, TaskTransformer> = {
-  [EditMode.DRAG]: drag,
-  [EditMode.DRAG_AND_SHIFT_OTHERS]: dragAndShiftOthers,
-  [EditMode.DRAG_AND_SHRINK_OTHERS]: dragAndShrinkOthers,
-  [EditMode.CREATE]: create,
-  [EditMode.RESIZE]: resize,
-  [EditMode.RESIZE_AND_SHIFT_OTHERS]: resizeAndShiftOthers,
-  [EditMode.RESIZE_FROM_TOP]: resizeFromTop,
-  [EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS]: resizeFromTopAndShiftOthers,
-  [EditMode.RESIZE_AND_SHRINK_OTHERS]: resizeAndShrinkOthers,
-  [EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS]: resizeFromTopAndShrinkOthers,
-  [EditMode.SCHEDULE_SEARCH_RESULT]: drag,
-};
+import { editBlocks } from "./edit-blocks";
 
 function isSingleDayMode(mode: EditMode) {
   return [
@@ -49,8 +23,45 @@ function isSingleDayMode(mode: EditMode) {
   ].includes(mode);
 }
 
-function sortByStartMinutes(tasks: WithTime<LocalTask>[]) {
-  return tasks.slice().sort((a, b) => a.startTime.diff(b.startTime));
+function getEditType(mode: EditMode) {
+  if (
+    mode === EditMode.DRAG ||
+    mode === EditMode.DRAG_AND_SHIFT_OTHERS ||
+    mode === EditMode.DRAG_AND_SHRINK_OTHERS
+  ) {
+    return "move";
+  }
+
+  if (
+    mode === EditMode.CREATE ||
+    mode === EditMode.RESIZE ||
+    mode === EditMode.RESIZE_AND_SHIFT_OTHERS ||
+    mode === EditMode.RESIZE_AND_SHRINK_OTHERS
+  ) {
+    return "end";
+  }
+
+  return "start";
+}
+
+function getEditInteraction(mode: EditMode) {
+  if (
+    mode === EditMode.DRAG_AND_SHRINK_OTHERS ||
+    mode === EditMode.RESIZE_AND_SHRINK_OTHERS ||
+    mode === EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS
+  ) {
+    return "shrink";
+  }
+
+  if (
+    mode === EditMode.DRAG_AND_SHIFT_OTHERS ||
+    mode === EditMode.RESIZE_AND_SHIFT_OTHERS ||
+    mode === EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS
+  ) {
+    return "push";
+  }
+
+  return "none";
 }
 
 export function transform(
@@ -59,13 +70,8 @@ export function transform(
   settings: DayPlannerSettings,
   pointerDateTime: PointerDateTime,
 ) {
-  const { dateTime } = pointerDateTime;
-  const transformFn = transformers[operation.mode];
-
-  isNotVoid(transformFn, `No transformer for operation: ${operation.mode}`);
-
   // todo: duplicated, task gets updated in transformer and here
-  const indexOfEditedTask = baseline.findIndex(
+  let indexOfEditedTask = baseline.findIndex(
     (task) => task.id === operation.task.id,
   );
   const isTaskInBaseline = indexOfEditedTask >= 0;
@@ -79,31 +85,69 @@ export function transform(
     if (!isSingleDayMode(operation.mode)) {
       taskWithCorrectDay = {
         ...found,
-        startTime: dateTime,
+        startTime: pointerDateTime.dateTime,
       };
     }
 
-    // todo: use Array.prototype.with
-    updatedTasks = toSpliced(baseline, indexOfEditedTask, taskWithCorrectDay);
+    updatedTasks = baseline.with(indexOfEditedTask, taskWithCorrectDay);
   } else {
     updatedTasks = baseline.concat({
       ...operation.task,
+      isAllDayEvent: pointerDateTime.type === "date",
       startTime: minutesToMomentOfDay(
         getMinutesSinceMidnight(operation.task.startTime),
-        dateTime,
+        pointerDateTime.dateTime,
       ),
+    });
+    indexOfEditedTask = updatedTasks.length - 1;
+  }
+
+  if (pointerDateTime.type === "date") {
+    if (indexOfEditedTask === -1) {
+      throw new Error("Task not found");
+    }
+
+    return updatedTasks.with(indexOfEditedTask, {
+      ...operation.task,
+      isAllDayEvent: true,
+      startTime: pointerDateTime.dateTime,
+      durationMinutes: 60,
     });
   }
 
-  const withTimeSorted = sortByStartMinutes(updatedTasks);
+  const idToTaskLookup = new Map(updatedTasks.map((it) => [it.id, it]));
 
-  return transformFn(
-    withTimeSorted,
-    operation.task,
-    getMinutesSinceMidnight(dateTime),
-    settings,
-    pointerDateTime,
+  const editableBlocks = updatedTasks
+    .map((it) => ({
+      id: it.id,
+      start: it.startTime.unix(),
+      end: t.getEndTime(it).unix(),
+    }))
+    .toSorted((a, b) => a.start - b.start);
+
+  // TODO: use object
+
+  const transformed = editBlocks(
+    editableBlocks,
+    operation.task.id,
+    pointerDateTime.dateTime.unix(),
+    getEditType(operation.mode),
+    getEditInteraction(operation.mode),
+    settings.minimalDurationMinutes * 60,
   );
+
+  return transformed.map((it) => {
+    const task = idToTaskLookup.get(it.id);
+
+    isNotVoid(task);
+
+    return {
+      ...task,
+      startTime: window.moment.unix(it.start),
+      durationMinutes: (it.end - it.start) / 60,
+      isAllDayEvent: false,
+    };
+  });
   // TODO: this is what's making timestamps appear in the wrong place
   //   .map((task) => ({ ...task, text: t.toString(task, operation.mode) }));
 }

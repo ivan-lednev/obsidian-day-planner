@@ -2,7 +2,6 @@ import moment from "moment";
 import { get } from "svelte/store";
 import { test, expect, describe } from "vitest";
 
-import { defaultSettingsForTests } from "../../src/settings";
 import { EditMode } from "../../src/ui/hooks/use-edit/types";
 
 import {
@@ -12,6 +11,7 @@ import {
   emptyTasks,
   nextDayKey,
   tasksWithUnscheduledTask,
+  threeTasksOverTwoDays,
 } from "./util/fixtures";
 import { setUp } from "./util/setup";
 
@@ -70,12 +70,7 @@ describe("moving tasks between containers", () => {
 
   test("drag many works between days", () => {
     const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp({
-      tasks: [
-        baseTask,
-        { ...baseTask, id: "2", startTime: moment("2023-01-01 01:00") },
-        { ...baseTask, id: "3", startTime: moment("2023-01-02 02:00") },
-      ],
-      settings: defaultSettingsForTests,
+      tasks: threeTasksOverTwoDays,
     });
 
     handlers.handleGripMouseDown(baseTask, EditMode.DRAG_AND_SHIFT_OTHERS);
@@ -90,6 +85,27 @@ describe("moving tasks between containers", () => {
           { startTime: moment("2023-01-02 02:00") },
           { id: "3", startTime: moment("2023-01-02 03:00") },
         ],
+      },
+    });
+  });
+
+  test("drag many does not mess with other days", () => {
+    const { handlers, moveCursorTo, dayToDisplayedTasks } = setUp({
+      tasks: threeTasksOverTwoDays,
+    });
+
+    handlers.handleGripMouseDown(baseTask, EditMode.DRAG_AND_SHIFT_OTHERS);
+    moveCursorTo(moment("2023-01-01 05:00"));
+
+    expect(get(dayToDisplayedTasks)).toMatchObject({
+      [dayKey]: {
+        withTime: [
+          { startTime: moment("2023-01-01 01:00") },
+          { startTime: moment("2023-01-01 05:00") },
+        ],
+      },
+      [nextDayKey]: {
+        withTime: [{ id: "3", startTime: moment("2023-01-02 02:00") }],
       },
     });
   });
