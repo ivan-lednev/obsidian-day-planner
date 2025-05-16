@@ -3,25 +3,10 @@ import { isNotVoid } from "typed-assert";
 import type { DayPlannerSettings } from "../../../../settings";
 import { type LocalTask } from "../../../../task-types";
 import type { PointerDateTime } from "../../../../types";
-import {
-  getMinutesSinceMidnight,
-  minutesToMomentOfDay,
-} from "../../../../util/moment";
 import * as t from "../../../../util/task-utils";
 import { EditMode, type EditOperation } from "../types";
 
 import { editBlocks } from "./edit-blocks";
-
-function isSingleDayMode(mode: EditMode) {
-  return [
-    EditMode.RESIZE,
-    EditMode.RESIZE_FROM_TOP,
-    EditMode.RESIZE_AND_SHRINK_OTHERS,
-    EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS,
-    EditMode.RESIZE_AND_SHIFT_OTHERS,
-    EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS,
-  ].includes(mode);
-}
 
 function getEditType(mode: EditMode) {
   if (
@@ -70,44 +55,23 @@ export function transform(
   settings: DayPlannerSettings,
   pointerDateTime: PointerDateTime,
 ) {
-  // todo: duplicated, task gets updated in transformer and here
-  let indexOfEditedTask = baseline.findIndex(
-    (task) => task.id === operation.task.id,
-  );
-  const isTaskInBaseline = indexOfEditedTask >= 0;
+  const result = baseline.slice();
 
-  let updatedTasks: LocalTask[];
+  const isInBaseline = baseline.find((task) => task.id === operation.task.id);
 
-  if (isTaskInBaseline) {
-    const found = baseline[indexOfEditedTask];
-    let taskWithCorrectDay = found;
-
-    if (!isSingleDayMode(operation.mode)) {
-      taskWithCorrectDay = {
-        ...found,
-        startTime: pointerDateTime.dateTime,
-      };
-    }
-
-    updatedTasks = baseline.with(indexOfEditedTask, taskWithCorrectDay);
-  } else {
-    updatedTasks = baseline.concat({
+  if (!isInBaseline) {
+    result.push({
       ...operation.task,
-      isAllDayEvent: pointerDateTime.type === "date",
-      startTime: minutesToMomentOfDay(
-        getMinutesSinceMidnight(operation.task.startTime),
-        pointerDateTime.dateTime,
-      ),
+      startTime: pointerDateTime.dateTime,
     });
-    indexOfEditedTask = updatedTasks.length - 1;
   }
 
-  if (pointerDateTime.type === "date") {
-    if (indexOfEditedTask === -1) {
-      throw new Error("Task not found");
-    }
+  const indexOfEditedTask = result.findIndex(
+    (task) => task.id === operation.task.id,
+  );
 
-    return updatedTasks.with(indexOfEditedTask, {
+  if (pointerDateTime.type === "date") {
+    return result.with(indexOfEditedTask, {
       ...operation.task,
       isAllDayEvent: true,
       startTime: pointerDateTime.dateTime,
@@ -115,17 +79,20 @@ export function transform(
     });
   }
 
-  const idToTaskLookup = new Map(updatedTasks.map((it) => [it.id, it]));
+  result[indexOfEditedTask] = {
+    ...operation.task,
+    isAllDayEvent: false,
+  };
 
-  const editableBlocks = updatedTasks
+  const idToTaskLookup = new Map(result.map((it) => [it.id, it]));
+
+  const editableBlocks = result
     .map((it) => ({
       id: it.id,
       start: it.startTime.unix(),
       end: t.getEndTime(it).unix(),
     }))
     .toSorted((a, b) => a.start - b.start);
-
-  // TODO: use object
 
   const transformed = editBlocks(
     editableBlocks,
@@ -145,9 +112,6 @@ export function transform(
       ...task,
       startTime: window.moment.unix(it.start),
       durationMinutes: (it.end - it.start) / 60,
-      isAllDayEvent: false,
     };
   });
-  // TODO: this is what's making timestamps appear in the wrong place
-  //   .map((task) => ({ ...task, text: t.toString(task, operation.mode) }));
 }

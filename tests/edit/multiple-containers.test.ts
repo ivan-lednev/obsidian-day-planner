@@ -77,13 +77,11 @@ describe("moving tasks between containers", () => {
     moveCursorTo(moment("2023-01-02 02:00"));
 
     expect(get(dayToDisplayedTasks)).toMatchObject({
-      [dayKey]: {
-        withTime: [{ id: "2", startTime: moment("2023-01-01 01:00") }],
-      },
       [nextDayKey]: {
         withTime: [
           { startTime: moment("2023-01-02 02:00") },
-          { id: "3", startTime: moment("2023-01-02 03:00") },
+          { id: "2", startTime: moment("2023-01-02 03:00") },
+          { id: "3", startTime: moment("2023-01-02 04:00") },
         ],
       },
     });
@@ -100,8 +98,8 @@ describe("moving tasks between containers", () => {
     expect(get(dayToDisplayedTasks)).toMatchObject({
       [dayKey]: {
         withTime: [
-          { startTime: moment("2023-01-01 01:00") },
           { startTime: moment("2023-01-01 05:00") },
+          { startTime: moment("2023-01-01 06:00") },
         ],
       },
       [nextDayKey]: {
