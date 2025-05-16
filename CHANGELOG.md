@@ -1,3 +1,32 @@
+## 0.28.0
+
+### 💥 Breaking changes
+
+- Now the plugin searches for tasks with scheduled date properties all across the vault by default, there is no need to include any files in the Dataview filter
+
+### ✨ New feature: status bar timeline
+
+- You can enable a mini-timeline in the status bar that lets you overview the upcoming 3 hours, with all the task blocks visible there. To enable it, go to 'Settings' > 'Status bar widget' > 'Task progress indicator' > 'Mini-timeline'
+
+### ✨ Other improvements
+
+- All-day tasks can be dragged between days, if a task with time is dragged into the all-day section, its timestamp gets removed (closes #315, #623)
+- You can create blocks with drag & drop on mobile now: long tap and drag on the timeline to start creating a block
+- Improved resize & drag controls for task blocks. Now they are much easier to use on mobile: left-click or tap on a task to see the controls, right-click or long tap to see a contextual menu
+  - Right-click to reveal block in file
+- Description and location are now shown in remote events
+- Multi-day remote events are now shown spanning across days
+- You can expand, collapse or disable unscheduled tasks & clocks in the timeline view
+
+### 🐞 Fixed issues
+
+- Fix advanced edit modes messing up other tasks (closes #619)
+- All-day tasks are no longer highlighted
+- Fix tasks not shown in status bar if timeline is closed
+- Fix showing all-day tasks in status bar
+- Fix the Escape key closing weekly view
+- Fix clocks from daily notes not showing up in timeline (closes #649)
+
 ## 0.27.0
 
 ### ✨ New features

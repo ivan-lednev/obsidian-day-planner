@@ -1,7 +1,7 @@
 {
   "id": "obsidian-day-planner",
   "name": "Day Planner",
-  "version": "0.27.0",
+  "version": "0.28.0",
   "minAppVersion": "0.16.0",
   "description": "A day planner with clean UI and readable syntax",
   "author": "James Lynch, continued by Ivan Lednev",

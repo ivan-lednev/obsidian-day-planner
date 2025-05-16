@@ -48,7 +48,13 @@ To open multi-day planner:
 - Or click on the icon in the left ribbon:
   - ![](./assets/open-multi-day-view-ribbon-icon.png)
 
-The plugin has 4 distinct 'modes'. That is, it can display records from different sources:
+You can overview the upcoming 3 hours in the mini-timeline in the status bar:
+
+<img src="./assets/mini-timeline-demo.png" width="100%">
+
+If there are remote tasks, the blocks will be colored accordingly.
+
+The plugin can display records from different sources:
 
 1. Daily notes
 2. Obsidian-tasks
@@ -62,7 +68,7 @@ Let's go over each one of them.
 > [!Warning]
 > Either the core 'Daily Notes' (core plugin) or the 'Periodic Notes' (community plugin, [see in Obsidian](obsidian://show-plugin?id=periodic-notes)) should be enabled. This is what allows day-planner to 'see' and interact with your daily notes.
 
-This works out of the box: you write your tasks in a daily note, and they show up on the timeline:
+Write your tasks in a daily note, and they show up on the timeline:
 
 ```md
 # Day planner
@@ -73,28 +79,19 @@ This works out of the box: you write your tasks in a daily note, and they show u
 
 ### 2. [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin) integration, showing events from other files in your vault
 
-This mode allows you to see tasks anywhere in the vault with dates added by the [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin).
+You can see tasks anywhere in the vault with dates added by the [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin). This also works out of the box for all the files in the vault. You only need to add the `scheduled` property to a task in one of the formats:
 
-To make this work,
+- Shorthand, added by [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin): `⏳ 2021-08-29`
+  - Note that this plugin has a handy modal for adding these properties
+- Full Dataview-like property: `[scheduled:: 2021-08-29]`
+- Another Dataview format: `(scheduled:: 2021-08-29)`.
 
-1. Add a tag like `#task` or a folder to the Dataview source field:
-   ![](./assets/dv-source.png)
-1. Add the tag (`#task` in this example) to the file with some tasks
-1. Add the `scheduled` property to a task in one of the formats:
-   - Shorthand, added by [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin): `⏳ 2021-08-29`
-     - Note that this plugin has a handy modal for adding these properties
-   - Full Dataview-like property: `[scheduled:: 2021-08-29]`
-   - Another Dataview format: `(scheduled:: 2021-08-29)`.
-
-Full examples:
+For example, these tasks will show up in the timeline:
 
 ```md
 - [ ] #task 08:00 - 10:00 This task uses the shorthand format ⏳ 2021-08-29
 - [ ] #task 11:00 - 13:00 This task uses the Dataview property format [scheduled:: 2021-08-29]
 ```
-
-> [!Note]
-> For now, the tags work at the level of files. So if `#task` is found anywhere in the file, all the tasks are going to be pulled into the calendar.
 
 ### 3. Showing internet calendars
 
