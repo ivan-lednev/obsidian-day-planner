@@ -1,35 +1,76 @@
+import { partition } from "lodash/fp";
+import type { Vault } from "obsidian";
 import { STask, type DataviewApi } from "obsidian-dataview";
 
 import {
   type Scheduler,
   createBackgroundBatchScheduler,
 } from "../util/scheduler";
+import { isNotVoid } from "typed-assert";
+
+interface STaskCacheEntry {
+  mtime: number;
+  tasks: STask[];
+}
 
 export class DataviewFacade {
   private readonly scheduler: Scheduler<STask[]> =
     createBackgroundBatchScheduler({
       timeRemainingLowerLimit: 5,
     });
+  private readonly taskCache = new Map<string, STaskCacheEntry>();
 
-  constructor(private readonly getDataview: () => DataviewApi | undefined) {}
+  constructor(
+    private readonly getDataview: () => DataviewApi | undefined,
+    private readonly vault: Vault,
+  ) {}
 
-  getAllTasksFrom = async (source: string) => {
-    return new Promise<STask[]>((resolve) => {
-      const paths: string[] = this.getDataview()?.pagePaths(source).array();
+  private isCached = (path: string) => {
+    const cacheForPath = this.taskCache.get(path);
 
-      const pageQueries: Array<() => STask[]> = paths.map(
-        (path) => () =>
-          this.getDataview()?.page(path)?.file.tasks.array() || [],
-      );
+    if (!cacheForPath) {
+      return false;
+    }
 
-      this.scheduler.enqueueTasks(pageQueries, (results) => {
-        resolve(results.flat());
-      });
-    });
+    const fileInVault = this.vault.getFileByPath(path);
+
+    isNotVoid(fileInVault);
+
+    return cacheForPath.mtime === fileInVault.stat.mtime;
   };
 
-  getPathsFrom = (source: string) => {
-    return this.getDataview()?.pages(source).file.path.array() || [];
+  getAllTasksFrom = async (source: string) => {
+    const pathsForSource: string[] = this.getDataview()
+      ?.pagePaths(source)
+      .array();
+
+    const [pathsWithValidCache, pathsToBeQueried] = partition(
+      this.isCached,
+      pathsForSource,
+    );
+
+    const cachedTasks = pathsWithValidCache.map(
+      (it) => this.taskCache.get(it)?.tasks || [],
+    );
+
+    const pageQueries: Array<() => STask[]> = pathsToBeQueried.map(
+      (path) => () => {
+        const tasks = this.getDataview()?.page(path)?.file.tasks.array() || [];
+        const mtime = this.vault.getFileByPath(path)?.stat.mtime;
+
+        if (mtime && tasks.length > 0) {
+          this.taskCache.set(path, { mtime, tasks });
+        }
+
+        return tasks;
+      },
+    );
+
+    return new Promise<STask[]>((resolve) => {
+      this.scheduler.enqueueTasks(pageQueries, (results) => {
+        resolve(results.concat(cachedTasks).flat());
+      });
+    });
   };
 
   getAllListsFrom = (source: string) => {

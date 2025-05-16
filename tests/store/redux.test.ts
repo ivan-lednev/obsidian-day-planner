@@ -10,6 +10,7 @@ import {
 import { makeStore } from "../../src/redux/store";
 import { DataviewFacade } from "../../src/service/dataview-facade";
 import { createSTask } from "../../src/util/dataview";
+import type { Vault } from "obsidian";
 
 export async function getIcalFixture(file: string) {
   return readFile(`fixtures/${file}.txt`, {
@@ -17,13 +18,15 @@ export async function getIcalFixture(file: string) {
   });
 }
 
+export class FakeVault {}
+
 export class FakeDataviewFacade extends DataviewFacade {
   private readonly fixtures: Record<string, Array<STask>>;
 
   constructor() {
     super(() => {
       throw new Error("Incorrect usage");
-    });
+    }, new FakeVault() as Vault);
 
     // this.fixtures = readFileSync(`${fixturesPath}/dataview-fixtures.json`);
     this.fixtures = {};
@@ -31,10 +34,6 @@ export class FakeDataviewFacade extends DataviewFacade {
 
   getTasksFromPath = (path: string) => {
     return this.fixtures[path];
-  };
-
-  getPathsFrom = (source: string) => {
-    return Object.keys(this.fixtures);
   };
 }
 

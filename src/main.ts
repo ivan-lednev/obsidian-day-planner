@@ -77,7 +77,10 @@ export default class DayPlanner extends Plugin {
   private store!: AppStore;
 
   async onload() {
-    this.dataviewFacade = new DataviewFacade(() => getAPI(this.app));
+    this.dataviewFacade = new DataviewFacade(
+      () => getAPI(this.app),
+      this.app.vault,
+    );
     const initialPluginData: PluginData = {
       ...defaultSettings,
       ...(await this.loadData()),
