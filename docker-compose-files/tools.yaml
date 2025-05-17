@@ -1,0 +1,9 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker-files/npm/Dockerfile
+    volumes:
+      - ../:/app
+    environment:
+      - REPO_NAME=${REPO_NAME}
