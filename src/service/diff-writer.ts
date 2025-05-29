@@ -1,6 +1,10 @@
 import { groupBy } from "lodash/fp";
 import type { Root } from "mdast";
-import { getDateFromPath } from "obsidian-daily-notes-interface";
+import {
+  getAllDailyNotes,
+  getDailyNote,
+  getDateFromPath,
+} from "obsidian-daily-notes-interface";
 import { isNotVoid } from "typed-assert";
 
 import {
@@ -260,9 +264,14 @@ function mapTaskDiffToUpdate(props: {
       };
     }
 
+    const dailyNoteIfPresent = getDailyNote(task.startTime, getAllDailyNotes());
+    const mdastPath = dailyNoteIfPresent
+      ? dailyNoteIfPresent.path
+      : createDailyNotePath(task.startTime);
+
     return {
       type: "mdast",
-      path: createDailyNotePath(task.startTime),
+      path: mdastPath,
       updateFn: (root: Root) => {
         const taskRoot = fromMarkdown(taskTextWithUpdatedProps);
         const listItemToInsert = findFirst(taskRoot, checkListItem);

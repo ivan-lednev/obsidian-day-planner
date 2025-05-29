@@ -17,6 +17,8 @@ vi.mock("obsidian-dataview", () => ({
 vi.mock("obsidian-daily-notes-interface", () => ({
   default: vi.fn(),
   getDateFromPath: vi.fn(() => null),
+  getDailyNote: vi.fn(() => null),
+  getAllDailyNotes: vi.fn(() => []),
   DEFAULT_DAILY_NOTE_FORMAT: defaultDayFormat,
 }));
 
