@@ -34,6 +34,8 @@ vi.mock("obsidian-daily-notes-interface", () => ({
     format: "YYYY-MM-DD",
     folder: ".",
   })),
+  getAllDailyNotes: vi.fn(() => []),
+  getDailyNote: vi.fn(() => null),
   DEFAULT_DAILY_NOTE_FORMAT: "YYYY-MM-DD",
 }));
 
