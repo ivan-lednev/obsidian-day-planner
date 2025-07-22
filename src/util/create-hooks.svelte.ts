@@ -10,13 +10,8 @@ import {
 } from "svelte/store";
 
 import { reQueryAfterMillis } from "../constants";
-import type DayPlanner from "../main";
-import { dataviewChange as dataviewChangeAction } from "../redux/dataview/dataview-slice";
 import {
-  darkModeUpdated,
   layoutReady as layoutReadyAction,
-  keyDown as keyDownAction,
-  networkStatusChanged,
 } from "../redux/global-slice";
 import type { AppDispatch } from "../redux/store";
 import { createUseSelector } from "../redux/use-selector";
@@ -24,7 +19,6 @@ import { DataviewFacade } from "../service/dataview-facade";
 import { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
 import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../types";
-import { useDataviewChange } from "../ui/hooks/use-dataview-change";
 import { useDataviewLoaded } from "../ui/hooks/use-dataview-loaded";
 import { useDateRanges } from "../ui/hooks/use-date-ranges";
 import { useDebounceWithDelay } from "../ui/hooks/use-debounce-with-delay";
@@ -34,6 +28,7 @@ import { useModPressed } from "../ui/hooks/use-mod-pressed";
 import { useTasks } from "../ui/hooks/use-tasks";
 import { useVisibleDays } from "../ui/hooks/use-visible-days";
 
+import { getDarkModeFlag } from "./dom";
 import { getUpdateTrigger } from "./store";
 
 interface CreateHooksProps {
@@ -45,12 +40,8 @@ interface CreateHooksProps {
   onEditAborted: OnEditAbortedFn;
   currentTime: Readable<Moment>;
   dispatch: AppDispatch;
-  plugin: DayPlanner;
   useSelector: ReturnType<typeof createUseSelector>;
-}
-
-function getDarkModeFlag() {
-  return document.body.hasClass("theme-dark");
+  dataviewChange: Readable<unknown>;
 }
 
 export function createHooks({
@@ -62,8 +53,8 @@ export function createHooks({
   onEditAborted,
   currentTime,
   dispatch,
-  plugin,
   useSelector,
+  dataviewChange,
 }: CreateHooksProps) {
   const dataviewSource = derived(settingsStore, ($settings) => {
     return $settings.dataviewSource;
@@ -91,36 +82,10 @@ export function createHooks({
     };
   });
   const isDarkMode = fromStore(isDarkModeStore);
-  plugin.registerEvent(
-    app.workspace.on("css-change", () => {
-      dispatch(darkModeUpdated(getDarkModeFlag()));
-    }),
-  );
-
   const keyDown = useKeyDown();
-  plugin.registerDomEvent(document, "keydown", () => {
-    dispatch(keyDownAction());
-  });
-
   const isModPressed = useModPressed();
-  // todo:
 
   const isOnline = useIsOnline();
-  plugin.registerDomEvent(window, "online", () => {
-    dispatch(networkStatusChanged({ isOnline: true }));
-  });
-  plugin.registerDomEvent(window, "offline", () => {
-    dispatch(networkStatusChanged({ isOnline: false }));
-  });
-
-  const dataviewChange = useDataviewChange(app.metadataCache);
-  plugin.registerEvent(
-    app.metadataCache.on(
-      // @ts-expect-error
-      "dataview:metadata-change",
-      () => dispatch(dataviewChangeAction()),
-    ),
-  );
 
   const dataviewLoaded = useDataviewLoaded(app);
 
@@ -175,6 +140,5 @@ export function createHooks({
     pointerDateTime,
     getDisplayedTasksWithClocksForTimeline,
     visibleDays,
-    dataviewChange,
   };
 }

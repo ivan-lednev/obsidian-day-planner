@@ -129,7 +129,7 @@ export function useDataviewTasks({
 
   return derived(
     [visibleDailyNotes, settings, refreshSignal],
-    ([$visibleDailyNotes, $settings], set: (tasks: SListEntry) => void) => {
+    ([$visibleDailyNotes, $settings], set: (tasks: SListEntry[]) => void) => {
       const listsFromDailyNotesForVisibleDays =
         getListsFromDailyNotesForVisibleDays($visibleDailyNotes, $settings);
 

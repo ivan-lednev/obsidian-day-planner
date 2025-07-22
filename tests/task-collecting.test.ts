@@ -1,11 +1,25 @@
 import { describe, test } from "vitest";
 
-describe("Task collecting", () => {
-  test("Collects active clocks", () => {});
+import  { type DataviewFacade } from "src/service/dataview-facade";
 
-  test.todo(
-    "When Dataview source is empty, tasks are pulled from visible daily notes",
-  );
+class FakeDataviewFacade implements DataviewFacade {
+  getAllTasksFrom = (source: string) => {
+    return Promise.resolve([]);
+  };
+
+  getAllListsFrom = (source: string) => {};
+
+  getTaskAtLine({ path, line }: { path: string; line: number }) {
+    throw new Error("Method not implemented.");
+  }
+}
+
+describe("Task collecting", () => {
+  test("Reads log data", () => {
+    const dataviewFacade = new FakeDataviewFacade();
+
+
+  });
 
   test.todo("Ignores tasks and lists outside of planner section");
 

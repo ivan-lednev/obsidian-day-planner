@@ -2,6 +2,7 @@ import type {
   Action,
   ConfigureStoreOptions,
   ListenerEffect,
+  ListenerMiddlewareInstance,
   ThunkAction,
   TypedStartListening,
 } from "@reduxjs/toolkit";
@@ -59,4 +60,9 @@ export type AppListenerEffect<A extends Action = Action> = ListenerEffect<
   A,
   RootState,
   AppDispatch
+>;
+export type AppListenerMiddlewareInstance = ListenerMiddlewareInstance<
+  RootState,
+  AppDispatch,
+  ReduxExtraArgument
 >;

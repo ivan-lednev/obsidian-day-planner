@@ -120,3 +120,31 @@ export function assertNoActiveClock(sTask: STask) {
 
   return sTask;
 }
+
+export interface LogEntry {
+  start: string;
+  end: string;
+}
+
+export function isValidLogEntry(
+  entry: LogEntry | Record<string, unknown>,
+): entry is LogEntry {
+  if (!("start" in entry) || !("end" in entry)) {
+    return false;
+  }
+
+  const { start, end } = entry;
+
+  if (typeof start !== "string" || typeof end !== "string") {
+    return false;
+  }
+
+  const parsedStart = window.moment(start, window.moment.ISO_8601, true);
+  const parsedEnd = window.moment(end, window.moment.ISO_8601, true);
+
+  return (
+    parsedStart.isValid() &&
+    parsedEnd.isValid() &&
+    parsedStart.isBefore(parsedEnd)
+  );
+}

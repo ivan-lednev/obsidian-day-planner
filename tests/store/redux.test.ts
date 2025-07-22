@@ -1,5 +1,6 @@
 import { readFile } from "fs/promises";
 
+import type { Vault } from "obsidian";
 import type { STask } from "obsidian-dataview";
 import { describe, expect, test } from "vitest";
 
@@ -10,7 +11,6 @@ import {
 import { makeStore } from "../../src/redux/store";
 import { DataviewFacade } from "../../src/service/dataview-facade";
 import { createSTask } from "../../src/util/dataview";
-import type { Vault } from "obsidian";
 
 export async function getIcalFixture(file: string) {
   return readFile(`fixtures/${file}.txt`, {

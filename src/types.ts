@@ -1,7 +1,9 @@
 import type Fraction from "fraction.js";
 import type { Moment } from "moment";
+import type { MetadataCache, Vault } from "obsidian";
 import type { Readable, Writable } from "svelte/store";
 
+import type { RawIcal } from "./redux/ical/ical-slice";
 import { type AppDispatch, type AppStore } from "./redux/store";
 import type { createUseSelector } from "./redux/use-selector";
 import type { DataviewFacade } from "./service/dataview-facade";
@@ -84,4 +86,7 @@ export type DateRange = Writable<Moment[]> & { untrack: () => void };
 
 export type ReduxExtraArgument = {
   dataviewFacade: DataviewFacade;
+  vault: Vault;
+  metadataCache: MetadataCache;
+  onIcalsFetched: (rawIcals: RawIcal[]) => Promise<void>;
 };

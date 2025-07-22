@@ -1,0 +1,133 @@
+{
+  "tasks": [
+    {
+      "symbol": "-",
+      "link": {
+        "path": "fixture-vault/Test.md",
+        "subpath": "Heading 1",
+        "type": "header"
+      },
+      "section": {
+        "path": "fixture-vault/Test.md",
+        "subpath": "Heading 1",
+        "type": "header"
+      },
+      "text": "Drink full and descend. The horse is the white of the eyes\n```yaml\nplanner:\nlog:\n- start: 2025-07-18 12:00\nend: 2025-07-18 14:40\n```",
+      "tags": [],
+      "line": 7,
+      "lineCount": 7,
+      "list": 3,
+      "outlinks": [],
+      "path": "fixture-vault/Test.md",
+      "children": [],
+      "task": true,
+      "annotated": false,
+      "position": {
+        "start": {
+          "line": 7,
+          "col": 2,
+          "offset": 57
+        },
+        "end": {
+          "line": 13,
+          "col": 9,
+          "offset": 245
+        }
+      },
+      "subtasks": [],
+      "real": true,
+      "header": {
+        "path": "fixture-vault/Test.md",
+        "subpath": "Heading 1",
+        "type": "header"
+      },
+      "parent": 3,
+      "status": " ",
+      "checked": false,
+      "completed": false,
+      "fullyCompleted": false
+    },
+    {
+      "symbol": "-",
+      "link": {
+        "path": "fixture-vault/Test.md",
+        "subpath": "Heading 2",
+        "type": "header"
+      },
+      "section": {
+        "path": "fixture-vault/Test.md",
+        "subpath": "Heading 2",
+        "type": "header"
+      },
+      "text": "This is the water, and this is the well\n```yaml\nplanner:\nlog:\n- start: 2025-07-19 12:00\nend: 2025-07-19 14:30\n- start: 2025-07-19 15:00\nend: 2025-07-19 16:30\n- start: 2025-07-19 13:00\nend: 2025-07-19 16:30\n```",
+      "tags": [],
+      "line": 17,
+      "lineCount": 11,
+      "list": 17,
+      "outlinks": [],
+      "path": "fixture-vault/Test.md",
+      "children": [],
+      "task": true,
+      "annotated": false,
+      "position": {
+        "start": {
+          "line": 17,
+          "col": 0,
+          "offset": 261
+        },
+        "end": {
+          "line": 27,
+          "col": 5,
+          "offset": 528
+        }
+      },
+      "subtasks": [],
+      "real": true,
+      "header": {
+        "path": "fixture-vault/Test.md",
+        "subpath": "Heading 2",
+        "type": "header"
+      },
+      "status": " ",
+      "checked": false,
+      "completed": false,
+      "fullyCompleted": false
+    }
+  ],
+  "headings": {
+    "fixture-vault/Test.md": [
+      {
+        "heading": "Heading 1",
+        "level": 1,
+        "position": {
+          "start": {
+            "line": 1,
+            "col": 0,
+            "offset": 1
+          },
+          "end": {
+            "line": 1,
+            "col": 11,
+            "offset": 12
+          }
+        }
+      },
+      {
+        "heading": "Heading 2",
+        "level": 2,
+        "position": {
+          "start": {
+            "line": 15,
+            "col": 0,
+            "offset": 247
+          },
+          "end": {
+            "line": 15,
+            "col": 12,
+            "offset": 259
+          }
+        }
+      }
+    ]
+  }
+}
