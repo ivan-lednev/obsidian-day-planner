@@ -68,3 +68,8 @@ export function offsetYToMinutes(
 
   return (offsetY + hiddenHoursSize) / zoomLevel;
 }
+
+export function getDarkModeFlag() {
+  return document.body.hasClass("theme-dark");
+}
+

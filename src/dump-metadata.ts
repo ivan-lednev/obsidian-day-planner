@@ -7,14 +7,13 @@ const metadataDumpPath =
 
 export function createDumpMetadataCommand(app: App) {
   return async () => {
-    const pathToHeadings = Object.fromEntries(
-      app.vault
-        .getMarkdownFiles()
-        .map((tFile) => [
-          tFile.path,
-          app.metadataCache.getFileCache(tFile)?.headings,
-        ]),
-    );
+    const dataview = getAPI(app);
+
+    if (!dataview) {
+      console.error("Dataview is not enabled");
+
+      return;
+    }
 
     const exists = await app.vault.adapter.exists(metadataDumpPath);
 
@@ -24,18 +23,21 @@ export function createDumpMetadataCommand(app: App) {
 
     await app.vault.adapter.mkdir(metadataDumpPath);
 
-    await app.vault.create(
-      `${metadataDumpPath}/headings-metadata.json`,
-      JSON.stringify(pathToHeadings, null, 2),
-    );
-
-    const tasks = getAPI(app)
-      ?.pages(`"${fixtureVaultPath}"`)
-      .file.tasks.array();
+    const dump = {
+      tasks: dataview?.pages(`"${fixtureVaultPath}"`).file.tasks.array(),
+      headings: Object.fromEntries(
+        app.vault
+          .getMarkdownFiles()
+          .map((tFile) => [
+            tFile.path,
+            app.metadataCache.getFileCache(tFile)?.headings,
+          ]),
+      ),
+    };
 
     await app.vault.create(
       `${metadataDumpPath}/tasks.json`,
-      JSON.stringify(tasks, null, 2),
+      JSON.stringify(dump, null, 2),
     );
   };
 }

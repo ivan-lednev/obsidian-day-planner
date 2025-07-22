@@ -4,10 +4,10 @@ import {
   Plugin,
   WorkspaceLeaf,
   type MarkdownFileInfo,
+  type TFile,
 } from "obsidian";
-import {} from "obsidian-daily-notes-interface";
 import { getAPI } from "obsidian-dataview";
-import { fromStore, get, writable, type Writable } from "svelte/store";
+import { derived, fromStore, get, writable, type Writable } from "svelte/store";
 import { isInstanceOf, isNotVoid } from "typed-assert";
 
 import {
@@ -19,6 +19,7 @@ import {
   icalRefreshIntervalMillis,
 } from "./constants";
 import { createUpdateHandler } from "./create-update-handler";
+import { createDumpMetadataCommand } from "./dump-metadata";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import {
@@ -30,7 +31,16 @@ import {
   toMarkdown,
   toMdastPoint,
 } from "./mdast/mdast";
-import { visibleDaysUpdated } from "./redux/global-slice";
+import {
+  dataviewChange as dataviewChangeAction,
+  listPropsParsed,
+} from "./redux/dataview/dataview-slice";
+import {
+  darkModeUpdated,
+  keyDown as keyDownAction,
+  networkStatusChanged,
+  visibleDaysUpdated,
+} from "./redux/global-slice";
 import {
   initialIcalState,
   type IcalState,
@@ -38,7 +48,12 @@ import {
 } from "./redux/ical/ical-slice";
 import { initListenerMiddleware } from "./redux/listener-middleware";
 import { settingsUpdated } from "./redux/settings-slice";
-import { type AppStore, makeStore } from "./redux/store";
+import {
+  type AppListenerMiddlewareInstance,
+  type AppStore,
+  makeStore,
+} from "./redux/store";
+import { useActionDispatched } from "./redux/use-action-dispatched";
 import { createUseSelector } from "./redux/use-selector";
 import { DataviewFacade } from "./service/dataview-facade";
 import { TransactionWriter } from "./service/diff-writer";
@@ -74,20 +89,16 @@ export default class DayPlanner extends Plugin {
   private transationWriter!: TransactionWriter;
   private syncDataview?: () => void;
   private currentUndoNotice?: Notice;
-  private store!: AppStore;
 
   async onload() {
-    this.dataviewFacade = new DataviewFacade(
-      () => getAPI(this.app),
-      this.app.vault,
-    );
     const initialPluginData: PluginData = {
       ...defaultSettings,
       ...(await this.loadData()),
     };
 
-    await this.setUpReduxStore(initialPluginData);
-    await this.initSettingsStore(initialPluginData);
+    const { store, listenerMiddleware } =
+      this.setUpReduxStore(initialPluginData);
+    this.initSettingsStore({ initialSettings: initialPluginData, store });
 
     const getTasksApi = createGetTasksApi(this.app);
 
@@ -97,13 +108,17 @@ export default class DayPlanner extends Plugin {
       this.app.workspace,
       this.vaultFacade,
     );
+    this.dataviewFacade = new DataviewFacade(
+      () => getAPI(this.app),
+      this.app.vault,
+    );
     this.sTaskEditor = new STaskEditor(
       this.workspaceFacade,
       this.vaultFacade,
       this.dataviewFacade,
     );
 
-    this.registerViews();
+    this.registerViews({ store, listenerMiddleware });
     this.registerCommands();
     this.addRibbonIcons();
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
@@ -271,12 +286,17 @@ export default class DayPlanner extends Plugin {
     });
   }
 
-  private async initSettingsStore(initialSettings: DayPlannerSettings) {
+  private initSettingsStore(props: {
+    initialSettings: DayPlannerSettings;
+    store: AppStore;
+  }) {
+    const { initialSettings, store } = props;
+
     settings.set(initialSettings);
 
     this.register(
       settings.subscribe(async (newValue) => {
-        this.store.dispatch(settingsUpdated(newValue));
+        store.dispatch(settingsUpdated(newValue));
 
         await this.saveData(newValue);
       }),
@@ -321,7 +341,12 @@ export default class DayPlanner extends Plugin {
     return sTask;
   };
 
-  private registerViews() {
+  private registerViews(props: {
+    store: AppStore;
+    listenerMiddleware: AppListenerMiddlewareInstance;
+  }) {
+    const { store, listenerMiddleware } = props;
+
     const onUpdate: OnUpdateFn = createUpdateHandler({
       app: this.app,
       settings: this.settings,
@@ -340,7 +365,21 @@ export default class DayPlanner extends Plugin {
       new Notice("Tasks changed externally; edit canceled");
     };
 
-    const useSelector = createUseSelector(this.store);
+    /**
+     * These are the points of interop from Redux to Svelte
+     */
+    const useSelector = createUseSelector(store);
+    const actionDispatched = useActionDispatched({ listenerMiddleware });
+
+    const dataviewRefreshSignal = derived(
+      actionDispatched,
+      ($actionDispatched, set) => {
+        if (listPropsParsed.match($actionDispatched)) {
+          set($actionDispatched);
+        }
+      },
+    );
+
     const {
       editContext,
       tasksWithTimeForToday,
@@ -363,9 +402,9 @@ export default class DayPlanner extends Plugin {
       onUpdate,
       onEditAborted,
       currentTime,
-      dispatch: this.store.dispatch,
-      plugin: this,
+      dispatch: store.dispatch,
       useSelector,
+      dataviewChange: dataviewRefreshSignal,
     });
 
     this.syncDataview = () => dataviewSyncTrigger.set({});
@@ -390,7 +429,7 @@ export default class DayPlanner extends Plugin {
     );
     this.register(
       visibleDays.subscribe((days) => {
-        this.store.dispatch(
+        store.dispatch(
           // without the offset, an event right of UTC is going to be displayed as the previous day
           // a visible day in my zone is 2025-04-15, but in UTC it's 2025-04-14T22:00:00, and getDayKey returns 2025-04-14
           visibleDaysUpdated(days.map((it) => it.toISOString(true))),
@@ -418,7 +457,7 @@ export default class DayPlanner extends Plugin {
       id: "re-sync",
       name: "Re-sync tasks",
       callback: async () => {
-        this.store.dispatch(icalRefreshRequested());
+        store.dispatch(icalRefreshRequested());
       },
     });
 
@@ -448,12 +487,12 @@ export default class DayPlanner extends Plugin {
       },
     });
 
-    //todo: show only in dev mode
-    // this.addCommand({
-    //   id: "dump-metadata",
-    //   name: "Dump metadata to files",
-    //   callback: createDumpMetadataCommand(this.app),
-    // });
+    // todo: show only in dev mode
+    this.addCommand({
+      id: "dump-metadata",
+      name: "Dump metadata to files",
+      callback: createDumpMetadataCommand(this.app),
+    });
 
     const defaultObsidianContext: ObsidianContext = {
       sTaskEditor: this.sTaskEditor,
@@ -466,7 +505,7 @@ export default class DayPlanner extends Plugin {
       editContext,
       showPreview: createShowPreview(this.app),
       isModPressed,
-      reSync: () => this.store.dispatch(icalRefreshRequested()),
+      reSync: () => store.dispatch(icalRefreshRequested()),
       isOnline,
       isDarkMode,
       settings,
@@ -474,8 +513,8 @@ export default class DayPlanner extends Plugin {
       pointerDateTime,
       tasksWithActiveClockProps,
       getDisplayedTasksWithClocksForTimeline,
-      dispatch: this.store.dispatch,
-      store: this.store,
+      dispatch: store.dispatch,
+      store: store,
       useSelector,
     };
 
@@ -510,13 +549,15 @@ export default class DayPlanner extends Plugin {
     );
   }
 
-  private async setUpReduxStore(pluginData: PluginData) {
+  private setUpReduxStore(pluginData: PluginData) {
     const listenerMiddleware = initListenerMiddleware({
       extra: {
         dataviewFacade: this.dataviewFacade,
-      },
-      onIcalsFetched: async (rawIcals) => {
-        await this.saveData({ ...this.settings(), rawIcals });
+        vault: this.app.vault,
+        metadataCache: this.app.metadataCache,
+        onIcalsFetched: async (rawIcals) => {
+          await this.saveData({ ...this.settings(), rawIcals });
+        },
       },
     });
 
@@ -525,7 +566,7 @@ export default class DayPlanner extends Plugin {
       plainTextIcals: pluginData.rawIcals || [],
     };
 
-    this.store = makeStore({
+    const store = makeStore({
       preloadedState: {
         ical: icalStateWithCachedRawIcals,
       },
@@ -540,8 +581,34 @@ export default class DayPlanner extends Plugin {
 
     this.registerInterval(
       window.setInterval(() => {
-        this.store.dispatch(icalRefreshRequested());
+        store.dispatch(icalRefreshRequested());
       }, icalRefreshIntervalMillis),
     );
+
+    this.registerDomEvent(window, "online", () => {
+      store.dispatch(networkStatusChanged({ isOnline: true }));
+    });
+    this.registerDomEvent(window, "offline", () => {
+      store.dispatch(networkStatusChanged({ isOnline: false }));
+    });
+    this.registerEvent(
+      this.app.workspace.on("css-change", () => {
+        store.dispatch(darkModeUpdated(document.body.hasClass("theme-dark")));
+      }),
+    );
+    this.registerDomEvent(document, "keydown", () => {
+      store.dispatch(keyDownAction());
+    });
+
+    this.registerEvent(
+      this.app.metadataCache.on(
+        // @ts-expect-error
+        "dataview:metadata-change",
+        (eventType: unknown, file: TFile) =>
+          store.dispatch(dataviewChangeAction(file.path)),
+      ),
+    );
+
+    return { store, listenerMiddleware };
   }
 }

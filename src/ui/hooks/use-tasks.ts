@@ -4,6 +4,7 @@ import type { MetadataCache } from "obsidian";
 import { derived, type Readable, type Writable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
+import { selectListProps } from "../../redux/dataview/dataview-slice";
 import { selectRemoteTasks } from "../../redux/ical/ical-slice";
 import type { createUseSelector } from "../../redux/use-selector";
 import { DataviewFacade } from "../../service/dataview-facade";
@@ -11,10 +12,10 @@ import { WorkspaceFacade } from "../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../settings";
 import type { LocalTask, Task, WithTime } from "../../task-types";
 import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../../types";
-import { hasClockProp } from "../../util/clock";
+import { isValidLogEntry } from "../../util/clock";
 import * as dv from "../../util/dataview";
-import { withClockMoments } from "../../util/dataview";
 import * as m from "../../util/moment";
+import { splitMultiday } from "../../util/moment";
 import { getUpdateTrigger } from "../../util/store";
 import { getDayKey, getRenderKey } from "../../util/task-utils";
 
@@ -58,6 +59,7 @@ export function useTasks(props: {
   } = props;
 
   const remoteTasks = useSelector(selectRemoteTasks);
+  const listProps = useSelector(selectListProps);
 
   const visibleDailyNotes = useVisibleDailyNotes(
     layoutReady,
@@ -90,14 +92,36 @@ export function useTasks(props: {
       })),
   );
 
-  const visibleTasksWithClockProps = derived(
-    [dataviewTasks, tasksWithActiveClockPropsAndDurations],
-    ([$dataviewTasks, $tasksWithActiveClockPropsAndDurations]) => {
+  const logRecords = derived(
+    [dataviewTasks, listProps],
+    ([$dataviewTasks, $listProps]) => {
       const flatTasksWithClocks = $dataviewTasks
-        .filter(hasClockProp)
-        .flatMap(withClockMoments)
-        .map(dv.toTaskWithClock)
-        .concat($tasksWithActiveClockPropsAndDurations);
+        .map((it) => {
+          return {
+            ...it,
+            props: $listProps[it.path]?.[it.line],
+          };
+        })
+        .filter((it) => {
+          const log = it.props?.planner?.log;
+
+          return (
+            Array.isArray(log) && log.length > 0 && log.every(isValidLogEntry)
+          );
+        })
+        .flatMap((it) => {
+          return it.props.planner.log
+            .map(({ start, end }) => [
+              window.moment(start, window.moment.ISO_8601, true),
+              window.moment(end, window.moment.ISO_8601, true),
+            ])
+            .flatMap(([start, end]) => splitMultiday(start, end))
+            .map((clockMoments) => ({
+              sTask: it,
+              clockMoments,
+            }));
+        })
+        .map(dv.toTaskWithClock);
 
       return groupBy(
         ({ startTime }) => getDayKey(startTime),
@@ -107,14 +131,11 @@ export function useTasks(props: {
   );
 
   function getDisplayedTasksWithClocksForTimeline(day: Moment) {
-    return derived(
-      visibleTasksWithClockProps,
-      ($visibleTasksWithClockProps) => {
-        const tasksForDay = $visibleTasksWithClockProps[getDayKey(day)] || [];
+    return derived(logRecords, ($visibleTasksWithClockProps) => {
+      const tasksForDay = $visibleTasksWithClockProps[getDayKey(day)] || [];
 
-        return flow(uniqBy(getRenderKey), addHorizontalPlacing)(tasksForDay);
-      },
-    );
+      return flow(uniqBy(getRenderKey), addHorizontalPlacing)(tasksForDay);
+    });
   }
 
   const localTasks = useVisibleDataviewTasks(dataviewTasks, visibleDays);
