@@ -72,4 +72,3 @@ export function offsetYToMinutes(
 export function getDarkModeFlag() {
   return document.body.hasClass("theme-dark");
 }
-

@@ -1,3 +1,4 @@
+import { isAnyOf } from "@reduxjs/toolkit";
 import {
   MarkdownView,
   Notice,
@@ -34,17 +35,15 @@ import {
 import {
   dataviewChange as dataviewChangeAction,
   listPropsParsed,
+  selectDataviewLoaded,
+  selectListProps,
 } from "./redux/dataview/dataview-slice";
-import {
-  darkModeUpdated,
-  keyDown as keyDownAction,
-  networkStatusChanged,
-  visibleDaysUpdated,
-} from "./redux/global-slice";
+import { editCanceled, visibleDaysUpdated } from "./redux/global-slice";
 import {
   initialIcalState,
   type IcalState,
   icalRefreshRequested,
+  selectRemoteTasks,
 } from "./redux/ical/ical-slice";
 import { initListenerMiddleware } from "./redux/listener-middleware";
 import { settingsUpdated } from "./redux/settings-slice";
@@ -78,6 +77,7 @@ import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
+import { createEnvironmentHooks } from "./util/create-environment-hooks";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -87,7 +87,6 @@ export default class DayPlanner extends Plugin {
   private sTaskEditor!: STaskEditor;
   private vaultFacade!: VaultFacade;
   private transationWriter!: TransactionWriter;
-  private syncDataview?: () => void;
   private currentUndoNotice?: Notice;
 
   async onload() {
@@ -119,6 +118,14 @@ export default class DayPlanner extends Plugin {
     );
 
     this.registerViews({ store, listenerMiddleware });
+
+    const handleEditorMenu = createEditorMenuCallback({
+      sTaskEditor: this.sTaskEditor,
+      plugin: this,
+    });
+
+    this.registerEvent(this.app.workspace.on("editor-menu", handleEditorMenu));
+
     this.registerCommands();
     this.addRibbonIcons();
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
@@ -355,9 +362,7 @@ export default class DayPlanner extends Plugin {
       onEditCanceled: () => {
         new Notice("Edit canceled");
 
-        // We need to manually reset tasks to the initial state
-        // todo: use an optimistic update
-        this.syncDataview?.();
+        store.dispatch(editCanceled());
       },
     });
 
@@ -371,56 +376,49 @@ export default class DayPlanner extends Plugin {
     const useSelector = createUseSelector(store);
     const actionDispatched = useActionDispatched({ listenerMiddleware });
 
+    const remoteTasks = useSelector(selectRemoteTasks);
+    const listProps = useSelector(selectListProps);
+    const dataviewLoaded = useSelector(selectDataviewLoaded);
+
     const dataviewRefreshSignal = derived(
       actionDispatched,
       ($actionDispatched, set) => {
-        if (listPropsParsed.match($actionDispatched)) {
+        if (isAnyOf(listPropsParsed, editCanceled)) {
           set($actionDispatched);
         }
       },
     );
 
+    const { isDarkMode, isOnline, keyDown, isModPressed, layoutReady } =
+      createEnvironmentHooks({ workspace: this.app.workspace });
+
     const {
       editContext,
       tasksWithTimeForToday,
-      dataviewLoaded,
-      isModPressed,
       newlyStartedTasks,
-      isOnline,
-      isDarkMode,
       dateRanges,
-      dataviewSyncTrigger,
       pointerDateTime,
       tasksWithActiveClockProps,
       getDisplayedTasksWithClocksForTimeline,
       visibleDays,
     } = createHooks({
-      app: this.app,
+      metadataCache: this.app.metadataCache,
       dataviewFacade: this.dataviewFacade,
       workspaceFacade: this.workspaceFacade,
       settingsStore: this.settingsStore,
       onUpdate,
       onEditAborted,
       currentTime,
-      dispatch: store.dispatch,
-      useSelector,
       dataviewChange: dataviewRefreshSignal,
+      remoteTasks,
+      listProps,
+      keyDown,
+      isOnline,
+      layoutReady,
     });
-
-    this.syncDataview = () => dataviewSyncTrigger.set({});
 
     this.registerDomEvent(window, "blur", editContext.cancelEdit);
     this.registerDomEvent(document, "pointerup", editContext.cancelEdit);
-
-    const handleEditorMenu = createEditorMenuCallback({
-      sTaskEditor: this.sTaskEditor,
-      plugin: this,
-    });
-
-    this.registerEvent(
-      // todo: move out
-      this.app.workspace.on("editor-menu", handleEditorMenu),
-    );
 
     this.register(
       editContext.cursor.subscribe(({ bodyCursor }) => {
@@ -584,21 +582,6 @@ export default class DayPlanner extends Plugin {
         store.dispatch(icalRefreshRequested());
       }, icalRefreshIntervalMillis),
     );
-
-    this.registerDomEvent(window, "online", () => {
-      store.dispatch(networkStatusChanged({ isOnline: true }));
-    });
-    this.registerDomEvent(window, "offline", () => {
-      store.dispatch(networkStatusChanged({ isOnline: false }));
-    });
-    this.registerEvent(
-      this.app.workspace.on("css-change", () => {
-        store.dispatch(darkModeUpdated(document.body.hasClass("theme-dark")));
-      }),
-    );
-    this.registerDomEvent(document, "keydown", () => {
-      store.dispatch(keyDownAction());
-    });
 
     this.registerEvent(
       this.app.metadataCache.on(

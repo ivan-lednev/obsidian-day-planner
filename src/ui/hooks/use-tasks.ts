@@ -4,13 +4,11 @@ import type { MetadataCache } from "obsidian";
 import { derived, type Readable, type Writable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
-import { selectListProps } from "../../redux/dataview/dataview-slice";
-import { selectRemoteTasks } from "../../redux/ical/ical-slice";
-import type { createUseSelector } from "../../redux/use-selector";
+import { type PathToListProps } from "../../redux/dataview/dataview-slice";
 import { DataviewFacade } from "../../service/dataview-facade";
 import { WorkspaceFacade } from "../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../settings";
-import type { LocalTask, Task, WithTime } from "../../task-types";
+import type { LocalTask, RemoteTask, Task, WithTime } from "../../task-types";
 import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../../types";
 import { isValidLogEntry } from "../../util/clock";
 import * as dv from "../../util/dataview";
@@ -39,8 +37,9 @@ export function useTasks(props: {
   onUpdate: OnUpdateFn;
   onEditAborted: OnEditAbortedFn;
   pointerDateTime: Readable<PointerDateTime>;
-  useSelector: ReturnType<typeof createUseSelector>;
   dataviewChange: Readable<unknown>;
+  remoteTasks: Readable<RemoteTask[]>;
+  listProps: Readable<PathToListProps>;
 }) {
   const {
     settingsStore,
@@ -55,11 +54,9 @@ export function useTasks(props: {
     dataviewChange,
     onUpdate,
     onEditAborted,
-    useSelector,
+    remoteTasks,
+    listProps,
   } = props;
-
-  const remoteTasks = useSelector(selectRemoteTasks);
-  const listProps = useSelector(selectListProps);
 
   const visibleDailyNotes = useVisibleDailyNotes(
     layoutReady,

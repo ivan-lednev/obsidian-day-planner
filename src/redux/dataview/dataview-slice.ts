@@ -4,7 +4,7 @@ import type { STask } from "obsidian-dataview";
 import { createAppSlice } from "../create-app-slice";
 
 type LineToListProps = Record<number, unknown>;
-type PathToListProps = Record<string, LineToListProps>;
+export type PathToListProps = Record<string, LineToListProps>;
 
 interface DataviewSliceState {
   dataviewTasks: Array<STask>;
@@ -51,11 +51,14 @@ export const dataviewSlice = createAppSlice({
   selectors: {
     selectDataviewTasks: (state) => state.dataviewTasks,
     selectListProps: (state) => state.listProps,
+    selectDataviewLoaded: (state) => state.dataviewLoaded,
   },
 });
 
 export const { dataviewChange, dataviewTasksUpdated, listPropsParsed } =
   dataviewSlice.actions;
-export const { selectDataviewTasks, selectListProps } = dataviewSlice.selectors;
+
+export const { selectDataviewTasks, selectListProps, selectDataviewLoaded } =
+  dataviewSlice.selectors;
 
 export type DataviewChangeAction = ReturnType<typeof dataviewChange>;

@@ -23,15 +23,17 @@ export function createDumpMetadataCommand(app: App) {
 
     await app.vault.adapter.mkdir(metadataDumpPath);
 
+    const markdownFiles = app.vault.getMarkdownFiles();
+
     const dump = {
+      pathToMtime: Object.fromEntries(
+        markdownFiles.map((it) => [it.path, it.stat.mtime]),
+      ),
       tasks: dataview?.pages(`"${fixtureVaultPath}"`).file.tasks.array(),
       headings: Object.fromEntries(
         app.vault
           .getMarkdownFiles()
-          .map((tFile) => [
-            tFile.path,
-            app.metadataCache.getFileCache(tFile)?.headings,
-          ]),
+          .map((it) => [it.path, app.metadataCache.getFileCache(it)?.headings]),
       ),
     };
 
