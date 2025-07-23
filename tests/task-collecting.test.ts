@@ -1,24 +1,33 @@
-import { describe, test } from "vitest";
+import { readFileSync, readdirSync, statSync } from "fs";
 
-import  { type DataviewFacade } from "src/service/dataview-facade";
+import { describe, expect, test } from "vitest";
 
-class FakeDataviewFacade implements DataviewFacade {
+class FakeDataviewFacade {
   getAllTasksFrom = (source: string) => {
     return Promise.resolve([]);
   };
 
   getAllListsFrom = (source: string) => {};
-
-  getTaskAtLine({ path, line }: { path: string; line: number }) {
-    throw new Error("Method not implemented.");
-  }
 }
 
 describe("Task collecting", () => {
   test("Reads log data", () => {
-    const dataviewFacade = new FakeDataviewFacade();
+    const metadataDump = readFileSync(
+      "fixtures/metadata-dump/tasks.json",
+      "utf-8",
+    );
+    const asJson = JSON.parse(metadataDump);
 
+    const metadataDir = readdirSync("fixtures/fixture-vault", {
+      withFileTypes: true,
+    });
 
+    const hren = [...metadataDir.entries()].map(([, it]) => [
+      it.parentPath,
+      statSync(it).mtime,
+    ]);
+
+    expect(asJson).toEqual("hren");
   });
 
   test.todo("Ignores tasks and lists outside of planner section");
