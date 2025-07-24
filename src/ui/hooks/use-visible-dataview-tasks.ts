@@ -8,15 +8,20 @@ import type { LocalTask } from "../../task-types";
 import { getScheduledDay } from "../../util/dataview";
 import { mapToTasksForDay } from "../../util/get-tasks-for-day";
 import { getDayKey } from "../../util/task-utils";
+import type { PeriodicNotes } from "../../service/periodic-notes";
 
 export function useVisibleDataviewTasks(
   dataviewTasks: Readable<STask[]>,
   visibleDays: Readable<Moment[]>,
+  periodicNotes: PeriodicNotes,
 ) {
   return derived(
     [visibleDays, dataviewTasks, settings],
     ([$visibleDays, $dataviewTasks, $settings]) => {
-      const dayToSTasks = groupBy(getScheduledDay, $dataviewTasks);
+      const dayToSTasks = groupBy(
+        (sTask) => getScheduledDay({ sTask, periodicNotes }),
+        $dataviewTasks,
+      );
 
       return $visibleDays.reduce<LocalTask[]>((result, day) => {
         const key = getDayKey(day);

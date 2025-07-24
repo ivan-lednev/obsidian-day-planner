@@ -69,7 +69,7 @@ function getHeadingBreadcrumbs(position: Pos, headings: HeadingCache[]) {
 }
 
 interface UseDataviewTasksProps {
-  visibleDailyNotes: Readable<TFile[]>;
+  visibleDailyNotes: Readable<(TFile | null)[]>;
   dataviewFacade: DataviewFacade;
   metadataCache: MetadataCache;
   settings: Readable<DayPlannerSettings>;
@@ -84,15 +84,19 @@ export function useDataviewTasks({
   refreshSignal,
 }: UseDataviewTasksProps) {
   function getListsFromDailyNotesForVisibleDays(
-    visibleDailyNotes: TFile[],
+    visibleDailyNotes: (TFile | null)[],
     settings: DayPlannerSettings,
   ) {
     if (visibleDailyNotes.length === 0) {
       return [];
     }
 
+    const nonNullDailyNotes = visibleDailyNotes.filter<TFile>(
+      (it) => it !== null,
+    );
+
     const allLists = dataviewFacade.getAllListsFrom(
-      query.anyOf(visibleDailyNotes),
+      query.anyOf(nonNullDailyNotes),
     );
 
     if (settings.plannerHeading === "") {
@@ -100,7 +104,7 @@ export function useDataviewTasks({
     }
 
     const pathToHeadingMetadata = Object.fromEntries(
-      visibleDailyNotes.map((file) => [
+      nonNullDailyNotes.map((file) => [
         file.path,
         metadataCache.getFileCache(file)?.headings || [],
       ]),

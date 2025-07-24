@@ -1,4 +1,3 @@
-import { getDateFromPath } from "obsidian-daily-notes-interface";
 import type { Readable, Writable } from "svelte/store";
 import { get } from "svelte/store";
 
@@ -11,6 +10,7 @@ import * as t from "../../../util/task-utils";
 
 import type { EditOperation } from "./types";
 import { EditMode } from "./types";
+import type { PeriodicNotes } from "../../../service/periodic-notes";
 
 export interface UseEditHandlersProps {
   startEdit: (operation: EditOperation) => void;
@@ -18,10 +18,12 @@ export interface UseEditHandlersProps {
   editOperation: Writable<EditOperation | undefined>;
   settings: Readable<DayPlannerSettings>;
   pointerDateTime: Readable<PointerDateTime>;
+  periodicNotes: PeriodicNotes;
 }
 
 export function createEditHandlers({
   workspaceFacade,
+  periodicNotes,
   startEdit,
   editOperation,
   settings,
@@ -83,7 +85,8 @@ export function createEditHandlers({
       // todo: add a proper fix
       //  in what case does a task not have a location?
       startTime: task.location
-        ? getDateFromPath(task.location.path, "day") || window.moment()
+        ? periodicNotes.getDateFromPath(task.location.path, "day") ||
+          window.moment()
         : window.moment(),
     };
 

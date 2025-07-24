@@ -9,6 +9,7 @@ import { handleActiveLeafChange } from "../util/handle-active-leaf-change";
 
 import TimelineWithControls from "./components/timeline-with-controls.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
+import type { PeriodicNotes } from "src/service/periodic-notes";
 
 export default class TimelineView extends ItemView {
   private timeline?: Component;
@@ -19,6 +20,7 @@ export default class TimelineView extends ItemView {
     private readonly settings: () => DayPlannerSettings,
     private readonly componentContext: ComponentContext,
     private readonly dateRanges: ReturnType<typeof useDateRanges>,
+    private readonly periodicNotes: PeriodicNotes,
   ) {
     super(leaf);
   }
@@ -45,7 +47,7 @@ export default class TimelineView extends ItemView {
           return;
         }
 
-        handleActiveLeafChange(leaf, this.dateRange);
+        handleActiveLeafChange(leaf, this.dateRange, this.periodicNotes);
       }),
     );
 

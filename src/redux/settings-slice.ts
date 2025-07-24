@@ -39,6 +39,3 @@ export const { settingsUpdated, settingsLoaded } = settingsSlice.actions;
 
 export const { selectDataviewSource, selectSettings, selectIcals } =
   settingsSlice.selectors;
-
-export const checkDataviewSourceChanged =
-  createSelectorChangePredicate(selectDataviewSource);

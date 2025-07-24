@@ -5,7 +5,6 @@ import {
   Plugin,
   WorkspaceLeaf,
   type MarkdownFileInfo,
-  type TFile,
 } from "obsidian";
 import { getAPI } from "obsidian-dataview";
 import { derived, fromStore, get, writable, type Writable } from "svelte/store";
@@ -17,7 +16,7 @@ import {
   viewTypeReleaseNotes,
   viewTypeTimeline,
   viewTypeMultiDay,
-  icalRefreshIntervalMillis,
+  reQueryAfterMillis,
 } from "./constants";
 import { createUpdateHandler } from "./create-update-handler";
 import { createDumpMetadataCommand } from "./dump-metadata";
@@ -33,24 +32,20 @@ import {
   toMdastPoint,
 } from "./mdast/mdast";
 import {
-  dataviewChange as dataviewChangeAction,
   listPropsParsed,
   selectDataviewLoaded,
   selectListProps,
 } from "./redux/dataview/dataview-slice";
 import { editCanceled, visibleDaysUpdated } from "./redux/global-slice";
 import {
-  initialIcalState,
-  type IcalState,
   icalRefreshRequested,
   selectRemoteTasks,
 } from "./redux/ical/ical-slice";
-import { initListenerMiddleware } from "./redux/listener-middleware";
-import { settingsUpdated } from "./redux/settings-slice";
+import { selectDataviewSource, settingsUpdated } from "./redux/settings-slice";
 import {
   type AppListenerMiddlewareInstance,
   type AppStore,
-  makeStore,
+  initStoreForPlugin,
 } from "./redux/store";
 import { useActionDispatched } from "./redux/use-action-dispatched";
 import { createUseSelector } from "./redux/use-selector";
@@ -65,25 +60,30 @@ import {
   type PluginData,
 } from "./settings";
 import { createGetTasksApi } from "./tasks-plugin";
-import type { ObsidianContext, OnUpdateFn } from "./types";
+import type { ObsidianContext, OnUpdateFn, PointerDateTime } from "./types";
 import { createEditorMenuCallback } from "./ui/editor-menu";
 import { mountStatusBarWidget } from "./ui/hooks/use-status-bar-widget";
 import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimelineView from "./ui/timeline-view";
-import { createHooks } from "./util/create-hooks.svelte";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
-import { createDailyNoteIfNeeded } from "./util/daily-notes";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { createEnvironmentHooks } from "./util/create-environment-hooks";
+import { getUpdateTrigger } from "./util/store";
+import { useDebounceWithDelay } from "./ui/hooks/use-debounce-with-delay";
+import { useDateRanges } from "./ui/hooks/use-date-ranges";
+import { useTasks } from "./ui/hooks/use-tasks";
+import { useVisibleDays } from "./ui/hooks/use-visible-days";
+import { PeriodicNotes } from "./service/periodic-notes";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
   private settingsStore!: Writable<DayPlannerSettings>;
   private workspaceFacade!: WorkspaceFacade;
   private dataviewFacade!: DataviewFacade;
+  private periodicNotes!: PeriodicNotes;
   private sTaskEditor!: STaskEditor;
   private vaultFacade!: VaultFacade;
   private transationWriter!: TransactionWriter;
@@ -95,17 +95,15 @@ export default class DayPlanner extends Plugin {
       ...(await this.loadData()),
     };
 
-    const { store, listenerMiddleware } =
-      this.setUpReduxStore(initialPluginData);
-    this.initSettingsStore({ initialSettings: initialPluginData, store });
-
     const getTasksApi = createGetTasksApi(this.app);
 
+    this.periodicNotes = new PeriodicNotes();
     this.vaultFacade = new VaultFacade(this.app.vault, getTasksApi);
     this.transationWriter = new TransactionWriter(this.vaultFacade);
     this.workspaceFacade = new WorkspaceFacade(
       this.app.workspace,
       this.vaultFacade,
+      this.periodicNotes,
     );
     this.dataviewFacade = new DataviewFacade(
       () => getAPI(this.app),
@@ -117,6 +115,15 @@ export default class DayPlanner extends Plugin {
       this.dataviewFacade,
     );
 
+    const { store, listenerMiddleware } = initStoreForPlugin({
+      pluginData: initialPluginData,
+      plugin: this,
+      dataviewFacade: this.dataviewFacade,
+      vault: this.app.vault,
+      metadataCache: this.app.metadataCache,
+    });
+
+    this.initSettingsStore({ initialSettings: initialPluginData, store });
     this.registerViews({ store, listenerMiddleware });
 
     const handleEditorMenu = createEditorMenuCallback({
@@ -230,7 +237,9 @@ export default class DayPlanner extends Plugin {
       id: "show-day-planner-today-note",
       name: "Open today's Day Planner",
       callback: async () => {
-        const dailyNote = await createDailyNoteIfNeeded(window.moment());
+        const dailyNote = await this.periodicNotes.createDailyNoteIfNeeded(
+          window.moment(),
+        );
 
         await this.app.workspace.getLeaf(false).openFile(dailyNote);
       },
@@ -359,6 +368,7 @@ export default class DayPlanner extends Plugin {
       settings: this.settings,
       transactionWriter: this.transationWriter,
       vaultFacade: this.vaultFacade,
+      periodicNotes: this.periodicNotes,
       onEditCanceled: () => {
         new Notice("Edit canceled");
 
@@ -379,6 +389,7 @@ export default class DayPlanner extends Plugin {
     const remoteTasks = useSelector(selectRemoteTasks);
     const listProps = useSelector(selectListProps);
     const dataviewLoaded = useSelector(selectDataviewLoaded);
+    const dataviewSource = useSelector(selectDataviewSource);
 
     const dataviewRefreshSignal = derived(
       actionDispatched,
@@ -392,29 +403,48 @@ export default class DayPlanner extends Plugin {
     const { isDarkMode, isOnline, keyDown, isModPressed, layoutReady } =
       createEnvironmentHooks({ workspace: this.app.workspace });
 
+    const taskUpdateTrigger = derived(
+      [dataviewRefreshSignal, dataviewSource],
+      getUpdateTrigger,
+    );
+
+    const debouncedTaskUpdateTrigger = useDebounceWithDelay(
+      taskUpdateTrigger,
+      keyDown,
+      reQueryAfterMillis,
+    );
+
+    const pointerDateTime = writable<PointerDateTime>({
+      dateTime: window.moment(),
+      type: "dateTime",
+    });
+
+    const dateRanges = useDateRanges();
+    const visibleDays = useVisibleDays(dateRanges.ranges);
+
     const {
-      editContext,
-      tasksWithTimeForToday,
-      newlyStartedTasks,
-      dateRanges,
-      pointerDateTime,
       tasksWithActiveClockProps,
       getDisplayedTasksWithClocksForTimeline,
-      visibleDays,
-    } = createHooks({
-      metadataCache: this.app.metadataCache,
-      dataviewFacade: this.dataviewFacade,
-      workspaceFacade: this.workspaceFacade,
-      settingsStore: this.settingsStore,
+      tasksWithTimeForToday,
+      editContext,
+      newlyStartedTasks,
+    } = useTasks({
       onUpdate,
       onEditAborted,
-      currentTime,
+      periodicNotes: this.periodicNotes,
+      dataviewFacade: this.dataviewFacade,
+      metadataCache: this.app.metadataCache,
+      workspaceFacade: this.workspaceFacade,
+      isOnline,
+      visibleDays,
+      layoutReady,
+      debouncedTaskUpdateTrigger,
       dataviewChange: dataviewRefreshSignal,
+      settingsStore: this.settingsStore,
+      currentTime,
+      pointerDateTime,
       remoteTasks,
       listProps,
-      keyDown,
-      isOnline,
-      layoutReady,
     });
 
     this.registerDomEvent(window, "blur", editContext.cancelEdit);
@@ -493,6 +523,7 @@ export default class DayPlanner extends Plugin {
     });
 
     const defaultObsidianContext: ObsidianContext = {
+      periodicNotes: this.periodicNotes,
       sTaskEditor: this.sTaskEditor,
       workspaceFacade: this.workspaceFacade,
       initWeeklyView: this.initWeeklyLeaf,
@@ -527,7 +558,13 @@ export default class DayPlanner extends Plugin {
     this.registerView(
       viewTypeTimeline,
       (leaf: WorkspaceLeaf) =>
-        new TimelineView(leaf, this.settings, componentContext, dateRanges),
+        new TimelineView(
+          leaf,
+          this.settings,
+          componentContext,
+          dateRanges,
+          this.periodicNotes,
+        ),
     );
 
     this.registerView(
@@ -545,53 +582,5 @@ export default class DayPlanner extends Plugin {
       viewTypeReleaseNotes,
       (leaf: WorkspaceLeaf) => new DayPlannerReleaseNotesView(leaf),
     );
-  }
-
-  private setUpReduxStore(pluginData: PluginData) {
-    const listenerMiddleware = initListenerMiddleware({
-      extra: {
-        dataviewFacade: this.dataviewFacade,
-        vault: this.app.vault,
-        metadataCache: this.app.metadataCache,
-        onIcalsFetched: async (rawIcals) => {
-          await this.saveData({ ...this.settings(), rawIcals });
-        },
-      },
-    });
-
-    const icalStateWithCachedRawIcals: IcalState = {
-      ...initialIcalState,
-      plainTextIcals: pluginData.rawIcals || [],
-    };
-
-    const store = makeStore({
-      preloadedState: {
-        ical: icalStateWithCachedRawIcals,
-      },
-      middleware: (getDefaultMiddleware) => {
-        return getDefaultMiddleware().concat(listenerMiddleware.middleware);
-      },
-    });
-
-    this.register(() => {
-      listenerMiddleware.clearListeners();
-    });
-
-    this.registerInterval(
-      window.setInterval(() => {
-        store.dispatch(icalRefreshRequested());
-      }, icalRefreshIntervalMillis),
-    );
-
-    this.registerEvent(
-      this.app.metadataCache.on(
-        // @ts-expect-error
-        "dataview:metadata-change",
-        (eventType: unknown, file: TFile) =>
-          store.dispatch(dataviewChangeAction(file.path)),
-      ),
-    );
-
-    return { store, listenerMiddleware };
   }
 }

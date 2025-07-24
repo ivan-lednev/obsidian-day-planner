@@ -44,8 +44,8 @@ function makeStoreForTests(props?: { preloadedState?: Partial<RootState> }) {
   const listenerMiddleware = initListenerMiddleware({
     extra: {
       dataviewFacade: new FakeDataviewFacade(),
+      onIcalsFetched: async () => {},
     },
-    onIcalsFetched: async () => {},
   });
 
   return makeStore({

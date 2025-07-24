@@ -6,14 +6,10 @@ import {
   Workspace,
   WorkspaceLeaf,
 } from "obsidian";
-import {
-  createDailyNote,
-  getAllDailyNotes,
-  getDailyNote,
-} from "obsidian-daily-notes-interface";
 import { isInstanceOf, isNotVoid } from "typed-assert";
 
 import type { VaultFacade } from "./vault-facade";
+import type { PeriodicNotes } from "./periodic-notes";
 
 function doesLeafContainFile(leaf: WorkspaceLeaf, file: TFile) {
   const { view } = leaf;
@@ -25,6 +21,7 @@ export class WorkspaceFacade {
   constructor(
     private readonly workspace: Workspace,
     private readonly vaultFacade: VaultFacade,
+    private readonly periodicNotes: PeriodicNotes,
   ) {}
 
   async openFileInEditor(file: TFile) {
@@ -64,8 +61,10 @@ export class WorkspaceFacade {
 
   async openFileForDay(moment: Moment) {
     const dailyNote =
-      getDailyNote(moment, getAllDailyNotes()) ||
-      (await createDailyNote(moment));
+      this.periodicNotes.getDailyNote(
+        moment,
+        this.periodicNotes.getAllDailyNotes(),
+      ) || (await this.periodicNotes.createDailyNote(moment));
 
     return this.openFileInEditor(dailyNote);
   }

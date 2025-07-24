@@ -38,6 +38,13 @@ function createProps({
       dateTime: moment("2023-01-01 00:00"),
       type: "dateTime",
     }),
+    periodicNotes: () => ({
+      getDateFromPath: vi.fn(() => null),
+      getDailyNoteSettings: vi.fn(() => ({
+        format: "YYYY-MM-DD",
+        folder: ".",
+      })),
+    }),
   };
 }
 
