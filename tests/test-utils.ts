@@ -28,7 +28,10 @@ export class InMemoryVault {
     const found = this.files.find((file) => file.path === path);
 
     if (!found) {
-      throw new Error(`There is no file in the test vault: '${path}'`);
+      throw new Error(`There is no file in the test vault: '${path}'
+
+Available files: ${this.files.map((it) => it.path).join(", ")}
+`);
     }
 
     return found;

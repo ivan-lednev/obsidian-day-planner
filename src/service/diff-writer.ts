@@ -1,6 +1,5 @@
 import { groupBy } from "lodash/fp";
 import type { Root } from "mdast";
-import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { isNotVoid } from "typed-assert";
 
 import {
@@ -14,11 +13,11 @@ import {
 import type { DayPlannerSettings } from "../settings";
 import type { LocalTask } from "../task-types";
 import { EditMode } from "../ui/hooks/use-edit/types";
-import { createDailyNotePath } from "../util/daily-notes";
 import { applyScopedUpdates, getFirstLine } from "../util/markdown";
 import * as t from "../util/task-utils";
 
 import type { VaultFacade } from "./vault-facade";
+import type { PeriodicNotes } from "./periodic-notes";
 
 interface Range {
   start: {
@@ -234,8 +233,9 @@ function mapTaskDiffToUpdate(props: {
   task: LocalTask;
   mode: EditMode;
   settings: DayPlannerSettings;
+  periodicNotes: PeriodicNotes;
 }): Update | Update[] {
-  const { type, task, mode, settings } = props;
+  const { type, task, mode, settings, periodicNotes } = props;
   const taskTextWithUpdatedProps = t.toString(task, mode);
 
   if (type === "added") {
@@ -262,7 +262,7 @@ function mapTaskDiffToUpdate(props: {
 
     return {
       type: "mdast",
-      path: createDailyNotePath(task.startTime),
+      path: periodicNotes.createDailyNotePath(task.startTime),
       updateFn: (root: Root) => {
         const taskRoot = fromMarkdown(taskTextWithUpdatedProps);
         const listItemToInsert = findFirst(taskRoot, checkListItem);
@@ -299,7 +299,7 @@ function mapTaskDiffToUpdate(props: {
     };
   }
 
-  const originalLocationDay = getDateFromPath(path, "day");
+  const originalLocationDay = periodicNotes.getDateFromPath(path, "day");
   const needToMoveBetweenNotes =
     originalLocationDay && !task.startTime.isSame(originalLocationDay, "day");
 
@@ -320,7 +320,7 @@ function mapTaskDiffToUpdate(props: {
     },
     {
       type: "mdast",
-      path: createDailyNotePath(task.startTime),
+      path: periodicNotes.createDailyNotePath(task.startTime),
       updateFn: (root: Root) => {
         const taskRoot = fromMarkdown(taskTextWithUpdatedProps);
         const listItemToInsert = findFirst(taskRoot, checkListItem);
@@ -345,6 +345,7 @@ export function mapTaskDiffToUpdates(
   diff: ViewDiff,
   mode: EditMode,
   settings: DayPlannerSettings,
+  periodicNotes: PeriodicNotes,
 ): Update[] {
   return Object.entries(diff)
     .flatMap(([type, tasks]) => tasks.map((task) => ({ type, task })))
@@ -354,6 +355,7 @@ export function mapTaskDiffToUpdates(
         task,
         mode,
         settings,
+        periodicNotes,
       });
 
       return result.concat(updates);

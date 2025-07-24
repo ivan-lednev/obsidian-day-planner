@@ -24,6 +24,7 @@ import { useCursor } from "./cursor";
 import { transform } from "./transform/transform";
 import type { EditOperation } from "./types";
 import { useEditActions } from "./use-edit-actions";
+import type { PeriodicNotes } from "../../../service/periodic-notes";
 
 function groupByDay(tasks: Task[]) {
   return tasks.reduce<Record<string, { withTime: Task[]; noTime: Task[] }>>(
@@ -48,6 +49,7 @@ function groupByDay(tasks: Task[]) {
 
 export function useEditContext(props: {
   workspaceFacade: WorkspaceFacade;
+  periodicNotes: PeriodicNotes;
   onUpdate: OnUpdateFn;
   settings: Readable<DayPlannerSettings>;
   localTasks: Readable<LocalTask[]>;
@@ -58,6 +60,7 @@ export function useEditContext(props: {
 }) {
   const {
     workspaceFacade,
+    periodicNotes,
     onEditAborted,
     onUpdate,
     settings,
@@ -106,6 +109,7 @@ export function useEditContext(props: {
   });
 
   const handlers = createEditHandlers({
+    periodicNotes,
     pointerDateTime,
     workspaceFacade,
     startEdit,

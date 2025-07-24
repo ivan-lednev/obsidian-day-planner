@@ -23,6 +23,7 @@ import { useNewlyStartedTasks } from "./use-newly-started-tasks";
 import { useTasksWithActiveClockProps } from "./use-tasks-with-active-clock-props";
 import { useVisibleDailyNotes } from "./use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "./use-visible-dataview-tasks";
+import type { PeriodicNotes } from "../../service/periodic-notes";
 
 export function useTasks(props: {
   settingsStore: Writable<DayPlannerSettings>;
@@ -40,6 +41,7 @@ export function useTasks(props: {
   dataviewChange: Readable<unknown>;
   remoteTasks: Readable<RemoteTask[]>;
   listProps: Readable<PathToListProps>;
+  periodicNotes: PeriodicNotes;
 }) {
   const {
     settingsStore,
@@ -47,6 +49,7 @@ export function useTasks(props: {
     layoutReady,
     debouncedTaskUpdateTrigger,
     dataviewFacade,
+    periodicNotes,
     metadataCache,
     currentTime,
     workspaceFacade,
@@ -62,6 +65,7 @@ export function useTasks(props: {
     layoutReady,
     debouncedTaskUpdateTrigger,
     visibleDays,
+    periodicNotes,
   );
 
   const dataviewTasks = useDataviewTasks({
@@ -135,7 +139,11 @@ export function useTasks(props: {
     });
   }
 
-  const localTasks = useVisibleDataviewTasks(dataviewTasks, visibleDays);
+  const localTasks = useVisibleDataviewTasks(
+    dataviewTasks,
+    visibleDays,
+    periodicNotes,
+  );
 
   const tasksWithTimeForToday = derived(
     [localTasks, remoteTasks, currentTime],
@@ -155,6 +163,7 @@ export function useTasks(props: {
   );
 
   const editContext = useEditContext({
+    periodicNotes,
     workspaceFacade,
     onUpdate,
     onEditAborted,

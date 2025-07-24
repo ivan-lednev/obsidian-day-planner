@@ -8,7 +8,6 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
-  import { createDailyNoteIfNeeded } from "../../util/daily-notes";
 
   import Callout from "./callout.svelte";
   import ControlButton from "./control-button.svelte";
@@ -22,8 +21,13 @@
   import Pill from "./pill.svelte";
   import SettingsControls from "./settings-controls.svelte";
 
-  const { workspaceFacade, initWeeklyView, dataviewLoaded, reSync } =
-    getObsidianContext();
+  const {
+    workspaceFacade,
+    initWeeklyView,
+    dataviewLoaded,
+    reSync,
+    periodicNotes,
+  } = getObsidianContext();
   const dateRange = getDateRangeContext();
 
   let settingsVisible = $state(false);
@@ -49,7 +53,9 @@
   }
 
   async function goToNoteForToday() {
-    const noteForToday = await createDailyNoteIfNeeded(window.moment());
+    const noteForToday = await periodicNotes.createDailyNoteIfNeeded(
+      window.moment(),
+    );
 
     await workspaceFacade.openFileInEditor(noteForToday);
   }
@@ -102,7 +108,7 @@
     <ControlButton
       label="Go to file"
       onclick={async () => {
-        const note = await createDailyNoteIfNeeded($dateRange[0]);
+        const note = await periodicNotes.createDailyNoteIfNeeded($dateRange[0]);
 
         await workspaceFacade.openFileInEditor(note);
       }}

@@ -43,6 +43,7 @@ describe("Search", () => {
       middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
       preloadedState: {
         dataview: {
+          listProps: {},
           dataviewLoaded: true,
           dataviewTasks: [
             createSTask({

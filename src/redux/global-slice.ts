@@ -1,8 +1,4 @@
-import {
-  createAction,
-  createSelector,
-  type PayloadAction,
-} from "@reduxjs/toolkit";
+import { createSelector, type PayloadAction } from "@reduxjs/toolkit";
 
 import { defaultDayFormat } from "../constants";
 
@@ -31,8 +27,6 @@ export const globalSlice = createAppSlice({
     selectVisibleDays: (state) => state.visibleDays,
   },
 });
-
-export const keyDown = createAction("obsidian/keyDown");
 
 export const { visibleDaysUpdated, editCanceled } = globalSlice.actions;
 

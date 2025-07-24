@@ -1,8 +1,4 @@
 import type { App, Notice } from "obsidian";
-import {
-  createDailyNote,
-  getDateFromPath,
-} from "obsidian-daily-notes-interface";
 import { isNotVoid } from "typed-assert";
 
 import { sortListsRecursivelyInMarkdown } from "./mdast/mdast";
@@ -20,6 +16,7 @@ import { EditMode } from "./ui/hooks/use-edit/types";
 import { SingleSuggestModal } from "./ui/SingleSuggestModal";
 import { createUndoNotice } from "./ui/undo-notice";
 import { applyScopedUpdates } from "./util/markdown";
+import type { PeriodicNotes } from "./service/periodic-notes";
 
 async function getTextFromUser(app: App): Promise<string | undefined> {
   return new Promise((resolve) => {
@@ -44,10 +41,17 @@ export const createUpdateHandler = (props: {
   settings: () => DayPlannerSettings;
   transactionWriter: TransactionWriter;
   vaultFacade: VaultFacade;
+  periodicNotes: PeriodicNotes;
   onEditCanceled: () => void;
 }): OnUpdateFn => {
-  const { app, settings, transactionWriter, vaultFacade, onEditCanceled } =
-    props;
+  const {
+    app,
+    settings,
+    transactionWriter,
+    vaultFacade,
+    onEditCanceled,
+    periodicNotes,
+  } = props;
 
   let currentUndoNotice: Notice | undefined;
 
@@ -78,7 +82,7 @@ export const createUpdateHandler = (props: {
       diff.added[0] = { ...created, text: modalOutput };
     }
 
-    const updates = mapTaskDiffToUpdates(diff, mode, settings());
+    const updates = mapTaskDiffToUpdates(diff, mode, settings(), periodicNotes);
 
     const afterEach = settings().sortTasksInPlanAfterEdit
       ? (contents: string) =>
@@ -115,11 +119,11 @@ export const createUpdateHandler = (props: {
 
       await Promise.all(
         needToCreate.map(async (path) => {
-          const date = getDateFromPath(path, "day");
+          const date = periodicNotes.getDateFromPath(path, "day");
 
           isNotVoid(date);
 
-          await createDailyNote(date);
+          await periodicNotes.createDailyNote(date);
         }),
       );
     }

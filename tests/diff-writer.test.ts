@@ -1,9 +1,5 @@
 import moment, { type Moment } from "moment";
 import type { Vault } from "obsidian";
-import {
-  getDailyNoteSettings,
-  getDateFromPath,
-} from "obsidian-daily-notes-interface";
 import { vi, test, expect, describe } from "vitest";
 
 import { defaultDayFormat } from "../src/constants";
@@ -27,15 +23,19 @@ import {
   type InMemoryFile,
   InMemoryVault,
 } from "./test-utils";
+import type { PeriodicNotes } from "../src/service/periodic-notes";
 
-vi.mock("obsidian-daily-notes-interface", () => ({
+const mockPeriodicNotes: PeriodicNotes = {
   getDateFromPath: vi.fn(() => null),
   getDailyNoteSettings: vi.fn(() => ({
-    format: "YYYY-MM-DD",
+    format: defaultDayFormat,
     folder: ".",
   })),
-  DEFAULT_DAILY_NOTE_FORMAT: "YYYY-MM-DD",
-}));
+  DEFAULT_DAILY_NOTE_FORMAT: defaultDayFormat,
+  createDailyNotePath: vi.fn(
+    (date: Moment) => `${date.format(defaultDayFormat)}.md`,
+  ),
+} as unknown as PeriodicNotes;
 
 async function writeDiff(props: {
   diff: ViewDiff;
@@ -51,7 +51,12 @@ async function writeDiff(props: {
 
   const vault = new InMemoryVault(files);
   const vaultFacade = new VaultFacade(vault as unknown as Vault, getTasksApi);
-  const updates = mapTaskDiffToUpdates(diff, mode, defaultSettingsForTests);
+  const updates = mapTaskDiffToUpdates(
+    diff,
+    mode,
+    defaultSettingsForTests,
+    mockPeriodicNotes,
+  );
   // todo: remove test tautology
   const transaction = createTransaction({
     updates,
@@ -161,7 +166,7 @@ describe("From diff to vault", () => {
   });
 
   test("Updates nested tasks", async () => {
-    vi.mocked(getDailyNoteSettings).mockReturnValue({});
+    vi.mocked(mockPeriodicNotes.getDailyNoteSettings).mockReturnValue({});
 
     const files = [
       createInMemoryFile({
@@ -237,11 +242,11 @@ describe("From diff to vault", () => {
     const tomorrowDailynotePath = `${tomorrowKey}.md`;
     const tomorrowMoment = moment(tomorrowKey);
 
-    vi.mocked(getDailyNoteSettings).mockReturnValue({
+    vi.mocked(mockPeriodicNotes.getDailyNoteSettings).mockReturnValue({
       format: defaultDayFormat,
       folder: ".",
     });
-    vi.mocked(getDateFromPath).mockReturnValue(todayMoment);
+    vi.mocked(mockPeriodicNotes.getDateFromPath).mockReturnValue(todayMoment);
 
     const files = [
       createInMemoryFile({
@@ -513,7 +518,7 @@ describe("From diff to vault", () => {
   });
 
   test("Adds a heading to daily notes if there is none", async () => {
-    vi.mocked(getDailyNoteSettings).mockReturnValue({
+    vi.mocked(mockPeriodicNotes.getDailyNoteSettings).mockReturnValue({
       format: defaultDayFormat,
       folder: ".",
     });
@@ -550,7 +555,7 @@ describe("From diff to vault", () => {
 
   describe("Sorting by time", () => {
     test("Sorts tasks in plan after edit", async () => {
-      vi.mocked(getDailyNoteSettings).mockReturnValue({
+      vi.mocked(mockPeriodicNotes.getDailyNoteSettings).mockReturnValue({
         format: defaultDayFormat,
         folder: ".",
       });
@@ -598,7 +603,7 @@ describe("From diff to vault", () => {
     });
 
     test("Sorts tasks after non-mdast edit", async () => {
-      vi.mocked(getDailyNoteSettings).mockReturnValue({
+      vi.mocked(mockPeriodicNotes.getDailyNoteSettings).mockReturnValue({
         format: defaultDayFormat,
         folder: ".",
       });
@@ -660,7 +665,7 @@ describe("From diff to vault", () => {
     });
 
     test("Skips sorting if day planner heading is not found", async () => {
-      vi.mocked(getDailyNoteSettings).mockReturnValue({
+      vi.mocked(mockPeriodicNotes.getDailyNoteSettings).mockReturnValue({
         format: defaultDayFormat,
         folder: ".",
       });
