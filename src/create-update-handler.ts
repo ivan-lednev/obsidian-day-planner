@@ -8,17 +8,16 @@ import {
   mapTaskDiffToUpdates,
   TransactionWriter,
 } from "./service/diff-writer";
+import type { PeriodicNotes } from "./service/periodic-notes";
 import type { VaultFacade } from "./service/vault-facade";
 import type { DayPlannerSettings } from "./settings";
 import type { OnUpdateFn } from "./types";
-import { askForConfirmation } from "./ui/confirmation-modal";
+import { type ConfirmationModalProps } from "./ui/confirmation-modal";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { SingleSuggestModal } from "./ui/SingleSuggestModal";
-import { createUndoNotice } from "./ui/undo-notice";
 import { applyScopedUpdates } from "./util/markdown";
-import type { PeriodicNotes } from "./service/periodic-notes";
 
-async function getTextFromUser(app: App): Promise<string | undefined> {
+export async function getTextFromUser(app: App): Promise<string | undefined> {
   return new Promise((resolve) => {
     new SingleSuggestModal({
       app,
@@ -37,23 +36,25 @@ async function getTextFromUser(app: App): Promise<string | undefined> {
 }
 
 export const createUpdateHandler = (props: {
-  app: App;
   settings: () => DayPlannerSettings;
   transactionWriter: TransactionWriter;
   vaultFacade: VaultFacade;
   periodicNotes: PeriodicNotes;
   onEditCanceled: () => void;
+  onEditConfirmed: () => void;
+  getTextInput: () => Promise<string | undefined>;
+  getConfirmationInput: (input: ConfirmationModalProps) => Promise<boolean>;
 }): OnUpdateFn => {
   const {
-    app,
     settings,
     transactionWriter,
     vaultFacade,
     onEditCanceled,
+    onEditConfirmed,
     periodicNotes,
+    getTextInput,
+    getConfirmationInput,
   } = props;
-
-  let currentUndoNotice: Notice | undefined;
 
   function getPathsToCreate(paths: string[]) {
     return paths.reduce<string[]>(
@@ -71,12 +72,10 @@ export const createUpdateHandler = (props: {
 
       isNotVoid(created);
 
-      const modalOutput = await getTextFromUser(app);
+      const modalOutput = await getTextInput();
 
       if (!modalOutput) {
-        onEditCanceled();
-
-        return;
+        return onEditCanceled();
       }
 
       diff.added[0] = { ...created, text: modalOutput };
@@ -104,17 +103,14 @@ export const createUpdateHandler = (props: {
     const needToCreate = getPathsToCreate(updatePaths);
 
     if (needToCreate.length > 0) {
-      const confirmed = await askForConfirmation({
-        app,
+      const confirmed = await getConfirmationInput({
         title: "Need to create files",
         text: `The following files need to be created: ${needToCreate.join("; ")}`,
         cta: "Create",
       });
 
       if (!confirmed) {
-        onEditCanceled();
-
-        return;
+        return onEditCanceled();
       }
 
       await Promise.all(
@@ -130,7 +126,6 @@ export const createUpdateHandler = (props: {
 
     await transactionWriter.writeTransaction(transaction);
 
-    currentUndoNotice?.hide();
-    currentUndoNotice = createUndoNotice(transactionWriter.undo);
+    return onEditConfirmed();
   };
 };

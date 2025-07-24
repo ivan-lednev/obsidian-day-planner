@@ -7,7 +7,12 @@ import type {
   TypedStartListening,
 } from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
+import type { MetadataCache, TFile, Vault } from "obsidian";
 
+import { icalRefreshIntervalMillis } from "../constants";
+import type DayPlanner from "../main";
+import type { DataviewFacade } from "../service/dataview-facade";
+import type { PluginData } from "../settings";
 import type { ReduxExtraArgument } from "../types";
 
 import { dataviewChange, dataviewSlice } from "./dataview/dataview-slice";
@@ -18,14 +23,9 @@ import {
   type IcalState,
   initialIcalState,
 } from "./ical/ical-slice";
+import { initListenerMiddleware } from "./listener-middleware";
 import { searchSlice } from "./search-slice";
 import { settingsSlice } from "./settings-slice";
-import type { DataviewFacade } from "../service/dataview-facade";
-import type { MetadataCache, TFile, Vault } from "obsidian";
-import type DayPlanner from "../main";
-import type { PluginData } from "../settings";
-import { initListenerMiddleware } from "./listener-middleware";
-import { icalRefreshIntervalMillis } from "../constants";
 
 const rootReducer = combineSlices(
   globalSlice,
@@ -68,6 +68,7 @@ export function initStoreForPlugin(props: {
     plainTextIcals: pluginData.rawIcals || [],
   };
 
+  // todo: extra is not needed at all
   const listenerMiddleware = initListenerMiddleware({
     extra: {
       dataviewFacade,

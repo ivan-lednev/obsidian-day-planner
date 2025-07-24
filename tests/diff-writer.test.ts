@@ -10,6 +10,7 @@ import {
   TransactionWriter,
   type ViewDiff,
 } from "../src/service/diff-writer";
+import type { PeriodicNotes } from "../src/service/periodic-notes";
 import { VaultFacade } from "../src/service/vault-facade";
 import { defaultSettingsForTests } from "../src/settings";
 import type { LocalTask, WithTime } from "../src/task-types";
@@ -23,7 +24,6 @@ import {
   type InMemoryFile,
   InMemoryVault,
 } from "./test-utils";
-import type { PeriodicNotes } from "../src/service/periodic-notes";
 
 const mockPeriodicNotes: PeriodicNotes = {
   getDateFromPath: vi.fn(() => null),

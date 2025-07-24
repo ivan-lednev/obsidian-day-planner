@@ -1,0 +1,23 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Task views > Editing > Edits tasks 1`] = `
+{
+  "fixtures/fixture-vault/2025-07-19.md": "
+- - 11:00 - 11:30 List item under planner heading
++ - 17:00 - 17:30 List item under planner heading
+",
+}
+`;
+
+exports[`Task views > Editing > Moves tasks between daily notes 1`] = `
+{
+  "fixtures/fixture-vault/2025-07-19.md": "
+- - 11:00 - 11:30 List item under planner heading
+",
+  "fixtures/fixture-vault/2025-07-20.md": "
++ # Day planner
++ 
++ - 17:00 - 17:30 List item under planner heading
+",
+}
+`;

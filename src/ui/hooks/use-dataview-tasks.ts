@@ -5,7 +5,6 @@ import { derived, type Readable } from "svelte/store";
 import { DataviewFacade } from "../../service/dataview-facade";
 import type { DayPlannerSettings } from "../../settings";
 import * as dv from "../../util/dataview";
-import * as query from "../../util/dataview-query";
 
 function getHeadingIndexContaining(position: Pos, headings: HeadingCache[]) {
   return headings.findIndex(
@@ -96,7 +95,7 @@ export function useDataviewTasks({
     );
 
     const allLists = dataviewFacade.getAllListsFrom(
-      query.anyOf(nonNullDailyNotes),
+      nonNullDailyNotes.map((it) => it.path),
     );
 
     if (settings.plannerHeading === "") {
@@ -156,5 +155,6 @@ export function useDataviewTasks({
           set([]);
         });
     },
+    [],
   );
 }

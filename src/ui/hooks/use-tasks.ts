@@ -6,6 +6,7 @@ import { derived, type Readable, type Writable } from "svelte/store";
 import { addHorizontalPlacing } from "../../overlap/overlap";
 import { type PathToListProps } from "../../redux/dataview/dataview-slice";
 import { DataviewFacade } from "../../service/dataview-facade";
+import type { PeriodicNotes } from "../../service/periodic-notes";
 import { WorkspaceFacade } from "../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../settings";
 import type { LocalTask, RemoteTask, Task, WithTime } from "../../task-types";
@@ -23,7 +24,6 @@ import { useNewlyStartedTasks } from "./use-newly-started-tasks";
 import { useTasksWithActiveClockProps } from "./use-tasks-with-active-clock-props";
 import { useVisibleDailyNotes } from "./use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "./use-visible-dataview-tasks";
-import type { PeriodicNotes } from "../../service/periodic-notes";
 
 export function useTasks(props: {
   settingsStore: Writable<DayPlannerSettings>;

@@ -9,6 +9,7 @@ import { handleActiveLeafChange } from "../util/handle-active-leaf-change";
 
 import TimelineWithControls from "./components/timeline-with-controls.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
+
 import type { PeriodicNotes } from "src/service/periodic-notes";
 
 export default class TimelineView extends ItemView {
