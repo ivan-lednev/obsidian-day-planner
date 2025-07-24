@@ -73,8 +73,12 @@ export class DataviewFacade {
     });
   };
 
-  getAllListsFrom = (source: string) => {
-    return this.getDataview()?.pages(source).file.lists.array() || [];
+  getAllListsFrom = (paths: string[]) => {
+    return (
+      this.getDataview()
+        ?.pages(paths.map((it) => `"${it}"`).join(" OR "))
+        .file.lists.array() || []
+    );
   };
 
   getTaskAtLine({ path, line }: { path: string; line: number }) {

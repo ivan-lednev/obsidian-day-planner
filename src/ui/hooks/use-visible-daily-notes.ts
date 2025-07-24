@@ -1,8 +1,9 @@
 import type { Moment } from "moment";
 import { Notice } from "obsidian";
-import type { PeriodicNotes } from "../../service/periodic-notes";
 import type { Readable } from "svelte/store";
 import { derived } from "svelte/store";
+
+import type { PeriodicNotes } from "../../service/periodic-notes";
 
 /**
  *

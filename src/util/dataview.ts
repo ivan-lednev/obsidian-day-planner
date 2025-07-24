@@ -12,6 +12,7 @@ import {
   indentBeforeTaskParagraph,
 } from "../constants";
 import { getTimeFromLine } from "../parser/parser";
+import type { PeriodicNotes } from "../service/periodic-notes";
 import type {
   FileLine,
   LocalTask,
@@ -34,7 +35,6 @@ import {
   indentLines,
 } from "./markdown";
 import { splitMultiday } from "./moment";
-import type { PeriodicNotes } from "../service/periodic-notes";
 
 interface Node {
   text: string;

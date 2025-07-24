@@ -1,6 +1,7 @@
 import type { Readable, Writable } from "svelte/store";
 import { get } from "svelte/store";
 
+import type { PeriodicNotes } from "../../../service/periodic-notes";
 import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
 import type { LocalTask, WithTime } from "../../../task-types";
@@ -10,7 +11,6 @@ import * as t from "../../../util/task-utils";
 
 import type { EditOperation } from "./types";
 import { EditMode } from "./types";
-import type { PeriodicNotes } from "../../../service/periodic-notes";
 
 export interface UseEditHandlersProps {
   startEdit: (operation: EditOperation) => void;

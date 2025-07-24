@@ -3,6 +3,7 @@ import type { Moment } from "moment";
 import { derived, type Readable, writable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../../overlap/overlap";
+import type { PeriodicNotes } from "../../../service/periodic-notes";
 import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
 import type {
@@ -24,7 +25,6 @@ import { useCursor } from "./cursor";
 import { transform } from "./transform/transform";
 import type { EditOperation } from "./types";
 import { useEditActions } from "./use-edit-actions";
-import type { PeriodicNotes } from "../../../service/periodic-notes";
 
 function groupByDay(tasks: Task[]) {
   return tasks.reduce<Record<string, { withTime: Task[]; noTime: Task[] }>>(

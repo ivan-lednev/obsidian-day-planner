@@ -3,7 +3,6 @@ import { type PayloadAction } from "@reduxjs/toolkit";
 import { type DayPlannerSettings, defaultSettings } from "../settings";
 
 import { createAppSlice } from "./create-app-slice";
-import { createSelectorChangePredicate } from "./util";
 
 interface SettingsSliceState {
   settings: DayPlannerSettings;

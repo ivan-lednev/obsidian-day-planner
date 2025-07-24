@@ -8,8 +8,8 @@ import {
 } from "obsidian";
 import { isInstanceOf, isNotVoid } from "typed-assert";
 
-import type { VaultFacade } from "./vault-facade";
 import type { PeriodicNotes } from "./periodic-notes";
+import type { VaultFacade } from "./vault-facade";
 
 function doesLeafContainFile(leaf: WorkspaceLeaf, file: TFile) {
   const { view } = leaf;

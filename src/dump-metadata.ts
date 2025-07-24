@@ -1,7 +1,7 @@
 import type { App } from "obsidian";
 import { getAPI } from "obsidian-dataview";
 
-const fixtureVaultPath = "fixture-vault";
+const fixtureVaultPath = "fixtures/fixture-vault";
 const metadataDumpPath =
   ".obsidian/plugins/obsidian-day-planner/fixtures/metadata-dump";
 
@@ -29,11 +29,12 @@ export function createDumpMetadataCommand(app: App) {
       pathToMtime: Object.fromEntries(
         markdownFiles.map((it) => [it.path, it.stat.mtime]),
       ),
-      tasks: dataview?.pages(`"${fixtureVaultPath}"`).file.tasks.array(),
-      headings: Object.fromEntries(
+      lists: dataview.pages(`"${fixtureVaultPath}"`).file.lists.array(),
+      tasks: dataview.pages(`"${fixtureVaultPath}"`).file.tasks.array(),
+      cachedMetadata: Object.fromEntries(
         app.vault
           .getMarkdownFiles()
-          .map((it) => [it.path, app.metadataCache.getFileCache(it)?.headings]),
+          .map((it) => [it.path, app.metadataCache.getFileCache(it)]),
       ),
     };
 

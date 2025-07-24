@@ -1,9 +1,11 @@
 import { Workspace } from "obsidian";
 import { fromStore, readable } from "svelte/store";
-import { getDarkModeFlag } from "./dom";
+
+import { useIsOnline } from "../ui/hooks/use-is-online";
 import { useKeyDown } from "../ui/hooks/use-key-down";
 import { useModPressed } from "../ui/hooks/use-mod-pressed";
-import { useIsOnline } from "../ui/hooks/use-is-online";
+
+import { getDarkModeFlag } from "./dom";
 
 export function createEnvironmentHooks(props: { workspace: Workspace }) {
   const { workspace } = props;

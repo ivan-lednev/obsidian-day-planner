@@ -16,8 +16,8 @@ import { EditMode } from "../ui/hooks/use-edit/types";
 import { applyScopedUpdates, getFirstLine } from "../util/markdown";
 import * as t from "../util/task-utils";
 
-import type { VaultFacade } from "./vault-facade";
 import type { PeriodicNotes } from "./periodic-notes";
+import type { VaultFacade } from "./vault-facade";
 
 interface Range {
   start: {

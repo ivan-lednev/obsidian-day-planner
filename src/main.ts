@@ -18,7 +18,7 @@ import {
   viewTypeMultiDay,
   reQueryAfterMillis,
 } from "./constants";
-import { createUpdateHandler } from "./create-update-handler";
+import { createUpdateHandler, getTextFromUser } from "./create-update-handler";
 import { createDumpMetadataCommand } from "./dump-metadata";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
@@ -51,6 +51,7 @@ import { useActionDispatched } from "./redux/use-action-dispatched";
 import { createUseSelector } from "./redux/use-selector";
 import { DataviewFacade } from "./service/dataview-facade";
 import { TransactionWriter } from "./service/diff-writer";
+import { PeriodicNotes } from "./service/periodic-notes";
 import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
@@ -62,21 +63,22 @@ import {
 import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn, PointerDateTime } from "./types";
 import { createEditorMenuCallback } from "./ui/editor-menu";
+import { useDateRanges } from "./ui/hooks/use-date-ranges";
+import { useDebounceWithDelay } from "./ui/hooks/use-debounce-with-delay";
 import { mountStatusBarWidget } from "./ui/hooks/use-status-bar-widget";
+import { useTasks } from "./ui/hooks/use-tasks";
+import { useVisibleDays } from "./ui/hooks/use-visible-days";
 import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimelineView from "./ui/timeline-view";
+import { createEnvironmentHooks } from "./util/create-environment-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
-import { createEnvironmentHooks } from "./util/create-environment-hooks";
 import { getUpdateTrigger } from "./util/store";
-import { useDebounceWithDelay } from "./ui/hooks/use-debounce-with-delay";
-import { useDateRanges } from "./ui/hooks/use-date-ranges";
-import { useTasks } from "./ui/hooks/use-tasks";
-import { useVisibleDays } from "./ui/hooks/use-visible-days";
-import { PeriodicNotes } from "./service/periodic-notes";
+import { createUndoNotice } from "./ui/undo-notice";
+import { askForConfirmation } from "./ui/confirmation-modal";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -86,7 +88,7 @@ export default class DayPlanner extends Plugin {
   private periodicNotes!: PeriodicNotes;
   private sTaskEditor!: STaskEditor;
   private vaultFacade!: VaultFacade;
-  private transationWriter!: TransactionWriter;
+  private transactionWriter!: TransactionWriter;
   private currentUndoNotice?: Notice;
 
   async onload() {
@@ -99,7 +101,7 @@ export default class DayPlanner extends Plugin {
 
     this.periodicNotes = new PeriodicNotes();
     this.vaultFacade = new VaultFacade(this.app.vault, getTasksApi);
-    this.transationWriter = new TransactionWriter(this.vaultFacade);
+    this.transactionWriter = new TransactionWriter(this.vaultFacade);
     this.workspaceFacade = new WorkspaceFacade(
       this.app.workspace,
       this.vaultFacade,
@@ -362,18 +364,28 @@ export default class DayPlanner extends Plugin {
     listenerMiddleware: AppListenerMiddlewareInstance;
   }) {
     const { store, listenerMiddleware } = props;
+    let currentUndoNotice: Notice | undefined;
 
     const onUpdate: OnUpdateFn = createUpdateHandler({
-      app: this.app,
       settings: this.settings,
-      transactionWriter: this.transationWriter,
+      transactionWriter: this.transactionWriter,
       vaultFacade: this.vaultFacade,
       periodicNotes: this.periodicNotes,
+      onEditConfirmed: () => {
+        currentUndoNotice?.hide();
+        currentUndoNotice = createUndoNotice(this.transactionWriter.undo);
+      },
       onEditCanceled: () => {
         new Notice("Edit canceled");
 
         store.dispatch(editCanceled());
       },
+      getTextInput: () => getTextFromUser(this.app),
+      getConfirmationInput: (input) =>
+        askForConfirmation({
+          ...input,
+          app: this.app,
+        }),
     });
 
     const onEditAborted = () => {
@@ -391,33 +403,34 @@ export default class DayPlanner extends Plugin {
     const dataviewLoaded = useSelector(selectDataviewLoaded);
     const dataviewSource = useSelector(selectDataviewSource);
 
+    const isDataviewRefreshSignal = isAnyOf(listPropsParsed, editCanceled);
     const dataviewRefreshSignal = derived(
       actionDispatched,
       ($actionDispatched, set) => {
-        if (isAnyOf(listPropsParsed, editCanceled)) {
+        if (isDataviewRefreshSignal($actionDispatched)) {
           set($actionDispatched);
         }
       },
     );
-
-    const { isDarkMode, isOnline, keyDown, isModPressed, layoutReady } =
-      createEnvironmentHooks({ workspace: this.app.workspace });
 
     const taskUpdateTrigger = derived(
       [dataviewRefreshSignal, dataviewSource],
       getUpdateTrigger,
     );
 
+    const pointerDateTime = writable<PointerDateTime>({
+      dateTime: window.moment(),
+      type: "dateTime",
+    });
+
+    const { isDarkMode, isOnline, keyDown, isModPressed, layoutReady } =
+      createEnvironmentHooks({ workspace: this.app.workspace });
+
     const debouncedTaskUpdateTrigger = useDebounceWithDelay(
       taskUpdateTrigger,
       keyDown,
       reQueryAfterMillis,
     );
-
-    const pointerDateTime = writable<PointerDateTime>({
-      dateTime: window.moment(),
-      type: "dateTime",
-    });
 
     const dateRanges = useDateRanges();
     const visibleDays = useVisibleDays(dateRanges.ranges);
