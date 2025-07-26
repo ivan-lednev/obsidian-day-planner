@@ -1,31 +1,17 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
-import { isAnyOf } from "@reduxjs/toolkit";
-import { MetadataCache, type Vault } from "obsidian";
+import { type CachedMetadata, MetadataCache, type Vault } from "obsidian";
 import { derived, get, writable } from "svelte/store";
 import { describe, expect, test, vi } from "vitest";
 
-import {
-  dataviewChange,
-  listPropsParsed,
-  selectDataviewLoaded,
-  selectListProps,
-} from "../src/redux/dataview/dataview-slice";
-import { editCanceled, initialState } from "../src/redux/global-slice";
-import { selectRemoteTasks } from "../src/redux/ical/ical-slice";
-import { initListenerMiddleware } from "../src/redux/listener-middleware";
-import { selectDataviewSource } from "../src/redux/settings-slice";
-import { makeStore, type RootState } from "../src/redux/store";
-import { useActionDispatched } from "../src/redux/use-action-dispatched";
-import { createUseSelector } from "../src/redux/use-selector";
+import { dataviewChange } from "../src/redux/dataview/dataview-slice";
+import { initialState } from "../src/redux/global-slice";
+import { createReactor, type RootState } from "../src/redux/store";
 import type { DataviewFacade } from "../src/service/dataview-facade";
 import type { WorkspaceFacade } from "../src/service/workspace-facade";
 import { defaultSettingsForTests } from "../src/settings";
-import type { PointerDateTime } from "../src/types";
 import { useTasks } from "../src/ui/hooks/use-tasks";
-import { getUpdateTrigger } from "../src/util/store";
-
 import {
   createInMemoryFile,
   FakeDataviewFacade,
@@ -34,6 +20,7 @@ import {
   FakeWorkspaceFacade,
   getPathToDiff,
   InMemoryVault,
+  type InMemoryFile,
 } from "./test-utils";
 
 import type { PeriodicNotes } from "../src/service/periodic-notes";
@@ -46,10 +33,16 @@ import { createUpdateHandler } from "../src/create-update-handler";
 import { VaultFacade } from "../src/service/vault-facade";
 import { isLocal, type Task } from "../src/task-types";
 import { getOneLineSummary } from "../src/util/task-utils";
+import type { SListEntry, STask } from "obsidian-dataview";
 
 const { join } = path.posix;
 
 const defaultVisibleDays = ["2024-09-26"];
+const dailyNoteFileNames = ["2025-07-19", "2025-07-20"];
+
+const fixturesDirPath = "fixtures";
+const dumpPath = join(fixturesDirPath, "metadata-dump", "tasks.json");
+const fixtureVaultPath = join(fixturesDirPath, "fixture-vault");
 
 const defaultPreloadedStateForTests: Partial<RootState> = {
   obsidian: {
@@ -63,49 +56,7 @@ const defaultPreloadedStateForTests: Partial<RootState> = {
   },
 };
 
-function makeStoreForTests(props: {
-  vault: Vault;
-  metadataCache: MetadataCache;
-  dataviewFacade: DataviewFacade;
-  preloadedState?: Partial<RootState>;
-}) {
-  const {
-    metadataCache,
-    dataviewFacade,
-    vault,
-    preloadedState = defaultPreloadedStateForTests,
-  } = props;
-
-  const listenerMiddleware = initListenerMiddleware({
-    extra: {
-      metadataCache,
-      dataviewFacade,
-      vault,
-      onIcalsFetched: async () => {},
-    },
-  });
-
-  const store = makeStore({
-    preloadedState,
-    middleware: (getDefaultMiddleware) => {
-      return getDefaultMiddleware().concat(listenerMiddleware.middleware);
-    },
-  });
-
-  return { store, listenerMiddleware };
-}
-
-/**
- * This assembles all the system separated from the UI, Obsidian, time, DOM, etc.
- * @param props
- */
-async function setUp(props: { visibleDays?: string[] }) {
-  const { visibleDays = defaultVisibleDays } = props;
-
-  const fixturesDirPath = "fixtures";
-  const dumpPath = join(fixturesDirPath, "metadata-dump", "tasks.json");
-  const fixtureVaultPath = join(fixturesDirPath, "fixture-vault");
-
+async function loadMetadataDump() {
   const files = await readdir(fixtureVaultPath);
 
   const inMemoryFiles = await Promise.all(
@@ -135,8 +86,6 @@ async function setUp(props: { visibleDays?: string[] }) {
     inMemoryFiles.map((it) => [it.path, it]),
   );
 
-  const dailyNoteFileNames = ["2025-07-19", "2025-07-20"];
-
   const inMemoryDailyNotes = dailyNoteFileNames.map((it) => {
     const path = join(fixtureVaultPath, `${it}.md`);
     const file = pathToInMemoryFile[path];
@@ -145,6 +94,25 @@ async function setUp(props: { visibleDays?: string[] }) {
 
     return { path, file, date: window.moment(it) };
   });
+
+  return {
+    inMemoryFiles,
+    inMemoryDailyNotes,
+    tasks,
+    lists,
+    cachedMetadata,
+  };
+}
+
+function initTestServices(props: {
+  inMemoryFiles: InMemoryFile[];
+  inMemoryDailyNotes: { path: string; file: InMemoryFile; date: Moment }[];
+  tasks: STask[];
+  lists: SListEntry[];
+  cachedMetadata: Record<string, CachedMetadata>;
+}) {
+  const { inMemoryFiles, inMemoryDailyNotes, tasks, lists, cachedMetadata } =
+    props;
 
   const periodicNotes = new FakePeriodicNotes(
     inMemoryDailyNotes,
@@ -172,25 +140,37 @@ async function setUp(props: { visibleDays?: string[] }) {
   const workspaceFacade =
     new FakeWorkspaceFacade() as unknown as WorkspaceFacade;
 
-  const {
-    store,
-    store: { dispatch, getState },
-    listenerMiddleware,
-  } = makeStoreForTests({
+  return {
+    periodicNotes,
     dataviewFacade,
     metadataCache,
-    vault: vault as unknown as Vault,
-    preloadedState: {
-      ...defaultPreloadedStateForTests,
-      obsidian: {
-        ...initialState,
-        visibleDays,
-      },
-    },
-  });
+    vault,
+    transactionWriter,
+    workspaceFacade,
+    vaultFacade,
+  };
+}
 
-  inMemoryFiles.forEach(({ path }) => {
-    store.dispatch(dataviewChange(path));
+async function setUp(props: { visibleDays?: string[] }) {
+  const { visibleDays = defaultVisibleDays } = props;
+
+  const { inMemoryFiles, inMemoryDailyNotes, tasks, lists, cachedMetadata } =
+    await loadMetadataDump();
+
+  const {
+    periodicNotes,
+    dataviewFacade,
+    metadataCache,
+    vault,
+    transactionWriter,
+    workspaceFacade,
+    vaultFacade,
+  } = initTestServices({
+    inMemoryFiles,
+    inMemoryDailyNotes,
+    tasks,
+    lists,
+    cachedMetadata,
   });
 
   const visibleDaysStore = writable(visibleDays.map((it) => window.moment(it)));
@@ -201,6 +181,31 @@ async function setUp(props: { visibleDays?: string[] }) {
 
   const onEditCanceled = vi.fn();
   const onEditConfirmed = vi.fn();
+  const onIcalsFetched = vi.fn();
+
+  const {
+    dispatch,
+    remoteTasks,
+    taskUpdateTrigger,
+    listProps,
+    pointerDateTime,
+  } = createReactor({
+    preloadedState: {
+      ...defaultPreloadedStateForTests,
+      obsidian: {
+        ...initialState,
+        visibleDays,
+      },
+    },
+    dataviewFacade,
+    metadataCache,
+    vault: vault as unknown as Vault,
+    onIcalsFetched,
+  });
+
+  inMemoryFiles.forEach(({ path }) => {
+    dispatch(dataviewChange(path));
+  });
 
   const onUpdate = createUpdateHandler({
     settings: () => defaultSettingsForTests,
@@ -212,36 +217,6 @@ async function setUp(props: { visibleDays?: string[] }) {
     getTextInput: () => Promise.resolve("Text input"),
     getConfirmationInput: () => Promise.resolve(true),
   });
-
-  // todo: remove copy-pasta
-  const useSelector = createUseSelector(store);
-  const actionDispatched = useActionDispatched({ listenerMiddleware });
-
-  const remoteTasks = useSelector(selectRemoteTasks);
-  const listProps = useSelector(selectListProps);
-  const dataviewLoaded = useSelector(selectDataviewLoaded);
-  const dataviewSource = useSelector(selectDataviewSource);
-
-  const dataviewRefreshSignal = derived(
-    actionDispatched,
-    ($actionDispatched, set) => {
-      // todo: fix in real code
-      if (isAnyOf(listPropsParsed, editCanceled)($actionDispatched)) {
-        set($actionDispatched);
-      }
-    },
-  );
-
-  const taskUpdateTrigger = derived(
-    [dataviewRefreshSignal, dataviewSource],
-    getUpdateTrigger,
-  );
-
-  const pointerDateTime = writable<PointerDateTime>({
-    dateTime: window.moment(),
-    type: "dateTime",
-  });
-  // ---
 
   const {
     tasksWithActiveClockProps,
@@ -280,7 +255,6 @@ async function setUp(props: { visibleDays?: string[] }) {
   // this prevents the store from resetting;
   allTasks.subscribe(noop);
 
-  // todo: copy-pasta
   function moveCursorTo(
     dateTime: Moment,
     type: "date" | "dateTime" = "dateTime",
@@ -305,7 +279,6 @@ async function setUp(props: { visibleDays?: string[] }) {
 
   return {
     dispatch,
-    getState,
     tasksWithActiveClockProps,
     getDisplayedTasksWithClocksForTimeline,
     tasksWithTimeForToday,
