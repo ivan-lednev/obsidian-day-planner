@@ -4,8 +4,8 @@ import type { MetadataCache, Vault } from "obsidian";
 import type { Readable, Writable } from "svelte/store";
 
 import type { RawIcal } from "./redux/ical/ical-slice";
-import { type AppDispatch, type AppStore } from "./redux/store";
-import type { createUseSelector } from "./redux/use-selector";
+import { type AppDispatch } from "./redux/store";
+import type { UseSelector } from "./redux/use-selector";
 import type { DataviewFacade } from "./service/dataview-facade";
 import type { PeriodicNotes } from "./service/periodic-notes";
 import type { STaskEditor } from "./service/stask-editor";
@@ -67,8 +67,7 @@ export interface ObsidianContext {
     day: Moment,
   ) => Readable<Array<WithPlacing<LocalTask>>>;
   dispatch: AppDispatch;
-  store: AppStore;
-  useSelector: ReturnType<typeof createUseSelector>;
+  useSelector: UseSelector;
 }
 
 export type ComponentContext = Map<string, unknown>;

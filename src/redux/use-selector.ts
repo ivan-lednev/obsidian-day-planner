@@ -32,3 +32,5 @@ export function createUseSelector(store: AppStore) {
     };
   };
 }
+
+export type UseSelector = ReturnType<typeof createUseSelector>;
