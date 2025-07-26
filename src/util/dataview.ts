@@ -1,6 +1,5 @@
 import { isString, uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
-import { getDateFromPath } from "obsidian-daily-notes-interface";
 import { STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
 
@@ -13,6 +12,7 @@ import {
   indentBeforeTaskParagraph,
 } from "../constants";
 import { getTimeFromLine } from "../parser/parser";
+import type { PeriodicNotes } from "../service/periodic-notes";
 import type {
   FileLine,
   LocalTask,
@@ -164,13 +164,18 @@ export function toTask(sTask: STask, day: Moment): TaskWithoutComputedDuration {
   };
 }
 
-export function getScheduledDay(sTask: STask) {
+export function getScheduledDay(props: {
+  sTask: STask;
+  periodicNotes: PeriodicNotes;
+}) {
+  const { sTask, periodicNotes } = props;
+
   const scheduledPropDay: string = sTask.scheduled?.toFormat?.(
     defaultDayFormatForLuxon,
   );
-  const dailyNoteDay = getDateFromPath(sTask.path, "day")?.format(
-    defaultDayFormat,
-  );
+  const dailyNoteDay = periodicNotes
+    .getDateFromPath(sTask.path, "day")
+    ?.format(defaultDayFormat);
 
   return scheduledPropDay || dailyNoteDay;
 }

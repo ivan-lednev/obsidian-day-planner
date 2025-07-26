@@ -1,19 +1,33 @@
-import type {
-  Action,
-  ConfigureStoreOptions,
-  ListenerEffect,
-  ThunkAction,
-  TypedStartListening,
+import {
+  type Action,
+  type ConfigureStoreOptions,
+  isAnyOf,
+  type ListenerEffect,
+  type ListenerMiddlewareInstance,
+  type ThunkAction,
+  type TypedStartListening,
 } from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
+import type { MetadataCache, Vault } from "obsidian";
 
-import type { ReduxExtraArgument } from "../types";
+import type { DataviewFacade } from "../service/dataview-facade";
+import type { PointerDateTime, ReduxExtraArgument } from "../types";
 
-import { dataviewSlice } from "./dataview/dataview-slice";
-import { globalSlice } from "./global-slice";
-import { icalSlice } from "./ical/ical-slice";
+import {
+  dataviewSlice,
+  listPropsParsed,
+  selectDataviewLoaded,
+  selectListProps,
+} from "./dataview/dataview-slice";
+import { editCanceled, globalSlice } from "./global-slice";
+import { icalSlice, type RawIcal, selectRemoteTasks } from "./ical/ical-slice";
+import { initListenerMiddleware } from "./listener-middleware";
 import { searchSlice } from "./search-slice";
-import { settingsSlice } from "./settings-slice";
+import { selectDataviewSource, settingsSlice } from "./settings-slice";
+import { createUseSelector } from "./use-selector";
+import { useActionDispatched } from "./use-action-dispatched";
+import { derived, writable } from "svelte/store";
+import { getUpdateTrigger } from "../util/store";
 
 const rootReducer = combineSlices(
   globalSlice,
@@ -42,6 +56,81 @@ export const makeStore = (
   });
 };
 
+export function createReactor(props: {
+  preloadedState: Partial<RootState>;
+  dataviewFacade: DataviewFacade;
+  vault: Vault;
+  metadataCache: MetadataCache;
+  onIcalsFetched: (rawIcals: RawIcal[]) => Promise<void>;
+}) {
+  const {
+    preloadedState,
+    dataviewFacade,
+    vault,
+    metadataCache,
+    onIcalsFetched,
+  } = props;
+
+  // todo: extra is not needed at all
+  const listenerMiddleware = initListenerMiddleware({
+    extra: {
+      dataviewFacade,
+      vault,
+      metadataCache,
+      onIcalsFetched,
+    },
+  });
+
+  const store = makeStore({
+    preloadedState,
+    middleware: (getDefaultMiddleware) => {
+      return getDefaultMiddleware().concat(listenerMiddleware.middleware);
+    },
+  });
+
+  const { dispatch } = store;
+
+  const useSelector = createUseSelector(store);
+  const actionDispatched = useActionDispatched({ listenerMiddleware });
+
+  const remoteTasks = useSelector(selectRemoteTasks);
+  const listProps = useSelector(selectListProps);
+  const dataviewLoaded = useSelector(selectDataviewLoaded);
+  const dataviewSource = useSelector(selectDataviewSource);
+
+  const isDataviewRefreshSignal = isAnyOf(listPropsParsed, editCanceled);
+  const dataviewRefreshSignal = derived(
+    actionDispatched,
+    ($actionDispatched, set) => {
+      if (isDataviewRefreshSignal($actionDispatched)) {
+        set($actionDispatched);
+      }
+    },
+  );
+
+  const taskUpdateTrigger = derived(
+    [dataviewRefreshSignal, dataviewSource],
+    getUpdateTrigger,
+  );
+
+  const pointerDateTime = writable<PointerDateTime>({
+    dateTime: window.moment(),
+    type: "dateTime",
+  });
+
+  return {
+    dispatch,
+    listenerMiddleware,
+    remoteTasks,
+    taskUpdateTrigger,
+    listProps,
+    dataviewLoaded,
+    pointerDateTime,
+    dataviewRefreshSignal,
+    useSelector,
+  };
+}
+
 export type AppStore = ReturnType<typeof makeStore>;
 export type AppDispatch = AppStore["dispatch"];
 export type AppThunk<ThunkReturnType = void> = ThunkAction<
@@ -59,4 +148,9 @@ export type AppListenerEffect<A extends Action = Action> = ListenerEffect<
   A,
   RootState,
   AppDispatch
+>;
+export type AppListenerMiddlewareInstance = ListenerMiddlewareInstance<
+  RootState,
+  AppDispatch,
+  ReduxExtraArgument
 >;

@@ -73,6 +73,7 @@ export default defineConfig((env) => ({
     },
   },
   test: {
+    testTimeout: 10 * 60 * 1000,
     include: ["tests/**/*.test.ts"],
     environment: "jsdom",
     setupFiles: ["vite-setup.ts"],

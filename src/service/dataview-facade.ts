@@ -1,12 +1,12 @@
 import { partition } from "lodash/fp";
 import type { Vault } from "obsidian";
 import { STask, type DataviewApi } from "obsidian-dataview";
+import { isNotVoid } from "typed-assert";
 
 import {
   type Scheduler,
   createBackgroundBatchScheduler,
 } from "../util/scheduler";
-import { isNotVoid } from "typed-assert";
 
 interface STaskCacheEntry {
   mtime: number;
@@ -73,8 +73,12 @@ export class DataviewFacade {
     });
   };
 
-  getAllListsFrom = (source: string) => {
-    return this.getDataview()?.pages(source).file.lists.array() || [];
+  getAllListsFrom = (paths: string[]) => {
+    return (
+      this.getDataview()
+        ?.pages(paths.map((it) => `"${it}"`).join(" OR "))
+        .file.lists.array() || []
+    );
   };
 
   getTaskAtLine({ path, line }: { path: string; line: number }) {
@@ -83,6 +87,6 @@ export class DataviewFacade {
     );
   }
 
-  getTasksFromPath = (path: string): STask[] =>
+  private getTasksFromPath = (path: string): STask[] =>
     this.getDataview()?.page(path)?.file.tasks.array() || [];
 }

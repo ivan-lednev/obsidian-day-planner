@@ -1,20 +1,19 @@
 import type { App } from "obsidian";
 import { getAPI } from "obsidian-dataview";
 
-const fixtureVaultPath = "fixture-vault";
+const fixtureVaultPath = "fixtures/fixture-vault";
 const metadataDumpPath =
   ".obsidian/plugins/obsidian-day-planner/fixtures/metadata-dump";
 
 export function createDumpMetadataCommand(app: App) {
   return async () => {
-    const pathToHeadings = Object.fromEntries(
-      app.vault
-        .getMarkdownFiles()
-        .map((tFile) => [
-          tFile.path,
-          app.metadataCache.getFileCache(tFile)?.headings,
-        ]),
-    );
+    const dataview = getAPI(app);
+
+    if (!dataview) {
+      console.error("Dataview is not enabled");
+
+      return;
+    }
 
     const exists = await app.vault.adapter.exists(metadataDumpPath);
 
@@ -24,18 +23,24 @@ export function createDumpMetadataCommand(app: App) {
 
     await app.vault.adapter.mkdir(metadataDumpPath);
 
-    await app.vault.create(
-      `${metadataDumpPath}/headings-metadata.json`,
-      JSON.stringify(pathToHeadings, null, 2),
-    );
+    const markdownFiles = app.vault.getMarkdownFiles();
 
-    const tasks = getAPI(app)
-      ?.pages(`"${fixtureVaultPath}"`)
-      .file.tasks.array();
+    const dump = {
+      pathToMtime: Object.fromEntries(
+        markdownFiles.map((it) => [it.path, it.stat.mtime]),
+      ),
+      lists: dataview.pages(`"${fixtureVaultPath}"`).file.lists.array(),
+      tasks: dataview.pages(`"${fixtureVaultPath}"`).file.tasks.array(),
+      cachedMetadata: Object.fromEntries(
+        app.vault
+          .getMarkdownFiles()
+          .map((it) => [it.path, app.metadataCache.getFileCache(it)]),
+      ),
+    };
 
     await app.vault.create(
       `${metadataDumpPath}/tasks.json`,
-      JSON.stringify(tasks, null, 2),
+      JSON.stringify(dump, null, 2),
     );
   };
 }
