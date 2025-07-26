@@ -1,31 +1,33 @@
-import type {
-  Action,
-  ConfigureStoreOptions,
-  ListenerEffect,
-  ListenerMiddlewareInstance,
-  ThunkAction,
-  TypedStartListening,
+import {
+  type Action,
+  type ConfigureStoreOptions,
+  isAnyOf,
+  type ListenerEffect,
+  type ListenerMiddlewareInstance,
+  type ThunkAction,
+  type TypedStartListening,
 } from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
-import type { MetadataCache, TFile, Vault } from "obsidian";
+import type { MetadataCache, Vault } from "obsidian";
 
-import { icalRefreshIntervalMillis } from "../constants";
-import type DayPlanner from "../main";
 import type { DataviewFacade } from "../service/dataview-facade";
-import type { PluginData } from "../settings";
-import type { ReduxExtraArgument } from "../types";
+import type { PointerDateTime, ReduxExtraArgument } from "../types";
 
-import { dataviewChange, dataviewSlice } from "./dataview/dataview-slice";
-import { globalSlice } from "./global-slice";
 import {
-  icalRefreshRequested,
-  icalSlice,
-  type IcalState,
-  initialIcalState,
-} from "./ical/ical-slice";
+  dataviewSlice,
+  listPropsParsed,
+  selectDataviewLoaded,
+  selectListProps,
+} from "./dataview/dataview-slice";
+import { editCanceled, globalSlice } from "./global-slice";
+import { icalSlice, type RawIcal, selectRemoteTasks } from "./ical/ical-slice";
 import { initListenerMiddleware } from "./listener-middleware";
 import { searchSlice } from "./search-slice";
-import { settingsSlice } from "./settings-slice";
+import { selectDataviewSource, settingsSlice } from "./settings-slice";
+import { createUseSelector } from "./use-selector";
+import { useActionDispatched } from "./use-action-dispatched";
+import { derived, writable } from "svelte/store";
+import { getUpdateTrigger } from "../util/store";
 
 const rootReducer = combineSlices(
   globalSlice,
@@ -54,19 +56,20 @@ export const makeStore = (
   });
 };
 
-export function initStoreForPlugin(props: {
-  pluginData: PluginData;
+export function createReactor(props: {
+  preloadedState: Partial<RootState>;
   dataviewFacade: DataviewFacade;
   vault: Vault;
   metadataCache: MetadataCache;
-  plugin: DayPlanner;
+  onIcalsFetched: (rawIcals: RawIcal[]) => Promise<void>;
 }) {
-  const { pluginData, dataviewFacade, vault, metadataCache, plugin } = props;
-
-  const icalStateWithCachedRawIcals: IcalState = {
-    ...initialIcalState,
-    plainTextIcals: pluginData.rawIcals || [],
-  };
+  const {
+    preloadedState,
+    dataviewFacade,
+    vault,
+    metadataCache,
+    onIcalsFetched,
+  } = props;
 
   // todo: extra is not needed at all
   const listenerMiddleware = initListenerMiddleware({
@@ -74,41 +77,58 @@ export function initStoreForPlugin(props: {
       dataviewFacade,
       vault,
       metadataCache,
-      onIcalsFetched: async (rawIcals) => {
-        await plugin.saveData({ ...plugin.settings(), rawIcals });
-      },
+      onIcalsFetched,
     },
   });
 
   const store = makeStore({
-    preloadedState: {
-      ical: icalStateWithCachedRawIcals,
-    },
+    preloadedState,
     middleware: (getDefaultMiddleware) => {
       return getDefaultMiddleware().concat(listenerMiddleware.middleware);
     },
   });
 
-  plugin.register(() => {
-    listenerMiddleware.clearListeners();
+  const { dispatch } = store;
+
+  const useSelector = createUseSelector(store);
+  const actionDispatched = useActionDispatched({ listenerMiddleware });
+
+  const remoteTasks = useSelector(selectRemoteTasks);
+  const listProps = useSelector(selectListProps);
+  const dataviewLoaded = useSelector(selectDataviewLoaded);
+  const dataviewSource = useSelector(selectDataviewSource);
+
+  const isDataviewRefreshSignal = isAnyOf(listPropsParsed, editCanceled);
+  const dataviewRefreshSignal = derived(
+    actionDispatched,
+    ($actionDispatched, set) => {
+      if (isDataviewRefreshSignal($actionDispatched)) {
+        set($actionDispatched);
+      }
+    },
+  );
+
+  const taskUpdateTrigger = derived(
+    [dataviewRefreshSignal, dataviewSource],
+    getUpdateTrigger,
+  );
+
+  const pointerDateTime = writable<PointerDateTime>({
+    dateTime: window.moment(),
+    type: "dateTime",
   });
 
-  plugin.registerInterval(
-    window.setInterval(() => {
-      store.dispatch(icalRefreshRequested());
-    }, icalRefreshIntervalMillis),
-  );
-
-  plugin.registerEvent(
-    metadataCache.on(
-      // @ts-expect-error
-      "dataview:metadata-change",
-      (eventType: unknown, file: TFile) =>
-        store.dispatch(dataviewChange(file.path)),
-    ),
-  );
-
-  return { store, listenerMiddleware };
+  return {
+    dispatch,
+    listenerMiddleware,
+    remoteTasks,
+    taskUpdateTrigger,
+    listProps,
+    dataviewLoaded,
+    pointerDateTime,
+    dataviewRefreshSignal,
+    useSelector,
+  };
 }
 
 export type AppStore = ReturnType<typeof makeStore>;

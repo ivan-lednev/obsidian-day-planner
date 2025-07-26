@@ -1,31 +1,17 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
-import { isAnyOf } from "@reduxjs/toolkit";
 import { MetadataCache, type Vault } from "obsidian";
 import { derived, get, writable } from "svelte/store";
 import { describe, expect, test, vi } from "vitest";
 
-import {
-  dataviewChange,
-  listPropsParsed,
-  selectDataviewLoaded,
-  selectListProps,
-} from "../src/redux/dataview/dataview-slice";
-import { editCanceled, initialState } from "../src/redux/global-slice";
-import { selectRemoteTasks } from "../src/redux/ical/ical-slice";
-import { initListenerMiddleware } from "../src/redux/listener-middleware";
-import { selectDataviewSource } from "../src/redux/settings-slice";
-import { makeStore, type RootState } from "../src/redux/store";
-import { useActionDispatched } from "../src/redux/use-action-dispatched";
-import { createUseSelector } from "../src/redux/use-selector";
+import { dataviewChange } from "../src/redux/dataview/dataview-slice";
+import { initialState } from "../src/redux/global-slice";
+import { createReactor, type RootState } from "../src/redux/store";
 import type { DataviewFacade } from "../src/service/dataview-facade";
 import type { WorkspaceFacade } from "../src/service/workspace-facade";
 import { defaultSettingsForTests } from "../src/settings";
-import type { PointerDateTime } from "../src/types";
 import { useTasks } from "../src/ui/hooks/use-tasks";
-import { getUpdateTrigger } from "../src/util/store";
-
 import {
   createInMemoryFile,
   FakeDataviewFacade,
@@ -62,38 +48,6 @@ const defaultPreloadedStateForTests: Partial<RootState> = {
     },
   },
 };
-
-function makeStoreForTests(props: {
-  vault: Vault;
-  metadataCache: MetadataCache;
-  dataviewFacade: DataviewFacade;
-  preloadedState?: Partial<RootState>;
-}) {
-  const {
-    metadataCache,
-    dataviewFacade,
-    vault,
-    preloadedState = defaultPreloadedStateForTests,
-  } = props;
-
-  const listenerMiddleware = initListenerMiddleware({
-    extra: {
-      metadataCache,
-      dataviewFacade,
-      vault,
-      onIcalsFetched: async () => {},
-    },
-  });
-
-  const store = makeStore({
-    preloadedState,
-    middleware: (getDefaultMiddleware) => {
-      return getDefaultMiddleware().concat(listenerMiddleware.middleware);
-    },
-  });
-
-  return { store, listenerMiddleware };
-}
 
 /**
  * This assembles all the system separated from the UI, Obsidian, time, DOM, etc.
@@ -172,14 +126,15 @@ async function setUp(props: { visibleDays?: string[] }) {
   const workspaceFacade =
     new FakeWorkspaceFacade() as unknown as WorkspaceFacade;
 
+  const onIcalsFetched = vi.fn();
+
   const {
-    store,
-    store: { dispatch, getState },
-    listenerMiddleware,
-  } = makeStoreForTests({
-    dataviewFacade,
-    metadataCache,
-    vault: vault as unknown as Vault,
+    dispatch,
+    remoteTasks,
+    taskUpdateTrigger,
+    listProps,
+    pointerDateTime,
+  } = createReactor({
     preloadedState: {
       ...defaultPreloadedStateForTests,
       obsidian: {
@@ -187,10 +142,14 @@ async function setUp(props: { visibleDays?: string[] }) {
         visibleDays,
       },
     },
+    dataviewFacade,
+    metadataCache,
+    vault: vault as unknown as Vault,
+    onIcalsFetched,
   });
 
   inMemoryFiles.forEach(({ path }) => {
-    store.dispatch(dataviewChange(path));
+    dispatch(dataviewChange(path));
   });
 
   const visibleDaysStore = writable(visibleDays.map((it) => window.moment(it)));
@@ -212,36 +171,6 @@ async function setUp(props: { visibleDays?: string[] }) {
     getTextInput: () => Promise.resolve("Text input"),
     getConfirmationInput: () => Promise.resolve(true),
   });
-
-  // todo: remove copy-pasta
-  const useSelector = createUseSelector(store);
-  const actionDispatched = useActionDispatched({ listenerMiddleware });
-
-  const remoteTasks = useSelector(selectRemoteTasks);
-  const listProps = useSelector(selectListProps);
-  const dataviewLoaded = useSelector(selectDataviewLoaded);
-  const dataviewSource = useSelector(selectDataviewSource);
-
-  const dataviewRefreshSignal = derived(
-    actionDispatched,
-    ($actionDispatched, set) => {
-      // todo: fix in real code
-      if (isAnyOf(listPropsParsed, editCanceled)($actionDispatched)) {
-        set($actionDispatched);
-      }
-    },
-  );
-
-  const taskUpdateTrigger = derived(
-    [dataviewRefreshSignal, dataviewSource],
-    getUpdateTrigger,
-  );
-
-  const pointerDateTime = writable<PointerDateTime>({
-    dateTime: window.moment(),
-    type: "dateTime",
-  });
-  // ---
 
   const {
     tasksWithActiveClockProps,
@@ -305,7 +234,6 @@ async function setUp(props: { visibleDays?: string[] }) {
 
   return {
     dispatch,
-    getState,
     tasksWithActiveClockProps,
     getDisplayedTasksWithClocksForTimeline,
     tasksWithTimeForToday,

@@ -1,13 +1,19 @@
-import { isAnyOf } from "@reduxjs/toolkit";
 import {
   MarkdownView,
   Notice,
   Plugin,
   WorkspaceLeaf,
   type MarkdownFileInfo,
+  type TFile,
 } from "obsidian";
 import { getAPI } from "obsidian-dataview";
-import { derived, fromStore, get, writable, type Writable } from "svelte/store";
+import {
+  fromStore,
+  get,
+  writable,
+  type Readable,
+  type Writable,
+} from "svelte/store";
 import { isInstanceOf, isNotVoid } from "typed-assert";
 
 import {
@@ -17,6 +23,7 @@ import {
   viewTypeTimeline,
   viewTypeMultiDay,
   reQueryAfterMillis,
+  icalRefreshIntervalMillis,
 } from "./constants";
 import { createUpdateHandler, getTextFromUser } from "./create-update-handler";
 import { createDumpMetadataCommand } from "./dump-metadata";
@@ -32,22 +39,17 @@ import {
   toMdastPoint,
 } from "./mdast/mdast";
 import {
-  listPropsParsed,
-  selectDataviewLoaded,
-  selectListProps,
+  dataviewChange,
+  type PathToListProps,
 } from "./redux/dataview/dataview-slice";
 import { editCanceled, visibleDaysUpdated } from "./redux/global-slice";
 import {
   icalRefreshRequested,
-  selectRemoteTasks,
+  type IcalState,
+  initialIcalState,
 } from "./redux/ical/ical-slice";
-import { selectDataviewSource, settingsUpdated } from "./redux/settings-slice";
-import {
-  type AppListenerMiddlewareInstance,
-  type AppStore,
-  initStoreForPlugin,
-} from "./redux/store";
-import { useActionDispatched } from "./redux/use-action-dispatched";
+import { settingsUpdated } from "./redux/settings-slice";
+import { type AppDispatch, createReactor } from "./redux/store";
 import { createUseSelector } from "./redux/use-selector";
 import { DataviewFacade } from "./service/dataview-facade";
 import { TransactionWriter } from "./service/diff-writer";
@@ -76,9 +78,9 @@ import { createEnvironmentHooks } from "./util/create-environment-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
-import { getUpdateTrigger } from "./util/store";
 import { createUndoNotice } from "./ui/undo-notice";
 import { askForConfirmation } from "./ui/confirmation-modal";
+import type { RemoteTask } from "./task-types";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -89,7 +91,6 @@ export default class DayPlanner extends Plugin {
   private sTaskEditor!: STaskEditor;
   private vaultFacade!: VaultFacade;
   private transactionWriter!: TransactionWriter;
-  private currentUndoNotice?: Notice;
 
   async onload() {
     const initialPluginData: PluginData = {
@@ -117,16 +118,48 @@ export default class DayPlanner extends Plugin {
       this.dataviewFacade,
     );
 
-    const { store, listenerMiddleware } = initStoreForPlugin({
-      pluginData: initialPluginData,
-      plugin: this,
+    const icalStateWithCachedRawIcals: IcalState = {
+      ...initialIcalState,
+      plainTextIcals: initialPluginData.rawIcals || [],
+    };
+
+    const {
+      dispatch,
+      useSelector,
+      listenerMiddleware,
+      remoteTasks,
+      taskUpdateTrigger,
+      listProps,
+      dataviewLoaded,
+      pointerDateTime,
+      dataviewRefreshSignal,
+    } = createReactor({
+      preloadedState: {
+        ical: icalStateWithCachedRawIcals,
+      },
       dataviewFacade: this.dataviewFacade,
       vault: this.app.vault,
       metadataCache: this.app.metadataCache,
+      onIcalsFetched: async (rawIcals) => {
+        await this.saveData({ ...this.settings(), rawIcals });
+      },
     });
 
-    this.initSettingsStore({ initialSettings: initialPluginData, store });
-    this.registerViews({ store, listenerMiddleware });
+    this.register(() => {
+      listenerMiddleware.clearListeners();
+    });
+
+    this.initSettingsStore({ initialSettings: initialPluginData, dispatch });
+    this.registerViews({
+      dispatch,
+      remoteTasks,
+      taskUpdateTrigger,
+      listProps,
+      dataviewLoaded,
+      pointerDateTime,
+      dataviewRefreshSignal,
+      useSelector,
+    });
 
     const handleEditorMenu = createEditorMenuCallback({
       sTaskEditor: this.sTaskEditor,
@@ -306,15 +339,15 @@ export default class DayPlanner extends Plugin {
 
   private initSettingsStore(props: {
     initialSettings: DayPlannerSettings;
-    store: AppStore;
+    dispatch: AppDispatch;
   }) {
-    const { initialSettings, store } = props;
+    const { initialSettings, dispatch } = props;
 
     settings.set(initialSettings);
 
     this.register(
       settings.subscribe(async (newValue) => {
-        store.dispatch(settingsUpdated(newValue));
+        dispatch(settingsUpdated(newValue));
 
         await this.saveData(newValue);
       }),
@@ -360,10 +393,26 @@ export default class DayPlanner extends Plugin {
   };
 
   private registerViews(props: {
-    store: AppStore;
-    listenerMiddleware: AppListenerMiddlewareInstance;
+    dispatch: AppDispatch;
+    useSelector: ReturnType<typeof createUseSelector>;
+    remoteTasks: Readable<RemoteTask[]>;
+    taskUpdateTrigger: Readable<unknown>;
+    listProps: Readable<PathToListProps>;
+    dataviewLoaded: Readable<boolean>;
+    pointerDateTime: Writable<PointerDateTime>;
+    dataviewRefreshSignal: Readable<unknown>;
   }) {
-    const { store, listenerMiddleware } = props;
+    const {
+      dispatch,
+      useSelector,
+      remoteTasks,
+      taskUpdateTrigger,
+      listProps,
+      dataviewLoaded,
+      pointerDateTime,
+      dataviewRefreshSignal,
+    } = props;
+
     let currentUndoNotice: Notice | undefined;
 
     const onUpdate: OnUpdateFn = createUpdateHandler({
@@ -378,7 +427,7 @@ export default class DayPlanner extends Plugin {
       onEditCanceled: () => {
         new Notice("Edit canceled");
 
-        store.dispatch(editCanceled());
+        dispatch(editCanceled());
       },
       getTextInput: () => getTextFromUser(this.app),
       getConfirmationInput: (input) =>
@@ -391,37 +440,6 @@ export default class DayPlanner extends Plugin {
     const onEditAborted = () => {
       new Notice("Tasks changed externally; edit canceled");
     };
-
-    /**
-     * These are the points of interop from Redux to Svelte
-     */
-    const useSelector = createUseSelector(store);
-    const actionDispatched = useActionDispatched({ listenerMiddleware });
-
-    const remoteTasks = useSelector(selectRemoteTasks);
-    const listProps = useSelector(selectListProps);
-    const dataviewLoaded = useSelector(selectDataviewLoaded);
-    const dataviewSource = useSelector(selectDataviewSource);
-
-    const isDataviewRefreshSignal = isAnyOf(listPropsParsed, editCanceled);
-    const dataviewRefreshSignal = derived(
-      actionDispatched,
-      ($actionDispatched, set) => {
-        if (isDataviewRefreshSignal($actionDispatched)) {
-          set($actionDispatched);
-        }
-      },
-    );
-
-    const taskUpdateTrigger = derived(
-      [dataviewRefreshSignal, dataviewSource],
-      getUpdateTrigger,
-    );
-
-    const pointerDateTime = writable<PointerDateTime>({
-      dateTime: window.moment(),
-      type: "dateTime",
-    });
 
     const { isDarkMode, isOnline, keyDown, isModPressed, layoutReady } =
       createEnvironmentHooks({ workspace: this.app.workspace });
@@ -460,6 +478,21 @@ export default class DayPlanner extends Plugin {
       listProps,
     });
 
+    this.registerInterval(
+      window.setInterval(() => {
+        dispatch(icalRefreshRequested());
+      }, icalRefreshIntervalMillis),
+    );
+
+    this.registerEvent(
+      this.app.metadataCache.on(
+        // @ts-expect-error
+        "dataview:metadata-change",
+        (eventType: unknown, file: TFile) =>
+          dispatch(dataviewChange(file.path)),
+      ),
+    );
+
     this.registerDomEvent(window, "blur", editContext.cancelEdit);
     this.registerDomEvent(document, "pointerup", editContext.cancelEdit);
 
@@ -470,7 +503,7 @@ export default class DayPlanner extends Plugin {
     );
     this.register(
       visibleDays.subscribe((days) => {
-        store.dispatch(
+        dispatch(
           // without the offset, an event right of UTC is going to be displayed as the previous day
           // a visible day in my zone is 2025-04-15, but in UTC it's 2025-04-14T22:00:00, and getDayKey returns 2025-04-14
           visibleDaysUpdated(days.map((it) => it.toISOString(true))),
@@ -498,7 +531,7 @@ export default class DayPlanner extends Plugin {
       id: "re-sync",
       name: "Re-sync tasks",
       callback: async () => {
-        store.dispatch(icalRefreshRequested());
+        dispatch(icalRefreshRequested());
       },
     });
 
@@ -547,7 +580,7 @@ export default class DayPlanner extends Plugin {
       editContext,
       showPreview: createShowPreview(this.app),
       isModPressed,
-      reSync: () => store.dispatch(icalRefreshRequested()),
+      reSync: () => dispatch(icalRefreshRequested()),
       isOnline,
       isDarkMode,
       settings,
@@ -555,8 +588,7 @@ export default class DayPlanner extends Plugin {
       pointerDateTime,
       tasksWithActiveClockProps,
       getDisplayedTasksWithClocksForTimeline,
-      dispatch: store.dispatch,
-      store: store,
+      dispatch,
       useSelector,
     };
 
