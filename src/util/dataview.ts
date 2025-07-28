@@ -2,6 +2,7 @@ import { isString, uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
 import { STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
+import { DateTime } from "luxon";
 
 import {
   clockKey,
@@ -170,9 +171,12 @@ export function getScheduledDay(props: {
 }) {
   const { sTask, periodicNotes } = props;
 
-  const scheduledPropDay: string = sTask.scheduled?.toFormat?.(
-    defaultDayFormatForLuxon,
-  );
+  const scheduledPropDay: string = (
+    typeof sTask.scheduled === "string"
+      ? DateTime.fromISO(sTask.scheduled)
+      : sTask.scheduled
+  )?.toFormat?.(defaultDayFormatForLuxon);
+
   const dailyNoteDay = periodicNotes
     .getDateFromPath(sTask.path, "day")
     ?.format(defaultDayFormat);
