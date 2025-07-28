@@ -561,12 +561,13 @@ export default class DayPlanner extends Plugin {
       },
     });
 
-    // todo: show only in dev mode
-    this.addCommand({
-      id: "dump-metadata",
-      name: "Dump metadata to files",
-      callback: createDumpMetadataCommand(this.app),
-    });
+    if (envMode === "development") {
+      this.addCommand({
+        id: "dump-metadata",
+        name: "Dump metadata to files",
+        callback: createDumpMetadataCommand(this.app),
+      });
+    }
 
     const defaultObsidianContext: ObsidianContext = {
       periodicNotes: this.periodicNotes,

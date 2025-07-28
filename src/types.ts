@@ -79,6 +79,7 @@ declare global {
   const currentPluginVersion: string;
   const changelogMd: string;
   const supportBanner: string;
+  const envMode: "development" | "production";
 }
 
 export type WithIcalConfig<T> = T & { calendar: IcalConfig };
