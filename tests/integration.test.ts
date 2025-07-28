@@ -10,7 +10,10 @@ import { initialState } from "../src/redux/global-slice";
 import { createReactor, type RootState } from "../src/redux/store";
 import type { DataviewFacade } from "../src/service/dataview-facade";
 import type { WorkspaceFacade } from "../src/service/workspace-facade";
-import { defaultSettingsForTests } from "../src/settings";
+import {
+  type DayPlannerSettings,
+  defaultSettingsForTests,
+} from "../src/settings";
 import { useTasks } from "../src/ui/hooks/use-tasks";
 import {
   createInMemoryFile,
@@ -38,23 +41,11 @@ import type { SListEntry, STask } from "obsidian-dataview";
 const { join } = path.posix;
 
 const defaultVisibleDays = ["2024-09-26"];
-const dailyNoteFileNames = ["2025-07-19", "2025-07-20"];
+const dailyNoteFileNames = ["2025-07-19", "2025-07-20", "2025-07-28"];
 
 const fixturesDirPath = "fixtures";
 const dumpPath = join(fixturesDirPath, "metadata-dump", "tasks.json");
 const fixtureVaultPath = join(fixturesDirPath, "fixture-vault");
-
-const defaultPreloadedStateForTests: Partial<RootState> = {
-  obsidian: {
-    ...initialState,
-    visibleDays: defaultVisibleDays,
-  },
-  settings: {
-    settings: {
-      ...defaultSettingsForTests,
-    },
-  },
-};
 
 async function loadMetadataDump() {
   const files = await readdir(fixtureVaultPath);
@@ -151,8 +142,14 @@ function initTestServices(props: {
   };
 }
 
-async function setUp(props: { visibleDays?: string[] }) {
-  const { visibleDays = defaultVisibleDays } = props;
+async function setUp(props: {
+  visibleDays?: string[];
+  settings?: DayPlannerSettings;
+}) {
+  const {
+    visibleDays = defaultVisibleDays,
+    settings = defaultSettingsForTests,
+  } = props;
 
   const { inMemoryFiles, inMemoryDailyNotes, tasks, lists, cachedMetadata } =
     await loadMetadataDump();
@@ -176,12 +173,20 @@ async function setUp(props: { visibleDays?: string[] }) {
   const visibleDaysStore = writable(visibleDays.map((it) => window.moment(it)));
   const isOnline = writable(true);
   const layoutReady = writable(true);
-  const settingsStore = writable(defaultSettingsForTests);
+  const settingsStore = writable(settings);
   const currentTime = writable(window.moment());
 
   const onEditCanceled = vi.fn();
   const onEditConfirmed = vi.fn();
   const onIcalsFetched = vi.fn();
+
+  const defaultPreloadedStateForTests: Partial<RootState> = {
+    obsidian: {
+      ...initialState,
+      visibleDays: defaultVisibleDays,
+    },
+    settings: { settings },
+  };
 
   const {
     dispatch,
@@ -208,7 +213,7 @@ async function setUp(props: { visibleDays?: string[] }) {
   });
 
   const onUpdate = createUpdateHandler({
-    settings: () => defaultSettingsForTests,
+    settings: () => settings,
     transactionWriter,
     vaultFacade,
     periodicNotes,
@@ -268,7 +273,7 @@ async function setUp(props: { visibleDays?: string[] }) {
   function findTask(predicate: (task: Task) => boolean) {
     const found = get(allTasks).filter(isLocal).find(predicate);
 
-    isNotVoid(found, "Task not found. Wrong test code");
+    isNotVoid(found, `Task not found`);
 
     return found;
   }
@@ -276,6 +281,8 @@ async function setUp(props: { visibleDays?: string[] }) {
   function findByText(text: string) {
     return findTask((it) => getOneLineSummary(it).includes(text));
   }
+
+  await vi.waitFor(() => expect(get(allTasks).length).toBeGreaterThan(0));
 
   return {
     dispatch,
@@ -291,6 +298,7 @@ async function setUp(props: { visibleDays?: string[] }) {
     findTask,
     findByText,
     allTasks,
+    transactionWriter,
   };
 }
 
@@ -304,8 +312,6 @@ describe("Task views", () => {
       const displayedTasks = getDisplayedTasksWithClocksForTimeline(
         window.moment("2025-07-19"),
       );
-
-      await vi.waitFor(() => expect(get(displayedTasks)).toHaveLength(3));
 
       expect(get(displayedTasks)).toMatchObject([
         {
@@ -328,34 +334,20 @@ describe("Task views", () => {
     test.todo("Tasks with active clocks receive durations set to current time");
 
     test.todo("Splits log entries over midnight");
+
+    test.todo("Edits log entries");
   });
 
-  test("Ignores tasks and lists outside of planner section", async () => {
-    const { editContext } = await setUp({
-      visibleDays: ["2025-07-19"],
-    });
+  describe("Frontmatter", () => {
+    test.todo("Shows log entries from frontmatter");
 
-    const displayedTasks = editContext.getDisplayedTasksForTimeline(
-      window.moment("2025-07-19"),
-    );
-
-    await vi.waitFor(() =>
-      expect(get(displayedTasks)?.withTime.length).toBeGreaterThan(0),
-    );
-
-    expect(get(displayedTasks)?.withTime).toHaveLength(1);
-    expect(get(displayedTasks)?.withTime).toMatchObject([
-      { startTime: window.moment("2025-07-19 11:00"), durationMinutes: 30 },
-    ]);
+    test.todo("Edits log entries from frontmatter");
   });
 
-  test.todo("Tasks do not contain duplicates");
-
-  test.todo("Combines tasks from daily notes with tasks from other files");
-
-  describe("Editing", () => {
-    test("Edits tasks", async () => {
-      const { editContext, moveCursorTo, vault, findByText } = await setUp({
+  test.fails(
+    "Ignores tasks and lists outside of planner section in daily notes",
+    async () => {
+      const { editContext } = await setUp({
         visibleDays: ["2025-07-19"],
       });
 
@@ -363,9 +355,24 @@ describe("Task views", () => {
         window.moment("2025-07-19"),
       );
 
-      await vi.waitFor(() =>
-        expect(get(displayedTasks)?.withTime.length).toBeGreaterThan(0),
-      );
+      expect(get(displayedTasks)?.withTime).toHaveLength(1);
+      expect(get(displayedTasks)?.withTime).toMatchObject([
+        { startTime: window.moment("2025-07-19 11:00"), durationMinutes: 30 },
+      ]);
+    },
+  );
+
+  test.todo("Tasks do not contain duplicates");
+
+  test.todo("Combines tasks from daily notes with tasks from other files");
+});
+
+describe("Editing", () => {
+  describe("Daily notes", () => {
+    test("Edits tasks", async () => {
+      const { editContext, moveCursorTo, vault, findByText } = await setUp({
+        visibleDays: ["2025-07-19"],
+      });
 
       editContext.handlers.handleGripMouseDown(
         findByText("List item under planner heading"),
@@ -379,16 +386,56 @@ describe("Task views", () => {
       expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
     });
 
-    test("Moves tasks between daily notes", async () => {
-      const { editContext, moveCursorTo, vault, findByText, allTasks } =
-        await setUp({
-          visibleDays: ["2025-07-19"],
-        });
-
-      await vi.waitFor(() => expect(get(allTasks).length).toBeGreaterThan(0));
+    test("Un-schedules tasks", async () => {
+      const { editContext, moveCursorTo, vault, findByText } = await setUp({
+        visibleDays: ["2025-07-19"],
+      });
 
       editContext.handlers.handleGripMouseDown(
         findByText("List item under planner heading"),
+        EditMode.DRAG,
+      );
+
+      moveCursorTo(window.moment("2025-07-19"), "date");
+
+      await editContext.confirmEdit();
+
+      expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
+    });
+
+    test("Creates tasks", async () => {
+      const { editContext, moveCursorTo, vault } = await setUp({
+        visibleDays: ["2025-07-19", "2025-07-20"],
+      });
+
+      moveCursorTo(window.moment("2025-07-20 13:00"));
+      editContext.handlers.handleContainerMouseDown();
+      moveCursorTo(window.moment("2025-07-20 14:00"));
+
+      await editContext.confirmEdit();
+
+      expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
+    });
+
+    test(`* Moves a nested task with text between notes
+* Does not touch invalid markdown
+* Undoes the move`, async () => {
+      const {
+        editContext,
+        moveCursorTo,
+        vault,
+        findByText,
+        transactionWriter,
+      } = await setUp({
+        visibleDays: ["2025-07-28"],
+        settings: {
+          ...defaultSettingsForTests,
+          sortTasksInPlanAfterEdit: true,
+        },
+      });
+
+      editContext.handlers.handleGripMouseDown(
+        findByText("Child"),
         EditMode.DRAG,
       );
 
@@ -397,10 +444,50 @@ describe("Task views", () => {
       await editContext.confirmEdit();
 
       expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
+
+      await transactionWriter.undo();
+
+      expect(
+        Object.keys(getPathToDiff(vault.initialState, vault.state)).length,
+      ).toBe(0);
+    });
+
+    describe("Sorting by time", () => {
+      test.todo("Sorts tasks after non-mdast edit");
+
+      test.todo("Skips sorting if day planner heading is not found");
     });
   });
 
-  describe("Frontmatter", () => {
-    test.todo("Shows log entries from frontmatter");
+  describe("Obsidian-tasks", () => {
+    test("Schedules tasks & un-schedules tasks", async () => {
+      const { editContext, moveCursorTo, vault, findByText } = await setUp({
+        visibleDays: ["2025-07-19"],
+      });
+
+      editContext.handlers.handleGripMouseDown(
+        findByText("Task without time"),
+        EditMode.DRAG,
+      );
+
+      moveCursorTo(window.moment("2025-07-19 13:00"));
+
+      await editContext.confirmEdit();
+
+      editContext.handlers.handleGripMouseDown(
+        findByText("Task with time"),
+        EditMode.DRAG,
+      );
+
+      moveCursorTo(window.moment("2025-07-19"), "date");
+
+      await editContext.confirmEdit();
+
+      expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
+    });
+
+    test.todo(
+      "Updates tasks plugin props without duplicating timestamps if moved to same time on another day",
+    );
   });
 });

@@ -132,8 +132,8 @@ export function useTasks(props: {
   );
 
   function getDisplayedTasksWithClocksForTimeline(day: Moment) {
-    return derived(logRecords, ($visibleTasksWithClockProps) => {
-      const tasksForDay = $visibleTasksWithClockProps[getDayKey(day)] || [];
+    return derived(logRecords, ($logRecords) => {
+      const tasksForDay = $logRecords[getDayKey(day)] || [];
 
       return flow(uniqBy(getRenderKey), addHorizontalPlacing)(tasksForDay);
     });
