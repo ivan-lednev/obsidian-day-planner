@@ -1,6 +1,6 @@
 import { readFile } from "fs/promises";
 
-import { request, Vault } from "obsidian";
+import { type MetadataCache, request, Vault } from "obsidian";
 import { SListEntry, type STask } from "obsidian-dataview";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -13,7 +13,7 @@ import { initListenerMiddleware } from "../../src/redux/listener-middleware";
 import { makeStore, type RootState } from "../../src/redux/store";
 import { DataviewFacade } from "../../src/service/dataview-facade";
 import { defaultSettingsForTests } from "../../src/settings";
-import { InMemoryVault } from "../test-utils";
+import { FakeMetadataCache, InMemoryVault } from "../test-utils";
 
 vi.mock("obsidian", () => ({
   request: vi.fn(),
@@ -66,7 +66,11 @@ function makeStoreForTests(props?: { preloadedState?: Partial<RootState> }) {
 
   const listenerMiddleware = initListenerMiddleware({
     extra: {
-      dataviewFacade: new FakeDataviewFacade() as unknown as DataviewFacade,
+      dataviewFacade: new FakeDataviewFacade({
+        lists: [],
+        tasks: [],
+      }) as unknown as DataviewFacade,
+      metadataCache: new FakeMetadataCache({}) as unknown as MetadataCache,
       vault: new InMemoryVault([]) as unknown as Vault,
       onIcalsFetched: async () => {},
     },
