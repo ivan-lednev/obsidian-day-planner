@@ -1,9 +1,9 @@
+import { diffLines } from "diff";
 import { groupBy } from "lodash/fp";
 import type { Moment } from "moment/moment";
 import { type CachedMetadata, TFile } from "obsidian";
 import { SListEntry, type STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
-import { diffLines } from "diff";
 
 export function createInMemoryFile(props: { path: string; contents: string }) {
   const mockTFile = Object.create(TFile.prototype);

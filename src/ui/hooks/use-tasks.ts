@@ -11,7 +11,7 @@ import { WorkspaceFacade } from "../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../settings";
 import type { LocalTask, RemoteTask, Task, WithTime } from "../../task-types";
 import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../../types";
-import { isValidLogEntry } from "../../util/clock";
+import { isValidLogEntry, type LogEntry } from "../../util/clock";
 import * as dv from "../../util/dataview";
 import * as m from "../../util/moment";
 import { splitMultiday } from "../../util/moment";
@@ -21,9 +21,9 @@ import { getDayKey, getRenderKey } from "../../util/task-utils";
 import { useDataviewTasks } from "./use-dataview-tasks";
 import { useEditContext } from "./use-edit/use-edit-context";
 import { useNewlyStartedTasks } from "./use-newly-started-tasks";
-import { useTasksWithActiveClockProps } from "./use-tasks-with-active-clock-props";
 import { useVisibleDailyNotes } from "./use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "./use-visible-dataview-tasks";
+import type { STask } from "obsidian-dataview";
 
 export function useTasks(props: {
   settingsStore: Writable<DayPlannerSettings>;
@@ -76,64 +76,99 @@ export function useTasks(props: {
     refreshSignal: debouncedTaskUpdateTrigger,
   });
 
-  const tasksWithActiveClockProps = useTasksWithActiveClockProps({
-    dataviewTasks,
-  });
-
-  const tasksWithActiveClockPropsAndDurations = derived(
-    [tasksWithActiveClockProps, currentTime],
-    ([$tasksWithActiveClockProps, $currentTime]) =>
-      $tasksWithActiveClockProps.map((task: LocalTask) => ({
-        ...task,
-        durationMinutes: m.getDiffInMinutes(
-          $currentTime,
-          task.startTime.clone().startOf("minute"),
-        ),
-        truncated: ["bottom" as const],
+  const dataviewTasksWithProps = derived(
+    [dataviewTasks, listProps],
+    ([$dataviewTasks, $listProps]) =>
+      $dataviewTasks.map((it) => ({
+        ...it,
+        props: $listProps[it.path]?.[it.line],
       })),
   );
 
-  const logRecords = derived(
-    [dataviewTasks, listProps],
-    ([$dataviewTasks, $listProps]) => {
-      const flatTasksWithClocks = $dataviewTasks
-        .map((it) => {
-          return {
-            ...it,
-            props: $listProps[it.path]?.[it.line],
-          };
-        })
-        .filter((it) => {
-          const log = it.props?.planner?.log;
+  const tasksWithValidLogEntries = derived(
+    [dataviewTasksWithProps],
+    ([$dataviewTasksWithProps]) =>
+      $dataviewTasksWithProps.filter((it) => {
+        const log = it.props?.planner?.log;
 
-          return (
-            Array.isArray(log) && log.length > 0 && log.every(isValidLogEntry)
-          );
-        })
-        .flatMap((it) => {
-          return it.props.planner.log
-            .map(({ start, end }) => [
-              window.moment(start, window.moment.ISO_8601, true),
-              window.moment(end, window.moment.ISO_8601, true),
-            ])
-            .flatMap(([start, end]) => splitMultiday(start, end))
+        return (
+          Array.isArray(log) &&
+          log.length > 0 &&
+          log.every<LogEntry>(isValidLogEntry)
+        );
+      }),
+  );
+
+  // todo: remove duplication
+  const tasksWithActiveClockProps = derived(
+    [tasksWithValidLogEntries, currentTime],
+    ([$tasksWithValidLogEntries, $currentTime]) =>
+      $tasksWithValidLogEntries
+        .flatMap((sTask) => {
+          return sTask.props.planner.log
+            .filter(({ end }) => typeof end === "undefined")
+            .flatMap(({ start }) => {
+              const parsedStart = window.moment(
+                start,
+                window.moment.ISO_8601,
+                true,
+              );
+
+              return splitMultiday(parsedStart, $currentTime);
+            })
             .map((clockMoments) => ({
-              sTask: it,
+              sTask,
               clockMoments,
             }));
         })
-        .map(dv.toTaskWithClock);
+        .map(({ sTask, clockMoments }) => ({
+          ...dv.toTaskWithClock({ sTask, clockMoments }),
+          truncated: ["bottom" as const],
+        })),
+  );
 
-      return groupBy(
-        ({ startTime }) => getDayKey(startTime),
-        flatTasksWithClocks,
-      );
-    },
+  const logRecords = derived(
+    [tasksWithValidLogEntries],
+    ([$tasksWithValidLogEntries]) =>
+      $tasksWithValidLogEntries
+        .flatMap((sTask) => {
+          return sTask.props.planner.log
+            .filter(({ end }) => typeof end !== "undefined")
+            .flatMap(({ start, end }) => {
+              const parsedStart = window.moment(
+                start,
+                window.moment.ISO_8601,
+                true,
+              );
+              const parsedEnd = window.moment(
+                end,
+                window.moment.ISO_8601,
+                true,
+              );
+
+              return splitMultiday(parsedStart, parsedEnd);
+            })
+            .map((clockMoments) => ({
+              sTask,
+              clockMoments,
+            }));
+        })
+        .map(dv.toTaskWithClock),
+  );
+
+  const combinedClocks = derived(
+    [tasksWithActiveClockProps, logRecords],
+    ([$tasksWithActiveClockProps, $logRecords]) =>
+      $tasksWithActiveClockProps.concat($logRecords),
+  );
+
+  const dayToLogRecords = derived(combinedClocks, ($combinedClocks) =>
+    groupBy(({ startTime }) => getDayKey(startTime), $combinedClocks),
   );
 
   function getDisplayedTasksWithClocksForTimeline(day: Moment) {
-    return derived(logRecords, ($logRecords) => {
-      const tasksForDay = $logRecords[getDayKey(day)] || [];
+    return derived(dayToLogRecords, ($dayToLogRecords) => {
+      const tasksForDay = $dayToLogRecords[getDayKey(day)] || [];
 
       return flow(uniqBy(getRenderKey), addHorizontalPlacing)(tasksForDay);
     });

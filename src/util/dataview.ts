@@ -1,8 +1,8 @@
 import { isString, uniqBy } from "lodash/fp";
+import { DateTime } from "luxon";
 import type { Moment } from "moment";
 import { STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
-import { DateTime } from "luxon";
 
 import {
   clockKey,

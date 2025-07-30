@@ -1,4 +1,4 @@
-import type { App, Notice } from "obsidian";
+import type { App } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
 import { sortListsRecursivelyInMarkdown } from "./mdast/mdast";

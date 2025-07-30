@@ -9,9 +9,11 @@ import {
 } from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
 import type { MetadataCache, Vault } from "obsidian";
+import { derived, writable } from "svelte/store";
 
 import type { DataviewFacade } from "../service/dataview-facade";
 import type { PointerDateTime, ReduxExtraArgument } from "../types";
+import { getUpdateTrigger } from "../util/store";
 
 import {
   dataviewSlice,
@@ -24,10 +26,8 @@ import { icalSlice, type RawIcal, selectRemoteTasks } from "./ical/ical-slice";
 import { initListenerMiddleware } from "./listener-middleware";
 import { searchSlice } from "./search-slice";
 import { selectDataviewSource, settingsSlice } from "./settings-slice";
-import { createUseSelector } from "./use-selector";
 import { useActionDispatched } from "./use-action-dispatched";
-import { derived, writable } from "svelte/store";
-import { getUpdateTrigger } from "../util/store";
+import { createUseSelector } from "./use-selector";
 
 const rootReducer = combineSlices(
   globalSlice,

@@ -62,8 +62,10 @@ import {
   defaultSettings,
   type PluginData,
 } from "./settings";
+import type { RemoteTask } from "./task-types";
 import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn, PointerDateTime } from "./types";
+import { askForConfirmation } from "./ui/confirmation-modal";
 import { createEditorMenuCallback } from "./ui/editor-menu";
 import { useDateRanges } from "./ui/hooks/use-date-ranges";
 import { useDebounceWithDelay } from "./ui/hooks/use-debounce-with-delay";
@@ -74,13 +76,11 @@ import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimelineView from "./ui/timeline-view";
+import { createUndoNotice } from "./ui/undo-notice";
 import { createEnvironmentHooks } from "./util/create-environment-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
-import { createUndoNotice } from "./ui/undo-notice";
-import { askForConfirmation } from "./ui/confirmation-modal";
-import type { RemoteTask } from "./task-types";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
