@@ -42,6 +42,7 @@
       "content",
       task.truncated?.includes("left") && "truncated-left",
       task.truncated?.includes("right") && "truncated-right",
+      task.truncated?.includes("bottom") && "truncated-bottom",
     ]}
     {onpointerup}
     use:useActions={use}
@@ -94,6 +95,13 @@
     border-right-style: dashed;
     border-right-width: 2px;
     border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .truncated-bottom {
+    border-bottom-style: dashed;
+    border-bottom-width: 2px;
+    border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
 </style>

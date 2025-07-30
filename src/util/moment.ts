@@ -76,6 +76,10 @@ export function splitMultiday(
   end: Moment,
   chunks: Array<[Moment, Moment]> = [],
 ): Array<[Moment, Moment]> {
+  if (!start.isValid() || !end.isValid()) {
+    throw new Error(`Invalid Moment objects: ${start}, ${end}`);
+  }
+
   const endOfDayForStart = start.clone().endOf("day");
 
   if (end.isBefore(endOfDayForStart)) {

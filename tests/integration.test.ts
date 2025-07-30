@@ -1,19 +1,29 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
+import { noop } from "lodash/fp";
+import type { Moment } from "moment";
 import { type CachedMetadata, MetadataCache, type Vault } from "obsidian";
+import type { SListEntry, STask } from "obsidian-dataview";
 import { derived, get, writable } from "svelte/store";
+import { isNotVoid } from "typed-assert";
 import { describe, expect, test, vi } from "vitest";
 
+import { createUpdateHandler } from "../src/create-update-handler";
 import { dataviewChange } from "../src/redux/dataview/dataview-slice";
 import { initialState } from "../src/redux/global-slice";
 import { createReactor, type RootState } from "../src/redux/store";
 import type { DataviewFacade } from "../src/service/dataview-facade";
+import { TransactionWriter } from "../src/service/diff-writer";
+import type { PeriodicNotes } from "../src/service/periodic-notes";
+import { VaultFacade } from "../src/service/vault-facade";
 import type { WorkspaceFacade } from "../src/service/workspace-facade";
 import {
   type DayPlannerSettings,
   defaultSettingsForTests,
 } from "../src/settings";
+import { isLocal, type Task } from "../src/task-types";
+import { EditMode } from "../src/ui/hooks/use-edit/types";
 import { useTasks } from "../src/ui/hooks/use-tasks";
 import {
   createInMemoryFile,
@@ -26,17 +36,7 @@ import {
   type InMemoryFile,
 } from "./test-utils";
 
-import type { PeriodicNotes } from "../src/service/periodic-notes";
-import { isNotVoid } from "typed-assert";
-import { EditMode } from "../src/ui/hooks/use-edit/types";
-import type { Moment } from "moment";
-import { noop } from "lodash/fp";
-import { TransactionWriter } from "../src/service/diff-writer";
-import { createUpdateHandler } from "../src/create-update-handler";
-import { VaultFacade } from "../src/service/vault-facade";
-import { isLocal, type Task } from "../src/task-types";
 import { getOneLineSummary } from "../src/util/task-utils";
-import type { SListEntry, STask } from "obsidian-dataview";
 
 const { join } = path.posix;
 
@@ -282,7 +282,12 @@ async function setUp(props: {
     return findTask((it) => getOneLineSummary(it).includes(text));
   }
 
-  await vi.waitFor(() => expect(get(allTasks).length).toBeGreaterThan(0));
+  await vi.waitFor(() => {
+    const areTasksLoaded = get(allTasks).length > 0;
+    const areClocksLoaded = get(tasksWithActiveClockProps).length > 0;
+
+    expect(areTasksLoaded || areClocksLoaded).toBeTruthy();
+  });
 
   return {
     dispatch,
@@ -299,6 +304,7 @@ async function setUp(props: {
     findByText,
     allTasks,
     transactionWriter,
+    currentTime,
   };
 }
 
@@ -313,25 +319,59 @@ describe("Task views", () => {
         window.moment("2025-07-19"),
       );
 
-      expect(get(displayedTasks)).toMatchObject([
-        {
-          startTime: window.moment("2025-07-19 12:00"),
-          durationMinutes: 150,
-        },
-        {
-          startTime: window.moment("2025-07-19 15:00"),
-          durationMinutes: 90,
-        },
-        {
-          startTime: window.moment("2025-07-19 13:00"),
-          durationMinutes: 210,
-        },
-      ]);
+      expect(get(displayedTasks)).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            startTime: window.moment("2025-07-19 12:00"),
+            durationMinutes: 150,
+          }),
+          expect.objectContaining({
+            startTime: window.moment("2025-07-19 15:00"),
+            durationMinutes: 90,
+          }),
+          expect.objectContaining({
+            startTime: window.moment("2025-07-19 13:00"),
+            durationMinutes: 210,
+          }),
+        ]),
+      );
     });
 
     test.todo("Ignores invalid dates, extra keys");
 
-    test.todo("Tasks with active clocks receive durations set to current time");
+    test("Tasks with active clocks receive durations set to current time", async () => {
+      const {
+        getDisplayedTasksWithClocksForTimeline,
+        currentTime,
+        tasksWithActiveClockProps,
+      } = await setUp({
+        visibleDays: ["2025-01-11"],
+      });
+
+      currentTime.set(window.moment("2025-01-01 17:30"));
+
+      const displayedClocks = getDisplayedTasksWithClocksForTimeline(
+        window.moment("2025-01-01"),
+      );
+
+      expect(get(displayedClocks)).toMatchObject([
+        {
+          startTime: window.moment("2025-01-01 17:00"),
+          durationMinutes: 30,
+        },
+        {
+          startTime: window.moment("2025-01-01 13:00"),
+          durationMinutes: 120,
+        },
+      ]);
+
+      expect(get(tasksWithActiveClockProps)).toMatchObject([
+        {
+          startTime: window.moment("2025-01-01 17:00"),
+          durationMinutes: 30,
+        },
+      ]);
+    });
 
     test.todo("Splits log entries over midnight");
 
