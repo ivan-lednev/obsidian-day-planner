@@ -11,9 +11,7 @@ import { WorkspaceFacade } from "../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../settings";
 import type { LocalTask, RemoteTask, Task, WithTime } from "../../task-types";
 import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../../types";
-import { isValidLogEntry, type LogEntry } from "../../util/clock";
 import * as dv from "../../util/dataview";
-import * as m from "../../util/moment";
 import { splitMultiday } from "../../util/moment";
 import { getUpdateTrigger } from "../../util/store";
 import { getDayKey, getRenderKey } from "../../util/task-utils";
@@ -24,6 +22,7 @@ import { useNewlyStartedTasks } from "./use-newly-started-tasks";
 import { useVisibleDailyNotes } from "./use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "./use-visible-dataview-tasks";
 import type { STask } from "obsidian-dataview";
+import { propsSchema, type Props } from "../../util/props";
 
 export function useTasks(props: {
   settingsStore: Writable<DayPlannerSettings>;
@@ -76,37 +75,38 @@ export function useTasks(props: {
     refreshSignal: debouncedTaskUpdateTrigger,
   });
 
-  const dataviewTasksWithProps = derived(
-    [dataviewTasks, listProps],
-    ([$dataviewTasks, $listProps]) =>
-      $dataviewTasks.map((it) => ({
-        ...it,
-        props: $listProps[it.path]?.[it.line],
-      })),
-  );
+  const dataviewTasksWithProps: Readable<Array<STask & { props: Props }>> =
+    derived([dataviewTasks, listProps], ([$dataviewTasks, $listProps]) =>
+      $dataviewTasks.reduce<Array<STask & { props: Props }>>(
+        (result, current) => {
+          const props = $listProps[current.path]?.[current.line];
 
-  const tasksWithValidLogEntries = derived(
-    [dataviewTasksWithProps],
-    ([$dataviewTasksWithProps]) =>
-      $dataviewTasksWithProps.filter((it) => {
-        const log = it.props?.planner?.log;
+          if (props) {
+            const { data, success, error } = propsSchema.safeParse(props);
 
-        return (
-          Array.isArray(log) &&
-          log.length > 0 &&
-          log.every<LogEntry>(isValidLogEntry)
-        );
-      }),
-  );
+            if (success) {
+              result.push({ ...current, props: data });
+            } else {
+              console.error(error);
+            }
+          }
+
+          return result;
+        },
+        [],
+      ),
+    );
 
   // todo: remove duplication
   const tasksWithActiveClockProps = derived(
-    [tasksWithValidLogEntries, currentTime],
-    ([$tasksWithValidLogEntries, $currentTime]) =>
-      $tasksWithValidLogEntries
+    [dataviewTasksWithProps, currentTime],
+    ([$dataviewTasksWithProps, $currentTime]) =>
+      $dataviewTasksWithProps
         .flatMap((sTask) => {
-          return sTask.props.planner.log
-            .filter(({ end }) => typeof end === "undefined")
+          const props: Props = sTask.props;
+
+          return (props.planner?.log || [])
+            ?.filter(({ end }) => typeof end === "undefined")
             .flatMap(({ start }) => {
               const parsedStart = window.moment(
                 start,
@@ -128,11 +128,13 @@ export function useTasks(props: {
   );
 
   const logRecords = derived(
-    [tasksWithValidLogEntries],
-    ([$tasksWithValidLogEntries]) =>
-      $tasksWithValidLogEntries
+    [dataviewTasksWithProps],
+    ([$dataviewTasksWithProps]) =>
+      $dataviewTasksWithProps
         .flatMap((sTask) => {
-          return sTask.props.planner.log
+          const props: Props = sTask.props;
+
+          return (props.planner?.log || [])
             .filter(({ end }) => typeof end !== "undefined")
             .flatMap(({ start, end }) => {
               const parsedStart = window.moment(
@@ -158,7 +160,7 @@ export function useTasks(props: {
 
   const combinedClocks = derived(
     [tasksWithActiveClockProps, logRecords],
-    ([$tasksWithActiveClockProps, $logRecords]) =>
+    ([$tasksWithActiveClockProps, $logRecords]: [LocalTask[], LocalTask[]]) =>
       $tasksWithActiveClockProps.concat($logRecords),
   );
 
