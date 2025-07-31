@@ -22,7 +22,7 @@ import { useNewlyStartedTasks } from "./use-newly-started-tasks";
 import { useVisibleDailyNotes } from "./use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "./use-visible-dataview-tasks";
 import type { STask } from "obsidian-dataview";
-import { propsSchema, type Props } from "../../util/props";
+import { propsSchema, type Props, type LogEntry } from "../../util/props";
 
 export function useTasks(props: {
   settingsStore: Writable<DayPlannerSettings>;
@@ -97,16 +97,21 @@ export function useTasks(props: {
       ),
     );
 
+  const sTasksWithLogs: Readable<Array<{ sTask: STask; log: LogEntry[] }>> =
+    derived([dataviewTasksWithProps], ([$dataviewTasksWithProps]) =>
+      $dataviewTasksWithProps
+        .filter((sTask) => sTask.props.planner?.log)
+        .map((sTask) => ({ sTask, log: sTask.props.planner.log })),
+    );
+
   // todo: remove duplication
   const tasksWithActiveClockProps = derived(
-    [dataviewTasksWithProps, currentTime],
-    ([$dataviewTasksWithProps, $currentTime]) =>
-      $dataviewTasksWithProps
-        .flatMap((sTask) => {
-          const props: Props = sTask.props;
-
-          return (props.planner?.log || [])
-            ?.filter(({ end }) => typeof end === "undefined")
+    [sTasksWithLogs, currentTime],
+    ([$sTasksWithLogs, $currentTime]) =>
+      $sTasksWithLogs
+        .flatMap(({ sTask, log }) => {
+          return log
+            .filter(({ end }) => typeof end === "undefined")
             .flatMap(({ start }) => {
               const parsedStart = window.moment(
                 start,
@@ -127,35 +132,27 @@ export function useTasks(props: {
         })),
   );
 
-  const logRecords = derived(
-    [dataviewTasksWithProps],
-    ([$dataviewTasksWithProps]) =>
-      $dataviewTasksWithProps
-        .flatMap((sTask) => {
-          const props: Props = sTask.props;
+  const logRecords = derived([sTasksWithLogs], ([$sTasksWithLogs]) =>
+    $sTasksWithLogs
+      .flatMap(({ sTask, log }) => {
+        return log
+          .filter(({ end }) => typeof end !== "undefined")
+          .flatMap(({ start, end }) => {
+            const parsedStart = window.moment(
+              start,
+              window.moment.ISO_8601,
+              true,
+            );
+            const parsedEnd = window.moment(end, window.moment.ISO_8601, true);
 
-          return (props.planner?.log || [])
-            .filter(({ end }) => typeof end !== "undefined")
-            .flatMap(({ start, end }) => {
-              const parsedStart = window.moment(
-                start,
-                window.moment.ISO_8601,
-                true,
-              );
-              const parsedEnd = window.moment(
-                end,
-                window.moment.ISO_8601,
-                true,
-              );
-
-              return splitMultiday(parsedStart, parsedEnd);
-            })
-            .map((clockMoments) => ({
-              sTask,
-              clockMoments,
-            }));
-        })
-        .map(dv.toTaskWithClock),
+            return splitMultiday(parsedStart, parsedEnd);
+          })
+          .map((clockMoments) => ({
+            sTask,
+            clockMoments,
+          }));
+      })
+      .map(dv.toTaskWithClock),
   );
 
   const combinedClocks = derived(
