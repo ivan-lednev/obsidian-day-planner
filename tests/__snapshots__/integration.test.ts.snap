@@ -1,0 +1,63 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Editing > Daily notes > * Moves a nested task with text between notes
+* Does not touch invalid markdown
+* Undoes the move 1`] = `
+{
+  "fixtures/fixture-vault/2025-07-20.md": "
++ # Day planner
++ 
++ - [ ] 17:00 - 17:30 Child
++     Child text
+",
+  "fixtures/fixture-vault/2025-07-28.md": "
+- - [ ] 10:00 - 11:00 Before
+...
+-   Parent text
+-     - [ ] Child
+-       Child text
++     Parent text
++ - [ ] 10:00 - 11:00 Before
+",
+}
+`;
+
+exports[`Editing > Daily notes > Creates tasks 1`] = `
+{
+  "fixtures/fixture-vault/2025-07-20.md": "
++ # Day planner
++ 
++ - [ ] 13:00 - 14:00 Text input
+",
+}
+`;
+
+exports[`Editing > Daily notes > Edits tasks 1`] = `
+{
+  "fixtures/fixture-vault/2025-07-19.md": "
+- - 11:00 - 11:30 List item under planner heading
++ - 17:00 - 17:30 List item under planner heading
+",
+}
+`;
+
+exports[`Editing > Daily notes > Un-schedules tasks 1`] = `
+{
+  "fixtures/fixture-vault/2025-07-19.md": "
+- - 11:00 - 11:30 List item under planner heading
++ - List item under planner heading
+",
+}
+`;
+
+exports[`Editing > Obsidian-tasks > Schedules tasks & un-schedules tasks 1`] = `
+{
+  "fixtures/fixture-vault/tasks.md": "
+- - [ ] Task without time ⏳ 2025-07-19
++ - [ ] 13:00 - 13:30 Task without time ⏳ 2025-07-19
+...
+- - [ ] 10:00 - 10:30 Task with time ⏳ 2025-07-19
++ - [ ] Task with time ⏳ 2025-07-19
+",
+}
+`;

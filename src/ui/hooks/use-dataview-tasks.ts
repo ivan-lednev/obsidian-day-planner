@@ -5,7 +5,6 @@ import { derived, type Readable } from "svelte/store";
 import { DataviewFacade } from "../../service/dataview-facade";
 import type { DayPlannerSettings } from "../../settings";
 import * as dv from "../../util/dataview";
-import * as query from "../../util/dataview-query";
 
 function getHeadingIndexContaining(position: Pos, headings: HeadingCache[]) {
   return headings.findIndex(
@@ -69,7 +68,7 @@ function getHeadingBreadcrumbs(position: Pos, headings: HeadingCache[]) {
 }
 
 interface UseDataviewTasksProps {
-  visibleDailyNotes: Readable<TFile[]>;
+  visibleDailyNotes: Readable<(TFile | null)[]>;
   dataviewFacade: DataviewFacade;
   metadataCache: MetadataCache;
   settings: Readable<DayPlannerSettings>;
@@ -84,15 +83,19 @@ export function useDataviewTasks({
   refreshSignal,
 }: UseDataviewTasksProps) {
   function getListsFromDailyNotesForVisibleDays(
-    visibleDailyNotes: TFile[],
+    visibleDailyNotes: (TFile | null)[],
     settings: DayPlannerSettings,
   ) {
     if (visibleDailyNotes.length === 0) {
       return [];
     }
 
+    const nonNullDailyNotes = visibleDailyNotes.filter<TFile>(
+      (it) => it !== null,
+    );
+
     const allLists = dataviewFacade.getAllListsFrom(
-      query.anyOf(visibleDailyNotes),
+      nonNullDailyNotes.map((it) => it.path),
     );
 
     if (settings.plannerHeading === "") {
@@ -100,7 +103,7 @@ export function useDataviewTasks({
     }
 
     const pathToHeadingMetadata = Object.fromEntries(
-      visibleDailyNotes.map((file) => [
+      nonNullDailyNotes.map((file) => [
         file.path,
         metadataCache.getFileCache(file)?.headings || [],
       ]),
@@ -129,7 +132,7 @@ export function useDataviewTasks({
 
   return derived(
     [visibleDailyNotes, settings, refreshSignal],
-    ([$visibleDailyNotes, $settings], set: (tasks: SListEntry) => void) => {
+    ([$visibleDailyNotes, $settings], set: (tasks: SListEntry[]) => void) => {
       const listsFromDailyNotesForVisibleDays =
         getListsFromDailyNotesForVisibleDays($visibleDailyNotes, $settings);
 
@@ -152,5 +155,6 @@ export function useDataviewTasks({
           set([]);
         });
     },
+    [],
   );
 }

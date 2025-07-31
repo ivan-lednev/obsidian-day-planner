@@ -4,26 +4,25 @@ import type { MetadataCache } from "obsidian";
 import { derived, type Readable, type Writable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
-import { selectRemoteTasks } from "../../redux/ical/ical-slice";
-import type { createUseSelector } from "../../redux/use-selector";
+import { type PathToListProps } from "../../redux/dataview/dataview-slice";
 import { DataviewFacade } from "../../service/dataview-facade";
+import type { PeriodicNotes } from "../../service/periodic-notes";
 import { WorkspaceFacade } from "../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../settings";
-import type { LocalTask, Task, WithTime } from "../../task-types";
+import type { LocalTask, RemoteTask, Task, WithTime } from "../../task-types";
 import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../../types";
-import { hasClockProp } from "../../util/clock";
 import * as dv from "../../util/dataview";
-import { withClockMoments } from "../../util/dataview";
-import * as m from "../../util/moment";
+import { splitMultiday } from "../../util/moment";
 import { getUpdateTrigger } from "../../util/store";
 import { getDayKey, getRenderKey } from "../../util/task-utils";
 
 import { useDataviewTasks } from "./use-dataview-tasks";
 import { useEditContext } from "./use-edit/use-edit-context";
 import { useNewlyStartedTasks } from "./use-newly-started-tasks";
-import { useTasksWithActiveClockProps } from "./use-tasks-with-active-clock-props";
 import { useVisibleDailyNotes } from "./use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "./use-visible-dataview-tasks";
+import type { STask } from "obsidian-dataview";
+import { propsSchema, type Props, type LogEntry } from "../../util/props";
 
 export function useTasks(props: {
   settingsStore: Writable<DayPlannerSettings>;
@@ -38,8 +37,10 @@ export function useTasks(props: {
   onUpdate: OnUpdateFn;
   onEditAborted: OnEditAbortedFn;
   pointerDateTime: Readable<PointerDateTime>;
-  useSelector: ReturnType<typeof createUseSelector>;
   dataviewChange: Readable<unknown>;
+  remoteTasks: Readable<RemoteTask[]>;
+  listProps: Readable<PathToListProps>;
+  periodicNotes: PeriodicNotes;
 }) {
   const {
     settingsStore,
@@ -47,6 +48,7 @@ export function useTasks(props: {
     layoutReady,
     debouncedTaskUpdateTrigger,
     dataviewFacade,
+    periodicNotes,
     metadataCache,
     currentTime,
     workspaceFacade,
@@ -54,15 +56,15 @@ export function useTasks(props: {
     dataviewChange,
     onUpdate,
     onEditAborted,
-    useSelector,
+    remoteTasks,
+    listProps,
   } = props;
-
-  const remoteTasks = useSelector(selectRemoteTasks);
 
   const visibleDailyNotes = useVisibleDailyNotes(
     layoutReady,
     debouncedTaskUpdateTrigger,
     visibleDays,
+    periodicNotes,
   );
 
   const dataviewTasks = useDataviewTasks({
@@ -73,51 +75,109 @@ export function useTasks(props: {
     refreshSignal: debouncedTaskUpdateTrigger,
   });
 
-  const tasksWithActiveClockProps = useTasksWithActiveClockProps({
-    dataviewTasks,
-  });
+  const dataviewTasksWithProps: Readable<Array<STask & { props: Props }>> =
+    derived([dataviewTasks, listProps], ([$dataviewTasks, $listProps]) =>
+      $dataviewTasks.reduce<Array<STask & { props: Props }>>(
+        (result, current) => {
+          const props = $listProps[current.path]?.[current.line];
 
-  const tasksWithActiveClockPropsAndDurations = derived(
-    [tasksWithActiveClockProps, currentTime],
-    ([$tasksWithActiveClockProps, $currentTime]) =>
-      $tasksWithActiveClockProps.map((task: LocalTask) => ({
-        ...task,
-        durationMinutes: m.getDiffInMinutes(
-          $currentTime,
-          task.startTime.clone().startOf("minute"),
-        ),
-        truncated: ["bottom" as const],
-      })),
+          if (props) {
+            const { data, success, error } = propsSchema.safeParse(props);
+
+            if (success) {
+              result.push({ ...current, props: data });
+            } else {
+              console.error(error);
+            }
+          }
+
+          return result;
+        },
+        [],
+      ),
+    );
+
+  const sTasksWithLogs: Readable<Array<{ sTask: STask; log: LogEntry[] }>> =
+    derived([dataviewTasksWithProps], ([$dataviewTasksWithProps]) =>
+      $dataviewTasksWithProps
+        .filter((sTask) => sTask.props.planner?.log)
+        .map((sTask) => ({ sTask, log: sTask.props.planner.log })),
+    );
+
+  // todo: remove duplication
+  const tasksWithActiveClockProps = derived(
+    [sTasksWithLogs, currentTime],
+    ([$sTasksWithLogs, $currentTime]) =>
+      $sTasksWithLogs
+        .flatMap(({ sTask, log }) => {
+          return log
+            .filter(({ end }) => typeof end === "undefined")
+            .flatMap(({ start }) => {
+              const parsedStart = window.moment(
+                start,
+                window.moment.ISO_8601,
+                true,
+              );
+
+              return splitMultiday(parsedStart, $currentTime);
+            })
+            .map((clockMoments) => ({
+              sTask,
+              clockMoments,
+            }));
+        })
+        .map(({ sTask, clockMoments }) => ({
+          ...dv.toTaskWithClock({ sTask, clockMoments }),
+          truncated: ["bottom" as const],
+        })),
   );
 
-  const visibleTasksWithClockProps = derived(
-    [dataviewTasks, tasksWithActiveClockPropsAndDurations],
-    ([$dataviewTasks, $tasksWithActiveClockPropsAndDurations]) => {
-      const flatTasksWithClocks = $dataviewTasks
-        .filter(hasClockProp)
-        .flatMap(withClockMoments)
-        .map(dv.toTaskWithClock)
-        .concat($tasksWithActiveClockPropsAndDurations);
+  const logRecords = derived([sTasksWithLogs], ([$sTasksWithLogs]) =>
+    $sTasksWithLogs
+      .flatMap(({ sTask, log }) => {
+        return log
+          .filter(({ end }) => typeof end !== "undefined")
+          .flatMap(({ start, end }) => {
+            const parsedStart = window.moment(
+              start,
+              window.moment.ISO_8601,
+              true,
+            );
+            const parsedEnd = window.moment(end, window.moment.ISO_8601, true);
 
-      return groupBy(
-        ({ startTime }) => getDayKey(startTime),
-        flatTasksWithClocks,
-      );
-    },
+            return splitMultiday(parsedStart, parsedEnd);
+          })
+          .map((clockMoments) => ({
+            sTask,
+            clockMoments,
+          }));
+      })
+      .map(dv.toTaskWithClock),
+  );
+
+  const combinedClocks = derived(
+    [tasksWithActiveClockProps, logRecords],
+    ([$tasksWithActiveClockProps, $logRecords]: [LocalTask[], LocalTask[]]) =>
+      $tasksWithActiveClockProps.concat($logRecords),
+  );
+
+  const dayToLogRecords = derived(combinedClocks, ($combinedClocks) =>
+    groupBy(({ startTime }) => getDayKey(startTime), $combinedClocks),
   );
 
   function getDisplayedTasksWithClocksForTimeline(day: Moment) {
-    return derived(
-      visibleTasksWithClockProps,
-      ($visibleTasksWithClockProps) => {
-        const tasksForDay = $visibleTasksWithClockProps[getDayKey(day)] || [];
+    return derived(dayToLogRecords, ($dayToLogRecords) => {
+      const tasksForDay = $dayToLogRecords[getDayKey(day)] || [];
 
-        return flow(uniqBy(getRenderKey), addHorizontalPlacing)(tasksForDay);
-      },
-    );
+      return flow(uniqBy(getRenderKey), addHorizontalPlacing)(tasksForDay);
+    });
   }
 
-  const localTasks = useVisibleDataviewTasks(dataviewTasks, visibleDays);
+  const localTasks = useVisibleDataviewTasks(
+    dataviewTasks,
+    visibleDays,
+    periodicNotes,
+  );
 
   const tasksWithTimeForToday = derived(
     [localTasks, remoteTasks, currentTime],
@@ -137,6 +197,7 @@ export function useTasks(props: {
   );
 
   const editContext = useEditContext({
+    periodicNotes,
     workspaceFacade,
     onUpdate,
     onEditAborted,

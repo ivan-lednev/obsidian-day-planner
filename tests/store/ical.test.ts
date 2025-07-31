@@ -1,4 +1,7 @@
-import { request } from "obsidian";
+import { readFile } from "fs/promises";
+
+import { type MetadataCache, request, Vault } from "obsidian";
+import { SListEntry, type STask } from "obsidian-dataview";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { initialState as initialGlobalState } from "../../src/redux/global-slice";
@@ -8,15 +11,35 @@ import {
 } from "../../src/redux/ical/ical-slice";
 import { initListenerMiddleware } from "../../src/redux/listener-middleware";
 import { makeStore, type RootState } from "../../src/redux/store";
+import { DataviewFacade } from "../../src/service/dataview-facade";
 import { defaultSettingsForTests } from "../../src/settings";
-
-import { FakeDataviewFacade, getIcalFixture } from "./redux.test";
+import { FakeMetadataCache, InMemoryVault } from "../test-utils";
 
 vi.mock("obsidian", () => ({
   request: vi.fn(),
 }));
 
 const defaultVisibleDays = ["2024-09-26"];
+
+export async function getIcalFixture(file: string) {
+  return readFile(`fixtures/${file}.txt`, {
+    encoding: "utf8",
+  });
+}
+
+export class FakeDataviewFacade {
+  constructor(
+    private readonly fixtures: { tasks: STask[]; lists: SListEntry[] },
+  ) {}
+
+  async getAllTasksFrom() {
+    return this.fixtures.tasks;
+  }
+
+  getAllListsFrom() {
+    return this.fixtures.lists;
+  }
+}
 
 const defaultPreloadedStateForTests: Partial<RootState> = {
   obsidian: {
@@ -43,9 +66,14 @@ function makeStoreForTests(props?: { preloadedState?: Partial<RootState> }) {
 
   const listenerMiddleware = initListenerMiddleware({
     extra: {
-      dataviewFacade: new FakeDataviewFacade(),
+      dataviewFacade: new FakeDataviewFacade({
+        lists: [],
+        tasks: [],
+      }) as unknown as DataviewFacade,
+      metadataCache: new FakeMetadataCache({}) as unknown as MetadataCache,
+      vault: new InMemoryVault([]) as unknown as Vault,
+      onIcalsFetched: async () => {},
     },
-    onIcalsFetched: async () => {},
   });
 
   return makeStore({

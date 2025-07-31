@@ -55,7 +55,11 @@ This document describes how to make a code contribution to the repo.
 - There are no unit tests for UI
   - This is because svelte-testing-library is not very good, and js-dom is not a good fit for testing things like drag-and-drop.
 - There are no E2E tests
-  - There is no easy way to write E2E tests for an Obsidian plugin, so we don't do those.
+- There is no easy way to write E2E tests for an Obsidian plugin, so we don't do those.
+- `fixtures/` contains ICAL, markdown files & metadata on these files for integration tests. This allows us to use real Obsidian & Dataview to produce metadata on these files instead of writing it all by hand. You can update corresponding Dataview fixtures manually:
+  1.  Build the plugin in dev mode
+  2.  Copy `fixture-vault` into an Obsidian vault: `cp fixture-vault <obsidian>`. If you cloned the project into a test vault, just run: `cp -r fixtures/fixture-vault/ ../../../fixtures/`
+  3.  Open your Obsidian test vault and run the command: `Dump metadata`
 
 ### UI, Svelte guidelines
 

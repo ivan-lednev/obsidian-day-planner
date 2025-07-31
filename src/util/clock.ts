@@ -120,3 +120,8 @@ export function assertNoActiveClock(sTask: STask) {
 
   return sTask;
 }
+
+export interface LogEntry {
+  start: string;
+  end?: string;
+}

@@ -31,6 +31,10 @@ export default defineConfig((env) => ({
             from: "supportBanner",
             to: JSON.stringify(fs.readFileSync("./support-banner.md", "utf-8")),
           },
+          {
+            from: "envMode",
+            to: JSON.stringify(env.mode),
+          },
         ],
       },
     ]),
@@ -73,6 +77,7 @@ export default defineConfig((env) => ({
     },
   },
   test: {
+    testTimeout: 10 * 60 * 1000,
     include: ["tests/**/*.test.ts"],
     environment: "jsdom",
     setupFiles: ["vite-setup.ts"],

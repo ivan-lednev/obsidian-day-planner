@@ -2,14 +2,18 @@ import { App, Modal } from "obsidian";
 
 export interface ConfirmationModalProps {
   cta: string;
-  onAccept: (event: MouseEvent) => Promise<void>;
-  onCancel: (event: MouseEvent) => void;
   text: string;
   title: string;
 }
 
 class ConfirmationModal extends Modal {
-  constructor(app: App, props: ConfirmationModalProps) {
+  constructor(
+    app: App,
+    props: ConfirmationModalProps & {
+      onAccept: (event: MouseEvent) => Promise<void>;
+      onCancel: (event: MouseEvent) => void;
+    },
+  ) {
     super(app);
 
     const { cta, onAccept, text, title, onCancel } = props;
@@ -39,12 +43,11 @@ class ConfirmationModal extends Modal {
   }
 }
 
-export async function askForConfirmation(props: {
-  app: App;
-  title: string;
-  text: string;
-  cta: string;
-}) {
+export async function askForConfirmation(
+  props: {
+    app: App;
+  } & ConfirmationModalProps,
+): Promise<boolean> {
   return new Promise((resolve) => {
     const { app, ...rest } = props;
 

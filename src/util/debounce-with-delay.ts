@@ -1,3 +1,6 @@
+/**
+ * This is useful for cases when we want to debounce a function and delay it until the user stops typing.
+ */
 export function debounceWithDelay(
   cb: (...args: unknown[]) => void,
   timeout: number,

@@ -3,6 +3,7 @@ import type { Moment } from "moment";
 import { derived, type Readable, writable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../../overlap/overlap";
+import type { PeriodicNotes } from "../../../service/periodic-notes";
 import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
 import type {
@@ -48,6 +49,7 @@ function groupByDay(tasks: Task[]) {
 
 export function useEditContext(props: {
   workspaceFacade: WorkspaceFacade;
+  periodicNotes: PeriodicNotes;
   onUpdate: OnUpdateFn;
   settings: Readable<DayPlannerSettings>;
   localTasks: Readable<LocalTask[]>;
@@ -58,6 +60,7 @@ export function useEditContext(props: {
 }) {
   const {
     workspaceFacade,
+    periodicNotes,
     onEditAborted,
     onUpdate,
     settings,
@@ -106,6 +109,7 @@ export function useEditContext(props: {
   });
 
   const handlers = createEditHandlers({
+    periodicNotes,
     pointerDateTime,
     workspaceFacade,
     startEdit,

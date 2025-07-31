@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import {
   keylessScheduledPropRegExp,
   propRegexp,
@@ -6,6 +8,31 @@ import {
 } from "../regexp";
 
 import { appendText } from "./task-utils";
+import { takeWhile } from "lodash/fp";
+import { codeFence } from "../constants";
+
+const dateTimeSchema = z
+  .string()
+  .refine((it) => window.moment(it, window.moment.ISO_8601, true).isValid());
+
+const logEntrySchema = z.object({
+  start: dateTimeSchema,
+  end: dateTimeSchema.optional(),
+});
+
+export type LogEntry = z.infer<typeof logEntrySchema>;
+
+const plannerSchema = z.object({
+  log: z.array(logEntrySchema).optional(),
+});
+
+export type Planner = z.infer<typeof plannerSchema>;
+
+export const propsSchema = z.object({
+  planner: plannerSchema.optional(),
+});
+
+export type Props = z.infer<typeof propsSchema>;
 
 export function createProp(
   key: string,
@@ -36,7 +63,13 @@ export function updateProp(
 }
 
 export function deleteProps(text: string) {
-  return text.replaceAll(propRegexp, "").trim();
+  return takeWhile(
+    (line) => !line.trimStart().startsWith(codeFence),
+    text.split("\n"),
+  )
+    .join("\n")
+    .replaceAll(propRegexp, "")
+    .trim();
 }
 
 export function updateScheduledPropInText(text: string, dayKey: string) {
