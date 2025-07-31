@@ -1,4 +1,5 @@
 import { type CachedMetadata, parseYaml } from "obsidian";
+import { codeFence } from "../constants";
 
 const listItemWithPropertiesMinSpan = 3;
 
@@ -23,14 +24,14 @@ export function getPropertiesFromListItems(
       const listLines = listContent.split("\n");
       const secondLine = listLines[1];
 
-      if (!secondLine.trimStart().startsWith("```yaml")) {
+      if (!secondLine.trimStart().startsWith(codeFence + "yaml")) {
         return result;
       }
 
       const linesAfterSecond = listLines.slice(2);
 
       const closingLineIndex = linesAfterSecond.findIndex((line) =>
-        line.trimStart().startsWith("```"),
+        line.trimStart().startsWith(codeFence),
       );
 
       if (closingLineIndex === -1) {

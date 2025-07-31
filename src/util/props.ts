@@ -8,6 +8,8 @@ import {
 } from "../regexp";
 
 import { appendText } from "./task-utils";
+import { takeWhile } from "lodash/fp";
+import { codeFence } from "../constants";
 
 const dateTimeSchema = z
   .string()
@@ -61,7 +63,13 @@ export function updateProp(
 }
 
 export function deleteProps(text: string) {
-  return text.replaceAll(propRegexp, "").trim();
+  return takeWhile(
+    (line) => !line.trimStart().startsWith(codeFence),
+    text.split("\n"),
+  )
+    .join("\n")
+    .replaceAll(propRegexp, "")
+    .trim();
 }
 
 export function updateScheduledPropInText(text: string, dayKey: string) {

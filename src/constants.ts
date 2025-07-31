@@ -14,6 +14,7 @@ export const defaultDayFormatForLuxon = "yyyy-MM-dd";
 export const clockSeparator = "--";
 export const clockKey = "clock";
 export const clockFormat = "YYYY-MM-DDTHH:mm:ss";
+export const codeFence = "```";
 
 export const defaultDurationMinutes = 30;
 
