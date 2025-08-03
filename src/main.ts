@@ -112,11 +112,6 @@ export default class DayPlanner extends Plugin {
       () => getAPI(this.app),
       this.app.vault,
     );
-    this.sTaskEditor = new STaskEditor(
-      this.workspaceFacade,
-      this.vaultFacade,
-      this.dataviewFacade,
-    );
 
     const icalStateWithCachedRawIcals: IcalState = {
       ...initialIcalState,
@@ -124,6 +119,7 @@ export default class DayPlanner extends Plugin {
     };
 
     const {
+      getState,
       dispatch,
       useSelector,
       listenerMiddleware,
@@ -144,6 +140,13 @@ export default class DayPlanner extends Plugin {
         await this.saveData({ ...this.settings(), rawIcals });
       },
     });
+
+    this.sTaskEditor = new STaskEditor(
+      getState,
+      this.workspaceFacade,
+      this.vaultFacade,
+      this.dataviewFacade,
+    );
 
     this.register(() => {
       listenerMiddleware.clearListeners();

@@ -101,7 +101,7 @@
   .truncated-bottom {
     border-bottom-style: dashed;
     border-bottom-width: 2px;
-    border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
   }
 </style>

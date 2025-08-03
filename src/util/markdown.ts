@@ -1,5 +1,6 @@
 import { isNotVoid } from "typed-assert";
 
+import { codeFence } from "../constants";
 import {
   checkboxRegExp,
   headingRegExp,
@@ -177,4 +178,11 @@ function findHeading(text: string, headingText: string) {
   }
 
   return result;
+}
+
+export function createCodeBlock(props: {
+  language: "yaml" | "yml";
+  text: string;
+}) {
+  return codeFence + props.language + "\n" + props.text + codeFence;
 }

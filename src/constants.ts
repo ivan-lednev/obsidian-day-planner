@@ -13,14 +13,14 @@ export const defaultDayFormatForLuxon = "yyyy-MM-dd";
 
 export const clockSeparator = "--";
 export const clockKey = "clock";
-export const clockFormat = "YYYY-MM-DDTHH:mm:ss";
+export const clockFormat = "YYYY-MM-DD HH:mm:ss";
 export const codeFence = "```";
 
 export const defaultDurationMinutes = 30;
 
 export const searchResultLimit = 50;
 export const statusBarTextLimit = 15;
-export const indentBeforeTaskParagraph = 6;
+export const indentBeforeTaskParagraph = 2;
 export const indentBeforeListParagraph = 2;
 
 export const reQueryAfterMillis = 200;

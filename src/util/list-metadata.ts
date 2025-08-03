@@ -1,55 +1,129 @@
-import { type CachedMetadata, parseYaml } from "obsidian";
+import {
+  type CachedMetadata,
+  type ListItemCache,
+  type MetadataCache,
+  parseYaml,
+  type Vault,
+} from "obsidian";
+
 import { codeFence } from "../constants";
+import type { LineToListProps } from "../redux/dataview/dataview-slice";
 
 const listItemWithPropertiesMinSpan = 3;
 
-export function getPropertiesFromListItems(
-  fileContent: string,
-  metadata: CachedMetadata,
+export async function getListPropsForPath(
+  path: string,
+  { vault, metadataCache }: { vault: Vault; metadataCache: MetadataCache },
 ) {
-  return metadata.listItems?.reduce<{ [line: number]: unknown }>(
-    (result, listItem) => {
-      const listLineSpan =
-        listItem.position.end.line - listItem.position.start.line;
+  const file = vault.getFileByPath(path);
 
-      if (listLineSpan < listItemWithPropertiesMinSpan) {
-        return result;
-      }
+  if (!file) {
+    return;
+  }
 
-      const listContent = fileContent.slice(
-        listItem.position.start.offset,
-        listItem.position.end.offset,
-      );
+  const metadata = metadataCache.getFileCache(file);
 
-      const listLines = listContent.split("\n");
-      const secondLine = listLines[1];
+  if (!metadata?.listItems) {
+    return;
+  }
 
-      if (!secondLine.trimStart().startsWith(codeFence + "yaml")) {
-        return result;
-      }
+  const contents = await vault.cachedRead(file);
 
-      const linesAfterSecond = listLines.slice(2);
+  return getListPropsFromFile(contents, metadata);
+}
 
-      const closingLineIndex = linesAfterSecond.findIndex((line) =>
-        line.trimStart().startsWith(codeFence),
-      );
+function getListPropsFromFile(fileText: string, metadata: CachedMetadata) {
+  return metadata.listItems?.reduce<LineToListProps>((result, listItem) => {
+    const listLineSpan =
+      listItem.position.end.line - listItem.position.start.line;
 
-      if (closingLineIndex === -1) {
-        return result;
-      }
-
-      const linesInsideCodeBlock = linesAfterSecond.slice(0, closingLineIndex);
-
-      try {
-        result[listItem.position.start.line] = parseYaml(
-          linesInsideCodeBlock.join("\n"),
-        );
-      } catch (error) {
-        console.error(error);
-      }
-
+    if (listLineSpan < listItemWithPropertiesMinSpan) {
       return result;
-    },
-    {},
+    }
+
+    const listContent = fileText.slice(
+      listItem.position.start.offset,
+      listItem.position.end.offset,
+    );
+
+    const props = getListPropsFromListItem(listItem, listContent);
+
+    if (props) {
+      result[listItem.position.start.line] = props;
+    }
+
+    return result;
+  }, {});
+}
+
+function getListPropsFromListItem(
+  listItem: ListItemCache,
+  listItemText: string,
+) {
+  const listLines = listItemText.split("\n");
+  const firstLine = listLines[0];
+  const secondLine = listLines.at(1);
+
+  if (!secondLine?.trimStart().startsWith(codeFence + "yaml")) {
+    return;
+  }
+
+  const indentation = secondLine.match(/^\s*/)?.[0];
+  const linesAfterSecond = listLines.slice(2);
+
+  const closingLineIndex = linesAfterSecond.findIndex((line) =>
+    line.trimStart().startsWith(codeFence),
   );
+
+  if (closingLineIndex === -1) {
+    return;
+  }
+
+  const closingLine = linesAfterSecond[closingLineIndex];
+  const linesInsideCodeBlock = linesAfterSecond.slice(0, closingLineIndex);
+  const textInsideCodeBlock = linesInsideCodeBlock.join("\n");
+
+  const trimmedTextInsideCodeBlock = linesInsideCodeBlock
+    .map((line) => (indentation ? line.slice(indentation.length) : line))
+    .join("\n");
+
+  let parsed;
+
+  try {
+    parsed = parseYaml(trimmedTextInsideCodeBlock);
+  } catch (error) {
+    console.error(error);
+  }
+
+  if (!parsed) {
+    return;
+  }
+
+  const startLine = listItem.position.start.line + 1;
+  const startOffset = listItem.position.start.offset + firstLine.length + 1;
+
+  const endLine = startLine + linesInsideCodeBlock.length + 1;
+  const endOffset =
+    startOffset + textInsideCodeBlock.length + closingLine.length;
+
+  const position = {
+    start: {
+      line: listItem.position.start.line + 1,
+      col: 0,
+      offset: startOffset,
+    },
+    end: {
+      line: endLine,
+      col: closingLine.length,
+      offset: endOffset,
+    },
+  };
+
+  const codeBlockLines = [secondLine].concat(linesInsideCodeBlock, closingLine);
+
+  return {
+    parsed,
+    position,
+    raw: codeBlockLines.join("\n"),
+  };
 }

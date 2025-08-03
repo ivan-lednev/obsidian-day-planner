@@ -88,7 +88,7 @@ export function createReactor(props: {
     },
   });
 
-  const { dispatch } = store;
+  const { dispatch, getState } = store;
 
   const useSelector = createUseSelector(store);
   const actionDispatched = useActionDispatched({ listenerMiddleware });
@@ -119,6 +119,7 @@ export function createReactor(props: {
   });
 
   return {
+    getState,
     dispatch,
     listenerMiddleware,
     remoteTasks,

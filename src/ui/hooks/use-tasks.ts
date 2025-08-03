@@ -1,6 +1,7 @@
 import { flow, groupBy, uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
 import type { MetadataCache } from "obsidian";
+import type { STask } from "obsidian-dataview";
 import { derived, type Readable, type Writable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
@@ -13,6 +14,7 @@ import type { LocalTask, RemoteTask, Task, WithTime } from "../../task-types";
 import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../../types";
 import * as dv from "../../util/dataview";
 import { splitMultiday } from "../../util/moment";
+import { propsSchema, type Props, type LogEntry } from "../../util/props";
 import { getUpdateTrigger } from "../../util/store";
 import { getDayKey, getRenderKey } from "../../util/task-utils";
 
@@ -21,8 +23,6 @@ import { useEditContext } from "./use-edit/use-edit-context";
 import { useNewlyStartedTasks } from "./use-newly-started-tasks";
 import { useVisibleDailyNotes } from "./use-visible-daily-notes";
 import { useVisibleDataviewTasks } from "./use-visible-dataview-tasks";
-import type { STask } from "obsidian-dataview";
-import { propsSchema, type Props, type LogEntry } from "../../util/props";
 
 export function useTasks(props: {
   settingsStore: Writable<DayPlannerSettings>;
@@ -82,7 +82,9 @@ export function useTasks(props: {
           const props = $listProps[current.path]?.[current.line];
 
           if (props) {
-            const { data, success, error } = propsSchema.safeParse(props);
+            const { data, success, error } = propsSchema.safeParse(
+              props.parsed,
+            );
 
             if (success) {
               result.push({ ...current, props: data });

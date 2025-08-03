@@ -1,5 +1,8 @@
+import { takeWhile } from "lodash/fp";
+import { stringifyYaml } from "obsidian";
 import { z } from "zod";
 
+import { clockFormat, codeFence } from "../constants";
 import {
   keylessScheduledPropRegExp,
   propRegexp,
@@ -7,9 +10,8 @@ import {
   shortScheduledPropRegExp,
 } from "../regexp";
 
+import { createCodeBlock } from "./markdown";
 import { appendText } from "./task-utils";
-import { takeWhile } from "lodash/fp";
-import { codeFence } from "../constants";
 
 const dateTimeSchema = z
   .string()
@@ -33,6 +35,88 @@ export const propsSchema = z.object({
 });
 
 export type Props = z.infer<typeof propsSchema>;
+
+export function createPropsWithOpenClock(): Props {
+  return {
+    planner: {
+      log: [
+        {
+          start: window.moment().format(clockFormat),
+        },
+      ],
+    },
+  };
+}
+
+export function addOpenClock(props: Props): Props {
+  const openClocks = props.planner?.log?.find((it) => !it.end);
+
+  if (openClocks) {
+    throw new Error("There is already an open clock");
+  }
+
+  return {
+    ...props,
+    planner: {
+      ...props.planner,
+      log: [
+        ...(props.planner?.log || []),
+        {
+          start: window.moment().format(clockFormat),
+        },
+      ],
+    },
+  };
+}
+
+export function cancelOpenClock(props: Props): Props {
+  if (!props.planner?.log) {
+    throw new Error("There is no log");
+  }
+
+  const openClockIndex = props.planner.log.findIndex((it) => !it.end);
+
+  if (openClockIndex === -1) {
+    throw new Error("There is no open clock");
+  }
+
+  return {
+    ...props,
+    planner: {
+      ...props.planner,
+      log: props.planner.log.toSpliced(openClockIndex, 1),
+    },
+  };
+}
+
+export function closeActiveClock(props: Props): Props {
+  if (!props.planner?.log) {
+    throw new Error("There is no log under cursor");
+  }
+
+  const openClockIndex = props.planner.log.findIndex((it) => !it.end);
+
+  if (openClockIndex === -1) {
+    throw new Error("There is no open clock");
+  }
+
+  const updatedOpenClock = {
+    ...props.planner.log[openClockIndex],
+    end: window.moment().format(clockFormat),
+  };
+
+  return {
+    ...props,
+    planner: {
+      ...props.planner,
+      log: props.planner.log.with(openClockIndex, updatedOpenClock),
+    },
+  };
+}
+
+export function toMarkdown(props: Props) {
+  return createCodeBlock({ language: "yaml", text: stringifyYaml(props) });
+}
 
 export function createProp(
   key: string,
