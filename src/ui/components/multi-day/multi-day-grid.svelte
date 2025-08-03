@@ -302,11 +302,8 @@
 
   :global(.horizontal-resize-box-wrapper) {
     position: relative;
-
     grid-area: multiday;
-
     max-height: 20vh;
-
     border-bottom: 1px solid var(--background-modifier-border);
   }
 

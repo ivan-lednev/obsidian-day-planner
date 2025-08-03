@@ -26,6 +26,7 @@ export function createActiveClockMenu(props: {
     },
   } = location;
 
+  // todo: delete or refactor
   menu.addItem((item) =>
     item
       .setTitle("Clock out")

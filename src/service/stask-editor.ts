@@ -1,16 +1,21 @@
-import { flow } from "lodash/fp";
 import type { STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
 
-import {
-  assertActiveClock,
-  assertNoActiveClock,
-  withActiveClock,
-  withActiveClockCompleted,
-  withoutActiveClock,
-} from "../util/clock";
+import { selectListPropsForPath } from "../redux/dataview/dataview-slice";
+import type { AppStore } from "../redux/store";
 import * as dv from "../util/dataview";
+import { getIndentationForListParagraph } from "../util/dataview";
 import { locToEditorPosition } from "../util/editor";
+import { createIndentation, indent } from "../util/markdown";
+import {
+  addOpenClock,
+  cancelOpenClock,
+  closeActiveClock,
+  createPropsWithOpenClock,
+  type Props,
+  propsSchema,
+  toMarkdown,
+} from "../util/props";
 import { withNotice } from "../util/with-notice";
 
 import { DataviewFacade } from "./dataview-facade";
@@ -38,6 +43,7 @@ export class STaskEditor {
   );
 
   constructor(
+    private readonly getState: AppStore["getState"],
     private readonly workspaceFacade: WorkspaceFacade,
     private readonly vaultFacade: VaultFacade,
     private readonly dataviewFacade: DataviewFacade,
@@ -45,7 +51,7 @@ export class STaskEditor {
 
   private replaceSTaskUnderCursor = (newMarkdown: string) => {
     const view = this.workspaceFacade.getActiveMarkdownView();
-    const sTask = this.getSTaskUnderCursorFromLastView();
+    const { sTask } = this.getSTaskUnderCursorFromLastView();
 
     // Note: we re-calculate indentation when transforming sTasks to markdown, so we
     //  don't need the original indentation
@@ -59,43 +65,93 @@ export class STaskEditor {
   };
 
   private getSTaskUnderCursorFromLastView = () => {
-    const sTask = this.dataviewFacade.getTaskAtLine(
-      this.workspaceFacade.getLastCaretLocation(),
-    );
+    const location = this.workspaceFacade.getLastCaretLocation();
+    const { path, line } = location;
+    const sTask = this.dataviewFacade.getTaskAtLine({ path, line });
 
     isNotVoid(sTask, "No task under cursor");
 
-    return sTask;
+    return { sTask, location };
   };
 
-  // todo: remove duplication
-  clockInUnderCursor = withNotice(
-    flow(
-      this.getSTaskUnderCursorFromLastView,
-      assertNoActiveClock,
-      withActiveClock,
-      dv.textToMarkdownWithIndentation,
-      this.replaceSTaskUnderCursor,
-    ),
-  );
+  private getSTaskWithListPropsUnderCursor() {
+    const { sTask, location } = this.getSTaskUnderCursorFromLastView();
 
-  clockOutUnderCursor = withNotice(
-    flow(
-      this.getSTaskUnderCursorFromLastView,
-      assertActiveClock,
-      withActiveClockCompleted,
-      dv.textToMarkdownWithIndentation,
-      this.replaceSTaskUnderCursor,
-    ),
-  );
+    const listPropsForPath = selectListPropsForPath(
+      this.getState(),
+      location.path,
+    );
 
-  cancelClockUnderCursor = withNotice(
-    flow(
-      this.getSTaskUnderCursorFromLastView,
-      assertActiveClock,
-      withoutActiveClock,
-      dv.textToMarkdownWithIndentation,
-      this.replaceSTaskUnderCursor,
-    ),
-  );
+    return { sTask, listPropsForLine: listPropsForPath?.[location.line] };
+  }
+
+  private validate(yaml?: Record<string, unknown>) {
+    if (!yaml) {
+      return;
+    }
+
+    const { data, error } = propsSchema.safeParse(yaml);
+
+    if (error) {
+      throw new Error(`Invalid props under cursor: ${error.message}`);
+    }
+
+    return data;
+  }
+
+  private updateListPropsUnderCursor(updateFn: (props?: Props) => Props) {
+    const { sTask, listPropsForLine } = this.getSTaskWithListPropsUnderCursor();
+    const validated = this.validate(listPropsForLine?.parsed);
+    const updated = updateFn(validated);
+    const asMarkdown = toMarkdown(updated);
+    // todo: remove duplication
+    const indentation =
+      createIndentation(sTask.position.start.col) +
+      getIndentationForListParagraph(sTask);
+    const indented = indent(asMarkdown, indentation);
+    const withNewline = indented + "\n";
+
+    const view = this.workspaceFacade.getActiveMarkdownView();
+
+    if (listPropsForLine) {
+      view.editor.replaceRange(
+        indented,
+        locToEditorPosition(listPropsForLine.position.start),
+        locToEditorPosition(listPropsForLine.position.end),
+      );
+    } else {
+      const afterFirstLine = {
+        line: sTask.position.start.line + 1,
+        ch: 0,
+      };
+
+      view.editor.replaceRange(withNewline, afterFirstLine, afterFirstLine);
+    }
+  }
+
+  clockInUnderCursor = withNotice(() => {
+    this.updateListPropsUnderCursor((props) =>
+      props ? addOpenClock(props) : createPropsWithOpenClock(),
+    );
+  });
+
+  clockOutUnderCursor = withNotice(() => {
+    this.updateListPropsUnderCursor((props) => {
+      if (!props) {
+        throw new Error("There are no props under cursor");
+      }
+
+      return closeActiveClock(props);
+    });
+  });
+
+  cancelClockUnderCursor = withNotice(() => {
+    this.updateListPropsUnderCursor((props) => {
+      if (!props) {
+        throw new Error("There are no props under cursor");
+      }
+
+      return cancelOpenClock(props);
+    });
+  });
 }

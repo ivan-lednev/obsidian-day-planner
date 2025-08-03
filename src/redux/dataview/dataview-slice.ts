@@ -1,9 +1,17 @@
 import { type PayloadAction } from "@reduxjs/toolkit";
+import type { Pos } from "obsidian";
 import type { STask } from "obsidian-dataview";
 
 import { createAppSlice } from "../create-app-slice";
 
-type LineToListProps = Record<number, unknown>;
+export type ListPropsParseResult = {
+  parsed: Record<string, unknown>;
+  position: Pos;
+  raw: string;
+};
+
+export type LineToListProps = Record<number, ListPropsParseResult>;
+
 export type PathToListProps = Record<string, LineToListProps>;
 
 interface DataviewSliceState {
@@ -51,6 +59,7 @@ export const dataviewSlice = createAppSlice({
   selectors: {
     selectDataviewTasks: (state) => state.dataviewTasks,
     selectListProps: (state) => state.listProps,
+    selectListPropsForPath: (state, path: string) => state.listProps[path],
     selectDataviewLoaded: (state) => state.dataviewLoaded,
   },
 });
@@ -58,7 +67,11 @@ export const dataviewSlice = createAppSlice({
 export const { dataviewChange, dataviewTasksUpdated, listPropsParsed } =
   dataviewSlice.actions;
 
-export const { selectDataviewTasks, selectListProps, selectDataviewLoaded } =
-  dataviewSlice.selectors;
+export const {
+  selectDataviewTasks,
+  selectListProps,
+  selectDataviewLoaded,
+  selectListPropsForPath,
+} = dataviewSlice.selectors;
 
 export type DataviewChangeAction = ReturnType<typeof dataviewChange>;
