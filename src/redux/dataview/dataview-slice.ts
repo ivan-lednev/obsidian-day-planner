@@ -48,11 +48,7 @@ export const dataviewSlice = createAppSlice({
       ) => {
         const { path, lineToListProps } = action.payload;
 
-        if (!lineToListProps || Object.keys(lineToListProps).length === 0) {
-          return;
-        }
-
-        state.listProps[path] = lineToListProps;
+        state.listProps[path] = lineToListProps || {};
       },
     ),
   }),
