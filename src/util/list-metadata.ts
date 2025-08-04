@@ -62,13 +62,13 @@ function getListPropsFromListItem(
 ) {
   const listLines = listItemText.split("\n");
   const firstLine = listLines[0];
-  const secondLine = listLines.at(1);
+  const openingLine = listLines.at(1);
 
-  if (!secondLine?.trimStart().startsWith(codeFence + "yaml")) {
+  if (!openingLine?.trimStart().startsWith(codeFence + "yaml")) {
     return;
   }
 
-  const indentation = secondLine.match(/^\s*/)?.[0];
+  const indentation = openingLine.match(/^\s*/)?.[0];
   const linesAfterSecond = listLines.slice(2);
 
   const closingLineIndex = linesAfterSecond.findIndex((line) =>
@@ -103,12 +103,15 @@ function getListPropsFromListItem(
   const startOffset = listItem.position.start.offset + firstLine.length + 1;
 
   const endLine = startLine + linesInsideCodeBlock.length + 1;
-  const endOffset =
-    startOffset + textInsideCodeBlock.length + closingLine.length;
+  const codeBlockLength = [openingLine, textInsideCodeBlock, closingLine].join(
+    "\n",
+  ).length;
+  const endOffset = startOffset + codeBlockLength;
 
   const position = {
     start: {
       line: listItem.position.start.line + 1,
+      // todo: use real col ?
       col: 0,
       offset: startOffset,
     },
@@ -119,11 +122,15 @@ function getListPropsFromListItem(
     },
   };
 
-  const codeBlockLines = [secondLine].concat(linesInsideCodeBlock, closingLine);
+  const codeBlockLines = [openingLine].concat(
+    linesInsideCodeBlock,
+    closingLine,
+  );
 
   return {
     parsed,
     position,
+    // todo: not needed
     raw: codeBlockLines.join("\n"),
   };
 }

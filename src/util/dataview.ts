@@ -1,16 +1,14 @@
-import { isString, uniqBy } from "lodash/fp";
+import { uniqBy } from "lodash/fp";
 import { DateTime } from "luxon";
 import type { Moment } from "moment";
 import { STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
 
 import {
-  clockKey,
   defaultDayFormat,
   defaultDayFormatForLuxon,
   defaultDurationMinutes,
   indentBeforeListParagraph,
-  indentBeforeTaskParagraph,
 } from "../constants";
 import { getTimeFromLine } from "../parser/parser";
 import type { PeriodicNotes } from "../service/periodic-notes";
@@ -21,13 +19,8 @@ import type {
   TaskWithoutComputedDuration,
 } from "../task-types";
 
-import {
-  areValidClockMoments,
-  type ClockMoments,
-  toClockMoments,
-} from "./clock";
+import { type ClockMoments } from "./clock";
 import { getId } from "./id";
-import { liftToArray } from "./lift";
 import {
   checkbox,
   createIndentation,
@@ -35,7 +28,6 @@ import {
   indent,
   indentLines,
 } from "./markdown";
-import { splitMultiday } from "./moment";
 
 interface Node {
   text: string;
@@ -44,12 +36,8 @@ interface Node {
   status?: string;
 }
 
-export function getIndentationForListParagraph(sTask: Node) {
-  const isListItem = sTask.status === undefined;
-
-  return " ".repeat(
-    isListItem ? indentBeforeListParagraph : indentBeforeTaskParagraph,
-  );
+export function getIndentationForListParagraph() {
+  return " ".repeat(indentBeforeListParagraph);
 }
 
 export function textToMarkdown(sTask: Node) {
@@ -107,15 +95,6 @@ export function toTaskWithClock(props: {
     isAllDayEvent: false,
     startTime,
     durationMinutes,
-  };
-}
-
-export function toTaskWithActiveClock(sTask: STask, startTime: Moment) {
-  // todo: remove duplication
-  return {
-    ...toUnscheduledTask(sTask, startTime),
-    isAllDayEvent: false,
-    startTime,
   };
 }
 
@@ -212,28 +191,9 @@ export function replaceSTaskText(
   return lines.join("\n");
 }
 
-export function withClockMoments(sTask: STask) {
-  return liftToArray(sTask[clockKey])
-    .filter(isString)
-    .map(toClockMoments)
-    .filter(areValidClockMoments)
-    .flatMap(([start, end]) => splitMultiday(start, end))
-    .map((clockMoments) => ({
-      sTask,
-      clockMoments,
-    }));
-}
-
 export const uniq = uniqBy(
   (task: STask) => `${task.path}::${task.position.start.line}`,
 );
-
-export function createSTask(props: Partial<STask>) {
-  return {
-    ...baseSTask,
-    ...props,
-  };
-}
 
 export const baseSTask: STask = {
   symbol: "-",

@@ -1,9 +1,7 @@
-import type { Editor, MarkdownFileInfo, MarkdownView, Menu } from "obsidian";
-import type { STask } from "obsidian-dataview";
+import type { Menu } from "obsidian";
 
 import type DayPlanner from "../main";
 import type { STaskEditor } from "../service/stask-editor";
-import * as c from "../util/clock";
 import { isWithOpenClock } from "../util/props";
 
 export const createEditorMenuCallback =

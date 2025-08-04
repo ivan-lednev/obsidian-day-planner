@@ -1,20 +1,16 @@
-import type { STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
 
 import { selectListPropsForPath } from "../redux/dataview/dataview-slice";
 import type { AppStore } from "../redux/store";
-import * as dv from "../util/dataview";
-import { getIndentationForListParagraph } from "../util/dataview";
 import { locToEditorPosition } from "../util/editor";
-import { createIndentation, indent } from "../util/markdown";
 import {
   addOpenClock,
   cancelOpenClock,
-  closeActiveClock,
+  clockOut,
   createPropsWithOpenClock,
   type Props,
   propsSchema,
-  toMarkdown,
+  toIndentedMarkdown,
 } from "../util/props";
 import { withNotice } from "../util/with-notice";
 
@@ -23,21 +19,31 @@ import type { VaultFacade } from "./vault-facade";
 import { WorkspaceFacade } from "./workspace-facade";
 
 export class STaskEditor {
-  edit = withNotice(
+  editProps = withNotice(
     async (props: {
       path: string;
       line: number;
-      editFn: (sTask: STask) => STask;
+      editFn: (props: Props) => Props;
     }) => {
       const { path, line, editFn } = props;
       const sTask = this.dataviewFacade.getTaskAtLine({ path, line });
+      const { listPropsForLine, position } = this.getListProps({ path, line });
 
       isNotVoid(sTask, `No task found: ${path}:${line}`);
+      isNotVoid(listPropsForLine, `No list props found: ${path}:${line}`);
 
-      const newSTaskMarkdown = dv.textToMarkdownWithIndentation(editFn(sTask));
+      const updatedProps = editFn(listPropsForLine);
+      const indented = toIndentedMarkdown(
+        updatedProps,
+        sTask.position.start.col,
+      );
 
-      await this.vaultFacade.editFile(sTask.path, (contents) =>
-        dv.replaceSTaskText(contents, sTask, newSTaskMarkdown),
+      await this.vaultFacade.editFile(
+        sTask.path,
+        (contents) =>
+          contents.slice(0, position.start.offset) +
+          indented +
+          contents.slice(position.end.offset),
       );
     },
   );
@@ -49,21 +55,6 @@ export class STaskEditor {
     private readonly dataviewFacade: DataviewFacade,
   ) {}
 
-  private replaceSTaskUnderCursor = (newMarkdown: string) => {
-    const view = this.workspaceFacade.getActiveMarkdownView();
-    const { sTask } = this.getSTaskUnderCursorFromLastView();
-
-    // Note: we re-calculate indentation when transforming sTasks to markdown, so we
-    //  don't need the original indentation
-    const replacementStart = { ...sTask.position.start, col: 0 };
-
-    view.editor.replaceRange(
-      newMarkdown,
-      locToEditorPosition(replacementStart),
-      locToEditorPosition(sTask.position.end),
-    );
-  };
-
   getSTaskUnderCursorFromLastView = () => {
     const location = this.workspaceFacade.getLastCaretLocation();
     const { path, line } = location;
@@ -74,9 +65,7 @@ export class STaskEditor {
     return { sTask, location };
   };
 
-  getSTaskWithListPropsUnderCursor() {
-    const { sTask, location } = this.getSTaskUnderCursorFromLastView();
-
+  private getListProps(location: { path: string; line: number }) {
     const listPropsForPath = selectListPropsForPath(
       this.getState(),
       location.path,
@@ -86,12 +75,23 @@ export class STaskEditor {
     const validated = this.validate(listPropsForLine?.parsed);
 
     return {
-      sTask,
       listPropsForLine: validated,
       position: listPropsForLine.position,
     };
   }
 
+  getSTaskWithListPropsUnderCursor() {
+    const { sTask, location } = this.getSTaskUnderCursorFromLastView();
+    const { listPropsForLine, position } = this.getListProps(location);
+
+    return {
+      sTask,
+      listPropsForLine,
+      position,
+    };
+  }
+
+  // todo: remove
   private validate(yaml?: Record<string, unknown>) {
     if (!yaml) {
       return;
@@ -109,13 +109,8 @@ export class STaskEditor {
   private updateListPropsUnderCursor(updateFn: (props?: Props) => Props) {
     const { sTask, listPropsForLine, position } =
       this.getSTaskWithListPropsUnderCursor();
-    const updated = updateFn(listPropsForLine);
-    const asMarkdown = toMarkdown(updated);
-    // todo: remove duplication
-    const indentation =
-      createIndentation(sTask.position.start.col) +
-      getIndentationForListParagraph(sTask);
-    const indented = indent(asMarkdown, indentation);
+    const updatedProps = updateFn(listPropsForLine);
+    const indented = toIndentedMarkdown(updatedProps, sTask.position.start.col);
     const withNewline = indented + "\n";
 
     const view = this.workspaceFacade.getActiveMarkdownView();
@@ -148,7 +143,7 @@ export class STaskEditor {
         throw new Error("There are no props under cursor");
       }
 
-      return closeActiveClock(props);
+      return clockOut(props);
     });
   });
 

@@ -4,7 +4,7 @@ import { isNotVoid } from "typed-assert";
 import type { STaskEditor } from "../service/stask-editor";
 import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { LocalTask } from "../task-types";
-import * as c from "../util/clock";
+import { cancelOpenClock, clockOut } from "../util/props";
 
 export function createActiveClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;
@@ -26,26 +26,29 @@ export function createActiveClockMenu(props: {
     },
   } = location;
 
-  // todo: delete or refactor
-  menu.addItem((item) =>
-    item
+  menu.addItem((item) => {
+    return item
       .setTitle("Clock out")
       .setIcon("square")
       .onClick(async () => {
-        await sTaskEditor.edit({
+        await sTaskEditor.editProps({
           path,
           line,
-          editFn: c.withActiveClockCompleted,
+          editFn: (listPropsForLine) => clockOut(listPropsForLine),
         });
-      }),
-  );
+      });
+  });
 
   menu.addItem((item) => {
     item
       .setTitle("Cancel clock")
       .setIcon("trash-2")
       .onClick(async () => {
-        await sTaskEditor.edit({ path, line, editFn: c.withoutActiveClock });
+        await sTaskEditor.editProps({
+          path,
+          line,
+          editFn: (listPropsForLine) => cancelOpenClock(listPropsForLine),
+        });
       });
   });
 

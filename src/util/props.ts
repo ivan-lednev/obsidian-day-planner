@@ -10,7 +10,8 @@ import {
   shortScheduledPropRegExp,
 } from "../regexp";
 
-import { createCodeBlock } from "./markdown";
+import { getIndentationForListParagraph } from "./dataview";
+import { createCodeBlock, createIndentation, indent } from "./markdown";
 import { appendText } from "./task-utils";
 
 const dateTimeSchema = z
@@ -91,7 +92,7 @@ export function cancelOpenClock(props: Props): Props {
   };
 }
 
-export function closeActiveClock(props: Props): Props {
+export function clockOut(props: Props): Props {
   if (!props.planner?.log) {
     throw new Error("There is no log under cursor");
   }
@@ -167,4 +168,12 @@ export function updateScheduledPropInText(text: string, dayKey: string) {
 
 export function addTasksPluginProp(text: string, prop: string) {
   return appendText(text, ` ${prop}`);
+}
+
+export function toIndentedMarkdown(props: Props, column: number) {
+  const asMarkdown = toMarkdown(props);
+  const indentation =
+    createIndentation(column) + getIndentationForListParagraph();
+
+  return indent(asMarkdown, indentation);
 }
