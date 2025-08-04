@@ -7,6 +7,7 @@ import { createAppSlice } from "../create-app-slice";
 export type ListPropsParseResult = {
   parsed: Record<string, unknown>;
   position: Pos;
+  // todo: delete
   raw: string;
 };
 

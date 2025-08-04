@@ -62,6 +62,7 @@ export function createActiveClock() {
   return createProp(clockKey, createClockTimestamp());
 }
 
+// todo: delete
 export function clockOut(line: string) {
   return updateProp(
     line,
@@ -69,10 +70,12 @@ export function clockOut(line: string) {
   );
 }
 
+// todo: delete
 export function containsActiveClock(line: string) {
   return line.includes(clockKey) && !line.includes(clockSeparator);
 }
 
+// todo: delete
 export function withActiveClock(sTask: STask): STask {
   return {
     ...sTask,
@@ -81,6 +84,7 @@ ${createActiveClock()}`,
   };
 }
 
+// todo: delete
 export function withoutActiveClock(sTask: STask) {
   return {
     ...sTask,
@@ -95,6 +99,7 @@ export function lines(fn: (lines: string[]) => string[], text: string) {
   return fn(text.split("\n")).join("\n");
 }
 
+// todo: delete
 export function withActiveClockCompleted(task: { text: string }) {
   return {
     ...task,
@@ -105,23 +110,3 @@ export function withActiveClockCompleted(task: { text: string }) {
   };
 }
 
-export function assertActiveClock(sTask: STask) {
-  if (!hasActiveClockProp(sTask)) {
-    throw new Error("The task has no active clocks");
-  }
-
-  return sTask;
-}
-
-export function assertNoActiveClock(sTask: STask) {
-  if (hasActiveClockProp(sTask)) {
-    throw new Error("The task already has an active clock");
-  }
-
-  return sTask;
-}
-
-export interface LogEntry {
-  start: string;
-  end?: string;
-}
