@@ -64,7 +64,7 @@ export class STaskEditor {
     );
   };
 
-  private getSTaskUnderCursorFromLastView = () => {
+  getSTaskUnderCursorFromLastView = () => {
     const location = this.workspaceFacade.getLastCaretLocation();
     const { path, line } = location;
     const sTask = this.dataviewFacade.getTaskAtLine({ path, line });
@@ -74,7 +74,7 @@ export class STaskEditor {
     return { sTask, location };
   };
 
-  private getSTaskWithListPropsUnderCursor() {
+  getSTaskWithListPropsUnderCursor() {
     const { sTask, location } = this.getSTaskUnderCursorFromLastView();
 
     const listPropsForPath = selectListPropsForPath(
@@ -82,7 +82,14 @@ export class STaskEditor {
       location.path,
     );
 
-    return { sTask, listPropsForLine: listPropsForPath?.[location.line] };
+    const listPropsForLine = listPropsForPath?.[location.line];
+    const validated = this.validate(listPropsForLine?.parsed);
+
+    return {
+      sTask,
+      listPropsForLine: validated,
+      position: listPropsForLine.position,
+    };
   }
 
   private validate(yaml?: Record<string, unknown>) {
@@ -100,9 +107,9 @@ export class STaskEditor {
   }
 
   private updateListPropsUnderCursor(updateFn: (props?: Props) => Props) {
-    const { sTask, listPropsForLine } = this.getSTaskWithListPropsUnderCursor();
-    const validated = this.validate(listPropsForLine?.parsed);
-    const updated = updateFn(validated);
+    const { sTask, listPropsForLine, position } =
+      this.getSTaskWithListPropsUnderCursor();
+    const updated = updateFn(listPropsForLine);
     const asMarkdown = toMarkdown(updated);
     // todo: remove duplication
     const indentation =
@@ -116,8 +123,8 @@ export class STaskEditor {
     if (listPropsForLine) {
       view.editor.replaceRange(
         indented,
-        locToEditorPosition(listPropsForLine.position.start),
-        locToEditorPosition(listPropsForLine.position.end),
+        locToEditorPosition(position.start),
+        locToEditorPosition(position.end),
       );
     } else {
       const afterFirstLine = {

@@ -36,6 +36,10 @@ export const propsSchema = z.object({
 
 export type Props = z.infer<typeof propsSchema>;
 
+export function isWithOpenClock(props?: Props) {
+  return Boolean(props?.planner?.log?.find((it) => !it.end));
+}
+
 export function createPropsWithOpenClock(): Props {
   return {
     planner: {
@@ -49,9 +53,7 @@ export function createPropsWithOpenClock(): Props {
 }
 
 export function addOpenClock(props: Props): Props {
-  const openClocks = props.planner?.log?.find((it) => !it.end);
-
-  if (openClocks) {
+  if (isWithOpenClock(props)) {
     throw new Error("There is already an open clock");
   }
 
