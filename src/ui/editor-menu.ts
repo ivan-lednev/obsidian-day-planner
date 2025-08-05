@@ -8,19 +8,17 @@ export const createEditorMenuCallback =
   (props: { sTaskEditor: STaskEditor; plugin: DayPlanner }) => (menu: Menu) => {
     const { sTaskEditor } = props;
 
-    let sTaskUnderCursor;
+    let sTask;
 
     try {
-      sTaskUnderCursor = sTaskEditor.getSTaskWithListPropsUnderCursor();
+      sTask = sTaskEditor.getSTaskWithListPropsUnderCursor();
     } catch {
       return;
     }
 
-    const { listPropsForLine } = sTaskUnderCursor;
-
     menu.addSeparator();
 
-    if (isWithOpenClock(listPropsForLine)) {
+    if (isWithOpenClock(sTask.props.validated)) {
       menu.addItem((item) => {
         item
           .setTitle("Clock out")
