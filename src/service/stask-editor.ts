@@ -27,12 +27,12 @@ export class STaskEditor {
     }) => {
       const { path, line, editFn } = props;
       const sTask = this.dataviewFacade.getTaskAtLine({ path, line });
-      const { listPropsForLine, position } = this.getListProps({ path, line });
+      const listPropsForLine = this.getListProps({ path, line });
 
       isNotVoid(sTask, `No task found: ${path}:${line}`);
       isNotVoid(listPropsForLine, `No list props found: ${path}:${line}`);
 
-      const updatedProps = editFn(listPropsForLine);
+      const updatedProps = editFn(listPropsForLine.listPropsForLine);
       const indented = toIndentedMarkdown(
         updatedProps,
         sTask.position.start.col,
@@ -41,9 +41,9 @@ export class STaskEditor {
       await this.vaultFacade.editFile(
         sTask.path,
         (contents) =>
-          contents.slice(0, position.start.offset) +
+          contents.slice(0, listPropsForLine.position.start.offset) +
           indented +
-          contents.slice(position.end.offset),
+          contents.slice(listPropsForLine.position.end.offset),
       );
     },
   );
@@ -72,7 +72,12 @@ export class STaskEditor {
     );
 
     const listPropsForLine = listPropsForPath?.[location.line];
-    const validated = this.validate(listPropsForLine?.parsed);
+
+    if (!listPropsForLine) {
+      return undefined;
+    }
+
+    const validated = this.validate(listPropsForLine.parsed);
 
     return {
       listPropsForLine: validated,
@@ -82,21 +87,23 @@ export class STaskEditor {
 
   getSTaskWithListPropsUnderCursor() {
     const { sTask, location } = this.getSTaskUnderCursorFromLastView();
-    const { listPropsForLine, position } = this.getListProps(location);
+    const listProps = this.getListProps(location);
+
+    if (!listProps) {
+      return sTask;
+    }
 
     return {
-      sTask,
-      listPropsForLine,
-      position,
+      ...sTask,
+      props: {
+        validated: { ...listProps.listPropsForLine },
+        position: listProps.position,
+      },
     };
   }
 
   // todo: remove
-  private validate(yaml?: Record<string, unknown>) {
-    if (!yaml) {
-      return;
-    }
-
+  private validate(yaml: Record<string, unknown>) {
     const { data, error } = propsSchema.safeParse(yaml);
 
     if (error) {
@@ -107,19 +114,18 @@ export class STaskEditor {
   }
 
   private updateListPropsUnderCursor(updateFn: (props?: Props) => Props) {
-    const { sTask, listPropsForLine, position } =
-      this.getSTaskWithListPropsUnderCursor();
-    const updatedProps = updateFn(listPropsForLine);
+    const sTask = this.getSTaskWithListPropsUnderCursor();
+    const updatedProps = updateFn(sTask.props.validated);
     const indented = toIndentedMarkdown(updatedProps, sTask.position.start.col);
     const withNewline = indented + "\n";
 
     const view = this.workspaceFacade.getActiveMarkdownView();
 
-    if (listPropsForLine) {
+    if (sTask.props.validated) {
       view.editor.replaceRange(
         indented,
-        locToEditorPosition(position.start),
-        locToEditorPosition(position.end),
+        locToEditorPosition(sTask.props.position.start),
+        locToEditorPosition(sTask.props.position.end),
       );
     } else {
       const afterFirstLine = {

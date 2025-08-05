@@ -4,6 +4,12 @@ import type { Pos } from "obsidian";
 
 import type { HorizontalPlacing } from "./overlap/horizontal-placing";
 import type { IcalConfig } from "./settings";
+import type { Props } from "./util/props";
+
+export interface Entry {
+  type: "listItem" | "task" | "icalEvent" | "file";
+  props: Props;
+}
 
 export interface TaskLocation {
   path: string;
