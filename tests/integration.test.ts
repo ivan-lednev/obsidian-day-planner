@@ -378,6 +378,10 @@ describe("Clocks", () => {
     test.todo("Does not clock in on tasks with active clocks");
 
     test.todo("Does not mess up other child blocks in list");
+
+    test.todo(
+      "For a single line in a file, adds a newline instead of appending the code block to the line",
+    );
   });
 
   describe("Clocking out", () => {
