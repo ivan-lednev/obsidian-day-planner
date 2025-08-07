@@ -65,7 +65,6 @@ export function createReactor(props: {
   const { preloadedState, dataviewFacade, listPropsParser, onIcalsFetched } =
     props;
 
-  // todo: extra is not needed at all
   const listenerMiddleware = initListenerMiddleware({
     extra: {
       dataviewFacade,
