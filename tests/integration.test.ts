@@ -37,6 +37,7 @@ import {
   InMemoryVault,
   type InMemoryFile,
 } from "./test-utils";
+import { ListPropsParser } from "../src/service/list-props-parser";
 
 const { join } = path.posix;
 
@@ -130,6 +131,11 @@ function initTestServices(props: {
   const workspaceFacade =
     new FakeWorkspaceFacade() as unknown as WorkspaceFacade;
 
+  const listPropsParser = new ListPropsParser(
+    vault as unknown as Vault,
+    metadataCache,
+  );
+
   return {
     periodicNotes,
     dataviewFacade,
@@ -138,6 +144,7 @@ function initTestServices(props: {
     transactionWriter,
     workspaceFacade,
     vaultFacade,
+    listPropsParser,
   };
 }
 
@@ -158,6 +165,7 @@ async function setUp(props: {
     transactionWriter,
     workspaceFacade,
     vaultFacade,
+    listPropsParser,
   } = initTestServices({
     inMemoryFiles,
     inMemoryDailyNotes,
@@ -199,9 +207,8 @@ async function setUp(props: {
       },
     },
     dataviewFacade,
-    metadataCache,
-    vault: vault as unknown as Vault,
     onIcalsFetched,
+    listPropsParser,
   });
 
   inMemoryFiles.forEach(({ path }) => {

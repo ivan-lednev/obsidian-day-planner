@@ -81,7 +81,7 @@ import { createEnvironmentHooks } from "./util/create-environment-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
-import { ListPropsParser } from "./util/list-metadata";
+import { ListPropsParser } from "./service/list-props-parser";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;

@@ -29,7 +29,7 @@ const plannerSchema = z.object({
   log: z.array(logEntrySchema).optional(),
 });
 
-export const propsSchema = z.object({
+export const propsSchema = z.looseObject({
   planner: plannerSchema.optional(),
 });
 

@@ -27,7 +27,7 @@ import { searchSlice } from "./search-slice";
 import { selectDataviewSource, settingsSlice } from "./settings-slice";
 import { useActionDispatched } from "./use-action-dispatched";
 import { createUseSelector } from "./use-selector";
-import type { ListPropsParser } from "../util/list-metadata";
+import type { ListPropsParser } from "../service/list-props-parser";
 
 const rootReducer = combineSlices(
   globalSlice,
