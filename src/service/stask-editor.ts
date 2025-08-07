@@ -1,9 +1,6 @@
 import { isNotVoid } from "typed-assert";
 
-import {
-  selectListPropsForLocation,
-  selectListPropsForPath,
-} from "../redux/dataview/dataview-slice";
+import { selectListPropsForLocation } from "../redux/dataview/dataview-slice";
 import type { AppStore } from "../redux/store";
 import { locToEditorPosition } from "../util/editor";
 import {
@@ -20,58 +17,7 @@ import { DataviewFacade } from "./dataview-facade";
 import type { VaultFacade } from "./vault-facade";
 import { WorkspaceFacade } from "./workspace-facade";
 
-// export interface Writer {
-//   update(operation: Updated): Promise<void>;
-// }
-//
-// export class VaultWriter implements Writer {
-//   constructor(private readonly vaultFacade: VaultFacade) {}
-//
-//   async update(operation: Updated) {
-//     const {
-//       range: { start, end },
-//       contents: updateContents,
-//     } = operation;
-//
-//     await this.vaultFacade.editFile(
-//       operation.path,
-//       (contents) =>
-//         contents.slice(0, start.offset) +
-//         updateContents +
-//         contents.slice(end.offset),
-//     );
-//   }
-// }
-
-// export class ActiveViewAwareWriter implements Writer {
-//   constructor(
-//     private readonly fallback: Writer,
-//     private readonly workspaceFacade: WorkspaceFacade,
-//   ) {}
-//
-//   async update(operation: Updated) {
-//     const view = this.workspaceFacade.getActiveMarkdownView();
-//
-//     if (!view || view.file?.path === operation.path) {
-//       await this.fallback.update(operation);
-//     }
-//
-//     const {
-//       range: { start, end },
-//       contents: updateContents,
-//     } = operation;
-//
-//     view.editor.replaceRange(
-//       updateContents,
-//       locToEditorPosition(start),
-//       locToEditorPosition(end),
-//     );
-//   }
-// }
-
 export class STaskEditor {
-  // todo: make private
-  // todo: remove withNotice
   editProps = withNotice(
     async (props: {
       path: string;
@@ -178,16 +124,14 @@ export class STaskEditor {
     };
   }
 
-  // todo: receive editor
   private updateListPropsUnderCursor(updateFn: (props?: Props) => Props) {
     const sTask = this.getSTaskWithListPropsUnderCursor();
 
     const updatedProps = updateFn(sTask.props?.validated);
     const indented = toIndentedMarkdown(updatedProps, sTask.position.start.col);
 
-    const withNewline = indented + "\n";
+    let result = indented + "\n";
 
-    // todo: remove
     const view = this.workspaceFacade.getActiveMarkdownView();
 
     if (sTask.props?.validated) {
@@ -202,7 +146,14 @@ export class STaskEditor {
         ch: 0,
       };
 
-      view.editor.replaceRange(withNewline, afterFirstLine, afterFirstLine);
+      const needsNewlineBeforeProps =
+        sTask.position.start.line === view.editor.lastLine();
+
+      if (needsNewlineBeforeProps) {
+        result = "\n" + result;
+      }
+
+      view.editor.replaceRange(result, afterFirstLine, afterFirstLine);
     }
   }
 }

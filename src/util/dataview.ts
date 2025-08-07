@@ -41,7 +41,7 @@ export function getIndentationForListParagraph() {
 }
 
 export function textToMarkdown(sTask: Node) {
-  const indentationForListParagraph = getIndentationForListParagraph(sTask);
+  const indentationForListParagraph = getIndentationForListParagraph();
 
   const [firstLine, ...otherLines] = sTask.text.split("\n");
 
