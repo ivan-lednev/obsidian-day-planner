@@ -16,6 +16,7 @@ import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { type ShowPreview } from "./util/create-show-preview";
 import type { ListPropsParser } from "./service/list-props-parser";
+import type { useTasks } from "./ui/hooks/use-tasks";
 
 export type OnUpdateFn = (
   base: Array<LocalTask>,
@@ -62,6 +63,7 @@ export interface ObsidianContext {
   settingsSignal: { current: DayPlannerSettings };
   pointerDateTime: Writable<PointerDateTime>;
   tasksWithActiveClockProps: Readable<LocalTask[]>;
+  logSummary: ReturnType<typeof useTasks>["logSummary"];
   sTaskEditor: STaskEditor;
   getDisplayedTasksWithClocksForTimeline: (
     day: Moment,

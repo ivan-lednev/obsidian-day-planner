@@ -46,7 +46,7 @@ export function normalizeNewlines(text: string) {
 }
 
 export function indentLines(lines: string[], indentation: string) {
-  return lines.map((line) => `${indentation}${line}`);
+  return lines.map((line) => indentation + line);
 }
 
 export function indent(text: string, indentation: string) {

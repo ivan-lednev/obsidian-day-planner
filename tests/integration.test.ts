@@ -339,6 +339,8 @@ describe("Clocks", () => {
     );
   });
 
+  test.todo("Only reads props under tasks");
+
   test.todo("Ignores invalid dates, extra keys");
 
   test("Tasks with active clocks receive durations set to current time", async () => {
