@@ -81,6 +81,7 @@ import { createEnvironmentHooks } from "./util/create-environment-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
+import { ListPropsParser } from "./util/list-metadata";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -99,6 +100,10 @@ export default class DayPlanner extends Plugin {
     };
 
     const getTasksApi = createGetTasksApi(this.app);
+    const listPropsParser = new ListPropsParser(
+      this.app.vault,
+      this.app.metadataCache,
+    );
 
     this.periodicNotes = new PeriodicNotes();
     this.vaultFacade = new VaultFacade(this.app.vault, getTasksApi);
@@ -134,8 +139,7 @@ export default class DayPlanner extends Plugin {
         ical: icalStateWithCachedRawIcals,
       },
       dataviewFacade: this.dataviewFacade,
-      vault: this.app.vault,
-      metadataCache: this.app.metadataCache,
+      listPropsParser,
       onIcalsFetched: async (rawIcals) => {
         await this.saveData({ ...this.settings(), rawIcals });
       },
@@ -320,23 +324,21 @@ export default class DayPlanner extends Plugin {
       id: "clock-in",
       icon: "play",
       name: "Clock in",
-      // @ts-expect-error
-      editorCallback: this.sTaskEditor.clockInUnderCursor,
+      editorCallback: () => this.sTaskEditor.clockInUnderCursor(),
     });
 
     this.addCommand({
       icon: "square",
       id: "clock-out",
       name: "Clock out",
-      editorCallback: this.sTaskEditor.clockOutUnderCursor,
+      editorCallback: () => this.sTaskEditor.clockOutUnderCursor(),
     });
 
     this.addCommand({
       icon: "trash-2",
       id: "cancel-clock",
       name: "Cancel clock",
-      // @ts-expect-error
-      editorCallback: this.sTaskEditor.cancelClockUnderCursor,
+      editorCallback: () => this.sTaskEditor.cancelClockUnderCursor(),
     });
   }
 

@@ -20,7 +20,7 @@ import type { AppDispatch, RootState } from "./store";
 export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
   const {
     extra,
-    extra: { vault, metadataCache },
+    extra: { listPropsParser },
   } = props;
 
   const icalParseScheduler =
@@ -59,7 +59,7 @@ export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
 
   listenerMiddleware.startListening({
     actionCreator: dataviewChange,
-    effect: createListPropsParseListener({ vault, metadataCache }),
+    effect: createListPropsParseListener({ listPropsParser }),
   });
 
   return listenerMiddleware;

@@ -16,6 +16,7 @@ import type { LocalTask, WithPlacing } from "./task-types";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { type ShowPreview } from "./util/create-show-preview";
+import type { ListPropsParser } from "./util/list-metadata";
 
 export type OnUpdateFn = (
   base: Array<LocalTask>,
@@ -88,7 +89,6 @@ export type DateRange = Writable<Moment[]> & { untrack: () => void };
 
 export type ReduxExtraArgument = {
   dataviewFacade: DataviewFacade;
-  vault: Vault;
-  metadataCache: MetadataCache;
+  listPropsParser: ListPropsParser;
   onIcalsFetched: (rawIcals: RawIcal[]) => Promise<void>;
 };

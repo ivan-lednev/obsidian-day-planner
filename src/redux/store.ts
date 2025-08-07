@@ -8,7 +8,6 @@ import {
   type TypedStartListening,
 } from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
-import type { MetadataCache, Vault } from "obsidian";
 import { derived, writable } from "svelte/store";
 
 import type { DataviewFacade } from "../service/dataview-facade";
@@ -28,6 +27,7 @@ import { searchSlice } from "./search-slice";
 import { selectDataviewSource, settingsSlice } from "./settings-slice";
 import { useActionDispatched } from "./use-action-dispatched";
 import { createUseSelector } from "./use-selector";
+import type { ListPropsParser } from "../util/list-metadata";
 
 const rootReducer = combineSlices(
   globalSlice,
@@ -59,24 +59,17 @@ export const makeStore = (
 export function createReactor(props: {
   preloadedState: Partial<RootState>;
   dataviewFacade: DataviewFacade;
-  vault: Vault;
-  metadataCache: MetadataCache;
+  listPropsParser: ListPropsParser;
   onIcalsFetched: (rawIcals: RawIcal[]) => Promise<void>;
 }) {
-  const {
-    preloadedState,
-    dataviewFacade,
-    vault,
-    metadataCache,
-    onIcalsFetched,
-  } = props;
+  const { preloadedState, dataviewFacade, listPropsParser, onIcalsFetched } =
+    props;
 
   // todo: extra is not needed at all
   const listenerMiddleware = initListenerMiddleware({
     extra: {
       dataviewFacade,
-      vault,
-      metadataCache,
+      listPropsParser,
       onIcalsFetched,
     },
   });
