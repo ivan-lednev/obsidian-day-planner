@@ -40,7 +40,6 @@ import {
 
 const { join } = path.posix;
 
-const defaultVisibleDays = ["2024-09-26"];
 const dailyNoteFileNames = ["2025-07-19", "2025-07-20", "2025-07-28"];
 
 const fixturesDirPath = "fixtures";
@@ -143,13 +142,10 @@ function initTestServices(props: {
 }
 
 async function setUp(props: {
-  visibleDays?: string[];
+  visibleDays: string[];
   settings?: DayPlannerSettings;
 }) {
-  const {
-    visibleDays = defaultVisibleDays,
-    settings = defaultSettingsForTests,
-  } = props;
+  const { visibleDays, settings = defaultSettingsForTests } = props;
 
   const { inMemoryFiles, inMemoryDailyNotes, tasks, lists, cachedMetadata } =
     await loadMetadataDump();
@@ -183,7 +179,7 @@ async function setUp(props: {
   const defaultPreloadedStateForTests: Partial<RootState> = {
     obsidian: {
       ...initialState,
-      visibleDays: defaultVisibleDays,
+      visibleDays,
     },
     settings: { settings },
   };

@@ -3,12 +3,11 @@ import type { Pos } from "obsidian";
 import type { STask } from "obsidian-dataview";
 
 import { createAppSlice } from "../create-app-slice";
+import type { Props } from "src/util/props";
 
 export type ListPropsParseResult = {
-  parsed: Record<string, unknown>;
+  parsed: Props;
   position: Pos;
-  // todo: delete
-  raw: string;
 };
 
 export type LineToListProps = Record<number, ListPropsParseResult>;
@@ -57,6 +56,8 @@ export const dataviewSlice = createAppSlice({
     selectDataviewTasks: (state) => state.dataviewTasks,
     selectListProps: (state) => state.listProps,
     selectListPropsForPath: (state, path: string) => state.listProps[path],
+    selectListPropsForLocation: (state, path: string, line: number) =>
+      state.listProps[path]?.[line],
     selectDataviewLoaded: (state) => state.dataviewLoaded,
   },
 });
@@ -69,6 +70,7 @@ export const {
   selectListProps,
   selectDataviewLoaded,
   selectListPropsForPath,
+  selectListPropsForLocation,
 } = dataviewSlice.selectors;
 
 export type DataviewChangeAction = ReturnType<typeof dataviewChange>;
