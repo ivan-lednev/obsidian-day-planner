@@ -10,9 +10,9 @@ import { codeFence } from "../constants";
 import type { LineToListProps } from "../redux/dataview/dataview-slice";
 import { type Props, propsSchema } from "../util/props";
 
-const listItemWithPropertiesMinSpan = 3;
-
 export class ListPropsParser {
+  private static readonly listItemWithPropertiesMinSpan = 3;
+
   constructor(
     private readonly vault: Vault,
     private readonly metadataCache: MetadataCache,
@@ -38,10 +38,14 @@ export class ListPropsParser {
 
   private getListPropsFromFile(fileText: string, metadata: CachedMetadata) {
     return metadata.listItems?.reduce<LineToListProps>((result, listItem) => {
+      if (!listItem.task) {
+        return result;
+      }
+
       const listLineSpan =
         listItem.position.end.line - listItem.position.start.line;
 
-      if (listLineSpan < listItemWithPropertiesMinSpan) {
+      if (listLineSpan < ListPropsParser.listItemWithPropertiesMinSpan) {
         return result;
       }
 
@@ -116,7 +120,6 @@ export class ListPropsParser {
     const position = {
       start: {
         line: listItem.position.start.line + 1,
-        // todo: use real col ?
         col: 0,
         offset: startOffset,
       },

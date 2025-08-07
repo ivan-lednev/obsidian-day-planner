@@ -24,6 +24,7 @@ import {
   viewTypeMultiDay,
   reQueryAfterMillis,
   icalRefreshIntervalMillis,
+  viewTypeLogSummary,
 } from "./constants";
 import { createUpdateHandler, getTextFromUser } from "./create-update-handler";
 import { createDumpMetadataCommand } from "./dump-metadata";
@@ -82,6 +83,7 @@ import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { ListPropsParser } from "./service/list-props-parser";
+import { LogSummaryView } from "./ui/log-summary";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -276,6 +278,16 @@ export default class DayPlanner extends Plugin {
     });
 
     this.addCommand({
+      id: "show-log-summary",
+      name: "Show log summary",
+      callback: async () =>
+        await this.app.workspace.getLeaf().setViewState({
+          type: viewTypeLogSummary,
+          active: true,
+        }),
+    });
+
+    this.addCommand({
       id: "show-day-planner-today-note",
       name: "Open today's Day Planner",
       callback: async () => {
@@ -464,6 +476,7 @@ export default class DayPlanner extends Plugin {
       tasksWithTimeForToday,
       editContext,
       newlyStartedTasks,
+      logSummary,
     } = useTasks({
       onUpdate,
       onEditAborted,
@@ -593,6 +606,7 @@ export default class DayPlanner extends Plugin {
       settingsSignal: fromStore(settings),
       pointerDateTime,
       tasksWithActiveClockProps,
+      logSummary,
       getDisplayedTasksWithClocksForTimeline,
       dispatch,
       useSelector,
@@ -632,6 +646,11 @@ export default class DayPlanner extends Plugin {
     this.registerView(
       viewTypeReleaseNotes,
       (leaf: WorkspaceLeaf) => new DayPlannerReleaseNotesView(leaf),
+    );
+
+    this.registerView(
+      viewTypeLogSummary,
+      (leaf: WorkspaceLeaf) => new LogSummaryView(leaf, componentContext),
     );
   }
 }

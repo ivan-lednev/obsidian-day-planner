@@ -98,6 +98,22 @@ export function useTasks(props: {
         .map((sTask) => ({ sTask, log: sTask.props.planner.log })),
     );
 
+  const logSummary = derived([sTasksWithLogs], ([$sTasksWithLogs]) =>
+    $sTasksWithLogs.map(({ sTask, log }) => ({
+      title: sTask.text.split("\n").at(0),
+      log: log.map(({ start, end }) => ({
+        start: start,
+        end: end || "-",
+      })),
+      timeSpent: log.reduce((result, current) => {
+        const start = window.moment(current.start);
+        const end = window.moment(current.end);
+
+        return result.add(end.diff(start));
+      }, window.moment.duration()),
+    })),
+  );
+
   // todo: remove duplication
   const tasksWithActiveClockProps = derived(
     [sTasksWithLogs, currentTime],
@@ -222,5 +238,6 @@ export function useTasks(props: {
     tasksWithTimeForToday,
     editContext,
     newlyStartedTasks,
+    logSummary,
   };
 }
