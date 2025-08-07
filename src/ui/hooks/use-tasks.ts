@@ -120,10 +120,16 @@ export function useTasks(props: {
               clockMoments,
             }));
         })
-        .map(({ sTask, clockMoments }) => ({
-          ...dv.toTaskWithClock({ sTask, clockMoments }),
-          truncated: ["bottom" as const],
-        })),
+        .map(dv.toTaskWithClock),
+  );
+
+  const truncatedTasksWithActiveClockProps = derived(
+    [tasksWithActiveClockProps],
+    ([$tasksWithActiveClockProps]) =>
+      $tasksWithActiveClockProps.map((task) => ({
+        ...task,
+        truncated: ["bottom" as const],
+      })),
   );
 
   const logRecords = derived([sTasksWithLogs], ([$sTasksWithLogs]) =>
@@ -150,9 +156,11 @@ export function useTasks(props: {
   );
 
   const combinedClocks = derived(
-    [tasksWithActiveClockProps, logRecords],
-    ([$tasksWithActiveClockProps, $logRecords]: [LocalTask[], LocalTask[]]) =>
-      $tasksWithActiveClockProps.concat($logRecords),
+    [truncatedTasksWithActiveClockProps, logRecords],
+    ([$truncatedTasksWithActiveClockProps, $logRecords]: [
+      LocalTask[],
+      LocalTask[],
+    ]) => $truncatedTasksWithActiveClockProps.concat($logRecords),
   );
 
   const dayToLogRecords = derived(combinedClocks, ($combinedClocks) =>
