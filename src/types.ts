@@ -6,6 +6,7 @@ import type { RawIcal } from "./redux/ical/ical-slice";
 import { type AppDispatch } from "./redux/store";
 import type { UseSelector } from "./redux/use-selector";
 import type { DataviewFacade } from "./service/dataview-facade";
+import type { ListPropsParser } from "./service/list-props-parser";
 import type { PeriodicNotes } from "./service/periodic-notes";
 import type { STaskEditor } from "./service/stask-editor";
 import type { VaultFacade } from "./service/vault-facade";
@@ -14,9 +15,8 @@ import type { DayPlannerSettings, IcalConfig } from "./settings";
 import type { LocalTask, WithPlacing } from "./task-types";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
-import { type ShowPreview } from "./util/create-show-preview";
-import type { ListPropsParser } from "./service/list-props-parser";
 import type { useTasks } from "./ui/hooks/use-tasks";
+import { type ShowPreview } from "./util/create-show-preview";
 
 export type OnUpdateFn = (
   base: Array<LocalTask>,

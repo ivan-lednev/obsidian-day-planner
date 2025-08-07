@@ -54,6 +54,7 @@ import { type AppDispatch, createReactor } from "./redux/store";
 import { createUseSelector } from "./redux/use-selector";
 import { DataviewFacade } from "./service/dataview-facade";
 import { TransactionWriter } from "./service/diff-writer";
+import { ListPropsParser } from "./service/list-props-parser";
 import { PeriodicNotes } from "./service/periodic-notes";
 import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
@@ -73,6 +74,7 @@ import { useDebounceWithDelay } from "./ui/hooks/use-debounce-with-delay";
 import { mountStatusBarWidget } from "./ui/hooks/use-status-bar-widget";
 import { useTasks } from "./ui/hooks/use-tasks";
 import { useVisibleDays } from "./ui/hooks/use-visible-days";
+import { LogSummaryView } from "./ui/log-summary";
 import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
@@ -82,8 +84,6 @@ import { createEnvironmentHooks } from "./util/create-environment-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
-import { ListPropsParser } from "./service/list-props-parser";
-import { LogSummaryView } from "./ui/log-summary";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;

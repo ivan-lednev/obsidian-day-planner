@@ -12,6 +12,7 @@ import {
 import { initListenerMiddleware } from "../../src/redux/listener-middleware";
 import { makeStore, type RootState } from "../../src/redux/store";
 import { DataviewFacade } from "../../src/service/dataview-facade";
+import { ListPropsParser } from "../../src/service/list-props-parser";
 import { defaultSettingsForTests } from "../../src/settings";
 import { FakeMetadataCache, InMemoryVault } from "../test-utils";
 
@@ -70,8 +71,10 @@ function makeStoreForTests(props?: { preloadedState?: Partial<RootState> }) {
         lists: [],
         tasks: [],
       }) as unknown as DataviewFacade,
-      metadataCache: new FakeMetadataCache({}) as unknown as MetadataCache,
-      vault: new InMemoryVault([]) as unknown as Vault,
+      listPropsParser: new ListPropsParser(
+        new InMemoryVault([]) as unknown as Vault,
+        new FakeMetadataCache({}) as unknown as MetadataCache,
+      ),
       onIcalsFetched: async () => {},
     },
   });

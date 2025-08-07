@@ -15,6 +15,7 @@ import { initialState } from "../src/redux/global-slice";
 import { createReactor, type RootState } from "../src/redux/store";
 import type { DataviewFacade } from "../src/service/dataview-facade";
 import { TransactionWriter } from "../src/service/diff-writer";
+import { ListPropsParser } from "../src/service/list-props-parser";
 import type { PeriodicNotes } from "../src/service/periodic-notes";
 import { VaultFacade } from "../src/service/vault-facade";
 import type { WorkspaceFacade } from "../src/service/workspace-facade";
@@ -37,7 +38,6 @@ import {
   InMemoryVault,
   type InMemoryFile,
 } from "./test-utils";
-import { ListPropsParser } from "../src/service/list-props-parser";
 
 const { join } = path.posix;
 

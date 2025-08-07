@@ -3,6 +3,7 @@ import type { Pos } from "obsidian";
 import type { STask } from "obsidian-dataview";
 
 import { createAppSlice } from "../create-app-slice";
+
 import type { Props } from "src/util/props";
 
 export type ListPropsParseResult = {
