@@ -8,6 +8,7 @@ import {
 
 import { codeFence } from "../constants";
 import type { LineToListProps } from "../redux/dataview/dataview-slice";
+import { propsSchema } from "./props";
 
 const listItemWithPropertiesMinSpan = 3;
 
@@ -87,15 +88,14 @@ function getListPropsFromListItem(
     .map((line) => (indentation ? line.slice(indentation.length) : line))
     .join("\n");
 
-  let parsed;
+  let validated;
 
   try {
-    parsed = parseYaml(trimmedTextInsideCodeBlock);
+    const parsedYaml = parseYaml(trimmedTextInsideCodeBlock);
+    validated = propsSchema.parse(parsedYaml);
   } catch (error) {
     console.error(error);
-  }
 
-  if (!parsed) {
     return;
   }
 
@@ -122,15 +122,8 @@ function getListPropsFromListItem(
     },
   };
 
-  const codeBlockLines = [openingLine].concat(
-    linesInsideCodeBlock,
-    closingLine,
-  );
-
   return {
-    parsed,
+    parsed: validated,
     position,
-    // todo: not needed
-    raw: codeBlockLines.join("\n"),
   };
 }

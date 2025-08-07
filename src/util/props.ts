@@ -29,8 +29,6 @@ const plannerSchema = z.object({
   log: z.array(logEntrySchema).optional(),
 });
 
-export type Planner = z.infer<typeof plannerSchema>;
-
 export const propsSchema = z.object({
   planner: plannerSchema.optional(),
 });

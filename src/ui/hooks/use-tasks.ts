@@ -81,16 +81,8 @@ export function useTasks(props: {
         (result, current) => {
           const props = $listProps[current.path]?.[current.line];
 
-          if (props) {
-            const { data, success, error } = propsSchema.safeParse(
-              props.parsed,
-            );
-
-            if (success) {
-              result.push({ ...current, props: data });
-            } else {
-              console.error(error);
-            }
+          if (props?.parsed) {
+            result.push({ ...current, props: props.parsed });
           }
 
           return result;

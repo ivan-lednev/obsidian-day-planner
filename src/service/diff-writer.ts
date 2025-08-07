@@ -42,7 +42,7 @@ interface Deleted extends RangeOperation {
   type: "deleted";
 }
 
-interface Updated extends RangeOperation {
+export interface Updated extends RangeOperation {
   type: "updated";
   contents: string;
 }
@@ -121,12 +121,12 @@ export function createTransaction(props: {
     path,
     updateFn: (contents: string) => {
       const lines = contents.split("\n");
-      const mdastUpdates = updates.filter(
-        (update): update is MdastUpdate => update.type === "mdast",
+      const mdastUpdates = updates.filter<MdastUpdate>(
+        (update) => update.type === "mdast",
       );
 
-      const rangeUpdates = updates.filter(
-        (update): update is RangeUpdate => update.type !== "mdast",
+      const rangeUpdates = updates.filter<RangeUpdate>(
+        (update) => update.type !== "mdast",
       );
 
       let result = rangeUpdates
