@@ -14,7 +14,7 @@ import type { LocalTask, RemoteTask, Task, WithTime } from "../../task-types";
 import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../../types";
 import * as dv from "../../util/dataview";
 import { splitMultiday } from "../../util/moment";
-import { propsSchema, type Props, type LogEntry } from "../../util/props";
+import { type Props, type LogEntry } from "../../util/props";
 import { getUpdateTrigger } from "../../util/store";
 import { getDayKey, getRenderKey } from "../../util/task-utils";
 

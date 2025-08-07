@@ -8,7 +8,7 @@ import {
 
 import { codeFence } from "../constants";
 import type { LineToListProps } from "../redux/dataview/dataview-slice";
-import { propsSchema } from "./props";
+import { type Props, propsSchema } from "../util/props";
 
 const listItemWithPropertiesMinSpan = 3;
 
@@ -91,7 +91,7 @@ export class ListPropsParser {
       .map((line) => (indentation ? line.slice(indentation.length) : line))
       .join("\n");
 
-    let validated;
+    let validated: Props;
 
     try {
       const parsedYaml = parseYaml(trimmedTextInsideCodeBlock);
