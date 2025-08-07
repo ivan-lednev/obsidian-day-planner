@@ -1,9 +1,10 @@
-import { ItemView, View, WorkspaceLeaf } from "obsidian";
-import { viewTypeLogSummary } from "../constants";
+import { ItemView, WorkspaceLeaf } from "obsidian";
 import { type Component, mount } from "svelte";
-import LogSummary from "./components/log-summary.svelte";
+
+import { viewTypeLogSummary } from "../constants";
 import type { ComponentContext } from "../types";
-import { isNotVoid } from "typed-assert";
+
+import LogSummary from "./components/log-summary.svelte";
 
 export class LogSummaryView extends ItemView {
   private component?: Component;

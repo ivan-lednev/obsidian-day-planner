@@ -11,6 +11,7 @@ import { combineSlices, configureStore } from "@reduxjs/toolkit";
 import { derived, writable } from "svelte/store";
 
 import type { DataviewFacade } from "../service/dataview-facade";
+import type { ListPropsParser } from "../service/list-props-parser";
 import type { PointerDateTime, ReduxExtraArgument } from "../types";
 import { getUpdateTrigger } from "../util/store";
 
@@ -27,7 +28,6 @@ import { searchSlice } from "./search-slice";
 import { selectDataviewSource, settingsSlice } from "./settings-slice";
 import { useActionDispatched } from "./use-action-dispatched";
 import { createUseSelector } from "./use-selector";
-import type { ListPropsParser } from "../service/list-props-parser";
 
 const rootReducer = combineSlices(
   globalSlice,

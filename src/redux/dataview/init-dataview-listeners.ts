@@ -1,7 +1,7 @@
+import type { ListPropsParser } from "../../service/list-props-parser";
 import type { AppListenerEffect } from "../store";
 
 import { type DataviewChangeAction, listPropsParsed } from "./dataview-slice";
-import type { ListPropsParser } from "../../service/list-props-parser";
 
 export function createListPropsParseListener(props: {
   listPropsParser: ListPropsParser;
