@@ -87,7 +87,7 @@ For example, these tasks will show up in the timeline:
 
 ### 3. Showing internet calendars
 
-To show events from internet calendars like **Google Calendar, iCloud Calendar and Outlook** you only need to add an ICS link in the plugin settings.
+To show events from internet calendars like **Google Calendar, iCloud Calendar and Outlook** you only need to add an ICS link in the plugin settings. You can also use local .ics files by using the `file://` protocol (e.g., `file:///path/to/your/calendar.ics`).
 
 ![](./assets/ical-settings-demo.png)
 

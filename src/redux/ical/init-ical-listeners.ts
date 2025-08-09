@@ -1,3 +1,4 @@
+const fs = require("fs");
 import { isEmpty } from "lodash/fp";
 import { request } from "obsidian";
 import { isNotVoid } from "typed-assert";
@@ -29,8 +30,15 @@ export function createCachingFetcher() {
   const previousFetches = new Map<string, string>();
 
   return async (url: string) => {
+    let response: string;
     try {
-      const response = await request({ url });
+      if (url.startsWith("file://")) {
+        let filePath = url.replace("file://", "");
+        response = fs.readFileSync(filePath, "utf8");
+      }
+      else {
+        response = await request({ url });
+      }
 
       previousFetches.set(url, response);
 
