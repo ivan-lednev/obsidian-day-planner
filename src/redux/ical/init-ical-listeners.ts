@@ -1,4 +1,3 @@
-const fs = require("fs");
 import { isEmpty } from "lodash/fp";
 import { request } from "obsidian";
 import { isNotVoid } from "typed-assert";
@@ -20,6 +19,8 @@ import {
   selectAllIcalEventsWithIcalConfigs,
 } from "./ical-slice";
 
+const fs = require("fs");
+
 export const checkVisibleDaysChanged =
   createSelectorChangePredicate(selectVisibleDays);
 export const checkIcalEventsChanged = createSelectorChangePredicate(
@@ -33,7 +34,7 @@ export function createCachingFetcher() {
     let response: string;
     try {
       if (url.startsWith("file://")) {
-        let filePath = url.replace("file://", "");
+        const filePath = url.replace("file://", "");
         response = fs.readFileSync(filePath, "utf8");
       }
       else {
