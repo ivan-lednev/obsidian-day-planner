@@ -1,6 +1,6 @@
 import { Prec, StateEffect, StateField } from "@codemirror/state";
-import { EditorView, gutter, GutterMarker, ViewPlugin } from "@codemirror/view";
-import { getIcon } from "obsidian";
+import { EditorView, gutter, GutterMarker } from "@codemirror/view";
+import { editorInfoField, getIcon } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
 class ClockControlMarker extends GutterMarker {
@@ -14,9 +14,10 @@ class ClockControlMarker extends GutterMarker {
 }
 
 export function createClockControlExtension(props: {
-  onpointerup: (event: Event, line: number) => void;
+  onpointerup: (event: Event, location: { path: string; line: number }) => void;
+  onpointermove: (view: EditorView, line: number) => boolean;
 }) {
-  const { onpointerup } = props;
+  const { onpointerup, onpointermove } = props;
 
   const marker = new ClockControlMarker();
 
@@ -26,7 +27,7 @@ export function createClockControlExtension(props: {
       lineMarker(view, line) {
         if (
           view.state.doc.lineAt(line.from).number ===
-          view.state.field(hoveredLineNumber)
+          view.state.field(markedLine)
         ) {
           return marker;
         }
@@ -35,8 +36,7 @@ export function createClockControlExtension(props: {
       },
       lineMarkerChange(update) {
         return (
-          update.state.field(hoveredLineNumber) !==
-          update.startState.field(hoveredLineNumber)
+          update.state.field(markedLine) !== update.startState.field(markedLine)
         );
       },
       initialSpacer() {
@@ -44,83 +44,108 @@ export function createClockControlExtension(props: {
       },
       domEventHandlers: {
         pointerup: (view, line, event) => {
-          onpointerup(event, view.state.doc.lineAt(line.from).number);
+          const path = view.state.field(editorInfoField).file?.path;
+
+          if (!path) {
+            return false;
+          }
+
+          onpointerup(event, {
+            path,
+            line: view.state.doc.lineAt(line.from).number,
+          });
 
           return true;
+        },
+        pointermove: (view, lineBlockInfo) => {
+          const line = view.state.doc.lineAt(lineBlockInfo.from).number;
+
+          return onpointermove(view, line);
         },
       },
     }),
   );
 }
 
-const setHoveredLineNumber = StateEffect.define<number | null>({
+const setMarkedLine = StateEffect.define<number | null>({
   map(line) {
     return line;
   },
 });
 
-const hoveredLineNumber = StateField.define<number | null>({
+const markedLine = StateField.define<number | null>({
   create() {
     return null;
   },
   update(previous, transaction) {
-    return (
-      transaction.effects.find((it) => it.is(setHoveredLineNumber))?.value ??
-      previous
-    );
+    const effect = transaction.effects.find((it) => it.is(setMarkedLine));
+
+    if (!effect) {
+      return previous;
+    }
+
+    return effect.value;
   },
 });
 
+export type MarkerPredicateProps = {
+  path: string;
+  line: number | null;
+};
+
+export type MarkerPredicate = (props: MarkerPredicateProps) => boolean;
+
 function createLineNumberPlugin(props: {
-  markerPredicate: (line: number | null) => boolean;
+  onpointermove: (view: EditorView, line: number | null) => void;
 }) {
-  const { markerPredicate } = props;
+  const { onpointermove } = props;
 
-  return ViewPlugin.fromClass(
-    class {
-      private readonly markerPredicate = markerPredicate;
+  return EditorView.domEventObservers({
+    pointermove(event, view) {
+      const posAtCoords = view.posAtCoords({
+        x: event.clientX,
+        y: event.clientY,
+      });
 
-      constructor(readonly view: EditorView) {}
+      const line = posAtCoords
+        ? view.state.doc.lineAt(posAtCoords).number
+        : null;
 
-      setHoveredLineNumber(lineNumber: number | null) {
-        if (
-          this.view.state.field(hoveredLineNumber) !== lineNumber &&
-          this.markerPredicate(lineNumber)
-        ) {
-          this.view.dispatch({
-            effects: setHoveredLineNumber.of(lineNumber),
-          });
-        }
-      }
+      onpointermove(view, line);
     },
-    {
-      eventObservers: {
-        mouseover(event, view) {
-          const posAtCoords = view.posAtCoords({
-            x: event.clientX,
-            y: event.clientY,
-          });
-
-          const lineAtCursor = posAtCoords
-            ? view.state.doc.lineAt(posAtCoords).number
-            : null;
-
-          this.setHoveredLineNumber(lineAtCursor);
-        },
-      },
-    },
-  );
+  });
 }
 
 export function hoverPlugin(props: {
-  onpointerup: (event: Event, line: number) => void;
-  markerPredicate: (line: number | null) => boolean;
+  onpointerup: (event: Event, location: { path: string; line: number }) => void;
+  markerPredicate: MarkerPredicate;
 }) {
   const { onpointerup, markerPredicate } = props;
 
+  function handlePointerMove(view: EditorView, line: number | null) {
+    if (view.state.field(markedLine) === line) {
+      return false;
+    }
+
+    const path = view.state.field(editorInfoField).file?.path;
+
+    if (!path) {
+      return false;
+    }
+
+    view.dispatch({
+      effects: setMarkedLine.of(markerPredicate({ path, line }) ? line : null),
+    });
+
+    return true;
+  }
+
   return [
-    createClockControlExtension({ onpointerup }),
-    createLineNumberPlugin({ markerPredicate }),
-    hoveredLineNumber,
+    createClockControlExtension({
+      onpointerup,
+      onpointermove: handlePointerMove,
+    }),
+    createLineNumberPlugin({ onpointermove: handlePointerMove }),
+    markedLine,
   ];
 }

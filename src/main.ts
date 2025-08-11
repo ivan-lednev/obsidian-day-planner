@@ -6,6 +6,7 @@ import {
   WorkspaceLeaf,
   type MarkdownFileInfo,
   type TFile,
+  Menu,
 } from "obsidian";
 import { getAPI } from "obsidian-dataview";
 import {
@@ -189,8 +190,33 @@ export default class DayPlanner extends Plugin {
 
     this.registerEditorExtension([
       hoverPlugin({
-        onpointerup: () => {},
-        markerPredicate: () => true,
+        onpointerup: (event, { path, line }) => {
+          new Menu()
+            .addItem((item) => {
+              item
+                .setTitle("Clock in")
+                .setIcon("play")
+                .onClick(
+                  () =>
+                    this.sTaskEditor.clockInAtLine({ path, line: line - 1 }), // todo: bridge editor lines & cache lines
+                );
+            })
+            .showAtMouseEvent(event);
+        },
+        markerPredicate: (props) => {
+          const { path, line } = props;
+
+          if (line === null) {
+            return false;
+          }
+
+          const task = this.dataviewFacade.getTaskAtLine({
+            path,
+            line: line - 1, // todo: bridge editor lines & cache lines
+          });
+
+          return Boolean(task);
+        },
       }),
     ]);
   }
