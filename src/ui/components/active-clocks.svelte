@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { PlaneTakeoff, Clock3 } from "lucide-svelte";
+  import { PlaneTakeoff, Clock3, File } from "lucide-svelte";
+  import { isNotVoid } from "typed-assert";
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { currentTimeSignal } from "../../global-store/current-time";
@@ -37,18 +38,34 @@
           {task}
           {use}
         >
-          <Properties>
-            <Pill
-              key={PlaneTakeoff}
-              value={task.startTime.format($settings.timestampFormat)}
-            />
-            <Pill
-              key={Clock3}
-              value={m
-                .fromDiff(task.startTime, currentTimeSignal.current)
-                .format($settings.timestampFormat)}
-            />
-          </Properties>
+          {#snippet bottomDecoration()}
+            <Properties>
+              {#if task.location?.path}
+                <Pill
+                  key={File}
+                  onpointerup={() => {
+                    isNotVoid(task.location);
+
+                    return workspaceFacade.revealLineInFile(
+                      task.location.path,
+                      task.location.position.start.line,
+                    );
+                  }}
+                  value={task.location.path}
+                />
+              {/if}
+              <Pill
+                key={PlaneTakeoff}
+                value={task.startTime.format($settings.timestampFormat)}
+              />
+              <Pill
+                key={Clock3}
+                value={m
+                  .fromDiff(task.startTime, currentTimeSignal.current)
+                  .format($settings.timestampFormat)}
+              />
+            </Properties>
+          {/snippet}
         </LocalTimeBlock>
       {/snippet}
     </Selectable>

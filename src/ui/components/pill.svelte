@@ -27,6 +27,7 @@
 
 <style>
   :global(.pill-icon) {
+    flex-shrink: 0;
     width: var(--size-4-3);
     height: var(--size-4-3);
   }
@@ -40,7 +41,6 @@
 
     font-size: var(--font-ui-smaller);
     color: var(--tag-color);
-    white-space: nowrap;
 
     background-color: var(--tag-background);
     border-radius: var(--radius-m);
