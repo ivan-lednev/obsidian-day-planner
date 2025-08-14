@@ -6,11 +6,11 @@
 
   const {
     children,
-    className,
     onscroll,
+    ...rest
   }: {
     children: Snippet<[boolean]>;
-    className?: string;
+    class?: string;
     onscroll?: (event: Event) => void;
   } = $props();
 
@@ -36,7 +36,7 @@
 </script>
 
 <div
-  class="scroller {className}"
+  class={["scroller", rest.class]}
   onmouseenter={() => {
     isUnderCursor = true;
   }}

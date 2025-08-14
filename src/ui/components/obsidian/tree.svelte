@@ -49,17 +49,25 @@
     {/if}
   </div>
   {#if isTreeVisible}
-    <div transition:slide={createSlide({ axis: "y" })}>
+    <div
+      class="transition-wrapper"
+      transition:slide={createSlide({ axis: "y" })}
+    >
       {@render children()}
     </div>
   {/if}
 </div>
 
 <style>
+  .transition-wrapper,
   .tree-container {
     display: flex;
     flex: var(--flex);
     flex-direction: column;
+  }
+
+  .tree-container {
+    border-bottom: 1px solid var(--background-modifier-border);
   }
 
   .tree-item-inner {
