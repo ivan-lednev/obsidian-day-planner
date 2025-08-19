@@ -16,6 +16,7 @@ import { withNotice } from "../util/with-notice";
 import { DataviewFacade } from "./dataview-facade";
 import type { VaultFacade } from "./vault-facade";
 import { WorkspaceFacade } from "./workspace-facade";
+import { STask } from "obsidian-dataview";
 
 export class STaskEditor {
   editProps = withNotice(
@@ -46,6 +47,12 @@ export class STaskEditor {
       );
     },
   );
+
+  clockInAtLine = withNotice((location: { path: string; line: number }) => {
+    this.updateListPropsAtLine(location, (props) =>
+      props ? addOpenClock(props) : createPropsWithOpenClock(),
+    );
+  });
 
   clockInUnderCursor = withNotice(() => {
     this.updateListPropsUnderCursor((props) =>
@@ -80,16 +87,6 @@ export class STaskEditor {
     private readonly dataviewFacade: DataviewFacade,
   ) {}
 
-  getSTaskUnderCursorFromLastView = () => {
-    const location = this.workspaceFacade.getLastCaretLocation();
-    const { path, line } = location;
-    const sTask = this.dataviewFacade.getTaskAtLine({ path, line });
-
-    isNotVoid(sTask, "No task under cursor");
-
-    return { sTask, location };
-  };
-
   private getListProps(location: { path: string; line: number }) {
     const props = selectListPropsForLocation(
       this.getState(),
@@ -108,8 +105,18 @@ export class STaskEditor {
   }
 
   getSTaskWithListPropsUnderCursor() {
-    const { sTask, location } = this.getSTaskUnderCursorFromLastView();
-    const listProps = this.getListProps(location);
+    const location = this.workspaceFacade.getLastCaretLocation();
+
+    return this.getSTaskWithListPropsAtLine(location);
+  }
+
+  private getSTaskWithListPropsAtLine(props: { path: string; line: number }) {
+    const { path, line } = props;
+    const sTask = this.dataviewFacade.getTaskAtLine({ path, line });
+
+    isNotVoid(sTask, "No task under cursor");
+
+    const listProps = this.getListProps(props);
 
     if (!listProps) {
       return sTask;
@@ -124,9 +131,7 @@ export class STaskEditor {
     };
   }
 
-  private updateListPropsUnderCursor(updateFn: (props?: Props) => Props) {
-    const sTask = this.getSTaskWithListPropsUnderCursor();
-
+  private updateListProps(sTask: STask, updateFn: (props?: Props) => Props) {
     const updatedProps = updateFn(sTask.props?.validated);
     const indented = toIndentedMarkdown(updatedProps, sTask.position.start.col);
 
@@ -155,5 +160,20 @@ export class STaskEditor {
 
       view.editor.replaceRange(result, afterFirstLine, afterFirstLine);
     }
+  }
+
+  private updateListPropsUnderCursor(updateFn: (props?: Props) => Props) {
+    const sTask = this.getSTaskWithListPropsUnderCursor();
+
+    this.updateListProps(sTask, updateFn);
+  }
+
+  private updateListPropsAtLine(
+    location: { path: string; line: number },
+    updateFn: (props?: Props) => Props,
+  ) {
+    const sTask = this.getSTaskWithListPropsAtLine(location);
+
+    this.updateListProps(sTask, updateFn);
   }
 }

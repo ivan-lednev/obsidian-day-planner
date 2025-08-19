@@ -73,7 +73,18 @@ export default defineConfig((env) => ({
           return assetInfo.name;
         },
       },
-      external: ["obsidian", "electron"],
+      external: [
+        "obsidian",
+        "electron",
+        "@codemirror/autocomplete",
+        "@codemirror/collab",
+        "@codemirror/commands",
+        "@codemirror/language",
+        "@codemirror/lint",
+        "@codemirror/search",
+        "@codemirror/state",
+        "@codemirror/view",
+      ],
     },
   },
   test: {
