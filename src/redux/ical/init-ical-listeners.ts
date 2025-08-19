@@ -19,6 +19,8 @@ import {
   selectAllIcalEventsWithIcalConfigs,
 } from "./ical-slice";
 
+const fs = require("fs");
+
 export const checkVisibleDaysChanged =
   createSelectorChangePredicate(selectVisibleDays);
 export const checkIcalEventsChanged = createSelectorChangePredicate(
@@ -29,8 +31,15 @@ export function createCachingFetcher() {
   const previousFetches = new Map<string, string>();
 
   return async (url: string) => {
+    let response: string;
     try {
-      const response = await request({ url });
+      if (url.startsWith("file://")) {
+        const filePath = url.replace("file://", "");
+        response = fs.readFileSync(filePath, "utf8");
+      }
+      else {
+        response = await request({ url });
+      }
 
       previousFetches.set(url, response);
 
