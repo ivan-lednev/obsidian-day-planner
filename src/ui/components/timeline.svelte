@@ -44,7 +44,7 @@
     getDisplayedTasksWithClocksForTimeline(day),
   );
 
-  let el: HTMLElement | undefined;
+  let el: HTMLElement | undefined = $state();
 
   function updatePointerDateTime(event: MouseEvent | TouchEvent) {
     isNotVoid(el);
