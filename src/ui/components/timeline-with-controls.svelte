@@ -92,14 +92,16 @@
   </Tree>
 {/if}
 
-<Tree --flex="1 1 auto" isInitiallyOpen title="Timeline">
-  <Scroller class="timeline-scroller">
-    {#snippet children(isUnderCursor)}
-      <Ruler visibleHours={getVisibleHours($settings)} />
-      <Timeline day={firstDayInRange} {isUnderCursor} />
-    {/snippet}
-  </Scroller>
-</Tree>
+{#if $settings.showTimelineInSidebar}
+  <Tree --flex="1 1 auto" isInitiallyOpen title="Timeline">
+    <Scroller class="timeline-scroller">
+      {#snippet children(isUnderCursor)}
+        <Ruler visibleHours={getVisibleHours($settings)} />
+        <Timeline day={firstDayInRange} {isUnderCursor} />
+      {/snippet}
+    </Scroller>
+  </Tree>
+{/if}
 
 <style>
   :global(.timeline-scroller) {

@@ -47,6 +47,7 @@ export interface DayPlannerSettings {
   showTimestampInTaskBlock: boolean;
   showUncheduledTasks: boolean;
   showUnscheduledNestedTasks: boolean;
+  showTimelineInSidebar: boolean;
   showNow: boolean;
   showNext: boolean;
   showTimeTracker: boolean;
@@ -110,6 +111,7 @@ export const defaultSettings: DayPlannerSettings = {
   multiDayRange: "3-days",
   showTimeTracker: false,
   showActiveClocks: false,
+  showTimelineInSidebar: true,
 };
 
 export const defaultSettingsForTests = {

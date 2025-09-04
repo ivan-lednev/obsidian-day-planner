@@ -75,6 +75,27 @@
       />
     {/snippet}
   </SettingItem>
+
+  <SettingItem class="mod-toggle">
+    {#snippet name()}
+      Show timeline
+    {/snippet}
+    {#snippet control()}
+      <div
+        class={[
+          "checkbox-container",
+          "mod-small",
+          { "is-enabled": $settings.showTimelineInSidebar },
+        ]}
+        onclick={() => {
+          $settings.showTimelineInSidebar = !$settings.showTimelineInSidebar;
+        }}
+      >
+        <input tabindex="0" type="checkbox" />
+      </div>
+    {/snippet}
+  </SettingItem>
+
   <SettingItem class="mod-toggle">
     {#snippet name()}
       Auto-scroll to now
