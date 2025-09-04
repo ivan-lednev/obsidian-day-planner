@@ -24,6 +24,9 @@ export const firstDaysOfWeek = [
   "friday",
 ] as const;
 
+export type TimelineColumnType = "timeTracker" | "planner";
+export type TimelineColumns = Record<TimelineColumnType, boolean>;
+
 export interface DayPlannerSettings {
   progressIndicator: "mini-timeline" | "pie" | "bar" | "none";
   showTaskNotification: boolean;
@@ -64,6 +67,7 @@ export interface DayPlannerSettings {
   sortTasksInPlanAfterEdit: boolean;
   firstDayOfWeek: (typeof firstDaysOfWeek)[number];
   multiDayRange: "full-week" | "work-week" | "3-days";
+  timelineColumns: TimelineColumns;
 }
 
 export interface Cache {
@@ -112,6 +116,7 @@ export const defaultSettings: DayPlannerSettings = {
   showTimeTracker: false,
   showActiveClocks: false,
   showTimelineInSidebar: true,
+  timelineColumns: { planner: true, timeTracker: false },
 };
 
 export const defaultSettingsForTests = {

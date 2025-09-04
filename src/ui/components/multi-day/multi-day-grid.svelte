@@ -17,6 +17,7 @@
   import * as r from "../../../util/range";
   import { createResizeState } from "../../actions/create-resize-state";
   import { createColumnChangeMenu } from "../../column-change-menu";
+  import { createColumnSelectionMenu } from "../../column-selection-menu";
   import Search from "../../components/search.svelte";
   import ControlButton from "../control-button.svelte";
   import { createSlide } from "../defaults";
@@ -27,6 +28,7 @@
     CalendarArrowUp,
     Columns3,
     GripHorizontal,
+    TableColumnsSplit,
   } from "../lucide";
   import Ruler from "../ruler.svelte";
   import Scroller from "../scroller.svelte";
@@ -127,7 +129,7 @@
 <div
   bind:this={daysRef}
   style:--timeline-internal-column-count={$settings.showTimeTracker ? 2 : 1}
-  class={["dp-header-row", "day-buttons"]}
+  class={["planner-header-row", "day-buttons"]}
 >
   {#each $dateRange as day}
     <div class="header-cell">
@@ -149,7 +151,7 @@
 {#if $settings.showUncheduledTasks}
   <div
     style:--timeline-internal-column-count={$settings.showTimeTracker ? 2 : 1}
-    class={["dp-header-row", "horizontal-resize-box-wrapper"]}
+    class={["planner-header-row", "horizontal-resize-box-wrapper"]}
     use:resizeAction
   >
     <!--Note: we need this wrapper to listen to pointer events on the whole height of the row-->
@@ -206,6 +208,13 @@
       onclick={(event) => createColumnChangeMenu({ event, settings })}
     >
       <Columns3 />
+    </ControlButton>
+
+    <ControlButton
+      label="Configure columns"
+      onclick={(event) => createColumnSelectionMenu({ event, settings })}
+    >
+      <TableColumnsSplit />
     </ControlButton>
 
     <ControlButton

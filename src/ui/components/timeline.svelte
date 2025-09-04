@@ -90,34 +90,36 @@
   });
 </script>
 
-<Column visibleHours={getVisibleHours($settings)}>
-  {#if $isToday(day)}
-    <Needle autoScrollBlocked={isUnderCursor} />
-  {/if}
+{#if $settings.timelineColumns.planner}
+  <Column visibleHours={getVisibleHours($settings)}>
+    {#if $isToday(day)}
+      <Needle autoScrollBlocked={isUnderCursor} />
+    {/if}
 
-  <div
-    bind:this={el}
-    class="tasks absolute-stretch-x"
-    onpointerdown={(event) => {
-      if (isTouchEvent(event) || event.target !== el) {
-        return;
-      }
+    <div
+      bind:this={el}
+      class="tasks absolute-stretch-x"
+      onpointerdown={(event) => {
+        if (isTouchEvent(event) || event.target !== el) {
+          return;
+        }
 
-      handleContainerPointerDown(event);
-    }}
-    onpointermove={updatePointerDateTime}
-    onpointerup={confirmEdit}
-    use:timelineGestures
-  >
-    {#each $displayedTasksForTimeline.withTime as task (getRenderKey(task))}
-      <PositionedTimeBlock {task}>
-        <UnscheduledTimeBlock {task} />
-      </PositionedTimeBlock>
-    {/each}
-  </div>
-</Column>
+        handleContainerPointerDown(event);
+      }}
+      onpointermove={updatePointerDateTime}
+      onpointerup={confirmEdit}
+      use:timelineGestures
+    >
+      {#each $displayedTasksForTimeline.withTime as task (getRenderKey(task))}
+        <PositionedTimeBlock {task}>
+          <UnscheduledTimeBlock {task} />
+        </PositionedTimeBlock>
+      {/each}
+    </div>
+  </Column>
+{/if}
 
-{#if $settings.showTimeTracker}
+{#if $settings.timelineColumns.timeTracker}
   <Column
     --column-background-color="hsl(var(--color-accent-hsl), 0.03)"
     visibleHours={getVisibleHours($settings)}

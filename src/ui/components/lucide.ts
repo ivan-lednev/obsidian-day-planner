@@ -22,6 +22,7 @@ export const ChevronLeft = obsidianIcon(lucideSvelte.ChevronLeft);
 export const ChevronRight = obsidianIcon(lucideSvelte.ChevronRight);
 export const CalendarArrowUp = obsidianIcon(lucideSvelte.CalendarArrowUp);
 export const Columns3 = obsidianIcon(lucideSvelte.Columns3);
+export const TableColumnsSplit = obsidianIcon(lucideSvelte.TableColumnsSplit);
 export const Search = obsidianIcon(lucideSvelte.Search);
 export const AlertTriangle = obsidianIcon(lucideSvelte.AlertTriangle);
 export const Info = obsidianIcon(lucideSvelte.Info);

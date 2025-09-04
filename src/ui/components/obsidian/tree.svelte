@@ -14,7 +14,7 @@
   }: {
     children: Snippet;
     title: string;
-    flair?: string;
+    flair?: Snippet;
     isInitiallyOpen?: boolean;
   } = $props();
 
@@ -44,7 +44,7 @@
     <div style:color={titleColor} class="tree-item-inner">{title}</div>
     {#if flair}
       <div class="tree-item-flair-outer">
-        <span class="tree-item-flair">{flair}</span>
+        <span class="tree-item-flair">{@render flair()}</span>
       </div>
     {/if}
   </div>
@@ -77,5 +77,16 @@
   .tree-item-self {
     margin-bottom: 0;
     border-radius: 0;
+  }
+
+  .tree-item-flair-outer {
+    align-self: center;
+  }
+
+  .tree-item-flair {
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    height: var(--icon-xs);
   }
 </style>

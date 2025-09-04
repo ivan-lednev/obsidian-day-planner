@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Ellipsis } from "lucide-svelte";
   import { fromStore } from "svelte/store";
 
   import { getDateRangeContext } from "../../context/date-range-context";
@@ -6,6 +7,7 @@
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import type { Task } from "../../task-types";
+  import { createColumnSelectionMenu } from "../column-selection-menu";
 
   import ActiveClocks from "./active-clocks.svelte";
   import BlockList from "./block-list.svelte";
@@ -46,21 +48,19 @@
 <TimelineControls />
 
 {#if $settings.showActiveClocks}
-  <Tree
-    flair={String($tasksWithActiveClockProps.length)}
-    isInitiallyOpen
-    title="Active clocks"
-  >
+  <Tree isInitiallyOpen title="Active clocks">
+    {#snippet flair()}
+      {String($tasksWithActiveClockProps.length)}
+    {/snippet}
     <ActiveClocks --search-results-bg-color="var(--background-primary)" />
   </Tree>
 {/if}
 
 {#if $settings.showUncheduledTasks}
-  <Tree
-    flair={String(displayedAllDayTasks.length)}
-    isInitiallyOpen
-    title="Unscheduled tasks"
-  >
+  <Tree isInitiallyOpen title="Unscheduled tasks">
+    {#snippet flair()}
+      {String(displayedAllDayTasks.length)}
+    {/snippet}
     {#if editOperation.current || displayedAllDayTasks.length > 0}
       <ResizeableBox
         class="unscheduled-task-container"
@@ -94,6 +94,15 @@
 
 {#if $settings.showTimelineInSidebar}
   <Tree --flex="1 1 auto" isInitiallyOpen title="Timeline">
+    {#snippet flair()}
+      <Ellipsis
+        onclick={(event) => {
+          event.stopPropagation();
+
+          createColumnSelectionMenu({ settings, event });
+        }}
+      />
+    {/snippet}
     <Scroller class="timeline-scroller">
       {#snippet children(isUnderCursor)}
         <Ruler visibleHours={getVisibleHours($settings)} />
