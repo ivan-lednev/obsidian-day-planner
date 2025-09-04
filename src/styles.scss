@@ -34,7 +34,7 @@
   padding-block: 0;
 }
 
-.day-planner-progress-bar {
+.planner-progress-bar {
   overflow: hidden;
   display: flex;
   align-items: stretch;
@@ -46,12 +46,12 @@
   border-radius: var(--radius-s);
 }
 
-.day-planner-progress-value {
+.planner-progress-value {
   background-color: var(--color-accent);
   height: 100%;
 }
 
-.day-planner-progress-value.green,
+.planner-progress-value.green,
 .day-planner .progress-pie.green::before {
   background-color: #4caf50;
 }
@@ -60,12 +60,12 @@
   background-image: linear-gradient(to right, transparent 50%, #4caf50 0);
 }
 
-.day-planner-status-bar-text {
+.planner-status-bar-text {
   float: left;
   margin-right: 10px;
 }
 
-.day-planner-status-card {
+.planner-status-card {
   position: absolute;
   top: -140px;
 
@@ -78,7 +78,7 @@
   border-radius: 4px;
 }
 
-.day-planner-status-card .arrow-down {
+.planner-status-card .arrow-down {
   position: absolute;
 
   width: 20px;
@@ -181,14 +181,14 @@ body {
   left: 0;
 }
 
-.day-planner-release-notes-modal {
+.planner-release-notes-modal {
   .modal-content {
     height: 100%;
     overflow: auto;
   }
 }
 
-.day-planner-modal-buttons {
+.planner-modal-buttons {
   display: flex;
   justify-content: flex-end;
   gap: var(--size-4-2);
@@ -199,7 +199,7 @@ body {
   height: 100%;
 }
 
-.day-planner-release-notes-container {
+.planner-release-notes-container {
   max-width: var(--file-line-width);
   margin-left: auto;
   margin-right: auto;

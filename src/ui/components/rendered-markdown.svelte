@@ -20,7 +20,7 @@
 ></div>
 
 <style>
-  :global(.day-planner-task-decoration) {
+  :global(.planner-task-decoration) {
     margin: 0 0.25em;
     padding: 0.1em 0.25em;
 

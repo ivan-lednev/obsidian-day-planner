@@ -194,13 +194,6 @@
   </Scroller>
 
   <div class="controls-sidebar">
-    <!--    <ControlButton-->
-    <!--      isActive={visibleSideControls === "search"}-->
-    <!--      onclick={() => toggleSideControls("search")}-->
-    <!--    >-->
-    <!--      <SearchIcon />-->
-    <!--    </ControlButton>-->
-
     <ControlButton
       isActive={visibleSideControls === "settings"}
       onclick={() => toggleSideControls("settings")}
@@ -255,7 +248,7 @@
 </div>
 
 <style>
-  :global(.dp-header-row) {
+  :global(.planner-header-row) {
     --cell-flex-basis: calc(
       var(--timeline-flex-basis) * var(--timeline-internal-column-count, 1)
     );
