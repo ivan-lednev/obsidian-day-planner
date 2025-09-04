@@ -38,13 +38,23 @@
   import ColumnTracksOverlay from "./column-tracks-overlay.svelte";
   import MultiDayRow from "./multi-day-row.svelte";
 
-  const { workspaceFacade, settings, pointerDateTime, editContext } =
-    getObsidianContext();
+  const {
+    workspaceFacade,
+    settings,
+    pointerDateTime,
+    editContext,
+    settingsSignal,
+  } = getObsidianContext();
   const dateRange = getDateRangeContext();
 
   type SideControls = "none" | "settings" | "search";
 
   let visibleSideControls = $state<SideControls>("none");
+  let timelineInternalColumnCount = $derived.by(() => {
+    const columnFlags = Object.values(settingsSignal.current.timelineColumns);
+
+    return columnFlags.filter(Boolean).length;
+  });
 
   function toggleSideControls(toggledControls: SideControls) {
     visibleSideControls =
@@ -128,7 +138,7 @@
 
 <div
   bind:this={daysRef}
-  style:--timeline-internal-column-count={$settings.showTimeTracker ? 2 : 1}
+  style:--timeline-internal-column-count={timelineInternalColumnCount}
   class={["planner-header-row", "day-buttons"]}
 >
   {#each $dateRange as day}
@@ -150,7 +160,7 @@
 
 {#if $settings.showUncheduledTasks}
   <div
-    style:--timeline-internal-column-count={$settings.showTimeTracker ? 2 : 1}
+    style:--timeline-internal-column-count={timelineInternalColumnCount}
     class={["planner-header-row", "horizontal-resize-box-wrapper"]}
     use:resizeAction
   >

@@ -208,26 +208,6 @@
 
   <SettingItem class="mod-toggle">
     {#snippet name()}
-      Show time tracker
-    {/snippet}
-    {#snippet control()}
-      <div
-        class={[
-          "checkbox-container",
-          "mod-small",
-          { "is-enabled": $settings.showTimeTracker },
-        ]}
-        onclick={() => {
-          $settings.showTimeTracker = !$settings.showTimeTracker;
-        }}
-      >
-        <input tabindex="0" type="checkbox" />
-      </div>
-    {/snippet}
-  </SettingItem>
-
-  <SettingItem class="mod-toggle">
-    {#snippet name()}
       Show active clocks
     {/snippet}
     {#snippet control()}
