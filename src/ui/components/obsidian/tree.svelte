@@ -1,8 +1,5 @@
 <script lang="ts">
   import { type Snippet } from "svelte";
-  import { slide } from "svelte/transition";
-
-  import { createSlide } from "../defaults";
 
   import RightTriangle from "./right-triangle.svelte";
 
@@ -49,24 +46,15 @@
     {/if}
   </div>
   {#if isTreeVisible}
-    <div
-      class="transition-wrapper"
-      transition:slide={createSlide({ axis: "y" })}
-    >
-      {@render children()}
-    </div>
+    {@render children()}
   {/if}
 </div>
 
 <style>
-  .transition-wrapper,
   .tree-container {
     display: flex;
     flex: var(--flex);
     flex-direction: column;
-  }
-
-  .tree-container {
     border-bottom: 1px solid var(--background-modifier-border);
   }
 

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { EllipsisVertical } from "lucide-svelte";
   import { Menu } from "obsidian";
-  import { slide } from "svelte/transition";
 
   import { dataviewDownloadLink } from "../../constants";
   import { getDateRangeContext } from "../../context/date-range-context";
@@ -11,7 +10,6 @@
 
   import Callout from "./callout.svelte";
   import ControlButton from "./control-button.svelte";
-  import { createSlide } from "./defaults";
   import {
     Settings,
     ChevronLeft,
@@ -155,7 +153,7 @@
   {/if}
 
   {#if settingsVisible}
-    <div class="settings-wrapper" transition:slide={createSlide({ axis: "y" })}>
+    <div class="settings-wrapper">
       <SettingsControls />
     </div>
   {/if}
@@ -197,6 +195,7 @@
   .header {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
+    padding-right: var(--size-4-3);
   }
 
   .header > :global(*):last-child {
@@ -206,18 +205,22 @@
   .controls {
     overflow: hidden;
     display: flex;
-    flex: 0 0 auto;
     flex-direction: column;
     gap: var(--size-4-2);
 
-    padding: var(--size-4-2) var(--size-4-3);
+    padding: var(--size-4-2) 0 var(--size-4-2) var(--size-4-3);
 
     font-size: var(--font-ui-small);
   }
 
   .settings-wrapper {
+    overflow: scroll;
     display: flex;
     flex-direction: column;
     gap: var(--size-4-2);
+  }
+
+  .settings-wrapper > :global(*) {
+    padding-right: var(--size-4-1);
   }
 </style>
