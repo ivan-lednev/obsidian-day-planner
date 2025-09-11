@@ -93,7 +93,7 @@
 {/if}
 
 {#if $settings.showTimelineInSidebar}
-  <Tree --flex="1 1 auto" isInitiallyOpen title="Timeline">
+  <Tree isInitiallyOpen title="Timeline">
     {#snippet flair()}
       <Ellipsis
         onclick={(event) => {
@@ -103,7 +103,7 @@
         }}
       />
     {/snippet}
-    <Scroller class="timeline-scroller">
+    <Scroller class={["timeline-scroller", "planner-flex-scrollable"]}>
       {#snippet children(isUnderCursor)}
         <Ruler visibleHours={getVisibleHours($settings)} />
         <Timeline day={firstDayInRange} {isUnderCursor} />

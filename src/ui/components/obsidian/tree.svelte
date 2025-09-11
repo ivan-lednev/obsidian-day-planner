@@ -53,8 +53,10 @@
 <style>
   .tree-container {
     display: flex;
-    flex: var(--flex);
     flex-direction: column;
+  }
+
+  .tree-container:not(:last-child) {
     border-bottom: 1px solid var(--background-modifier-border);
   }
 

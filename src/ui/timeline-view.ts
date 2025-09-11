@@ -41,6 +41,8 @@ export default class TimelineView extends ItemView {
   async onOpen() {
     const contentEl = this.containerEl.children[1];
 
+    contentEl.addClass("planner-flex-container");
+
     this.dateRange = this.dateRanges.trackRange([window.moment()]);
     this.registerEvent(
       this.app.workspace.on("active-leaf-change", (leaf) => {

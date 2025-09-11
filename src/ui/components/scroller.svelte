@@ -10,7 +10,7 @@
     ...rest
   }: {
     children: Snippet<[boolean]>;
-    class?: string;
+    class?: string | string[];
     onscroll?: (event: Event) => void;
   } = $props();
 
@@ -51,9 +51,7 @@
 
 <style>
   .scroller {
-    overflow: auto;
     display: flex;
-    flex: 1 0 0;
     background-color: var(--background-secondary);
   }
 </style>
