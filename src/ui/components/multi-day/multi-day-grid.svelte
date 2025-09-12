@@ -195,7 +195,7 @@
 {/if}
 
 <div class="multi-day-main-content">
-  <Scroller onscroll={handleScroll}>
+  <Scroller class="planner-multi-day-scroller" onscroll={handleScroll}>
     {#each $dateRange as day}
       <Timeline
         --column-background-color={getColumnBackgroundColor(day)}
@@ -267,6 +267,11 @@
 </div>
 
 <style>
+  :global(.planner-multi-day-scroller) {
+    overflow: auto;
+    flex: 1 0 0;
+  }
+
   :global(.planner-header-row) {
     --cell-flex-basis: calc(
       var(--timeline-flex-basis) * var(--timeline-internal-column-count, 1)
