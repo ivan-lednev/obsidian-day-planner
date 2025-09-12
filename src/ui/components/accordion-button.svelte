@@ -11,17 +11,15 @@
   }: { onclick: () => void; children: Snippet; Icon: Component } = $props();
 </script>
 
-<div style:display="contents" class="accordion-button">
-  <ControlButton classes="day-planner-clickable-icon" {onclick}>
-    <div class="button-text">
-      <Icon class="svg-icon" />
-      {@render children()}
-    </div>
-  </ControlButton>
-</div>
+<ControlButton classes="planner-clickable-icon" {onclick}>
+  <div class="button-text">
+    <Icon class="svg-icon" />
+    {@render children()}
+  </div>
+</ControlButton>
 
 <style>
-  .accordion-button :global(.clickable-icon) {
+  :global(.planner-clickable-icon) {
     padding: var(--size-4-1) 0 var(--size-2-1) var(--size-4-4);
     border-radius: 0;
   }

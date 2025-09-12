@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Ellipsis } from "lucide-svelte";
   import { fromStore } from "svelte/store";
 
   import { getDateRangeContext } from "../../context/date-range-context";
@@ -11,6 +10,8 @@
 
   import ActiveClocks from "./active-clocks.svelte";
   import BlockList from "./block-list.svelte";
+  import ControlButton from "./control-button.svelte";
+  import { Settings } from "./lucide";
   import Tree from "./obsidian/tree.svelte";
   import ResizeHandle from "./resize-handle.svelte";
   import ResizeableBox from "./resizeable-box.svelte";
@@ -94,16 +95,18 @@
 
 {#if $settings.showTimelineInSidebar}
   <Tree isInitiallyOpen title="Timeline">
-    {#snippet flair()}
-      <Ellipsis
+    {#snippet controls()}
+      <ControlButton
+        --border-radius="0"
+        label="Timeline Settings"
         onclick={(event) => {
-          event.stopPropagation();
-
           createColumnSelectionMenu({ settings, event });
         }}
-      />
+      >
+        <Settings class="planner-settings-icon" />
+      </ControlButton>
     {/snippet}
-    <Scroller class={["timeline-scroller", "planner-flex-scrollable"]}>
+    <Scroller class={["planner-timeline-scroller", "planner-flex-scrollable"]}>
       {#snippet children(isUnderCursor)}
         <Ruler visibleHours={getVisibleHours($settings)} />
         <Timeline day={firstDayInRange} {isUnderCursor} />
@@ -113,7 +116,12 @@
 {/if}
 
 <style>
-  :global(.timeline-scroller) {
+  :global(svg.svg-icon.planner-settings-icon) {
+    width: var(--icon-s);
+    height: var(--icon-s);
+  }
+
+  :global(.planner-timeline-scroller) {
     border-top: 1px solid var(--background-modifier-border);
   }
 

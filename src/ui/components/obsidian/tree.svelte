@@ -7,11 +7,13 @@
     children,
     title,
     flair,
+    controls,
     isInitiallyOpen,
   }: {
-    children: Snippet;
     title: string;
+    children: Snippet;
     flair?: Snippet;
+    controls?: Snippet;
     isInitiallyOpen?: boolean;
   } = $props();
 
@@ -28,21 +30,26 @@
 
 <!--Partially uses Obsidian's classes for search result matches-->
 <div class="tree-container">
-  <div class="tree-item-self is-clickable" onclick={toggleTree}>
-    <div
-      class={[
-        "tree-item-icon",
-        "collapse-icon",
-        !isTreeVisible && "is-collapsed",
-      ]}
-    >
-      <RightTriangle />
-    </div>
-    <div style:color={titleColor} class="tree-item-inner">{title}</div>
-    {#if flair}
-      <div class="tree-item-flair-outer">
-        <span class="tree-item-flair">{@render flair()}</span>
+  <div class="tree-header-container">
+    <div class="tree-item-self is-clickable" onclick={toggleTree}>
+      <div
+        class={[
+          "tree-item-icon",
+          "collapse-icon",
+          !isTreeVisible && "is-collapsed",
+        ]}
+      >
+        <RightTriangle />
       </div>
+      <div style:color={titleColor} class="tree-item-inner">{title}</div>
+      {#if flair}
+        <div class="tree-item-flair-outer">
+          <span class="tree-item-flair">{@render flair()}</span>
+        </div>
+      {/if}
+    </div>
+    {#if controls && isTreeVisible}
+      {@render controls()}
     {/if}
   </div>
   {#if isTreeVisible}
@@ -56,6 +63,10 @@
     flex-direction: column;
   }
 
+  .tree-header-container {
+    display: flex;
+  }
+
   .tree-container:not(:last-child) {
     border-bottom: 1px solid var(--background-modifier-border);
   }
@@ -65,6 +76,7 @@
   }
 
   .tree-item-self {
+    flex: 1;
     margin-bottom: 0;
     border-radius: 0;
   }
