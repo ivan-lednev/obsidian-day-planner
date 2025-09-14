@@ -9,13 +9,13 @@ const durationSeparator = `\\s?-{1,2}\\s?`;
 
 const hours = `\\d{1,2}`;
 const minutes = `\\d{2}`;
-const hourMinuteSeparator = `[:. ]`;
+const hourMinuteSeparator = `[:.]`;
 const strictHourMinuteSeparator = ":";
 const amPm = "\\s?[apAP][mM](?!\\w)";
 
 const date = "\\d{4}-\\d{2}-\\d{2}";
 
-const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))?(${amPm})?`;
+const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))(${amPm})?`;
 const strictTime = `${hours}${strictHourMinuteSeparator}${minutes}(${amPm})?`;
 
 export const listTokenWithSpacesRegExp = new RegExp(listTokenWithSpaces);
