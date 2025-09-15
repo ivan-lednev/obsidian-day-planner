@@ -2,12 +2,13 @@
 - 🪲 [Report bugs and suggest features](https://github.com/ivan-lednev/obsidian-day-planner/issues)
 - ❓ [Ask questions](https://github.com/ivan-lednev/obsidian-day-planner/discussions/new?category=q-a)
 - 🛠️ [Submit pull-requests](./CONTRIBUTING.md)
-- ❤️ If this project adds value to your life, consider supporting it finantially:
+- ❤️ If this project adds value to your life, consider supporting it financially:
   - <a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
 
-Day Planner is a community plugin for [Obsidian](https://obsidian.md/). It adds editable calendar views and basic time-tracking. Day Planner is integrated with
-
+Day Planner is a community plugin for [Obsidian](https://obsidian.md/).
+It adds editable calendar views and basic time-tracking. 
+###### Day Planner is integrated with:
 - The core Daily Notes plugin.
 - [the Tasks plugin](https://obsidian.md/plugins?id=obsidian-tasks-plugin)
 - Online calendars
