@@ -36,7 +36,11 @@ export interface Overlap {
 }
 
 export type CleanUp = () => void;
-export type RenderMarkdown = (el: HTMLElement, markdown: string) => CleanUp;
+export type RenderMarkdown = (
+  el: HTMLElement,
+  markdown: string,
+  sourcePath: string,
+) => CleanUp;
 
 export type PointerDateTime = {
   dateTime: Moment;
@@ -46,6 +50,7 @@ export type PointerDateTime = {
 export type RefreshDataviewFn = (source: string) => Promise<unknown>;
 
 export interface ObsidianContext {
+  app: import("obsidian").App;
   workspaceFacade: WorkspaceFacade;
   periodicNotes: PeriodicNotes;
   initWeeklyView: () => Promise<void>;
