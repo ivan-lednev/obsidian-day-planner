@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Moment } from "moment";
   import { get } from "svelte/store";
+  import { onMount } from "svelte";
   import { isNotVoid } from "typed-assert";
 
   import { getObsidianContext } from "../../context/obsidian-context";
@@ -46,6 +47,48 @@
 
   let el: HTMLElement | undefined = $state();
 
+  function findOffsetForMinutes(
+    targetMinutesSinceMidnight: number,
+  ): number | undefined {
+    if (!el) {
+      return undefined;
+    }
+
+    const height = el.clientHeight;
+    if (height <= 0) {
+      return undefined;
+    }
+
+    const zoomLevel = settingsSignal.current.zoomLevel;
+    const startHour = settingsSignal.current.startHour;
+
+    const minMinutes = offsetYToMinutes(0, zoomLevel, startHour);
+    const maxMinutes = offsetYToMinutes(height, zoomLevel, startHour);
+
+    if (targetMinutesSinceMidnight <= minMinutes) {
+      return 0;
+    }
+
+    if (targetMinutesSinceMidnight >= maxMinutes) {
+      return height;
+    }
+
+    let low = 0;
+    let high = height;
+
+    for (let i = 0; i < 20; i += 1) {
+      const mid = (low + high) / 2;
+      const minutesAtMid = offsetYToMinutes(mid, zoomLevel, startHour);
+
+      if (minutesAtMid < targetMinutesSinceMidnight) {
+        low = mid;
+      } else {
+        high = mid;
+      }
+    }
+    return (low + high) / 2;
+  }
+
   function updatePointerDateTime(event: MouseEvent | TouchEvent) {
     isNotVoid(el);
 
@@ -87,6 +130,56 @@
     },
     onpanend: confirmEdit,
     options: { mouseSupport: false },
+  });
+
+  onMount(() => {
+    // respect the existing setting
+    if (!settingsSignal.current.centerNeedle) {
+      return;
+    }
+
+    // only scroll when viewing today
+    const isTodayFn = get(isToday);
+    if (!isTodayFn(day)) {
+      return;
+    }
+
+    // do not fight the user if cursor is already over the timeline
+    if (isUnderCursor) {
+      return;
+    }
+
+    if (!el) {
+      return;
+    }
+
+    const scroller = el.closest(".scroller") as HTMLElement | null;
+    if (!scroller) {
+      return;
+    }
+
+    const now = window.moment();
+    const minutesSinceMidnight = now.hours() * 60 + now.minutes();
+
+    const offsetFromTop = findOffsetForMinutes(minutesSinceMidnight);
+    if (offsetFromTop === undefined) {
+      return;
+    }
+
+    const halfViewport = scroller.clientHeight / 2;
+    const rawTarget = offsetFromTop - halfViewport;
+
+    const maxScroll =
+      scroller.scrollHeight > scroller.clientHeight
+        ? scroller.scrollHeight - scroller.clientHeight
+        : 0;
+
+    const target = Math.max(0, Math.min(rawTarget, maxScroll));
+
+    scroller.scrollTo({
+      top: target,
+      behavior: "auto",
+    });
   });
 </script>
 
