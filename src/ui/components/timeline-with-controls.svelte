@@ -11,7 +11,7 @@
   import ActiveClocks from "./active-clocks.svelte";
   import BlockList from "./block-list.svelte";
   import ControlButton from "./control-button.svelte";
-  import { Settings } from "./lucide";
+  import { Ellipsis } from "./lucide";
   import Tree from "./obsidian/tree.svelte";
   import ResizeHandle from "./resize-handle.svelte";
   import ResizeableBox from "./resizeable-box.svelte";
@@ -103,7 +103,7 @@
           createColumnSelectionMenu({ settings, event });
         }}
       >
-        <Settings class="planner-settings-icon" />
+        <Ellipsis class="planner-settings-icon" />
       </ControlButton>
     {/snippet}
     <Scroller class={["planner-timeline-scroller", "planner-flex-scrollable"]}>

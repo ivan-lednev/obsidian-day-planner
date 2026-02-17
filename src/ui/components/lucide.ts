@@ -17,6 +17,7 @@ const obsidianIcon =
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 /* eslint-disable @typescript-eslint/naming-convention */
+export const Ellipsis = obsidianIcon(lucideSvelte.Ellipsis);
 export const Settings = obsidianIcon(lucideSvelte.Settings);
 export const ChevronLeft = obsidianIcon(lucideSvelte.ChevronLeft);
 export const ChevronRight = obsidianIcon(lucideSvelte.ChevronRight);
