@@ -63,8 +63,11 @@
       minutesSinceMidnight,
       window.moment(day),
     );
+    const previousDateTime = get(pointerDateTime).dateTime;
 
-    pointerDateTime.set({ dateTime, type: "dateTime" });
+    if (!dateTime.isSame(previousDateTime, "minute")) {
+      pointerDateTime.set({ dateTime, type: "dateTime" });
+    }
   }
 
   function handleContainerPointerDown(event: MouseEvent | TouchEvent) {
