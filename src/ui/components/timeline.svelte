@@ -63,13 +63,19 @@
       minutesSinceMidnight,
       window.moment(day),
     );
-    // todo: might hurt perf. Need to check for identity of time not to run on every change of coords
+
     pointerDateTime.set({ dateTime, type: "dateTime" });
   }
 
   function handleContainerPointerDown(event: MouseEvent | TouchEvent) {
     updatePointerDateTime(event);
     handleContainerMouseDown();
+  }
+
+  function handleContainerPointerMove(event: MouseEvent | TouchEvent) {
+    if (get(editOperation)) {
+      updatePointerDateTime(event);
+    }
   }
 
   const timelineGestures = createGestures({
@@ -80,11 +86,7 @@
 
       handleContainerPointerDown(event);
     },
-    onpanmove: (event) => {
-      if (get(editOperation)) {
-        updatePointerDateTime(event);
-      }
-    },
+    onpanmove: handleContainerPointerMove,
     onpanend: confirmEdit,
     options: { mouseSupport: false },
   });
@@ -106,7 +108,7 @@
 
         handleContainerPointerDown(event);
       }}
-      onpointermove={updatePointerDateTime}
+      onpointermove={handleContainerPointerMove}
       onpointerup={confirmEdit}
       use:timelineGestures
     >
