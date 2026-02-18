@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { initialState as initialGlobalState } from "../../src/redux/global-slice";
 import {
   icalRefreshRequested,
+  selectAllIcalEventsWithIcalConfigs,
   selectRemoteTasks,
 } from "../../src/redux/ical/ical-slice";
 import { initListenerMiddleware } from "../../src/redux/listener-middleware";
@@ -114,6 +115,70 @@ async function setUp(props: {
     dispatch,
     getState,
   };
+}
+
+async function setUpWithPatterns(props: {
+  icalFixtureFileName: string;
+  visibleDays?: string[];
+  calendarFilterPatterns: string[];
+}) {
+  const {
+    icalFixtureFileName,
+    visibleDays = defaultVisibleDays,
+    calendarFilterPatterns,
+  } = props;
+
+  vi.mocked(request).mockReturnValue(getIcalFixture(icalFixtureFileName));
+
+  const { dispatch, getState } = makeStoreForTests({
+    preloadedState: {
+      ...defaultPreloadedStateForTests,
+      obsidian: {
+        ...initialGlobalState,
+        visibleDays,
+      },
+      settings: {
+        settings: {
+          ...defaultSettingsForTests,
+          icals: [
+            {
+              name: "Test",
+              url: "https://example.com",
+              color: "#ff0000",
+              email: "bishop1860@gmail.com",
+            },
+          ],
+          calendarFilterPatterns,
+        },
+      },
+    },
+  });
+
+  dispatch(icalRefreshRequested());
+
+  return { dispatch, getState };
+}
+
+async function setUpExpectingNoTasks(props: {
+  icalFixtureFileName: string;
+  visibleDays?: string[];
+  calendarFilterPatterns: string[];
+}) {
+  const { getState, dispatch } = await setUpWithPatterns(props);
+
+  // Wait for the ical events to be parsed (proves the fetch + parse cycle ran)
+  await vi.waitUntil(
+    () => selectAllIcalEventsWithIcalConfigs(getState()).length > 0,
+  );
+  // Give the background scheduler time to dispatch remoteTasksUpdated([])
+  await vi.waitFor(
+    () => {
+      expect(selectRemoteTasks(getState())).toHaveLength(0);
+    },
+    { timeout: 2000 },
+  );
+
+  return { remoteTasks: selectRemoteTasks(getState()), dispatch, getState };
 }
 
 describe("ical", () => {
@@ -261,5 +326,19 @@ describe("ical", () => {
 
   describe("Daylight savings time", () => {
     test.todo("Base case");
+  });
+
+  describe("calendarFilterPatterns", () => {
+    test("Events matching a summary pattern are filtered out", async () => {
+      const { remoteTasks } = await setUpExpectingNoTasks({
+        icalFixtureFileName: "google-tentative-attendee",
+        visibleDays: ["2024-09-26"],
+        calendarFilterPatterns: ["tentative-status"],
+      });
+
+      expect(remoteTasks).toHaveLength(0);
+    });
+
+
   });
 });

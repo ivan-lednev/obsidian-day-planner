@@ -67,6 +67,7 @@ export interface DayPlannerSettings {
   firstDayOfWeek: (typeof firstDaysOfWeek)[number];
   multiDayRange: "full-week" | "work-week" | "3-days";
   timelineColumns: TimelineColumns;
+  calendarFilterPatterns: string[];
 }
 
 export interface Cache {
@@ -115,6 +116,7 @@ export const defaultSettings: DayPlannerSettings = {
   showActiveClocks: false,
   showTimelineInSidebar: true,
   timelineColumns: { planner: true, timeTracker: false },
+  calendarFilterPatterns: [],
 };
 
 export const defaultSettingsForTests = {
