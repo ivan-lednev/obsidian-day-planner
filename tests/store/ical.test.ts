@@ -10,11 +10,13 @@ import {
   selectAllIcalEventsWithIcalConfigs,
   selectRemoteTasks,
 } from "../../src/redux/ical/ical-slice";
+import { matchesAnyFilterPattern } from "../../src/redux/ical/init-ical-listeners";
 import { initListenerMiddleware } from "../../src/redux/listener-middleware";
 import { makeStore, type RootState } from "../../src/redux/store";
 import { DataviewFacade } from "../../src/service/dataview-facade";
 import { ListPropsParser } from "../../src/service/list-props-parser";
 import { defaultSettingsForTests } from "../../src/settings";
+import type { RemoteTask } from "../../src/task-types";
 import { FakeMetadataCache, InMemoryVault } from "../test-utils";
 
 vi.mock("obsidian", () => ({
@@ -180,6 +182,59 @@ async function setUpExpectingNoTasks(props: {
 
   return { remoteTasks: selectRemoteTasks(getState()), dispatch, getState };
 }
+
+function makeRemoteTask(
+  overrides: Partial<Pick<RemoteTask, "summary" | "description" | "location">>,
+): RemoteTask {
+  return {
+    id: "test-id",
+    startTime: window.moment("2024-09-26T13:00:00Z"),
+    calendar: { name: "Test", url: "https://example.com", color: "#ff0000" },
+    rsvpStatus: "ACCEPTED",
+    summary: "Test event",
+    ...overrides,
+  };
+}
+
+describe("matchesAnyFilterPattern", () => {
+  test("returns false when patterns list is empty", () => {
+    expect(matchesAnyFilterPattern(makeRemoteTask({ summary: "Name in Stockholm" }), [])).toBe(false);
+  });
+
+  test("returns false when no pattern matches", () => {
+    const task = makeRemoteTask({ summary: "Team standup", description: "Daily sync", location: "Conference room A" });
+
+    expect(matchesAnyFilterPattern(task, ["Stockholm", "vacation"])).toBe(false);
+  });
+
+  test("matches summary case-insensitively", () => {
+    expect(matchesAnyFilterPattern(makeRemoteTask({ summary: "ANNA IN STOCKHOLM" }), ["in stockholm"])).toBe(true);
+  });
+
+  test("matches description", () => {
+    const task = makeRemoteTask({ summary: "Team event", description: "Anna in Stockholm" });
+
+    expect(matchesAnyFilterPattern(task, ["in stockholm"])).toBe(true);
+  });
+
+  test("matches location", () => {
+    expect(matchesAnyFilterPattern(makeRemoteTask({ summary: "Team event", location: "Stockholm office" }), ["stockholm"])).toBe(true);
+  });
+
+  test("returns true if any one pattern matches", () => {
+    expect(matchesAnyFilterPattern(makeRemoteTask({ summary: "Vacation block" }), ["in stockholm", "vacation"])).toBe(true);
+  });
+
+  test("ignores blank patterns", () => {
+    expect(matchesAnyFilterPattern(makeRemoteTask({ summary: "Team standup" }), ["   ", ""])).toBe(false);
+  });
+
+  test("works when optional fields are undefined", () => {
+    const task = makeRemoteTask({ summary: "Stockholm conference", description: undefined, location: undefined });
+
+    expect(matchesAnyFilterPattern(task, ["stockholm"])).toBe(true);
+  });
+});
 
 describe("ical", () => {
   beforeEach(() => {
