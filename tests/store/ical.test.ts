@@ -7,16 +7,15 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { initialState as initialGlobalState } from "../../src/redux/global-slice";
 import {
   icalRefreshRequested,
-  selectAllIcalEventsWithIcalConfigs,
   selectRemoteTasks,
 } from "../../src/redux/ical/ical-slice";
-import { matchesAnyFilterPattern } from "../../src/redux/ical/init-ical-listeners";
+import { localTaskMatchesAnyPattern, remoteTaskMatchesAnyPattern } from "../../src/util/task-filter";
 import { initListenerMiddleware } from "../../src/redux/listener-middleware";
 import { makeStore, type RootState } from "../../src/redux/store";
 import { DataviewFacade } from "../../src/service/dataview-facade";
 import { ListPropsParser } from "../../src/service/list-props-parser";
 import { defaultSettingsForTests } from "../../src/settings";
-import type { RemoteTask } from "../../src/task-types";
+import type { LocalTask, RemoteTask } from "../../src/task-types";
 import { FakeMetadataCache, InMemoryVault } from "../test-utils";
 
 vi.mock("obsidian", () => ({
@@ -119,69 +118,6 @@ async function setUp(props: {
   };
 }
 
-async function setUpWithPatterns(props: {
-  icalFixtureFileName: string;
-  visibleDays?: string[];
-  calendarFilterPatterns: string[];
-}) {
-  const {
-    icalFixtureFileName,
-    visibleDays = defaultVisibleDays,
-    calendarFilterPatterns,
-  } = props;
-
-  vi.mocked(request).mockReturnValue(getIcalFixture(icalFixtureFileName));
-
-  const { dispatch, getState } = makeStoreForTests({
-    preloadedState: {
-      ...defaultPreloadedStateForTests,
-      obsidian: {
-        ...initialGlobalState,
-        visibleDays,
-      },
-      settings: {
-        settings: {
-          ...defaultSettingsForTests,
-          icals: [
-            {
-              name: "Test",
-              url: "https://example.com",
-              color: "#ff0000",
-              email: "bishop1860@gmail.com",
-            },
-          ],
-          calendarFilterPatterns,
-        },
-      },
-    },
-  });
-
-  dispatch(icalRefreshRequested());
-
-  return { dispatch, getState };
-}
-
-async function setUpExpectingNoTasks(props: {
-  icalFixtureFileName: string;
-  visibleDays?: string[];
-  calendarFilterPatterns: string[];
-}) {
-  const { getState, dispatch } = await setUpWithPatterns(props);
-
-  // Wait for the ical events to be parsed (proves the fetch + parse cycle ran)
-  await vi.waitUntil(
-    () => selectAllIcalEventsWithIcalConfigs(getState()).length > 0,
-  );
-  // Give the background scheduler time to dispatch remoteTasksUpdated([])
-  await vi.waitFor(
-    () => {
-      expect(selectRemoteTasks(getState())).toHaveLength(0);
-    },
-    { timeout: 2000 },
-  );
-
-  return { remoteTasks: selectRemoteTasks(getState()), dispatch, getState };
-}
 
 function makeRemoteTask(
   overrides: Partial<Pick<RemoteTask, "summary" | "description" | "location">>,
@@ -196,43 +132,61 @@ function makeRemoteTask(
   };
 }
 
+function makeLocalTask(text: string): LocalTask {
+  return {
+    id: "test-local-id",
+    startTime: window.moment("2024-09-26T09:00:00Z"),
+    durationMinutes: 60,
+    symbol: "-",
+    text,
+  };
+}
+
 describe("matchesAnyFilterPattern", () => {
   test("returns false when patterns list is empty", () => {
-    expect(matchesAnyFilterPattern(makeRemoteTask({ summary: "Name in Stockholm" }), [])).toBe(false);
+    expect(remoteTaskMatchesAnyPattern(makeRemoteTask({ summary: "Name in Stockholm" }), [])).toBe(false);
   });
 
   test("returns false when no pattern matches", () => {
     const task = makeRemoteTask({ summary: "Team standup", description: "Daily sync", location: "Conference room A" });
 
-    expect(matchesAnyFilterPattern(task, ["Stockholm", "vacation"])).toBe(false);
+    expect(remoteTaskMatchesAnyPattern(task, ["Stockholm", "vacation"])).toBe(false);
   });
 
-  test("matches summary case-insensitively", () => {
-    expect(matchesAnyFilterPattern(makeRemoteTask({ summary: "ANNA IN STOCKHOLM" }), ["in stockholm"])).toBe(true);
+  test("matches remote task summary case-insensitively", () => {
+    expect(remoteTaskMatchesAnyPattern(makeRemoteTask({ summary: "ANNA IN STOCKHOLM" }), ["in stockholm"])).toBe(true);
   });
 
-  test("matches description", () => {
+  test("matches remote task description", () => {
     const task = makeRemoteTask({ summary: "Team event", description: "Anna in Stockholm" });
 
-    expect(matchesAnyFilterPattern(task, ["in stockholm"])).toBe(true);
+    expect(remoteTaskMatchesAnyPattern(task, ["in stockholm"])).toBe(true);
   });
 
-  test("matches location", () => {
-    expect(matchesAnyFilterPattern(makeRemoteTask({ summary: "Team event", location: "Stockholm office" }), ["stockholm"])).toBe(true);
+  test("matches remote task location", () => {
+    expect(remoteTaskMatchesAnyPattern(makeRemoteTask({ summary: "Team event", location: "Stockholm office" }), ["stockholm"])).toBe(true);
   });
 
   test("returns true if any one pattern matches", () => {
-    expect(matchesAnyFilterPattern(makeRemoteTask({ summary: "Vacation block" }), ["in stockholm", "vacation"])).toBe(true);
+    expect(remoteTaskMatchesAnyPattern(makeRemoteTask({ summary: "Vacation block" }), ["in stockholm", "vacation"])).toBe(true);
   });
 
   test("ignores blank patterns", () => {
-    expect(matchesAnyFilterPattern(makeRemoteTask({ summary: "Team standup" }), ["   ", ""])).toBe(false);
+    expect(remoteTaskMatchesAnyPattern(makeRemoteTask({ summary: "Team standup" }), ["   ", ""])).toBe(false);
   });
 
-  test("works when optional fields are undefined", () => {
+  test("works when optional remote fields are undefined", () => {
     const task = makeRemoteTask({ summary: "Stockholm conference", description: undefined, location: undefined });
 
-    expect(matchesAnyFilterPattern(task, ["stockholm"])).toBe(true);
+    expect(remoteTaskMatchesAnyPattern(task, ["stockholm"])).toBe(true);
+  });
+
+  test("matches local task text case-insensitively", () => {
+    expect(localTaskMatchesAnyPattern(makeLocalTask("Personal errand meeting"), ["personal"])).toBe(true);
+  });
+
+  test("does not match local task when pattern is absent", () => {
+    expect(localTaskMatchesAnyPattern(makeLocalTask("Team standup"), ["personal"])).toBe(false);
   });
 });
 
@@ -383,17 +337,4 @@ describe("ical", () => {
     test.todo("Base case");
   });
 
-  describe("calendarFilterPatterns", () => {
-    test("Events matching a summary pattern are filtered out", async () => {
-      const { remoteTasks } = await setUpExpectingNoTasks({
-        icalFixtureFileName: "google-tentative-attendee",
-        visibleDays: ["2024-09-26"],
-        calendarFilterPatterns: ["tentative-status"],
-      });
-
-      expect(remoteTasks).toHaveLength(0);
-    });
-
-
-  });
 });

@@ -186,38 +186,6 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
 
     containerEl.createEl("h2", { text: "Remote calendars" });
 
-    new Setting(containerEl)
-      .setName("Filter calendar events by text")
-      .setDesc(
-        createFragment((fragment) => {
-          fragment.append(
-            createEl("p", {
-              text: "Hide calendar events whose title, description, or location contains any of these patterns (one per line, case-insensitive).",
-            }),
-            createEl("p", {
-              text: "Useful for hiding noisy shared-calendar events like whole-day blocks or multi-day entries from other people.",
-            }),
-          );
-        }),
-      )
-      .addTextArea((el) => {
-        el.setPlaceholder("e.g. Name in Stockholm\nvacation")
-          .setValue(
-            (this.plugin.settings().calendarFilterPatterns ?? []).join("\n"),
-          )
-          .onChange((value: string) => {
-            const patterns = value
-              .split("\n")
-              .map((line) => line.trim())
-              .filter((line) => line.length > 0);
-
-            this.update({ calendarFilterPatterns: patterns });
-          });
-
-        el.inputEl.rows = 4;
-        el.inputEl.style.width = "100%";
-      });
-
     this.plugin.settings().icals.map((ical, index) => {
       containerEl.createEl("h2", { text: `Calendar ${index + 1}` });
 

@@ -16,6 +16,10 @@ import * as dv from "../../util/dataview";
 import { splitMultiday } from "../../util/moment";
 import { type Props, type LogEntry } from "../../util/props";
 import { getUpdateTrigger } from "../../util/store";
+import {
+  localTaskMatchesAnyPattern,
+  remoteTaskMatchesAnyPattern,
+} from "../../util/task-filter";
 import { getDayKey, getRenderKey } from "../../util/task-utils";
 
 import { useDataviewTasks } from "./use-dataview-tasks";
@@ -197,8 +201,26 @@ export function useTasks(props: {
     periodicNotes,
   );
 
+  const filteredLocalTasks = derived(
+    [localTasks, settingsStore],
+    ([$localTasks, $settings]) =>
+      $localTasks.filter(
+        (task) =>
+          !localTaskMatchesAnyPattern(task, $settings.calendarFilterPatterns),
+      ),
+  );
+
+  const filteredRemoteTasks = derived(
+    [remoteTasks, settingsStore],
+    ([$remoteTasks, $settings]) =>
+      $remoteTasks.filter(
+        (task) =>
+          !remoteTaskMatchesAnyPattern(task, $settings.calendarFilterPatterns),
+      ),
+  );
+
   const tasksWithTimeForToday = derived(
-    [localTasks, remoteTasks, currentTime],
+    [filteredLocalTasks, filteredRemoteTasks, currentTime],
     ([$localTasks, $remoteTasks, $currentTime]: [Task[], Task[], Moment]) => {
       return $localTasks
         .concat($remoteTasks)
@@ -209,6 +231,8 @@ export function useTasks(props: {
     },
   );
 
+  // Intentionally uses unfiltered localTasks — abort on any underlying task
+  // list change, not just visible ones, to avoid stale edit state.
   const abortEditTrigger = derived(
     [localTasks, dataviewChange],
     getUpdateTrigger,
@@ -220,8 +244,8 @@ export function useTasks(props: {
     onUpdate,
     onEditAborted,
     settings: settingsStore,
-    localTasks,
-    remoteTasks,
+    localTasks: filteredLocalTasks,
+    remoteTasks: filteredRemoteTasks,
     pointerDateTime,
     abortEditTrigger,
   });

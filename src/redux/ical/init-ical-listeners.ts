@@ -9,7 +9,7 @@ import {
   selectSortedDedupedVisibleDays,
   selectVisibleDays,
 } from "../global-slice";
-import { selectIcals, selectSettings } from "../settings-slice";
+import { selectIcals } from "../settings-slice";
 import type { AppListenerEffect } from "../store";
 import { createSelectorChangePredicate } from "../util";
 
@@ -62,31 +62,6 @@ export function createIcalFetchListener(props: {
   };
 }
 
-export function matchesAnyFilterPattern(
-  task: RemoteTask,
-  patterns: string[],
-): boolean {
-  if (patterns.length === 0) {
-    return false;
-  }
-
-  const fieldsToCheck = [task.summary, task.description, task.location].filter(
-    Boolean,
-  ) as string[];
-
-  return patterns.some((pattern) => {
-    if (pattern.trim().length === 0) {
-      return false;
-    }
-
-    const lowerPattern = pattern.toLowerCase();
-
-    return fieldsToCheck.some((field) =>
-      field.toLowerCase().includes(lowerPattern),
-    );
-  });
-}
-
 export type IcalParseTaskResult = RemoteTask | RemoteTask[] | undefined;
 
 export function createIcalParseListener(props: {
@@ -126,16 +101,11 @@ export function createIcalParseListener(props: {
         icalEventToTasksForRange(icalEvent, earliestDay, latestDay),
     );
 
-    const { calendarFilterPatterns } = selectSettings(listenerApi.getState());
-
     scheduler.enqueueTasks(taskComputationQueue, (tasksFromEvents) => {
       const remoteTasks = tasksFromEvents
         .flat()
         .filter((task): task is RemoteTask | WithTime<RemoteTask> =>
           Boolean(task),
-        )
-        .filter(
-          (task) => !matchesAnyFilterPattern(task, calendarFilterPatterns),
         )
         // todo: t.serialize(), t.deserialize()
         .map((it) => ({ ...it, startTime: it.startTime.toISOString() }));

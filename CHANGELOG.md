@@ -1,3 +1,7 @@
+## Unreleased
+
+- Hide events and local tasks by entering text patterns in Settings > "Exclude containing..." (case-insensitive, one per line)
+
 ## 0.28.0
 
 ### 💥 Breaking changes

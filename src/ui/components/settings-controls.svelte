@@ -26,6 +26,16 @@
     // @ts-expect-error
     $settings.zoomLevel = Number(event.currentTarget.value);
   }
+
+  let rawFilterInput = ($settings.calendarFilterPatterns ?? []).join("\n");
+
+  function handleFilterInput(e: Event) {
+    rawFilterInput = (e.currentTarget as HTMLTextAreaElement).value;
+    $settings.calendarFilterPatterns = rawFilterInput
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+  }
 </script>
 
 <div class="dataview-source">
@@ -48,6 +58,16 @@
       >Filter syntax reference</a
     >
   </Callout>
+</div>
+
+<div class="filter-input">
+  <textarea
+    placeholder={"Exclude containing...\ne.g. personal"}
+    spellcheck="false"
+    rows="3"
+    value={rawFilterInput}
+    oninput={handleFilterInput}
+  ></textarea>
 </div>
 <div class="settings">
   <SettingItem>
@@ -228,7 +248,8 @@
 </div>
 
 <style>
-  .dataview-source {
+  .dataview-source,
+  .filter-input {
     display: flex;
     flex-direction: column;
     gap: var(--size-4-2);
@@ -237,8 +258,14 @@
     color: var(--text-muted);
   }
 
-  .dataview-source input {
+  .dataview-source input,
+  .filter-input textarea {
     font-family: var(--font-monospace);
+  }
+
+  .filter-input textarea {
+    resize: vertical;
+    width: 100%;
   }
 
   .error-message {
