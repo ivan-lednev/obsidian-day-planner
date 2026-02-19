@@ -74,9 +74,6 @@
     "vite-plugin-filter-replace": "^0.1.13",
     "vitest": "^2.1.3"
   },
-  "overrides": {
-    "svelte": "$svelte"
-  },
   "dependencies": {
     "@floating-ui/dom": "^1.6.11",
     "@reduxjs/toolkit": "^2.3.0",
@@ -95,7 +92,7 @@
     "obsidian-daily-notes-interface": "^0.9.4",
     "overlayscrollbars": "^2.10.0",
     "overlayscrollbars-svelte": "^0.5.4",
-    "svelte": "^5.0.0-next.255",
+    "svelte": "^5.53.0",
     "svelte-portal": "^2.2.1",
     "tinygesture": "^3.0.0",
     "ts-dedent": "^2.2.0",
