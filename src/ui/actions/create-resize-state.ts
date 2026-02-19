@@ -1,7 +1,7 @@
 import { on } from "svelte/events";
 import { isNotVoid } from "typed-assert";
 
-import { getIsomorphicClientY } from "../../util/dom";
+import { getPointerOffsetY } from "../../util/dom";
 
 /**
  * This action is useful for cases when we need a resize grip that is outside
@@ -39,8 +39,7 @@ export function createResizeState() {
       `Failed to resize a container. Either an action function hasn't been passed to a container, or the container got destroyed.`,
     );
 
-    const viewportToElOffsetY = resizeContainerEl.getBoundingClientRect().top;
-    const newHeight = getIsomorphicClientY(event) - viewportToElOffsetY;
+    const newHeight = getPointerOffsetY(resizeContainerEl, event);
 
     resizeContainerEl.style.height = `${newHeight}px`;
   }

@@ -7,7 +7,7 @@
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import {
-    getIsomorphicClientY,
+    getPointerOffsetY,
     isTouchEvent,
     offsetYToMinutes,
   } from "../../util/dom";
@@ -49,11 +49,7 @@
   function updatePointerDateTime(event: MouseEvent | TouchEvent) {
     isNotVoid(el);
 
-    const viewportToElOffsetY = el.getBoundingClientRect().top;
-    const borderTopToPointerOffsetY =
-      getIsomorphicClientY(event) - viewportToElOffsetY;
-    const newOffsetY = snap(borderTopToPointerOffsetY, $settings);
-
+    const newOffsetY = snap(getPointerOffsetY(el, event), $settings);
     const minutesSinceMidnight = offsetYToMinutes(
       newOffsetY,
       settingsSignal.current.zoomLevel,

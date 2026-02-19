@@ -2,7 +2,7 @@
   import { type Snippet } from "svelte";
   import { isNotVoid } from "typed-assert";
 
-  import { getIsomorphicClientY } from "../../util/dom";
+  import { getPointerOffsetY } from "../../util/dom";
 
   let {
     el = $bindable(),
@@ -44,9 +44,7 @@
 
     isNotVoid(el);
 
-    const viewportToElOffsetY = el.getBoundingClientRect().top;
-
-    customHeight = getIsomorphicClientY(event) - viewportToElOffsetY;
+    customHeight = getPointerOffsetY(el, event);
   }
 </script>
 

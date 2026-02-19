@@ -3,6 +3,7 @@
   import { on } from "svelte/events";
 
   import { getObsidianContext } from "../../context/obsidian-context";
+  import { createAutoScroll, getScrollZones } from "../../util/dom";
 
   const {
     children,
@@ -15,6 +16,9 @@
   } = $props();
 
   let isUnderCursor = $state(false);
+  let el: HTMLElement | undefined = $state();
+
+  const { startScroll, stopScroll } = createAutoScroll();
 
   const {
     editContext: { editOperation },
@@ -36,12 +40,29 @@
 </script>
 
 <div
+  bind:this={el}
   class={["scroller", rest.class]}
   onmouseenter={() => {
     isUnderCursor = true;
   }}
   onmouseleave={() => {
     isUnderCursor = false;
+  }}
+  onpointerleave={stopScroll}
+  onpointermove={(event) => {
+    if (!$editOperation || !el) {
+      return;
+    }
+
+    const scrollZones = getScrollZones(event, el);
+
+    if (scrollZones.isInTopScrollZone) {
+      startScroll({ el, direction: "up" });
+    } else if (scrollZones.isInBottomScrollZone) {
+      startScroll({ el, direction: "down" });
+    } else {
+      stopScroll();
+    }
   }}
   {onscroll}
   use:blockPanOnEdit
