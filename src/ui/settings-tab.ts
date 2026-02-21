@@ -233,7 +233,7 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             }),
         );
 
-      new Setting(containerEl).setName("Remote calendar URL").addText((el) =>
+      new Setting(containerEl).setName("Calendar URL").addText((el) =>
         el
           .setPlaceholder("URL")
           .setValue(ical.url)
