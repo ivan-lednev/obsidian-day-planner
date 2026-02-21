@@ -588,6 +588,7 @@ export default class DayPlanner extends Plugin {
     }
 
     const defaultObsidianContext: ObsidianContext = {
+      app: this.app,
       periodicNotes: this.periodicNotes,
       sTaskEditor: this.sTaskEditor,
       workspaceFacade: this.workspaceFacade,

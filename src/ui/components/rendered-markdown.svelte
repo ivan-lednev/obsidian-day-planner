@@ -5,7 +5,7 @@
 
   export let task: LocalTask;
 
-  const { renderMarkdown, toggleCheckboxInFile, settings } =
+  const { app, renderMarkdown, toggleCheckboxInFile, settings } =
     getObsidianContext();
 </script>
 
@@ -16,6 +16,7 @@
     settings: $settings,
     renderMarkdown,
     toggleCheckboxInFile,
+    app,
   }}
 ></div>
 

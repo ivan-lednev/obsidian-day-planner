@@ -84,6 +84,15 @@
       return;
     }
 
+    // Don't interfere with link clicks - let Obsidian handle them
+    if (
+      event.target instanceof HTMLElement &&
+      (event.target.classList.contains("internal-link") ||
+        event.target.closest("a.internal-link"))
+    ) {
+      return;
+    }
+
     if (event.button === MouseButton.LEFT) {
       setPrimary();
     } else if (event.button === MouseButton.RIGHT) {
