@@ -1,3 +1,4 @@
+import { type Extension } from "@codemirror/state";
 import {
   MarkdownView,
   Notice,
@@ -5,6 +6,7 @@ import {
   WorkspaceLeaf,
   type MarkdownFileInfo,
   type TFile,
+  Menu,
 } from "obsidian";
 import { getAPI } from "obsidian-dataview";
 import {
@@ -69,6 +71,7 @@ import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn, PointerDateTime } from "./types";
 import { askForConfirmation } from "./ui/confirmation-modal";
 import { createEditorMenuCallback } from "./ui/editor-menu";
+import { hoverPlugin } from "./ui/gutter-plugin";
 import { useDateRanges } from "./ui/hooks/use-date-ranges";
 import { useDebounceWithDelay } from "./ui/hooks/use-debounce-with-delay";
 import { mountStatusBarWidget } from "./ui/hooks/use-status-bar-widget";
@@ -94,6 +97,7 @@ export default class DayPlanner extends Plugin {
   private sTaskEditor!: STaskEditor;
   private vaultFacade!: VaultFacade;
   private transactionWriter!: TransactionWriter;
+  private extensions: Extension[] = [];
 
   async onload() {
     const initialPluginData: PluginData = {
@@ -183,6 +187,38 @@ export default class DayPlanner extends Plugin {
 
     await this.handleNewPluginVersion();
     await this.initTimelineLeafSilently();
+
+    this.registerEditorExtension([
+      hoverPlugin({
+        onpointerup: (event, { path, line }) => {
+          new Menu()
+            .addItem((item) => {
+              item
+                .setTitle("Clock in")
+                .setIcon("play")
+                .onClick(
+                  () =>
+                    this.sTaskEditor.clockInAtLine({ path, line: line - 1 }), // todo: bridge editor lines & cache lines
+                );
+            })
+            .showAtMouseEvent(event);
+        },
+        markerPredicate: (props) => {
+          const { path, line } = props;
+
+          if (line === null) {
+            return false;
+          }
+
+          const task = this.dataviewFacade.getTaskAtLine({
+            path,
+            line: line - 1, // todo: bridge editor lines & cache lines
+          });
+
+          return Boolean(task);
+        },
+      }),
+    ]);
   }
 
   async onunload() {
