@@ -6,9 +6,34 @@ import type { HorizontalPlacing } from "./overlap/horizontal-placing";
 import type { IcalConfig } from "./settings";
 import type { Props } from "./util/props";
 
+type EntryType = "listItem" | "task" | "icalEvent";
+
 export interface Entry {
-  type: "listItem" | "task" | "icalEvent" | "file";
+  type: EntryType;
+}
+
+export interface IcalEntry extends Entry {
+  type: "icalEvent";
+}
+
+export interface FsEntry extends Entry {
+  path: string;
   props: Props;
+}
+
+export interface ListItemLikeEntry extends FsEntry {
+  symbol: string;
+  position: Pos;
+  children: string[];
+}
+
+export interface ListItemEntry extends ListItemLikeEntry {
+  type: "listItem";
+}
+
+export interface TaskEntry extends ListItemLikeEntry {
+  type: "task";
+  status: string;
 }
 
 export interface TaskLocation {

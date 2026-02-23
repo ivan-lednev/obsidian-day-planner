@@ -81,9 +81,12 @@ export function getTimeFromLine({ line, day }: { line: string; day: Moment }) {
   };
 }
 
-export function getDisplayedText(task: LocalTask) {
-  if (task.status) {
-    return task.text;
+export function getTextForRendering(task: LocalTask) {
+  const isTask = task.status;
+
+  if (isTask) {
+    return `${getFirstLine(task.text)}
+${dedent(getLinesAfterFirst(task.text)).trimStart()}`;
   }
 
   return `${removeListTokens(getFirstLine(task.text))}

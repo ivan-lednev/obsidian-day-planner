@@ -145,11 +145,12 @@ export function createTimestamp(
   startMinutes: number,
   durationMinutes: number,
   format: string,
+  separator = " - ",
 ) {
   const start = minutesToMoment(startMinutes);
   const end = addMinutes(start, durationMinutes);
 
-  return `${start.format(format)} - ${end.format(format)}`;
+  return `${start.format(format)}${separator}${end.format(format)}`;
 }
 
 export function getEmptyTasksForDay() {

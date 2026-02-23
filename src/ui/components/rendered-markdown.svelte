@@ -1,23 +1,37 @@
 <script lang="ts">
   import { getObsidianContext } from "../../context/obsidian-context";
   import type { LocalTask } from "../../task-types";
-  import { renderTaskMarkdown } from "../actions/render-task-markdown";
+  import { createTimestamp, removeTimestamp } from "../../util/task-utils";
+  import { getFirstLine, getLinesAfterFirst } from "../../util/markdown";
+  import { getMinutesSinceMidnight } from "../../util/moment";
+  import dedent from "ts-dedent";
 
   export let task: LocalTask;
 
   const { renderMarkdown, toggleCheckboxInFile, settings } =
     getObsidianContext();
+
+    const emDash = "–"
 </script>
 
-<div
-  class="rendered-markdown planner-sticky-block-content"
-  use:renderTaskMarkdown={{
-    task,
-    settings: $settings,
-    renderMarkdown,
-    toggleCheckboxInFile,
-  }}
-></div>
+<div class="rendered-markdown planner-sticky-block-content">
+  <div
+    class="first-line-wrapper"
+    {@attach (el) =>
+      renderMarkdown(el, removeTimestamp(getFirstLine(task.text)))}
+  ></div>
+  {createTimestamp(
+    getMinutesSinceMidnight(task.startTime),
+    task.durationMinutes,
+    $settings.timestampFormat,
+    emDash,
+  )}
+  <div
+    class="lines-after-first-wrapper"
+    {@attach (el) =>
+      renderMarkdown(el, dedent(getLinesAfterFirst(task.text)).trimStart())}
+  ></div>
+</div>
 
 <style>
   :global(.planner-task-decoration) {
@@ -65,5 +79,9 @@
   .rendered-markdown :global(li.task-list-item[data-task="x"]),
   .rendered-markdown :global(li.task-list-item[data-task="X"]) {
     color: var(--text-muted);
+  }
+
+  .first-line-wrapper {
+    font-weight: var(--font-semibold);
   }
 </style>

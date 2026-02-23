@@ -24,7 +24,7 @@ export const statusBarTextLimit = 15;
 export const indentBeforeTaskParagraph = 2;
 export const indentBeforeListParagraph = 2;
 
-export const reQueryAfterMillis = 200;
+export const reQueryAfterMillis = 100;
 export const undoTimeoutMillis = 8000;
 export const vibrationDurationMillis = 100;
 export const transitionDurationShort = 150;
