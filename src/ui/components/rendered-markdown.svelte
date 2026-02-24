@@ -42,6 +42,8 @@
       return;
     }
 
+    event.stopPropagation();
+
     await toggleCheckboxInFile(task.location.path, line);
   }
 
