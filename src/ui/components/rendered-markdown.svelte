@@ -1,36 +1,100 @@
 <script lang="ts">
   import { getObsidianContext } from "../../context/obsidian-context";
-  import type { LocalTask } from "../../task-types";
+  import type { FileLine, LocalTask } from "../../task-types";
   import { createTimestamp, removeTimestamp } from "../../util/task-utils";
   import { getFirstLine, getLinesAfterFirst } from "../../util/markdown";
   import { getMinutesSinceMidnight } from "../../util/moment";
   import dedent from "ts-dedent";
+  import { emDash } from "../../constants";
+  import {
+    addLineDataToCheckboxes,
+    readCheckboxLineData,
+  } from "../../util/dom";
+  import { on } from "svelte/events";
 
   export let task: LocalTask;
 
   const { renderMarkdown, toggleCheckboxInFile, settings } =
     getObsidianContext();
 
-    const emDash = "–"
+  function stopPropagationForElWithLineData(event: Event) {
+    if (event.target instanceof HTMLElement && event.target.dataset.line) {
+      event.stopPropagation();
+    }
+  }
+
+  function getLineNumberFromEvent(event: PointerEvent) {
+    if (!(event.target instanceof HTMLElement)) {
+      return;
+    }
+
+    return Number(event.target.dataset.line);
+  }
+
+  async function handlePointerUp(event: PointerEvent) {
+    if (!task.location) {
+      return;
+    }
+
+    const line = getLineNumberFromEvent(event);
+
+    if (!line) {
+      return;
+    }
+
+    await toggleCheckboxInFile(task.location.path, line);
+  }
+
+  function createRenderMarkdownAttachment(
+    text: string,
+    lines: FileLine[] | FileLine,
+  ) {
+    return (el: HTMLElement) => {
+      const destroyMarkdown = renderMarkdown(el, text);
+
+      addLineDataToCheckboxes(el, lines);
+
+      const offPointerUp = on(el, "pointerup", handlePointerUp);
+      const offMouseUp = on(el, "mouseup", stopPropagationForElWithLineData);
+      const offTouchEnd = on(el, "touchend", stopPropagationForElWithLineData);
+
+      return () => {
+        destroyMarkdown();
+        offPointerUp();
+        offMouseUp();
+        offTouchEnd();
+      };
+    };
+  }
 </script>
 
 <div class="rendered-markdown planner-sticky-block-content">
   <div
     class="first-line-wrapper"
-    {@attach (el) =>
-      renderMarkdown(el, removeTimestamp(getFirstLine(task.text)))}
+    {@attach createRenderMarkdownAttachment(
+      removeTimestamp(getFirstLine(task.text)),
+      task.lines?.[0] || [],
+    )}
   ></div>
-  {createTimestamp(
-    getMinutesSinceMidnight(task.startTime),
-    task.durationMinutes,
-    $settings.timestampFormat,
-    emDash,
-  )}
-  <div
-    class="lines-after-first-wrapper"
-    {@attach (el) =>
-      renderMarkdown(el, dedent(getLinesAfterFirst(task.text)).trimStart())}
-  ></div>
+
+  {#if $settings.showTimestampInTaskBlock}
+    {createTimestamp(
+      getMinutesSinceMidnight(task.startTime),
+      task.durationMinutes,
+      $settings.timestampFormat,
+      emDash,
+    )}
+  {/if}
+
+  {#if $settings.showSubtasksInTaskBlocks}
+    <div
+      class="lines-after-first-wrapper"
+      {@attach createRenderMarkdownAttachment(
+        dedent(getLinesAfterFirst(task.text)).trimStart(),
+        task.lines?.slice(1) || [],
+      )}
+    ></div>
+  {/if}
 </div>
 
 <style>

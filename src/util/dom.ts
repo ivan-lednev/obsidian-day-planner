@@ -4,6 +4,9 @@ import {
   scrollOnHoverZoneHeightPercent,
   scrollSpeedPixelsPerAnimationFrame,
 } from "../constants";
+import type { FileLine } from "../task-types";
+
+import { liftToArray } from "./lift";
 
 export function isTouchEvent(event: PointerEvent) {
   return ["pen", "touch"].includes(event.pointerType);
@@ -141,4 +144,47 @@ export function createAutoScroll() {
   }
 
   return { startScroll, stopScroll };
+}
+
+export const checkboxInRenderedMarkdownSelector =
+  '[data-task] input[type="checkbox"]';
+
+export function addLineDataToCheckboxes(
+  el: HTMLElement,
+  lines?: FileLine[] | FileLine,
+) {
+  if (!lines) {
+    return;
+  }
+
+  const linesWithCheckboxes = liftToArray(lines).filter((line) => line.task);
+
+  el.querySelectorAll(checkboxInRenderedMarkdownSelector).forEach(
+    (checkbox, i) => {
+      if (!(checkbox instanceof HTMLElement)) {
+        return;
+      }
+
+      checkbox.dataset.line = String(linesWithCheckboxes[i].line);
+    },
+  );
+}
+
+export async function readCheckboxLineData(
+  event: PointerEvent,
+  checkFn: (line: number) => Promise<void>,
+) {
+  if (!(event.target instanceof HTMLElement)) {
+    return;
+  }
+
+  const line = event.target.dataset.line;
+
+  if (!line) {
+    return;
+  }
+
+  event.stopPropagation();
+
+  await checkFn(Number(line));
 }
