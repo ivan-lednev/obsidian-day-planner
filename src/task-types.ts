@@ -98,7 +98,7 @@ export type TaskWithoutComputedDuration = Omit<LocalTask, "durationMinutes"> &
 
 export type Task = LocalTask | RemoteTask;
 
-export function isRemote<T extends Task>(task: T): task is T & RemoteTask {
+export function isRemote(task: Task): task is RemoteTask {
   return Object.hasOwn(task, "calendar");
 }
 

@@ -6,7 +6,7 @@
   }: {
     // todo: once lucide-svelte supports Svelte 5, remove this
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    key: any;
+    key?: any;
     value: string;
     onpointerup?: () => void;
   } = $props();
@@ -14,7 +14,7 @@
 
 {#if value}
   <span class="pill" {onpointerup}>
-    {#if typeof key === "string"}
+    {#if !key}{:else if typeof key === "string"}
       {key}:
     {:else}
       {@const Component = key}
@@ -39,7 +39,7 @@
 
     padding: var(--size-2-1) var(--size-4-2);
 
-    font-size: var(--font-ui-smaller);
+    font-size: var(--font-ui-small);
     color: var(--tag-color);
 
     background-color: var(--tag-background);

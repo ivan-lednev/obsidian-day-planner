@@ -1,8 +1,12 @@
 <script lang="ts">
-  import type { RemoteTask } from "../../task-types";
-  import { mountHtmlAction } from "../actions/mount-html.svelte";
+  import type { Snippet } from "svelte";
 
-  const { task }: { task: RemoteTask } = $props();
+  import type { RemoteTask } from "../../task-types";
+
+  const {
+    task,
+    bottomDecoration,
+  }: { task: RemoteTask; bottomDecoration: Snippet } = $props();
 
   const tentative = task.rsvpStatus === "TENTATIVE";
   const declined = task.rsvpStatus === "DECLINED";
@@ -14,45 +18,16 @@
     class={["ribbon", { declined, tentative }]}
   ></div>
   <div class="planner-sticky-block-content">
-    <span class="calendar-name">
-      {task.calendar.name}
-    </span>
-
     <span class={["summary", { declined }]}>
       {task.summary}
     </span>
-
-    {#if task.location}
-      <div class="location">
-        📍 {task.location}
-      </div>
-    {/if}
-
-    {#if task.description}
-      <div
-        class="rendered-description"
-        use:mountHtmlAction={task.description}
-      ></div>
-    {/if}
+    <div>
+      {@render bottomDecoration()}
+    </div>
   </div>
 </div>
 
 <style>
-  .location,
-  .rendered-description {
-    font-size: var(--font-ui-smaller);
-    color: var(--text-muted);
-  }
-
-  .rendered-description :global(:is(ul, ol)) {
-    margin: 0.2em;
-    padding-inline-start: 20px;
-  }
-
-  .calendar-name {
-    color: var(--text-muted);
-  }
-
   .remote-task-content {
     display: flex;
     flex: 1 0 0;
@@ -93,6 +68,10 @@
       transparent 10px
     );
     border-right: 1px solid var(--ribbon-color);
+  }
+
+  .summary {
+    font-weight: var(--font-semibold);
   }
 
   .summary.declined {

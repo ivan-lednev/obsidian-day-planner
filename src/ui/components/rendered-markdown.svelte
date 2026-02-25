@@ -1,18 +1,18 @@
 <script lang="ts">
   import { getObsidianContext } from "../../context/obsidian-context";
   import type { FileLine, LocalTask } from "../../task-types";
-  import { createTimestamp, removeTimestamp } from "../../util/task-utils";
+  import { removeTimestamp } from "../../util/task-utils";
+  import { deleteProps } from "../../util/props";
   import { getFirstLine, getLinesAfterFirst } from "../../util/markdown";
-  import { getMinutesSinceMidnight } from "../../util/moment";
   import dedent from "ts-dedent";
-  import { emDash } from "../../constants";
   import {
     addLineDataToCheckboxes,
     readCheckboxLineData,
   } from "../../util/dom";
   import { on } from "svelte/events";
+  import type { Snippet } from "svelte";
 
-  export let task: LocalTask;
+  const { task, children }: { task: LocalTask; children: Snippet } = $props();
 
   const { renderMarkdown, toggleCheckboxInFile, settings } =
     getObsidianContext();
@@ -70,29 +70,22 @@
   }
 </script>
 
-<div class="rendered-markdown planner-sticky-block-content">
+<div class={["rendered-markdown", "planner-sticky-block-content"]}>
   <div
     class="first-line-wrapper"
     {@attach createRenderMarkdownAttachment(
-      removeTimestamp(getFirstLine(task.text)),
+      removeTimestamp(deleteProps(getFirstLine(task.text))),
       task.lines?.[0] || [],
     )}
   ></div>
 
-  {#if $settings.showTimestampInTaskBlock}
-    {createTimestamp(
-      getMinutesSinceMidnight(task.startTime),
-      task.durationMinutes,
-      $settings.timestampFormat,
-      emDash,
-    )}
-  {/if}
+  {@render children?.()}
 
   {#if $settings.showSubtasksInTaskBlocks}
     <div
       class="lines-after-first-wrapper"
       {@attach createRenderMarkdownAttachment(
-        dedent(getLinesAfterFirst(task.text)).trimStart(),
+        dedent(deleteProps(getLinesAfterFirst(task.text))).trimStart(),
         task.lines?.slice(1) || [],
       )}
     ></div>
@@ -100,20 +93,6 @@
 </div>
 
 <style>
-  :global(.planner-task-decoration) {
-    margin: 0 0.25em;
-    padding: 0.1em 0.25em;
-
-    font-size: var(--tag-size);
-    font-weight: var(--tag-weight);
-    line-height: 1;
-    color: var(--tag-color);
-    text-decoration: var(--tag-decoration);
-
-    background-color: var(--tag-background);
-    border-radius: var(--radius-s);
-  }
-
   .rendered-markdown {
     --checkbox-size: var(--font-ui-small);
 

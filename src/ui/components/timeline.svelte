@@ -132,7 +132,9 @@
     <div class="tasks absolute-stretch-x">
       {#each $displayedTasksWithClocksForTimeline as task (getRenderKey(task))}
         <PositionedTimeBlock {task}>
-          <LocalTimeBlock {task} />
+          <LocalTimeBlock {task}>
+            {#snippet bottomDecoration()}{/snippet}
+          </LocalTimeBlock>
         </PositionedTimeBlock>
       {/each}
     </div>

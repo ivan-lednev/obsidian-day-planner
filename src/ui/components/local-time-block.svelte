@@ -32,6 +32,7 @@
   {task}
   use={[...use, hoverPreview(task)]}
 >
-  <RenderedMarkdown {task} />
-  {@render bottomDecoration?.()}
+  <RenderedMarkdown {task}>
+    {@render bottomDecoration?.()}
+  </RenderedMarkdown>
 </TimeBlockBase>
