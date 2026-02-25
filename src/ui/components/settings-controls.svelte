@@ -1,5 +1,6 @@
 <script lang="ts">
   import { range } from "lodash/fp";
+  import { SettingGroup } from "obsidian";
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { settings } from "../../global-store/settings";
@@ -14,8 +15,14 @@
   const { errorMessage: dataviewErrorMessage, dataviewSourceInput } =
     useDataviewSource({ refreshDataviewFn });
 
-  const startHourOptions = range(0, 13).map(String);
-  const zoomLevelOptions = range(1, 9).map(String);
+  const startHourOptions = Object.fromEntries(
+    range(0, 13).map((it) => [it, String(it)]),
+  );
+  const zoomLevelOptions = Object.fromEntries(
+    range(1, 9)
+      .map(String)
+      .map((it) => [it, String(it)]),
+  );
 
   function handleStartHourInput(event: Event) {
     // @ts-expect-error
@@ -49,73 +56,57 @@
     >
   </Callout>
 </div>
-<div class="settings">
-  <SettingItem>
-    {#snippet name()}
-      Start hour
-    {/snippet}
-    {#snippet control()}
-      <Dropdown
-        value={String($settings.startHour)}
-        values={startHourOptions}
-        on:input={handleStartHourInput}
-      />
-    {/snippet}
-  </SettingItem>
 
-  <SettingItem>
-    {#snippet name()}
-      Zoom
-    {/snippet}
-    {#snippet control()}
-      <Dropdown
-        value={String($settings.zoomLevel)}
-        values={zoomLevelOptions}
-        on:input={handleZoomLevelInput}
-      />
-    {/snippet}
-  </SettingItem>
+<div
+  class="settings"
+  style:--setting-items-padding="12px"
+  {@attach (el) => {
+    new SettingGroup(el)
+      .addSetting((setting) =>
+        setting
+          .setName("Start hour")
+          .addDropdown((dropdown) =>
+            dropdown
+              .addOptions(startHourOptions)
+              .onChange((value) => ($settings.startHour = Number(value))),
+          ),
+      )
+      .addSetting((setting) =>
+        setting
+          .setName("Zoom")
+          .addDropdown((dropdown) =>
+            dropdown
+              .addOptions(zoomLevelOptions)
+              .onChange((value) => ($settings.zoomLevel = Number(value))),
+          ),
+      );
 
-  <SettingItem class="mod-toggle">
-    {#snippet name()}
-      Show timeline
-    {/snippet}
-    {#snippet control()}
-      <div
-        class={[
-          "checkbox-container",
-          "mod-small",
-          { "is-enabled": $settings.showTimelineInSidebar },
-        ]}
-        onclick={() => {
-          $settings.showTimelineInSidebar = !$settings.showTimelineInSidebar;
-        }}
-      >
-        <input tabindex="0" type="checkbox" />
-      </div>
-    {/snippet}
-  </SettingItem>
+    new SettingGroup(el)
+      .setHeading("Timeline")
+      .addSetting((setting) =>
+        setting
+          .setName("Show timeline")
+          .addToggle((toggle) =>
+            toggle
+              .setValue($settings.showTimelineInSidebar)
+              .onChange((value) => ($settings.showTimelineInSidebar = value)),
+          ),
+      )
+      .addSetting((setting) =>
+        setting
+          .setName("Auto-scroll to now")
+          .addToggle((toggle) =>
+            toggle
+              .setValue($settings.centerNeedle)
+              .onChange((value) => ($settings.centerNeedle = value)),
+          ),
+      );
 
-  <SettingItem class="mod-toggle">
-    {#snippet name()}
-      Auto-scroll to now
-    {/snippet}
-    {#snippet control()}
-      <div
-        class={[
-          "checkbox-container",
-          "mod-small",
-          { "is-enabled": $settings.centerNeedle },
-        ]}
-        onclick={() => {
-          $settings.centerNeedle = !$settings.centerNeedle;
-        }}
-      >
-        <input tabindex="0" type="checkbox" />
-      </div>
-    {/snippet}
-  </SettingItem>
-
+    return () => {
+      el.empty();
+    };
+  }}
+>
   <SettingItem class="mod-toggle">
     {#snippet name()}
       Show completed tasks
