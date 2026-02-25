@@ -12,7 +12,7 @@
     offsetYToMinutes,
   } from "../../util/dom";
   import { minutesToMomentOfDay } from "../../util/moment";
-  import { getRenderKey } from "../../util/task-utils";
+  import { getBlockProps, getRenderKey } from "../../util/task-utils";
   import { createGestures } from "../actions/gestures";
 
   import Column from "./column.svelte";
@@ -113,7 +113,11 @@
     >
       {#each $displayedTasksForTimeline.withTime as task (getRenderKey(task))}
         <PositionedTimeBlock {task}>
-          <UnscheduledTimeBlock {task} />
+          <UnscheduledTimeBlock {task}>
+            {#snippet bottomDecoration()}
+              {getBlockProps(task, settingsSignal.current)}
+            {/snippet}
+          </UnscheduledTimeBlock>
         </PositionedTimeBlock>
       {/each}
     </div>
@@ -133,7 +137,9 @@
       {#each $displayedTasksWithClocksForTimeline as task (getRenderKey(task))}
         <PositionedTimeBlock {task}>
           <LocalTimeBlock {task}>
-            {#snippet bottomDecoration()}{/snippet}
+            {#snippet bottomDecoration()}
+              {getBlockProps(task, settingsSignal.current)}
+            {/snippet}
           </LocalTimeBlock>
         </PositionedTimeBlock>
       {/each}

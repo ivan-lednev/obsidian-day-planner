@@ -6,7 +6,7 @@
   const {
     task,
     bottomDecoration,
-  }: { task: RemoteTask; bottomDecoration: Snippet } = $props();
+  }: { task: RemoteTask; bottomDecoration?: Snippet } = $props();
 
   const tentative = task.rsvpStatus === "TENTATIVE";
   const declined = task.rsvpStatus === "DECLINED";
@@ -22,7 +22,7 @@
       {task.summary}
     </span>
     <div>
-      {@render bottomDecoration()}
+      {@render bottomDecoration?.()}
     </div>
   </div>
 </div>

@@ -4,7 +4,7 @@ import type { Moment } from "moment";
 import { get } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
-import { defaultDayFormat } from "../constants";
+import { bullet, defaultDayFormat, emDash } from "../constants";
 import { settings } from "../global-store/settings";
 import { replaceOrPrependTimestamp } from "../parser/parser";
 import {
@@ -339,4 +339,25 @@ export function clamp<T extends WithTime<BaseTask>>(
     startTime: clampedStartTime,
     durationMinutes: clampedDurationMinutes,
   };
+}
+
+export function getBlockProps(task: Task, settings: DayPlannerSettings) {
+  const result: string[] = [];
+
+  if (settings.showTimestampInTaskBlock && isWithTime(task)) {
+    result.push(
+      createTimestamp(
+        getMinutesSinceMidnight(task.startTime),
+        task.durationMinutes,
+        settings.timestampFormat,
+        emDash,
+      ),
+    );
+  }
+
+  if (isRemote(task)) {
+    result.push(task.calendar.name);
+  }
+
+  return result.join(` ${bullet} `);
 }

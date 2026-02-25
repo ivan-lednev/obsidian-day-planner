@@ -18,6 +18,7 @@ export const clockFormat = "YYYY-MM-DD HH:mm:ss";
 export const codeFence = "```";
 
 export const emDash = "–";
+export const bullet = "•";
 
 export const defaultDurationMinutes = 30;
 
