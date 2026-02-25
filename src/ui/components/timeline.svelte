@@ -125,10 +125,7 @@
 {/if}
 
 {#if $settings.timelineColumns.timeTracker}
-  <Column
-    --column-background-color="hsl(var(--color-accent-hsl), 0.03)"
-    visibleHours={getVisibleHours($settings)}
-  >
+  <Column visibleHours={getVisibleHours($settings)}>
     {#if $isToday(day)}
       <Needle autoScrollBlocked={isUnderCursor} showBall={false} />
     {/if}

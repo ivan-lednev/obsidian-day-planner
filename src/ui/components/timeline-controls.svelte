@@ -89,9 +89,6 @@
 <div class="controls">
   <div class="header">
     <div class="buttons-left">
-      <ControlButton onclick={handleReSyncClick}>
-        <EllipsisVertical class="svg-icon" />
-      </ControlButton>
       <ControlButton label="Go to today" onclick={goToToday}>
         <CalendarArrowUp />
       </ControlButton>
@@ -121,6 +118,9 @@
     </ControlButton>
 
     <div class="buttons-right">
+      <ControlButton onclick={handleReSyncClick}>
+        <EllipsisVertical class="svg-icon" />
+      </ControlButton>
       <ControlButton
         isActive={settingsVisible}
         label="Settings"
@@ -183,12 +183,14 @@
     color: var(--text-error);
   }
 
+  .buttons-right,
   .buttons-left {
     display: flex;
   }
 
   .header,
-  .buttons-left {
+  .buttons-left,
+  .buttons-right {
     gap: var(--size-2-1);
   }
 

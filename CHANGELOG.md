@@ -16,7 +16,7 @@
   - Right-click to reveal block in file
 - Description and location are now shown in remote events
 - Multi-day remote events are now shown spanning across days
-- You can expand, collapse or disable unscheduled tasks & clocks in the timeline view
+- You can expand, collapse or disable all day events & clocks in the timeline view
 
 ### 🐞 Fixed issues
 
@@ -72,7 +72,7 @@ You can record time spent on tasks in the form of Dataview properties and then v
 - Tasks crossing midnight now get shown properly in multiple day columns instead of stretching the first day (#586, #364)
   - E.g.: `- 23:00 - 4:00 Task` will get shown in 2 columns as 2 separate blocks
 - Timeline controls look tidier now
-- Now all-day remote events are shown in the unscheduled tasks section
+- Now all-day remote events are shown in the all day events section
 - Text in blocks is now sticky and will stay visible when scrolling as well as when an event starts before the configured start hour
 
 #### Week planner -> multi-day planner

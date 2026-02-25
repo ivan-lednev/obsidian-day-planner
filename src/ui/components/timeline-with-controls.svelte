@@ -11,7 +11,7 @@
   import ActiveClocks from "./active-clocks.svelte";
   import BlockList from "./block-list.svelte";
   import ControlButton from "./control-button.svelte";
-  import { Ellipsis } from "./lucide";
+  import { EllipsisVertical } from "./lucide";
   import Tree from "./obsidian/tree.svelte";
   import ResizeHandle from "./resize-handle.svelte";
   import ResizeableBox from "./resizeable-box.svelte";
@@ -58,7 +58,7 @@
 {/if}
 
 {#if $settings.showUncheduledTasks}
-  <Tree isInitiallyOpen title="Unscheduled tasks">
+  <Tree isInitiallyOpen title="All day events">
     {#snippet flair()}
       {String(displayedAllDayTasks.length)}
     {/snippet}
@@ -103,7 +103,7 @@
           createColumnSelectionMenu({ settings, event });
         }}
       >
-        <Ellipsis class="planner-settings-icon" />
+        <EllipsisVertical class="planner-settings-icon" />
       </ControlButton>
     {/snippet}
     <Scroller class={["planner-timeline-scroller", "planner-flex-scrollable"]}>

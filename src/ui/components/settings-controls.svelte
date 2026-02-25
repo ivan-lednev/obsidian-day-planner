@@ -159,11 +159,11 @@
     {/snippet}
   </SettingItem>
 
-  <div class="controls-section">Unscheduled tasks</div>
+  <div class="controls-section">All day events</div>
 
   <SettingItem class="mod-toggle">
     {#snippet name()}
-      Show unscheduled tasks
+      Show all day events
     {/snippet}
     {#snippet control()}
       <div
