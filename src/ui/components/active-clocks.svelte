@@ -51,7 +51,7 @@
                       task.location.position.start.line,
                     );
                   }}
-                  value={task.location.path}
+                  value={task.location.path.replace(/\.md$/, "")}
                 />
               {/if}
               <Pill
