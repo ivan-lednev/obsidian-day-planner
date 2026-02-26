@@ -21,7 +21,7 @@ class ConfirmationModal extends Modal {
     this.contentEl.createEl("h2", { text: title });
     this.contentEl.createEl("p", { text });
 
-    this.contentEl.createDiv("day-planner-modal-buttons", (buttonsEl) => {
+    this.contentEl.createDiv("planner-confirmation-modal-buttons", (buttonsEl) => {
       buttonsEl
         .createEl("button", { text: "Cancel" })
         .addEventListener("click", (e) => {

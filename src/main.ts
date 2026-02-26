@@ -469,7 +469,7 @@ export default class DayPlanner extends Plugin {
       visibleDays,
       layoutReady,
       debouncedTaskUpdateTrigger,
-      dataviewChange: dataviewRefreshSignal,
+      metadataChange: dataviewRefreshSignal,
       settingsStore: this.settingsStore,
       currentTime,
       pointerDateTime,
