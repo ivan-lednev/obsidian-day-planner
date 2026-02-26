@@ -22,7 +22,7 @@ import {
   selectListProps,
 } from "./dataview/dataview-slice";
 import { editCanceled, globalSlice } from "./global-slice";
-import { icalSlice, type RawIcal, selectRemoteTasks } from "./ical/ical-slice";
+import { icalSlice, selectRemoteTasks } from "./ical/ical-slice";
 import { initListenerMiddleware } from "./listener-middleware";
 import { searchSlice } from "./search-slice";
 import { selectDataviewSource, settingsSlice } from "./settings-slice";
@@ -57,19 +57,16 @@ export const makeStore = (
 };
 
 export function createReactor(props: {
-  preloadedState: Partial<RootState>;
+  preloadedState?: Partial<RootState>;
   dataviewFacade: DataviewFacade;
   listPropsParser: ListPropsParser;
-  onIcalsFetched: (rawIcals: RawIcal[]) => Promise<void>;
 }) {
-  const { preloadedState, dataviewFacade, listPropsParser, onIcalsFetched } =
-    props;
+  const { preloadedState = {}, dataviewFacade, listPropsParser } = props;
 
   const listenerMiddleware = initListenerMiddleware({
     extra: {
       dataviewFacade,
       listPropsParser,
-      onIcalsFetched,
     },
   });
 

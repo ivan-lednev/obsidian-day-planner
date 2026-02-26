@@ -2,7 +2,6 @@ import type Fraction from "fraction.js";
 import type { Moment } from "moment";
 import type { Readable, Writable } from "svelte/store";
 
-import type { RawIcal } from "./redux/ical/ical-slice";
 import { type AppDispatch } from "./redux/store";
 import type { UseSelector } from "./redux/use-selector";
 import type { DataviewFacade } from "./service/dataview-facade";
@@ -91,5 +90,4 @@ export type DateRange = Writable<Moment[]> & { untrack: () => void };
 export type ReduxExtraArgument = {
   dataviewFacade: DataviewFacade;
   listPropsParser: ListPropsParser;
-  onIcalsFetched: (rawIcals: RawIcal[]) => Promise<void>;
 };

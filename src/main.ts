@@ -44,11 +44,7 @@ import {
   type PathToListProps,
 } from "./redux/dataview/dataview-slice";
 import { editCanceled, visibleDaysUpdated } from "./redux/global-slice";
-import {
-  icalRefreshRequested,
-  type IcalState,
-  initialIcalState,
-} from "./redux/ical/ical-slice";
+import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { settingsUpdated } from "./redux/settings-slice";
 import { type AppDispatch, createReactor } from "./redux/store";
 import { createUseSelector } from "./redux/use-selector";
@@ -59,11 +55,7 @@ import { PeriodicNotes } from "./service/periodic-notes";
 import { STaskEditor } from "./service/stask-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
-import {
-  type DayPlannerSettings,
-  defaultSettings,
-  type PluginData,
-} from "./settings";
+import { type DayPlannerSettings, defaultSettings } from "./settings";
 import type { RemoteTask } from "./task-types";
 import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn, PointerDateTime } from "./types";
@@ -96,7 +88,7 @@ export default class DayPlanner extends Plugin {
   private transactionWriter!: TransactionWriter;
 
   async onload() {
-    const initialPluginData: PluginData = {
+    const initialSettings: DayPlannerSettings = {
       ...defaultSettings,
       ...(await this.loadData()),
     };
@@ -120,11 +112,6 @@ export default class DayPlanner extends Plugin {
       this.app.vault,
     );
 
-    const icalStateWithCachedRawIcals: IcalState = {
-      ...initialIcalState,
-      plainTextIcals: initialPluginData.rawIcals || [],
-    };
-
     const {
       getState,
       dispatch,
@@ -137,14 +124,8 @@ export default class DayPlanner extends Plugin {
       pointerDateTime,
       dataviewRefreshSignal,
     } = createReactor({
-      preloadedState: {
-        ical: icalStateWithCachedRawIcals,
-      },
       dataviewFacade: this.dataviewFacade,
       listPropsParser,
-      onIcalsFetched: async (rawIcals) => {
-        await this.saveData({ ...this.settings(), rawIcals });
-      },
     });
 
     this.sTaskEditor = new STaskEditor(
@@ -158,7 +139,7 @@ export default class DayPlanner extends Plugin {
       listenerMiddleware.clearListeners();
     });
 
-    this.initSettingsStore({ initialSettings: initialPluginData, dispatch });
+    this.initSettingsStore({ initialSettings, dispatch });
     this.registerViews({
       dispatch,
       remoteTasks,
