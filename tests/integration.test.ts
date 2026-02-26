@@ -182,8 +182,6 @@ async function setUp(props: {
 
   const onEditCanceled = vi.fn();
   const onEditConfirmed = vi.fn();
-  const onIcalsFetched = vi.fn();
-
   const defaultPreloadedStateForTests: Partial<RootState> = {
     obsidian: {
       ...initialState,
@@ -207,7 +205,6 @@ async function setUp(props: {
       },
     },
     dataviewFacade,
-    onIcalsFetched,
     listPropsParser,
   });
 

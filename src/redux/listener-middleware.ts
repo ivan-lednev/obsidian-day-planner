@@ -6,7 +6,7 @@ import { createBackgroundBatchScheduler } from "../util/scheduler";
 
 import { dataviewChange } from "./dataview/dataview-slice";
 import { createListPropsParseListener } from "./dataview/init-dataview-listeners";
-import { icalRefreshRequested, icalsFetched } from "./ical/ical-slice";
+import { icalRefreshRequested } from "./ical/ical-slice";
 import {
   checkIcalEventsChanged,
   checkVisibleDaysChanged,
@@ -48,13 +48,6 @@ export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
     effect: createIcalParseListener({
       scheduler: icalParseScheduler,
     }),
-  });
-
-  listenerMiddleware.startListening({
-    actionCreator: icalsFetched,
-    effect: async (action, listenerApi) => {
-      await listenerApi.extra.onIcalsFetched(action.payload);
-    },
   });
 
   listenerMiddleware.startListening({

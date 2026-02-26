@@ -75,7 +75,6 @@ function makeStoreForTests(props?: { preloadedState?: Partial<RootState> }) {
         new InMemoryVault([]) as unknown as Vault,
         new FakeMetadataCache({}) as unknown as MetadataCache,
       ),
-      onIcalsFetched: async () => {},
     },
   });
 
