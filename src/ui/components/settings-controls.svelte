@@ -3,12 +3,9 @@
   import { SettingGroup } from "obsidian";
 
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { settings } from "../../global-store/settings";
   import { useDataviewSource } from "../hooks/use-dataview-source";
 
   import Callout from "./callout.svelte";
-  import Dropdown from "./obsidian/dropdown.svelte";
-  import SettingItem from "./obsidian/setting-item.svelte";
 
   const { refreshDataviewFn } = getObsidianContext();
 
@@ -24,15 +21,7 @@
       .map((it) => [it, String(it)]),
   );
 
-  function handleStartHourInput(event: Event) {
-    // @ts-expect-error
-    $settings.startHour = Number(event.currentTarget.value);
-  }
-
-  function handleZoomLevelInput(event: Event) {
-    // @ts-expect-error
-    $settings.zoomLevel = Number(event.currentTarget.value);
-  }
+  let shouldShowUnscheduledNestedTasks = $state($settings.showUncheduledTasks);
 </script>
 
 <div class="dataview-source">
@@ -60,163 +49,134 @@
 <div
   class="settings"
   style:--setting-items-padding="12px"
-  {@attach (el) => {
-    new SettingGroup(el)
-      .addSetting((setting) =>
-        setting
-          .setName("Start hour")
-          .addDropdown((dropdown) =>
+  {@attach (el: HTMLDivElement) => {
+    const renderSettings = () => {
+      el.empty();
+
+      new SettingGroup(el)
+        .addSetting((setting) =>
+          setting.setName("Start hour").addDropdown((dropdown) =>
             dropdown
               .addOptions(startHourOptions)
-              .onChange((value) => ($settings.startHour = Number(value))),
+              .setValue(String($settings.startHour))
+              .onChange((value) => {
+                $settings = {
+                  ...$settings,
+                  startHour: Number(value),
+                };
+              }),
           ),
-      )
-      .addSetting((setting) =>
-        setting
-          .setName("Zoom")
-          .addDropdown((dropdown) =>
+        )
+        .addSetting((setting) =>
+          setting.setName("Zoom").addDropdown((dropdown) =>
             dropdown
               .addOptions(zoomLevelOptions)
-              .onChange((value) => ($settings.zoomLevel = Number(value))),
+              .setValue(String($settings.zoomLevel))
+              .onChange((value) => {
+                $settings = {
+                  ...$settings,
+                  zoomLevel: Number(value),
+                };
+              }),
           ),
-      );
+        );
 
-    new SettingGroup(el)
-      .setHeading("Timeline")
-      .addSetting((setting) =>
-        setting
-          .setName("Show timeline")
-          .addToggle((toggle) =>
+      new SettingGroup(el)
+        .setHeading("Timeline")
+        .addSetting((setting) =>
+          setting.setName("Show timeline").addToggle((toggle) =>
             toggle
               .setValue($settings.showTimelineInSidebar)
-              .onChange((value) => ($settings.showTimelineInSidebar = value)),
+              .onChange((value) => {
+                $settings = {
+                  ...$settings,
+                  showTimelineInSidebar: value,
+                };
+              }),
           ),
-      )
-      .addSetting((setting) =>
-        setting
-          .setName("Auto-scroll to now")
-          .addToggle((toggle) =>
+        )
+        .addSetting((setting) =>
+          setting.setName("Auto-scroll to now").addToggle((toggle) =>
+            toggle.setValue($settings.centerNeedle).onChange((value) => {
+              $settings = {
+                ...$settings,
+                centerNeedle: value,
+              };
+            }),
+          ),
+        )
+        .addSetting((setting) =>
+          setting.setName("Show completed tasks").addToggle((toggle) =>
+            toggle.setValue($settings.showCompletedTasks).onChange((value) => {
+              $settings = {
+                ...$settings,
+                showCompletedTasks: value,
+              };
+            }),
+          ),
+        )
+        .addSetting((setting) =>
+          setting.setName("Show full list content").addToggle((toggle) =>
             toggle
-              .setValue($settings.centerNeedle)
-              .onChange((value) => ($settings.centerNeedle = value)),
+              .setValue($settings.showSubtasksInTaskBlocks)
+              .onChange((value) => {
+                $settings = {
+                  ...$settings,
+                  showSubtasksInTaskBlocks: value,
+                };
+              }),
           ),
+        );
+
+      const allDayEventsGroup = new SettingGroup(el)
+        .setHeading("All day events")
+        .addSetting((setting) =>
+          setting.setName("Show all day events").addToggle((toggle) =>
+            toggle.setValue($settings.showUncheduledTasks).onChange((value) => {
+              $settings = {
+                ...$settings,
+                showUncheduledTasks: value,
+              };
+              shouldShowUnscheduledNestedTasks = value;
+              renderSettings();
+            }),
+          ),
+        );
+
+      if (shouldShowUnscheduledNestedTasks) {
+        allDayEventsGroup.addSetting((setting) =>
+          setting.setName("Show sub-tasks as blocks").addToggle((toggle) =>
+            toggle
+              .setValue($settings.showUnscheduledNestedTasks)
+              .onChange((value) => {
+                $settings = {
+                  ...$settings,
+                  showUnscheduledNestedTasks: value,
+                };
+              }),
+          ),
+        );
+      }
+
+      new SettingGroup(el).setHeading("Time tracker").addSetting((setting) =>
+        setting.setName("Show active clocks").addToggle((toggle) =>
+          toggle.setValue($settings.showActiveClocks).onChange((value) => {
+            $settings = {
+              ...$settings,
+              showActiveClocks: value,
+            };
+          }),
+        ),
       );
+    };
+
+    renderSettings();
 
     return () => {
       el.empty();
     };
   }}
->
-  <SettingItem class="mod-toggle">
-    {#snippet name()}
-      Show completed tasks
-    {/snippet}
-    {#snippet control()}
-      <div
-        class={[
-          "checkbox-container",
-          "mod-small",
-          { "is-enabled": $settings.showCompletedTasks },
-        ]}
-        onclick={() => {
-          $settings.showCompletedTasks = !$settings.showCompletedTasks;
-        }}
-      >
-        <input tabindex="0" type="checkbox" />
-      </div>
-    {/snippet}
-  </SettingItem>
-
-  <SettingItem class="mod-toggle">
-    {#snippet name()}
-      Show full list content
-    {/snippet}
-    {#snippet control()}
-      <div
-        class={[
-          "checkbox-container",
-          "mod-small",
-          { "is-enabled": $settings.showSubtasksInTaskBlocks },
-        ]}
-        onclick={() => {
-          settings.update((previous) => ({
-            ...previous,
-            showSubtasksInTaskBlocks: !previous.showSubtasksInTaskBlocks,
-          }));
-        }}
-      >
-        <input tabindex="0" type="checkbox" />
-      </div>
-    {/snippet}
-  </SettingItem>
-
-  <div class="controls-section">All day events</div>
-
-  <SettingItem class="mod-toggle">
-    {#snippet name()}
-      Show all day events
-    {/snippet}
-    {#snippet control()}
-      <div
-        class={[
-          "checkbox-container",
-          "mod-small",
-          { "is-enabled": $settings.showUncheduledTasks },
-        ]}
-        onclick={() => {
-          $settings.showUncheduledTasks = !$settings.showUncheduledTasks;
-        }}
-      >
-        <input tabindex="0" type="checkbox" />
-      </div>
-    {/snippet}
-  </SettingItem>
-
-  {#if $settings.showUncheduledTasks}
-    <SettingItem class="mod-toggle">
-      {#snippet name()}
-        Show sub-tasks as blocks
-      {/snippet}
-      {#snippet control()}
-        <div
-          class={[
-            "checkbox-container",
-            "mod-small",
-            { "is-enabled": $settings.showUnscheduledNestedTasks },
-          ]}
-          onclick={() => {
-            $settings.showUnscheduledNestedTasks =
-              !$settings.showUnscheduledNestedTasks;
-          }}
-        >
-          <input tabindex="0" type="checkbox" />
-        </div>
-      {/snippet}
-    </SettingItem>
-  {/if}
-
-  <div class="controls-section">Time tracker</div>
-
-  <SettingItem class="mod-toggle">
-    {#snippet name()}
-      Show active clocks
-    {/snippet}
-    {#snippet control()}
-      <div
-        class={[
-          "checkbox-container",
-          "mod-small",
-          { "is-enabled": $settings.showActiveClocks },
-        ]}
-        onclick={() => {
-          $settings.showActiveClocks = !$settings.showActiveClocks;
-        }}
-      >
-        <input tabindex="0" type="checkbox" />
-      </div>
-    {/snippet}
-  </SettingItem>
-</div>
+></div>
 
 <style>
   .dataview-source {
@@ -240,11 +200,5 @@
 
     border: 1px solid var(--text-error);
     border-radius: var(--radius-s);
-  }
-
-  .controls-section {
-    margin: var(--size-4-2) 0;
-    font-size: var(--font-ui-small);
-    font-weight: var(--font-medium);
   }
 </style>
