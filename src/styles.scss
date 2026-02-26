@@ -20,11 +20,11 @@
   }
 }
 
-.day-planner {
+.planner {
   position: relative;
 }
 
-.day-planner .status-bar-item-segment:hover {
+.planner .status-bar-item-segment:hover {
   cursor: pointer;
 }
 
@@ -46,17 +46,22 @@
   border-radius: var(--radius-s);
 }
 
+.planner-confirmation-modal-buttons {
+  display: flex;
+  gap: var(--size-4-2);
+}
+
 .planner-progress-value {
   background-color: var(--color-accent);
   height: 100%;
 }
 
 .planner-progress-value.green,
-.day-planner .progress-pie.green::before {
+.planner .progress-pie.green::before {
   background-color: #4caf50;
 }
 
-.day-planner .progress-pie.green {
+.planner .progress-pie.green {
   background-image: linear-gradient(to right, transparent 50%, #4caf50 0);
 }
 
@@ -88,17 +93,17 @@
   border-left: 20px solid transparent;
 }
 
-.progress-pie.day-planner {
+.progress-pie.planner {
   width: 20px;
   height: 20px;
 }
 
-.progress-pie.day-planner::after {
+.progress-pie.planner::after {
   width: 80%;
   height: 80%;
 }
 
-.progress-pie.day-planner::after {
+.progress-pie.planner::after {
   font-size: 8px;
   font-weight: 900;
   line-height: 13px;
