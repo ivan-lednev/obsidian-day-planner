@@ -240,7 +240,7 @@ async function setUp(props: {
     visibleDays: visibleDaysStore,
     layoutReady,
     debouncedTaskUpdateTrigger: taskUpdateTrigger,
-    dataviewChange: taskUpdateTrigger,
+    metadataChange: taskUpdateTrigger,
     settingsStore,
     currentTime,
     pointerDateTime,
