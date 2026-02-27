@@ -4,3 +4,4 @@ main.js
 src/ui/actions/use-actions.ts
 # Needed until we update to eslint v9
 src/ui/components/rendered-markdown.svelte
+src/ui/components/settings-controls.svelte

@@ -7,7 +7,7 @@
 
   import Callout from "./callout.svelte";
 
-  const { refreshDataviewFn } = getObsidianContext();
+  const { refreshDataviewFn, settings } = getObsidianContext();
 
   const { errorMessage: dataviewErrorMessage, dataviewSourceInput } =
     useDataviewSource({ refreshDataviewFn });
@@ -20,8 +20,6 @@
       .map(String)
       .map((it) => [it, String(it)]),
   );
-
-  let shouldShowUnscheduledNestedTasks = $state($settings.showUncheduledTasks);
 </script>
 
 <div class="dataview-source">
@@ -50,127 +48,119 @@
   class="settings"
   style:--setting-items-padding="12px"
   {@attach (el: HTMLDivElement) => {
-    const renderSettings = () => {
-      el.empty();
+    el.empty();
 
-      new SettingGroup(el)
-        .addSetting((setting) =>
-          setting.setName("Start hour").addDropdown((dropdown) =>
-            dropdown
-              .addOptions(startHourOptions)
-              .setValue(String($settings.startHour))
-              .onChange((value) => {
-                $settings = {
-                  ...$settings,
-                  startHour: Number(value),
-                };
-              }),
-          ),
-        )
-        .addSetting((setting) =>
-          setting.setName("Zoom").addDropdown((dropdown) =>
-            dropdown
-              .addOptions(zoomLevelOptions)
-              .setValue(String($settings.zoomLevel))
-              .onChange((value) => {
-                $settings = {
-                  ...$settings,
-                  zoomLevel: Number(value),
-                };
-              }),
-          ),
-        );
-
-      new SettingGroup(el)
-        .setHeading("Timeline")
-        .addSetting((setting) =>
-          setting.setName("Show timeline").addToggle((toggle) =>
-            toggle
-              .setValue($settings.showTimelineInSidebar)
-              .onChange((value) => {
-                $settings = {
-                  ...$settings,
-                  showTimelineInSidebar: value,
-                };
-              }),
-          ),
-        )
-        .addSetting((setting) =>
-          setting.setName("Auto-scroll to now").addToggle((toggle) =>
-            toggle.setValue($settings.centerNeedle).onChange((value) => {
+    new SettingGroup(el)
+      .addSetting((setting) =>
+        setting.setName("Start hour").addDropdown((dropdown) =>
+          dropdown
+            .addOptions(startHourOptions)
+            .setValue(String($settings.startHour))
+            .onChange((value) => {
               $settings = {
                 ...$settings,
-                centerNeedle: value,
+                startHour: Number(value),
               };
             }),
-          ),
-        )
-        .addSetting((setting) =>
-          setting.setName("Show completed tasks").addToggle((toggle) =>
-            toggle.setValue($settings.showCompletedTasks).onChange((value) => {
+        ),
+      )
+      .addSetting((setting) =>
+        setting.setName("Zoom").addDropdown((dropdown) =>
+          dropdown
+            .addOptions(zoomLevelOptions)
+            .setValue(String($settings.zoomLevel))
+            .onChange((value) => {
               $settings = {
                 ...$settings,
-                showCompletedTasks: value,
+                zoomLevel: Number(value),
               };
             }),
-          ),
-        )
-        .addSetting((setting) =>
-          setting.setName("Show full list content").addToggle((toggle) =>
-            toggle
-              .setValue($settings.showSubtasksInTaskBlocks)
-              .onChange((value) => {
-                $settings = {
-                  ...$settings,
-                  showSubtasksInTaskBlocks: value,
-                };
-              }),
-          ),
-        );
+        ),
+      );
 
-      const allDayEventsGroup = new SettingGroup(el)
-        .setHeading("All day events")
-        .addSetting((setting) =>
-          setting.setName("Show all day events").addToggle((toggle) =>
-            toggle.setValue($settings.showUncheduledTasks).onChange((value) => {
-              $settings = {
-                ...$settings,
-                showUncheduledTasks: value,
-              };
-              shouldShowUnscheduledNestedTasks = value;
-              renderSettings();
-            }),
-          ),
-        );
-
-      if (shouldShowUnscheduledNestedTasks) {
-        allDayEventsGroup.addSetting((setting) =>
-          setting.setName("Show sub-tasks as blocks").addToggle((toggle) =>
-            toggle
-              .setValue($settings.showUnscheduledNestedTasks)
-              .onChange((value) => {
-                $settings = {
-                  ...$settings,
-                  showUnscheduledNestedTasks: value,
-                };
-              }),
-          ),
-        );
-      }
-
-      new SettingGroup(el).setHeading("Time tracker").addSetting((setting) =>
-        setting.setName("Show active clocks").addToggle((toggle) =>
-          toggle.setValue($settings.showActiveClocks).onChange((value) => {
+    new SettingGroup(el)
+      .setHeading("Timeline")
+      .addSetting((setting) =>
+        setting.setName("Show timeline").addToggle((toggle) =>
+          toggle.setValue($settings.showTimelineInSidebar).onChange((value) => {
             $settings = {
               ...$settings,
-              showActiveClocks: value,
+              showTimelineInSidebar: value,
+            };
+          }),
+        ),
+      )
+      .addSetting((setting) =>
+        setting.setName("Auto-scroll to now").addToggle((toggle) =>
+          toggle.setValue($settings.centerNeedle).onChange((value) => {
+            $settings = {
+              ...$settings,
+              centerNeedle: value,
+            };
+          }),
+        ),
+      )
+      .addSetting((setting) =>
+        setting.setName("Show completed tasks").addToggle((toggle) =>
+          toggle.setValue($settings.showCompletedTasks).onChange((value) => {
+            $settings = {
+              ...$settings,
+              showCompletedTasks: value,
+            };
+          }),
+        ),
+      )
+      .addSetting((setting) =>
+        setting.setName("Show full list content").addToggle((toggle) =>
+          toggle
+            .setValue($settings.showSubtasksInTaskBlocks)
+            .onChange((value) => {
+              $settings = {
+                ...$settings,
+                showSubtasksInTaskBlocks: value,
+              };
+            }),
+        ),
+      );
+
+    const allDayEventsGroup = new SettingGroup(el)
+      .setHeading("All day events")
+      .addSetting((setting) =>
+        setting.setName("Show all day events").addToggle((toggle) =>
+          toggle.setValue($settings.showUncheduledTasks).onChange((value) => {
+            $settings = {
+              ...$settings,
+              showUncheduledTasks: value,
             };
           }),
         ),
       );
-    };
 
-    renderSettings();
+    if ($settings.showUncheduledTasks) {
+      allDayEventsGroup.addSetting((setting) =>
+        setting.setName("Show sub-tasks as blocks").addToggle((toggle) =>
+          toggle
+            .setValue($settings.showUnscheduledNestedTasks)
+            .onChange((value) => {
+              $settings = {
+                ...$settings,
+                showUnscheduledNestedTasks: value,
+              };
+            }),
+        ),
+      );
+    }
+
+    new SettingGroup(el).setHeading("Time tracker").addSetting((setting) =>
+      setting.setName("Show active clocks").addToggle((toggle) =>
+        toggle.setValue($settings.showActiveClocks).onChange((value) => {
+          $settings = {
+            ...$settings,
+            showActiveClocks: value,
+          };
+        }),
+      ),
+    );
 
     return () => {
       el.empty();
