@@ -98,7 +98,7 @@
 
     flex: 1 0 0;
     padding: var(--size-2-1) var(--size-4-1);
-    color: var(--text-normal);
+    color: var(--text-muted);
   }
 
   .rendered-markdown :global(p),
@@ -118,12 +118,12 @@
   }
 
   .rendered-markdown :global(li) {
-    color: var(--text-normal);
+    color: var(--text-muted);
   }
 
   .rendered-markdown :global(li.task-list-item[data-task="x"]),
   .rendered-markdown :global(li.task-list-item[data-task="X"]) {
-    color: var(--text-muted);
+    color: var(--text-faint);
   }
 
   .first-line-wrapper {

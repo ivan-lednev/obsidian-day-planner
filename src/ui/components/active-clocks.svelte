@@ -32,7 +32,6 @@
     >
       {#snippet children({ use, onpointerup, state })}
         <LocalTimeBlock
-          --time-block-padding="var(--size-4-1)"
           isActive={state === "secondary"}
           {onpointerup}
           {task}

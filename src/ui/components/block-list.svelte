@@ -14,39 +14,15 @@
     class="search-results-scroller"
     transition:slide={createSlide({ axis: "y" })}
   >
-    <div class="search-results">
-      {#each list as foundTimeBlock}
-        <div
-          class="search-result"
-          transition:slide={createSlide({ axis: "y" })}
-        >
-          {@render match(foundTimeBlock)}
-        </div>
-      {/each}
-    </div>
+    {#each list as foundTimeBlock}
+      {@render match(foundTimeBlock)}
+    {/each}
   </div>
 {/if}
 
 <style>
   .search-results-scroller {
     overflow-y: auto;
-  }
-
-  .search-results {
-    display: flex;
-    flex-direction: column;
-
-    margin: var(--size-4-2) var(--size-4-3);
-
-    background-color: var(
-      --search-results-bg-color,
-      var(--background-secondary)
-    );
-    border: 1px solid var(--background-modifier-border);
-    border-radius: var(--radius-s);
-  }
-
-  .search-result:not(:last-child) {
-    border-bottom: 1px solid var(--background-modifier-border);
+    padding: var(--size-4-1) var(--size-4-2);
   }
 </style>

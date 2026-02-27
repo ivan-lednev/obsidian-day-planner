@@ -53,7 +53,7 @@
     {#snippet flair()}
       {String($tasksWithActiveClockProps.length)}
     {/snippet}
-    <ActiveClocks --search-results-bg-color="var(--background-primary)" />
+    <ActiveClocks />
   </Tree>
 {/if}
 
@@ -74,13 +74,10 @@
               Drag blocks here to schedule all-day tasks
             </div>
           {:else if displayedAllDayTasks.length > 0}
-            <BlockList
-              --search-results-bg-color="var(--background-primary)"
-              list={displayedAllDayTasks}
-            >
+            <BlockList list={displayedAllDayTasks}>
               {#snippet match(task: Task)}
                 <UnscheduledTimeBlock
-                  --time-block-padding="var(--size-4-1)"
+                  --time-block-padding="var(--size-2-1) 0"
                   {task}
                 />
               {/snippet}
