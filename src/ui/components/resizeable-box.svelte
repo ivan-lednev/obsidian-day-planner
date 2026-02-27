@@ -58,16 +58,9 @@
 <div
   bind:this={el}
   style:height
-  class={[props.class, "resizeable-box"]}
+  class={[props.class]}
   onpointermove={props.onpointermove}
   onpointerup={props.onpointerup}
 >
   {@render props.children(startEdit)}
 </div>
-
-<style>
-  .resizeable-box {
-    min-height: var(--icon-size);
-    max-height: 25vh;
-  }
-</style>
