@@ -483,6 +483,8 @@ export default class DayPlanner extends Plugin {
       }, icalRefreshIntervalMillis),
     );
 
+    dispatch(icalRefreshRequested());
+
     this.registerEvent(
       this.app.metadataCache.on(
         // @ts-expect-error
