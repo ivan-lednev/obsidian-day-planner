@@ -4,8 +4,6 @@ import { getAPI } from "obsidian-dataview";
 const fixtureVaultPath = "fixtures/fixture-vault";
 const metadataDumpPath =
   ".obsidian/plugins/obsidian-day-planner/fixtures/metadata-dump";
-const metadataCacheDumpPath =
-  ".obsidian/plugins/obsidian-day-planner/fixtures/metadata-cache-dump";
 
 export function createDumpMetadataCommand(app: App) {
   return async () => {
@@ -16,8 +14,6 @@ export function createDumpMetadataCommand(app: App) {
 
       return;
     }
-    const markdownFiles = app.vault.getMarkdownFiles();
-
     const exists = await app.vault.adapter.exists(metadataDumpPath);
 
     if (exists) {
@@ -39,25 +35,6 @@ export function createDumpMetadataCommand(app: App) {
     await app.vault.create(
       `${metadataDumpPath}/tasks.json`,
       JSON.stringify(dump, null, 2),
-    );
-
-    const metadataCacheDumpExists = await app.vault.adapter.exists(
-      metadataCacheDumpPath,
-    );
-
-    if (metadataCacheDumpExists) {
-      await app.vault.adapter.rmdir(metadataCacheDumpPath, true);
-    }
-
-    await app.vault.adapter.mkdir(metadataCacheDumpPath);
-
-    const pathToCache = Object.fromEntries(
-      markdownFiles.map((it) => [it.path, app.metadataCache.getFileCache(it)]),
-    );
-
-    await app.vault.create(
-      `${metadataCacheDumpPath}/metadataCache.json`,
-      JSON.stringify(pathToCache, null, 2),
     );
   };
 }

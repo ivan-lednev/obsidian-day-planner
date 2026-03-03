@@ -28,6 +28,7 @@ import { searchSlice } from "./search-slice";
 import { selectDataviewSource, settingsSlice } from "./settings-slice";
 import { useActionDispatched } from "./use-action-dispatched";
 import { createUseSelector } from "./use-selector";
+import { trackerSlice } from "./tracker/tracker-slice";
 
 const rootReducer = combineSlices(
   globalSlice,
@@ -35,6 +36,7 @@ const rootReducer = combineSlices(
   dataviewSlice,
   settingsSlice,
   icalSlice,
+  trackerSlice,
 );
 
 export type RootState = ReturnType<typeof rootReducer>;
