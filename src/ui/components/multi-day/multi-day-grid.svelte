@@ -21,6 +21,7 @@
   import Search from "../../components/search.svelte";
   import ControlButton from "../control-button.svelte";
   import { createSlide } from "../defaults";
+  import ErrorBoundary from "../error-boundary.svelte";
   import {
     Settings,
     ChevronLeft,
@@ -194,77 +195,79 @@
   </div>
 {/if}
 
-<div class="multi-day-main-content">
-  <Scroller class="planner-multi-day-scroller" onscroll={handleScroll}>
-    {#each $dateRange as day}
-      <Timeline
-        --column-background-color={getColumnBackgroundColor(day)}
-        {day}
-        isUnderCursor={true}
-      />
-    {/each}
-  </Scroller>
+<ErrorBoundary>
+  <div class="multi-day-main-content">
+    <Scroller class="planner-multi-day-scroller" onscroll={handleScroll}>
+      {#each $dateRange as day}
+        <Timeline
+          --column-background-color={getColumnBackgroundColor(day)}
+          {day}
+          isUnderCursor={true}
+        />
+      {/each}
+    </Scroller>
 
-  <div class="controls-sidebar">
-    <ControlButton
-      isActive={visibleSideControls === "settings"}
-      onclick={() => toggleSideControls("settings")}
-    >
-      <Settings />
-    </ControlButton>
+    <div class="controls-sidebar">
+      <ControlButton
+        isActive={visibleSideControls === "settings"}
+        onclick={() => toggleSideControls("settings")}
+      >
+        <Settings />
+      </ControlButton>
 
-    <ControlButton
-      label="Change columns"
-      onclick={(event) => createColumnChangeMenu({ event, settings })}
-    >
-      <Columns3 />
-    </ControlButton>
+      <ControlButton
+        label="Change columns"
+        onclick={(event) => createColumnChangeMenu({ event, settings })}
+      >
+        <Columns3 />
+      </ControlButton>
 
-    <ControlButton
-      label="Configure columns"
-      onclick={(event) => createColumnSelectionMenu({ event, settings })}
-    >
-      <TableColumnsSplit />
-    </ControlButton>
+      <ControlButton
+        label="Configure columns"
+        onclick={(event) => createColumnSelectionMenu({ event, settings })}
+      >
+        <TableColumnsSplit />
+      </ControlButton>
 
-    <ControlButton
-      label="Show current period"
-      onclick={() => {
-        dateRange.set(
-          r.createRange($settings.multiDayRange, $settings.firstDayOfWeek),
-        );
-      }}
-    >
-      <CalendarArrowUp />
-    </ControlButton>
+      <ControlButton
+        label="Show current period"
+        onclick={() => {
+          dateRange.set(
+            r.createRange($settings.multiDayRange, $settings.firstDayOfWeek),
+          );
+        }}
+      >
+        <CalendarArrowUp />
+      </ControlButton>
 
-    <ControlButton
-      label="Show next period"
-      onclick={() => {
-        dateRange.update(
-          $settings.multiDayRange === "work-week"
-            ? ([firstDay]) => getNextWorkWeek(firstDay)
-            : getNextAdjacentRange,
-        );
-      }}
-    >
-      <ChevronRight />
-    </ControlButton>
+      <ControlButton
+        label="Show next period"
+        onclick={() => {
+          dateRange.update(
+            $settings.multiDayRange === "work-week"
+              ? ([firstDay]) => getNextWorkWeek(firstDay)
+              : getNextAdjacentRange,
+          );
+        }}
+      >
+        <ChevronRight />
+      </ControlButton>
 
-    <ControlButton
-      label="Show previous period"
-      onclick={() => {
-        dateRange.update(
-          $settings.multiDayRange === "work-week"
-            ? ([firstDay]) => getPreviousWorkWeek(firstDay)
-            : getPreviousAdjacentRange,
-        );
-      }}
-    >
-      <ChevronLeft />
-    </ControlButton>
+      <ControlButton
+        label="Show previous period"
+        onclick={() => {
+          dateRange.update(
+            $settings.multiDayRange === "work-week"
+              ? ([firstDay]) => getPreviousWorkWeek(firstDay)
+              : getPreviousAdjacentRange,
+          );
+        }}
+      >
+        <ChevronLeft />
+      </ControlButton>
+    </div>
   </div>
-</div>
+</ErrorBoundary>
 
 <style>
   :global(.planner-multi-day-scroller) {

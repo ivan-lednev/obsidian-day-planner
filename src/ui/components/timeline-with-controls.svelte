@@ -11,6 +11,7 @@
   import ActiveClocks from "./active-clocks.svelte";
   import BlockList from "./block-list.svelte";
   import ControlButton from "./control-button.svelte";
+  import ErrorBoundary from "./error-boundary.svelte";
   import { EllipsisVertical } from "./lucide";
   import Tree from "./obsidian/tree.svelte";
   import ResizeHandle from "./resize-handle.svelte";
@@ -46,71 +47,75 @@
   }
 </script>
 
-<TimelineControls />
+<ErrorBoundary>
+  <TimelineControls />
 
-{#if $settings.showActiveClocks}
-  <Tree isInitiallyOpen title="Active clocks">
-    {#snippet flair()}
-      {String($tasksWithActiveClockProps.length)}
-    {/snippet}
-    <ActiveClocks />
-  </Tree>
-{/if}
-
-{#if $settings.showUncheduledTasks}
-  <Tree isInitiallyOpen title="All day events">
-    {#snippet flair()}
-      {String(displayedAllDayTasks.length)}
-    {/snippet}
-    {#if editOperation.current || displayedAllDayTasks.length > 0}
-      <ResizeableBox
-        class="unscheduled-task-container"
-        onpointermove={handleResizeableBoxPointerMove}
-        onpointerup={editContext.confirmEdit}
-      >
-        {#snippet children(startEdit)}
-          {#if editOperation.current && displayedAllDayTasks.length === 0}
-            <div class="edit-prompt">
-              Drag blocks here to schedule all-day tasks
-            </div>
-          {:else if displayedAllDayTasks.length > 0}
-            <BlockList list={displayedAllDayTasks}>
-              {#snippet match(task: Task)}
-                <UnscheduledTimeBlock
-                  --time-block-padding="var(--size-2-1) 0"
-                  {task}
-                />
-              {/snippet}
-            </BlockList>
-          {/if}
-          <ResizeHandle on:mousedown={startEdit} />
-        {/snippet}
-      </ResizeableBox>
-    {/if}
-  </Tree>
-{/if}
-
-{#if $settings.showTimelineInSidebar}
-  <Tree isInitiallyOpen title="Timeline">
-    {#snippet controls()}
-      <ControlButton
-        --border-radius="0"
-        label="Timeline Settings"
-        onclick={(event) => {
-          createColumnSelectionMenu({ settings, event });
-        }}
-      >
-        <EllipsisVertical class="planner-settings-icon" />
-      </ControlButton>
-    {/snippet}
-    <Scroller class={["planner-timeline-scroller", "planner-flex-scrollable"]}>
-      {#snippet children(isUnderCursor)}
-        <Ruler visibleHours={getVisibleHours($settings)} />
-        <Timeline day={firstDayInRange} {isUnderCursor} />
+  {#if $settings.showActiveClocks}
+    <Tree isInitiallyOpen title="Active clocks">
+      {#snippet flair()}
+        {String($tasksWithActiveClockProps.length)}
       {/snippet}
-    </Scroller>
-  </Tree>
-{/if}
+      <ActiveClocks />
+    </Tree>
+  {/if}
+
+  {#if $settings.showUncheduledTasks}
+    <Tree isInitiallyOpen title="All day events">
+      {#snippet flair()}
+        {String(displayedAllDayTasks.length)}
+      {/snippet}
+      {#if editOperation.current || displayedAllDayTasks.length > 0}
+        <ResizeableBox
+          class="unscheduled-task-container"
+          onpointermove={handleResizeableBoxPointerMove}
+          onpointerup={editContext.confirmEdit}
+        >
+          {#snippet children(startEdit)}
+            {#if editOperation.current && displayedAllDayTasks.length === 0}
+              <div class="edit-prompt">
+                Drag blocks here to schedule all-day tasks
+              </div>
+            {:else if displayedAllDayTasks.length > 0}
+              <BlockList list={displayedAllDayTasks}>
+                {#snippet match(task: Task)}
+                  <UnscheduledTimeBlock
+                    --time-block-padding="var(--size-2-1) 0"
+                    {task}
+                  />
+                {/snippet}
+              </BlockList>
+            {/if}
+            <ResizeHandle on:mousedown={startEdit} />
+          {/snippet}
+        </ResizeableBox>
+      {/if}
+    </Tree>
+  {/if}
+
+  {#if $settings.showTimelineInSidebar}
+    <Tree isInitiallyOpen title="Timeline">
+      {#snippet controls()}
+        <ControlButton
+          --border-radius="0"
+          label="Timeline Settings"
+          onclick={(event) => {
+            createColumnSelectionMenu({ settings, event });
+          }}
+        >
+          <EllipsisVertical class="planner-settings-icon" />
+        </ControlButton>
+      {/snippet}
+      <Scroller
+        class={["planner-timeline-scroller", "planner-flex-scrollable"]}
+      >
+        {#snippet children(isUnderCursor)}
+          <Ruler visibleHours={getVisibleHours($settings)} />
+          <Timeline day={firstDayInRange} {isUnderCursor} />
+        {/snippet}
+      </Scroller>
+    </Tree>
+  {/if}
+</ErrorBoundary>
 
 <style>
   :global(svg.svg-icon.planner-settings-icon) {

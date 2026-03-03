@@ -6,6 +6,7 @@
   import { useDataviewSource } from "../hooks/use-dataview-source";
 
   import Callout from "./callout.svelte";
+  import ErrorMessage from "./error-message.svelte";
 
   const { refreshDataviewFn, settings } = getObsidianContext();
 
@@ -32,7 +33,9 @@
 
   {#if $dataviewErrorMessage.length > 0}
     <Callout type="error">
-      <pre class="error-message">{$dataviewErrorMessage}</pre>
+      <ErrorMessage>
+        {$dataviewErrorMessage}
+      </ErrorMessage>
     </Callout>
   {/if}
 
@@ -180,15 +183,5 @@
 
   .dataview-source input {
     font-family: var(--font-monospace);
-  }
-
-  .error-message {
-    overflow-x: auto;
-
-    margin-block: 0;
-    padding: var(--size-4-1);
-
-    border: 1px solid var(--text-error);
-    border-radius: var(--radius-s);
   }
 </style>
