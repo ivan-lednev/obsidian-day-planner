@@ -13,6 +13,11 @@ import { createUpdateHandler } from "../src/create-update-handler";
 import { dataviewChange } from "../src/redux/dataview/dataview-slice";
 import { initialState } from "../src/redux/global-slice";
 import { createReactor, type RootState } from "../src/redux/store";
+import {
+  metadataChanged,
+  selectActiveClocks,
+  selectEntriesForPath,
+} from "../src/redux/tracker/tracker-slice";
 import type { DataviewFacade } from "../src/service/dataview-facade";
 import { TransactionWriter } from "../src/service/diff-writer";
 import { ListPropsParser } from "../src/service/list-props-parser";
@@ -38,11 +43,6 @@ import {
   InMemoryVault,
   type InMemoryFile,
 } from "./test-utils";
-import {
-  metadataChanged,
-  selectEntriesForPath,
-  selectRecentEntries,
-} from "../src/redux/tracker/tracker-slice";
 
 const { join } = path.posix;
 
@@ -325,18 +325,43 @@ async function setUp(props?: {
 }
 
 describe("Log Records with indexes", () => {
-  test("Creates an entry with text for each task", async () => {
-    const { getState, dispatch } = await setUp();
+  test("Stores the first line of each task", async () => {
+    const { getState } = await setUp();
 
     expect(
       selectEntriesForPath(
         getState(),
         "fixtures/fixture-vault/one-task-two-log-records.md",
       ),
-    ).toEqual([{ text: "- [ ] Task" }]);
+    ).toMatchObject([{ text: "- [ ] Task" }]);
   });
 
-  test.todo("Orders entries most recent timer first");
+  test("Stores log entries for file", async () => {
+    const { getState } = await setUp();
+
+    expect(
+      selectEntriesForPath(
+        getState(),
+        "fixtures/fixture-vault/one-task-two-log-records.md",
+      ),
+    ).toMatchObject([
+      {
+        text: "- [ ] Task",
+      },
+    ]);
+  });
+
+  test("Stores tasks with active clocks", async () => {
+    const { getState } = await setUp();
+
+    expect(selectActiveClocks(getState())).toMatchObject([
+      {
+        start: "2025-01-01 17:00",
+      },
+    ]);
+  });
+
+  test.todo("Returns clocks in range");
 });
 
 describe("Clocks", () => {
