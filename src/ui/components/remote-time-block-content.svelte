@@ -8,8 +8,8 @@
     bottomDecoration,
   }: { task: RemoteTask; bottomDecoration?: Snippet } = $props();
 
-  const tentative = task.rsvpStatus === "TENTATIVE";
-  const declined = task.rsvpStatus === "DECLINED";
+  const tentative = $derived(task.rsvpStatus === "TENTATIVE");
+  const declined = $derived(task.rsvpStatus === "DECLINED");
 </script>
 
 <div class="remote-task-content">
