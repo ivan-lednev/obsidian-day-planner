@@ -64,7 +64,7 @@ export class ListPropsParser {
     }, {});
   }
 
-  private getListPropsFromListItem(
+  getListPropsFromListItem(
     listItem: ListItemCache,
     listItemText: string,
   ) {

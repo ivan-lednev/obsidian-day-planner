@@ -40,8 +40,8 @@ import {
 } from "./test-utils";
 import {
   metadataChanged,
+  selectActiveClocks,
   selectEntriesForPath,
-  selectRecentEntries,
 } from "../src/redux/tracker/tracker-slice";
 
 const { join } = path.posix;
@@ -325,18 +325,54 @@ async function setUp(props?: {
 }
 
 describe("Log Records with indexes", () => {
-  test("Creates an entry with text for each task", async () => {
-    const { getState, dispatch } = await setUp();
+  test("Stores the first line of each task", async () => {
+    const { getState } = await setUp();
 
     expect(
       selectEntriesForPath(
         getState(),
         "fixtures/fixture-vault/one-task-two-log-records.md",
       ),
-    ).toEqual([{ text: "- [ ] Task" }]);
+    ).toMatchObject([{ text: "- [ ] Task" }]);
   });
 
-  test.todo("Orders entries most recent timer first");
+  test("Stores log entries for file", async () => {
+    const { getState } = await setUp();
+
+    expect(
+      selectEntriesForPath(
+        getState(),
+        "fixtures/fixture-vault/one-task-two-log-records.md",
+      ),
+    ).toEqual([
+      {
+        text: "- [ ] Task",
+        logEntries: [
+          {
+            start: "2025-01-01 13:00",
+            end: "2025-01-01 15:00",
+          },
+          {
+            start: "2025-01-01 17:00",
+          },
+        ],
+      },
+    ]);
+  });
+
+  test("Stores tasks with active clocks", async () => {
+    const { getState } = await setUp();
+
+    expect(selectActiveClocks(getState())).toEqual([
+      {
+        start: "2025-01-01 17:00",
+      },
+    ]);
+  });
+
+  test.todo("Returns clocks in range");
+
+  test.todo("Returns clocks in range");
 });
 
 describe("Clocks", () => {

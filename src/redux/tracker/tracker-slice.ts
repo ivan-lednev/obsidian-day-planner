@@ -21,29 +21,30 @@ export interface ListPropsParsedPayload {
   lineToListProps?: LineToListProps;
 }
 
+interface TaskEntry {
+  text: string;
+  logEntries?: string[];
+}
+
+interface LogEntry {
+  start: string;
+  end: string;
+  parent: string;
+}
+
 interface TrackerSliceState {
-  entries: {
-    byPath: Record<string, object>;
+  taskEntries: {
+    byPath: Record<string, TaskEntry[]>;
   };
-  logRecords: {
-    byId: Record<string, LocalTask>;
-    byPath: Record<string, string[]>;
-
-    allIds: Array<string>;
-
-    sortedByStartTime: Array<string>;
-    sortedByEndTime: Array<string>;
+  logEntries: {
+    byPath: Record<string, LogEntry[]>;
   };
 }
 
 const initialState: TrackerSliceState = {
-  entries: { byPath: {} },
-  logRecords: {
-    byId: {},
+  taskEntries: { byPath: {} },
+  logEntries: {
     byPath: {},
-    allIds: [],
-    sortedByStartTime: [],
-    sortedByEndTime: [],
   },
 };
 
@@ -66,27 +67,41 @@ export const trackerSlice = createAppSlice({
         state,
         action: PayloadAction<{
           path: string;
-          entries: Array<{ text: string }>;
+          taskEntries?: TaskEntry[];
+          logEntries?: LogEntry[];
         }>,
       ) => {
-        const { path, entries } = action.payload;
+        const { path, taskEntries } = action.payload;
 
-        state.entries.byPath[path] = entries;
+        if (taskEntries) {
+          state.taskEntries.byPath[path] = taskEntries;
+        }
       },
     ),
   }),
   selectors: {
-    selectRecentEntries: (state) => Object.values(state.entries.byPath).flat(),
-    selectEntriesForPath: (state, path) => state.entries.byPath[path],
+    selectRecentEntries: (state) =>
+      Object.values(state.taskEntries.byPath).flat(),
+    selectEntriesForPath: (state, path) => state.taskEntries.byPath[path],
+    selectActiveClocks: (state) =>
+      Object.values(state.logEntries.byPath)
+        .flat()
+        .filter((it) => !it.end),
   },
 });
 
 export const { fileMetadataProcessed, metadataChanged } = trackerSlice.actions;
 
-export const { selectRecentEntries, selectEntriesForPath } =
+export const { selectRecentEntries, selectEntriesForPath, selectActiveClocks } =
   trackerSlice.selectors;
 
 type MetadataChanged = ReturnType<typeof metadataChanged>;
+
+const idSeparator = "::";
+
+function createId(...args: (string | number)[]) {
+  return args.join(idSeparator);
+}
 
 export function createTrackerListener(props: {
   listPropsParser: ListPropsParser;
@@ -98,21 +113,46 @@ export function createTrackerListener(props: {
 
     // const listProps = await listPropsParser.parse(path);
 
-    const entries = cache.listItems
+    const taskEntries = cache.listItems
       ?.filter((it) => it.task !== undefined)
       .map((it) => {
-        const listContent = contents.slice(
+        const listItemText = contents.slice(
           it.position.start.offset,
           it.position.end.offset,
         );
-        const listLines = listContent.split("\n");
-        const firstLine = listLines[0];
+        const listItemLines = listItemText.split("\n");
+        const firstLine = listItemLines[0];
+        const listItemProps = listPropsParser.getListPropsFromListItem(
+          it,
+          listItemText,
+        );
+        const taskEntryId = createId(path, it.position.start.line);
+
+        const logEntries = listItemProps?.parsed.planner?.log?.map(
+          (it, index) => ({
+            ...it,
+            parent: taskEntryId,
+            id: createId(taskEntryId, index),
+          }),
+        );
 
         return {
+          id: taskEntryId,
           text: firstLine,
+          logEntries,
         };
       });
 
-    listenerApi.dispatch(fileMetadataProcessed({ path, entries }));
+    listenerApi.dispatch(
+      fileMetadataProcessed({
+        path,
+        taskEntries: taskEntries?.map(({ id, text, logEntries }) => ({
+          id,
+          text,
+          logEntries: logEntries?.map((it) => it.id),
+        })),
+        logEntries: taskEntries?.flatMap((it) => it.logEntries || []),
+      }),
+    );
   };
 }
