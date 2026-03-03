@@ -1,5 +1,5 @@
 import { type PayloadAction } from "@reduxjs/toolkit";
-import type { CachedMetadata, Pos, TFile } from "obsidian";
+import type { CachedMetadata, Pos } from "obsidian";
 
 import { createAppSlice } from "../create-app-slice";
 
@@ -22,6 +22,9 @@ export interface ListPropsParsedPayload {
 }
 
 interface TrackerSliceState {
+  entries: {
+    byPath: Record<string, object>;
+  };
   logRecords: {
     byId: Record<string, LocalTask>;
     byPath: Record<string, string[]>;
@@ -34,6 +37,7 @@ interface TrackerSliceState {
 }
 
 const initialState: TrackerSliceState = {
+  entries: { byPath: {} },
   logRecords: {
     byId: {},
     byPath: {},
@@ -57,31 +61,58 @@ export const trackerSlice = createAppSlice({
         }>,
       ) => {},
     ),
-    listPropsParsed: create.reducer(
-      (state, action: PayloadAction<ListPropsParsedPayload>) => {
-        const { path, lineToListProps } = action.payload;
+    fileMetadataProcessed: create.reducer(
+      (
+        state,
+        action: PayloadAction<{
+          path: string;
+          entries: Array<{ text: string }>;
+        }>,
+      ) => {
+        const { path, entries } = action.payload;
 
-        state.listProps[path] = lineToListProps || {};
+        state.entries.byPath[path] = entries;
       },
     ),
   }),
-  selectors: {},
+  selectors: {
+    selectRecentEntries: (state) => Object.values(state.entries.byPath).flat(),
+    selectEntriesForPath: (state, path) => state.entries.byPath[path],
+  },
 });
 
-const { listPropsParsed, metadataChanged } = trackerSlice.actions;
+export const { fileMetadataProcessed, metadataChanged } = trackerSlice.actions;
+
+export const { selectRecentEntries, selectEntriesForPath } =
+  trackerSlice.selectors;
 
 type MetadataChanged = ReturnType<typeof metadataChanged>;
 
-export function createListPropsParseListener(props: {
+export function createTrackerListener(props: {
   listPropsParser: ListPropsParser;
 }): AppListenerEffect<MetadataChanged> {
   const { listPropsParser } = props;
 
   return async (action, listenerApi) => {
-    const { path } = action.payload;
+    const { path, cache, contents } = action.payload;
 
-    const listProps = await listPropsParser.parse(path);
+    // const listProps = await listPropsParser.parse(path);
 
-    listenerApi.dispatch(listPropsParsed({ path, lineToListProps: listProps }));
+    const entries = cache.listItems
+      ?.filter((it) => it.task !== undefined)
+      .map((it) => {
+        const listContent = contents.slice(
+          it.position.start.offset,
+          it.position.end.offset,
+        );
+        const listLines = listContent.split("\n");
+        const firstLine = listLines[0];
+
+        return {
+          text: firstLine,
+        };
+      });
+
+    listenerApi.dispatch(fileMetadataProcessed({ path, entries }));
   };
 }

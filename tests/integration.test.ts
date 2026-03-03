@@ -38,6 +38,11 @@ import {
   InMemoryVault,
   type InMemoryFile,
 } from "./test-utils";
+import {
+  metadataChanged,
+  selectEntriesForPath,
+  selectRecentEntries,
+} from "../src/redux/tracker/tracker-slice";
 
 const { join } = path.posix;
 
@@ -64,7 +69,10 @@ async function loadMetadataDump() {
 
       const contents = await readFile(filePath, "utf8");
 
-      return createInMemoryFile({ path: filePath, contents });
+      return createInMemoryFile({
+        path: filePath,
+        contents,
+      });
     }),
   );
 
@@ -148,11 +156,11 @@ function initTestServices(props: {
   };
 }
 
-async function setUp(props: {
-  visibleDays: string[];
+async function setUp(props?: {
+  visibleDays?: string[];
   settings?: DayPlannerSettings;
 }) {
-  const { visibleDays, settings = defaultSettingsForTests } = props;
+  const { visibleDays = [], settings = defaultSettingsForTests } = props || {};
 
   const { inMemoryFiles, inMemoryDailyNotes, tasks, lists, cachedMetadata } =
     await loadMetadataDump();
@@ -191,6 +199,7 @@ async function setUp(props: {
   };
 
   const {
+    getState,
     dispatch,
     remoteTasks,
     taskUpdateTrigger,
@@ -210,6 +219,12 @@ async function setUp(props: {
 
   inMemoryFiles.forEach(({ path }) => {
     dispatch(dataviewChange(path));
+  });
+
+  inMemoryFiles.forEach(({ path, contents }) => {
+    isNotVoid(cachedMetadata[path]);
+
+    dispatch(metadataChanged({ path, contents, cache: cachedMetadata[path] }));
   });
 
   const onUpdate = createUpdateHandler({
@@ -240,7 +255,7 @@ async function setUp(props: {
     visibleDays: visibleDaysStore,
     layoutReady,
     debouncedTaskUpdateTrigger: taskUpdateTrigger,
-    metadataChange: taskUpdateTrigger,
+    dataviewChange: taskUpdateTrigger,
     settingsStore,
     currentTime,
     pointerDateTime,
@@ -290,6 +305,7 @@ async function setUp(props: {
   });
 
   return {
+    getState,
     dispatch,
     tasksWithActiveClockProps,
     getDisplayedTasksWithClocksForTimeline,
@@ -307,6 +323,21 @@ async function setUp(props: {
     currentTime,
   };
 }
+
+describe("Log Records with indexes", () => {
+  test("Creates an entry with text for each task", async () => {
+    const { getState, dispatch } = await setUp();
+
+    expect(
+      selectEntriesForPath(
+        getState(),
+        "fixtures/fixture-vault/one-task-two-log-records.md",
+      ),
+    ).toEqual([{ text: "- [ ] Task" }]);
+  });
+
+  test.todo("Orders entries most recent timer first");
+});
 
 describe("Clocks", () => {
   test("Reads log data", async () => {
