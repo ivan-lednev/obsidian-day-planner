@@ -351,17 +351,22 @@ describe("Log Records with indexes", () => {
     ]);
   });
 
-  test("Stores tasks with active clocks", async () => {
+  test("Returns time block views for active log entries", async () => {
     const { getState } = await setUp();
 
     expect(selectActiveClocks(getState())).toMatchObject([
       {
+        text: "- [ ] Task",
         start: "2025-01-01 17:00",
       },
     ]);
   });
 
-  test.todo("Returns clocks in range");
+  test.todo("Returns time block views in range");
+
+  test.todo("Deletes entries on file change");
+
+  test.todo("Deletes entries on file deletion");
 });
 
 describe("Clocks", () => {

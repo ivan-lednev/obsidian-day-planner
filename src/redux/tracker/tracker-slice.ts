@@ -21,6 +21,7 @@ export interface ListPropsParsedPayload {
 }
 
 interface TaskEntry {
+  id: string;
   text: string;
   logEntries?: string[];
 }
@@ -33,7 +34,8 @@ interface LogEntry {
 
 interface TrackerSliceState {
   taskEntries: {
-    byPath: Record<string, TaskEntry[]>;
+    byPath: Record<string, string[]>;
+    byId: Record<string, TaskEntry>;
   };
   logEntries: {
     byPath: Record<string, LogEntry[]>;
@@ -41,7 +43,7 @@ interface TrackerSliceState {
 }
 
 const initialState: TrackerSliceState = {
-  taskEntries: { byPath: {} },
+  taskEntries: { byPath: {}, byId: {} },
   logEntries: {
     byPath: {},
   },
@@ -73,7 +75,11 @@ export const trackerSlice = createAppSlice({
         const { path, taskEntries, logEntries } = action.payload;
 
         if (taskEntries) {
-          state.taskEntries.byPath[path] = taskEntries;
+          state.taskEntries.byPath[path] = taskEntries.map((it) => it.id);
+
+          taskEntries.forEach((it) => {
+            state.taskEntries.byId[it.id] = it;
+          });
         }
 
         if (logEntries) {
@@ -83,19 +89,26 @@ export const trackerSlice = createAppSlice({
     ),
   }),
   selectors: {
-    selectRecentEntries: (state) =>
-      Object.values(state.taskEntries.byPath).flat(),
-    selectEntriesForPath: (state, path) => state.taskEntries.byPath[path],
+    selectEntriesForPath: (state, path) => {
+      return state.taskEntries.byPath[path].map(
+        (it) => state.taskEntries.byId[it],
+      );
+    },
     selectActiveClocks: (state) =>
       Object.values(state.logEntries.byPath)
         .flat()
-        .filter((it) => !it.end),
+        .filter((it) => !it.end)
+        .map((it) => {
+          const taskEntry = state.taskEntries.byId[it.parent];
+
+          return { ...it, text: taskEntry.text };
+        }),
   },
 });
 
 export const { fileMetadataProcessed, metadataChanged } = trackerSlice.actions;
 
-export const { selectRecentEntries, selectEntriesForPath, selectActiveClocks } =
+export const { selectEntriesForPath, selectActiveClocks } =
   trackerSlice.selectors;
 
 type MetadataChanged = ReturnType<typeof metadataChanged>;
