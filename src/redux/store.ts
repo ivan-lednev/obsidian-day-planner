@@ -26,6 +26,7 @@ import { icalSlice, selectRemoteTasks } from "./ical/ical-slice";
 import { initListenerMiddleware } from "./listener-middleware";
 import { searchSlice } from "./search-slice";
 import { selectDataviewSource, settingsSlice } from "./settings-slice";
+import { trackerSlice } from "./tracker/tracker-slice";
 import { useActionDispatched } from "./use-action-dispatched";
 import { createUseSelector } from "./use-selector";
 
@@ -35,6 +36,7 @@ const rootReducer = combineSlices(
   dataviewSlice,
   settingsSlice,
   icalSlice,
+  trackerSlice,
 );
 
 export type RootState = ReturnType<typeof rootReducer>;

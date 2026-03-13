@@ -1,10 +1,104 @@
 import { get } from "svelte/store";
 import { describe, expect, test } from "vitest";
 
+import {
+  fileDeleted,
+  metadataChanged,
+  selectActiveClocks,
+  selectEntriesForPath,
+} from "../src/redux/tracker/tracker-slice";
 import { defaultSettingsForTests } from "../src/settings";
 import { EditMode } from "../src/ui/hooks/use-edit/types";
-import { getPathToDiff } from "./test-utils";
+
 import { setUp } from "./integration/setup";
+import { getPathToDiff } from "./test-utils";
+
+describe("Log Records with indexes", () => {
+  test("Stores the first line of each task", async () => {
+    const { getState } = await setUp();
+
+    expect(
+      selectEntriesForPath(
+        getState(),
+        "fixtures/fixture-vault/one-task-two-log-records.md",
+      ),
+    ).toMatchObject([{ text: "- [ ] Task" }]);
+  });
+
+  test("Stores log entries for file", async () => {
+    const { getState } = await setUp();
+
+    expect(
+      selectEntriesForPath(
+        getState(),
+        "fixtures/fixture-vault/one-task-two-log-records.md",
+      ),
+    ).toMatchObject([
+      {
+        text: "- [ ] Task",
+      },
+    ]);
+  });
+
+  test("Returns time block views for active log entries", async () => {
+    const { getState } = await setUp();
+
+    expect(selectActiveClocks(getState())).toMatchObject([
+      {
+        text: "- [ ] Task",
+        start: "2025-01-01 17:00",
+      },
+    ]);
+  });
+
+  test("Deletes entries on file deletion", async () => {
+    const { getState, dispatch } = await setUp();
+
+    dispatch(
+      fileDeleted({
+        path: "fixtures/fixture-vault/one-task-two-log-records.md",
+      }),
+    );
+
+    expect(
+      selectEntriesForPath(
+        getState(),
+        "fixtures/fixture-vault/one-task-two-log-records.md",
+      ),
+    ).toBeFalsy();
+  });
+
+  test("Replaces old entries on file change", async () => {
+    const { getState, dispatch } = await setUp();
+
+    expect(
+      selectEntriesForPath(getState(), "fixtures/fixture-vault/test.md"),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          text: expect.stringContaining("Nested task with 1 log record"),
+        }),
+        expect.objectContaining({
+          text: expect.stringContaining("Task with 3 log records"),
+        }),
+      ]),
+    );
+
+    dispatch(
+      metadataChanged({
+        path: "fixtures/fixture-vault/test.md",
+        cache: {},
+        contents: "",
+      }),
+    );
+
+    expect(
+      selectEntriesForPath(getState(), "fixtures/fixture-vault/test.md"),
+    ).toHaveLength(0);
+  });
+
+  test.todo("Returns time block views in range");
+});
 
 describe("Clocks", () => {
   test("Reads log data", async () => {

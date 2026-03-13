@@ -21,25 +21,28 @@ class ConfirmationModal extends Modal {
     this.contentEl.createEl("h2", { text: title });
     this.contentEl.createEl("p", { text });
 
-    this.contentEl.createDiv("day-planner-modal-buttons", (buttonsEl) => {
-      buttonsEl
-        .createEl("button", { text: "Cancel" })
-        .addEventListener("click", (e) => {
-          onCancel(e);
-          this.close();
-        });
+    this.contentEl.createDiv(
+      "planner-confirmation-modal-buttons",
+      (buttonsEl) => {
+        buttonsEl
+          .createEl("button", { text: "Cancel" })
+          .addEventListener("click", (e) => {
+            onCancel(e);
+            this.close();
+          });
 
-      buttonsEl
-        .createEl("button", {
-          cls: "mod-cta",
-          text: cta,
-        })
-        .addEventListener("click", async (e) => {
-          await onAccept(e);
+        buttonsEl
+          .createEl("button", {
+            cls: "mod-cta",
+            text: cta,
+          })
+          .addEventListener("click", async (e) => {
+            await onAccept(e);
 
-          this.close();
-        });
-    });
+            this.close();
+          });
+      },
+    );
   }
 }
 

@@ -1,9 +1,9 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
+import type { Moment } from "moment";
 import type { CachedMetadata } from "obsidian";
 import type { SListEntry, STask } from "obsidian-dataview";
-import type { Moment } from "moment";
 import { isNotVoid } from "typed-assert";
 
 import { createInMemoryFile, type InMemoryFile } from "../test-utils";

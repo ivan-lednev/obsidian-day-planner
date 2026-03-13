@@ -1,17 +1,4 @@
 {
-  "pathToMtime": {
-    "test yaml.md": 1752930178503,
-    "tasks.md": 1752841860573,
-    "HREN.md": 1745496961167,
-    "fixtures/fixture-vault/tasks.md": 1753778206214,
-    "fixtures/fixture-vault/test.md": 1753778206209,
-    "fixtures/fixture-vault/one-task-two-log-records.md": 1753778206211,
-    "fixtures/fixture-vault/daily-note.md": 1753540579703,
-    "fixtures/fixture-vault/frontmatter-logs.md": 1753778206215,
-    "fixtures/fixture-vault/2025-07-28.md": 1753778206210,
-    "fixtures/fixture-vault/2025-07-20.md": 1753778206213,
-    "fixtures/fixture-vault/2025-07-19.md": 1753778206210
-  },
   "lists": [
     {
       "symbol": "-",
@@ -700,10 +687,10 @@
         "embed": false,
         "type": "file"
       },
-      "text": "Task\n```yaml\nplanner:\nlog:\n- start: 2025-01-01 13:00\nend: 2025-01-01 15:00\n- start: 2025-01-01 17:00\nend: 2025-01-01 18:00\n```",
+      "text": "Task\n```yaml\nplanner:\nlog:\n- start: 2025-01-01 13:00\nend: 2025-01-01 15:00\n- start: 2025-01-01 17:00\n```",
       "tags": [],
       "line": 0,
-      "lineCount": 9,
+      "lineCount": 8,
       "list": 0,
       "outlinks": [],
       "path": "fixtures/fixture-vault/one-task-two-log-records.md",
@@ -717,15 +704,201 @@
           "offset": 0
         },
         "end": {
-          "line": 8,
+          "line": 7,
           "col": 5,
-          "offset": 170
+          "offset": 140
         }
       },
       "subtasks": [],
       "real": true,
       "header": {
         "path": "fixtures/fixture-vault/one-task-two-log-records.md",
+        "embed": false,
+        "type": "file"
+      },
+      "status": " ",
+      "checked": false,
+      "completed": false,
+      "fullyCompleted": false
+    },
+    {
+      "symbol": "-",
+      "link": {
+        "path": "fixtures/fixture-vault/tasks.md",
+        "embed": false,
+        "type": "file"
+      },
+      "section": {
+        "path": "fixtures/fixture-vault/tasks.md",
+        "embed": false,
+        "type": "file"
+      },
+      "text": "Before",
+      "tags": [],
+      "line": 0,
+      "lineCount": 1,
+      "list": 0,
+      "outlinks": [],
+      "path": "fixtures/fixture-vault/tasks.md",
+      "children": [],
+      "task": true,
+      "annotated": false,
+      "position": {
+        "start": {
+          "line": 0,
+          "col": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "col": 12,
+          "offset": 12
+        }
+      },
+      "subtasks": [],
+      "real": true,
+      "header": {
+        "path": "fixtures/fixture-vault/tasks.md",
+        "embed": false,
+        "type": "file"
+      },
+      "status": " ",
+      "checked": false,
+      "completed": false,
+      "fullyCompleted": false
+    },
+    {
+      "symbol": "-",
+      "link": {
+        "path": "fixtures/fixture-vault/tasks.md",
+        "embed": false,
+        "type": "file"
+      },
+      "section": {
+        "path": "fixtures/fixture-vault/tasks.md",
+        "embed": false,
+        "type": "file"
+      },
+      "text": "Task without time ⏳ 2025-07-19\nSome text",
+      "tags": [],
+      "line": 1,
+      "lineCount": 2,
+      "list": 0,
+      "outlinks": [],
+      "path": "fixtures/fixture-vault/tasks.md",
+      "children": [],
+      "task": true,
+      "annotated": true,
+      "position": {
+        "start": {
+          "line": 1,
+          "col": 0,
+          "offset": 13
+        },
+        "end": {
+          "line": 2,
+          "col": 11,
+          "offset": 61
+        }
+      },
+      "subtasks": [],
+      "real": true,
+      "header": {
+        "path": "fixtures/fixture-vault/tasks.md",
+        "embed": false,
+        "type": "file"
+      },
+      "scheduled": "2025-07-19T00:00:00.000+02:00",
+      "status": " ",
+      "checked": false,
+      "completed": false,
+      "fullyCompleted": false
+    },
+    {
+      "symbol": "-",
+      "link": {
+        "path": "fixtures/fixture-vault/tasks.md",
+        "embed": false,
+        "type": "file"
+      },
+      "section": {
+        "path": "fixtures/fixture-vault/tasks.md",
+        "embed": false,
+        "type": "file"
+      },
+      "text": "10:00 - 10:30 Task with time ⏳ 2025-07-19",
+      "tags": [],
+      "line": 3,
+      "lineCount": 1,
+      "list": 0,
+      "outlinks": [],
+      "path": "fixtures/fixture-vault/tasks.md",
+      "children": [],
+      "task": true,
+      "annotated": true,
+      "position": {
+        "start": {
+          "line": 3,
+          "col": 0,
+          "offset": 62
+        },
+        "end": {
+          "line": 3,
+          "col": 47,
+          "offset": 109
+        }
+      },
+      "subtasks": [],
+      "real": true,
+      "header": {
+        "path": "fixtures/fixture-vault/tasks.md",
+        "embed": false,
+        "type": "file"
+      },
+      "scheduled": "2025-07-19T00:00:00.000+02:00",
+      "status": " ",
+      "checked": false,
+      "completed": false,
+      "fullyCompleted": false
+    },
+    {
+      "symbol": "-",
+      "link": {
+        "path": "fixtures/fixture-vault/tasks.md",
+        "embed": false,
+        "type": "file"
+      },
+      "section": {
+        "path": "fixtures/fixture-vault/tasks.md",
+        "embed": false,
+        "type": "file"
+      },
+      "text": "After",
+      "tags": [],
+      "line": 4,
+      "lineCount": 1,
+      "list": 0,
+      "outlinks": [],
+      "path": "fixtures/fixture-vault/tasks.md",
+      "children": [],
+      "task": true,
+      "annotated": false,
+      "position": {
+        "start": {
+          "line": 4,
+          "col": 0,
+          "offset": 110
+        },
+        "end": {
+          "line": 4,
+          "col": 11,
+          "offset": 121
+        }
+      },
+      "subtasks": [],
+      "real": true,
+      "header": {
+        "path": "fixtures/fixture-vault/tasks.md",
         "embed": false,
         "type": "file"
       },
@@ -959,192 +1132,6 @@
         "path": "fixtures/fixture-vault/test.md",
         "subpath": "Heading 2",
         "type": "header"
-      },
-      "status": " ",
-      "checked": false,
-      "completed": false,
-      "fullyCompleted": false
-    },
-    {
-      "symbol": "-",
-      "link": {
-        "path": "fixtures/fixture-vault/tasks.md",
-        "embed": false,
-        "type": "file"
-      },
-      "section": {
-        "path": "fixtures/fixture-vault/tasks.md",
-        "embed": false,
-        "type": "file"
-      },
-      "text": "Before",
-      "tags": [],
-      "line": 0,
-      "lineCount": 1,
-      "list": 0,
-      "outlinks": [],
-      "path": "fixtures/fixture-vault/tasks.md",
-      "children": [],
-      "task": true,
-      "annotated": false,
-      "position": {
-        "start": {
-          "line": 0,
-          "col": 0,
-          "offset": 0
-        },
-        "end": {
-          "line": 0,
-          "col": 12,
-          "offset": 12
-        }
-      },
-      "subtasks": [],
-      "real": true,
-      "header": {
-        "path": "fixtures/fixture-vault/tasks.md",
-        "embed": false,
-        "type": "file"
-      },
-      "status": " ",
-      "checked": false,
-      "completed": false,
-      "fullyCompleted": false
-    },
-    {
-      "symbol": "-",
-      "link": {
-        "path": "fixtures/fixture-vault/tasks.md",
-        "embed": false,
-        "type": "file"
-      },
-      "section": {
-        "path": "fixtures/fixture-vault/tasks.md",
-        "embed": false,
-        "type": "file"
-      },
-      "text": "Task without time ⏳ 2025-07-19\nSome text",
-      "tags": [],
-      "line": 1,
-      "lineCount": 2,
-      "list": 0,
-      "outlinks": [],
-      "path": "fixtures/fixture-vault/tasks.md",
-      "children": [],
-      "task": true,
-      "annotated": true,
-      "position": {
-        "start": {
-          "line": 1,
-          "col": 0,
-          "offset": 13
-        },
-        "end": {
-          "line": 2,
-          "col": 11,
-          "offset": 61
-        }
-      },
-      "subtasks": [],
-      "real": true,
-      "header": {
-        "path": "fixtures/fixture-vault/tasks.md",
-        "embed": false,
-        "type": "file"
-      },
-      "scheduled": "2025-07-19T00:00:00.000+02:00",
-      "status": " ",
-      "checked": false,
-      "completed": false,
-      "fullyCompleted": false
-    },
-    {
-      "symbol": "-",
-      "link": {
-        "path": "fixtures/fixture-vault/tasks.md",
-        "embed": false,
-        "type": "file"
-      },
-      "section": {
-        "path": "fixtures/fixture-vault/tasks.md",
-        "embed": false,
-        "type": "file"
-      },
-      "text": "10:00 - 10:30 Task with time ⏳ 2025-07-19",
-      "tags": [],
-      "line": 3,
-      "lineCount": 1,
-      "list": 0,
-      "outlinks": [],
-      "path": "fixtures/fixture-vault/tasks.md",
-      "children": [],
-      "task": true,
-      "annotated": true,
-      "position": {
-        "start": {
-          "line": 3,
-          "col": 0,
-          "offset": 62
-        },
-        "end": {
-          "line": 3,
-          "col": 47,
-          "offset": 109
-        }
-      },
-      "subtasks": [],
-      "real": true,
-      "header": {
-        "path": "fixtures/fixture-vault/tasks.md",
-        "embed": false,
-        "type": "file"
-      },
-      "scheduled": "2025-07-19T00:00:00.000+02:00",
-      "status": " ",
-      "checked": false,
-      "completed": false,
-      "fullyCompleted": false
-    },
-    {
-      "symbol": "-",
-      "link": {
-        "path": "fixtures/fixture-vault/tasks.md",
-        "embed": false,
-        "type": "file"
-      },
-      "section": {
-        "path": "fixtures/fixture-vault/tasks.md",
-        "embed": false,
-        "type": "file"
-      },
-      "text": "After",
-      "tags": [],
-      "line": 4,
-      "lineCount": 1,
-      "list": 0,
-      "outlinks": [],
-      "path": "fixtures/fixture-vault/tasks.md",
-      "children": [],
-      "task": true,
-      "annotated": false,
-      "position": {
-        "start": {
-          "line": 4,
-          "col": 0,
-          "offset": 110
-        },
-        "end": {
-          "line": 4,
-          "col": 11,
-          "offset": 121
-        }
-      },
-      "subtasks": [],
-      "real": true,
-      "header": {
-        "path": "fixtures/fixture-vault/tasks.md",
-        "embed": false,
-        "type": "file"
       },
       "status": " ",
       "checked": false,
@@ -1630,10 +1617,10 @@
         "embed": false,
         "type": "file"
       },
-      "text": "Task\n```yaml\nplanner:\nlog:\n- start: 2025-01-01 13:00\nend: 2025-01-01 15:00\n- start: 2025-01-01 17:00\nend: 2025-01-01 18:00\n```",
+      "text": "Task\n```yaml\nplanner:\nlog:\n- start: 2025-01-01 13:00\nend: 2025-01-01 15:00\n- start: 2025-01-01 17:00\n```",
       "tags": [],
       "line": 0,
-      "lineCount": 9,
+      "lineCount": 8,
       "list": 0,
       "outlinks": [],
       "path": "fixtures/fixture-vault/one-task-two-log-records.md",
@@ -1647,9 +1634,9 @@
           "offset": 0
         },
         "end": {
-          "line": 8,
+          "line": 7,
           "col": 5,
-          "offset": 170
+          "offset": 140
         }
       },
       "subtasks": [],
@@ -1658,99 +1645,6 @@
         "path": "fixtures/fixture-vault/one-task-two-log-records.md",
         "embed": false,
         "type": "file"
-      },
-      "status": " ",
-      "checked": false,
-      "completed": false,
-      "fullyCompleted": false
-    },
-    {
-      "symbol": "-",
-      "link": {
-        "path": "fixtures/fixture-vault/test.md",
-        "subpath": "Heading 1",
-        "type": "header"
-      },
-      "section": {
-        "path": "fixtures/fixture-vault/test.md",
-        "subpath": "Heading 1",
-        "type": "header"
-      },
-      "text": "Nested task with 1 log record\n```yaml\nplanner:\nlog:\n- start: 2025-07-18 12:00\nend: 2025-07-18 14:40\n```",
-      "tags": [],
-      "line": 7,
-      "lineCount": 7,
-      "list": 3,
-      "outlinks": [],
-      "path": "fixtures/fixture-vault/test.md",
-      "children": [],
-      "task": true,
-      "annotated": false,
-      "position": {
-        "start": {
-          "line": 7,
-          "col": 2,
-          "offset": 57
-        },
-        "end": {
-          "line": 13,
-          "col": 7,
-          "offset": 202
-        }
-      },
-      "subtasks": [],
-      "real": true,
-      "header": {
-        "path": "fixtures/fixture-vault/test.md",
-        "subpath": "Heading 1",
-        "type": "header"
-      },
-      "parent": 3,
-      "status": " ",
-      "checked": false,
-      "completed": false,
-      "fullyCompleted": false
-    },
-    {
-      "symbol": "-",
-      "link": {
-        "path": "fixtures/fixture-vault/test.md",
-        "subpath": "Heading 2",
-        "type": "header"
-      },
-      "section": {
-        "path": "fixtures/fixture-vault/test.md",
-        "subpath": "Heading 2",
-        "type": "header"
-      },
-      "text": "Task with 3 log records\n```yaml\nplanner:\nlog:\n- start: 2025-07-19 12:00\nend: 2025-07-19 14:30\n- start: 2025-07-19 15:00\nend: 2025-07-19 16:30\n- start: 2025-07-19 13:00\nend: 2025-07-19 16:30\n```",
-      "tags": [],
-      "line": 17,
-      "lineCount": 11,
-      "list": 17,
-      "outlinks": [],
-      "path": "fixtures/fixture-vault/test.md",
-      "children": [],
-      "task": true,
-      "annotated": false,
-      "position": {
-        "start": {
-          "line": 17,
-          "col": 0,
-          "offset": 218
-        },
-        "end": {
-          "line": 27,
-          "col": 5,
-          "offset": 469
-        }
-      },
-      "subtasks": [],
-      "real": true,
-      "header": {
-        "path": "fixtures/fixture-vault/test.md",
-        "subpath": "Heading 2",
-        "type": "header"
       },
       "status": " ",
       "checked": false,
@@ -1942,170 +1836,102 @@
       "checked": false,
       "completed": false,
       "fullyCompleted": false
+    },
+    {
+      "symbol": "-",
+      "link": {
+        "path": "fixtures/fixture-vault/test.md",
+        "subpath": "Heading 1",
+        "type": "header"
+      },
+      "section": {
+        "path": "fixtures/fixture-vault/test.md",
+        "subpath": "Heading 1",
+        "type": "header"
+      },
+      "text": "Nested task with 1 log record\n```yaml\nplanner:\nlog:\n- start: 2025-07-18 12:00\nend: 2025-07-18 14:40\n```",
+      "tags": [],
+      "line": 7,
+      "lineCount": 7,
+      "list": 3,
+      "outlinks": [],
+      "path": "fixtures/fixture-vault/test.md",
+      "children": [],
+      "task": true,
+      "annotated": false,
+      "position": {
+        "start": {
+          "line": 7,
+          "col": 2,
+          "offset": 57
+        },
+        "end": {
+          "line": 13,
+          "col": 7,
+          "offset": 202
+        }
+      },
+      "subtasks": [],
+      "real": true,
+      "header": {
+        "path": "fixtures/fixture-vault/test.md",
+        "subpath": "Heading 1",
+        "type": "header"
+      },
+      "parent": 3,
+      "status": " ",
+      "checked": false,
+      "completed": false,
+      "fullyCompleted": false
+    },
+    {
+      "symbol": "-",
+      "link": {
+        "path": "fixtures/fixture-vault/test.md",
+        "subpath": "Heading 2",
+        "type": "header"
+      },
+      "section": {
+        "path": "fixtures/fixture-vault/test.md",
+        "subpath": "Heading 2",
+        "type": "header"
+      },
+      "text": "Task with 3 log records\n```yaml\nplanner:\nlog:\n- start: 2025-07-19 12:00\nend: 2025-07-19 14:30\n- start: 2025-07-19 15:00\nend: 2025-07-19 16:30\n- start: 2025-07-19 13:00\nend: 2025-07-19 16:30\n```",
+      "tags": [],
+      "line": 17,
+      "lineCount": 11,
+      "list": 17,
+      "outlinks": [],
+      "path": "fixtures/fixture-vault/test.md",
+      "children": [],
+      "task": true,
+      "annotated": false,
+      "position": {
+        "start": {
+          "line": 17,
+          "col": 0,
+          "offset": 218
+        },
+        "end": {
+          "line": 27,
+          "col": 5,
+          "offset": 469
+        }
+      },
+      "subtasks": [],
+      "real": true,
+      "header": {
+        "path": "fixtures/fixture-vault/test.md",
+        "subpath": "Heading 2",
+        "type": "header"
+      },
+      "status": " ",
+      "checked": false,
+      "completed": false,
+      "fullyCompleted": false
     }
   ],
   "cachedMetadata": {
-    "test yaml.md": {
-      "sections": [
-        {
-          "type": "list",
-          "position": {
-            "start": {
-              "line": 0,
-              "col": 0,
-              "offset": 0
-            },
-            "end": {
-              "line": 21,
-              "col": 5,
-              "offset": 499
-            }
-          }
-        }
-      ],
-      "listItems": [
-        {
-          "parent": -1,
-          "position": {
-            "start": {
-              "line": 0,
-              "col": 0,
-              "offset": 0
-            },
-            "end": {
-              "line": 3,
-              "col": 5,
-              "offset": 40
-            }
-          }
-        },
-        {
-          "parent": 0,
-          "task": " ",
-          "position": {
-            "start": {
-              "line": 4,
-              "col": 2,
-              "offset": 43
-            },
-            "end": {
-              "line": 10,
-              "col": 9,
-              "offset": 231
-            }
-          }
-        },
-        {
-          "parent": -1,
-          "task": " ",
-          "position": {
-            "start": {
-              "line": 11,
-              "col": 0,
-              "offset": 232
-            },
-            "end": {
-              "line": 21,
-              "col": 5,
-              "offset": 499
-            }
-          }
-        }
-      ],
-      "v": 1
-    },
-    "tasks.md": {
-      "v": 1
-    },
-    "HREN.md": {
-      "v": 1
-    },
-    "fixtures/fixture-vault/tasks.md": {
-      "sections": [
-        {
-          "type": "list",
-          "position": {
-            "start": {
-              "line": 0,
-              "col": 0,
-              "offset": 0
-            },
-            "end": {
-              "line": 4,
-              "col": 11,
-              "offset": 121
-            }
-          }
-        }
-      ],
-      "listItems": [
-        {
-          "parent": -1,
-          "task": " ",
-          "position": {
-            "start": {
-              "line": 0,
-              "col": 0,
-              "offset": 0
-            },
-            "end": {
-              "line": 0,
-              "col": 12,
-              "offset": 12
-            }
-          }
-        },
-        {
-          "parent": -1,
-          "task": " ",
-          "position": {
-            "start": {
-              "line": 1,
-              "col": 0,
-              "offset": 13
-            },
-            "end": {
-              "line": 2,
-              "col": 11,
-              "offset": 61
-            }
-          }
-        },
-        {
-          "parent": -1,
-          "task": " ",
-          "position": {
-            "start": {
-              "line": 3,
-              "col": 0,
-              "offset": 62
-            },
-            "end": {
-              "line": 3,
-              "col": 47,
-              "offset": 109
-            }
-          }
-        },
-        {
-          "parent": -1,
-          "task": " ",
-          "position": {
-            "start": {
-              "line": 4,
-              "col": 0,
-              "offset": 110
-            },
-            "end": {
-              "line": 4,
-              "col": 11,
-              "offset": 121
-            }
-          }
-        }
-      ],
-      "v": 1
-    },
     "fixtures/fixture-vault/test.md": {
       "headings": [
         {
@@ -2254,7 +2080,7 @@
       ],
       "v": 1
     },
-    "fixtures/fixture-vault/one-task-two-log-records.md": {
+    "fixtures/fixture-vault/tasks.md": {
       "sections": [
         {
           "type": "list",
@@ -2265,9 +2091,9 @@
               "offset": 0
             },
             "end": {
-              "line": 8,
-              "col": 5,
-              "offset": 170
+              "line": 4,
+              "col": 11,
+              "offset": 121
             }
           }
         }
@@ -2283,14 +2109,158 @@
               "offset": 0
             },
             "end": {
-              "line": 8,
-              "col": 5,
-              "offset": 170
+              "line": 0,
+              "col": 12,
+              "offset": 12
+            }
+          }
+        },
+        {
+          "parent": -1,
+          "task": " ",
+          "position": {
+            "start": {
+              "line": 1,
+              "col": 0,
+              "offset": 13
+            },
+            "end": {
+              "line": 2,
+              "col": 11,
+              "offset": 61
+            }
+          }
+        },
+        {
+          "parent": -1,
+          "task": " ",
+          "position": {
+            "start": {
+              "line": 3,
+              "col": 0,
+              "offset": 62
+            },
+            "end": {
+              "line": 3,
+              "col": 47,
+              "offset": 109
+            }
+          }
+        },
+        {
+          "parent": -1,
+          "task": " ",
+          "position": {
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 110
+            },
+            "end": {
+              "line": 4,
+              "col": 11,
+              "offset": 121
             }
           }
         }
       ],
       "v": 1
+    },
+    "fixtures/fixture-vault/one-task-two-log-records.md": {
+      "sections": [
+        {
+          "type": "list",
+          "position": {
+            "start": {
+              "line": 0,
+              "col": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 7,
+              "col": 5,
+              "offset": 140
+            }
+          }
+        }
+      ],
+      "listItems": [
+        {
+          "parent": -1,
+          "task": " ",
+          "position": {
+            "start": {
+              "line": 0,
+              "col": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 7,
+              "col": 5,
+              "offset": 140
+            }
+          }
+        }
+      ],
+      "v": 1
+    },
+    "fixtures/fixture-vault/frontmatter-logs.md": {
+      "sections": [
+        {
+          "type": "yaml",
+          "position": {
+            "start": {
+              "line": 0,
+              "col": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 5,
+              "col": 3,
+              "offset": 81
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "position": {
+            "start": {
+              "line": 7,
+              "col": 0,
+              "offset": 83
+            },
+            "end": {
+              "line": 7,
+              "col": 3,
+              "offset": 86
+            }
+          }
+        }
+      ],
+      "frontmatter": {
+        "planner": {
+          "log": [
+            {
+              "start": "2025-07-19 12:00",
+              "end": "2025-07-19 14:30"
+            }
+          ]
+        }
+      },
+      "frontmatterLinks": [],
+      "v": 1,
+      "frontmatterPosition": {
+        "start": {
+          "line": 0,
+          "col": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 5,
+          "col": 3,
+          "offset": 81
+        }
+      }
     },
     "fixtures/fixture-vault/daily-note.md": {
       "headings": [
@@ -2484,67 +2454,11 @@
       ],
       "v": 1
     },
-    "fixtures/fixture-vault/frontmatter-logs.md": {
-      "sections": [
-        {
-          "type": "yaml",
-          "position": {
-            "start": {
-              "line": 0,
-              "col": 0,
-              "offset": 0
-            },
-            "end": {
-              "line": 5,
-              "col": 3,
-              "offset": 81
-            }
-          }
-        },
-        {
-          "type": "paragraph",
-          "position": {
-            "start": {
-              "line": 7,
-              "col": 0,
-              "offset": 83
-            },
-            "end": {
-              "line": 7,
-              "col": 3,
-              "offset": 86
-            }
-          }
-        }
-      ],
-      "frontmatter": {
-        "planner": {
-          "log": [
-            {
-              "start": "2025-07-19 12:00",
-              "end": "2025-07-19 14:30"
-            }
-          ]
-        }
-      },
-      "frontmatterLinks": [],
-      "v": 1,
-      "frontmatterPosition": {
-        "start": {
-          "line": 0,
-          "col": 0,
-          "offset": 0
-        },
-        "end": {
-          "line": 5,
-          "col": 3,
-          "offset": 81
-        }
-      }
-    },
     "fixtures/fixture-vault/2025-07-28.md": {
       "headings": [
         {
+          "heading": "Dreams",
+          "level": 1,
           "position": {
             "start": {
               "line": 2,
@@ -2556,11 +2470,11 @@
               "col": 8,
               "offset": 122
             }
-          },
-          "heading": "Dreams",
-          "level": 1
+          }
         },
         {
+          "heading": "Day planner",
+          "level": 1,
           "position": {
             "start": {
               "line": 6,
@@ -2572,9 +2486,7 @@
               "col": 13,
               "offset": 141
             }
-          },
-          "heading": "Day planner",
-          "level": 1
+          }
         }
       ],
       "sections": [
@@ -2656,6 +2568,7 @@
       ],
       "listItems": [
         {
+          "parent": -4,
           "position": {
             "start": {
               "line": 4,
@@ -2667,10 +2580,11 @@
               "col": 2,
               "offset": 126
             }
-          },
-          "parent": -4
+          }
         },
         {
+          "parent": -8,
+          "task": " ",
           "position": {
             "start": {
               "line": 8,
@@ -2682,11 +2596,11 @@
               "col": 26,
               "offset": 169
             }
-          },
-          "parent": -8,
-          "task": " "
+          }
         },
         {
+          "parent": -8,
+          "task": " ",
           "position": {
             "start": {
               "line": 9,
@@ -2698,11 +2612,11 @@
               "col": 13,
               "offset": 210
             }
-          },
-          "parent": -8,
-          "task": " "
+          }
         },
         {
+          "parent": 9,
+          "task": " ",
           "position": {
             "start": {
               "line": 11,
@@ -2714,11 +2628,11 @@
               "col": 16,
               "offset": 243
             }
-          },
-          "parent": 9,
-          "task": " "
+          }
         },
         {
+          "parent": -8,
+          "task": " ",
           "position": {
             "start": {
               "line": 13,
@@ -2730,11 +2644,10 @@
               "col": 25,
               "offset": 269
             }
-          },
-          "parent": -8,
-          "task": " "
+          }
         }
-      ]
+      ],
+      "v": 1
     },
     "fixtures/fixture-vault/2025-07-20.md": {
       "v": 1

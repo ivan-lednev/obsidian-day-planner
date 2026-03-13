@@ -16,6 +16,10 @@ import {
   type IcalParseTaskResult,
 } from "./ical/init-ical-listeners";
 import type { AppDispatch, RootState } from "./store";
+import {
+  createTrackerListener,
+  metadataChanged,
+} from "./tracker/tracker-slice";
 
 export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
   const {
@@ -53,6 +57,11 @@ export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
   listenerMiddleware.startListening({
     actionCreator: dataviewChange,
     effect: createListPropsParseListener({ listPropsParser }),
+  });
+
+  listenerMiddleware.startListening({
+    actionCreator: metadataChanged,
+    effect: createTrackerListener({ listPropsParser }),
   });
 
   return listenerMiddleware;
