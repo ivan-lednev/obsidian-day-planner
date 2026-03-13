@@ -30,6 +30,7 @@ interface LogEntry {
   start: string;
   end?: string;
   parent: string;
+  id: string;
 }
 
 interface TrackerSliceState {
