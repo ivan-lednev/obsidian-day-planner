@@ -1,12 +1,11 @@
 import { type PayloadAction } from "@reduxjs/toolkit";
 import type { CachedMetadata, Pos } from "obsidian";
+import { isNotVoid } from "typed-assert";
 
 import type { ListPropsParser } from "../../service/list-props-parser";
-import { createAppSlice } from "../create-app-slice";
 import type { Props } from "../../util/props";
+import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
-
-import { isNotVoid } from "typed-assert";
 
 export type ListPropsParseResult = {
   parsed: Props;
