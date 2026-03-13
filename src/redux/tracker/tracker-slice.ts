@@ -3,9 +3,10 @@ import type { CachedMetadata, Pos } from "obsidian";
 
 import type { ListPropsParser } from "../../service/list-props-parser";
 import { createAppSlice } from "../create-app-slice";
+import type { Props } from "../../util/props";
 import type { AppListenerEffect } from "../store";
 
-import type { Props } from "src/util/props";
+import { isNotVoid } from "typed-assert";
 
 export type ListPropsParseResult = {
   parsed: Props;
@@ -91,7 +92,7 @@ export const trackerSlice = createAppSlice({
   }),
   selectors: {
     selectEntriesForPath: (state, path) => {
-      return state.taskEntries.byPath[path].map(
+      return state.taskEntries.byPath[path]?.map(
         (it) => state.taskEntries.byId[it],
       );
     },
@@ -101,6 +102,8 @@ export const trackerSlice = createAppSlice({
         .filter((it) => !it.end)
         .map((it) => {
           const taskEntry = state.taskEntries.byId[it.parent];
+
+          isNotVoid(taskEntry, "Inconsistent store state");
 
           return { ...it, text: taskEntry.text };
         }),
@@ -137,6 +140,9 @@ export function createTrackerListener(props: {
         );
         const listItemLines = listItemText.split("\n");
         const firstLine = listItemLines[0];
+
+        isNotVoid(firstLine, "The first line of any list cannot be empty");
+
         const listItemProps = listPropsParser.getListPropsFromListItem(
           it,
           listItemText,
