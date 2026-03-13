@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 
 import {
   fileDeleted,
+  metadataChanged,
   selectActiveClocks,
   selectEntriesForPath,
 } from "../src/redux/tracker/tracker-slice";
@@ -67,7 +68,34 @@ describe("Log Records with indexes", () => {
     ).toBeFalsy();
   });
 
-  test.todo("Deletes entries on file deletion");
+  test("Replaces old entries on file change", async () => {
+    const { getState, dispatch } = await setUp();
+
+    expect(
+      selectEntriesForPath(getState(), "fixtures/fixture-vault/test.md"),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          text: expect.stringContaining("Nested task with 1 log record"),
+        }),
+        expect.objectContaining({
+          text: expect.stringContaining("Task with 3 log records"),
+        }),
+      ]),
+    );
+
+    dispatch(
+      metadataChanged({
+        path: "fixtures/fixture-vault/test.md",
+        cache: {},
+        contents: "",
+      }),
+    );
+
+    expect(
+      selectEntriesForPath(getState(), "fixtures/fixture-vault/test.md"),
+    ).toHaveLength(0);
+  });
 
   test.todo("Returns time block views in range");
 });

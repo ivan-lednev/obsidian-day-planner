@@ -89,19 +89,21 @@ export const trackerSlice = createAppSlice({
     ),
     fileMetadataProcessed: create.reducer(
       (state, action: PayloadAction<FileMetadataProcessedPayload>) => {
-        const { path, taskEntries, logEntries } = action.payload;
+        const { path, taskEntries = [], logEntries = [] } = action.payload;
 
-        if (taskEntries) {
-          state.taskEntries.byPath[path] = taskEntries.map((it) => it.id);
+        const previousTaskEntryIds = state.taskEntries.byPath[path] || [];
 
-          taskEntries.forEach((it) => {
-            state.taskEntries.byId[it.id] = it;
-          });
-        }
+        previousTaskEntryIds.forEach((id) => {
+          delete state.taskEntries.byId[id];
+        });
 
-        if (logEntries) {
-          state.logEntries.byPath[path] = logEntries;
-        }
+        state.taskEntries.byPath[path] = taskEntries.map((it) => it.id);
+
+        taskEntries.forEach((it) => {
+          state.taskEntries.byId[it.id] = it;
+        });
+
+        state.logEntries.byPath[path] = logEntries;
       },
     ),
   }),
