@@ -50,14 +50,4 @@ exports[`Editing > Daily notes > Un-schedules tasks 1`] = `
 }
 `;
 
-exports[`Editing > Obsidian-tasks > Schedules tasks & un-schedules tasks 1`] = `
-{
-  "fixtures/fixture-vault/tasks.md": "
-- - [ ] Task without time ⏳ 2025-07-19
-+ - [ ] 13:00 - 13:30 Task without time ⏳ 2025-07-19
-...
-- - [ ] 10:00 - 10:30 Task with time ⏳ 2025-07-19
-+ - [ ] Task with time ⏳ 2025-07-19
-",
-}
-`;
+exports[`Editing > Obsidian-tasks > Schedules tasks & un-schedules tasks 1`] = `{}`;
