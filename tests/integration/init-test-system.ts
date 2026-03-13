@@ -216,18 +216,8 @@ export async function setUp(props: {
     return found;
   }
 
-  async function findByText(text: string) {
-    let found: LocalTask | undefined;
-
-    await vi.waitFor(() => {
-      found = get(allTasks)
-        .filter(isLocal)
-        .find((it) => getOneLineSummary(it).includes(text));
-
-      expect(found).toBeDefined();
-    });
-
-    return found as LocalTask;
+  function findByText(text: string) {
+    return findTask((it) => getOneLineSummary(it).includes(text)) as LocalTask;
   }
 
   await vi.waitFor(() => {
