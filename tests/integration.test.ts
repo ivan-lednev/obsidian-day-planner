@@ -14,6 +14,7 @@ import { dataviewChange } from "../src/redux/dataview/dataview-slice";
 import { initialState } from "../src/redux/global-slice";
 import { createReactor, type RootState } from "../src/redux/store";
 import {
+  fileDeleted,
   metadataChanged,
   selectActiveClocks,
   selectEntriesForPath,
@@ -362,11 +363,27 @@ describe("Log Records with indexes", () => {
     ]);
   });
 
-  test.todo("Returns time block views in range");
+  test("Deletes entries on file change", async () => {
+    const { getState, dispatch } = await setUp();
 
-  test.todo("Deletes entries on file change");
+    dispatch(
+      fileDeleted({
+        path: "fixtures/fixture-vault/one-task-two-log-records.md",
+      }),
+    );
+
+    expect(selectActiveClocks(getState())).toHaveLength(0);
+    expect(
+      selectEntriesForPath(
+        getState(),
+        "fixtures/fixture-vault/one-task-two-log-records.md",
+      ),
+    ).toBeFalsy();
+  });
 
   test.todo("Deletes entries on file deletion");
+
+  test.todo("Returns time block views in range");
 });
 
 describe("Clocks", () => {

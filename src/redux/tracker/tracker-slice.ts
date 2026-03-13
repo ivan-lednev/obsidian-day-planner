@@ -51,29 +51,45 @@ const initialState: TrackerSliceState = {
   },
 };
 
+interface MetadataChangedPayload {
+  path: string;
+  contents: string;
+  cache: CachedMetadata;
+}
+
+interface FileMetadataProcessedPayload {
+  path: string;
+  taskEntries?: TaskEntry[];
+  logEntries?: LogEntry[];
+}
+
+interface FileDeletedPayload {
+  path: string;
+}
+
 export const trackerSlice = createAppSlice({
   name: "tracker",
   initialState,
   reducers: (create) => ({
     metadataChanged: create.reducer(
-      (
-        state,
-        action: PayloadAction<{
-          path: string;
-          contents: string;
-          cache: CachedMetadata;
-        }>,
-      ) => {},
+      (state, action: PayloadAction<MetadataChangedPayload>) => {},
+    ),
+    fileDeleted: create.reducer(
+      (state, action: PayloadAction<FileDeletedPayload>) => {
+        const { path } = action.payload;
+
+        const taskEntryIds = state.taskEntries.byPath[path] || [];
+
+        taskEntryIds.forEach((id) => {
+          delete state.taskEntries.byId[id];
+        });
+
+        delete state.taskEntries.byPath[path];
+        delete state.logEntries.byPath[path];
+      },
     ),
     fileMetadataProcessed: create.reducer(
-      (
-        state,
-        action: PayloadAction<{
-          path: string;
-          taskEntries?: TaskEntry[];
-          logEntries?: LogEntry[];
-        }>,
-      ) => {
+      (state, action: PayloadAction<FileMetadataProcessedPayload>) => {
         const { path, taskEntries, logEntries } = action.payload;
 
         if (taskEntries) {
@@ -110,7 +126,8 @@ export const trackerSlice = createAppSlice({
   },
 });
 
-export const { fileMetadataProcessed, metadataChanged } = trackerSlice.actions;
+export const { fileMetadataProcessed, metadataChanged, fileDeleted } =
+  trackerSlice.actions;
 
 export const { selectEntriesForPath, selectActiveClocks } =
   trackerSlice.selectors;
