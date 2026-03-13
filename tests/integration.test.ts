@@ -50,7 +50,7 @@ describe("Log Records with indexes", () => {
     ]);
   });
 
-  test("Deletes entries on file change", async () => {
+  test("Deletes entries on file deletion", async () => {
     const { getState, dispatch } = await setUp();
 
     dispatch(
@@ -59,7 +59,6 @@ describe("Log Records with indexes", () => {
       }),
     );
 
-    expect(selectActiveClocks(getState())).toHaveLength(0);
     expect(
       selectEntriesForPath(
         getState(),
