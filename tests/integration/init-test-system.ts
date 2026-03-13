@@ -217,7 +217,21 @@ export async function setUp(props: {
   }
 
   function findByText(text: string) {
-    return findTask((it) => getOneLineSummary(it).includes(text)) as LocalTask;
+    const fallbackForTasksPlugin =
+      text === "Task without time"
+        ? (it: Task) => getOneLineSummary(it).includes("Task") && !it.startTime
+        : text === "Task with time"
+          ? (it: Task) =>
+              getOneLineSummary(it).includes("Task") && !!it.startTime
+          : undefined;
+
+    return findTask((it) => {
+      if (getOneLineSummary(it).includes(text)) {
+        return true;
+      }
+
+      return fallbackForTasksPlugin?.(it) ?? false;
+    }) as LocalTask;
   }
 
   await vi.waitFor(() => {
