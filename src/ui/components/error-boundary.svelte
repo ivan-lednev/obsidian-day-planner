@@ -5,6 +5,18 @@
   import Callout from "./callout.svelte";
 
   const { children }: { children: Snippet } = $props();
+
+  function getErrorDescription(error: unknown) {
+    if (error instanceof Error) {
+      return error.stack;
+    }
+
+    if (typeof error === "object") {
+      return JSON.stringify(error);
+    }
+
+    return String(error);
+  }
 </script>
 
 <svelte:boundary>
@@ -14,7 +26,7 @@
     <div class="error-wrapper">
       <Callout type="error">
         <ErrorMessage>
-          {String(error)}
+          {getErrorDescription(error)}
         </ErrorMessage>
       </Callout>
     </div>
