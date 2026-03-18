@@ -2,7 +2,9 @@ import { type PayloadAction } from "@reduxjs/toolkit";
 import type { CachedMetadata, Pos } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
+import { defaultDayFormat } from "../../constants";
 import type { ListPropsParser } from "../../service/list-props-parser";
+import { getDaysInRange } from "../../util/moment";
 import type { Props } from "../../util/props";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
@@ -30,16 +32,19 @@ interface LogEntry {
   start: string;
   end?: string;
   parent: string;
+  dayKeys: string[];
   id: string;
 }
 
 interface TrackerSliceState {
   taskEntries: {
-    byPath: Record<string, string[]>;
     byId: Record<string, TaskEntry>;
+    byPath: Record<string, string[]>;
   };
   logEntries: {
-    byPath: Record<string, LogEntry[]>;
+    byId: Record<string, LogEntry>;
+    byPath: Record<string, string[]>;
+    byDay: Record<string, string[]>;
   };
 }
 
@@ -47,6 +52,8 @@ const initialState: TrackerSliceState = {
   taskEntries: { byPath: {}, byId: {} },
   logEntries: {
     byPath: {},
+    byId: {},
+    byDay: {},
   },
 };
 
@@ -84,6 +91,14 @@ export const trackerSlice = createAppSlice({
         });
 
         delete state.taskEntries.byPath[path];
+
+        // todo: copypasted
+        const logEntryIds = state.logEntries.byPath[path] || [];
+
+        logEntryIds.forEach((id) => {
+          delete state.logEntries.byId[id];
+        });
+
         delete state.logEntries.byPath[path];
       },
     ),
@@ -91,19 +106,32 @@ export const trackerSlice = createAppSlice({
       (state, action: PayloadAction<FileMetadataProcessedPayload>) => {
         const { path, taskEntries = [], logEntries = [] } = action.payload;
 
+        // todo: repeat for logEntries
         const previousTaskEntryIds = state.taskEntries.byPath[path] || [];
 
         previousTaskEntryIds.forEach((id) => {
           delete state.taskEntries.byId[id];
         });
 
+        // todo: copy pasta
         state.taskEntries.byPath[path] = taskEntries.map((it) => it.id);
 
         taskEntries.forEach((it) => {
           state.taskEntries.byId[it.id] = it;
         });
 
-        state.logEntries.byPath[path] = logEntries;
+        // todo: copy pasta
+        state.logEntries.byPath[path] = logEntries.map((it) => it.id);
+
+        logEntries.forEach((it) => {
+          state.logEntries.byId[it.id] = it;
+        });
+
+        logEntries.forEach((logEntry) => {
+          logEntry.dayKeys.forEach((dayKey) => {
+            (state.logEntries.byDay[dayKey] ??= []).push(logEntry.id);
+          });
+        });
       },
     ),
   }),
@@ -114,7 +142,7 @@ export const trackerSlice = createAppSlice({
       );
     },
     selectActiveClocks: (state) =>
-      Object.values(state.logEntries.byPath)
+      Object.values(state.logEntries.byId)
         .flat()
         .filter((it) => !it.end)
         .map((it) => {
@@ -124,14 +152,27 @@ export const trackerSlice = createAppSlice({
 
           return { ...it, text: taskEntry.text };
         }),
+    selectLogEntriesForDayKeys: (state, dayKeys: string[]) => {
+      // todo: filter unique
+      const uniqueLogEntryKeysForDayKeys = new Set(
+        dayKeys.flatMap((dayKey) => state.logEntries.byDay[dayKey] || []),
+      );
+
+      return [...uniqueLogEntryKeysForDayKeys].map(
+        (logEntryKey) => state.logEntries.byId[logEntryKey],
+      );
+    },
   },
 });
 
 export const { fileMetadataProcessed, metadataChanged, fileDeleted } =
   trackerSlice.actions;
 
-export const { selectEntriesForPath, selectActiveClocks } =
-  trackerSlice.selectors;
+export const {
+  selectEntriesForPath,
+  selectActiveClocks,
+  selectLogEntriesForDayKeys,
+} = trackerSlice.selectors;
 
 type MetadataChanged = ReturnType<typeof metadataChanged>;
 
@@ -168,11 +209,30 @@ export function createTrackerListener(props: {
         const taskEntryId = createId(path, it.position.start.line);
 
         const logEntries = listItemProps?.parsed.planner?.log?.map(
-          (it, index) => ({
-            ...it,
-            parent: taskEntryId,
-            id: createId(taskEntryId, index),
-          }),
+          (it, index) => {
+            const { start, end } = it;
+
+            const parsedStart = window.moment(
+              start,
+              window.moment.ISO_8601,
+              true,
+            );
+            const parsedEnd = end
+              ? window.moment(end, window.moment.ISO_8601, true)
+              : window.moment();
+
+            const dayKeys: string[] = getDaysInRange(
+              parsedStart,
+              parsedEnd,
+            ).map((day) => day.format(defaultDayFormat));
+
+            return {
+              ...it,
+              parent: taskEntryId,
+              dayKeys,
+              id: createId(taskEntryId, index),
+            };
+          },
         );
 
         return {

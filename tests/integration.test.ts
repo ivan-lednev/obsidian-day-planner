@@ -6,6 +6,7 @@ import {
   metadataChanged,
   selectActiveClocks,
   selectEntriesForPath,
+  selectLogEntriesForDayKeys,
 } from "../src/redux/tracker/tracker-slice";
 import { defaultSettingsForTests } from "../src/settings";
 import { EditMode } from "../src/ui/hooks/use-edit/types";
@@ -97,7 +98,20 @@ describe("Log Records with indexes", () => {
     ).toHaveLength(0);
   });
 
-  test.todo("Returns time block views in range");
+  test("Returns time block views in range", async () => {
+    const { getState } = await setUp();
+
+    expect(
+      selectLogEntriesForDayKeys(getState(), ["2025-07-18"]),
+    ).toContainEqual(
+      expect.objectContaining({
+        // TODO: replace with text
+        parent: expect.stringContaining("test.md::7"),
+      }),
+    );
+  });
+
+  test.todo("Should not select deleted tasks within date range");
 });
 
 describe("Clocks", () => {

@@ -1,4 +1,5 @@
 import type { Moment } from "moment/moment";
+import { isExactly } from "typed-assert";
 
 import type { DayPlannerSettings } from "../settings";
 import type { RelationToNow } from "../types";
@@ -122,4 +123,27 @@ export function doesOverlapWithRange(target: Range, rangeEndExclusive: Range) {
     target.start.isBefore(rangeEndExclusive.end) &&
     target.end.isAfter(rangeEndExclusive.start)
   );
+}
+
+export function isTrue(value: boolean, message?: string) {
+  isExactly(value, true, message);
+}
+
+export function getDaysInRange(start: Moment, end: Moment) {
+  isTrue(
+    end.isSameOrAfter(start),
+    `End moment must be the same or after start moment. Received: ${JSON.stringify({ start, end })}`,
+  );
+
+  const result: Moment[] = [];
+
+  const mutableCurrent = start.clone().startOf("day");
+  const last = end.clone().startOf("day");
+
+  while (mutableCurrent.isSameOrBefore(last)) {
+    result.push(mutableCurrent.clone());
+    mutableCurrent.add(1, "day");
+  }
+
+  return result;
 }
