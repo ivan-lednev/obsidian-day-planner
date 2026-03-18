@@ -34,6 +34,7 @@ interface LogEntry {
   parent: string;
   dayKeys: string[];
   id: string;
+  text: string;
 }
 
 interface TrackerSliceState {
@@ -254,6 +255,7 @@ export function createTrackerListener(props: {
               parent: taskEntryId,
               dayKeys,
               id: createId(taskEntryId, index),
+              text: firstLine,
             };
           },
         );

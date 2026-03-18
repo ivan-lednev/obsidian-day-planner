@@ -105,8 +105,7 @@ describe("Log Records with indexes", () => {
       selectLogEntriesForDayKeys(getState(), ["2025-07-18"]),
     ).toContainEqual(
       expect.objectContaining({
-        // TODO: replace with text
-        parent: expect.stringContaining("test.md::7"),
+        text: expect.stringContaining("Nested task with 1 log record"),
       }),
     );
   });
@@ -126,11 +125,16 @@ describe("Log Records with indexes", () => {
       selectLogEntriesForDayKeys(getState(), ["2025-07-18"]),
     ).not.toContainEqual(
       expect.objectContaining({
-        // TODO: replace with text
-        parent: expect.stringContaining("test.md::7"),
+        text: expect.stringContaining("Nested task with 1 log record"),
       }),
     );
   });
+
+  test.todo("No duplicates");
+
+  test.todo("Consistency");
+
+  test.todo("Old versions don't overwrite new ones");
 });
 
 describe("Clocks", () => {
