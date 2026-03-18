@@ -135,6 +135,8 @@ describe("Log Records with indexes", () => {
   test.todo("Consistency");
 
   test.todo("Old versions don't overwrite new ones");
+
+  test.todo("Renaming a file removes entries by the old path")
 });
 
 describe("Clocks", () => {
