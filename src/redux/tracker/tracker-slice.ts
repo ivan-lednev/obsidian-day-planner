@@ -120,6 +120,29 @@ export const trackerSlice = createAppSlice({
           state.taskEntries.byId[it.id] = it;
         });
 
+        const previousLogEntryIds = state.logEntries.byPath[path] || [];
+
+        previousLogEntryIds.forEach((id) => {
+          const logEntry = state.logEntries.byId[id];
+
+          isNotVoid(logEntry, "Inconsistent store state");
+
+          logEntry.dayKeys.forEach((dayKey) => {
+            isNotVoid(
+              state.logEntries.byDay[dayKey],
+              "Inconsistent store state",
+            );
+
+            state.logEntries.byDay[dayKey] = state.logEntries.byDay[
+              dayKey
+            ].filter((it) => it !== id);
+          });
+        });
+
+        previousLogEntryIds.forEach((id) => {
+          delete state.logEntries.byId[id];
+        });
+
         // todo: copy pasta
         state.logEntries.byPath[path] = logEntries.map((it) => it.id);
 

@@ -111,7 +111,26 @@ describe("Log Records with indexes", () => {
     );
   });
 
-  test.todo("Should not select deleted tasks within date range");
+  test("Does not select deleted tasks within date range", async () => {
+    const { dispatch, getState } = await setUp();
+
+    dispatch(
+      metadataChanged({
+        path: "fixtures/fixture-vault/test.md",
+        cache: {},
+        contents: "",
+      }),
+    );
+
+    expect(
+      selectLogEntriesForDayKeys(getState(), ["2025-07-18"]),
+    ).not.toContainEqual(
+      expect.objectContaining({
+        // TODO: replace with text
+        parent: expect.stringContaining("test.md::7"),
+      }),
+    );
+  });
 });
 
 describe("Clocks", () => {
