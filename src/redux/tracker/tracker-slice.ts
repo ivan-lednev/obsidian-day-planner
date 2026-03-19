@@ -4,23 +4,16 @@ import { isNotVoid } from "typed-assert";
 
 import { defaultDayFormat } from "../../constants";
 import type { ListPropsParser } from "../../service/list-props-parser";
-import { getDaysInRange } from "../../util/moment";
+import { getDaysInRange, strictParse } from "../../util/moment";
 import type { Props } from "../../util/props";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
+import type { LocalTask } from "../../task-types";
 
 export type ListPropsParseResult = {
   parsed: Props;
   position: Pos;
 };
-
-export type LineToListProps = Record<number, ListPropsParseResult>;
-export type PathToListProps = Record<string, LineToListProps>;
-
-export interface ListPropsParsedPayload {
-  path: string;
-  lineToListProps?: LineToListProps;
-}
 
 interface TaskEntry {
   id: string;
@@ -169,12 +162,19 @@ export const trackerSlice = createAppSlice({
       Object.values(state.logEntries.byId)
         .flat()
         .filter((it) => !it.end)
-        .map((it) => {
-          const taskEntry = state.taskEntries.byId[it.parent];
+        .map((logEntry) => {
+          const taskEntry = state.taskEntries.byId[logEntry.parent];
 
           isNotVoid(taskEntry, "Inconsistent store state");
 
-          return { ...it, text: taskEntry.text };
+          return {
+            text: taskEntry.text,
+            location: { path: taskEntry.id, position: taskEntry.position },
+            symbol: "-",
+            startTime: strictParse(logEntry.start),
+            durationMinutes: 30,
+            id: logEntry.id,
+          } satisfies LocalTask;
         }),
     selectLogEntriesForDayKeys: (state, dayKeys: string[]) => {
       // todo: filter unique

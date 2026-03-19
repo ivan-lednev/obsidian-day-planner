@@ -147,3 +147,7 @@ export function getDaysInRange(start: Moment, end: Moment) {
 
   return result;
 }
+
+export function strictParse(value: string) {
+  return window.moment(value, window.moment.ISO_8601, true);
+}
