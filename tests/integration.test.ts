@@ -47,7 +47,7 @@ describe("Log Records with indexes", () => {
     expect(selectActiveClocks(getState())).toMatchObject([
       {
         text: "- [ ] Task",
-        start: "2025-01-01 17:00",
+        startTime: window.moment("2025-01-01 17:00"),
       },
     ]);
   });
@@ -136,7 +136,7 @@ describe("Log Records with indexes", () => {
 
   test.todo("Old versions don't overwrite new ones");
 
-  test.todo("Renaming a file removes entries by the old path")
+  test.todo("Renaming a file removes entries by the old path");
 });
 
 describe("Clocks", () => {

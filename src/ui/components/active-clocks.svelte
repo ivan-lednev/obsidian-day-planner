@@ -16,13 +16,13 @@
   import Properties from "./Properties.svelte";
   import Selectable from "./selectable.svelte";
 
-  const { workspaceFacade, tasksWithActiveClockProps, sTaskEditor, useSelector } =
+  const { workspaceFacade, sTaskEditor, useSelector } =
     getObsidianContext();
 
   const activeLogRecords = useSelector(selectActiveClocks)
 </script>
 
-<BlockList list={$tasksWithActiveClockProps}>
+<BlockList list={$activeLogRecords}>
   {#snippet match(task: LocalTask)}
     <Selectable
       onSecondarySelect={(event) =>
