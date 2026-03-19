@@ -15,7 +15,7 @@ import { setUp } from "./integration/setup";
 import { getPathToDiff } from "./test-utils";
 
 describe("Log Records with indexes", () => {
-  test("Stores the first line of each task", async () => {
+  test("Stores text, path, position for task entries", async () => {
     const { getState } = await setUp();
 
     expect(
@@ -23,7 +23,16 @@ describe("Log Records with indexes", () => {
         getState(),
         "fixtures/fixture-vault/one-task-two-log-records.md",
       ),
-    ).toMatchObject([{ text: "- [ ] Task" }]);
+    ).toMatchObject([
+      {
+        text: "- [ ] Task",
+        position: {
+          start: expect.any(Object),
+          end: expect.any(Object),
+        },
+        path: "fixtures/fixture-vault/one-task-two-log-records.md",
+      },
+    ]);
   });
 
   test("Stores log entries for file", async () => {

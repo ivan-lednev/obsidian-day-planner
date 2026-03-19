@@ -18,6 +18,8 @@ export type ListPropsParseResult = {
 interface TaskEntry {
   id: string;
   text: string;
+  position: Pos;
+  path: string;
   logEntries?: string[];
 }
 
@@ -169,7 +171,7 @@ export const trackerSlice = createAppSlice({
 
           return {
             text: taskEntry.text,
-            location: { path: taskEntry.id, position: taskEntry.position },
+            location: { path: taskEntry.path, position: taskEntry.position },
             symbol: "-",
             startTime: strictParse(logEntry.start),
             durationMinutes: 30,
@@ -216,10 +218,10 @@ export function createTrackerListener(props: {
 
     const taskEntries = cache.listItems
       ?.filter((it) => it.task !== undefined)
-      .map((it) => {
+      .map((taskListItem) => {
         const listItemText = contents.slice(
-          it.position.start.offset,
-          it.position.end.offset,
+          taskListItem.position.start.offset,
+          taskListItem.position.end.offset,
         );
         const listItemLines = listItemText.split("\n");
         const firstLine = listItemLines[0];
@@ -227,10 +229,10 @@ export function createTrackerListener(props: {
         isNotVoid(firstLine, "The first line of any list cannot be empty");
 
         const listItemProps = listPropsParser.getListPropsFromListItem(
-          it,
+          taskListItem,
           listItemText,
         );
-        const taskEntryId = createId(path, it.position.start.line);
+        const taskEntryId = createId(path, taskListItem.position.start.line);
 
         const logEntries = listItemProps?.parsed.planner?.log?.map(
           (it, index) => {
@@ -264,6 +266,8 @@ export function createTrackerListener(props: {
         return {
           id: taskEntryId,
           text: firstLine,
+          position: taskListItem.position,
+          path,
           logEntries,
         };
       });
@@ -271,10 +275,9 @@ export function createTrackerListener(props: {
     listenerApi.dispatch(
       fileMetadataProcessed({
         path,
-        taskEntries: taskEntries?.map(({ id, text, logEntries }) => ({
-          id,
-          text,
+        taskEntries: taskEntries?.map(({ logEntries, ...rest }) => ({
           logEntries: logEntries?.map((it) => it.id),
+          ...rest,
         })),
         logEntries: taskEntries?.flatMap((it) => it.logEntries || []),
       }),
