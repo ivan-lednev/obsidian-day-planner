@@ -243,8 +243,8 @@ export function createTrackerListener(props: {
             );
             const parsedEnd = end
               ? window.moment(end, window.moment.ISO_8601, true)
-              // TODO: bug source
-              : window.moment();
+              : // TODO: bug source
+                window.moment();
 
             const dayKeys: string[] = getDaysInRange(
               parsedStart,

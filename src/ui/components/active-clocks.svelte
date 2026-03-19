@@ -5,6 +5,7 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { currentTimeSignal } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
+  import { selectActiveClocks } from "../../redux/tracker/tracker-slice";
   import type { LocalTask } from "../../task-types";
   import * as m from "../../util/moment";
   import { createActiveClockMenu } from "../active-clock-menu";
@@ -15,8 +16,10 @@
   import Properties from "./Properties.svelte";
   import Selectable from "./selectable.svelte";
 
-  const { workspaceFacade, tasksWithActiveClockProps, sTaskEditor } =
+  const { workspaceFacade, tasksWithActiveClockProps, sTaskEditor, useSelector } =
     getObsidianContext();
+
+  const activeLogRecords = useSelector(selectActiveClocks)
 </script>
 
 <BlockList list={$tasksWithActiveClockProps}>

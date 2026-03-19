@@ -44,6 +44,8 @@
     getDisplayedTasksWithClocksForTimeline(day),
   );
 
+  // const tasksWithClocksForTimeline = useSelector()
+
   let el: HTMLElement | undefined = $state();
 
   function updatePointerDateTime(event: MouseEvent | TouchEvent) {

@@ -4,7 +4,7 @@ import {
   Plugin,
   WorkspaceLeaf,
   type MarkdownFileInfo,
-  type TFile,
+  TFile,
 } from "obsidian";
 import { getAPI } from "obsidian-dataview";
 import {
@@ -28,6 +28,7 @@ import {
 } from "./constants";
 import { createUpdateHandler, getTextFromUser } from "./create-update-handler";
 import { createDumpMetadataCommand } from "./dump-metadata";
+import { TimeTrackingFeature } from "./feature/time-tracking-feature";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import {
@@ -164,6 +165,16 @@ export default class DayPlanner extends Plugin {
 
     await this.handleNewPluginVersion();
     await this.initTimelineLeafSilently();
+
+    const timeTrackingFeature = new TimeTrackingFeature(
+      this,
+      this.app.workspace,
+      this.app.vault,
+      this.app.metadataCache,
+      dispatch,
+    );
+
+    timeTrackingFeature.load();
   }
 
   async onunload() {
