@@ -60,7 +60,7 @@
     "obsidian-dataview": "^0.5.67",
     "postcss-html": "^1.7.0",
     "prettier-plugin-svelte": "latest",
-    "sass": "^1.79.1",
+    "sass": "^1.98.0",
     "simple-git": "^3.26.0",
     "stylelint": "^16.9.0",
     "stylelint-config-clean-order": "^6.1.0",
