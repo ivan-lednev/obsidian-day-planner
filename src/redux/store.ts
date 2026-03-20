@@ -28,7 +28,7 @@ import { searchSlice } from "./search-slice";
 import { selectDataviewSource, settingsSlice } from "./settings-slice";
 import { trackerSlice } from "./tracker/tracker-slice";
 import { useActionDispatched } from "./use-action-dispatched";
-import { createUseSelector } from "./use-selector";
+import { createUseSelector, createUseSelector_v2 } from "./use-selector";
 
 const rootReducer = combineSlices(
   globalSlice,
@@ -82,6 +82,7 @@ export function createReactor(props: {
   const { dispatch, getState } = store;
 
   const useSelector = createUseSelector(store);
+  const useSelector_v2 = createUseSelector_v2(store);
   const actionDispatched = useActionDispatched({ listenerMiddleware });
 
   const remoteTasks = useSelector(selectRemoteTasks);
@@ -121,6 +122,7 @@ export function createReactor(props: {
     pointerDateTime,
     dataviewRefreshSignal,
     useSelector,
+    useSelector_v2,
   };
 }
 

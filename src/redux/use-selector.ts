@@ -87,3 +87,4 @@ export function createSvelteSignalFromReduxStore(reduxStore: AppStore) {
 }
 
 export type UseSelector = ReturnType<typeof createUseSelector>;
+export type UseSelector_v2 = ReturnType<typeof createUseSelector_v2>;

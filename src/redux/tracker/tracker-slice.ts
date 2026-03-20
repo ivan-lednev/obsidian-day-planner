@@ -5,14 +5,8 @@ import { isNotVoid } from "typed-assert";
 import { defaultDayFormat } from "../../constants";
 import type { ListPropsParser } from "../../service/list-props-parser";
 import { getDaysInRange, strictParse } from "../../util/moment";
-import type { Props } from "../../util/props";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
-
-export type ListPropsParseResult = {
-  parsed: Props;
-  position: Pos;
-};
 
 interface TaskEntry {
   id: string;
@@ -170,8 +164,9 @@ export const trackerSlice = createAppSlice({
 
           return logEntryToLocalTask(logEntry, taskEntry);
         }),
+    selectLogEntriesByDay: (state) => state.logEntries.byDay,
+    selectLogEntriesById: (state) => state.logEntries.byId,
     selectLogEntriesForDayKeys: (state, dayKeys: string[]) => {
-      // todo: filter unique
       const uniqueLogEntryKeysForDayKeys = new Set(
         dayKeys.flatMap((dayKey) => state.logEntries.byDay[dayKey] || []),
       );
@@ -200,7 +195,8 @@ export const { fileMetadataProcessed, metadataChanged, fileDeleted } =
 export const {
   selectEntriesForPath,
   selectActiveClocks,
-  selectLogEntriesForDayKeys,
+  selectLogEntriesByDay,
+  selectLogEntriesById,
 } = trackerSlice.selectors;
 
 type MetadataChanged = ReturnType<typeof metadataChanged>;

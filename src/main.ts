@@ -48,9 +48,7 @@ import { editCanceled } from "./redux/global-slice";
 import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { settingsUpdated } from "./redux/settings-slice";
 import { type AppDispatch, type AppStore, createReactor } from "./redux/store";
-import {
-  createUseSelector,
-} from "./redux/use-selector";
+import { createUseSelector, createUseSelector_v2 } from "./redux/use-selector";
 import { createSvelteSignalFromReduxStore } from "./redux/use-selector";
 import { DataviewFacade } from "./service/dataview-facade";
 import { TransactionWriter } from "./service/diff-writer";
@@ -121,6 +119,7 @@ export default class DayPlanner extends Plugin {
       getState,
       dispatch,
       useSelector,
+      useSelector_v2,
       listenerMiddleware,
       remoteTasks,
       taskUpdateTrigger,
@@ -155,6 +154,7 @@ export default class DayPlanner extends Plugin {
       pointerDateTime,
       dataviewRefreshSignal,
       useSelector,
+      useSelector_v2,
     });
 
     const handleEditorMenu = createEditorMenuCallback({
@@ -410,6 +410,7 @@ export default class DayPlanner extends Plugin {
     store: AppStore;
     dispatch: AppDispatch;
     useSelector: ReturnType<typeof createUseSelector>;
+    useSelector_v2: ReturnType<typeof createUseSelector_v2>;
     remoteTasks: Readable<RemoteTask[]>;
     taskUpdateTrigger: Readable<unknown>;
     listProps: Readable<PathToListProps>;
@@ -421,6 +422,7 @@ export default class DayPlanner extends Plugin {
       store,
       dispatch,
       useSelector,
+      useSelector_v2,
       remoteTasks,
       taskUpdateTrigger,
       listProps,
@@ -612,6 +614,7 @@ export default class DayPlanner extends Plugin {
       getDisplayedTasksWithClocksForTimeline,
       dispatch,
       useSelector,
+      useSelector_v2,
     };
 
     const componentContext = new Map<
