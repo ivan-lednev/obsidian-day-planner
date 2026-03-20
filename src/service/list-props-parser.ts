@@ -64,10 +64,7 @@ export class ListPropsParser {
     }, {});
   }
 
-  private getListPropsFromListItem(
-    listItem: ListItemCache,
-    listItemText: string,
-  ) {
+  getListPropsFromListItem(listItem: ListItemCache, listItemText: string) {
     const listLines = listItemText.split("\n");
     const firstLine = listLines[0];
     const openingLine = listLines.at(1);

@@ -14,7 +14,6 @@ export function createDumpMetadataCommand(app: App) {
 
       return;
     }
-
     const exists = await app.vault.adapter.exists(metadataDumpPath);
 
     if (exists) {
@@ -23,12 +22,7 @@ export function createDumpMetadataCommand(app: App) {
 
     await app.vault.adapter.mkdir(metadataDumpPath);
 
-    const markdownFiles = app.vault.getMarkdownFiles();
-
     const dump = {
-      pathToMtime: Object.fromEntries(
-        markdownFiles.map((it) => [it.path, it.stat.mtime]),
-      ),
       lists: dataview.pages(`"${fixtureVaultPath}"`).file.lists.array(),
       tasks: dataview.pages(`"${fixtureVaultPath}"`).file.tasks.array(),
       cachedMetadata: Object.fromEntries(

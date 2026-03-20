@@ -2,8 +2,8 @@ import type Fraction from "fraction.js";
 import type { Moment } from "moment";
 import type { Readable, Writable } from "svelte/store";
 
-import { type AppDispatch } from "./redux/store";
-import type { UseSelector } from "./redux/use-selector";
+import { type AppDispatch, type RootState } from "./redux/store";
+import { type UseSelector } from "./redux/use-selector";
 import type { DataviewFacade } from "./service/dataview-facade";
 import type { ListPropsParser } from "./service/list-props-parser";
 import type { PeriodicNotes } from "./service/periodic-notes";
@@ -43,6 +43,7 @@ export type PointerDateTime = {
 };
 
 export type RefreshDataviewFn = (source: string) => Promise<unknown>;
+export type Signal<T> = { current: T };
 
 export interface ObsidianContext {
   workspaceFacade: WorkspaceFacade;
@@ -57,9 +58,10 @@ export interface ObsidianContext {
   isModPressed: Readable<boolean>;
   reSync: () => void;
   isOnline: Readable<boolean>;
-  isDarkMode: { current: boolean };
+  isDarkMode: Signal<boolean>;
   settings: Writable<DayPlannerSettings>;
-  settingsSignal: { current: DayPlannerSettings };
+  settingsSignal: Signal<DayPlannerSettings>;
+  storeSignal: Signal<RootState>;
   pointerDateTime: Writable<PointerDateTime>;
   tasksWithActiveClockProps: Readable<LocalTask[]>;
   logSummary: ReturnType<typeof useTasks>["logSummary"];

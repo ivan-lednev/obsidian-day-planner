@@ -4,7 +4,7 @@ import {
   Plugin,
   WorkspaceLeaf,
   type MarkdownFileInfo,
-  type TFile,
+  TFile,
 } from "obsidian";
 import { getAPI } from "obsidian-dataview";
 import {
@@ -28,6 +28,7 @@ import {
 } from "./constants";
 import { createUpdateHandler, getTextFromUser } from "./create-update-handler";
 import { createDumpMetadataCommand } from "./dump-metadata";
+import { TimeTrackingFeature } from "./feature/time-tracking-feature";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import {
@@ -43,11 +44,14 @@ import {
   dataviewChange,
   type PathToListProps,
 } from "./redux/dataview/dataview-slice";
-import { editCanceled, visibleDaysUpdated } from "./redux/global-slice";
+import { editCanceled } from "./redux/global-slice";
 import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { settingsUpdated } from "./redux/settings-slice";
-import { type AppDispatch, createReactor } from "./redux/store";
-import { createUseSelector } from "./redux/use-selector";
+import { type AppDispatch, type AppStore, createReactor } from "./redux/store";
+import {
+  createUseSelector,
+} from "./redux/use-selector";
+import { createSvelteSignalFromReduxStore } from "./redux/use-selector";
 import { DataviewFacade } from "./service/dataview-facade";
 import { TransactionWriter } from "./service/diff-writer";
 import { ListPropsParser } from "./service/list-props-parser";
@@ -113,6 +117,7 @@ export default class DayPlanner extends Plugin {
     );
 
     const {
+      store,
       getState,
       dispatch,
       useSelector,
@@ -141,6 +146,7 @@ export default class DayPlanner extends Plugin {
 
     this.initSettingsStore({ initialSettings, dispatch });
     this.registerViews({
+      store,
       dispatch,
       remoteTasks,
       taskUpdateTrigger,
@@ -164,6 +170,16 @@ export default class DayPlanner extends Plugin {
 
     await this.handleNewPluginVersion();
     await this.initTimelineLeafSilently();
+
+    const timeTrackingFeature = new TimeTrackingFeature(
+      this,
+      this.app.workspace,
+      this.app.vault,
+      this.app.metadataCache,
+      dispatch,
+    );
+
+    timeTrackingFeature.load();
   }
 
   async onunload() {
@@ -391,6 +407,7 @@ export default class DayPlanner extends Plugin {
   };
 
   private registerViews(props: {
+    store: AppStore;
     dispatch: AppDispatch;
     useSelector: ReturnType<typeof createUseSelector>;
     remoteTasks: Readable<RemoteTask[]>;
@@ -401,6 +418,7 @@ export default class DayPlanner extends Plugin {
     dataviewRefreshSignal: Readable<unknown>;
   }) {
     const {
+      store,
       dispatch,
       useSelector,
       remoteTasks,
@@ -502,15 +520,15 @@ export default class DayPlanner extends Plugin {
         document.body.style.cursor = bodyCursor;
       }),
     );
-    this.register(
-      visibleDays.subscribe((days) => {
-        dispatch(
-          // without the offset, an event right of UTC is going to be displayed as the previous day
-          // a visible day in my zone is 2025-04-15, but in UTC it's 2025-04-14T22:00:00, and getDayKey returns 2025-04-14
-          visibleDaysUpdated(days.map((it) => it.toISOString(true))),
-        );
-      }),
-    );
+    // this.register(
+    //   visibleDays.subscribe((days) => {
+    //     dispatch(
+    //       // without the offset, an event right of UTC is going to be displayed as the previous day
+    //       // a visible day in my zone is 2025-04-15, but in UTC it's 2025-04-14T22:00:00, and getDayKey returns 2025-04-14
+    //       visibleDaysUpdated(days.map((it) => it.toISOString(true))),
+    //     );
+    //   }),
+    // );
 
     const errorStore = writable<Error | undefined>();
 
@@ -571,6 +589,7 @@ export default class DayPlanner extends Plugin {
     }
 
     const defaultObsidianContext: ObsidianContext = {
+      storeSignal: createSvelteSignalFromReduxStore(store),
       periodicNotes: this.periodicNotes,
       sTaskEditor: this.sTaskEditor,
       workspaceFacade: this.workspaceFacade,

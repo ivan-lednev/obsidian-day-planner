@@ -161,11 +161,13 @@ export function addLineDataToCheckboxes(
 
   el.querySelectorAll(checkboxInRenderedMarkdownSelector).forEach(
     (checkbox, i) => {
-      if (!(checkbox instanceof HTMLElement)) {
+      const fileLine = linesWithCheckboxes[i];
+
+      if (!(checkbox instanceof HTMLElement) || !fileLine) {
         return;
       }
 
-      checkbox.dataset.line = String(linesWithCheckboxes[i].line);
+      checkbox.dataset.line = String(fileLine.line);
     },
   );
 }

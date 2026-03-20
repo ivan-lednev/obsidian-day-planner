@@ -10,6 +10,10 @@ import { createUpdateHandler } from "../../src/create-update-handler";
 import { dataviewChange } from "../../src/redux/dataview/dataview-slice";
 import { initialState } from "../../src/redux/global-slice";
 import { createReactor, type RootState } from "../../src/redux/store";
+import { metadataChanged } from "../../src/redux/tracker/tracker-slice";
+import {
+  createUseSelector_v2,
+} from "../../src/redux/use-selector";
 import type { DataviewFacade } from "../../src/service/dataview-facade";
 import { TransactionWriter } from "../../src/service/diff-writer";
 import { ListPropsParser } from "../../src/service/list-props-parser";
@@ -23,7 +27,6 @@ import {
 import { isLocal, type Task } from "../../src/task-types";
 import { useTasks } from "../../src/ui/hooks/use-tasks";
 import { getOneLineSummary } from "../../src/util/task-utils";
-
 import {
   FakeDataviewFacade,
   FakeMetadataCache,
@@ -32,6 +35,7 @@ import {
   InMemoryVault,
   type InMemoryFile,
 } from "../test-utils";
+
 import { loadMetadataDump } from "./metadata-dump";
 
 function initTestServices(props: {
@@ -87,11 +91,11 @@ function initTestServices(props: {
   };
 }
 
-export async function setUp(props: {
-  visibleDays: string[];
+export async function setUp(props?: {
+  visibleDays?: string[];
   settings?: DayPlannerSettings;
 }) {
-  const { visibleDays, settings = defaultSettingsForTests } = props;
+  const { visibleDays = [], settings = defaultSettingsForTests } = props || {};
 
   const { inMemoryFiles, inMemoryDailyNotes, tasks, lists, cachedMetadata } =
     await loadMetadataDump();
@@ -130,6 +134,8 @@ export async function setUp(props: {
   };
 
   const {
+    store,
+    getState,
     dispatch,
     remoteTasks,
     taskUpdateTrigger,
@@ -150,6 +156,14 @@ export async function setUp(props: {
   inMemoryFiles.forEach(({ path }) => {
     dispatch(dataviewChange(path));
   });
+
+  inMemoryFiles.forEach(({ path, contents }) => {
+    isNotVoid(cachedMetadata[path]);
+
+    dispatch(metadataChanged({ path, contents, cache: cachedMetadata[path] }));
+  });
+
+  const useSelector = createUseSelector_v2(store)
 
   const onUpdate = createUpdateHandler({
     settings: () => settings,
@@ -229,6 +243,8 @@ export async function setUp(props: {
   });
 
   return {
+    useSelector,
+    getState,
     dispatch,
     tasksWithActiveClockProps,
     getDisplayedTasksWithClocksForTimeline,
