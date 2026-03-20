@@ -6,13 +6,18 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
+  import { selectLogEntriesForDayKeys } from "../../redux/tracker/tracker-slice";
   import {
     getPointerOffsetY,
     isTouchEvent,
     offsetYToMinutes,
   } from "../../util/dom";
   import { minutesToMomentOfDay } from "../../util/moment";
-  import { getBlockProps, getRenderKey } from "../../util/task-utils";
+  import {
+    getBlockProps,
+    getDayKey,
+    getRenderKey,
+  } from "../../util/task-utils";
   import { createGestures } from "../actions/gestures";
 
   import Column from "./column.svelte";
@@ -37,6 +42,7 @@
     pointerDateTime,
     getDisplayedTasksWithClocksForTimeline,
     settingsSignal,
+    storeSignal,
   } = getObsidianContext();
 
   const displayedTasksForTimeline = $derived(getDisplayedTasksForTimeline(day));
@@ -44,7 +50,13 @@
     getDisplayedTasksWithClocksForTimeline(day),
   );
 
-  // const tasksWithClocksForTimeline = useSelector()
+  const tasksWithClocksForTimeline = $derived(
+    selectLogEntriesForDayKeys(storeSignal.current, [getDayKey(day)]),
+  );
+
+  $effect(() => {
+    console.log(tasksWithClocksForTimeline);
+  });
 
   let el: HTMLElement | undefined = $state();
 

@@ -11,6 +11,9 @@ import { dataviewChange } from "../../src/redux/dataview/dataview-slice";
 import { initialState } from "../../src/redux/global-slice";
 import { createReactor, type RootState } from "../../src/redux/store";
 import { metadataChanged } from "../../src/redux/tracker/tracker-slice";
+import {
+  createUseSelector_v2,
+} from "../../src/redux/use-selector";
 import type { DataviewFacade } from "../../src/service/dataview-facade";
 import { TransactionWriter } from "../../src/service/diff-writer";
 import { ListPropsParser } from "../../src/service/list-props-parser";
@@ -131,6 +134,7 @@ export async function setUp(props?: {
   };
 
   const {
+    store,
     getState,
     dispatch,
     remoteTasks,
@@ -158,6 +162,8 @@ export async function setUp(props?: {
 
     dispatch(metadataChanged({ path, contents, cache: cachedMetadata[path] }));
   });
+
+  const useSelector = createUseSelector_v2(store)
 
   const onUpdate = createUpdateHandler({
     settings: () => settings,
@@ -237,6 +243,7 @@ export async function setUp(props?: {
   });
 
   return {
+    useSelector,
     getState,
     dispatch,
     tasksWithActiveClockProps,

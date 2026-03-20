@@ -110,6 +110,7 @@ export function createReactor(props: {
   });
 
   return {
+    store,
     getState,
     dispatch,
     listenerMiddleware,

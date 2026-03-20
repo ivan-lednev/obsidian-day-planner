@@ -8,6 +8,7 @@
   import { selectActiveClocks } from "../../redux/tracker/tracker-slice";
   import type { LocalTask } from "../../task-types";
   import * as m from "../../util/moment";
+  import { getDiffInMinutes } from "../../util/moment";
   import { createActiveClockMenu } from "../active-clock-menu";
 
   import BlockList from "./block-list.svelte";
@@ -16,13 +17,21 @@
   import Properties from "./Properties.svelte";
   import Selectable from "./selectable.svelte";
 
-  const { workspaceFacade, sTaskEditor, useSelector } =
-    getObsidianContext();
+  const { workspaceFacade, sTaskEditor, useSelector } = getObsidianContext();
 
-  const activeLogRecords = useSelector(selectActiveClocks)
+  const activeLogRecords = useSelector(selectActiveClocks);
+  const activeLogRecordsCompat = $derived(
+    $activeLogRecords.map((it) => ({
+      ...it,
+      durationMinutes: getDiffInMinutes(
+        it.startTime,
+        currentTimeSignal.current,
+      ),
+    })),
+  );
 </script>
 
-<BlockList list={$activeLogRecords}>
+<BlockList list={activeLogRecordsCompat}>
   {#snippet match(task: LocalTask)}
     <Selectable
       onSecondarySelect={(event) =>

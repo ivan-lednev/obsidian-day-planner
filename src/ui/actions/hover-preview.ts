@@ -1,9 +1,9 @@
 import { derived, writable } from "svelte/store";
 
 import { getObsidianContext } from "../../context/obsidian-context";
-import type { LocalTask } from "../../task-types";
+import type { TaskLocation } from "../../task-types";
 
-export function hoverPreview(task: LocalTask) {
+export function hoverPreview(task: { location?: TaskLocation }) {
   return (el: HTMLElement) => {
     const { isModPressed, showPreview } = getObsidianContext();
     let currentEvent: MouseEvent | undefined;

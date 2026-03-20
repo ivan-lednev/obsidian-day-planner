@@ -8,7 +8,6 @@ import { getDaysInRange, strictParse } from "../../util/moment";
 import type { Props } from "../../util/props";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
-import type { LocalTask } from "../../task-types";
 
 export type ListPropsParseResult = {
   parsed: Props;
@@ -169,14 +168,7 @@ export const trackerSlice = createAppSlice({
 
           isNotVoid(taskEntry, "Inconsistent store state");
 
-          return {
-            text: taskEntry.text,
-            location: { path: taskEntry.path, position: taskEntry.position },
-            symbol: "-",
-            startTime: strictParse(logEntry.start),
-            durationMinutes: 30,
-            id: logEntry.id,
-          } satisfies LocalTask;
+          return logEntryToLocalTask(logEntry, taskEntry);
         }),
     selectLogEntriesForDayKeys: (state, dayKeys: string[]) => {
       // todo: filter unique
@@ -190,6 +182,17 @@ export const trackerSlice = createAppSlice({
     },
   },
 });
+
+function logEntryToLocalTask(logEntry: LogEntry, taskEntry: TaskEntry) {
+  return {
+    text: taskEntry.text,
+    location: { path: taskEntry.path, position: taskEntry.position },
+    symbol: "-",
+    startTime: strictParse(logEntry.start),
+    durationMinutes: 30,
+    id: logEntry.id,
+  };
+}
 
 export const { fileMetadataProcessed, metadataChanged, fileDeleted } =
   trackerSlice.actions;
