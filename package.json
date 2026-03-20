@@ -37,7 +37,7 @@
     "commander": "^13.1.0",
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
-    "diff": "^8.0.2",
+    "diff": "^8.0.3",
     "dotenv": "^16.4.7",
     "esbuild": "^0.23.1",
     "esbuild-plugin-replace": "^1.4.0",
