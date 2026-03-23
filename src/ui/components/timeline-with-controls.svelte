@@ -51,7 +51,7 @@
   <TimelineControls />
 
   {#if $settings.showActiveClocks}
-    <Tree isInitiallyOpen title="Active clocks">
+    <Tree title="Active clocks">
       {#snippet flair()}
         {String($tasksWithActiveClockProps.length)}
       {/snippet}
@@ -60,7 +60,7 @@
   {/if}
 
   {#if $settings.showUncheduledTasks}
-    <Tree isInitiallyOpen title="All day events">
+    <Tree title="All day events">
       {#snippet flair()}
         {String(displayedAllDayTasks.length)}
       {/snippet}
@@ -93,7 +93,7 @@
   {/if}
 
   {#if $settings.showTimelineInSidebar}
-    <Tree isInitiallyOpen title="Timeline">
+    <Tree title="Timeline">
       {#snippet controls()}
         <ControlButton
           --border-radius="0"

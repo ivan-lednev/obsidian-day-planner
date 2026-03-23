@@ -8,16 +8,14 @@
     title,
     flair,
     controls,
-    isInitiallyOpen,
   }: {
     title: string;
     children: Snippet;
     flair?: Snippet;
     controls?: Snippet;
-    isInitiallyOpen?: boolean;
   } = $props();
 
-  let isTreeVisible = $state(isInitiallyOpen);
+  let isTreeVisible = $state(true);
 
   const titleColor = $derived(
     isTreeVisible ? "var(--text-muted)" : "var(--text-faint)",
