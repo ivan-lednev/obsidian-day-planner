@@ -34,7 +34,7 @@
     "@vitest/coverage-istanbul": "^2.1.4",
     "babel": "^6.23.0",
     "builtin-modules": "^4.0.0",
-    "commander": "^13.1.0",
+    "commander": "^14.0.3",
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "diff": "^8.0.2",
