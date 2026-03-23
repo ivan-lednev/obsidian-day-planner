@@ -44,7 +44,7 @@ import {
   dataviewChange,
   type PathToListProps,
 } from "./redux/dataview/dataview-slice";
-import { editCanceled } from "./redux/global-slice";
+import { editCanceled, visibleDaysUpdated } from "./redux/global-slice";
 import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { settingsUpdated } from "./redux/settings-slice";
 import { type AppDispatch, type AppStore, createReactor } from "./redux/store";
@@ -522,15 +522,15 @@ export default class DayPlanner extends Plugin {
         document.body.style.cursor = bodyCursor;
       }),
     );
-    // this.register(
-    //   visibleDays.subscribe((days) => {
-    //     dispatch(
-    //       // without the offset, an event right of UTC is going to be displayed as the previous day
-    //       // a visible day in my zone is 2025-04-15, but in UTC it's 2025-04-14T22:00:00, and getDayKey returns 2025-04-14
-    //       visibleDaysUpdated(days.map((it) => it.toISOString(true))),
-    //     );
-    //   }),
-    // );
+    this.register(
+      visibleDays.subscribe((days) => {
+        dispatch(
+          // without the offset, an event right of UTC is going to be displayed as the previous day
+          // a visible day in my zone is 2025-04-15, but in UTC it's 2025-04-14T22:00:00, and getDayKey returns 2025-04-14
+          visibleDaysUpdated(days.map((it) => it.toISOString(true))),
+        );
+      }),
+    );
 
     const errorStore = writable<Error | undefined>();
 
