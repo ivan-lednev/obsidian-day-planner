@@ -6,7 +6,7 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
-  import { selectLogEntriesForDayKeys } from "../../redux";
+  import { selectLogEntriesForDay } from "../../redux";
   import {
     getPointerOffsetY,
     isTouchEvent,
@@ -48,7 +48,7 @@
   const dayKey = $derived(getDayKey(day));
 
   const logEntriesForDay = useSelector((state) =>
-    selectLogEntriesForDayKeys(state, dayKey),
+    selectLogEntriesForDay(state, dayKey),
   );
 
   let el: HTMLElement | undefined = $state();

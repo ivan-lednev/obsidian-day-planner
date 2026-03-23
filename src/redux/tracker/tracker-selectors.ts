@@ -9,7 +9,7 @@ import {
   selectLogEntriesById,
 } from "./tracker-slice";
 
-export const selectLogEntriesForDayKeys = createAppSelector(
+export const selectLogEntriesForDay = createAppSelector(
   [
     selectLogEntriesByDay,
     selectLogEntriesById,

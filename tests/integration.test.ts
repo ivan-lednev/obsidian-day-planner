@@ -1,7 +1,7 @@
 import { get } from "svelte/store";
 import { describe, expect, test } from "vitest";
 
-import { selectLogEntriesForDayKeys } from "../src/redux";
+import { selectLogEntriesForDay } from "../src/redux";
 import {
   fileDeleted,
   metadataChanged,
@@ -110,7 +110,7 @@ describe("Log Records with indexes", () => {
   test("Returns time block views in range", async () => {
     const { getState } = await setUp();
 
-    expect(selectLogEntriesForDayKeys(getState(), "2025-07-18")).toContainEqual(
+    expect(selectLogEntriesForDay(getState(), "2025-07-18")).toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Nested task with 1 log record"),
       }),
@@ -128,9 +128,7 @@ describe("Log Records with indexes", () => {
       }),
     );
 
-    expect(
-      selectLogEntriesForDayKeys(getState(), "2025-07-18"),
-    ).not.toContainEqual(
+    expect(selectLogEntriesForDay(getState(), "2025-07-18")).not.toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Nested task with 1 log record"),
       }),
