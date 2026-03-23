@@ -40,26 +40,18 @@
       editOperation,
     },
     pointerDateTime,
-    getDisplayedTasksWithClocksForTimeline,
     settingsSignal,
     // storeSignal,
     useSelector_v2: useSelector,
   } = getObsidianContext();
 
   const displayedTasksForTimeline = $derived(getDisplayedTasksForTimeline(day));
-  const displayedTasksWithClocksForTimeline = $derived(
-    getDisplayedTasksWithClocksForTimeline(day),
-  );
 
   const dayKeys = $derived([getDayKey(day)]);
 
-  const tasksWithClocksForTimeline = useSelector((state) =>
+  const logEntriesForDay = useSelector((state) =>
     selectLogEntriesForDayKeys(state, dayKeys),
   );
-
-  $effect(() => {
-    console.log({ tasks: tasksWithClocksForTimeline.current });
-  });
 
   let el: HTMLElement | undefined = $state();
 
@@ -148,7 +140,7 @@
     {/if}
 
     <div class="tasks absolute-stretch-x">
-      {#each $displayedTasksWithClocksForTimeline as task (getRenderKey(task))}
+      {#each logEntriesForDay.current as task (task.id)}
         <PositionedTimeBlock {task}>
           <LocalTimeBlock {task}>
             {#snippet bottomDecoration()}

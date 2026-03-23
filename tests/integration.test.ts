@@ -1,12 +1,12 @@
 import { get } from "svelte/store";
 import { describe, expect, test } from "vitest";
 
+import { selectLogEntriesForDayKeys } from "../src/redux";
 import {
   fileDeleted,
   metadataChanged,
   selectActiveClocks,
   selectEntriesForPath,
-  selectLogEntriesForDayKeys,
 } from "../src/redux/tracker/tracker-slice";
 import { defaultSettingsForTests } from "../src/settings";
 import { EditMode } from "../src/ui/hooks/use-edit/types";

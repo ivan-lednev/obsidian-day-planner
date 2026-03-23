@@ -1,5 +1,6 @@
 import {
   type MetadataCache,
+  Notice,
   TFile,
   type Vault,
   type Workspace,
@@ -9,7 +10,6 @@ import { isNotVoid } from "typed-assert";
 import type DayPlanner from "../main";
 import type { AppDispatch } from "../redux/store";
 import { fileDeleted, metadataChanged } from "../redux/tracker/tracker-slice";
-
 
 export class TimeTrackingFeature {
   constructor(
@@ -29,6 +29,8 @@ export class TimeTrackingFeature {
   }
 
   private async initialLoad() {
+    const start = performance.now();
+
     const initialCachingPromises = this.vault
       .getMarkdownFiles()
       .map(async (file) => {
@@ -45,6 +47,10 @@ export class TimeTrackingFeature {
 
     // todo: will cause stale state if we change a file during this
     await Promise.all(initialCachingPromises);
+
+    const end = performance.now();
+
+    new Notice(`Planner index initialized in ${(end - start).toFixed(2)}ms`);
   }
 
   private registerEvents() {

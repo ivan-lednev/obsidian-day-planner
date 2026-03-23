@@ -1,8 +1,7 @@
 import { flushSync, untrack } from "svelte";
 import { describe, expect, test } from "vitest";
 
-import { editCanceled } from "../../src/redux/global-slice";
-import { selectLogEntriesForDayKeys } from "../../src/redux/tracker/tracker-slice";
+import { selectLogEntriesForDayKeys } from "../../src/redux";
 
 import { setUp } from "./setup";
 

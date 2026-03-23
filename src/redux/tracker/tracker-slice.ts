@@ -16,7 +16,7 @@ interface TaskEntry {
   logEntries?: string[];
 }
 
-interface LogEntry {
+export interface LogEntry {
   start: string;
   end?: string;
   parent: string;
@@ -203,7 +203,7 @@ type MetadataChanged = ReturnType<typeof metadataChanged>;
 
 const idSeparator = "::";
 
-function createId(...args: (string | number)[]) {
+export function createId(...args: (string | number)[]) {
   return args.join(idSeparator);
 }
 
