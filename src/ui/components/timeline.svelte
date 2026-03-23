@@ -41,7 +41,7 @@
     },
     pointerDateTime,
     settingsSignal,
-    useSelector_v2: useSelector,
+    useSelectorV2: useSelector,
   } = getObsidianContext();
 
   const displayedTasksForTimeline = $derived(getDisplayedTasksForTimeline(day));

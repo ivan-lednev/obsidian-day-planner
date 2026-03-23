@@ -131,7 +131,7 @@ export async function setUp(props?: {
   };
 
   const {
-    useSelector_v2: useSelector,
+    useSelectorV2: useSelector,
     store,
     getState,
     dispatch,

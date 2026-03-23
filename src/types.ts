@@ -3,7 +3,7 @@ import type { Moment } from "moment";
 import type { Readable, Writable } from "svelte/store";
 
 import { type AppDispatch, type RootState } from "./redux/store";
-import { type UseSelector, type UseSelector_v2 } from "./redux/use-selector";
+import { type UseSelector, type useSelectorV2 } from "./redux/use-selector";
 import type { DataviewFacade } from "./service/dataview-facade";
 import type { ListPropsParser } from "./service/list-props-parser";
 import type { PeriodicNotes } from "./service/periodic-notes";
@@ -71,7 +71,7 @@ export interface ObsidianContext {
   ) => Readable<Array<WithPlacing<LocalTask>>>;
   dispatch: AppDispatch;
   useSelector: UseSelector;
-  useSelector_v2: UseSelector_v2;
+  useSelectorV2: useSelectorV2;
 }
 
 export type ComponentContext = Map<string, unknown>;
