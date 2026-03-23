@@ -38,18 +38,12 @@ function hasExceptionForDate(icalEvent: ical.VEvent, date: Date) {
     return false;
   }
 
-  // NOTE: exdate contains floating dates, i.e. any UTC offset that's on them
-  // must be ignored, and we should treat them as local time
-  const asMoment = window.moment(date);
-  const utcOffset = asMoment.utcOffset();
-  const dateWithoutOffset = asMoment.clone().subtract(utcOffset, "minutes");
-
   return Object.values(icalEvent.exdate).some((exceptionDate) => {
     if (!(exceptionDate instanceof Date)) {
       throw new Error("Unexpected exdate format");
     }
 
-    return window.moment(exceptionDate).isSame(dateWithoutOffset, "day");
+    return getIcalDayKey(exceptionDate) === getIcalDayKey(date);
   });
 }
 
