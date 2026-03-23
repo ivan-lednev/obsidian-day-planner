@@ -1,5 +1,3 @@
-import { isNotVoid } from "typed-assert";
-
 import { addHorizontalPlacing } from "../../overlap/overlap";
 import { strictParse } from "../../util/moment";
 import { clamp } from "../../util/task-utils";
@@ -11,28 +9,20 @@ import {
   selectLogEntriesById,
 } from "./tracker-slice";
 
-// todo: this is misleading, it works only for a single day, and it should
 export const selectLogEntriesForDayKeys = createAppSelector(
   [
     selectLogEntriesByDay,
     selectLogEntriesById,
-    (state, dayKeys: string[]) => dayKeys,
+    (state, dayKey: string) => dayKey,
   ],
-  (byDay, byId, dayKeys) => {
-    // todo: clean up
-    const firstDay = dayKeys[0];
-
-    isNotVoid(firstDay);
-
-    const parsedFirstDay = strictParse(firstDay);
+  (byDay, byId, dayKey) => {
+    const parsedFirstDay = strictParse(dayKey);
     const startOfDay = parsedFirstDay.clone().startOf("day");
     const endOfDay = parsedFirstDay.clone().endOf("day");
 
-    const uniqueLogEntryKeys = new Set(
-      dayKeys.flatMap((dayKey) => byDay[dayKey] || []),
-    );
+    const uniqueLogEntryKeys = [...new Set(byDay[dayKey])];
 
-    const inflatedTimeBlocksWithoutActiveClocks = [...uniqueLogEntryKeys]
+    const inflatedTimeBlocksWithoutActiveClocks = uniqueLogEntryKeys
       .map((logEntryKey) => byId[logEntryKey])
       .filter((logEntry): logEntry is LogEntry & { end: string } =>
         Boolean(logEntry.end),

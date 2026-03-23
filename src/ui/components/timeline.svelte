@@ -41,16 +41,14 @@
     },
     pointerDateTime,
     settingsSignal,
-    // storeSignal,
     useSelector_v2: useSelector,
   } = getObsidianContext();
 
   const displayedTasksForTimeline = $derived(getDisplayedTasksForTimeline(day));
-
-  const dayKeys = $derived([getDayKey(day)]);
+  const dayKey = $derived(getDayKey(day));
 
   const logEntriesForDay = useSelector((state) =>
-    selectLogEntriesForDayKeys(state, dayKeys),
+    selectLogEntriesForDayKeys(state, dayKey),
   );
 
   let el: HTMLElement | undefined = $state();

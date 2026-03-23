@@ -10,7 +10,7 @@ describe("useSelector", () => {
     const { useSelector } = await setUp();
 
     const logEntries = useSelector((state) =>
-      selectLogEntriesForDayKeys(state, ["2025-01-18"]),
+      selectLogEntriesForDayKeys(state, "2025-01-18"),
     );
 
     expect(logEntries.current).toHaveLength(1);
@@ -19,15 +19,15 @@ describe("useSelector", () => {
   test("Re-runs on reactive argument changes", async () => {
     const { useSelector } = await setUp();
 
-    let activeDays = $state(["2025-01-18"]);
+    let activeDay = $state("2025-01-18");
 
     const logEntries = useSelector((state) =>
-      selectLogEntriesForDayKeys(state, activeDays),
+      selectLogEntriesForDayKeys(state, activeDay),
     );
 
     expect(logEntries.current).toHaveLength(1);
 
-    activeDays = ["2024-01-01"];
+    activeDay = "2024-01-01";
 
     expect(logEntries.current).toHaveLength(0);
   });

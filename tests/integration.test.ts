@@ -110,9 +110,7 @@ describe("Log Records with indexes", () => {
   test("Returns time block views in range", async () => {
     const { getState } = await setUp();
 
-    expect(
-      selectLogEntriesForDayKeys(getState(), ["2025-07-18"]),
-    ).toContainEqual(
+    expect(selectLogEntriesForDayKeys(getState(), "2025-07-18")).toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Nested task with 1 log record"),
       }),
@@ -131,7 +129,7 @@ describe("Log Records with indexes", () => {
     );
 
     expect(
-      selectLogEntriesForDayKeys(getState(), ["2025-07-18"]),
+      selectLogEntriesForDayKeys(getState(), "2025-07-18"),
     ).not.toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Nested task with 1 log record"),
