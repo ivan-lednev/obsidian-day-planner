@@ -453,11 +453,7 @@ export default class DayPlanner extends Plugin {
     const dateRanges = useDateRanges();
     const visibleDays = useVisibleDays(dateRanges.ranges);
 
-    const {
-      tasksWithTimeForToday,
-      editContext,
-      newlyStartedTasks,
-    } = useTasks({
+    const { tasksWithTimeForToday, editContext, newlyStartedTasks } = useTasks({
       onUpdate,
       onEditAborted,
       periodicNotes: this.periodicNotes,
@@ -629,6 +625,5 @@ export default class DayPlanner extends Plugin {
       viewTypeReleaseNotes,
       (leaf: WorkspaceLeaf) => new DayPlannerReleaseNotesView(leaf),
     );
-
   }
 }

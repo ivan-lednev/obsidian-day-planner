@@ -6,7 +6,7 @@ import { DataviewFacade } from "../../service/dataview-facade";
 import type { PeriodicNotes } from "../../service/periodic-notes";
 import { WorkspaceFacade } from "../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../settings";
-import type { LocalTask, RemoteTask, Task, WithTime } from "../../task-types";
+import type { RemoteTask, Task, WithTime } from "../../task-types";
 import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../../types";
 import { getUpdateTrigger } from "../../util/store";
 

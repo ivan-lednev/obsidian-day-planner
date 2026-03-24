@@ -10,7 +10,10 @@ import { createUpdateHandler } from "../../src/create-update-handler";
 import { dataviewChange } from "../../src/redux/dataview/dataview-slice";
 import { initialState } from "../../src/redux/global-slice";
 import { createReactor, type RootState } from "../../src/redux/store";
-import { metadataChanged } from "../../src/redux/tracker/tracker-slice";
+import {
+  metadataChanged,
+  selectActiveClocks,
+} from "../../src/redux/tracker/tracker-slice";
 import type { DataviewFacade } from "../../src/service/dataview-facade";
 import { TransactionWriter } from "../../src/service/diff-writer";
 import { ListPropsParser } from "../../src/service/list-props-parser";
@@ -136,7 +139,6 @@ export async function setUp(props?: {
     dispatch,
     remoteTasks,
     taskUpdateTrigger,
-    listProps,
     pointerDateTime,
   } = createReactor({
     preloadedState: {
@@ -150,13 +152,10 @@ export async function setUp(props?: {
     listPropsParser,
   });
 
-  inMemoryFiles.forEach(({ path }) => {
-    dispatch(dataviewChange(path));
-  });
-
   inMemoryFiles.forEach(({ path, contents }) => {
     isNotVoid(cachedMetadata[path]);
 
+    dispatch(dataviewChange(path));
     dispatch(metadataChanged({ path, contents, cache: cachedMetadata[path] }));
   });
 
@@ -171,13 +170,7 @@ export async function setUp(props?: {
     getConfirmationInput: () => Promise.resolve(true),
   });
 
-  const {
-    tasksWithActiveClockProps,
-    getDisplayedTasksWithClocksForTimeline,
-    tasksWithTimeForToday,
-    editContext,
-    newlyStartedTasks,
-  } = useTasks({
+  const { tasksWithTimeForToday, editContext, newlyStartedTasks } = useTasks({
     onUpdate,
     onEditAborted: () => {},
     periodicNotes,
@@ -193,7 +186,6 @@ export async function setUp(props?: {
     currentTime,
     pointerDateTime,
     remoteTasks,
-    listProps,
   });
 
   const allTasks = derived(
@@ -231,18 +223,17 @@ export async function setUp(props?: {
   }
 
   await vi.waitFor(() => {
-    const areTasksLoaded = get(allTasks).length > 0;
-    const areClocksLoaded = get(tasksWithActiveClockProps).length > 0;
+    // todo: just wait for cache to be 'warm'
+    const isAtLeastOneLogRecordLoaded =
+      useSelector((state) => selectActiveClocks(state)).current.length > 0;
 
-    expect(areTasksLoaded || areClocksLoaded).toBeTruthy();
+    expect(isAtLeastOneLogRecordLoaded).toBeTruthy();
   });
 
   return {
     useSelector,
     getState,
     dispatch,
-    tasksWithActiveClockProps,
-    getDisplayedTasksWithClocksForTimeline,
     tasksWithTimeForToday,
     editContext,
     newlyStartedTasks,
