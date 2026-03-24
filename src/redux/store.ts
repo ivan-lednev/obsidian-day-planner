@@ -24,7 +24,6 @@ import {
 import { editCanceled, globalSlice } from "./global-slice";
 import { icalSlice, selectRemoteTasks } from "./ical/ical-slice";
 import { initListenerMiddleware } from "./listener-middleware";
-import { searchSlice } from "./search-slice";
 import { selectDataviewSource, settingsSlice } from "./settings-slice";
 import { trackerSlice } from "./tracker/tracker-slice";
 import { useActionDispatched } from "./use-action-dispatched";
@@ -32,7 +31,6 @@ import { createUseSelector, createUseSelectorV2 } from "./use-selector";
 
 const rootReducer = combineSlices(
   globalSlice,
-  searchSlice,
   dataviewSlice,
   settingsSlice,
   icalSlice,

@@ -1,4 +1,5 @@
 import type { Moment } from "moment";
+import { isNotVoid } from "typed-assert";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
 import { strictParse } from "../../util/moment";
@@ -6,7 +7,6 @@ import { clamp } from "../../util/task-utils";
 import { createAppSelector } from "../create-app-selector";
 
 import { selectLogEntriesByDay, selectLogEntriesById } from "./tracker-slice";
-import { isNotVoid } from "typed-assert";
 
 export const selectLogEntriesForDay = createAppSelector(
   [

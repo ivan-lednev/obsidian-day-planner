@@ -34,11 +34,6 @@ export const dataviewSlice = createAppSlice({
     dataviewChange: create.reducer((state, action: PayloadAction<string>) => {
       state.dataviewLoaded = true;
     }),
-    dataviewTasksUpdated: create.reducer(
-      (state, action: PayloadAction<Array<STask>>) => {
-        state.dataviewTasks = action.payload;
-      },
-    ),
     listPropsParsed: create.reducer(
       (
         state,
@@ -54,7 +49,6 @@ export const dataviewSlice = createAppSlice({
     ),
   }),
   selectors: {
-    selectDataviewTasks: (state) => state.dataviewTasks,
     selectListProps: (state) => state.listProps,
     selectListPropsForPath: (state, path: string) => state.listProps[path],
     selectListPropsForLocation: (state, path: string, line: number) =>
@@ -63,11 +57,9 @@ export const dataviewSlice = createAppSlice({
   },
 });
 
-export const { dataviewChange, dataviewTasksUpdated, listPropsParsed } =
-  dataviewSlice.actions;
+export const { dataviewChange, listPropsParsed } = dataviewSlice.actions;
 
 export const {
-  selectDataviewTasks,
   selectListProps,
   selectDataviewLoaded,
   selectListPropsForPath,
