@@ -4,7 +4,7 @@
   import { isNotVoid } from "typed-assert";
 
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { isToday } from "../../global-store/current-time";
+  import { currentTimeSignal, isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { selectLogEntriesForDay } from "../../redux";
   import {
@@ -48,7 +48,7 @@
   const dayKey = $derived(getDayKey(day));
 
   const logEntriesForDay = useSelector((state) =>
-    selectLogEntriesForDay(state, dayKey),
+    selectLogEntriesForDay(state, dayKey, currentTimeSignal.current),
   );
 
   let el: HTMLElement | undefined = $state();

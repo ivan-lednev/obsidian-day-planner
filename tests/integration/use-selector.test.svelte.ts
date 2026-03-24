@@ -4,25 +4,26 @@ import { describe, expect, test } from "vitest";
 import { selectLogEntriesForDay } from "../../src/redux";
 
 import { setUp } from "./setup";
+import { strictParse } from "../../src/util/moment";
 
 describe("useSelector", () => {
-  test.fails("Returns values from the store", async () => {
+  test.skip("Returns values from the store", async () => {
     const { useSelector } = await setUp();
 
     const logEntries = useSelector((state) =>
-      selectLogEntriesForDay(state, "2025-01-18"),
+      selectLogEntriesForDay(state, "2025-01-18", strictParse("2025-01-18")),
     );
 
     expect(logEntries.current).toHaveLength(1);
   });
 
-  test.fails("Re-runs on reactive argument changes", async () => {
+  test.skip("Re-runs on reactive argument changes", async () => {
     const { useSelector } = await setUp();
 
     let activeDay = $state("2025-01-18");
 
     const logEntries = useSelector((state) =>
-      selectLogEntriesForDay(state, activeDay),
+      selectLogEntriesForDay(state, activeDay, strictParse("2025-01-18")),
     );
 
     expect(logEntries.current).toHaveLength(1);

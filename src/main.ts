@@ -48,7 +48,7 @@ import { editCanceled, visibleDaysUpdated } from "./redux/global-slice";
 import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { settingsUpdated } from "./redux/settings-slice";
 import { type AppDispatch, type AppStore, createReactor } from "./redux/store";
-import { createUseSelector, createuseSelectorV2 } from "./redux/use-selector";
+import { createUseSelector, createUseSelectorV2 } from "./redux/use-selector";
 import { createSvelteSignalFromReduxStore } from "./redux/use-selector";
 import { DataviewFacade } from "./service/dataview-facade";
 import { TransactionWriter } from "./service/diff-writer";
@@ -410,7 +410,7 @@ export default class DayPlanner extends Plugin {
     store: AppStore;
     dispatch: AppDispatch;
     useSelector: ReturnType<typeof createUseSelector>;
-    useSelectorV2: ReturnType<typeof createuseSelectorV2>;
+    useSelectorV2: ReturnType<typeof createUseSelectorV2>;
     remoteTasks: Readable<RemoteTask[]>;
     taskUpdateTrigger: Readable<unknown>;
     listProps: Readable<PathToListProps>;

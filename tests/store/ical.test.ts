@@ -220,7 +220,7 @@ describe("ical", () => {
     );
   });
 
-  test.todo("Yearly recurrences do not show up every month", async () => {
+  test.skip("Yearly recurrences do not show up every month", async () => {
     const { remoteTasks } = await setUp({
       icalFixtureFileName: "google-yearly-recurrence",
       visibleDays: [

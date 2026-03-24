@@ -35,7 +35,7 @@ export function createUseSelector(store: AppStore) {
   };
 }
 
-export function createuseSelectorV2(reduxStore: AppStore) {
+export function createUseSelectorV2(reduxStore: AppStore) {
   return <T>(selector: (state: RootState) => T) => {
     let previousResult = selector(reduxStore.getState());
 
@@ -87,4 +87,4 @@ export function createSvelteSignalFromReduxStore(reduxStore: AppStore) {
 }
 
 export type UseSelector = ReturnType<typeof createUseSelector>;
-export type useSelectorV2 = ReturnType<typeof createuseSelectorV2>;
+export type useSelectorV2 = ReturnType<typeof createUseSelectorV2>;

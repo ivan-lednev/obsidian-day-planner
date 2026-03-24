@@ -1,21 +1,20 @@
+import type { Moment } from "moment";
+
 import { addHorizontalPlacing } from "../../overlap/overlap";
 import { strictParse } from "../../util/moment";
 import { clamp } from "../../util/task-utils";
 import { createAppSelector } from "../create-app-selector";
 
-import {
-  type LogEntry,
-  selectLogEntriesByDay,
-  selectLogEntriesById,
-} from "./tracker-slice";
+import { selectLogEntriesByDay, selectLogEntriesById } from "./tracker-slice";
 
 export const selectLogEntriesForDay = createAppSelector(
   [
     selectLogEntriesByDay,
     selectLogEntriesById,
     (state, dayKey: string) => dayKey,
+    (state, dayKey, currentTime: Moment) => currentTime,
   ],
-  (byDay, byId, dayKey) => {
+  (byDay, byId, dayKey, currentTime) => {
     const parsedFirstDay = strictParse(dayKey);
     const startOfDay = parsedFirstDay.clone().startOf("day");
     const endOfDay = parsedFirstDay.clone().endOf("day");
@@ -24,13 +23,13 @@ export const selectLogEntriesForDay = createAppSelector(
 
     const inflatedTimeBlocksWithoutActiveClocks = uniqueLogEntryKeys
       .map((logEntryKey) => byId[logEntryKey])
-      .filter((logEntry): logEntry is LogEntry & { end: string } =>
-        Boolean(logEntry.end),
-      )
       .map((logEntry) => {
         const parsedStart = strictParse(logEntry.start);
-        const parsedEnd = strictParse(logEntry.end);
+        const parsedEnd = logEntry.end
+          ? strictParse(logEntry.end)
+          : currentTime;
 
+        // todo: use adapter: logEntryToLocalTask
         const timeBlock = {
           ...logEntry,
           startTime: parsedStart,

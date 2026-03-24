@@ -166,15 +166,6 @@ export const trackerSlice = createAppSlice({
         }),
     selectLogEntriesByDay: (state) => state.logEntries.byDay,
     selectLogEntriesById: (state) => state.logEntries.byId,
-    selectLogEntriesForDayKeys: (state, dayKeys: string[]) => {
-      const uniqueLogEntryKeysForDayKeys = new Set(
-        dayKeys.flatMap((dayKey) => state.logEntries.byDay[dayKey] || []),
-      );
-
-      return [...uniqueLogEntryKeysForDayKeys].map(
-        (logEntryKey) => state.logEntries.byId[logEntryKey],
-      );
-    },
   },
 });
 

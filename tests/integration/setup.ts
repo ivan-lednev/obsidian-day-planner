@@ -132,7 +132,6 @@ export async function setUp(props?: {
 
   const {
     useSelectorV2: useSelector,
-    store,
     getState,
     dispatch,
     remoteTasks,
