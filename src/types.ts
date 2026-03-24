@@ -11,10 +11,9 @@ import type { STaskEditor } from "./service/stask-editor";
 import type { VaultFacade } from "./service/vault-facade";
 import type { WorkspaceFacade } from "./service/workspace-facade";
 import type { DayPlannerSettings, IcalConfig } from "./settings";
-import type { LocalTask, WithPlacing } from "./task-types";
+import type { LocalTask } from "./task-types";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
-import type { useTasks } from "./ui/hooks/use-tasks";
 import { type ShowPreview } from "./util/create-show-preview";
 
 export type OnUpdateFn = (
@@ -63,12 +62,7 @@ export interface ObsidianContext {
   settingsSignal: Signal<DayPlannerSettings>;
   storeSignal: Signal<RootState>;
   pointerDateTime: Writable<PointerDateTime>;
-  tasksWithActiveClockProps: Readable<LocalTask[]>;
-  logSummary: ReturnType<typeof useTasks>["logSummary"];
   sTaskEditor: STaskEditor;
-  getDisplayedTasksWithClocksForTimeline: (
-    day: Moment,
-  ) => Readable<Array<WithPlacing<LocalTask>>>;
   dispatch: AppDispatch;
   useSelector: UseSelector;
   useSelectorV2: useSelectorV2;
