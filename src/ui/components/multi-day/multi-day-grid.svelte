@@ -18,7 +18,6 @@
   import { createResizeState } from "../../actions/create-resize-state";
   import { createColumnChangeMenu } from "../../column-change-menu";
   import { createColumnSelectionMenu } from "../../column-selection-menu";
-  import Search from "../../components/search.svelte";
   import ControlButton from "../control-button.svelte";
   import { createSlide } from "../defaults";
   import ErrorBoundary from "../error-boundary.svelte";
@@ -48,7 +47,7 @@
   } = getObsidianContext();
   const dateRange = getDateRangeContext();
 
-  type SideControls = "none" | "settings" | "search";
+  type SideControls = "none" | "settings";
 
   let visibleSideControls = $state<SideControls>("none");
   let timelineInternalColumnCount = $derived.by(() => {
@@ -188,9 +187,6 @@
   >
     {#if visibleSideControls === "settings"}
       <SettingsControls />
-    {/if}
-    {#if visibleSideControls === "search"}
-      <Search />
     {/if}
   </div>
 {/if}
