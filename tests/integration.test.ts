@@ -78,6 +78,10 @@ describe("Log Records with indexes", () => {
         "fixtures/fixture-vault/one-task-two-log-records.md",
       ),
     ).toBeFalsy();
+
+    expect(
+      selectLogEntriesForDay(getState(), "2025-01-01", window.moment()),
+    ).toEqual([]);
   });
 
   test("Replaces old entries on file change", async () => {
@@ -180,6 +184,10 @@ describe("Log Records with indexes", () => {
       }),
     );
   });
+
+  test.todo(
+    "Nothing gets triggered for files that do not contain any tasks or relevant props",
+  );
 
   test.todo("No duplicates");
 

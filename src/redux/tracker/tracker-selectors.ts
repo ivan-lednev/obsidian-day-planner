@@ -6,6 +6,7 @@ import { clamp } from "../../util/task-utils";
 import { createAppSelector } from "../create-app-selector";
 
 import { selectLogEntriesByDay, selectLogEntriesById } from "./tracker-slice";
+import { isNotVoid } from "typed-assert";
 
 export const selectLogEntriesForDay = createAppSelector(
   [
@@ -25,6 +26,12 @@ export const selectLogEntriesForDay = createAppSelector(
     const inflatedTimeBlocksWithoutActiveClocks = uniqueLogEntryKeys.map(
       (logEntryKey) => {
         const logEntry = byId[logEntryKey];
+
+        isNotVoid(
+          logEntry,
+          `Inconsistent store state: expected to find log entry by id ${logEntryKey}`,
+        );
+
         const parsedStart = strictParse(logEntry.start);
         const parsedEnd = logEntry.end
           ? strictParse(logEntry.end)
