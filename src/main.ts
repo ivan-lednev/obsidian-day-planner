@@ -24,7 +24,6 @@ import {
   viewTypeMultiDay,
   reQueryAfterMillis,
   icalRefreshIntervalMillis,
-  viewTypeLogSummary,
 } from "./constants";
 import { createUpdateHandler, getTextFromUser } from "./create-update-handler";
 import { createDumpMetadataCommand } from "./dump-metadata";
@@ -40,14 +39,12 @@ import {
   toMarkdown,
   toMdastPoint,
 } from "./mdast/mdast";
-import {
-  dataviewChange,
-  type PathToListProps,
-} from "./redux/dataview/dataview-slice";
+import { dataviewChange } from "./redux/dataview/dataview-slice";
 import { editCanceled, visibleDaysUpdated } from "./redux/global-slice";
 import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { settingsUpdated } from "./redux/settings-slice";
 import { type AppDispatch, type AppStore, createReactor } from "./redux/store";
+import { selectActiveClocks } from "./redux/tracker/tracker-slice";
 import { createUseSelector, createUseSelectorV2 } from "./redux/use-selector";
 import { createSvelteSignalFromReduxStore } from "./redux/use-selector";
 import { DataviewFacade } from "./service/dataview-facade";
@@ -68,7 +65,6 @@ import { useDebounceWithDelay } from "./ui/hooks/use-debounce-with-delay";
 import { mountStatusBarWidget } from "./ui/hooks/use-status-bar-widget";
 import { useTasks } from "./ui/hooks/use-tasks";
 import { useVisibleDays } from "./ui/hooks/use-visible-days";
-import { LogSummaryView } from "./ui/log-summary";
 import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
@@ -123,7 +119,6 @@ export default class DayPlanner extends Plugin {
       listenerMiddleware,
       remoteTasks,
       taskUpdateTrigger,
-      listProps,
       dataviewLoaded,
       pointerDateTime,
       dataviewRefreshSignal,
@@ -149,7 +144,6 @@ export default class DayPlanner extends Plugin {
       dispatch,
       remoteTasks,
       taskUpdateTrigger,
-      listProps,
       dataviewLoaded,
       pointerDateTime,
       dataviewRefreshSignal,
@@ -272,16 +266,6 @@ export default class DayPlanner extends Plugin {
       id: "show-multi-day-view",
       name: "Show multi-day planner",
       callback: this.initWeeklyLeaf,
-    });
-
-    this.addCommand({
-      id: "show-log-summary",
-      name: "Show log summary",
-      callback: async () =>
-        await this.app.workspace.getLeaf().setViewState({
-          type: viewTypeLogSummary,
-          active: true,
-        }),
     });
 
     this.addCommand({
@@ -413,7 +397,6 @@ export default class DayPlanner extends Plugin {
     useSelectorV2: ReturnType<typeof createUseSelectorV2>;
     remoteTasks: Readable<RemoteTask[]>;
     taskUpdateTrigger: Readable<unknown>;
-    listProps: Readable<PathToListProps>;
     dataviewLoaded: Readable<boolean>;
     pointerDateTime: Writable<PointerDateTime>;
     dataviewRefreshSignal: Readable<unknown>;
@@ -425,7 +408,6 @@ export default class DayPlanner extends Plugin {
       useSelectorV2,
       remoteTasks,
       taskUpdateTrigger,
-      listProps,
       dataviewLoaded,
       pointerDateTime,
       dataviewRefreshSignal,
@@ -471,14 +453,7 @@ export default class DayPlanner extends Plugin {
     const dateRanges = useDateRanges();
     const visibleDays = useVisibleDays(dateRanges.ranges);
 
-    const {
-      tasksWithActiveClockProps,
-      getDisplayedTasksWithClocksForTimeline,
-      tasksWithTimeForToday,
-      editContext,
-      newlyStartedTasks,
-      logSummary,
-    } = useTasks({
+    const { tasksWithTimeForToday, editContext, newlyStartedTasks } = useTasks({
       onUpdate,
       onEditAborted,
       periodicNotes: this.periodicNotes,
@@ -494,7 +469,6 @@ export default class DayPlanner extends Plugin {
       currentTime,
       pointerDateTime,
       remoteTasks,
-      listProps,
     });
 
     this.registerInterval(
@@ -560,7 +534,9 @@ export default class DayPlanner extends Plugin {
       id: "jump-to-active-clock",
       name: "Jump to active clock",
       callback: () => {
-        const currentTasksWithActiveClockProps = get(tasksWithActiveClockProps);
+        const currentTasksWithActiveClockProps = selectActiveClocks(
+          store.getState(),
+        );
 
         if (currentTasksWithActiveClockProps.length === 0) {
           new Notice("No active clocks found");
@@ -609,9 +585,6 @@ export default class DayPlanner extends Plugin {
       settings,
       settingsSignal: fromStore(settings),
       pointerDateTime,
-      tasksWithActiveClockProps,
-      logSummary,
-      getDisplayedTasksWithClocksForTimeline,
       dispatch,
       useSelector,
       useSelectorV2,
@@ -651,11 +624,6 @@ export default class DayPlanner extends Plugin {
     this.registerView(
       viewTypeReleaseNotes,
       (leaf: WorkspaceLeaf) => new DayPlannerReleaseNotesView(leaf),
-    );
-
-    this.registerView(
-      viewTypeLogSummary,
-      (leaf: WorkspaceLeaf) => new LogSummaryView(leaf, componentContext),
     );
   }
 }
