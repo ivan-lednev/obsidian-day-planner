@@ -1,16 +1,25 @@
 <script lang="ts">
-  import { currentTime } from "../../global-store/current-time";
+  import { currentTimeSignal } from "../../global-store/current-time";
   import { timeToTimelineOffset } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
   import { getMinutesSinceMidnight } from "../../util/moment";
 
-  export let autoScrollBlocked = false;
-  export let showBall: boolean | undefined = true;
+  type Props = {
+    autoScrollBlocked?: boolean;
+    showBall?: boolean;
+  };
+
+  const {
+    autoScrollBlocked = false,
+    showBall = true,
+  }: Required<Props> = $props();
 
   let el: HTMLDivElement;
-  let coords = timeToTimelineOffset(
-    getMinutesSinceMidnight($currentTime),
-    $settings,
+  const coords = $derived(
+    timeToTimelineOffset(
+      getMinutesSinceMidnight(currentTimeSignal.current),
+      $settings,
+    ),
   );
 
   function scrollIntoView() {
@@ -19,13 +28,10 @@
     }
   }
 
-  $: {
-    coords = timeToTimelineOffset(
-      getMinutesSinceMidnight($currentTime),
-      $settings,
-    );
+  $effect(() => {
+    coords;
     scrollIntoView();
-  }
+  });
 </script>
 
 <div
