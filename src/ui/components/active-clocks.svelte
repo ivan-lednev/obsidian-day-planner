@@ -20,6 +20,7 @@
   const { workspaceFacade, sTaskEditor, useSelector } = getObsidianContext();
 
   const activeLogRecords = useSelector(selectActiveClocks);
+  // todo: duplication?
   const activeLogRecordsCompat = $derived(
     $activeLogRecords.map((it) => ({
       ...it,
