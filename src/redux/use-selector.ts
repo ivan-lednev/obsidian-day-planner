@@ -59,6 +59,7 @@ export function createUseSelectorV2(reduxStore: AppStore) {
       get current() {
         subscribe();
 
+        // todo: might be a source of bugs
         const nextResult = selector(reduxStore.getState());
         previousResult = nextResult;
 

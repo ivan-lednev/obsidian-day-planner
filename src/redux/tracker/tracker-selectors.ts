@@ -15,30 +15,37 @@ export const selectLogEntriesForDay = createAppSelector(
     (state, dayKey, currentTime: Moment) => currentTime,
   ],
   (byDay, byId, dayKey, currentTime) => {
-    const parsedFirstDay = strictParse(dayKey);
-    const startOfDay = parsedFirstDay.clone().startOf("day");
-    const endOfDay = parsedFirstDay.clone().endOf("day");
+    const parsedDay = strictParse(dayKey);
+    const startOfDay = parsedDay.clone().startOf("day");
+    const endOfDay = parsedDay.clone().endOf("day");
+    const isDayKeyForToday = parsedDay.isSame(currentTime, "day");
 
     const uniqueLogEntryKeys = [...new Set(byDay[dayKey])];
 
-    const inflatedTimeBlocksWithoutActiveClocks = uniqueLogEntryKeys
-      .map((logEntryKey) => byId[logEntryKey])
-      .map((logEntry) => {
+    const inflatedTimeBlocksWithoutActiveClocks = uniqueLogEntryKeys.map(
+      (logEntryKey) => {
+        const logEntry = byId[logEntryKey];
         const parsedStart = strictParse(logEntry.start);
         const parsedEnd = logEntry.end
           ? strictParse(logEntry.end)
           : currentTime;
+        const isActiveLogRecordForToday = isDayKeyForToday && !logEntry.end;
 
         // todo: use adapter: logEntryToLocalTask
         const timeBlock = {
-          ...logEntry,
+          id: logEntry.id,
+          text: logEntry.text,
           startTime: parsedStart,
           symbol: "-",
           durationMinutes: parsedEnd.diff(parsedStart, "minutes"),
+          ...(isActiveLogRecordForToday
+            ? { truncated: ["bottom" as const] }
+            : {}),
         };
 
         return clamp(timeBlock, startOfDay, endOfDay);
-      });
+      },
+    );
 
     return addHorizontalPlacing(inflatedTimeBlocksWithoutActiveClocks);
   },

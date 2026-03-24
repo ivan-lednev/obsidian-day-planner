@@ -11,6 +11,7 @@ import {
 import { defaultSettingsForTests } from "../src/settings";
 import { EditMode } from "../src/ui/hooks/use-edit/types";
 import { strictParse } from "../src/util/moment";
+import { getDayKey } from "../src/util/task-utils";
 
 import { setUp } from "./integration/setup";
 import { getPathToDiff } from "./test-utils";
@@ -106,6 +107,38 @@ describe("Log Records with indexes", () => {
     expect(
       selectEntriesForPath(getState(), "fixtures/fixture-vault/test.md"),
     ).toHaveLength(0);
+  });
+
+  test("Returns truncated active clocks for today's range", async () => {
+    const { getState } = await setUp();
+    const now = window.moment();
+
+    expect(
+      selectLogEntriesForDay(getState(), getDayKey(now), now),
+    ).toContainEqual(
+      expect.objectContaining({
+        text: expect.stringContaining("Task"),
+        truncated: ["bottom"],
+      }),
+    );
+  });
+
+  test("Does not truncate active clocks in yesterday's view", async () => {
+    const { getState } = await setUp();
+    const now = window.moment();
+    const yesterday = now.clone().subtract(1, "day");
+
+    const logEntriesForYesterday = selectLogEntriesForDay(
+      getState(),
+      getDayKey(yesterday),
+      now,
+    );
+
+    const activeClock = logEntriesForYesterday.find((it) =>
+      it.text.includes("Task"),
+    );
+
+    expect(activeClock).not.toHaveProperty("truncated");
   });
 
   test("Returns time block views in range", async () => {

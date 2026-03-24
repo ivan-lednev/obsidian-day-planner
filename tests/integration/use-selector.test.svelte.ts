@@ -2,9 +2,9 @@ import { flushSync, untrack } from "svelte";
 import { describe, expect, test } from "vitest";
 
 import { selectLogEntriesForDay } from "../../src/redux";
+import { strictParse } from "../../src/util/moment";
 
 import { setUp } from "./setup";
-import { strictParse } from "../../src/util/moment";
 
 describe("useSelector", () => {
   test.skip("Returns values from the store", async () => {

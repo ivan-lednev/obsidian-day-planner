@@ -4,15 +4,12 @@
   import { settings } from "../../global-store/settings";
   import { getMinutesSinceMidnight } from "../../util/moment";
 
-  type Props = {
+  interface Props {
     autoScrollBlocked?: boolean;
     showBall?: boolean;
-  };
+  }
 
-  const {
-    autoScrollBlocked = false,
-    showBall = true,
-  }: Required<Props> = $props();
+  const { autoScrollBlocked = false, showBall = true }: Props = $props();
 
   let el: HTMLDivElement;
   const coords = $derived(
@@ -29,6 +26,7 @@
   }
 
   $effect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     coords;
     scrollIntoView();
   });
