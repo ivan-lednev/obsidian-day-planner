@@ -4,11 +4,9 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { type LocalTask } from "../../task-types";
   import type { HTMLActionArray } from "../actions/use-actions";
+  import { createBlockDragResize } from "../actions/block-drag-resize";
   import { createTimeBlockMenu } from "../time-block-menu";
 
-  import DragControls from "./drag-controls.svelte";
-  import FloatingControls from "./floating-controls.svelte";
-  import ResizeControls from "./resize-controls.svelte";
   import Selectable from "./selectable.svelte";
 
   interface TimeBlockProps {
@@ -27,9 +25,18 @@
   } = $props();
 
   const {
-    editContext: { editOperation },
+    editContext: {
+      editOperation,
+      handlers: { handleGripMouseDown, handleResizerMouseDown },
+    },
     workspaceFacade,
   } = getObsidianContext();
+
+  const blockDragResize = createBlockDragResize({
+    getTask: () => task,
+    handleGripMouseDown,
+    handleResizerMouseDown,
+  });
 </script>
 
 <Selectable
@@ -38,35 +45,10 @@
   selectionBlocked={Boolean($editOperation)}
 >
   {#snippet children(selectable)}
-    <FloatingControls active={selectable.state === "primary"}>
-      {#snippet anchor(floatingControls)}
-        {@render timeBlock({
-          isActive: selectable.state !== "none",
-          onPointerUp: selectable.onpointerup,
-          use: [...selectable.use, ...floatingControls.actions],
-        })}
-      {/snippet}
-
-      {#snippet topEnd({ isActive, setIsActive })}
-        <DragControls
-          --expanding-controls-position="absolute"
-          {isActive}
-          {setIsActive}
-          {task}
-        />
-      {/snippet}
-
-      {#snippet bottom({ isActive, setIsActive })}
-        {#if !task.isAllDayEvent}
-          <ResizeControls {isActive} reverse {setIsActive} {task} />
-        {/if}
-      {/snippet}
-
-      {#snippet top({ isActive, setIsActive })}
-        {#if !task.isAllDayEvent}
-          <ResizeControls fromTop {isActive} reverse {setIsActive} {task} />
-        {/if}
-      {/snippet}
-    </FloatingControls>
+    {@render timeBlock({
+      isActive: selectable.state !== "none",
+      onPointerUp: selectable.onpointerup,
+      use: [...selectable.use, blockDragResize],
+    })}
   {/snippet}
 </Selectable>
