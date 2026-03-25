@@ -22,9 +22,9 @@ export class TimeTrackingFeature {
 
   load() {
     this.workspace.onLayoutReady(async () => {
-      await this.initialLoad();
-
       this.registerEvents();
+
+      await this.initialLoad();
     });
   }
 
@@ -35,8 +35,11 @@ export class TimeTrackingFeature {
       .getMarkdownFiles()
       .map(async (file) => {
         const cache = this.metadataCache.getFileCache(file);
+        const hasAtLeastOneTask = cache?.listItems?.some(
+          (listItem) => listItem.task !== undefined,
+        );
 
-        if (!cache) {
+        if (!cache || !hasAtLeastOneTask) {
           return;
         }
 

@@ -251,8 +251,12 @@ export function createTrackerListener(props: {
               true,
             );
             const parsedEnd = end
-              ? window.moment(end, window.moment.ISO_8601, true)
+              ? // todo: replace with util
+                window.moment(end, window.moment.ISO_8601, true)
               : // TODO: bug source
+                //  Solution 1: dispatch dayChanged() and update active clocks then; simple & works
+                //  Solution 2: calculate dayKeys for active clocks on the fly in selectActiveClocks selector
+                //  Solution 3: use sorted array instead of buckets
                 window.moment();
 
             const dayKeys: string[] = getDaysInRange(
