@@ -12,11 +12,10 @@ import {
 
 import { getIndentationForListParagraph } from "./dataview";
 import { createCodeBlock, createIndentation, indent } from "./markdown";
+import { strictParse } from "./moment";
 import { appendText } from "./task-utils";
 
-const dateTimeSchema = z
-  .string()
-  .refine((it) => window.moment(it, window.moment.ISO_8601, true).isValid());
+const dateTimeSchema = z.string().refine((it) => strictParse(it).isValid());
 
 const logEntrySchema = z.object({
   start: dateTimeSchema,

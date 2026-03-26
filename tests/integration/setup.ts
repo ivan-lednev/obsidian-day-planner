@@ -248,5 +248,6 @@ export async function setUp(props?: {
     allTasks,
     transactionWriter,
     currentTime,
+    metadataCache,
   };
 }

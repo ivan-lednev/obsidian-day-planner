@@ -1,5 +1,6 @@
 import { get } from "svelte/store";
-import { describe, expect, test } from "vitest";
+import { isNotVoid } from "typed-assert";
+import { describe, expect, test, vi } from "vitest";
 
 import { selectLogEntriesForDay } from "../src/redux";
 import {
@@ -85,11 +86,11 @@ describe("Log Records with indexes", () => {
   });
 
   test("Replaces old entries on file change", async () => {
-    const { getState, dispatch } = await setUp();
+    const { getState, dispatch, metadataCache } = await setUp();
 
-    expect(
-      selectEntriesForPath(getState(), "fixtures/fixture-vault/test.md"),
-    ).toEqual(
+    const filePath = "fixtures/fixture-vault/test.md";
+
+    expect(selectEntriesForPath(getState(), filePath)).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           text: expect.stringContaining("Nested task with 1 log record"),
@@ -100,17 +101,18 @@ describe("Log Records with indexes", () => {
       ]),
     );
 
-    dispatch(
-      indexRequested({
-        path: "fixtures/fixture-vault/test.md",
-        cache: {},
-        contents: "",
-      }),
-    );
+    const cache = metadataCache.getCache(filePath);
 
-    expect(
-      selectEntriesForPath(getState(), "fixtures/fixture-vault/test.md"),
-    ).toHaveLength(0);
+    // todo: to avoid this, we can let the tests know that this is a fake dep
+    isNotVoid(cache, "Invalid test state");
+
+    cache.listItems = [];
+
+    dispatch(indexRequested({ path: filePath }));
+
+    await vi.waitFor(() => {
+      expect(selectEntriesForPath(getState(), filePath)).toHaveLength(0);
+    });
   });
 
   test("Returns truncated active clocks for today's range", async () => {
@@ -162,27 +164,32 @@ describe("Log Records with indexes", () => {
   });
 
   test("Does not select deleted tasks within date range", async () => {
-    const { dispatch, getState } = await setUp();
+    const { dispatch, getState, metadataCache } = await setUp();
 
-    dispatch(
-      indexRequested({
-        path: "fixtures/fixture-vault/test.md",
-        cache: {},
-        contents: "",
-      }),
-    );
+    const filePath = "fixtures/fixture-vault/test.md";
 
-    expect(
-      selectLogEntriesForDay(
-        getState(),
-        "2025-07-18",
-        strictParse("2025-07-18"),
-      ),
-    ).not.toContainEqual(
-      expect.objectContaining({
-        text: expect.stringContaining("Nested task with 1 log record"),
-      }),
-    );
+    const cache = metadataCache.getCache(filePath);
+
+    // todo: to avoid this, we can let the tests know that this is a fake dep
+    isNotVoid(cache, "Invalid test state");
+
+    cache.listItems = [];
+
+    dispatch(indexRequested({ path: filePath }));
+
+    await vi.waitFor(() => {
+      expect(
+        selectLogEntriesForDay(
+          getState(),
+          "2025-07-18",
+          strictParse("2025-07-18"),
+        ),
+      ).not.toContainEqual(
+        expect.objectContaining({
+          text: expect.stringContaining("Nested task with 1 log record"),
+        }),
+      );
+    });
   });
 
   test.todo("Batched indexing");

@@ -1,5 +1,5 @@
 import { type PayloadAction } from "@reduxjs/toolkit";
-import type { CachedMetadata, MetadataCache, Pos, Vault } from "obsidian";
+import type { MetadataCache, Pos, Vault } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
 import { defaultDayFormat } from "../../constants";
@@ -48,11 +48,9 @@ const initialState: IndexSliceState = {
 
 interface IndexRequestedPayload {
   path: string;
-  contents: string;
-  cache: CachedMetadata;
 }
 
-interface FileMetadataProcessedPayload {
+interface FilesIndexedPayload {
   path: string;
   taskEntries?: TaskEntry[];
   logEntries?: LogEntry[];
@@ -67,7 +65,7 @@ export const trackerSlice = createAppSlice({
   initialState,
   reducers: (create) => ({
     indexRequested: create.reducer(
-      (state, action: PayloadAction<IndexRequestedPayload>) => {},
+      (state, action: PayloadAction<IndexRequestedPayload | string[]>) => {},
     ),
     fileDeleted: create.reducer(
       (state, action: PayloadAction<FileDeletedPayload>) => {
@@ -108,8 +106,8 @@ export const trackerSlice = createAppSlice({
         delete state.logEntries.byPath[path];
       },
     ),
-    fileMetadataProcessed: create.reducer(
-      (state, action: PayloadAction<FileMetadataProcessedPayload>) => {
+    filesIndexed: create.reducer(
+      (state, action: PayloadAction<FilesIndexedPayload>) => {
         const { path, taskEntries = [], logEntries = [] } = action.payload;
 
         // todo: repeat for logEntries
@@ -197,7 +195,7 @@ function logEntryToLocalTask(logEntry: LogEntry, taskEntry: TaskEntry) {
   };
 }
 
-export const { fileMetadataProcessed, indexRequested, fileDeleted } =
+export const { filesIndexed, indexRequested, fileDeleted } =
   trackerSlice.actions;
 
 export const {
@@ -220,14 +218,27 @@ export function createIndexListener(props: {
   vault: Vault;
   metadataCache: MetadataCache;
 }): AppListenerEffect<IndexRequested> {
-  const { listPropsParser } = props;
+  const { listPropsParser, metadataCache, vault } = props;
 
-  return async (action, listenerApi) => {
-    const { path, cache, contents } = action.payload;
+  async function parseFile(path: string) {
+    const cache = metadataCache.getCache(path);
 
-    const tasks = cache.listItems?.filter((it) => it.task !== undefined);
+    const tasks = cache?.listItems?.filter((it) => it.task !== undefined);
 
-    const taskEntries = tasks?.map((task) => {
+    if (!tasks) {
+      return [];
+    }
+
+    const file = vault.getFileByPath(path);
+
+    isNotVoid(
+      file,
+      "Inconsistent app state: indexing requested for a non-existent file",
+    );
+
+    const contents = await vault.cachedRead(file);
+
+    return tasks?.map((task) => {
       const listItemText = contents.slice(
         task.position.start.offset,
         task.position.end.offset,
@@ -247,15 +258,11 @@ export function createIndexListener(props: {
         (it, index) => {
           const { start, end } = it;
 
-          const parsedStart = window.moment(
-            start,
-            window.moment.ISO_8601,
-            true,
-          );
+          const parsedStart = strictParse(start);
+
           const parsedEnd = end
-            ? // todo: replace with util
-              window.moment(end, window.moment.ISO_8601, true)
-            : // TODO: bug source
+            ? strictParse(end)
+            : // TODO: P3 bug
               //  Solution 1: dispatch dayChanged() and update active clocks then; simple & works
               //  Solution 2: calculate dayKeys for active clocks on the fly in selectActiveClocks selector
               //  Solution 3: use sorted array instead of buckets
@@ -283,15 +290,28 @@ export function createIndexListener(props: {
         logEntries,
       };
     });
+  }
+
+  return async (action, listenerApi) => {
+    if (Array.isArray(action.payload)) {
+      return;
+    }
+
+    const { path } = action.payload;
+
+    const denormalizedEntries = await parseFile(path);
+    const normalizedEntries = {
+      taskEntries: denormalizedEntries.map(({ logEntries, ...rest }) => ({
+        logEntries: logEntries?.map((it) => it.id),
+        ...rest,
+      })),
+      logEntries: denormalizedEntries.flatMap((it) => it.logEntries || []),
+    };
 
     listenerApi.dispatch(
-      fileMetadataProcessed({
+      filesIndexed({
         path,
-        taskEntries: taskEntries?.map(({ logEntries, ...rest }) => ({
-          logEntries: logEntries?.map((it) => it.id),
-          ...rest,
-        })),
-        logEntries: taskEntries?.flatMap((it) => it.logEntries || []),
+        ...normalizedEntries,
       }),
     );
   };

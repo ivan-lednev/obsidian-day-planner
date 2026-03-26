@@ -1,3 +1,4 @@
+import { chunk } from "lodash/fp";
 import {
   type MetadataCache,
   Notice,
@@ -5,13 +6,14 @@ import {
   type Vault,
   type Workspace,
 } from "obsidian";
-import { isNotVoid } from "typed-assert";
 
 import type DayPlanner from "../main";
 import type { AppDispatch } from "../redux/store";
 import { fileDeleted, indexRequested } from "../redux/tracker/tracker-slice";
 
 export class TimeTrackingFeature {
+  private static readonly INITIAL_LOAD_CHUNK_SIZE = 100;
+
   constructor(
     private readonly plugin: DayPlanner,
     private readonly workspace: Workspace,
@@ -29,31 +31,12 @@ export class TimeTrackingFeature {
   }
 
   private async initialLoad() {
-    const start = performance.now();
+    // todo: this is broken
+    const paths = this.vault.getMarkdownFiles().map((file) => file.path);
 
-    const initialCachingPromises = this.vault
-      .getMarkdownFiles()
-      .map(async (file) => {
-        const cache = this.metadataCache.getFileCache(file);
-        const hasAtLeastOneTask = cache?.listItems?.some(
-          (listItem) => listItem.task !== undefined,
-        );
-
-        if (!cache || !hasAtLeastOneTask) {
-          return;
-        }
-
-        const contents = await this.vault.cachedRead(file);
-
-        this.dispatch(indexRequested({ path: file.path, contents, cache }));
-      });
-
-    // todo: will cause stale state if we change a file during this
-    await Promise.all(initialCachingPromises);
-
-    const end = performance.now();
-
-    new Notice(`Planner index initialized in ${(end - start).toFixed(2)}ms`);
+    chunk(TimeTrackingFeature.INITIAL_LOAD_CHUNK_SIZE, paths).forEach((batch) =>
+      this.dispatch(indexRequested(batch)),
+    );
   }
 
   private registerEvents() {
@@ -61,7 +44,7 @@ export class TimeTrackingFeature {
 
     plugin.registerEvent(
       metadataCache.on("changed", (file, contents, cache) => {
-        dispatch(indexRequested({ path: file.path, contents, cache }));
+        dispatch(indexRequested({ path: file.path }));
       }),
     );
 
@@ -78,17 +61,7 @@ export class TimeTrackingFeature {
         }
 
         dispatch(fileDeleted({ path: oldPath }));
-
-        const cache = metadataCache.getFileCache(file);
-
-        isNotVoid(
-          cache,
-          `Invalid state: could not find cache for a renamed file: ${oldPath} -> ${file.path}`,
-        );
-
-        const contents = await vault.cachedRead(file);
-
-        dispatch(indexRequested({ path: file.path, contents, cache }));
+        dispatch(indexRequested({ path: file.path }));
       }),
     );
   }
