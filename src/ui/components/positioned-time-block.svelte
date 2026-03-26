@@ -27,6 +27,7 @@
   style:--time-block-position="absolute"
   style:--time-block-top={$offset}
   style:--time-block-width={width}
+  style:--time-block-box-shadow="var(--time-block-shadow-on-timeline)"
 >
   {@render children()}
 </svelte-css-wrapper>

@@ -131,8 +131,9 @@
   padding: 0;
 }
 
-body {
+:root {
   --floating-controls-shadow: 0px 2px 10px rgba(0, 0, 0, 0.07);
+  --time-block-shadow-on-timeline: 1px 1px 2px 0 #0000001f;
 }
 
 [data-type="planner-weekly"] {
@@ -164,20 +165,6 @@ body {
     font-size: var(--font-ui-medium);
     color: var(--text-muted);
   }
-}
-
-.os-scrollbar {
-  box-sizing: border-box;
-  --os-size: var(--scrollbar-width);
-  --os-padding-perpendicular: 2px;
-  --os-padding-axis: 2px;
-  --os-track-border-radius: 10px;
-  --os-handle-interactive-area-offset: 4px;
-  --os-handle-border-radius: 10px;
-
-  --os-handle-bg: var(--scrollbar-thumb-bg);
-  --os-handle-bg-hover: var(--scrollbar-active-thumb-bg);
-  --os-handle-bg-active: var(--scrollbar-active-thumb-bg);
 }
 
 .absolute-stretch-x {

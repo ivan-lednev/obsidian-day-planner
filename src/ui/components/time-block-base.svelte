@@ -68,8 +68,6 @@
   }
 
   .content {
-    --default-box-shadow: 1px 1px 2px 0 #0000001f;
-
     position: relative;
 
     flex: 1 0 0;
@@ -81,7 +79,7 @@
 
     border: 1px solid var(--time-block-border-color, var(--color-base-50));
     border-radius: var(--radius-s);
-    box-shadow: var(--time-block-box-shadow, var(--default-box-shadow));
+    box-shadow: var(--time-block-box-shadow);
   }
 
   .truncated-left {
