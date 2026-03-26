@@ -1,12 +1,10 @@
 <script lang="ts">
   import { type Snippet } from "svelte";
 
-  import { getObsidianContext } from "../../context/obsidian-context";
   import type { Task } from "../../task-types";
   import type { ActionArray } from "../actions/use-actions";
   import { useActions } from "../actions/use-actions";
-  import { getColorOverride } from "../hooks/get-color-override";
-  import { useColor } from "../hooks/use-color.svelte";
+  import { useColorOverrides } from "../hooks/use-color.svelte";
 
   interface Props {
     children: Snippet;
@@ -17,13 +15,10 @@
 
   const { onpointerup, children, task, use = [] }: Props = $props();
 
-  const { isDarkMode, settingsSignal } = getObsidianContext();
-
   const {
     properContrastColors: { normal, muted, faint },
     backgroundColor,
-    borderColor,
-  } = $derived(useColor({ task }));
+  } = $derived(useColorOverrides({ task }));
 </script>
 
 <div class="padding">
@@ -32,12 +27,6 @@
     style:--text-muted={muted}
     style:--text-normal={normal}
     style:--time-block-bg-color={backgroundColor}
-    style:--time-block-border-color="var(--time-block-border-color-override, {borderColor})"
-    style:background-color={getColorOverride(
-      task,
-      isDarkMode.current,
-      settingsSignal.current,
-    )}
     class={[
       "content",
       task.truncated?.includes("left") && "truncated-left",
@@ -77,7 +66,12 @@
     overflow-wrap: anywhere;
     white-space: normal;
 
-    border: 1px solid var(--time-block-border-color, var(--color-base-50));
+    background-color: var(--time-block-bg-color, var(--background-primary));
+    border: 1px solid
+      var(
+        --time-block-border-color-override,
+        var(--time-block-border-color, var(--color-base-50))
+      );
     border-radius: var(--radius-s);
     box-shadow: var(--time-block-box-shadow);
   }

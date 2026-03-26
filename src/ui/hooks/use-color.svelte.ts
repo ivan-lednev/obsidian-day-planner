@@ -12,11 +12,7 @@ interface UseColorProps {
   task: Task;
 }
 
-const defaultBorderColor = "var(--color-base-50)";
-
-export function useColor({ task }: UseColorProps) {
-  const { settingsSignal, isDarkMode } = getObsidianContext();
-
+export function useStylesForRelationToNow(task: Task) {
   const relationToNow = $derived.by(() => {
     if (task.isAllDayEvent) {
       return getRelationToNow(
@@ -36,6 +32,29 @@ export function useColor({ task }: UseColorProps) {
 
     return "present";
   });
+
+  const borderColor = $derived(
+    relationToNow === "present" && !task.isAllDayEvent
+      ? "var(--color-accent)"
+      : "",
+  );
+
+  const backgroundColor = $derived(
+    relationToNow === "past" ? "var(--background-secondary)" : "",
+  );
+
+  return {
+    get backgroundColor() {
+      return backgroundColor;
+    },
+    get borderColor() {
+      return borderColor;
+    },
+  };
+}
+
+export function useColorOverrides({ task }: UseColorProps) {
+  const { settingsSignal, isDarkMode } = getObsidianContext();
 
   const colorScale = $derived.by(() => {
     const { timelineStartColor, timelineEndColor } = settingsSignal.current;
@@ -66,23 +85,13 @@ export function useColor({ task }: UseColorProps) {
       return colorScale(scaleKey).hex();
     }
 
-    if (relationToNow === "past") {
-      return "var(--background-secondary)";
-    }
-
-    return "var(--background-primary)";
+    return "";
   });
-
-  const borderColor = $derived(
-    relationToNow === "present" && !task.isAllDayEvent
-      ? "var(--color-accent)"
-      : defaultBorderColor,
-  );
 
   const properContrastColors = $derived.by(() => {
     const { timelineColored } = settingsSignal.current;
 
-    return timelineColored || colorOverride
+    return (timelineColored || colorOverride) && backgroundColor
       ? getTextColorWithEnoughContrast(backgroundColor)
       : {
           normal: "inherit",
@@ -97,9 +106,6 @@ export function useColor({ task }: UseColorProps) {
     },
     get backgroundColor() {
       return backgroundColor;
-    },
-    get borderColor() {
-      return borderColor;
     },
   };
 }
