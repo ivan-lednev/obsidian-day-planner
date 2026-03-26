@@ -26,12 +26,12 @@
     height: fit-content;
 
     background-color: var(--column-background-color, var(--background-primary));
-    border-right: 1px solid var(--background-modifier-border);
+    border-right: var(--border-base);
   }
 
   .hour-block {
     flex: 1 0 0;
-    border-bottom: 1px solid var(--background-modifier-border);
+    border-bottom: var(--border-base);
   }
 
   .half-hour-separator {

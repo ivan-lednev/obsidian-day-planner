@@ -40,9 +40,13 @@
     padding: var(--size-2-1) var(--size-4-2);
 
     font-size: var(--font-ui-small);
-    color: var(--tag-color);
+    color: var(--text-muted);
 
-    background-color: var(--tag-background);
     border-radius: var(--radius-m);
+    border: var(--border-base);
+  }
+
+  .pill:hover {
+    border-color: var(--color-accent);
   }
 </style>

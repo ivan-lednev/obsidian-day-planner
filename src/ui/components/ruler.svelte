@@ -26,7 +26,7 @@
     height: fit-content;
 
     background-color: var(--background-primary);
-    border-right: 1px solid var(--background-modifier-border);
+    border-right: var(--border-base);
     box-shadow: var(--ruler-box-shadow, none);
   }
 
@@ -41,6 +41,6 @@
     font-weight: var(--font-semibold);
     color: var(--text-muted);
 
-    border-bottom: 1px solid var(--background-modifier-border);
+    border-bottom: var(--border-base);
   }
 </style>

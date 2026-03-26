@@ -76,7 +76,7 @@
     padding: var(--size-2-1);
 
     background-color: var(--background-primary);
-    border: 1px solid var(--background-modifier-border);
+    border: var(--border-base);
     border-radius: var(--size-4-1);
     box-shadow: var(--floating-controls-shadow);
   }

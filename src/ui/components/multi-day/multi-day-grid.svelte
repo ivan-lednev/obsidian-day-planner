@@ -320,7 +320,7 @@
     position: relative;
     grid-area: multiday;
     max-height: 16vh;
-    border-bottom: 1px solid var(--background-modifier-border);
+    border-bottom: var(--border-base);
   }
 
   .controls-sidebar {
@@ -336,8 +336,8 @@
     padding: var(--size-4-2) var(--size-4-1);
 
     background-color: var(--background-primary);
-    border-bottom: 1px solid var(--background-modifier-border);
-    border-left: 1px solid var(--background-modifier-border);
+    border-bottom: var(--border-base);
+    border-left: var(--border-base);
     border-bottom-left-radius: var(--radius-m);
     box-shadow: var(--input-shadow);
   }
@@ -358,8 +358,8 @@
     align-items: center;
 
     background-color: var(--background-primary);
-    border-right: 1px solid var(--background-modifier-border);
-    border-bottom: 1px solid var(--background-modifier-border);
+    border-right: var(--border-base);
+    border-bottom: var(--border-base);
     box-shadow: var(--shadow-bottom);
   }
 
@@ -372,8 +372,8 @@
     font-weight: var(--font-semibold);
 
     background-color: var(--background-primary);
-    border-right: 1px solid var(--background-modifier-border);
-    border-bottom: 1px solid var(--background-modifier-border);
+    border-right: var(--border-base);
+    border-bottom: var(--border-base);
   }
 
   .header-cell:last-of-type {
@@ -385,6 +385,6 @@
     grid-area: settings;
     width: min(320px, 50vw);
     padding-inline: var(--size-4-3);
-    border-left: 1px solid var(--background-modifier-border);
+    border-left: var(--border-base);
   }
 </style>

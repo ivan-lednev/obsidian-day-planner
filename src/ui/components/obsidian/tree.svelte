@@ -66,7 +66,7 @@
   }
 
   .tree-container:not(:last-child) {
-    border-bottom: 1px solid var(--background-modifier-border);
+    border-bottom: var(--border-base);
   }
 
   .tree-item-inner {

@@ -127,7 +127,7 @@
   }
 
   :global(.planner-timeline-scroller) {
-    border-top: 1px solid var(--background-modifier-border);
+    border-top: var(--border-base);
   }
 
   :global(.unscheduled-task-container) {
