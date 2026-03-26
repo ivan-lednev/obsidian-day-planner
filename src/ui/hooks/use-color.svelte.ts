@@ -53,14 +53,51 @@ export function useStylesForRelationToNow(task: Task) {
   };
 }
 
-export function useColorOverrides({ task }: UseColorProps) {
-  const { settingsSignal, isDarkMode } = getObsidianContext();
+export function useColoredTimeline(task: Task) {
+  const { settingsSignal } = getObsidianContext();
 
   const colorScale = $derived.by(() => {
     const { timelineStartColor, timelineEndColor } = settingsSignal.current;
 
     return chroma.scale([timelineStartColor, timelineEndColor]).mode("lab");
   });
+
+  const backgroundColor = $derived.by(() => {
+    const { timelineColored, startHour } = settingsSignal.current;
+
+    if (timelineColored) {
+      const scaleKey = (task.startTime.hour() - startHour) / (24 - startHour);
+
+      return colorScale(scaleKey).hex();
+    }
+
+    return "";
+  });
+
+  const properContrastColors = $derived.by(() => {
+    const { timelineColored } = settingsSignal.current;
+
+    return timelineColored && backgroundColor
+      ? getTextColorWithEnoughContrast(backgroundColor)
+      : {
+          normal: "inherit",
+          muted: "inherit",
+          faint: "inherit",
+        };
+  });
+
+  return {
+    get properContrastColors() {
+      return properContrastColors;
+    },
+    get backgroundColor() {
+      return backgroundColor;
+    },
+  };
+}
+
+export function useColorOverrides({ task }: UseColorProps) {
+  const { settingsSignal, isDarkMode } = getObsidianContext();
 
   const colorOverride = $derived.by(() => {
     const { colorOverrides } = settingsSignal.current;
@@ -71,18 +108,10 @@ export function useColorOverrides({ task }: UseColorProps) {
   });
 
   const backgroundColor = $derived.by(() => {
-    const { timelineColored, startHour } = settingsSignal.current;
-
     if (colorOverride) {
       return isDarkMode.current
         ? colorOverride?.darkModeColor
         : colorOverride?.color;
-    }
-
-    if (timelineColored) {
-      const scaleKey = (task.startTime.hour() - startHour) / (24 - startHour);
-
-      return colorScale(scaleKey).hex();
     }
 
     return "";
