@@ -2,7 +2,7 @@
   const {
     key,
     value,
-    onpointerup = () => {},
+    onpointerup,
   }: {
     // todo: once lucide-svelte supports Svelte 5, remove this
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -13,20 +13,20 @@
 </script>
 
 {#if value}
-  <span class="pill" {onpointerup}>
+  <span class={["pill", onpointerup && "clickable"]} {onpointerup}>
     {#if !key}{:else if typeof key === "string"}
       {key}:
     {:else}
       {@const Component = key}
 
-      <Component class="pill-icon" />
+      <Component class="planner-pill-icon" />
     {/if}
     {value}
   </span>
 {/if}
 
 <style>
-  :global(.pill-icon) {
+  :global(.planner-pill-icon) {
     flex-shrink: 0;
     width: var(--size-4-3);
     height: var(--size-4-3);
@@ -46,7 +46,7 @@
     border: var(--border-base);
   }
 
-  .pill:hover {
+  .pill.clickable:hover {
     border-color: var(--color-accent);
   }
 </style>

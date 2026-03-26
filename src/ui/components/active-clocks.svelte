@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { File } from "lucide-svelte";
+  import { PlaneTakeoff, Clock3, File } from "lucide-svelte";
   import { isNotVoid } from "typed-assert";
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { currentTimeSignal } from "../../global-store/current-time";
+  import { settings } from "../../global-store/settings";
   import { selectActiveClocks } from "../../redux/tracker/tracker-slice";
   import type { LocalTask } from "../../task-types";
+  import * as m from "../../util/moment";
   import { getDiffInMinutes } from "../../util/moment";
   import { createActiveClockMenu } from "../active-clock-menu";
 
@@ -64,6 +66,16 @@
                   value={task.location.path.replace(/\.md$/, "")}
                 />
               {/if}
+              <Pill
+                key={PlaneTakeoff}
+                value={task.startTime.format($settings.timestampFormat)}
+              />
+              <Pill
+                key={Clock3}
+                value={m
+                  .fromDiff(task.startTime, currentTimeSignal.current)
+                  .format($settings.timestampFormat)}
+              />
             </Properties>
           {/snippet}
         </LocalTimeBlock>
