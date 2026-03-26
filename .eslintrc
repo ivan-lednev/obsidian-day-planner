@@ -84,8 +84,7 @@
       "error",
       {
         "ignore": [
-          "^obsidian$",
-          "^@testing-library/svelte$"
+          "^obsidian$"
         ]
       }
     ],
