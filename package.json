@@ -90,7 +90,7 @@
     "obsidian": "^1.6.6",
     "obsidian-daily-notes-interface": "^0.9.4",
     "overlayscrollbars-svelte": "^0.5.4",
-    "svelte": "^5.53.0",
+    "svelte": "^5.55.0",
     "svelte-portal": "^2.2.1",
     "tinygesture": "^3.0.0",
     "ts-dedent": "^2.2.0",
