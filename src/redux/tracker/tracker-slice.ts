@@ -1,5 +1,5 @@
 import { type PayloadAction } from "@reduxjs/toolkit";
-import type { CachedMetadata, Pos } from "obsidian";
+import type { CachedMetadata, MetadataCache, Pos, Vault } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
 import { defaultDayFormat } from "../../constants";
@@ -25,7 +25,7 @@ export interface LogEntry {
   text: string;
 }
 
-interface TrackerSliceState {
+interface IndexSliceState {
   taskEntries: {
     byId: Record<string, TaskEntry>;
     byPath: Record<string, string[]>;
@@ -37,7 +37,7 @@ interface TrackerSliceState {
   };
 }
 
-const initialState: TrackerSliceState = {
+const initialState: IndexSliceState = {
   taskEntries: { byPath: {}, byId: {} },
   logEntries: {
     byPath: {},
@@ -46,7 +46,7 @@ const initialState: TrackerSliceState = {
   },
 };
 
-interface MetadataChangedPayload {
+interface IndexRequestedPayload {
   path: string;
   contents: string;
   cache: CachedMetadata;
@@ -66,8 +66,8 @@ export const trackerSlice = createAppSlice({
   name: "tracker",
   initialState,
   reducers: (create) => ({
-    metadataChanged: create.reducer(
-      (state, action: PayloadAction<MetadataChangedPayload>) => {},
+    indexRequested: create.reducer(
+      (state, action: PayloadAction<IndexRequestedPayload>) => {},
     ),
     fileDeleted: create.reducer(
       (state, action: PayloadAction<FileDeletedPayload>) => {
@@ -197,7 +197,7 @@ function logEntryToLocalTask(logEntry: LogEntry, taskEntry: TaskEntry) {
   };
 }
 
-export const { fileMetadataProcessed, metadataChanged, fileDeleted } =
+export const { fileMetadataProcessed, indexRequested, fileDeleted } =
   trackerSlice.actions;
 
 export const {
@@ -207,7 +207,7 @@ export const {
   selectLogEntriesById,
 } = trackerSlice.selectors;
 
-type MetadataChanged = ReturnType<typeof metadataChanged>;
+type IndexRequested = ReturnType<typeof indexRequested>;
 
 const idSeparator = "::";
 
@@ -215,73 +215,74 @@ export function createId(...args: (string | number)[]) {
   return args.join(idSeparator);
 }
 
-export function createTrackerListener(props: {
+export function createIndexListener(props: {
   listPropsParser: ListPropsParser;
-}): AppListenerEffect<MetadataChanged> {
+  vault: Vault;
+  metadataCache: MetadataCache;
+}): AppListenerEffect<IndexRequested> {
   const { listPropsParser } = props;
 
   return async (action, listenerApi) => {
     const { path, cache, contents } = action.payload;
 
-    const taskEntries = cache.listItems
-      ?.filter((it) => it.task !== undefined)
-      .map((taskListItem) => {
-        const listItemText = contents.slice(
-          taskListItem.position.start.offset,
-          taskListItem.position.end.offset,
-        );
-        const listItemLines = listItemText.split("\n");
-        const firstLine = listItemLines[0];
+    const tasks = cache.listItems?.filter((it) => it.task !== undefined);
 
-        isNotVoid(firstLine, "The first line of any list cannot be empty");
+    const taskEntries = tasks?.map((task) => {
+      const listItemText = contents.slice(
+        task.position.start.offset,
+        task.position.end.offset,
+      );
+      const listItemLines = listItemText.split("\n");
+      const firstLine = listItemLines[0];
 
-        const listItemProps = listPropsParser.getListPropsFromListItem(
-          taskListItem,
-          listItemText,
-        );
-        const taskEntryId = createId(path, taskListItem.position.start.line);
+      isNotVoid(firstLine, "The first line of any list cannot be empty");
 
-        const logEntries = listItemProps?.parsed.planner?.log?.map(
-          (it, index) => {
-            const { start, end } = it;
+      const listItemProps = listPropsParser.getListPropsFromListItem(
+        task,
+        listItemText,
+      );
+      const taskEntryId = createId(path, task.position.start.line);
 
-            const parsedStart = window.moment(
-              start,
-              window.moment.ISO_8601,
-              true,
-            );
-            const parsedEnd = end
-              ? // todo: replace with util
-                window.moment(end, window.moment.ISO_8601, true)
-              : // TODO: bug source
-                //  Solution 1: dispatch dayChanged() and update active clocks then; simple & works
-                //  Solution 2: calculate dayKeys for active clocks on the fly in selectActiveClocks selector
-                //  Solution 3: use sorted array instead of buckets
-                window.moment();
+      const logEntries = listItemProps?.parsed.planner?.log?.map(
+        (it, index) => {
+          const { start, end } = it;
 
-            const dayKeys: string[] = getDaysInRange(
-              parsedStart,
-              parsedEnd,
-            ).map((day) => day.format(defaultDayFormat));
+          const parsedStart = window.moment(
+            start,
+            window.moment.ISO_8601,
+            true,
+          );
+          const parsedEnd = end
+            ? // todo: replace with util
+              window.moment(end, window.moment.ISO_8601, true)
+            : // TODO: bug source
+              //  Solution 1: dispatch dayChanged() and update active clocks then; simple & works
+              //  Solution 2: calculate dayKeys for active clocks on the fly in selectActiveClocks selector
+              //  Solution 3: use sorted array instead of buckets
+              window.moment();
 
-            return {
-              ...it,
-              parent: taskEntryId,
-              dayKeys,
-              id: createId(taskEntryId, index),
-              text: firstLine,
-            };
-          },
-        );
+          const dayKeys: string[] = getDaysInRange(parsedStart, parsedEnd).map(
+            (day) => day.format(defaultDayFormat),
+          );
 
-        return {
-          id: taskEntryId,
-          text: firstLine,
-          position: taskListItem.position,
-          path,
-          logEntries,
-        };
-      });
+          return {
+            ...it,
+            parent: taskEntryId,
+            dayKeys,
+            id: createId(taskEntryId, index),
+            text: firstLine,
+          };
+        },
+      );
+
+      return {
+        id: taskEntryId,
+        text: firstLine,
+        position: task.position,
+        path,
+        logEntries,
+      };
+    });
 
     listenerApi.dispatch(
       fileMetadataProcessed({

@@ -4,7 +4,7 @@ import { describe, expect, test } from "vitest";
 import { selectLogEntriesForDay } from "../src/redux";
 import {
   fileDeleted,
-  metadataChanged,
+  indexRequested,
   selectActiveClocks,
   selectEntriesForPath,
 } from "../src/redux/tracker/tracker-slice";
@@ -101,7 +101,7 @@ describe("Log Records with indexes", () => {
     );
 
     dispatch(
-      metadataChanged({
+      indexRequested({
         path: "fixtures/fixture-vault/test.md",
         cache: {},
         contents: "",
@@ -165,7 +165,7 @@ describe("Log Records with indexes", () => {
     const { dispatch, getState } = await setUp();
 
     dispatch(
-      metadataChanged({
+      indexRequested({
         path: "fixtures/fixture-vault/test.md",
         cache: {},
         contents: "",

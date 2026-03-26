@@ -16,15 +16,12 @@ import {
   type IcalParseTaskResult,
 } from "./ical/init-ical-listeners";
 import type { AppDispatch, RootState } from "./store";
-import {
-  createTrackerListener,
-  metadataChanged,
-} from "./tracker/tracker-slice";
+import { createIndexListener, indexRequested } from "./tracker/tracker-slice";
 
 export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
   const {
     extra,
-    extra: { listPropsParser },
+    extra: { listPropsParser, vault, metadataCache },
   } = props;
 
   const icalParseScheduler =
@@ -60,8 +57,8 @@ export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
   });
 
   listenerMiddleware.startListening({
-    actionCreator: metadataChanged,
-    effect: createTrackerListener({ listPropsParser }),
+    actionCreator: indexRequested,
+    effect: createIndexListener({ listPropsParser, vault, metadataCache }),
   });
 
   return listenerMiddleware;

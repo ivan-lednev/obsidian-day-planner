@@ -11,7 +11,7 @@ import { dataviewChange } from "../../src/redux/dataview/dataview-slice";
 import { initialState } from "../../src/redux/global-slice";
 import { createReactor, type RootState } from "../../src/redux/store";
 import {
-  metadataChanged,
+  indexRequested,
   selectActiveClocks,
 } from "../../src/redux/tracker/tracker-slice";
 import type { DataviewFacade } from "../../src/service/dataview-facade";
@@ -150,13 +150,15 @@ export async function setUp(props?: {
     },
     dataviewFacade,
     listPropsParser,
+    vault: vault as unknown as Vault,
+    metadataCache,
   });
 
   inMemoryFiles.forEach(({ path, contents }) => {
     isNotVoid(cachedMetadata[path]);
 
     dispatch(dataviewChange(path));
-    dispatch(metadataChanged({ path, contents, cache: cachedMetadata[path] }));
+    dispatch(indexRequested({ path, contents, cache: cachedMetadata[path] }));
   });
 
   const onUpdate = createUpdateHandler({

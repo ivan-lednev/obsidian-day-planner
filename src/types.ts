@@ -1,5 +1,6 @@
 import type Fraction from "fraction.js";
 import type { Moment } from "moment";
+import type { MetadataCache, Vault } from "obsidian";
 import type { Readable, Writable } from "svelte/store";
 
 import { type AppDispatch, type RootState } from "./redux/store";
@@ -87,4 +88,6 @@ export type DateRange = Writable<Moment[]> & { untrack: () => void };
 export type ReduxExtraArgument = {
   dataviewFacade: DataviewFacade;
   listPropsParser: ListPropsParser;
+  vault: Vault;
+  metadataCache: MetadataCache;
 };

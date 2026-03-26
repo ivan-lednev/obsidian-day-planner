@@ -42,8 +42,8 @@
     font-size: var(--font-ui-small);
     color: var(--text-muted);
 
-    border-radius: var(--radius-m);
     border: var(--border-base);
+    border-radius: var(--radius-m);
   }
 
   .pill.clickable:hover {

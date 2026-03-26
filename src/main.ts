@@ -86,29 +86,25 @@ export default class DayPlanner extends Plugin {
   private transactionWriter!: TransactionWriter;
 
   async onload() {
+    const { vault, metadataCache } = this.app;
+
     const initialSettings: DayPlannerSettings = {
       ...defaultSettings,
       ...(await this.loadData()),
     };
 
     const getTasksApi = createGetTasksApi(this.app);
-    const listPropsParser = new ListPropsParser(
-      this.app.vault,
-      this.app.metadataCache,
-    );
+    const listPropsParser = new ListPropsParser(vault, metadataCache);
 
     this.periodicNotes = new PeriodicNotes();
-    this.vaultFacade = new VaultFacade(this.app.vault, getTasksApi);
+    this.vaultFacade = new VaultFacade(vault, getTasksApi);
     this.transactionWriter = new TransactionWriter(this.vaultFacade);
     this.workspaceFacade = new WorkspaceFacade(
       this.app.workspace,
       this.vaultFacade,
       this.periodicNotes,
     );
-    this.dataviewFacade = new DataviewFacade(
-      () => getAPI(this.app),
-      this.app.vault,
-    );
+    this.dataviewFacade = new DataviewFacade(() => getAPI(this.app), vault);
 
     const {
       store,
@@ -125,6 +121,8 @@ export default class DayPlanner extends Plugin {
     } = createReactor({
       dataviewFacade: this.dataviewFacade,
       listPropsParser,
+      vault,
+      metadataCache,
     });
 
     this.sTaskEditor = new STaskEditor(
@@ -168,8 +166,8 @@ export default class DayPlanner extends Plugin {
     const timeTrackingFeature = new TimeTrackingFeature(
       this,
       this.app.workspace,
-      this.app.vault,
-      this.app.metadataCache,
+      vault,
+      metadataCache,
       dispatch,
     );
 

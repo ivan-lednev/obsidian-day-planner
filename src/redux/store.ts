@@ -8,6 +8,7 @@ import {
   type TypedStartListening,
 } from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
+import type { MetadataCache, Vault } from "obsidian";
 import { derived, writable } from "svelte/store";
 
 import type { DataviewFacade } from "../service/dataview-facade";
@@ -60,13 +61,23 @@ export function createReactor(props: {
   preloadedState?: Partial<RootState>;
   dataviewFacade: DataviewFacade;
   listPropsParser: ListPropsParser;
+  vault: Vault;
+  metadataCache: MetadataCache;
 }) {
-  const { preloadedState = {}, dataviewFacade, listPropsParser } = props;
+  const {
+    preloadedState = {},
+    dataviewFacade,
+    listPropsParser,
+    vault,
+    metadataCache,
+  } = props;
 
   const listenerMiddleware = initListenerMiddleware({
     extra: {
       dataviewFacade,
       listPropsParser,
+      vault,
+      metadataCache,
     },
   });
 

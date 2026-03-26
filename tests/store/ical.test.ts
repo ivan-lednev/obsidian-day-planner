@@ -65,16 +65,18 @@ const defaultPreloadedStateForTests: Partial<RootState> = {
 function makeStoreForTests(props?: { preloadedState?: Partial<RootState> }) {
   const { preloadedState = defaultPreloadedStateForTests } = props || {};
 
+  const inMemoryVault = new InMemoryVault([]) as unknown as Vault;
+  const metadataCache = new FakeMetadataCache({}) as unknown as MetadataCache;
+
   const listenerMiddleware = initListenerMiddleware({
     extra: {
       dataviewFacade: new FakeDataviewFacade({
         lists: [],
         tasks: [],
       }) as unknown as DataviewFacade,
-      listPropsParser: new ListPropsParser(
-        new InMemoryVault([]) as unknown as Vault,
-        new FakeMetadataCache({}) as unknown as MetadataCache,
-      ),
+      listPropsParser: new ListPropsParser(inMemoryVault, metadataCache),
+      vault: inMemoryVault,
+      metadataCache,
     },
   });
 

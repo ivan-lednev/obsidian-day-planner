@@ -9,7 +9,7 @@ import { isNotVoid } from "typed-assert";
 
 import type DayPlanner from "../main";
 import type { AppDispatch } from "../redux/store";
-import { fileDeleted, metadataChanged } from "../redux/tracker/tracker-slice";
+import { fileDeleted, indexRequested } from "../redux/tracker/tracker-slice";
 
 export class TimeTrackingFeature {
   constructor(
@@ -45,7 +45,7 @@ export class TimeTrackingFeature {
 
         const contents = await this.vault.cachedRead(file);
 
-        this.dispatch(metadataChanged({ path: file.path, contents, cache }));
+        this.dispatch(indexRequested({ path: file.path, contents, cache }));
       });
 
     // todo: will cause stale state if we change a file during this
@@ -61,7 +61,7 @@ export class TimeTrackingFeature {
 
     plugin.registerEvent(
       metadataCache.on("changed", (file, contents, cache) => {
-        dispatch(metadataChanged({ path: file.path, contents, cache }));
+        dispatch(indexRequested({ path: file.path, contents, cache }));
       }),
     );
 
@@ -88,7 +88,7 @@ export class TimeTrackingFeature {
 
         const contents = await vault.cachedRead(file);
 
-        dispatch(metadataChanged({ path: file.path, contents, cache }));
+        dispatch(indexRequested({ path: file.path, contents, cache }));
       }),
     );
   }
