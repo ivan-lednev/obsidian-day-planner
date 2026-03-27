@@ -1,5 +1,5 @@
 import { type PayloadAction } from "@reduxjs/toolkit";
-import type { MetadataCache, Pos, Vault } from "obsidian";
+import type { ListItemCache, MetadataCache, Pos, Vault } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
 import { defaultDayFormat } from "../../constants";
@@ -213,6 +213,12 @@ export function createId(...args: (string | number)[]) {
   return args.join(idSeparator);
 }
 
+type TaskCache = ListItemCache & { task: string };
+
+function isTaskCache(listItemCache: ListItemCache): listItemCache is TaskCache {
+  return listItemCache.task !== undefined;
+}
+
 export function createIndexListener(props: {
   listPropsParser: ListPropsParser;
   vault: Vault;
@@ -220,25 +226,12 @@ export function createIndexListener(props: {
 }): AppListenerEffect<IndexRequested> {
   const { listPropsParser, metadataCache, vault } = props;
 
-  async function parseFile(path: string) {
-    const cache = metadataCache.getCache(path);
-
-    const tasks = cache?.listItems?.filter((it) => it.task !== undefined);
-
-    if (!tasks) {
-      return [];
-    }
-
-    const file = vault.getFileByPath(path);
-
-    isNotVoid(
-      file,
-      "Inconsistent app state: indexing requested for a non-existent file",
-    );
-
-    const contents = await vault.cachedRead(file);
-
-    return tasks?.map((task) => {
+  function getDenormalizedEntries(
+    tasks: Array<TaskCache>,
+    contents: string,
+    path: string,
+  ) {
+    return tasks.map((task) => {
       const listItemText = contents.slice(
         task.position.start.offset,
         task.position.end.offset,
@@ -255,8 +248,8 @@ export function createIndexListener(props: {
       const taskEntryId = createId(path, task.position.start.line);
 
       const logEntries = listItemProps?.parsed.planner?.log?.map(
-        (it, index) => {
-          const { start, end } = it;
+        (rawLogEntry, index) => {
+          const { start, end } = rawLogEntry;
 
           const parsedStart = strictParse(start);
 
@@ -273,7 +266,7 @@ export function createIndexListener(props: {
           );
 
           return {
-            ...it,
+            ...rawLogEntry,
             parent: taskEntryId,
             dayKeys,
             id: createId(taskEntryId, index),
@@ -292,32 +285,55 @@ export function createIndexListener(props: {
     });
   }
 
+  async function parseFile(path: string) {
+    const cache = metadataCache.getCache(path);
+
+    const tasks = cache?.listItems?.filter(isTaskCache);
+
+    if (!tasks) {
+      return undefined;
+    }
+
+    const file = vault.getFileByPath(path);
+
+    isNotVoid(
+      file,
+      "Inconsistent app state: indexing requested for a non-existent file",
+    );
+
+    const contents = await vault.cachedRead(file);
+
+    const denormalizedEntries = getDenormalizedEntries(tasks, contents, path);
+
+    return {
+      taskEntries: denormalizedEntries.map(({ logEntries, ...rest }) => ({
+        logEntries: logEntries?.map((it) => it.id),
+        ...rest,
+      })),
+      logEntries: denormalizedEntries.flatMap((it) => it.logEntries || []),
+    };
+  }
+
   return async (action, listenerApi) => {
     const paths = action.payload;
 
     const normalizedEntriesForPaths = paths.map(async (path) => {
-      let denormalizedEntries:
-        | Awaited<ReturnType<typeof parseFile>>
-        | undefined;
-
       try {
-        denormalizedEntries = await parseFile(path);
+        const normalizedEntries = await parseFile(path);
+
+        if (!normalizedEntries) {
+          return undefined;
+        }
+
+        return {
+          path,
+          ...normalizedEntries,
+        };
       } catch (error) {
-        // todo: use logger
         console.error(error);
 
-        return;
+        return undefined;
       }
-
-      // todo: move to parser
-      return {
-        path,
-        taskEntries: denormalizedEntries.map(({ logEntries, ...rest }) => ({
-          logEntries: logEntries?.map((it) => it.id),
-          ...rest,
-        })),
-        logEntries: denormalizedEntries.flatMap((it) => it.logEntries || []),
-      };
     });
 
     const resolved = (await Promise.all(normalizedEntriesForPaths)).filter(
