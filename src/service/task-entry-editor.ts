@@ -17,7 +17,7 @@ import { DataviewFacade } from "./dataview-facade";
 import type { VaultFacade } from "./vault-facade";
 import { WorkspaceFacade } from "./workspace-facade";
 
-export class STaskEditor {
+export class TaskEntryEditor {
   editProps = withNotice(
     async (props: {
       path: string;

@@ -17,7 +17,8 @@
   import Properties from "./Properties.svelte";
   import Selectable from "./selectable.svelte";
 
-  const { workspaceFacade, sTaskEditor, useSelector } = getObsidianContext();
+  const { workspaceFacade, taskEntryEditor, useSelector } =
+    getObsidianContext();
 
   const activeLogRecords = useSelector(selectActiveClocks);
   // todo: duplication?
@@ -39,7 +40,7 @@
         createActiveClockMenu({
           event,
           task,
-          sTaskEditor,
+          taskEntryEditor,
           workspaceFacade,
         })}
     >

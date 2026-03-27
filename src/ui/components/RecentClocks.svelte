@@ -13,7 +13,8 @@
   import Properties from "./Properties.svelte";
   import Selectable from "./selectable.svelte";
 
-  const { workspaceFacade, useSelectorV2, sTaskEditor } = getObsidianContext();
+  const { workspaceFacade, useSelectorV2, taskEntryEditor } =
+    getObsidianContext();
 
   const recentLogRecords = useSelectorV2((state) => selectRecentClocks(state));
 </script>
@@ -22,7 +23,12 @@
   {#snippet match(task: LocalTask)}
     <Selectable
       onSecondarySelect={(event) =>
-        createRecentClockMenu({ event, task, sTaskEditor, workspaceFacade })}
+        createRecentClockMenu({
+          event,
+          task,
+          taskEntryEditor,
+          workspaceFacade,
+        })}
     >
       {#snippet children({ use, onpointerup, state })}
         <LocalTimeBlock

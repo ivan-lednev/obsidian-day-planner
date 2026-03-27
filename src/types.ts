@@ -8,7 +8,7 @@ import { type UseSelector, type useSelectorV2 } from "./redux/use-selector";
 import type { DataviewFacade } from "./service/dataview-facade";
 import type { ListPropsParser } from "./service/list-props-parser";
 import type { PeriodicNotes } from "./service/periodic-notes";
-import type { STaskEditor } from "./service/stask-editor";
+import type { TaskEntryEditor } from "./service/task-entry-editor";
 import type { VaultFacade } from "./service/vault-facade";
 import type { WorkspaceFacade } from "./service/workspace-facade";
 import type { DayPlannerSettings, IcalConfig } from "./settings";
@@ -63,7 +63,7 @@ export interface ObsidianContext {
   settingsSignal: Signal<DayPlannerSettings>;
   storeSignal: Signal<RootState>;
   pointerDateTime: Writable<PointerDateTime>;
-  sTaskEditor: STaskEditor;
+  taskEntryEditor: TaskEntryEditor;
   dispatch: AppDispatch;
   useSelector: UseSelector;
   useSelectorV2: useSelectorV2;

@@ -51,7 +51,7 @@ import { DataviewFacade } from "./service/dataview-facade";
 import { TransactionWriter } from "./service/diff-writer";
 import { ListPropsParser } from "./service/list-props-parser";
 import { PeriodicNotes } from "./service/periodic-notes";
-import { STaskEditor } from "./service/stask-editor";
+import { TaskEntryEditor } from "./service/task-entry-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
@@ -81,7 +81,7 @@ export default class DayPlanner extends Plugin {
   private workspaceFacade!: WorkspaceFacade;
   private dataviewFacade!: DataviewFacade;
   private periodicNotes!: PeriodicNotes;
-  private sTaskEditor!: STaskEditor;
+  private taskEntryEditor!: TaskEntryEditor;
   private vaultFacade!: VaultFacade;
   private transactionWriter!: TransactionWriter;
 
@@ -125,7 +125,7 @@ export default class DayPlanner extends Plugin {
       metadataCache,
     });
 
-    this.sTaskEditor = new STaskEditor(
+    this.taskEntryEditor = new TaskEntryEditor(
       getState,
       this.workspaceFacade,
       this.vaultFacade,
@@ -150,7 +150,7 @@ export default class DayPlanner extends Plugin {
     });
 
     const handleEditorMenu = createEditorMenuCallback({
-      sTaskEditor: this.sTaskEditor,
+      taskEntryEditor: this.taskEntryEditor,
       plugin: this,
     });
 
@@ -315,21 +315,21 @@ export default class DayPlanner extends Plugin {
       id: "clock-in",
       icon: "play",
       name: "Clock in",
-      editorCallback: () => this.sTaskEditor.clockInUnderCursor(),
+      editorCallback: () => this.taskEntryEditor.clockInUnderCursor(),
     });
 
     this.addCommand({
       icon: "square",
       id: "clock-out",
       name: "Clock out",
-      editorCallback: () => this.sTaskEditor.clockOutUnderCursor(),
+      editorCallback: () => this.taskEntryEditor.clockOutUnderCursor(),
     });
 
     this.addCommand({
       icon: "trash-2",
       id: "cancel-clock",
       name: "Cancel clock",
-      editorCallback: () => this.sTaskEditor.cancelClockUnderCursor(),
+      editorCallback: () => this.taskEntryEditor.cancelClockUnderCursor(),
     });
   }
 
@@ -567,7 +567,7 @@ export default class DayPlanner extends Plugin {
     const defaultObsidianContext: ObsidianContext = {
       storeSignal: createSvelteSignalFromReduxStore(store),
       periodicNotes: this.periodicNotes,
-      sTaskEditor: this.sTaskEditor,
+      taskEntryEditor: this.taskEntryEditor,
       workspaceFacade: this.workspaceFacade,
       initWeeklyView: this.initWeeklyLeaf,
       refreshDataviewFn: this.dataviewFacade.getAllTasksFrom,

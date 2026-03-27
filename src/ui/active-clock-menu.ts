@@ -1,7 +1,7 @@
 import { Menu } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
-import type { STaskEditor } from "../service/stask-editor";
+import type { TaskEntryEditor } from "../service/task-entry-editor";
 import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { LocalTask } from "../task-types";
 import { cancelOpenClock, clockOut } from "../util/props";
@@ -9,10 +9,10 @@ import { cancelOpenClock, clockOut } from "../util/props";
 export function createActiveClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;
   task: LocalTask;
-  sTaskEditor: STaskEditor;
+  taskEntryEditor: TaskEntryEditor;
   workspaceFacade: WorkspaceFacade;
 }) {
-  const { event, task, sTaskEditor, workspaceFacade } = props;
+  const { event, task, taskEntryEditor, workspaceFacade } = props;
   const menu = new Menu();
   const { location } = task;
 
@@ -31,7 +31,7 @@ export function createActiveClockMenu(props: {
       .setTitle("Clock out")
       .setIcon("square")
       .onClick(async () => {
-        await sTaskEditor.editProps({
+        await taskEntryEditor.editProps({
           path,
           line,
           editFn: (listPropsForLine) => clockOut(listPropsForLine),
@@ -44,7 +44,7 @@ export function createActiveClockMenu(props: {
       .setTitle("Cancel clock")
       .setIcon("trash-2")
       .onClick(async () => {
-        await sTaskEditor.editProps({
+        await taskEntryEditor.editProps({
           path,
           line,
           editFn: (listPropsForLine) => cancelOpenClock(listPropsForLine),
