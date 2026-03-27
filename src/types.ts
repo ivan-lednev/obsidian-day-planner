@@ -5,7 +5,6 @@ import type { Readable, Writable } from "svelte/store";
 
 import { type AppDispatch, type RootState } from "./redux/store";
 import { type UseSelector, type useSelectorV2 } from "./redux/use-selector";
-import type { DataviewFacade } from "./service/dataview-facade";
 import type { ListPropsParser } from "./service/list-props-parser";
 import type { PeriodicNotes } from "./service/periodic-notes";
 import type { TaskEntryEditor } from "./service/task-entry-editor";
@@ -86,7 +85,6 @@ export type WithIcalConfig<T> = T & { calendar: IcalConfig };
 export type DateRange = Writable<Moment[]> & { untrack: () => void };
 
 export type ReduxExtraArgument = {
-  dataviewFacade: DataviewFacade;
   listPropsParser: ListPropsParser;
   vault: Vault;
   metadataCache: MetadataCache;

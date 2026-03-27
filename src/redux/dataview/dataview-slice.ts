@@ -57,9 +57,7 @@ export const dataviewSlice = createAppSlice({
 
 export const { dataviewChange, listPropsParsed } = dataviewSlice.actions;
 
-export const {
-  selectDataviewLoaded,
-  selectListPropsForLocation,
-} = dataviewSlice.selectors;
+export const { selectDataviewLoaded, selectListPropsForLocation } =
+  dataviewSlice.selectors;
 
 export type DataviewChangeAction = ReturnType<typeof dataviewChange>;

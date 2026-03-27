@@ -11,7 +11,6 @@ import { combineSlices, configureStore } from "@reduxjs/toolkit";
 import type { MetadataCache, Vault } from "obsidian";
 import { derived, writable } from "svelte/store";
 
-import type { DataviewFacade } from "../service/dataview-facade";
 import type { ListPropsParser } from "../service/list-props-parser";
 import type { PointerDateTime, ReduxExtraArgument } from "../types";
 import { getUpdateTrigger } from "../util/store";
@@ -58,22 +57,14 @@ export const makeStore = (
 
 export function createReactor(props: {
   preloadedState?: Partial<RootState>;
-  dataviewFacade: DataviewFacade;
   listPropsParser: ListPropsParser;
   vault: Vault;
   metadataCache: MetadataCache;
 }) {
-  const {
-    preloadedState = {},
-    dataviewFacade,
-    listPropsParser,
-    vault,
-    metadataCache,
-  } = props;
+  const { preloadedState = {}, listPropsParser, vault, metadataCache } = props;
 
   const listenerMiddleware = initListenerMiddleware({
     extra: {
-      dataviewFacade,
       listPropsParser,
       vault,
       metadataCache,

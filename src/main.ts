@@ -119,7 +119,6 @@ export default class DayPlanner extends Plugin {
       pointerDateTime,
       dataviewRefreshSignal,
     } = createReactor({
-      dataviewFacade: this.dataviewFacade,
       listPropsParser,
       vault,
       metadataCache,

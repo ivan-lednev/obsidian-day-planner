@@ -148,7 +148,6 @@ export async function setUp(props?: {
         visibleDays,
       },
     },
-    dataviewFacade,
     listPropsParser,
     vault: vault as unknown as Vault,
     metadataCache,

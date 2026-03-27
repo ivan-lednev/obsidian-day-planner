@@ -70,10 +70,6 @@ function makeStoreForTests(props?: { preloadedState?: Partial<RootState> }) {
 
   const listenerMiddleware = initListenerMiddleware({
     extra: {
-      dataviewFacade: new FakeDataviewFacade({
-        lists: [],
-        tasks: [],
-      }) as unknown as DataviewFacade,
       listPropsParser: new ListPropsParser(inMemoryVault, metadataCache),
       vault: inMemoryVault,
       metadataCache,
