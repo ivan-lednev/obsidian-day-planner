@@ -1,6 +1,7 @@
 <script lang="ts">
   import { File } from "lucide-svelte";
   import { isNotVoid } from "typed-assert";
+  import { Play } from "./lucide";
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { selectRecentClocks } from "../../redux/tracker/tracker-slice";
@@ -12,6 +13,7 @@
   import Pill from "./pill.svelte";
   import Properties from "./Properties.svelte";
   import Selectable from "./selectable.svelte";
+  import ControlButton from "./control-button.svelte";
 
   const { workspaceFacade, useSelectorV2, sTaskEditor } = getObsidianContext();
 
@@ -48,6 +50,11 @@
                 />
               {/if}
             </Properties>
+          {/snippet}
+          {#snippet rightDecoration()}
+            <ControlButton label="Go to today" onclick={() => {}}>
+              <Play />
+            </ControlButton>
           {/snippet}
         </LocalTimeBlock>
       {/snippet}

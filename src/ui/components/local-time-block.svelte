@@ -11,6 +11,7 @@
   const {
     task,
     bottomDecoration,
+    rightDecoration,
     isActive = false,
     use = [],
     onpointerup,
@@ -18,6 +19,7 @@
     isActive?: boolean;
     task: LocalTask;
     bottomDecoration?: Snippet;
+    rightDecoration?: Snippet;
     use?: HTMLActionArray;
     onpointerup?: (event: PointerEvent) => void;
   } = $props();
@@ -32,7 +34,5 @@
   {task}
   use={[...use, hoverPreview(task)]}
 >
-  <RenderedMarkdown {task}>
-    {@render bottomDecoration?.()}
-  </RenderedMarkdown>
+  <RenderedMarkdown {task} {bottomDecoration} {rightDecoration} />
 </TimeBlockBase>

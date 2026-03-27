@@ -184,15 +184,13 @@ export const trackerSlice = createAppSlice({
         .flat()
         .filter((it): it is LogEntry & { end: string } => it.end !== undefined)
         .toSorted((a, b) => Date.parse(b.end) - Date.parse(a.end))
-        .reduce<Map<string, LogEntry>>((result, logEntry) => {
-          if (result.has(logEntry.parent)) {
-            return result;
-          }
-
-          result.set(logEntry.parent, logEntry);
-
-          return result;
-        }, new Map());
+        .reduce<Map<string, LogEntry>>(
+          (result, logEntry) =>
+            result.has(logEntry.parent)
+              ? result
+              : result.set(logEntry.parent, logEntry),
+          new Map(),
+        );
 
       return [...taskEntryIdToLatestLogRecord].map(
         ([taskEntryId, logEntry]) => {

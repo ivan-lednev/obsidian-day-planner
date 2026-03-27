@@ -12,7 +12,15 @@
   import { on } from "svelte/events";
   import type { Snippet } from "svelte";
 
-  const { task, children }: { task: LocalTask; children: Snippet } = $props();
+  const {
+    task,
+    bottomDecoration,
+    rightDecoration,
+  }: {
+    task: LocalTask;
+    bottomDecoration?: Snippet;
+    rightDecoration?: Snippet;
+  } = $props();
 
   const { renderMarkdown, toggleCheckboxInFile, settings } =
     getObsidianContext();
@@ -68,25 +76,39 @@
       };
     };
   }
+
+  const formattedFirstLine = $derived(
+    removeTimestamp(deleteProps(getFirstLine(task.text))),
+  );
+  const firstFileLine = $derived(task.lines?.[0] || []);
+
+  const formattedLinesAfterFirst = $derived(
+    dedent(deleteProps(getLinesAfterFirst(task.text))).trimStart(),
+  );
+
+  const fileLinesAfterFirst = $derived(task.lines?.slice(1) || []);
 </script>
 
 <div class={["rendered-markdown", "planner-sticky-block-content"]}>
   <div
     class="first-line-wrapper"
-    {@attach createRenderMarkdownAttachment(
-      removeTimestamp(deleteProps(getFirstLine(task.text))),
-      task.lines?.[0] || [],
-    )}
+    {@attach createRenderMarkdownAttachment(formattedFirstLine, firstFileLine)}
   ></div>
 
-  {@render children?.()}
+  <div class="controls">
+    {@render rightDecoration?.()}
+  </div>
+
+  <div class="properties">
+    {@render bottomDecoration?.()}
+  </div>
 
   {#if $settings.showSubtasksInTaskBlocks}
     <div
       class="lines-after-first-wrapper"
       {@attach createRenderMarkdownAttachment(
-        dedent(deleteProps(getLinesAfterFirst(task.text))).trimStart(),
-        task.lines?.slice(1) || [],
+        formattedLinesAfterFirst,
+        fileLinesAfterFirst,
       )}
     ></div>
   {/if}
@@ -99,6 +121,30 @@
     flex: 1 0 0;
     padding: var(--size-2-1) var(--size-4-1);
     color: var(--text-muted);
+
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "title controls"
+      "properties controls";
+  }
+
+  .first-line-wrapper {
+    font-weight: var(--font-semibold);
+    grid-area: title;
+  }
+
+  .controls {
+    display: none;
+  }
+
+  .rendered-markdown:hover .controls {
+    display: block;
+    grid-area: controls;
+  }
+
+  .properties {
+    grid-area: properties;
   }
 
   .rendered-markdown :global(p),
@@ -124,9 +170,5 @@
   .rendered-markdown :global(li.task-list-item[data-task="x"]),
   .rendered-markdown :global(li.task-list-item[data-task="X"]) {
     color: var(--text-faint);
-  }
-
-  .first-line-wrapper {
-    font-weight: var(--font-semibold);
   }
 </style>
