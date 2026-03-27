@@ -78,6 +78,6 @@
     background-color: var(--background-primary);
     border: var(--border-base);
     border-radius: var(--size-4-1);
-    box-shadow: var(--floating-controls-shadow);
+    box-shadow: var(--planner-floating-controls-shadow);
   }
 </style>

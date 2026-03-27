@@ -1,7 +1,6 @@
 import { chunk } from "lodash/fp";
 import {
   type MetadataCache,
-  Notice,
   TFile,
   type Vault,
   type Workspace,

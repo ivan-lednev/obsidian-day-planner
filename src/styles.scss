@@ -117,7 +117,7 @@
   --scrollbar-width: 12px;
   --timeline-flex-basis: 240px;
 
-  --border-base: 1px solid var(--background-modifier-border);
+  --border-base: var(--planner-border-base);
 
   --shadow-color: #00000010;
   --shadow-right: 2px 0px 2px var(--shadow-color);
@@ -134,8 +134,10 @@
 }
 
 :root {
-  --floating-controls-shadow: 0px 2px 10px rgba(0, 0, 0, 0.07);
-  --time-block-shadow-on-timeline: 1px 1px 2px 0 #0000001f;
+  --planner-border-base: 1px solid var(--background-modifier-border);
+  --planner-floating-controls-shadow: 0px 2px 10px rgba(0, 0, 0, 0.07);
+  --planner-floating-controls-border: var(--planner-border-base);
+  --planner-time-block-shadow-on-timeline: 1px 1px 2px 0 #0000001f;
 }
 
 [data-type="planner-weekly"] {

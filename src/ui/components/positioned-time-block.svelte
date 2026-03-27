@@ -41,7 +41,7 @@
   style:--time-block-position="absolute"
   style:--time-block-top={$offset}
   style:--time-block-width={width}
-  style:--time-block-box-shadow="var(--time-block-shadow-on-timeline)"
+  style:--time-block-box-shadow="var(--planner-time-block-shadow-on-timeline)"
   style:--time-block-border-color={relationToNow.borderColor}
   style:--time-block-bg-color={coloredTimeline.backgroundColor ||
     relationToNow.backgroundColor}
