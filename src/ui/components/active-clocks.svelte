@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PlaneTakeoff, Clock3, File } from "lucide-svelte";
+  import { Play, Hourglass, File } from "lucide-svelte";
   import { isNotVoid } from "typed-assert";
 
   import { getObsidianContext } from "../../context/obsidian-context";
@@ -67,11 +67,11 @@
                 />
               {/if}
               <Pill
-                key={PlaneTakeoff}
+                key={Play}
                 value={task.startTime.format($settings.timestampFormat)}
               />
               <Pill
-                key={Clock3}
+                key={Hourglass}
                 value={m
                   .fromDiff(task.startTime, currentTimeSignal.current)
                   .format($settings.timestampFormat)}
