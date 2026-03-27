@@ -291,7 +291,10 @@ export function createIndexListener(props: {
     const tasks = cache?.listItems?.filter(isTaskCache);
 
     if (!tasks) {
-      return undefined;
+      return {
+        taskEntries: [],
+        logEntries: [],
+      };
     }
 
     const file = vault.getFileByPath(path);
@@ -320,10 +323,6 @@ export function createIndexListener(props: {
     const normalizedEntriesForPaths = paths.map(async (path) => {
       try {
         const normalizedEntries = await parseFile(path);
-
-        if (!normalizedEntries) {
-          return undefined;
-        }
 
         return {
           path,
