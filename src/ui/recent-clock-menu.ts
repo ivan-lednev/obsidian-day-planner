@@ -1,8 +1,10 @@
-import type { LocalTask } from "../task-types";
-import type { STaskEditor } from "../service/stask-editor";
-import type { WorkspaceFacade } from "../service/workspace-facade";
 import { Menu } from "obsidian";
 import { isNotVoid } from "typed-assert";
+
+import type { STaskEditor } from "../service/stask-editor";
+import type { WorkspaceFacade } from "../service/workspace-facade";
+import type { LocalTask } from "../task-types";
+import { addOpenClock } from "../util/props";
 
 export function createRecentClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;
@@ -28,7 +30,13 @@ export function createRecentClockMenu(props: {
     item
       .setTitle("Clock in")
       .setIcon("play")
-      .onClick(() => sTaskEditor.clockInUnderCursor());
+      .onClick(async () => {
+        await sTaskEditor.editProps({
+          path,
+          line,
+          editFn: (listPropsForLine) => addOpenClock(listPropsForLine),
+        });
+      });
   });
 
   menu.addItem((item) => {

@@ -15,6 +15,7 @@
   import ErrorBoundary from "./error-boundary.svelte";
   import { EllipsisVertical } from "./lucide";
   import Tree from "./obsidian/tree.svelte";
+  import RecentClocks from "./RecentClocks.svelte";
   import ResizeHandle from "./resize-handle.svelte";
   import ResizeableBox from "./resizeable-box.svelte";
   import Ruler from "./ruler.svelte";
@@ -61,6 +62,10 @@
       <ActiveClocks />
     </Tree>
   {/if}
+
+  <Tree title="Recent clocks">
+    <RecentClocks />
+  </Tree>
 
   {#if $settings.showUncheduledTasks}
     <Tree title="All day events">

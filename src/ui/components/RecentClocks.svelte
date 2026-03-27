@@ -5,13 +5,13 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { selectRecentClocks } from "../../redux/tracker/tracker-slice";
   import type { LocalTask } from "../../task-types";
+  import { createRecentClockMenu } from "../recent-clock-menu";
 
   import BlockList from "./block-list.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Pill from "./pill.svelte";
   import Properties from "./Properties.svelte";
   import Selectable from "./selectable.svelte";
-  import { createRecentClockMenu } from "../recent-clock-menu";
 
   const { workspaceFacade, useSelectorV2, sTaskEditor } = getObsidianContext();
 

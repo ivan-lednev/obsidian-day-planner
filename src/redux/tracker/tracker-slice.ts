@@ -179,6 +179,31 @@ export const trackerSlice = createAppSlice({
 
           return logEntryToLocalTask(logEntry, taskEntry);
         }),
+    selectRecentClocks: (state) => {
+      const taskEntryIdToLatestLogRecord = Object.values(state.logEntries.byId)
+        .flat()
+        .filter((it): it is LogEntry & { end: string } => it.end !== undefined)
+        .toSorted((a, b) => Date.parse(b.end) - Date.parse(a.end))
+        .reduce<Map<string, LogEntry>>((result, logEntry) => {
+          if (result.has(logEntry.parent)) {
+            return result;
+          }
+
+          result.set(logEntry.parent, logEntry);
+
+          return result;
+        }, new Map());
+
+      return [...taskEntryIdToLatestLogRecord].map(
+        ([taskEntryId, logEntry]) => {
+          const taskEntry = state.taskEntries.byId[taskEntryId];
+
+          isNotVoid(taskEntry, "Inconsistent store state");
+
+          return logEntryToLocalTask(logEntry, taskEntry);
+        },
+      );
+    },
     selectLogEntriesByDay: (state) => state.logEntries.byDay,
     selectLogEntriesById: (state) => state.logEntries.byId,
   },
@@ -201,6 +226,7 @@ export const { filesIndexed, indexRequested, fileDeleted } =
 export const {
   selectEntriesForPath,
   selectActiveClocks,
+  selectRecentClocks,
   selectLogEntriesByDay,
   selectLogEntriesById,
 } = trackerSlice.selectors;
