@@ -158,7 +158,7 @@ export async function setUp(props?: {
     isNotVoid(cachedMetadata[path]);
 
     dispatch(dataviewChange(path));
-    dispatch(indexRequested({ path, contents, cache: cachedMetadata[path] }));
+    dispatch(indexRequested([path]));
   });
 
   const onUpdate = createUpdateHandler({

@@ -30,7 +30,6 @@ export class TimeTrackingFeature {
   }
 
   private async initialLoad() {
-    // todo: this is broken
     const paths = this.vault.getMarkdownFiles().map((file) => file.path);
 
     chunk(TimeTrackingFeature.INITIAL_LOAD_CHUNK_SIZE, paths).forEach((batch) =>
@@ -43,7 +42,7 @@ export class TimeTrackingFeature {
 
     plugin.registerEvent(
       metadataCache.on("changed", (file, contents, cache) => {
-        dispatch(indexRequested({ path: file.path }));
+        dispatch(indexRequested([file.path]));
       }),
     );
 
@@ -60,7 +59,7 @@ export class TimeTrackingFeature {
         }
 
         dispatch(fileDeleted({ path: oldPath }));
-        dispatch(indexRequested({ path: file.path }));
+        dispatch(indexRequested([file.path]));
       }),
     );
   }

@@ -73,7 +73,7 @@ export class FakeMetadataCache {
   constructor(private readonly fileCache: Record<string, CachedMetadata>) {}
 
   getFileCache({ path }: { path: string }) {
-    this.getCache(path);
+    return this.getCache(path);
   }
 
   getCache(path: string) {

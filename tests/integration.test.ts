@@ -108,7 +108,7 @@ describe("Log Records with indexes", () => {
 
     cache.listItems = [];
 
-    dispatch(indexRequested({ path: filePath }));
+    dispatch(indexRequested([filePath]));
 
     await vi.waitFor(() => {
       expect(selectEntriesForPath(getState(), filePath)).toHaveLength(0);
@@ -175,7 +175,7 @@ describe("Log Records with indexes", () => {
 
     cache.listItems = [];
 
-    dispatch(indexRequested({ path: filePath }));
+    dispatch(indexRequested([filePath]));
 
     await vi.waitFor(() => {
       expect(

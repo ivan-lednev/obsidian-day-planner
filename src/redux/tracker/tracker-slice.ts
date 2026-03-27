@@ -46,11 +46,7 @@ const initialState: IndexSliceState = {
   },
 };
 
-interface IndexRequestedPayload {
-  path: string;
-}
-
-interface FilesIndexedPayload {
+interface FileIndex {
   path: string;
   taskEntries?: TaskEntry[];
   logEntries?: LogEntry[];
@@ -65,7 +61,7 @@ export const trackerSlice = createAppSlice({
   initialState,
   reducers: (create) => ({
     indexRequested: create.reducer(
-      (state, action: PayloadAction<IndexRequestedPayload | string[]>) => {},
+      (state, action: PayloadAction<string[]>) => {},
     ),
     fileDeleted: create.reducer(
       (state, action: PayloadAction<FileDeletedPayload>) => {
@@ -107,56 +103,60 @@ export const trackerSlice = createAppSlice({
       },
     ),
     filesIndexed: create.reducer(
-      (state, action: PayloadAction<FilesIndexedPayload>) => {
-        const { path, taskEntries = [], logEntries = [] } = action.payload;
+      (state, action: PayloadAction<FileIndex[]>) => {
+        const fileIndexes = action.payload;
 
-        // todo: repeat for logEntries
-        const previousTaskEntryIds = state.taskEntries.byPath[path] || [];
+        fileIndexes.forEach((fileIndex) => {
+          const { path, taskEntries = [], logEntries = [] } = fileIndex;
 
-        previousTaskEntryIds.forEach((id) => {
-          delete state.taskEntries.byId[id];
-        });
+          // todo: repeat for logEntries
+          const previousTaskEntryIds = state.taskEntries.byPath[path] || [];
 
-        // todo: copy pasta
-        state.taskEntries.byPath[path] = taskEntries.map((it) => it.id);
-
-        taskEntries.forEach((it) => {
-          state.taskEntries.byId[it.id] = it;
-        });
-
-        const previousLogEntryIds = state.logEntries.byPath[path] || [];
-
-        previousLogEntryIds.forEach((id) => {
-          const logEntry = state.logEntries.byId[id];
-
-          isNotVoid(logEntry, "Inconsistent store state");
-
-          logEntry.dayKeys.forEach((dayKey) => {
-            isNotVoid(
-              state.logEntries.byDay[dayKey],
-              "Inconsistent store state",
-            );
-
-            state.logEntries.byDay[dayKey] = state.logEntries.byDay[
-              dayKey
-            ].filter((it) => it !== id);
+          previousTaskEntryIds.forEach((id) => {
+            delete state.taskEntries.byId[id];
           });
-        });
 
-        previousLogEntryIds.forEach((id) => {
-          delete state.logEntries.byId[id];
-        });
+          // todo: copy pasta
+          state.taskEntries.byPath[path] = taskEntries.map((it) => it.id);
 
-        // todo: copy pasta
-        state.logEntries.byPath[path] = logEntries.map((it) => it.id);
+          taskEntries.forEach((it) => {
+            state.taskEntries.byId[it.id] = it;
+          });
 
-        logEntries.forEach((it) => {
-          state.logEntries.byId[it.id] = it;
-        });
+          const previousLogEntryIds = state.logEntries.byPath[path] || [];
 
-        logEntries.forEach((logEntry) => {
-          logEntry.dayKeys.forEach((dayKey) => {
-            (state.logEntries.byDay[dayKey] ??= []).push(logEntry.id);
+          previousLogEntryIds.forEach((id) => {
+            const logEntry = state.logEntries.byId[id];
+
+            isNotVoid(logEntry, "Inconsistent store state");
+
+            logEntry.dayKeys.forEach((dayKey) => {
+              isNotVoid(
+                state.logEntries.byDay[dayKey],
+                "Inconsistent store state",
+              );
+
+              state.logEntries.byDay[dayKey] = state.logEntries.byDay[
+                dayKey
+              ].filter((it) => it !== id);
+            });
+          });
+
+          previousLogEntryIds.forEach((id) => {
+            delete state.logEntries.byId[id];
+          });
+
+          // todo: copy pasta
+          state.logEntries.byPath[path] = logEntries.map((it) => it.id);
+
+          logEntries.forEach((it) => {
+            state.logEntries.byId[it.id] = it;
+          });
+
+          logEntries.forEach((logEntry) => {
+            logEntry.dayKeys.forEach((dayKey) => {
+              (state.logEntries.byDay[dayKey] ??= []).push(logEntry.id);
+            });
           });
         });
       },
@@ -293,26 +293,37 @@ export function createIndexListener(props: {
   }
 
   return async (action, listenerApi) => {
-    if (Array.isArray(action.payload)) {
-      return;
-    }
+    const paths = action.payload;
 
-    const { path } = action.payload;
+    const normalizedEntriesForPaths = paths.map(async (path) => {
+      let denormalizedEntries:
+        | Awaited<ReturnType<typeof parseFile>>
+        | undefined;
 
-    const denormalizedEntries = await parseFile(path);
-    const normalizedEntries = {
-      taskEntries: denormalizedEntries.map(({ logEntries, ...rest }) => ({
-        logEntries: logEntries?.map((it) => it.id),
-        ...rest,
-      })),
-      logEntries: denormalizedEntries.flatMap((it) => it.logEntries || []),
-    };
+      try {
+        denormalizedEntries = await parseFile(path);
+      } catch (error) {
+        // todo: use logger
+        console.error(error);
 
-    listenerApi.dispatch(
-      filesIndexed({
+        return;
+      }
+
+      // todo: move to parser
+      return {
         path,
-        ...normalizedEntries,
-      }),
+        taskEntries: denormalizedEntries.map(({ logEntries, ...rest }) => ({
+          logEntries: logEntries?.map((it) => it.id),
+          ...rest,
+        })),
+        logEntries: denormalizedEntries.flatMap((it) => it.logEntries || []),
+      };
+    });
+
+    const resolved = (await Promise.all(normalizedEntriesForPaths)).filter(
+      (entries) => entries !== undefined,
     );
+
+    listenerApi.dispatch(filesIndexed(resolved));
   };
 }

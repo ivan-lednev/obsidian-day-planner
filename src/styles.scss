@@ -117,7 +117,7 @@
   --scrollbar-width: 12px;
   --timeline-flex-basis: 240px;
 
-  --border-base: var(--planner-border-base);
+  --border-base: 1px solid var(--background-modifier-border);
 
   --shadow-color: #00000010;
   --shadow-right: 2px 0px 2px var(--shadow-color);
@@ -134,9 +134,9 @@
 }
 
 :root {
-  --planner-border-base: 1px solid var(--background-modifier-border);
   --planner-floating-controls-shadow: 0px 2px 10px rgba(0, 0, 0, 0.07);
-  --planner-floating-controls-border: var(--planner-border-base);
+  --planner-floating-controls-border: 1px solid
+    var(--background-modifier-border);
   --planner-time-block-shadow-on-timeline: 1px 1px 2px 0 #0000001f;
 }
 
