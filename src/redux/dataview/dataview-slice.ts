@@ -49,8 +49,6 @@ export const dataviewSlice = createAppSlice({
     ),
   }),
   selectors: {
-    selectListProps: (state) => state.listProps,
-    selectListPropsForPath: (state, path: string) => state.listProps[path],
     selectListPropsForLocation: (state, path: string, line: number) =>
       state.listProps[path]?.[line],
     selectDataviewLoaded: (state) => state.dataviewLoaded,
@@ -60,9 +58,7 @@ export const dataviewSlice = createAppSlice({
 export const { dataviewChange, listPropsParsed } = dataviewSlice.actions;
 
 export const {
-  selectListProps,
   selectDataviewLoaded,
-  selectListPropsForPath,
   selectListPropsForLocation,
 } = dataviewSlice.selectors;
 

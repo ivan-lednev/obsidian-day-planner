@@ -20,7 +20,6 @@ import {
   dataviewSlice,
   listPropsParsed,
   selectDataviewLoaded,
-  selectListProps,
 } from "./dataview/dataview-slice";
 import { editCanceled, globalSlice } from "./global-slice";
 import { icalSlice, selectRemoteTasks } from "./ical/ical-slice";
@@ -95,7 +94,6 @@ export function createReactor(props: {
   const actionDispatched = useActionDispatched({ listenerMiddleware });
 
   const remoteTasks = useSelector(selectRemoteTasks);
-  const listProps = useSelector(selectListProps);
   const dataviewLoaded = useSelector(selectDataviewLoaded);
   const dataviewSource = useSelector(selectDataviewSource);
 
@@ -126,7 +124,6 @@ export function createReactor(props: {
     listenerMiddleware,
     remoteTasks,
     taskUpdateTrigger,
-    listProps,
     dataviewLoaded,
     pointerDateTime,
     dataviewRefreshSignal,
