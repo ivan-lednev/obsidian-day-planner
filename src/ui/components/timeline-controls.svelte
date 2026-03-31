@@ -143,15 +143,6 @@
     </div>
   {/if}
 
-  {#if !$dataviewLoaded}
-    <Callout type="error">
-      <span>
-        You need to install and enable
-        <a href={dataviewDownloadLink}>Dataview</a>
-      </span>
-    </Callout>
-  {/if}
-
   {#if settingsVisible}
     <div class="settings-wrapper">
       <SettingsControls />

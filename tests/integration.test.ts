@@ -196,7 +196,7 @@ describe("Log Records with indexes", () => {
     });
   });
 
-  test.todo("Batched indexing");
+  test();
 
   test.todo(
     "Nothing gets triggered for files that do not contain any tasks or relevant props",

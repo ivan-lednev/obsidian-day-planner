@@ -23,7 +23,27 @@ export interface LogEntry {
   parent: string;
   dayKeys: string[];
   id: string;
+  // todo: we don't need to store it here, it's in the parent
   text: string;
+}
+
+type PlanEntrySource =
+  | "daily-note"
+  | "obsidian-tasks"
+  | "dataview"
+  | "dataview-keyless"
+  | "frontmatter";
+
+type PlanEntryType = "scheduled" | "due" | "start" | string;
+
+export interface PlanEntry {
+  source: PlanEntrySource;
+  type: PlanEntryType;
+  start: string;
+  end: string;
+  parent: string;
+  dayKeys: string[];
+  id: string;
 }
 
 interface IndexSliceState {
@@ -169,6 +189,7 @@ export const trackerSlice = createAppSlice({
         (it) => state.taskEntries.byId[it],
       );
     },
+    // todo: should be memoized or stored in the index
     selectActiveClocks: (state) =>
       Object.values(state.logEntries.byId)
         .flat()
@@ -187,6 +208,7 @@ export const trackerSlice = createAppSlice({
 
       const taskEntryAtLine = taskEntriesForFile?.find(
         // todo: redux should not keep explicit undefined here
+        // todo: this is broken for line 0
         (it) => it?.position.start.line && it.position.start.line === line,
       );
 
