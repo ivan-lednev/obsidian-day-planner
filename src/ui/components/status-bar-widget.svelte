@@ -11,11 +11,9 @@
   const {
     onClick,
     tasksWithTimeForToday,
-    errorStore,
   }: {
     onClick: () => Promise<void>;
     tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
-    errorStore: Readable<Error | undefined>;
   } = $props();
 
   const { current, next } = $derived(
@@ -28,9 +26,7 @@
 </script>
 
 <div class="root" onclick={onClick}>
-  {#if $errorStore}
-    😵 Error in Day Planner (click to see)
-  {:else if !current && !next}
+  {#if !current && !next}
     <span class="status-bar-item-segment">All done</span>
   {:else}
     {#if showNow && current}

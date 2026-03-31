@@ -4,7 +4,6 @@ export const viewTypeReleaseNotes = "planner-release-notes";
 
 export const obsidianContextKey = "obsidianContext";
 export const dateRangeContextKey = "dateRangeContext";
-export const errorContextKey = "errorContext";
 
 export const defaultDayFormat = "YYYY-MM-DD";
 export const icalDayKeyFormat = "YYYY-MM-DD";

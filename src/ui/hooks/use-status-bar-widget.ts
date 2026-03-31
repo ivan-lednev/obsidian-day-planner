@@ -1,6 +1,6 @@
 import type { Moment } from "moment";
 import { mount, unmount } from "svelte";
-import { derived, type Readable, type Writable } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
 import { statusBarTextLimit } from "../../constants";
 import { currentTime } from "../../global-store/current-time";
@@ -39,11 +39,10 @@ export function minutesToTimestamp(minutes: number) {
 
 export function mountStatusBarWidget(props: {
   plugin: DayPlanner;
-  errorStore: Writable<Error | undefined>;
   dateRanges: DateRanges;
   tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
 }) {
-  const { plugin, tasksWithTimeForToday, errorStore, dateRanges } = props;
+  const { plugin, tasksWithTimeForToday, dateRanges } = props;
 
   const statusBarWidgetContainer = plugin.addStatusBarItem();
 
@@ -54,7 +53,6 @@ export function mountStatusBarWidget(props: {
     props: {
       onClick: plugin.initTimelineLeaf,
       tasksWithTimeForToday,
-      errorStore,
     },
   });
 

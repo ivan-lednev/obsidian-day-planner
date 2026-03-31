@@ -7,17 +7,10 @@ import {
   TFile,
 } from "obsidian";
 import { getAPI } from "obsidian-dataview";
-import {
-  fromStore,
-  get,
-  writable,
-  type Readable,
-  type Writable,
-} from "svelte/store";
+import { fromStore, get, type Readable, type Writable } from "svelte/store";
 import { isInstanceOf, isNotVoid } from "typed-assert";
 
 import {
-  errorContextKey,
   obsidianContextKey,
   viewTypeReleaseNotes,
   viewTypeTimeline,
@@ -509,11 +502,8 @@ export default class DayPlanner extends Plugin {
       }),
     );
 
-    const errorStore = writable<Error | undefined>();
-
     const destroyStatusBarWidget = mountStatusBarWidget({
       plugin: this,
-      errorStore,
       dateRanges,
       tasksWithTimeForToday,
     });
@@ -593,12 +583,8 @@ export default class DayPlanner extends Plugin {
       useSelectorV2,
     };
 
-    const componentContext = new Map<
-      string,
-      ObsidianContext | typeof errorStore
-    >([
+    const componentContext = new Map<string, ObsidianContext>([
       [obsidianContextKey, defaultObsidianContext],
-      [errorContextKey, errorStore],
     ]);
 
     this.registerView(
