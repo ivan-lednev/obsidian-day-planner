@@ -2,7 +2,7 @@ import { get } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 import { describe, expect, test, vi } from "vitest";
 
-import { selectLogEntriesForDay } from "../src/redux";
+import { selectLogEntriesForDay, selectPlanEntriesForDay } from "../src/redux";
 import {
   fileDeleted,
   indexRequested,
@@ -196,7 +196,15 @@ describe("Log Records with indexes", () => {
     });
   });
 
-  test();
+  test("Stores tasks from daily notes", async () => {
+    const { getState } = await setUp();
+
+    expect(selectPlanEntriesForDay(getState(), "2025-07-28")).toHaveLength(1);
+  });
+
+  test.todo("Stores tasks from obsidian-tasks (scheduled)");
+
+  test.todo("Stores Dataview tasks");
 
   test.todo(
     "Nothing gets triggered for files that do not contain any tasks or relevant props",

@@ -2,13 +2,11 @@
   import { EllipsisVertical } from "lucide-svelte";
   import { Menu } from "obsidian";
 
-  import { dataviewDownloadLink } from "../../constants";
   import { getDateRangeContext } from "../../context/date-range-context";
   import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
 
-  import Callout from "./callout.svelte";
   import ControlButton from "./control-button.svelte";
   import {
     Settings,
@@ -19,13 +17,8 @@
   import Pill from "./pill.svelte";
   import SettingsControls from "./settings-controls.svelte";
 
-  const {
-    workspaceFacade,
-    initWeeklyView,
-    dataviewLoaded,
-    reSync,
-    periodicNotes,
-  } = getObsidianContext();
+  const { workspaceFacade, initWeeklyView, reSync, periodicNotes } =
+    getObsidianContext();
   const dateRange = getDateRangeContext();
 
   let settingsVisible = $state(false);

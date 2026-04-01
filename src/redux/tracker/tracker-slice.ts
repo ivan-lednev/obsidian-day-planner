@@ -23,22 +23,10 @@ export interface LogEntry {
   parent: string;
   dayKeys: string[];
   id: string;
-  // todo: we don't need to store it here, it's in the parent
-  text: string;
 }
 
-type PlanEntrySource =
-  | "daily-note"
-  | "obsidian-tasks"
-  | "dataview"
-  | "dataview-keyless"
-  | "frontmatter";
-
-type PlanEntryType = "scheduled" | "due" | "start" | string;
-
 export interface PlanEntry {
-  source: PlanEntrySource;
-  type: PlanEntryType;
+  isAllDay?: boolean;
   start: string;
   end: string;
   parent: string;
@@ -56,11 +44,21 @@ interface IndexSliceState {
     byPath: Record<string, string[]>;
     byDay: Record<string, string[]>;
   };
+  planEntries: {
+    byId: Record<string, LogEntry>;
+    byPath: Record<string, string[]>;
+    byDay: Record<string, string[]>;
+  };
 }
 
 const initialState: IndexSliceState = {
   taskEntries: { byPath: {}, byId: {} },
   logEntries: {
+    byPath: {},
+    byId: {},
+    byDay: {},
+  },
+  planEntries: {
     byPath: {},
     byId: {},
     byDay: {},
@@ -216,6 +214,9 @@ export const trackerSlice = createAppSlice({
     },
     selectLogEntriesByDay: (state) => state.logEntries.byDay,
     selectLogEntriesById: (state) => state.logEntries.byId,
+    selectTaskEntriesById: (state) => state.taskEntries.byId,
+    selectPlanEntriesByDay: (state) => state.planEntries.byDay,
+    selectPlanEntriesById: (state) => state.planEntries.byId,
   },
 });
 
@@ -239,6 +240,9 @@ export const {
   selectLogEntriesByDay,
   selectLogEntriesById,
   selectListPropsPosition,
+  selectPlanEntriesById,
+  selectPlanEntriesByDay,
+  selectTaskEntriesById,
 } = trackerSlice.selectors;
 
 type IndexRequested = ReturnType<typeof indexRequested>;
@@ -255,6 +259,10 @@ function isTaskCache(listItemCache: ListItemCache): listItemCache is TaskCache {
   return listItemCache.task !== undefined;
 }
 
+function getTextAtPosition(inputText: string, position: Pos) {
+  return inputText.slice(position.start.offset, position.end.offset);
+}
+
 export function createIndexListener(props: {
   listPropsParser: ListPropsParser;
   vault: Vault;
@@ -262,54 +270,60 @@ export function createIndexListener(props: {
 }): AppListenerEffect<IndexRequested> {
   const { listPropsParser, metadataCache, vault } = props;
 
-  function getDenormalizedEntries(
+  function createLogEntry(props: {
+    start: string;
+    end?: string;
+    parent: string;
+    id: string;
+  }) {
+    const { start, end, parent, id } = props;
+
+    const parsedStart = strictParse(start);
+
+    const parsedEnd = end
+      ? strictParse(end)
+      : // TODO: P3 bug
+        //  Solution 1: dispatch dayChanged() and update active clocks then; simple & works
+        //  Solution 2: calculate dayKeys for active clocks on the fly in selectActiveClocks selector
+        //  Solution 3: use sorted array instead of buckets
+        window.moment();
+
+    const dayKeys: string[] = getDaysInRange(parsedStart, parsedEnd).map(
+      (day) => day.format(defaultDayFormat),
+    );
+
+    return { start, end, parent, dayKeys, id };
+  }
+
+  function getTaskEntries(
     tasks: Array<TaskCache>,
     contents: string,
     path: string,
   ) {
     return tasks.map((task) => {
-      const listItemText = contents.slice(
-        task.position.start.offset,
-        task.position.end.offset,
-      );
-      const listItemLines = listItemText.split("\n");
-      const firstLine = listItemLines[0];
+      const taskText = getTextAtPosition(contents, task.position);
+      const firstLine = taskText.split("\n")[0];
 
-      isNotVoid(firstLine, "The first line of any list cannot be empty");
+      isNotVoid(
+        firstLine,
+        "Inconsistent metadata cache state: the first line of any list cannot be empty",
+      );
 
       const listItemProps = listPropsParser.getListPropsFromListItem(
         task,
-        listItemText,
+        taskText,
       );
 
       const taskEntryId = createId(path, task.position.start.line);
 
       const logEntries = listItemProps?.parsed.planner?.log?.map(
-        (rawLogEntry, index) => {
-          const { start, end } = rawLogEntry;
-
-          const parsedStart = strictParse(start);
-
-          const parsedEnd = end
-            ? strictParse(end)
-            : // TODO: P3 bug
-              //  Solution 1: dispatch dayChanged() and update active clocks then; simple & works
-              //  Solution 2: calculate dayKeys for active clocks on the fly in selectActiveClocks selector
-              //  Solution 3: use sorted array instead of buckets
-              window.moment();
-
-          const dayKeys: string[] = getDaysInRange(parsedStart, parsedEnd).map(
-            (day) => day.format(defaultDayFormat),
-          );
-
-          return {
-            ...rawLogEntry,
+        ({ start, end }, index) =>
+          createLogEntry({
+            start,
+            end,
             parent: taskEntryId,
-            dayKeys,
             id: createId(taskEntryId, index),
-            text: firstLine,
-          };
-        },
+          }),
       );
 
       return {
@@ -344,7 +358,7 @@ export function createIndexListener(props: {
 
     const contents = await vault.cachedRead(file);
 
-    const denormalizedEntries = getDenormalizedEntries(tasks, contents, path);
+    const denormalizedEntries = getTaskEntries(tasks, contents, path);
 
     return {
       taskEntries: denormalizedEntries.map(({ logEntries, ...rest }) => ({

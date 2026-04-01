@@ -10,6 +10,9 @@ import {
   logEntryToLocalTask,
   selectLogEntriesByDay,
   selectLogEntriesById,
+  selectPlanEntriesByDay,
+  selectPlanEntriesById,
+  selectTaskEntriesById,
 } from "./tracker-slice";
 import type { LogEntry } from "./tracker-slice";
 
@@ -17,24 +20,32 @@ export const selectLogEntriesForDay = createAppSelector(
   [
     selectLogEntriesByDay,
     selectLogEntriesById,
+    selectTaskEntriesById,
     (state, dayKey: string) => dayKey,
     (state, dayKey, currentTime: Moment) => currentTime,
   ],
-  (byDay, byId, dayKey, currentTime) => {
+  (byDay, byId, taskEntriesById, dayKey, currentTime) => {
     const parsedDay = strictParse(dayKey);
     const startOfDay = parsedDay.clone().startOf("day");
     const endOfDay = parsedDay.clone().endOf("day");
     const isDayKeyForToday = parsedDay.isSame(currentTime, "day");
 
-    const uniqueLogEntryKeys = [...new Set(byDay[dayKey])];
+    const uniqueLogEntryIds = [...new Set(byDay[dayKey])];
 
-    const inflatedTimeBlocksWithoutActiveClocks = uniqueLogEntryKeys.map(
-      (logEntryKey) => {
-        const logEntry = byId[logEntryKey];
+    const inflatedTimeBlocksWithoutActiveClocks = uniqueLogEntryIds.map(
+      (logEntryId) => {
+        const logEntry = byId[logEntryId];
 
         isNotVoid(
           logEntry,
-          `Inconsistent store state: expected to find log entry by id ${logEntryKey}`,
+          `Inconsistent store state: expected to find log entry by id ${logEntryId}`,
+        );
+
+        const taskEntry = taskEntriesById[logEntry.parent];
+
+        isNotVoid(
+          taskEntry,
+          `Inconsistent store state: task entry not found for ID: ${logEntryId}`,
         );
 
         const parsedStart = strictParse(logEntry.start);
@@ -46,7 +57,7 @@ export const selectLogEntriesForDay = createAppSelector(
         // todo: use adapter: logEntryToLocalTask
         const timeBlock = {
           id: logEntry.id,
-          text: logEntry.text,
+          text: taskEntry.text,
           startTime: parsedStart,
           symbol: "-",
           durationMinutes: parsedEnd.diff(parsedStart, "minutes"),
@@ -65,6 +76,7 @@ export const selectLogEntriesForDay = createAppSelector(
 
 export const selectRecentClocks = createAppSelector(
   [
+    // todo: use pre-defined ones
     (state) => state.tracker.logEntries.byId,
     (state) => state.tracker.taskEntries.byId,
   ],
@@ -88,5 +100,12 @@ export const selectRecentClocks = createAppSelector(
 
       return logEntryToLocalTask(logEntry, taskEntry);
     });
+  },
+);
+
+export const selectPlanEntriesForDay = createAppSelector(
+  [selectPlanEntriesByDay, selectPlanEntriesById, (state, dayKey) => dayKey],
+  (planEntriesByDay, planEntriesById, dayKey) => {
+    return ["foo"];
   },
 );
