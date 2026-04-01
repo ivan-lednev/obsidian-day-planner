@@ -118,6 +118,7 @@ export default class DayPlanner extends Plugin {
       listPropsParser,
       vault,
       metadataCache,
+      periodicNotes: this.periodicNotes,
     });
 
     this.taskEntryEditor = new TaskEntryEditor(

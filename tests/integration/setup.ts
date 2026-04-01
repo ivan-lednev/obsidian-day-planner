@@ -151,6 +151,7 @@ export async function setUp(props?: {
     listPropsParser,
     vault: vault as unknown as Vault,
     metadataCache,
+    periodicNotes,
   });
 
   inMemoryFiles.forEach(({ path, contents }) => {

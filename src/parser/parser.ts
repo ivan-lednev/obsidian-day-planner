@@ -1,16 +1,9 @@
 import type { Moment } from "moment";
-import { dedent } from "ts-dedent";
 
 import {
   strictTimestampAnywhereInLineRegExp,
   looseTimestampAtStartOfLineRegExp,
 } from "../regexp";
-import type { LocalTask } from "../task-types";
-import {
-  getFirstLine,
-  getLinesAfterFirst,
-  removeListTokens,
-} from "../util/markdown";
 import { getDiffInMinutes } from "../util/moment";
 
 import { parseTimestamp } from "./timestamp";
@@ -79,18 +72,6 @@ export function getTimeFromLine({ line, day }: { line: string; day: Moment }) {
     startTime,
     durationMinutes,
   };
-}
-
-export function getTextForRendering(task: LocalTask) {
-  const isTask = task.status;
-
-  if (isTask) {
-    return `${getFirstLine(task.text)}
-${dedent(getLinesAfterFirst(task.text)).trimStart()}`;
-  }
-
-  return `${removeListTokens(getFirstLine(task.text))}
-${dedent(getLinesAfterFirst(task.text)).trimStart()}`;
 }
 
 export function compareTimestamps(a: string, b: string) {

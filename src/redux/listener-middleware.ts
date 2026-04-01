@@ -19,7 +19,7 @@ import { createIndexListener, indexRequested } from "./tracker/tracker-slice";
 export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
   const {
     extra,
-    extra: { listPropsParser, vault, metadataCache },
+    extra: { listPropsParser, vault, metadataCache, periodicNotes },
   } = props;
 
   const icalParseScheduler =
@@ -51,7 +51,12 @@ export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
 
   listenerMiddleware.startListening({
     actionCreator: indexRequested,
-    effect: createIndexListener({ listPropsParser, vault, metadataCache }),
+    effect: createIndexListener({
+      listPropsParser,
+      vault,
+      metadataCache,
+      periodicNotes,
+    }),
   });
 
   return listenerMiddleware;

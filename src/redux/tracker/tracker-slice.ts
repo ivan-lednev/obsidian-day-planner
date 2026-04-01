@@ -1,5 +1,12 @@
 import { type PayloadAction } from "@reduxjs/toolkit";
-import type { ListItemCache, MetadataCache, Pos, Vault } from "obsidian";
+import type {
+  CachedMetadata,
+  ListItemCache,
+  Loc,
+  MetadataCache,
+  Pos,
+  Vault,
+} from "obsidian";
 import { isNotVoid } from "typed-assert";
 
 import { defaultDayFormat } from "../../constants";
@@ -7,6 +14,11 @@ import type { ListPropsParser } from "../../service/list-props-parser";
 import { getDaysInRange, strictParse } from "../../util/moment";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
+import { PeriodicNotes } from "../../service/periodic-notes";
+import type { DayPlannerSettings } from "../../settings";
+import { getTimeFromLine } from "../../parser/parser";
+import type { Moment } from "moment";
+import { getEndTime } from "../../util/task-utils";
 
 export interface TaskEntry {
   id: string;
@@ -253,22 +265,65 @@ export function createId(...args: (string | number)[]) {
   return args.join(idSeparator);
 }
 
+// todo: move
 type TaskCache = ListItemCache & { task: string };
 
+// todo: Move
 function isTaskCache(listItemCache: ListItemCache): listItemCache is TaskCache {
   return listItemCache.task !== undefined;
 }
 
+// todo: move
 function getTextAtPosition(inputText: string, position: Pos) {
   return inputText.slice(position.start.offset, position.end.offset);
+}
+
+type PartialPos = Omit<Pos, "end"> & { end?: Loc };
+
+function isInside(inner: Pos, outer: PartialPos) {
+  const innerStartIsInside = inner.start.offset >= outer.start.offset;
+
+  if (!outer.end) {
+    return innerStartIsInside;
+  }
+
+  return innerStartIsInside && inner.end.offset <= outer.end.offset;
+}
+
+function getHeadingSectionPosition(cache: CachedMetadata, headingText: string) {
+  const { headings } = cache;
+
+  if (!headings) {
+    return undefined;
+  }
+
+  const targetIndex = headings.findIndex((h) => h.heading === headingText);
+
+  if (targetIndex === -1) {
+    return undefined;
+  }
+
+  const target = headings[targetIndex];
+
+  const nextBoundary = headings
+    .slice(targetIndex + 1)
+    .find((heading) => heading.level <= target.level);
+
+  return {
+    start: target.position.start,
+    end: nextBoundary?.position.start,
+  };
 }
 
 export function createIndexListener(props: {
   listPropsParser: ListPropsParser;
   vault: Vault;
   metadataCache: MetadataCache;
+  periodicNotes: PeriodicNotes;
+  settings: DayPlannerSettings;
 }): AppListenerEffect<IndexRequested> {
-  const { listPropsParser, metadataCache, vault } = props;
+  const { listPropsParser, metadataCache, vault, periodicNotes, settings } =
+    props;
 
   function createLogEntry(props: {
     start: string;
@@ -337,12 +392,67 @@ export function createIndexListener(props: {
     });
   }
 
+  function getRelevantListItemsCache(cache: CachedMetadata) {
+    if (settings.plannerHeading.length === 0) {
+      return cache.listItems;
+    }
+
+    const plannerHeadingSectionPosition = getHeadingSectionPosition(
+      cache,
+      settings.plannerHeading,
+    );
+
+    if (!plannerHeadingSectionPosition) {
+      return [];
+    }
+
+    return cache.listItems?.filter((listItem) =>
+      isInside(listItem.position, plannerHeadingSectionPosition),
+    );
+  }
+
+  function getPlanEntriesFromDailyNote(props: {
+    cache: CachedMetadata;
+    contents: string;
+    path: string;
+    date: Moment;
+  }) {
+    const { cache, contents, path, date } = props;
+
+    const relevantListItemsCache = getRelevantListItemsCache(cache)?.map(
+      (listItem) => {
+        const listItemText = getTextAtPosition(contents, listItem.position);
+        const firstLine = listItemText.split("\n")[0];
+
+        const time = getTimeFromLine({
+          line: firstLine,
+          day: date,
+        });
+
+        if (!time) {
+          return undefined;
+        }
+
+        const { startTime, durationMinutes } = time;
+
+        return {
+          start: startTime,
+          end: getEndTime({
+            startTime,
+            durationMinutes: durationMinutes ? durationMinutes : 30,
+          }),
+        };
+      },
+    );
+  }
+
   async function indexFile(path: string) {
     const cache = metadataCache.getCache(path);
 
+    // todo: we don't need this
     const tasks = cache?.listItems?.filter(isTaskCache);
 
-    if (!tasks) {
+    if (!tasks || !cache) {
       return {
         taskEntries: [],
         logEntries: [],
@@ -359,6 +469,17 @@ export function createIndexListener(props: {
     const contents = await vault.cachedRead(file);
 
     const denormalizedEntries = getTaskEntries(tasks, contents, path);
+
+    const dateFromPath = periodicNotes.getDateFromPath(path, "day");
+
+    if (dateFromPath) {
+      const planEntries = getPlanEntriesFromDailyNote({
+        cache,
+        contents,
+        path,
+        date: dateFromPath,
+      });
+    }
 
     return {
       taskEntries: denormalizedEntries.map(({ logEntries, ...rest }) => ({

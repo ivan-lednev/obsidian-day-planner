@@ -23,6 +23,7 @@ import { selectDataviewSource, settingsSlice } from "./settings-slice";
 import { trackerSlice } from "./tracker/tracker-slice";
 import { useActionDispatched } from "./use-action-dispatched";
 import { createUseSelector, createUseSelectorV2 } from "./use-selector";
+import type { PeriodicNotes } from "../service/periodic-notes";
 
 const rootReducer = combineSlices(
   globalSlice,
@@ -56,14 +57,22 @@ export function createReactor(props: {
   listPropsParser: ListPropsParser;
   vault: Vault;
   metadataCache: MetadataCache;
+  periodicNotes: PeriodicNotes;
 }) {
-  const { preloadedState = {}, listPropsParser, vault, metadataCache } = props;
+  const {
+    preloadedState = {},
+    listPropsParser,
+    vault,
+    metadataCache,
+    periodicNotes,
+  } = props;
 
   const listenerMiddleware = initListenerMiddleware({
     extra: {
       listPropsParser,
       vault,
       metadataCache,
+      periodicNotes,
     },
   });
 

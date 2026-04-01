@@ -56,6 +56,10 @@ export class PeriodicNotes {
 
     return normalizePath(join(folder, filename));
   }
+
+  isDailyNotePath(path: string) {
+    return this.getDateFromPath(path, "day") !== null;
+  }
 }
 
 // Copied from obsidian-daily-notes-interface

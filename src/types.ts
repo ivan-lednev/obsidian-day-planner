@@ -88,4 +88,5 @@ export type ReduxExtraArgument = {
   listPropsParser: ListPropsParser;
   vault: Vault;
   metadataCache: MetadataCache;
+  periodicNotes: PeriodicNotes;
 };

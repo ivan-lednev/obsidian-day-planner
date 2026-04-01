@@ -13,7 +13,12 @@ import { initListenerMiddleware } from "../../src/redux/listener-middleware";
 import { makeStore, type RootState } from "../../src/redux/store";
 import { ListPropsParser } from "../../src/service/list-props-parser";
 import { defaultSettingsForTests } from "../../src/settings";
-import { FakeMetadataCache, InMemoryVault } from "../test-utils";
+import {
+  FakeMetadataCache,
+  FakePeriodicNotes,
+  InMemoryVault,
+} from "../test-utils";
+import type { PeriodicNotes } from "../../src/service/periodic-notes";
 
 vi.mock("obsidian", () => ({
   request: vi.fn(),
@@ -66,12 +71,14 @@ function makeStoreForTests(props?: { preloadedState?: Partial<RootState> }) {
 
   const inMemoryVault = new InMemoryVault([]) as unknown as Vault;
   const metadataCache = new FakeMetadataCache({}) as unknown as MetadataCache;
+  const periodicNotes = new FakePeriodicNotes([]) as unknown as PeriodicNotes;
 
   const listenerMiddleware = initListenerMiddleware({
     extra: {
       listPropsParser: new ListPropsParser(inMemoryVault, metadataCache),
       vault: inMemoryVault,
       metadataCache,
+      periodicNotes,
     },
   });
 
