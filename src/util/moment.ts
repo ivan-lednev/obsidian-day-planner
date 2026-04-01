@@ -3,6 +3,8 @@ import { isExactly } from "typed-assert";
 
 import type { DayPlannerSettings } from "../settings";
 import type { RelationToNow } from "../types";
+import { defaultDayFormat } from "../constants";
+import { getDayKey } from "./task-utils";
 
 const moment = window.moment;
 
@@ -129,7 +131,7 @@ export function isTrue(value: boolean, message?: string) {
   isExactly(value, true, message);
 }
 
-export function getDaysInRange(start: Moment, end: Moment) {
+function getDaysInRange(start: Moment, end: Moment) {
   isTrue(
     end.isSameOrAfter(start),
     `End moment must be the same or after start moment. Received: ${JSON.stringify({ start, end })}`,
@@ -146,6 +148,10 @@ export function getDaysInRange(start: Moment, end: Moment) {
   }
 
   return result;
+}
+
+export function getDayKeysInRange(start: Moment, end: Moment) {
+  return getDaysInRange(start, end).map(getDayKey);
 }
 
 export function strictParse(value: string) {

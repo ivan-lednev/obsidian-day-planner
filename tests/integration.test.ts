@@ -196,10 +196,20 @@ describe("Log Records with indexes", () => {
     });
   });
 
-  test("Stores tasks from daily notes", async () => {
+  test("Stores tasks from daily notes basing their start time on daily note path", async () => {
     const { getState } = await setUp();
 
-    expect(selectPlanEntriesForDay(getState(), "2025-07-28")).toHaveLength(1);
+    expect(selectPlanEntriesForDay(getState(), "2025-07-28")).toMatchObject([
+      {
+        text: expect.stringContaining("Before"),
+      },
+      {
+        text: expect.stringContaining("Parent"),
+      },
+      {
+        text: expect.stringContaining("After"),
+      },
+    ]);
   });
 
   test.todo("Stores tasks from obsidian-tasks (scheduled)");

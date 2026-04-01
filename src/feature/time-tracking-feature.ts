@@ -11,7 +11,7 @@ import type { AppDispatch } from "../redux/store";
 import { fileDeleted, indexRequested } from "../redux/tracker/tracker-slice";
 
 export class TimeTrackingFeature {
-  private static readonly INITIAL_LOAD_CHUNK_SIZE = 100;
+  private static readonly INITIAL_LOAD_CHUNK_SIZE = 20;
 
   constructor(
     private readonly plugin: DayPlanner,

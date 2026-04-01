@@ -9,16 +9,15 @@ import type {
 } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
-import { defaultDayFormat } from "../../constants";
+import { clockFormat } from "../../constants";
 import type { ListPropsParser } from "../../service/list-props-parser";
-import { getDaysInRange, strictParse } from "../../util/moment";
+import { getDayKeysInRange, strictParse } from "../../util/moment";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
-import { PeriodicNotes } from "../../service/periodic-notes";
+import type { PeriodicNotes } from "../../service/periodic-notes";
 import type { DayPlannerSettings } from "../../settings";
 import { getTimeFromLine } from "../../parser/parser";
-import type { Moment } from "moment";
-import { getEndTime } from "../../util/task-utils";
+import { getDayKey, getEndTime } from "../../util/task-utils";
 
 export interface TaskEntry {
   id: string;
@@ -27,6 +26,7 @@ export interface TaskEntry {
   propsPosition?: Pos;
   path: string;
   logEntries?: string[];
+  planEntries?: string[];
 }
 
 export interface LogEntry {
@@ -81,6 +81,7 @@ interface FileIndex {
   path: string;
   taskEntries?: TaskEntry[];
   logEntries?: LogEntry[];
+  planEntries?: PlanEntry[];
 }
 
 interface FileDeletedPayload {
@@ -131,6 +132,32 @@ export const trackerSlice = createAppSlice({
         });
 
         delete state.logEntries.byPath[path];
+
+        // todo: copy pasta
+        const planEntryIds = state.planEntries.byPath[path] || [];
+
+        planEntryIds.forEach((id) => {
+          const planEntry = state.planEntries.byId[id];
+
+          isNotVoid(planEntry, "Inconsistent store state");
+
+          planEntry.dayKeys.forEach((dayKey) => {
+            isNotVoid(
+              state.planEntries.byDay[dayKey],
+              "Inconsistent store state",
+            );
+
+            state.planEntries.byDay[dayKey] = state.planEntries.byDay[
+              dayKey
+            ].filter((it) => it !== id);
+          });
+        });
+
+        planEntryIds.forEach((id) => {
+          delete state.planEntries.byId[id];
+        });
+
+        delete state.planEntries.byPath[path];
       },
     ),
     filesIndexed: create.reducer(
@@ -138,7 +165,12 @@ export const trackerSlice = createAppSlice({
         const fileIndexes = action.payload;
 
         fileIndexes.forEach((fileIndex) => {
-          const { path, taskEntries = [], logEntries = [] } = fileIndex;
+          const {
+            path,
+            taskEntries = [],
+            logEntries = [],
+            planEntries = [],
+          } = fileIndex;
 
           // todo: repeat for logEntries
           const previousTaskEntryIds = state.taskEntries.byPath[path] || [];
@@ -187,6 +219,43 @@ export const trackerSlice = createAppSlice({
           logEntries.forEach((logEntry) => {
             logEntry.dayKeys.forEach((dayKey) => {
               (state.logEntries.byDay[dayKey] ??= []).push(logEntry.id);
+            });
+          });
+
+          // todo: copy pasta
+
+          const previousPlanEntryIds = state.planEntries.byPath[path] || [];
+
+          previousPlanEntryIds.forEach((id) => {
+            const planEntry = state.planEntries.byId[id];
+
+            isNotVoid(planEntry, "Inconsistent store state");
+
+            planEntry.dayKeys.forEach((dayKey) => {
+              isNotVoid(
+                state.planEntries.byDay[dayKey],
+                "Inconsistent store state",
+              );
+
+              state.planEntries.byDay[dayKey] = state.planEntries.byDay[
+                dayKey
+              ].filter((it) => it !== id);
+            });
+          });
+
+          previousPlanEntryIds.forEach((id) => {
+            delete state.planEntries.byId[id];
+          });
+
+          state.planEntries.byPath[path] = planEntries.map((it) => it.id);
+
+          planEntries.forEach((it) => {
+            state.planEntries.byId[it.id] = it;
+          });
+
+          planEntries.forEach((logEntry) => {
+            logEntry.dayKeys.forEach((dayKey) => {
+              (state.planEntries.byDay[dayKey] ??= []).push(logEntry.id);
             });
           });
         });
@@ -343,119 +412,128 @@ export function createIndexListener(props: {
         //  Solution 3: use sorted array instead of buckets
         window.moment();
 
-    const dayKeys: string[] = getDaysInRange(parsedStart, parsedEnd).map(
-      (day) => day.format(defaultDayFormat),
-    );
+    const dayKeys: string[] = getDayKeysInRange(parsedStart, parsedEnd);
 
     return { start, end, parent, dayKeys, id };
   }
 
-  function getTaskEntries(
-    tasks: Array<TaskCache>,
+  function isInsideDailyNoteParseScope(
+    position: Pos,
+    plannerHeadingSectionPosition?: PartialPos,
+  ) {
+    const shouldScanAllDailyNote = settings.plannerHeading.length === 0;
+
+    if (shouldScanAllDailyNote) {
+      return true;
+    }
+
+    return (
+      plannerHeadingSectionPosition &&
+      isInside(position, plannerHeadingSectionPosition)
+    );
+  }
+
+  function getListItemEntries(
+    cache: CachedMetadata,
     contents: string,
     path: string,
   ) {
-    return tasks.map((task) => {
-      const taskText = getTextAtPosition(contents, task.position);
-      const firstLine = taskText.split("\n")[0];
-
-      isNotVoid(
-        firstLine,
-        "Inconsistent metadata cache state: the first line of any list cannot be empty",
-      );
-
-      const listItemProps = listPropsParser.getListPropsFromListItem(
-        task,
-        taskText,
-      );
-
-      const taskEntryId = createId(path, task.position.start.line);
-
-      const logEntries = listItemProps?.parsed.planner?.log?.map(
-        ({ start, end }, index) =>
-          createLogEntry({
-            start,
-            end,
-            parent: taskEntryId,
-            id: createId(taskEntryId, index),
-          }),
-      );
-
-      return {
-        id: taskEntryId,
-        text: firstLine,
-        position: task.position,
-        propsPosition: listItemProps?.position,
-        path,
-        logEntries,
-      };
-    });
-  }
-
-  function getRelevantListItemsCache(cache: CachedMetadata) {
-    if (settings.plannerHeading.length === 0) {
-      return cache.listItems;
-    }
-
+    const dateFromPath = periodicNotes.getDateFromPath(path, "day");
     const plannerHeadingSectionPosition = getHeadingSectionPosition(
       cache,
       settings.plannerHeading,
     );
 
-    if (!plannerHeadingSectionPosition) {
-      return [];
-    }
-
-    return cache.listItems?.filter((listItem) =>
-      isInside(listItem.position, plannerHeadingSectionPosition),
-    );
-  }
-
-  function getPlanEntriesFromDailyNote(props: {
-    cache: CachedMetadata;
-    contents: string;
-    path: string;
-    date: Moment;
-  }) {
-    const { cache, contents, path, date } = props;
-
-    const relevantListItemsCache = getRelevantListItemsCache(cache)?.map(
-      (listItem) => {
-        const listItemText = getTextAtPosition(contents, listItem.position);
+    return (
+      cache.listItems?.map((listItemCache) => {
+        const listItemText = getTextAtPosition(
+          contents,
+          listItemCache.position,
+        );
         const firstLine = listItemText.split("\n")[0];
 
-        const time = getTimeFromLine({
-          line: firstLine,
-          day: date,
-        });
+        isNotVoid(
+          firstLine,
+          "Inconsistent metadata cache state: the first line of any list cannot be empty",
+        );
 
-        if (!time) {
-          return undefined;
+        const taskEntryId = createId(path, listItemCache.position.start.line);
+
+        // todo: DenormalizedTaskEntry
+        const result: Omit<TaskEntry, "logEntries" | "planEntries"> & {
+          logEntries: LogEntry[];
+          planEntries: PlanEntry[];
+        } = {
+          id: taskEntryId,
+          text: firstLine,
+          position: listItemCache.position,
+          path,
+          logEntries: [],
+          planEntries: [],
+        };
+
+        if (
+          dateFromPath &&
+          isInsideDailyNoteParseScope(
+            listItemCache.position,
+            plannerHeadingSectionPosition,
+          )
+        ) {
+          const time = getTimeFromLine({
+            line: firstLine,
+            day: dateFromPath,
+          });
+
+          // todo: this is an all-day task/bullet. Skip only if it's a bullet list
+          if (time) {
+            const { startTime, durationMinutes } = time;
+            const endTime = getEndTime({
+              startTime,
+              durationMinutes:
+                durationMinutes ?? settings.defaultDurationMinutes,
+            });
+
+            result.planEntries.push({
+              parent: taskEntryId,
+              id: createId(taskEntryId, "daily"),
+              start: startTime.format(clockFormat),
+              end: endTime.format(clockFormat),
+              dayKeys: [getDayKey(dateFromPath)],
+            });
+          }
         }
 
-        const { startTime, durationMinutes } = time;
+        if (isTaskCache(listItemCache)) {
+          const listItemProps = listPropsParser.getListPropsFromListItem(
+            listItemCache,
+            listItemText,
+          );
 
-        return {
-          start: startTime,
-          end: getEndTime({
-            startTime,
-            durationMinutes: durationMinutes ? durationMinutes : 30,
-          }),
-        };
-      },
+          result.propsPosition = listItemProps?.position;
+          result.logEntries =
+            listItemProps?.parsed.planner?.log?.map(({ start, end }, index) =>
+              createLogEntry({
+                start,
+                end,
+                parent: taskEntryId,
+                id: createId(taskEntryId, index),
+              }),
+            ) || [];
+        }
+
+        return result;
+      }) || []
     );
   }
 
   async function indexFile(path: string) {
     const cache = metadataCache.getCache(path);
 
-    // todo: we don't need this
-    const tasks = cache?.listItems?.filter(isTaskCache);
-
-    if (!tasks || !cache) {
+    if (!cache?.listItems) {
       return {
         taskEntries: [],
         logEntries: [],
+        planEntries: [],
       };
     }
 
@@ -468,25 +546,19 @@ export function createIndexListener(props: {
 
     const contents = await vault.cachedRead(file);
 
-    const denormalizedEntries = getTaskEntries(tasks, contents, path);
-
-    const dateFromPath = periodicNotes.getDateFromPath(path, "day");
-
-    if (dateFromPath) {
-      const planEntries = getPlanEntriesFromDailyNote({
-        cache,
-        contents,
-        path,
-        date: dateFromPath,
-      });
-    }
+    // todo: fix
+    const denormalizedEntries = getListItemEntries(cache, contents, path);
 
     return {
-      taskEntries: denormalizedEntries.map(({ logEntries, ...rest }) => ({
-        logEntries: logEntries?.map((it) => it.id),
-        ...rest,
-      })),
+      taskEntries: denormalizedEntries?.map(
+        ({ logEntries, planEntries, ...rest }) => ({
+          logEntries: logEntries?.map((it) => it.id),
+          planEntries: planEntries?.map((it) => it.id),
+          ...rest,
+        }),
+      ),
       logEntries: denormalizedEntries.flatMap((it) => it.logEntries || []),
+      planEntries: denormalizedEntries.flatMap((it) => it.planEntries || []),
     };
   }
 

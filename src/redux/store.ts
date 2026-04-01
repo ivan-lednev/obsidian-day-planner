@@ -24,6 +24,7 @@ import { trackerSlice } from "./tracker/tracker-slice";
 import { useActionDispatched } from "./use-action-dispatched";
 import { createUseSelector, createUseSelectorV2 } from "./use-selector";
 import type { PeriodicNotes } from "../service/periodic-notes";
+import type { DayPlannerSettings } from "../settings";
 
 const rootReducer = combineSlices(
   globalSlice,
@@ -58,6 +59,7 @@ export function createReactor(props: {
   vault: Vault;
   metadataCache: MetadataCache;
   periodicNotes: PeriodicNotes;
+  settings: DayPlannerSettings;
 }) {
   const {
     preloadedState = {},
@@ -65,6 +67,7 @@ export function createReactor(props: {
     vault,
     metadataCache,
     periodicNotes,
+    settings,
   } = props;
 
   const listenerMiddleware = initListenerMiddleware({
@@ -73,6 +76,7 @@ export function createReactor(props: {
       vault,
       metadataCache,
       periodicNotes,
+      settings,
     },
   });
 

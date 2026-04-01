@@ -85,6 +85,7 @@ export type WithIcalConfig<T> = T & { calendar: IcalConfig };
 export type DateRange = Writable<Moment[]> & { untrack: () => void };
 
 export type ReduxExtraArgument = {
+  settings: DayPlannerSettings;
   listPropsParser: ListPropsParser;
   vault: Vault;
   metadataCache: MetadataCache;

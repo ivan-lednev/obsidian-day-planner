@@ -79,6 +79,7 @@ function makeStoreForTests(props?: { preloadedState?: Partial<RootState> }) {
       vault: inMemoryVault,
       metadataCache,
       periodicNotes,
+      settings: defaultSettingsForTests,
     },
   });
 

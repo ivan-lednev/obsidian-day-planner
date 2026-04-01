@@ -104,8 +104,27 @@ export const selectRecentClocks = createAppSelector(
 );
 
 export const selectPlanEntriesForDay = createAppSelector(
-  [selectPlanEntriesByDay, selectPlanEntriesById, (state, dayKey) => dayKey],
-  (planEntriesByDay, planEntriesById, dayKey) => {
-    return ["foo"];
+  [
+    selectPlanEntriesByDay,
+    selectPlanEntriesById,
+    selectTaskEntriesById,
+    (state, dayKey) => dayKey,
+  ],
+  (planEntriesByDay, planEntriesById, taskEntriesById, dayKey) => {
+    const ids = planEntriesByDay[dayKey];
+
+    return (
+      ids?.map((id) => {
+        const planEntry = planEntriesById[id];
+
+        isNotVoid(planEntry, "Inconsistent index state");
+
+        const taskEntry = taskEntriesById[planEntry.parent];
+
+        isNotVoid(taskEntry, "Inconsistent index state");
+
+        return logEntryToLocalTask(planEntry, taskEntry);
+      }) || []
+    );
   },
 );

@@ -152,6 +152,7 @@ export async function setUp(props?: {
     vault: vault as unknown as Vault,
     metadataCache,
     periodicNotes,
+    settings: defaultSettingsForTests,
   });
 
   inMemoryFiles.forEach(({ path, contents }) => {
