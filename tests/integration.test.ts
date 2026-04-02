@@ -207,7 +207,23 @@ describe("Log Records with indexes", () => {
         text: expect.stringContaining("Parent"),
       },
       {
+        text: expect.stringContaining("Child"),
+      },
+      {
         text: expect.stringContaining("After"),
+      },
+    ]);
+  });
+
+  test("Stores list items from daily notes basing their start time on daily note path", async () => {
+    const { getState } = await setUp();
+
+    expect(selectPlanEntriesForDay(getState(), "2025-07-19")).toMatchObject([
+      {
+        text: expect.stringContaining("List item under planner heading"),
+      },
+      {
+        text: expect.stringContaining("Task"),
       },
     ]);
   });

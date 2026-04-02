@@ -12,6 +12,8 @@ import type { MetadataCache, Vault } from "obsidian";
 import { derived, writable } from "svelte/store";
 
 import type { ListPropsParser } from "../service/list-props-parser";
+import type { PeriodicNotes } from "../service/periodic-notes";
+import type { DayPlannerSettings } from "../settings";
 import type { PointerDateTime, ReduxExtraArgument } from "../types";
 import { getUpdateTrigger } from "../util/store";
 
@@ -23,8 +25,6 @@ import { selectDataviewSource, settingsSlice } from "./settings-slice";
 import { trackerSlice } from "./tracker/tracker-slice";
 import { useActionDispatched } from "./use-action-dispatched";
 import { createUseSelector, createUseSelectorV2 } from "./use-selector";
-import type { PeriodicNotes } from "../service/periodic-notes";
-import type { DayPlannerSettings } from "../settings";
 
 const rootReducer = combineSlices(
   globalSlice,

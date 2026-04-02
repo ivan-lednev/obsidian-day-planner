@@ -10,14 +10,14 @@ import type {
 import { isNotVoid } from "typed-assert";
 
 import { clockFormat } from "../../constants";
+import { getTimeFromLine } from "../../parser/parser";
 import type { ListPropsParser } from "../../service/list-props-parser";
-import { getDayKeysInRange, strictParse } from "../../util/moment";
-import { createAppSlice } from "../create-app-slice";
-import type { AppListenerEffect } from "../store";
 import type { PeriodicNotes } from "../../service/periodic-notes";
 import type { DayPlannerSettings } from "../../settings";
-import { getTimeFromLine } from "../../parser/parser";
+import { getDayKeysInRange, strictParse } from "../../util/moment";
 import { getDayKey, getEndTime } from "../../util/task-utils";
+import { createAppSlice } from "../create-app-slice";
+import type { AppListenerEffect } from "../store";
 
 export interface TaskEntry {
   id: string;
@@ -28,6 +28,11 @@ export interface TaskEntry {
   logEntries?: string[];
   planEntries?: string[];
 }
+
+type DenormalizedTaskEntry = Omit<TaskEntry, "logEntries" | "planEntries"> & {
+  logEntries: LogEntry[];
+  planEntries: PlanEntry[];
+};
 
 export interface LogEntry {
   start: string;
@@ -417,6 +422,7 @@ export function createIndexListener(props: {
     return { start, end, parent, dayKeys, id };
   }
 
+  // todo: move out
   function isInsideDailyNoteParseScope(
     position: Pos,
     plannerHeadingSectionPosition?: PartialPos,
@@ -459,11 +465,7 @@ export function createIndexListener(props: {
 
         const taskEntryId = createId(path, listItemCache.position.start.line);
 
-        // todo: DenormalizedTaskEntry
-        const result: Omit<TaskEntry, "logEntries" | "planEntries"> & {
-          logEntries: LogEntry[];
-          planEntries: PlanEntry[];
-        } = {
+        const listItemEntry: DenormalizedTaskEntry = {
           id: taskEntryId,
           text: firstLine,
           position: listItemCache.position,
@@ -483,8 +485,9 @@ export function createIndexListener(props: {
             line: firstLine,
             day: dateFromPath,
           });
+          const id = createId(taskEntryId, "daily");
+          const dayKeys = [getDayKey(dateFromPath)];
 
-          // todo: this is an all-day task/bullet. Skip only if it's a bullet list
           if (time) {
             const { startTime, durationMinutes } = time;
             const endTime = getEndTime({
@@ -493,12 +496,22 @@ export function createIndexListener(props: {
                 durationMinutes ?? settings.defaultDurationMinutes,
             });
 
-            result.planEntries.push({
+            listItemEntry.planEntries.push({
+              id,
+              dayKeys,
               parent: taskEntryId,
-              id: createId(taskEntryId, "daily"),
               start: startTime.format(clockFormat),
               end: endTime.format(clockFormat),
-              dayKeys: [getDayKey(dateFromPath)],
+            });
+          } else if (isTaskCache(listItemCache)) {
+            listItemEntry.planEntries.push({
+              id,
+              dayKeys,
+              parent: taskEntryId,
+              start: dateFromPath.format(clockFormat),
+              // todo: this is not needed
+              end: dateFromPath.clone().add(1, "hour").format(clockFormat),
+              isAllDay: true,
             });
           }
         }
@@ -509,8 +522,8 @@ export function createIndexListener(props: {
             listItemText,
           );
 
-          result.propsPosition = listItemProps?.position;
-          result.logEntries =
+          listItemEntry.propsPosition = listItemProps?.position;
+          listItemEntry.logEntries =
             listItemProps?.parsed.planner?.log?.map(({ start, end }, index) =>
               createLogEntry({
                 start,
@@ -521,7 +534,7 @@ export function createIndexListener(props: {
             ) || [];
         }
 
-        return result;
+        return listItemEntry;
       }) || []
     );
   }

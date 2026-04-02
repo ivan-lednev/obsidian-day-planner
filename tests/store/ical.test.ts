@@ -12,13 +12,13 @@ import {
 import { initListenerMiddleware } from "../../src/redux/listener-middleware";
 import { makeStore, type RootState } from "../../src/redux/store";
 import { ListPropsParser } from "../../src/service/list-props-parser";
+import type { PeriodicNotes } from "../../src/service/periodic-notes";
 import { defaultSettingsForTests } from "../../src/settings";
 import {
   FakeMetadataCache,
   FakePeriodicNotes,
   InMemoryVault,
 } from "../test-utils";
-import type { PeriodicNotes } from "../../src/service/periodic-notes";
 
 vi.mock("obsidian", () => ({
   request: vi.fn(),
