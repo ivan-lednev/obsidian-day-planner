@@ -61,12 +61,12 @@ interface IndexSliceState {
   logEntries: {
     byId: Record<string, LogEntry>;
     byPath: Record<string, string[]>;
-    byDay: Record<string, string[]>;
+    byDay: Record<string, Record<string, true>>;
   };
   planEntries: {
     byId: Record<string, LogEntry>;
     byPath: Record<string, string[]>;
-    byDay: Record<string, string[]>;
+    byDay: Record<string, Record<string, true>>;
   };
 }
 
@@ -128,9 +128,7 @@ export const trackerSlice = createAppSlice({
               "Inconsistent store state",
             );
 
-            state.logEntries.byDay[dayKey] = state.logEntries.byDay[
-              dayKey
-            ].filter((it) => it !== id);
+            delete state.logEntries.byDay[dayKey]?.[id];
           });
         });
 
@@ -154,9 +152,7 @@ export const trackerSlice = createAppSlice({
               "Inconsistent store state",
             );
 
-            state.planEntries.byDay[dayKey] = state.planEntries.byDay[
-              dayKey
-            ].filter((it) => it !== id);
+            delete state.planEntries.byDay[dayKey]?.[id];
           });
         });
 
@@ -206,9 +202,7 @@ export const trackerSlice = createAppSlice({
                 "Inconsistent store state",
               );
 
-              state.logEntries.byDay[dayKey] = state.logEntries.byDay[
-                dayKey
-              ].filter((it) => it !== id);
+              delete state.logEntries.byDay[dayKey]?.[id];
             });
           });
 
@@ -225,7 +219,7 @@ export const trackerSlice = createAppSlice({
 
           logEntries.forEach((logEntry) => {
             logEntry.dayKeys.forEach((dayKey) => {
-              (state.logEntries.byDay[dayKey] ??= []).push(logEntry.id);
+              (state.logEntries.byDay[dayKey] ??= {})[logEntry.id] = true;
             });
           });
 
@@ -244,9 +238,7 @@ export const trackerSlice = createAppSlice({
                 "Inconsistent store state",
               );
 
-              state.planEntries.byDay[dayKey] = state.planEntries.byDay[
-                dayKey
-              ].filter((it) => it !== id);
+              delete state.planEntries.byDay[dayKey]?.[id];
             });
           });
 
@@ -262,7 +254,7 @@ export const trackerSlice = createAppSlice({
 
           planEntries.forEach((logEntry) => {
             logEntry.dayKeys.forEach((dayKey) => {
-              (state.planEntries.byDay[dayKey] ??= []).push(logEntry.id);
+              (state.planEntries.byDay[dayKey] ??= {})[logEntry.id] = true;
             });
           });
         });
@@ -526,98 +518,108 @@ export function createIndexListener(props: {
     );
 
     return (
-      cache.listItems?.map((listItemCache) => {
-        const listItemText = getTextAtPosition(
-          contents,
-          listItemCache.position,
-        );
-        const firstLine = listItemText.split("\n")[0];
-
-        isNotVoid(
-          firstLine,
-          "Inconsistent metadata cache state: the first line of any list cannot be empty",
-        );
-
-        const taskEntryId = createId(path, listItemCache.position.start.line);
-
-        const listItemEntry: DenormalizedTaskEntry = {
-          id: taskEntryId,
-          text: firstLine,
-          position: listItemCache.position,
-          path,
-          logEntries: [],
-          planEntries: [],
-        };
-
-        if (
-          dateFromPath &&
-          isInsideDailyNoteParseScope(
+      cache.listItems?.reduce<DenormalizedTaskEntry[]>(
+        (result, listItemCache) => {
+          const listItemText = getTextAtPosition(
+            contents,
             listItemCache.position,
-            plannerHeadingSectionPosition,
-          )
-        ) {
-          const time = getTimeFromLine({
-            line: firstLine,
-            day: dateFromPath,
-          });
-          const id = createId(taskEntryId, "daily");
-          const dayKeys = [getDayKey(dateFromPath)];
+          );
+          const firstLine = listItemText.split("\n")[0];
 
-          if (time) {
-            const { startTime, durationMinutes } = time;
-            const endTime = getEndTime({
-              startTime,
-              durationMinutes:
-                durationMinutes ?? settings.defaultDurationMinutes,
-            });
-
-            listItemEntry.planEntries.push({
-              id,
-              dayKeys,
-              parent: taskEntryId,
-              start: startTime.format(clockFormat),
-              end: endTime.format(clockFormat),
-            });
-          } else if (isTaskCache(listItemCache)) {
-            listItemEntry.planEntries.push({
-              id,
-              dayKeys,
-              parent: taskEntryId,
-              start: dateFromPath.format(clockFormat),
-              // todo: this is not needed
-              end: dateFromPath.clone().add(1, "hour").format(clockFormat),
-              isAllDay: true,
-            });
-          }
-        }
-
-        if (isTaskCache(listItemCache)) {
-          const obsidianTasksEntries = getObsidianTasksEntries({
+          isNotVoid(
             firstLine,
-            parentId: taskEntryId,
-          });
-
-          listItemEntry.planEntries.push(...obsidianTasksEntries);
-
-          const listItemProps = listPropsParser.getListPropsFromListItem(
-            listItemCache,
-            listItemText,
+            "Inconsistent metadata cache state: the first line of any list cannot be empty",
           );
 
-          listItemEntry.propsPosition = listItemProps?.position;
-          listItemEntry.logEntries =
-            listItemProps?.parsed.planner?.log?.map(({ start, end }, index) =>
-              createLogEntry({
-                start,
-                end,
-                parent: taskEntryId,
-                id: createId(taskEntryId, index),
-              }),
-            ) || [];
-        }
+          const taskEntryId = createId(path, listItemCache.position.start.line);
 
-        return listItemEntry;
-      }) || []
+          const listItemEntry: DenormalizedTaskEntry = {
+            id: taskEntryId,
+            text: firstLine,
+            position: listItemCache.position,
+            path,
+            logEntries: [],
+            planEntries: [],
+          };
+
+          if (
+            dateFromPath &&
+            isInsideDailyNoteParseScope(
+              listItemCache.position,
+              plannerHeadingSectionPosition,
+            )
+          ) {
+            const time = getTimeFromLine({
+              line: firstLine,
+              day: dateFromPath,
+            });
+            const id = createId(taskEntryId, "daily");
+            const dayKeys = [getDayKey(dateFromPath)];
+
+            if (time) {
+              const { startTime, durationMinutes } = time;
+              const endTime = getEndTime({
+                startTime,
+                durationMinutes:
+                  durationMinutes ?? settings.defaultDurationMinutes,
+              });
+
+              listItemEntry.planEntries.push({
+                id,
+                dayKeys,
+                parent: taskEntryId,
+                start: startTime.format(clockFormat),
+                end: endTime.format(clockFormat),
+              });
+            } else if (isTaskCache(listItemCache)) {
+              listItemEntry.planEntries.push({
+                id,
+                dayKeys,
+                parent: taskEntryId,
+                start: dateFromPath.format(clockFormat),
+                // todo: this is not needed
+                end: dateFromPath.clone().add(1, "hour").format(clockFormat),
+                isAllDay: true,
+              });
+            }
+          }
+
+          if (isTaskCache(listItemCache)) {
+            const obsidianTasksEntries = getObsidianTasksEntries({
+              firstLine,
+              parentId: taskEntryId,
+            });
+
+            listItemEntry.planEntries.push(...obsidianTasksEntries);
+
+            const listItemProps = listPropsParser.getListPropsFromListItem(
+              listItemCache,
+              listItemText,
+            );
+
+            listItemEntry.propsPosition = listItemProps?.position;
+            listItemEntry.logEntries =
+              listItemProps?.parsed.planner?.log?.map(({ start, end }, index) =>
+                createLogEntry({
+                  start,
+                  end,
+                  parent: taskEntryId,
+                  id: createId(taskEntryId, index),
+                }),
+              ) || [];
+          }
+
+          if (
+            listItemEntry.planEntries.length > 0 ||
+            listItemEntry.logEntries.length > 0
+          ) {
+            result.push(listItemEntry);
+          }
+
+          return result;
+        },
+        [],
+      ) || []
     );
   }
 
@@ -625,11 +627,7 @@ export function createIndexListener(props: {
     const cache = metadataCache.getCache(path);
 
     if (!cache?.listItems) {
-      return {
-        taskEntries: [],
-        logEntries: [],
-        planEntries: [],
-      };
+      return undefined;
     }
 
     const file = vault.getFileByPath(path);
@@ -664,15 +662,17 @@ export function createIndexListener(props: {
       try {
         const normalizedEntries = await indexFile(path);
 
-        return {
-          path,
-          ...normalizedEntries,
-        };
+        if (normalizedEntries) {
+          return {
+            path,
+            ...normalizedEntries,
+          };
+        }
       } catch (error) {
         console.error(error);
-
-        return undefined;
       }
+
+      return undefined;
     });
 
     const resolved = (await Promise.all(normalizedEntriesForPaths)).filter(

@@ -83,7 +83,10 @@ export function createReactor(props: {
   const store = makeStore({
     preloadedState,
     middleware: (getDefaultMiddleware) => {
-      return getDefaultMiddleware().concat(listenerMiddleware.middleware);
+      return getDefaultMiddleware({
+        serializableCheck: false,
+        immutableCheck: false,
+      }).concat(listenerMiddleware.middleware);
     },
   });
 
