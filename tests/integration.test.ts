@@ -239,9 +239,11 @@ describe("Log Records with indexes", () => {
       expect.arrayContaining([
         expect.objectContaining({
           text: expect.stringContaining("Task with time"),
+          startTime: window.moment("2025-07-19 10:00"),
         }),
         expect.objectContaining({
           text: expect.stringContaining("Task without time"),
+          isAllDayEvent: true,
         }),
       ]),
     );

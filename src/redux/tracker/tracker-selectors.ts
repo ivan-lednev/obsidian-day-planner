@@ -7,7 +7,7 @@ import { clamp } from "../../util/task-utils";
 import { createAppSelector } from "../create-app-selector";
 
 import {
-  logEntryToLocalTask,
+  planEntryToLocalTask,
   selectLogEntriesByDay,
   selectLogEntriesById,
   selectPlanEntriesByDay,
@@ -98,7 +98,7 @@ export const selectRecentClocks = createAppSelector(
 
       isNotVoid(taskEntry, "Inconsistent store state");
 
-      return logEntryToLocalTask(logEntry, taskEntry);
+      return planEntryToLocalTask(logEntry, taskEntry);
     });
   },
 );
@@ -123,7 +123,7 @@ export const selectPlanEntriesForDay = createAppSelector(
 
         isNotVoid(taskEntry, "Inconsistent index state");
 
-        return logEntryToLocalTask(planEntry, taskEntry);
+        return planEntryToLocalTask(planEntry, taskEntry);
       }) || []
     );
   },

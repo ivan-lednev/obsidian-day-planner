@@ -15,6 +15,7 @@ import { shortScheduledPropRegExp } from "../../regexp";
 import type { ListPropsParser } from "../../service/list-props-parser";
 import type { PeriodicNotes } from "../../service/periodic-notes";
 import type { DayPlannerSettings } from "../../settings";
+import type { LocalTask } from "../../task-types";
 import { getDayKeysInRange, strictParse } from "../../util/moment";
 import { getDayKey, getEndTime } from "../../util/task-utils";
 import { createAppSlice } from "../create-app-slice";
@@ -46,7 +47,7 @@ export interface LogEntry {
 export interface PlanEntry {
   isAllDay?: boolean;
   start: string;
-  end: string;
+  end?: string;
   parent: string;
   dayKeys: string[];
   id: string;
@@ -284,7 +285,7 @@ export const trackerSlice = createAppSlice({
 
           isNotVoid(taskEntry, "Inconsistent store state");
 
-          return logEntryToLocalTask(logEntry, taskEntry);
+          return planEntryToLocalTask(logEntry, taskEntry);
         }),
     selectListPropsPosition: (state, path: string, line: number) => {
       const taskEntriesForFile = state.taskEntries.byPath[path]?.map(
@@ -307,7 +308,10 @@ export const trackerSlice = createAppSlice({
   },
 });
 
-export function logEntryToLocalTask(logEntry: LogEntry, taskEntry: TaskEntry) {
+export function planEntryToLocalTask(
+  logEntry: PlanEntry,
+  taskEntry: TaskEntry,
+): LocalTask {
   return {
     text: taskEntry.text,
     location: { path: taskEntry.path, position: taskEntry.position },
@@ -315,6 +319,7 @@ export function logEntryToLocalTask(logEntry: LogEntry, taskEntry: TaskEntry) {
     startTime: strictParse(logEntry.start),
     durationMinutes: 30,
     id: logEntry.id,
+    isAllDayEvent: logEntry.isAllDay,
   };
 }
 
@@ -440,16 +445,11 @@ export function createIndexListener(props: {
     );
   }
 
-  function getObsidianTasksEntries(props: {
-    firstLine: string;
-    parentId: string;
-  }) {
-    const { firstLine, parentId } = props;
-
-    const datePropMatch = firstLine.match(shortScheduledPropRegExp);
+  function parseObsidianTasksScheduledDate(line: string) {
+    const datePropMatch = line.match(shortScheduledPropRegExp);
 
     if (!datePropMatch) {
-      return [];
+      return undefined;
     }
 
     isRecordOfType<string>(
@@ -462,18 +462,54 @@ export function createIndexListener(props: {
 
     isNotVoid(dateString);
 
-    const parsed = strictParse(dateString);
+    return strictParse(dateString);
+  }
+
+  function getObsidianTasksEntries(props: {
+    firstLine: string;
+    parentId: string;
+  }): PlanEntry[] {
+    const { firstLine, parentId } = props;
+
+    const scheduledDate = parseObsidianTasksScheduledDate(firstLine);
+
+    if (!scheduledDate) {
+      return [];
+    }
+
+    const result = {
+      id: createId(parentId, "tasks-scheduled"),
+      dayKeys: [getDayKey(scheduledDate)],
+      // todo P3: we can add parent id later
+      parent: parentId,
+    };
+
+    const time = getTimeFromLine({
+      line: firstLine,
+      day: scheduledDate,
+    });
+
+    if (!time) {
+      return [
+        {
+          ...result,
+          start: scheduledDate.format(clockFormat),
+          end: scheduledDate.clone().add(1, "hour").format(clockFormat),
+          isAllDay: true,
+        },
+      ];
+    }
 
     return [
       {
-        id: createId(parentId, "tasks-scheduled"),
-        dayKeys: [dateString],
-        // todo P3: we can add parent id later
-        parent: parentId,
-        start: parsed.format(clockFormat),
-        // todo: this is not needed
-        end: parsed.clone().add(1, "hour").format(clockFormat),
-        isAllDay: true,
+        ...result,
+        start: time.startTime.format(clockFormat),
+        // todo: duplication
+        end: getEndTime({
+          startTime: time.startTime,
+          durationMinutes:
+            time.durationMinutes ?? settings.defaultDurationMinutes,
+        }).format(clockFormat),
       },
     ];
   }
