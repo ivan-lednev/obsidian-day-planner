@@ -13,7 +13,7 @@ const hourMinuteSeparator = `[:.]`;
 const strictHourMinuteSeparator = ":";
 const amPm = "\\s?[apAP][mM](?!\\w)";
 
-const date = "\\d{4}-\\d{2}-\\d{2}";
+const datePattern = "\\d{4}-\\d{2}-\\d{2}";
 
 const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))(${amPm})?`;
 const strictTime = `${hours}${strictHourMinuteSeparator}${minutes}(${amPm})?`;
@@ -35,14 +35,18 @@ export const strictTimestampAnywhereInLineRegExp = new RegExp(
 );
 
 export const scheduledPropRegExp = new RegExp(
-  `(\\[scheduled\\s*::\\s*)${date}(\\])`,
+  `(\\[scheduled\\s*::\\s*)${datePattern}(\\])`,
 );
 
 export const keylessScheduledPropRegExp = new RegExp(
-  `(\\(scheduled\\s*::\\s*)${date}(\\))`,
+  `(\\(scheduled\\s*::\\s*)${datePattern}(\\))`,
 );
 
-export const shortScheduledPropRegExp = new RegExp(`(⏳\\s*)${date}`);
+export const hourglass = "⏳";
+
+export const shortScheduledPropRegExp = new RegExp(
+  `(${hourglass}\\s*)(?<date>${datePattern})`,
+);
 
 export const scheduledPropRegExps = [
   scheduledPropRegExp,

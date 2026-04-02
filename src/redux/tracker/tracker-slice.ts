@@ -7,10 +7,11 @@ import type {
   Pos,
   Vault,
 } from "obsidian";
-import { isNotVoid } from "typed-assert";
+import { isNotVoid, isRecordOfType } from "typed-assert";
 
 import { clockFormat } from "../../constants";
 import { getTimeFromLine } from "../../parser/parser";
+import { shortScheduledPropRegExp } from "../../regexp";
 import type { ListPropsParser } from "../../service/list-props-parser";
 import type { PeriodicNotes } from "../../service/periodic-notes";
 import type { DayPlannerSettings } from "../../settings";
@@ -439,6 +440,44 @@ export function createIndexListener(props: {
     );
   }
 
+  function getObsidianTasksEntries(props: {
+    firstLine: string;
+    parentId: string;
+  }) {
+    const { firstLine, parentId } = props;
+
+    const datePropMatch = firstLine.match(shortScheduledPropRegExp);
+
+    if (!datePropMatch) {
+      return [];
+    }
+
+    isRecordOfType<string>(
+      datePropMatch.groups,
+      (value) => typeof value === "string",
+      "Mismatching named regexp groups",
+    );
+
+    const dateString = datePropMatch.groups["date"];
+
+    isNotVoid(dateString);
+
+    const parsed = strictParse(dateString);
+
+    return [
+      {
+        id: createId(parentId, "tasks-scheduled"),
+        dayKeys: [dateString],
+        // todo P3: we can add parent id later
+        parent: parentId,
+        start: parsed.format(clockFormat),
+        // todo: this is not needed
+        end: parsed.clone().add(1, "hour").format(clockFormat),
+        isAllDay: true,
+      },
+    ];
+  }
+
   function getListItemEntries(
     cache: CachedMetadata,
     contents: string,
@@ -517,6 +556,13 @@ export function createIndexListener(props: {
         }
 
         if (isTaskCache(listItemCache)) {
+          const obsidianTasksEntries = getObsidianTasksEntries({
+            firstLine,
+            parentId: taskEntryId,
+          });
+
+          listItemEntry.planEntries.push(...obsidianTasksEntries);
+
           const listItemProps = listPropsParser.getListPropsFromListItem(
             listItemCache,
             listItemText,

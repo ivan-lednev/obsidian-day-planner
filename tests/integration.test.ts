@@ -218,17 +218,34 @@ describe("Log Records with indexes", () => {
   test("Stores list items from daily notes basing their start time on daily note path", async () => {
     const { getState } = await setUp();
 
-    expect(selectPlanEntriesForDay(getState(), "2025-07-19")).toMatchObject([
-      {
-        text: expect.stringContaining("List item under planner heading"),
-      },
-      {
-        text: expect.stringContaining("Task"),
-      },
-    ]);
+    expect(selectPlanEntriesForDay(getState(), "2025-07-19")).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          text: expect.stringContaining("List item under planner heading"),
+        }),
+        expect.objectContaining({
+          text: expect.stringContaining("Task"),
+        }),
+      ]),
+    );
   });
 
-  test.todo("Stores tasks from obsidian-tasks (scheduled)");
+  test.todo("Does not store tasks & list items outside planner heading");
+
+  test("Stores tasks from obsidian-tasks (scheduled)", async () => {
+    const { getState } = await setUp();
+
+    expect(selectPlanEntriesForDay(getState(), "2025-07-19")).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          text: expect.stringContaining("Task with time"),
+        }),
+        expect.objectContaining({
+          text: expect.stringContaining("Task without time"),
+        }),
+      ]),
+    );
+  });
 
   test.todo("Stores Dataview tasks");
 
