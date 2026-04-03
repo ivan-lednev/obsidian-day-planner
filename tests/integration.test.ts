@@ -6,7 +6,7 @@ import { selectLogEntriesForDay, selectPlanEntriesForDay } from "../src/redux";
 import {
   fileDeleted,
   indexRequested,
-  selectActiveClocks,
+  selectActiveLogEntries,
   selectEntriesForPath,
 } from "../src/redux/tracker/tracker-slice";
 import { defaultSettingsForTests } from "../src/settings";
@@ -60,7 +60,7 @@ describe("Log Records with indexes", () => {
   test("Returns time block views for active log entries", async () => {
     const { getState } = await setUp();
 
-    expect(selectActiveClocks(getState())).toMatchObject([
+    expect(selectActiveLogEntries(getState())).toMatchObject([
       {
         text: "- [ ] Task",
         startTime: window.moment("2025-01-01 17:00"),
@@ -119,7 +119,7 @@ describe("Log Records with indexes", () => {
     });
   });
 
-  test("Returns truncated active clocks for today's range", async () => {
+  test("Returns truncated active log entries for today's range", async () => {
     const { getState } = await setUp();
     const now = window.moment();
 
@@ -133,7 +133,7 @@ describe("Log Records with indexes", () => {
     );
   });
 
-  test("Does not truncate active clocks in yesterday's view", async () => {
+  test("Does not truncate active log entries in yesterday's view", async () => {
     const { getState } = await setUp();
     const now = window.moment();
     const yesterday = now.clone().subtract(1, "day");

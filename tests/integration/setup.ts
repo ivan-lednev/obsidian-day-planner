@@ -12,7 +12,7 @@ import { initialState } from "../../src/redux/global-slice";
 import { createReactor, type RootState } from "../../src/redux/store";
 import {
   indexRequested,
-  selectActiveClocks,
+  selectActiveLogEntries,
 } from "../../src/redux/tracker/tracker-slice";
 import type { DataviewFacade } from "../../src/service/dataview-facade";
 import { TransactionWriter } from "../../src/service/diff-writer";
@@ -228,7 +228,7 @@ export async function setUp(props?: {
   await vi.waitFor(() => {
     // todo: just wait for cache to be 'warm'
     const isAtLeastOneLogRecordLoaded =
-      useSelector((state) => selectActiveClocks(state)).current.length > 0;
+      useSelector((state) => selectActiveLogEntries(state)).current.length > 0;
 
     expect(isAtLeastOneLogRecordLoaded).toBeTruthy();
   });

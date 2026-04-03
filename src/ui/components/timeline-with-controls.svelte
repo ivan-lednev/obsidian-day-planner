@@ -5,7 +5,7 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
-  import { selectActiveClocks } from "../../redux/tracker/tracker-slice";
+  import { selectActiveLogEntries } from "../../redux/tracker/tracker-slice";
   import type { Task } from "../../task-types";
   import { createColumnSelectionMenu } from "../column-selection-menu";
 
@@ -26,7 +26,7 @@
 
   const { editContext, useSelector, pointerDateTime } = getObsidianContext();
 
-  const activeLogRecords = useSelector(selectActiveClocks);
+  const activeLogRecords = useSelector(selectActiveLogEntries);
 
   const getDisplayedAllDayTasksForMultiDayRow = fromStore(
     editContext.getDisplayedAllDayTasksForMultiDayRow,

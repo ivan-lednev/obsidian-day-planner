@@ -75,7 +75,7 @@ export const selectLogEntriesForDay = createAppSelector(
   },
 );
 
-export const selectRecentClocks = createAppSelector(
+export const selectRecentLogEntries = createAppSelector(
   [
     // todo: use pre-defined ones
     (state) => state.tracker.logEntries.byId,

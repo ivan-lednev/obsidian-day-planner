@@ -168,12 +168,7 @@ export const trackerSlice = createAppSlice({
         const fileIndexes = action.payload;
 
         fileIndexes.forEach((fileIndex) => {
-          const {
-            path,
-            taskEntries = [],
-            logEntries = [],
-            planEntries = [],
-          } = fileIndex;
+          const { path, taskEntries, logEntries, planEntries } = fileIndex;
 
           // todo: repeat for logEntries
           const previousTaskEntryIds = state.taskEntries.byPath[path] || [];
@@ -183,11 +178,13 @@ export const trackerSlice = createAppSlice({
           });
 
           // todo: copy pasta
-          state.taskEntries.byPath[path] = taskEntries.map((it) => it.id);
+          if (taskEntries) {
+            state.taskEntries.byPath[path] = taskEntries.map((it) => it.id);
 
-          taskEntries.forEach((it) => {
-            state.taskEntries.byId[it.id] = it;
-          });
+            taskEntries.forEach((it) => {
+              state.taskEntries.byId[it.id] = it;
+            });
+          }
 
           const previousLogEntryIds = state.logEntries.byPath[path] || [];
 
@@ -211,17 +208,19 @@ export const trackerSlice = createAppSlice({
           });
 
           // todo: copy pasta
-          state.logEntries.byPath[path] = logEntries.map((it) => it.id);
+          if (logEntries) {
+            state.logEntries.byPath[path] = logEntries.map((it) => it.id);
 
-          logEntries.forEach((it) => {
-            state.logEntries.byId[it.id] = it;
-          });
-
-          logEntries.forEach((logEntry) => {
-            logEntry.dayKeys.forEach((dayKey) => {
-              (state.logEntries.byDay[dayKey] ??= {})[logEntry.id] = true;
+            logEntries.forEach((it) => {
+              state.logEntries.byId[it.id] = it;
             });
-          });
+
+            logEntries.forEach((logEntry) => {
+              logEntry.dayKeys.forEach((dayKey) => {
+                (state.logEntries.byDay[dayKey] ??= {})[logEntry.id] = true;
+              });
+            });
+          }
 
           // todo: copy pasta
 
@@ -246,17 +245,19 @@ export const trackerSlice = createAppSlice({
             delete state.planEntries.byId[id];
           });
 
-          state.planEntries.byPath[path] = planEntries.map((it) => it.id);
+          if (planEntries) {
+            state.planEntries.byPath[path] = planEntries.map((it) => it.id);
 
-          planEntries.forEach((it) => {
-            state.planEntries.byId[it.id] = it;
-          });
-
-          planEntries.forEach((logEntry) => {
-            logEntry.dayKeys.forEach((dayKey) => {
-              (state.planEntries.byDay[dayKey] ??= {})[logEntry.id] = true;
+            planEntries.forEach((it) => {
+              state.planEntries.byId[it.id] = it;
             });
-          });
+
+            planEntries.forEach((logEntry) => {
+              logEntry.dayKeys.forEach((dayKey) => {
+                (state.planEntries.byDay[dayKey] ??= {})[logEntry.id] = true;
+              });
+            });
+          }
         });
       },
     ),
@@ -268,7 +269,7 @@ export const trackerSlice = createAppSlice({
       );
     },
     // todo: should be memoized or stored in the index
-    selectActiveClocks: (state) =>
+    selectActiveLogEntries: (state) =>
       Object.values(state.logEntries.byId)
         .flat()
         .filter((it) => !it.end)
@@ -320,7 +321,7 @@ export const { filesIndexed, indexRequested, fileDeleted } =
 
 export const {
   selectEntriesForPath,
-  selectActiveClocks,
+  selectActiveLogEntries,
   selectLogEntriesByDay,
   selectLogEntriesById,
   selectListPropsPosition,
@@ -411,7 +412,7 @@ export function createIndexListener(props: {
       ? strictParse(end)
       : // TODO: P3 bug
         //  Solution 1: dispatch dayChanged() and update active clocks then; simple & works
-        //  Solution 2: calculate dayKeys for active clocks on the fly in selectActiveClocks selector
+        //  Solution 2: calculate dayKeys for active clocks on the fly in selectActiveLogEntries selector
         //  Solution 3: use sorted array instead of buckets
         window.moment();
 
@@ -639,7 +640,7 @@ export function createIndexListener(props: {
 
     const contents = await vault.cachedRead(file);
 
-    // todo: fix
+    // todo: return normalized entries
     const denormalizedEntries = getListItemEntries(cache, contents, path);
 
     return {

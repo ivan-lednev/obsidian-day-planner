@@ -37,7 +37,7 @@ import { editCanceled, visibleDaysUpdated } from "./redux/global-slice";
 import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { settingsUpdated } from "./redux/settings-slice";
 import { type AppDispatch, type AppStore, createReactor } from "./redux/store";
-import { selectActiveClocks } from "./redux/tracker/tracker-slice";
+import { selectActiveLogEntries } from "./redux/tracker/tracker-slice";
 import { createUseSelector, createUseSelectorV2 } from "./redux/use-selector";
 import { createSvelteSignalFromReduxStore } from "./redux/use-selector";
 import { DataviewFacade } from "./service/dataview-facade";
@@ -529,7 +529,7 @@ export default class DayPlanner extends Plugin {
       id: "jump-to-active-clock",
       name: "Jump to active clock",
       callback: () => {
-        const currentTasksWithActiveClockProps = selectActiveClocks(
+        const currentTasksWithActiveClockProps = selectActiveLogEntries(
           store.getState(),
         );
 

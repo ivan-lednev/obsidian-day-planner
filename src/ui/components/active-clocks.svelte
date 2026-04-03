@@ -5,7 +5,7 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { currentTimeSignal } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
-  import { selectActiveClocks } from "../../redux/tracker/tracker-slice";
+  import { selectActiveLogEntries } from "../../redux/tracker/tracker-slice";
   import type { LocalTask } from "../../task-types";
   import * as m from "../../util/moment";
   import { getDiffInMinutes } from "../../util/moment";
@@ -20,7 +20,7 @@
   const { workspaceFacade, taskEntryEditor, useSelector } =
     getObsidianContext();
 
-  const activeLogRecords = useSelector(selectActiveClocks);
+  const activeLogRecords = useSelector(selectActiveLogEntries);
   // todo: duplication?
   const activeLogRecordsCompat = $derived(
     $activeLogRecords.map((it) => ({

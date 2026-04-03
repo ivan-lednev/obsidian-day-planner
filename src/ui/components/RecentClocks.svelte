@@ -3,7 +3,7 @@
   import { isNotVoid } from "typed-assert";
 
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { selectRecentClocks } from "../../redux/tracker/tracker-selectors";
+  import { selectRecentLogEntries } from "../../redux/tracker/tracker-selectors";
   import type { LocalTask } from "../../task-types";
   import { createRecentClockMenu } from "../recent-clock-menu";
 
@@ -16,7 +16,9 @@
   const { workspaceFacade, useSelectorV2, taskEntryEditor } =
     getObsidianContext();
 
-  const recentLogRecords = useSelectorV2((state) => selectRecentClocks(state));
+  const recentLogRecords = useSelectorV2((state) =>
+    selectRecentLogEntries(state),
+  );
 </script>
 
 <BlockList list={recentLogRecords.current}>
