@@ -2,7 +2,7 @@ import { get } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 import { describe, expect, test, vi } from "vitest";
 
-import { selectLogEntriesForDay, selectPlanEntriesForDay } from "../src/redux";
+import { selectLogEntriesForDay, selectPlanEntriesForDays } from "../src/redux";
 import {
   fileDeleted,
   indexRequested,
@@ -199,7 +199,7 @@ describe("Log Records with indexes", () => {
   test("Stores tasks from daily notes basing their start time on daily note path", async () => {
     const { getState } = await setUp();
 
-    expect(selectPlanEntriesForDay(getState(), "2025-07-28")).toMatchObject([
+    expect(selectPlanEntriesForDays(getState(), ["2025-07-28"])).toMatchObject([
       {
         text: expect.stringContaining("Before"),
       },
@@ -218,7 +218,7 @@ describe("Log Records with indexes", () => {
   test("Stores list items from daily notes basing their start time on daily note path", async () => {
     const { getState } = await setUp();
 
-    expect(selectPlanEntriesForDay(getState(), "2025-07-19")).toEqual(
+    expect(selectPlanEntriesForDays(getState(), ["2025-07-19"])).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           text: expect.stringContaining("List item under planner heading"),
@@ -235,7 +235,7 @@ describe("Log Records with indexes", () => {
   test("Stores tasks from obsidian-tasks (scheduled)", async () => {
     const { getState } = await setUp();
 
-    expect(selectPlanEntriesForDay(getState(), "2025-07-19")).toEqual(
+    expect(selectPlanEntriesForDays(getState(), ["2025-07-19"])).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           text: expect.stringContaining("Task with time"),

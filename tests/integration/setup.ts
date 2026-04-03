@@ -2,7 +2,7 @@ import { noop } from "lodash/fp";
 import type { Moment } from "moment";
 import { type CachedMetadata, MetadataCache, type Vault } from "obsidian";
 import type { SListEntry, STask } from "obsidian-dataview";
-import { derived, get, writable } from "svelte/store";
+import { derived, get, readable, writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 import { expect, vi } from "vitest";
 
@@ -102,7 +102,6 @@ export async function setUp(props?: {
 
   const {
     periodicNotes,
-    dataviewFacade,
     metadataCache,
     vault,
     transactionWriter,
@@ -117,9 +116,7 @@ export async function setUp(props?: {
     cachedMetadata,
   });
 
-  const visibleDaysStore = writable(visibleDays.map((it) => window.moment(it)));
   const isOnline = writable(true);
-  const layoutReady = writable(true);
   const settingsStore = writable(settings);
   const currentTime = writable(window.moment());
 
@@ -177,18 +174,14 @@ export async function setUp(props?: {
     onUpdate,
     onEditAborted: () => {},
     periodicNotes,
-    dataviewFacade,
-    metadataCache,
     workspaceFacade,
     isOnline,
-    visibleDays: visibleDaysStore,
-    layoutReady,
-    debouncedTaskUpdateTrigger: taskUpdateTrigger,
     dataviewChange: taskUpdateTrigger,
     settingsStore,
     currentTime,
     pointerDateTime,
     remoteTasks,
+    localTasks: readable([]),
   });
 
   const allTasks = derived(

@@ -15,7 +15,6 @@ import {
   viewTypeReleaseNotes,
   viewTypeTimeline,
   viewTypeMultiDay,
-  reQueryAfterMillis,
   icalRefreshIntervalMillis,
 } from "./constants";
 import { createUpdateHandler, getTextFromUser } from "./create-update-handler";
@@ -49,13 +48,12 @@ import { TaskEntryEditor } from "./service/task-entry-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
-import type { RemoteTask } from "./task-types";
+import type { LocalTask, RemoteTask } from "./task-types";
 import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn, PointerDateTime } from "./types";
 import { askForConfirmation } from "./ui/confirmation-modal";
 import { createEditorMenuCallback } from "./ui/editor-menu";
 import { useDateRanges } from "./ui/hooks/use-date-ranges";
-import { useDebounceWithDelay } from "./ui/hooks/use-debounce-with-delay";
 import { mountStatusBarWidget } from "./ui/hooks/use-status-bar-widget";
 import { useTasks } from "./ui/hooks/use-tasks";
 import { useVisibleDays } from "./ui/hooks/use-visible-days";
@@ -110,6 +108,7 @@ export default class DayPlanner extends Plugin {
       useSelectorV2,
       listenerMiddleware,
       remoteTasks,
+      localTasks,
       taskUpdateTrigger,
       dataviewLoaded,
       pointerDateTime,
@@ -145,6 +144,7 @@ export default class DayPlanner extends Plugin {
       dataviewRefreshSignal,
       useSelector,
       useSelectorV2,
+      localTasks,
     });
 
     const handleEditorMenu = createEditorMenuCallback({
@@ -394,6 +394,7 @@ export default class DayPlanner extends Plugin {
     useSelector: ReturnType<typeof createUseSelector>;
     useSelectorV2: ReturnType<typeof createUseSelectorV2>;
     remoteTasks: Readable<RemoteTask[]>;
+    localTasks: Readable<LocalTask[]>;
     taskUpdateTrigger: Readable<unknown>;
     dataviewLoaded: Readable<boolean>;
     pointerDateTime: Writable<PointerDateTime>;
@@ -405,7 +406,7 @@ export default class DayPlanner extends Plugin {
       useSelector,
       useSelectorV2,
       remoteTasks,
-      taskUpdateTrigger,
+      localTasks,
       dataviewLoaded,
       pointerDateTime,
       dataviewRefreshSignal,
@@ -439,14 +440,9 @@ export default class DayPlanner extends Plugin {
       new Notice("Tasks changed externally; edit canceled");
     };
 
-    const { isDarkMode, isOnline, keyDown, isModPressed, layoutReady } =
-      createEnvironmentHooks({ workspace: this.app.workspace });
-
-    const debouncedTaskUpdateTrigger = useDebounceWithDelay(
-      taskUpdateTrigger,
-      keyDown,
-      reQueryAfterMillis,
-    );
+    const { isDarkMode, isOnline, isModPressed } = createEnvironmentHooks({
+      workspace: this.app.workspace,
+    });
 
     const dateRanges = useDateRanges();
     const visibleDays = useVisibleDays(dateRanges.ranges);
@@ -455,18 +451,14 @@ export default class DayPlanner extends Plugin {
       onUpdate,
       onEditAborted,
       periodicNotes: this.periodicNotes,
-      dataviewFacade: this.dataviewFacade,
-      metadataCache: this.app.metadataCache,
       workspaceFacade: this.workspaceFacade,
       isOnline,
-      visibleDays,
-      layoutReady,
-      debouncedTaskUpdateTrigger,
       dataviewChange: dataviewRefreshSignal,
       settingsStore: this.settingsStore,
       currentTime,
       pointerDateTime,
       remoteTasks,
+      localTasks,
     });
 
     this.registerInterval(

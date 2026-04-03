@@ -22,6 +22,7 @@ import { editCanceled, globalSlice } from "./global-slice";
 import { icalSlice, selectRemoteTasks } from "./ical/ical-slice";
 import { initListenerMiddleware } from "./listener-middleware";
 import { selectDataviewSource, settingsSlice } from "./settings-slice";
+import { selectPlanEntriesForVisibleDays } from "./tracker/tracker-selectors";
 import { trackerSlice } from "./tracker/tracker-slice";
 import { useActionDispatched } from "./use-action-dispatched";
 import { createUseSelector, createUseSelectorV2 } from "./use-selector";
@@ -96,6 +97,7 @@ export function createReactor(props: {
   const useSelectorV2 = createUseSelectorV2(store);
   const actionDispatched = useActionDispatched({ listenerMiddleware });
 
+  const localTasks = useSelector(selectPlanEntriesForVisibleDays);
   const remoteTasks = useSelector(selectRemoteTasks);
   const dataviewLoaded = useSelector(selectDataviewLoaded);
   const dataviewSource = useSelector(selectDataviewSource);
@@ -126,6 +128,7 @@ export function createReactor(props: {
     dispatch,
     listenerMiddleware,
     remoteTasks,
+    localTasks,
     taskUpdateTrigger,
     dataviewLoaded,
     pointerDateTime,

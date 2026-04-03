@@ -3,8 +3,9 @@ import { isNotVoid } from "typed-assert";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
 import { strictParse } from "../../util/moment";
-import { clamp } from "../../util/task-utils";
+import { clamp, getDayKey } from "../../util/task-utils";
 import { createAppSelector } from "../create-app-selector";
+import { selectVisibleDays } from "../global-slice";
 
 import {
   planEntryToLocalTask,
@@ -104,18 +105,51 @@ export const selectRecentLogEntries = createAppSelector(
   },
 );
 
-export const selectPlanEntriesForDay = createAppSelector(
+export const selectPlanEntriesForVisibleDays = createAppSelector(
   [
     selectPlanEntriesByDay,
     selectPlanEntriesById,
     selectTaskEntriesById,
-    (state, dayKey) => dayKey,
+    selectVisibleDays,
   ],
-  (planEntriesByDay, planEntriesById, taskEntriesById, dayKey) => {
-    const ids = Object.keys(planEntriesByDay[dayKey]);
+  // todo: copy-pasta
+  (planEntriesByDay, planEntriesById, taskEntriesById, dayKeysFull) => {
+    const uniqueTaskIds = new Set(
+      dayKeysFull
+        .map((key) => getDayKey(strictParse(key)))
+        .flatMap((dayKey) => Object.keys(planEntriesByDay[dayKey] || {})),
+    );
 
     return (
-      ids?.map((id) => {
+      [...uniqueTaskIds]?.map((id) => {
+        const planEntry = planEntriesById[id];
+
+        isNotVoid(planEntry, "Inconsistent index state");
+
+        const taskEntry = taskEntriesById[planEntry.parent];
+
+        isNotVoid(taskEntry, "Inconsistent index state");
+
+        return planEntryToLocalTask(planEntry, taskEntry);
+      }) || []
+    );
+  },
+);
+
+export const selectPlanEntriesForDays = createAppSelector(
+  [
+    selectPlanEntriesByDay,
+    selectPlanEntriesById,
+    selectTaskEntriesById,
+    (state, dayKeys: string[]) => dayKeys,
+  ],
+  (planEntriesByDay, planEntriesById, taskEntriesById, dayKeys) => {
+    const uniqueTaskIds = new Set(
+      dayKeys.flatMap((dayKey) => Object.keys(planEntriesByDay[dayKey] || {})),
+    );
+
+    return (
+      [...uniqueTaskIds]?.map((id) => {
         const planEntry = planEntriesById[id];
 
         isNotVoid(planEntry, "Inconsistent index state");
