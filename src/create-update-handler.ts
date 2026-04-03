@@ -81,7 +81,7 @@ export const createUpdateHandler = (props: {
       diff.added[0] = { ...created, text: modalOutput };
     }
 
-    const updates = mapTaskDiffToUpdates(diff, mode, settings(), periodicNotes);
+    const updates = mapTaskDiffToUpdates(diff, settings(), periodicNotes);
 
     const afterEach = settings().sortTasksInPlanAfterEdit
       ? (contents: string) =>

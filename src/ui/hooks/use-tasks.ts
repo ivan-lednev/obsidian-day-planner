@@ -37,27 +37,6 @@ export function useTasks(props: {
     localTasks,
   } = props;
 
-  // const visibleDailyNotes = useVisibleDailyNotes(
-  //   layoutReady,
-  //   debouncedTaskUpdateTrigger,
-  //   visibleDays,
-  //   periodicNotes,
-  // );
-  //
-  // const dataviewTasks = useDataviewTasks({
-  //   dataviewFacade,
-  //   metadataCache,
-  //   settings: settingsStore,
-  //   visibleDailyNotes,
-  //   refreshSignal: debouncedTaskUpdateTrigger,
-  // });
-  //
-  // const localTasks = useVisibleDataviewTasks(
-  //   dataviewTasks,
-  //   visibleDays,
-  //   periodicNotes,
-  // );
-
   const tasksWithTimeForToday = derived(
     [localTasks, remoteTasks, currentTime],
     ([$localTasks, $remoteTasks, $currentTime]: [Task[], Task[], Moment]) => {

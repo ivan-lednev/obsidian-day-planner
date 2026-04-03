@@ -160,7 +160,7 @@ export function getDayKey(day: Moment) {
   return day.format(defaultDayFormat);
 }
 
-export function toString(task: WithTime<LocalTask>, mode: EditMode) {
+export function toString(task: WithTime<LocalTask>) {
   const firstLineWithoutListTokens = removeListTokens(getFirstLine(task.text));
 
   const updatedTimestamp = createTimestamp(

@@ -231,12 +231,11 @@ export function getTaskDiffFromEditState(base: LocalTask[], next: LocalTask[]) {
 function mapTaskDiffToUpdate(props: {
   type: string;
   task: LocalTask;
-  mode: EditMode;
   settings: DayPlannerSettings;
   periodicNotes: PeriodicNotes;
 }): Update | Update[] {
-  const { type, task, mode, settings, periodicNotes } = props;
-  const taskTextWithUpdatedProps = t.toString(task, mode);
+  const { type, task, settings, periodicNotes } = props;
+  const taskTextWithUpdatedProps = t.toString(task);
 
   if (type === "added") {
     if (task.location) {
@@ -331,7 +330,6 @@ function mapTaskDiffToUpdate(props: {
  */
 export function mapTaskDiffToUpdates(
   diff: ViewDiff,
-  mode: EditMode,
   settings: DayPlannerSettings,
   periodicNotes: PeriodicNotes,
 ): Update[] {
@@ -341,7 +339,6 @@ export function mapTaskDiffToUpdates(
       const updates = mapTaskDiffToUpdate({
         type,
         task,
-        mode,
         settings,
         periodicNotes,
       });

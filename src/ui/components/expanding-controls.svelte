@@ -67,6 +67,9 @@
   }
 
   .expanding-controls {
+    --planner-floating-controls-shadow: 0px 2px 10px rgba(0, 0, 0, 0.07);
+    --planner-floating-controls-border: 1px solid
+      var(--background-modifier-border);
     /* Note: this prevents jitter and losing hover state when a floating UI
     container has a slide animation that stretches it from right to left. */
     position: var(--expanding-controls-position, static);
@@ -76,7 +79,7 @@
     padding: var(--size-2-1);
 
     background-color: var(--background-primary);
-    border: var(--border-base);
+    border: var(--planner-floating-controls-border);
     border-radius: var(--size-4-1);
     box-shadow: var(--planner-floating-controls-shadow);
   }

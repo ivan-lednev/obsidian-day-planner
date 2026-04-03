@@ -54,7 +54,11 @@ export function indent(text: string, indentation: string) {
 }
 
 export function getFirstLine(text: string) {
-  return text.split("\n")[0];
+  const firstLine = text.split("\n")[0];
+
+  isNotVoid(firstLine)
+
+  return firstLine;
 }
 
 export function getLinesAfterFirst(text: string) {

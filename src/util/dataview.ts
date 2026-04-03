@@ -1,25 +1,18 @@
-import { uniqBy } from "lodash/fp";
-import { DateTime } from "luxon";
 import type { Moment } from "moment";
 import { STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
 
 import {
-  defaultDayFormat,
-  defaultDayFormatForLuxon,
   defaultDurationMinutes,
   indentBeforeListParagraph,
 } from "../constants";
 import { getTimeFromLine } from "../parser/parser";
-import type { PeriodicNotes } from "../service/periodic-notes";
 import type {
   FileLine,
-  LocalTask,
   TaskTokens,
   TaskWithoutComputedDuration,
 } from "../task-types";
 
-import { type ClockMoments } from "./clock";
 import { getId } from "./id";
 import {
   checkbox,
@@ -77,27 +70,6 @@ export function getLines(node: STask, result: Array<FileLine> = []) {
   return result;
 }
 
-export function toTaskWithClock(props: {
-  sTask: STask;
-  clockMoments: ClockMoments;
-}): LocalTask {
-  const { sTask, clockMoments } = props;
-  const [startTime, endTime] = clockMoments;
-  let durationMinutes = endTime.diff(startTime, "minutes");
-
-  if (durationMinutes < 0) {
-    durationMinutes = defaultDurationMinutes;
-  }
-
-  return {
-    // todo: remove moment
-    ...toUnscheduledTask(sTask, window.moment()),
-    isAllDayEvent: false,
-    startTime,
-    durationMinutes,
-  };
-}
-
 export function toUnscheduledTask(sTask: STask, startTime: Moment) {
   return {
     isAllDayEvent: true,
@@ -144,25 +116,6 @@ export function toTask(sTask: STask, day: Moment): TaskWithoutComputedDuration {
   };
 }
 
-export function getScheduledDay(props: {
-  sTask: STask;
-  periodicNotes: PeriodicNotes;
-}) {
-  const { sTask, periodicNotes } = props;
-
-  const scheduledPropDay: string = (
-    typeof sTask.scheduled === "string"
-      ? DateTime.fromISO(sTask.scheduled)
-      : sTask.scheduled
-  )?.toFormat?.(defaultDayFormatForLuxon);
-
-  const dailyNoteDay = periodicNotes
-    .getDateFromPath(sTask.path, "day")
-    ?.format(defaultDayFormat);
-
-  return scheduledPropDay || dailyNoteDay;
-}
-
 export function textToMarkdownWithIndentation(sTask: STask) {
   return indent(
     textToMarkdown(sTask),
@@ -191,53 +144,3 @@ export function replaceSTaskText(
   return lines.join("\n");
 }
 
-export const uniq = uniqBy(
-  (task: STask) => `${task.path}::${task.position.start.line}`,
-);
-
-export const baseSTask: STask = {
-  symbol: "-",
-  link: {
-    path: "fixture-vault/tasks.md",
-    embed: false,
-    type: "file",
-  },
-  section: {
-    path: "fixture-vault/tasks.md",
-    embed: false,
-    type: "file",
-  },
-  text: "Task text",
-  tags: [],
-  line: 0,
-  lineCount: 1,
-  list: 0,
-  outlinks: [],
-  path: "fixture-vault/tasks.md",
-  children: [],
-  task: true,
-  annotated: false,
-  position: {
-    start: {
-      line: 0,
-      col: 0,
-      offset: 0,
-    },
-    end: {
-      line: 0,
-      col: 15,
-      offset: 15,
-    },
-  },
-  subtasks: [],
-  real: true,
-  header: {
-    path: "fixture-vault/tasks.md",
-    embed: false,
-    type: "file",
-  },
-  status: " ",
-  checked: false,
-  completed: false,
-  fullyCompleted: false,
-};

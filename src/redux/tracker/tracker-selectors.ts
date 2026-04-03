@@ -112,10 +112,11 @@ export const selectPlanEntriesForVisibleDays = createAppSelector(
     selectTaskEntriesById,
     selectVisibleDays,
   ],
-  // todo: copy-pasta
+  // todo: copy-pasta. Can we re-use it without breaking caching?
   (planEntriesByDay, planEntriesById, taskEntriesById, dayKeysFull) => {
     const uniqueTaskIds = new Set(
       dayKeysFull
+        // todo: do not store full timestamp in store
         .map((key) => getDayKey(strictParse(key)))
         .flatMap((dayKey) => Object.keys(planEntriesByDay[dayKey] || {})),
     );

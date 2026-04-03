@@ -135,6 +135,7 @@ export async function setUp(props?: {
     getState,
     dispatch,
     remoteTasks,
+    localTasks,
     taskUpdateTrigger,
     pointerDateTime,
   } = createReactor({
@@ -181,7 +182,7 @@ export async function setUp(props?: {
     currentTime,
     pointerDateTime,
     remoteTasks,
-    localTasks: readable([]),
+    localTasks
   });
 
   const allTasks = derived(
