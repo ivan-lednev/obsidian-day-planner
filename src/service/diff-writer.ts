@@ -12,7 +12,6 @@ import {
 } from "../mdast/mdast";
 import type { DayPlannerSettings } from "../settings";
 import type { LocalTask } from "../task-types";
-import { EditMode } from "../ui/hooks/use-edit/types";
 import { applyScopedUpdates, getFirstLine } from "../util/markdown";
 import * as t from "../util/task-utils";
 

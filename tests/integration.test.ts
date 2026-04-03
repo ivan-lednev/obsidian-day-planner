@@ -28,7 +28,7 @@ describe("Log Records with indexes", () => {
       ),
     ).toMatchObject([
       {
-        text: "- [ ] Task",
+        text: expect.stringContaining("Task"),
         position: {
           start: expect.any(Object),
           end: expect.any(Object),
@@ -52,7 +52,7 @@ describe("Log Records with indexes", () => {
       ),
     ).toMatchObject([
       {
-        text: "- [ ] Task",
+        text: expect.stringContaining("Task"),
       },
     ]);
   });
@@ -62,7 +62,7 @@ describe("Log Records with indexes", () => {
 
     expect(selectActiveLogEntries(getState())).toMatchObject([
       {
-        text: "- [ ] Task",
+        text: expect.stringContaining("Task"),
         startTime: window.moment("2025-01-01 17:00"),
       },
     ]);

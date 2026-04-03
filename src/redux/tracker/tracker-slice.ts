@@ -20,10 +20,13 @@ import { getDayKeysInRange, strictParse } from "../../util/moment";
 import { getDayKey, getEndTime } from "../../util/task-utils";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
+import { getFirstLine } from "../../util/markdown";
 
-export interface TaskEntry {
+export interface ListItemEntry {
   id: string;
   text: string;
+  task?: string;
+  symbol: string;
   position: Pos;
   propsPosition?: Pos;
   path: string;
@@ -31,7 +34,10 @@ export interface TaskEntry {
   planEntries?: string[];
 }
 
-type DenormalizedTaskEntry = Omit<TaskEntry, "logEntries" | "planEntries"> & {
+type DenormalizedTaskEntry = Omit<
+  ListItemEntry,
+  "logEntries" | "planEntries"
+> & {
   logEntries: LogEntry[];
   planEntries: PlanEntry[];
 };
@@ -55,7 +61,7 @@ export interface PlanEntry {
 
 interface IndexSliceState {
   taskEntries: {
-    byId: Record<string, TaskEntry>;
+    byId: Record<string, ListItemEntry>;
     byPath: Record<string, string[]>;
   };
   logEntries: {
@@ -86,7 +92,7 @@ const initialState: IndexSliceState = {
 
 interface FileIndex {
   path: string;
-  taskEntries?: TaskEntry[];
+  taskEntries?: ListItemEntry[];
   logEntries?: LogEntry[];
   planEntries?: PlanEntry[];
 }
@@ -303,12 +309,13 @@ export const trackerSlice = createAppSlice({
 
 export function planEntryToLocalTask(
   logEntry: PlanEntry,
-  taskEntry: TaskEntry,
+  taskEntry: ListItemEntry,
 ): LocalTask {
   return {
+    status: taskEntry.task,
     text: taskEntry.text,
     location: { path: taskEntry.path, position: taskEntry.position },
-    symbol: "-",
+    symbol: taskEntry.symbol,
     startTime: strictParse(logEntry.start),
     durationMinutes: 30,
     id: logEntry.id,
@@ -377,6 +384,8 @@ function getHeadingSectionPosition(cache: CachedMetadata, headingText: string) {
   }
 
   const target = headings[targetIndex];
+
+  isNotVoid(target);
 
   const nextBoundary = headings
     .slice(targetIndex + 1)
@@ -507,6 +516,27 @@ export function createIndexListener(props: {
     ];
   }
 
+  const listItemRegExp = new RegExp(
+    "^[\\s>]*(?<symbol>\\d+\\.|\\d+\\)|\\*|-|\\+)\\s*(?:\\[(?<task>.)\\])?\\s*(?<text>.*)$",
+    "mu",
+  );
+
+  function parseListItemLine(line: string) {
+    const match = line.match(listItemRegExp);
+
+    isRecordOfType<string>(
+      match?.groups,
+      (value) => typeof value === "string",
+      "Mismatching named regexp groups",
+    );
+
+    const { symbol, text = "", task } = match.groups;
+
+    isNotVoid(symbol);
+
+    return { task, symbol, text: text.trim() };
+  }
+
   function getListItemEntries(
     cache: CachedMetadata,
     contents: string,
@@ -525,18 +555,17 @@ export function createIndexListener(props: {
             contents,
             listItemCache.position,
           );
-          const firstLine = listItemText.split("\n")[0];
-
-          isNotVoid(
-            firstLine,
-            "Inconsistent metadata cache state: the first line of any list cannot be empty",
+          const { text, symbol, task } = parseListItemLine(
+            getFirstLine(listItemText),
           );
 
           const taskEntryId = createId(path, listItemCache.position.start.line);
 
           const listItemEntry: DenormalizedTaskEntry = {
             id: taskEntryId,
-            text: firstLine,
+            text,
+            symbol,
+            task,
             position: listItemCache.position,
             path,
             logEntries: [],
@@ -551,7 +580,7 @@ export function createIndexListener(props: {
             )
           ) {
             const time = getTimeFromLine({
-              line: firstLine,
+              line: text,
               day: dateFromPath,
             });
             const id = createId(taskEntryId, "daily");
@@ -587,7 +616,7 @@ export function createIndexListener(props: {
 
           if (isTaskCache(listItemCache)) {
             const obsidianTasksEntries = getObsidianTasksEntries({
-              firstLine,
+              firstLine: text,
               parentId: taskEntryId,
             });
 

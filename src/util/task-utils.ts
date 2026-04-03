@@ -23,7 +23,6 @@ import {
   type TaskLocation,
   type WithTime,
 } from "../task-types";
-import { EditMode } from "../ui/hooks/use-edit/types";
 
 import { createMarkdownListTokens } from "./dataview";
 import { getId } from "./id";
@@ -161,8 +160,6 @@ export function getDayKey(day: Moment) {
 }
 
 export function toString(task: WithTime<LocalTask>) {
-  const firstLineWithoutListTokens = removeListTokens(getFirstLine(task.text));
-
   const updatedTimestamp = createTimestamp(
     getMinutesSinceMidnight(task.startTime),
     task.durationMinutes,
@@ -171,8 +168,8 @@ export function toString(task: WithTime<LocalTask>) {
   const listTokens = createMarkdownListTokens(task);
 
   const withUpdatedOrDeletedTimestamp = task.isAllDayEvent
-    ? removeTimestamp(firstLineWithoutListTokens)
-    : replaceOrPrependTimestamp(firstLineWithoutListTokens, updatedTimestamp);
+    ? removeTimestamp(getFirstLine(task.text))
+    : replaceOrPrependTimestamp(getFirstLine(task.text), updatedTimestamp);
 
   const updatedFirstLineText = updateScheduledPropInText(
     withUpdatedOrDeletedTimestamp,
