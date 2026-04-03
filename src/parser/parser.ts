@@ -7,6 +7,7 @@ import {
 import { getDiffInMinutes } from "../util/moment";
 
 import { parseTimestamp } from "./timestamp";
+import { isNotVoid } from "typed-assert";
 
 function execTimestampPatterns(line: string) {
   const trimmed = line.trim();
@@ -49,6 +50,11 @@ export function getTimeFromLine({ line, day }: { line: string; day: Moment }) {
   const {
     groups: { start, end },
   } = match;
+
+  isNotVoid(
+    start,
+    "Expected to find 'start' group on a timestamp regexp match",
+  );
 
   const startTime = parseTimestamp(start, day);
 

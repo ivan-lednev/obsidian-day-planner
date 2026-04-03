@@ -16,7 +16,11 @@ import type { ListPropsParser } from "../../service/list-props-parser";
 import type { PeriodicNotes } from "../../service/periodic-notes";
 import type { DayPlannerSettings } from "../../settings";
 import type { LocalTask } from "../../task-types";
-import { getDayKeysInRange, strictParse } from "../../util/moment";
+import {
+  getDayKeysInRange,
+  getDiffInMinutes,
+  strictParse,
+} from "../../util/moment";
 import { getDayKey, getEndTime } from "../../util/task-utils";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
@@ -311,13 +315,19 @@ export function planEntryToLocalTask(
   logEntry: PlanEntry,
   taskEntry: ListItemEntry,
 ): LocalTask {
+  const startTime = strictParse(logEntry.start);
+  const durationMinutes = logEntry.end
+    ? getDiffInMinutes(strictParse(logEntry.end), startTime)
+    : // todo: use settings OR logic from dataview code
+      30;
+
   return {
     status: taskEntry.task,
     text: taskEntry.text,
     location: { path: taskEntry.path, position: taskEntry.position },
     symbol: taskEntry.symbol,
-    startTime: strictParse(logEntry.start),
-    durationMinutes: 30,
+    startTime,
+    durationMinutes,
     id: logEntry.id,
     isAllDayEvent: logEntry.isAllDay,
   };
