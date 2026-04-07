@@ -5,7 +5,6 @@ import {
   checkboxRegExp,
   headingRegExp,
   listTokenWithSpacesRegExp,
-  repeatingNewlinesRegExp,
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
 
@@ -41,10 +40,6 @@ export function updateLine(
   return lines.join("\n");
 }
 
-export function normalizeNewlines(text: string) {
-  return text.replaceAll(repeatingNewlinesRegExp, "\n");
-}
-
 export function indentLines(lines: string[], indentation: string) {
   return lines.map((line) => indentation + line);
 }
@@ -56,7 +51,7 @@ export function indent(text: string, indentation: string) {
 export function getFirstLine(text: string) {
   const firstLine = text.split("\n")[0];
 
-  isNotVoid(firstLine)
+  isNotVoid(firstLine);
 
   return firstLine;
 }

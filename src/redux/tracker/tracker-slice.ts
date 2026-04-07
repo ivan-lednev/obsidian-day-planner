@@ -11,11 +11,12 @@ import { isNotVoid, isRecordOfType } from "typed-assert";
 
 import { clockFormat } from "../../constants";
 import { getTimeFromLine } from "../../parser/parser";
-import { shortScheduledPropRegExp } from "../../regexp";
+import { listItemRegExp, shortScheduledPropRegExp } from "../../regexp";
 import type { ListPropsParser } from "../../service/list-props-parser";
 import type { PeriodicNotes } from "../../service/periodic-notes";
 import type { DayPlannerSettings } from "../../settings";
 import type { LocalTask } from "../../task-types";
+import { getFirstLine } from "../../util/markdown";
 import {
   getDayKeysInRange,
   getDiffInMinutes,
@@ -24,7 +25,6 @@ import {
 import { getDayKey, getEndTime } from "../../util/task-utils";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
-import { getFirstLine } from "../../util/markdown";
 
 export interface ListItemEntry {
   id: string;
@@ -526,11 +526,6 @@ export function createIndexListener(props: {
     ];
   }
 
-  const listItemRegExp = new RegExp(
-    "^[\\s>]*(?<symbol>\\d+\\.|\\d+\\)|\\*|-|\\+)\\s*(?:\\[(?<task>.)\\])?\\s*(?<text>.*)$",
-    "mu",
-  );
-
   function parseListItemLine(line: string) {
     const match = line.match(listItemRegExp);
 
@@ -561,19 +556,34 @@ export function createIndexListener(props: {
     return (
       cache.listItems?.reduce<DenormalizedTaskEntry[]>(
         (result, listItemCache) => {
-          const listItemText = getTextAtPosition(
+          const fullListItemText = getTextAtPosition(
             contents,
             listItemCache.position,
           );
-          const { text, symbol, task } = parseListItemLine(
-            getFirstLine(listItemText),
+          const rawFirstLine = getFirstLine(fullListItemText);
+
+          const {
+            text: firstLineText,
+            symbol,
+            task,
+          } = parseListItemLine(rawFirstLine);
+
+          const trimmedLinesAfterFirst = fullListItemText
+            .split("\n")
+            .slice(1)
+            .map((line) => line.trim())
+            .join("\n");
+
+          const listItemTextInIndex = firstLineText.concat(
+            "\n",
+            trimmedLinesAfterFirst,
           );
 
           const taskEntryId = createId(path, listItemCache.position.start.line);
 
           const listItemEntry: DenormalizedTaskEntry = {
             id: taskEntryId,
-            text,
+            text: listItemTextInIndex,
             symbol,
             task,
             position: listItemCache.position,
@@ -590,7 +600,7 @@ export function createIndexListener(props: {
             )
           ) {
             const time = getTimeFromLine({
-              line: text,
+              line: firstLineText,
               day: dateFromPath,
             });
             const id = createId(taskEntryId, "daily");
@@ -626,7 +636,7 @@ export function createIndexListener(props: {
 
           if (isTaskCache(listItemCache)) {
             const obsidianTasksEntries = getObsidianTasksEntries({
-              firstLine: text,
+              firstLine: firstLineText,
               parentId: taskEntryId,
             });
 
@@ -634,7 +644,7 @@ export function createIndexListener(props: {
 
             const listItemProps = listPropsParser.getListPropsFromListItem(
               listItemCache,
-              listItemText,
+              fullListItemText,
             );
 
             listItemEntry.propsPosition = listItemProps?.position;

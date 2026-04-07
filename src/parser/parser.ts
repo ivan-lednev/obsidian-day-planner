@@ -1,4 +1,5 @@
 import type { Moment } from "moment";
+import { isNotVoid } from "typed-assert";
 
 import {
   strictTimestampAnywhereInLineRegExp,
@@ -7,7 +8,6 @@ import {
 import { getDiffInMinutes } from "../util/moment";
 
 import { parseTimestamp } from "./timestamp";
-import { isNotVoid } from "typed-assert";
 
 function execTimestampPatterns(line: string) {
   const trimmed = line.trim();

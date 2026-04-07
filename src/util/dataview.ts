@@ -143,4 +143,3 @@ export function replaceSTaskText(
 
   return lines.join("\n");
 }
-

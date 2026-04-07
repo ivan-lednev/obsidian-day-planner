@@ -21,9 +21,12 @@ const strictTime = `${hours}${strictHourMinuteSeparator}${minutes}(${amPm})?`;
 export const listTokenWithSpacesRegExp = new RegExp(listTokenWithSpaces);
 export const checkboxRegExp = new RegExp(checkbox);
 export const timeRegExp = new RegExp(time);
-export const timeFromStartRegExp = new RegExp(`^${time}`);
 export const headingRegExp = /^(#+)\s/;
 export const obsidianBlockIdRegExp = /\s\^[a-z1-9-]+$/i;
+export const listItemRegExp = new RegExp(
+  "^[\\s>]*(?<symbol>\\d+\\.|\\d+\\)|\\*|-|\\+)\\s*(?:\\[(?<task>.)\\])?\\s*(?<text>.*)$",
+  "mu",
+);
 
 export const looseTimestampAtStartOfLineRegExp = new RegExp(
   `^(?<start>${time})(?:${durationSeparator}(?<end>${time}))?`,

@@ -2,7 +2,7 @@ import { noop } from "lodash/fp";
 import type { Moment } from "moment";
 import { type CachedMetadata, MetadataCache, type Vault } from "obsidian";
 import type { SListEntry, STask } from "obsidian-dataview";
-import { derived, get, readable, writable } from "svelte/store";
+import { derived, get, writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 import { expect, vi } from "vitest";
 
@@ -182,7 +182,7 @@ export async function setUp(props?: {
     currentTime,
     pointerDateTime,
     remoteTasks,
-    localTasks
+    localTasks,
   });
 
   const allTasks = derived(
