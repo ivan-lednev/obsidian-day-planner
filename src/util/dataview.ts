@@ -9,7 +9,7 @@ import {
 import { getTimeFromLine } from "../parser/parser";
 import type {
   FileLine,
-  TaskTokens,
+  ListItemTokens,
   TaskWithoutComputedDuration,
 } from "../task-types";
 
@@ -33,24 +33,32 @@ export function getIndentationForListParagraph() {
   return " ".repeat(indentBeforeListParagraph);
 }
 
-export function textToMarkdown(sTask: Node) {
+export function getTextAsMarkdown(listItemEntry: Node) {
   const indentationForListParagraph = getIndentationForListParagraph();
 
-  const [firstLine, ...otherLines] = sTask.text.split("\n");
+  const [firstLine, ...otherLines] = listItemEntry.text.split("\n");
+  const firstLineWithTokens = `${createMarkdownListTokens(listItemEntry)} ${firstLine}`;
+  const indentedOtherLines = indentLines(
+    otherLines,
+    indentationForListParagraph,
+  );
 
-  const withIndentation = [
-    `${createMarkdownListTokens(sTask)} ${firstLine}`,
-    ...indentLines(otherLines, indentationForListParagraph),
-  ];
+  return [firstLineWithTokens, ...indentedOtherLines].join("\n");
+}
 
-  return withIndentation.join("\n");
+export function getFirstLineAsMarkdown(listItemEntry: Node) {
+  const firstLine = listItemEntry.text.split("\n")[0];
+
+  isNotVoid(firstLine);
+
+  return `${createMarkdownListTokens(listItemEntry)} ${firstLine}`;
 }
 
 const indentationPerLevel = "\t";
 
 // todo: use createIndentation
 export function toString(node: Node, parentIndentation = ""): string {
-  const nodeText = indent(textToMarkdown(node), parentIndentation);
+  const nodeText = indent(getFirstLineAsMarkdown(node), parentIndentation);
 
   return node.children.reduce((result, current) => {
     const indentation = `${indentationPerLevel}${parentIndentation}`;
@@ -118,28 +126,15 @@ export function toTask(sTask: STask, day: Moment): TaskWithoutComputedDuration {
 
 export function textToMarkdownWithIndentation(sTask: STask) {
   return indent(
-    textToMarkdown(sTask),
+    getFirstLineAsMarkdown(sTask),
     createIndentation(sTask.position.start.col),
   );
 }
 
-export function createMarkdownListTokens(task: TaskTokens) {
-  if (task.status === undefined) {
-    return task.symbol;
+export function createMarkdownListTokens(listItem: ListItemTokens) {
+  if (listItem.status === undefined) {
+    return listItem.symbol;
   }
 
-  return `${task.symbol} ${checkbox(task.status)}`;
-}
-
-export function replaceSTaskText(
-  contents: string,
-  sTask: STask,
-  newText: string,
-) {
-  const lines = contents.split("\n");
-  const deleteCount = sTask.position.end.line - sTask.position.start.line + 1;
-
-  lines.splice(sTask.position.start.line, deleteCount, newText);
-
-  return lines.join("\n");
+  return `${listItem.symbol} ${checkbox(listItem.status)}`;
 }

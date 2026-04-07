@@ -41,7 +41,7 @@ export interface TaskLocation {
   position: Pos;
 }
 
-export interface TaskTokens {
+export interface ListItemTokens {
   symbol: string;
   status?: string;
 }
@@ -82,7 +82,7 @@ export interface RemoteTask extends BaseTask {
 
 type Side = "top" | "bottom" | "left" | "right";
 
-export interface LocalTask extends TaskTokens, BaseTask {
+export interface LocalTask extends ListItemTokens, BaseTask {
   text: string;
   lines?: Array<FileLine>;
 

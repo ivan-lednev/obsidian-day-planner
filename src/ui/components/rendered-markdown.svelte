@@ -2,6 +2,7 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import type { FileLine, LocalTask } from "../../task-types";
   import { removeTimestamp } from "../../util/task-utils";
+  import { getFirstLineAsMarkdown } from "../../util/dataview";
   import { deleteProps } from "../../util/props";
   import { getFirstLine, getLinesAfterFirst } from "../../util/markdown";
   import dedent from "ts-dedent";
@@ -74,7 +75,7 @@
   <div
     class="first-line-wrapper"
     {@attach createRenderMarkdownAttachment(
-      removeTimestamp(deleteProps(getFirstLine(task.text))),
+      removeTimestamp(deleteProps(getFirstLineAsMarkdown(task))),
       task.lines?.[0] || [],
     )}
   ></div>
@@ -85,6 +86,7 @@
     <div
       class="lines-after-first-wrapper"
       {@attach createRenderMarkdownAttachment(
+        // todo: they are already dedented
         dedent(deleteProps(getLinesAfterFirst(task.text))).trimStart(),
         task.lines?.slice(1) || [],
       )}
