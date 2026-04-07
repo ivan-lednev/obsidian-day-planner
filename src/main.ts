@@ -12,6 +12,7 @@ import { isInstanceOf, isNotVoid } from "typed-assert";
 import { z } from "zod";
 
 import {
+  defaultDayFormat,
   obsidianContextKey,
   viewTypeReleaseNotes,
   viewTypeTimeline,
@@ -70,21 +71,72 @@ import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 
-const icalSchema = z
-  .object({
-    name: z.string().default(""),
-    url: z.string().default(""),
-    color: z.string().default(""),
-    email: z.string().default(""),
-  })
-  .passthrough();
+const icalSchema = z.object({
+  name: z.string().default(""),
+  url: z.string().default(""),
+  color: z.string().default(""),
+  email: z.string().default(""),
+});
 
-const settingsSchema = z
-  .object({
-    icals: z.array(icalSchema).default([]),
-    dataviewSource: z.string().default(""),
-  })
-  .passthrough();
+const colorOverrideSchema = z.object({
+  text: z.string().default(""),
+  color: z.string().default(""),
+  darkModeColor: z.string().default(""),
+});
+
+const timelineColumnsSchema = z.object({
+  planner: z.boolean().default(true),
+  timeTracker: z.boolean().default(false),
+});
+
+const settingsSchema = z.object({
+  progressIndicator: z
+    .enum(["mini-timeline", "pie", "bar", "none"])
+    .default("mini-timeline"),
+  showTaskNotification: z.boolean().default(false),
+  zoomLevel: z.number().min(0.5).max(10).default(2),
+  timelineIcon: z.string().default("calendar-with-checkmark"),
+  endLabel: z.string().default("All done"),
+  startHour: z.number().int().min(0).max(23).default(6),
+  timelineDateFormat: z.string().default(defaultDayFormat),
+  centerNeedle: z.boolean().default(false),
+  plannerHeading: z.string().default("Day planner"),
+  plannerHeadingLevel: z.number().int().min(1).max(6).default(1),
+  timelineColored: z.boolean().default(false),
+  timelineStartColor: z.string().default("#006466"),
+  timelineEndColor: z.string().default("#4d194d"),
+  timestampFormat: z.string().default("HH:mm"),
+  hourFormat: z.string().default("H"),
+  dataviewSource: z.string().default(""),
+  extendDurationUntilNext: z.boolean().default(false),
+  defaultDurationMinutes: z.number().min(1).default(30),
+  minimalDurationMinutes: z.number().min(1).default(10),
+  showTimestampInTaskBlock: z.boolean().default(false),
+  showUncheduledTasks: z.boolean().default(true),
+  showUnscheduledNestedTasks: z.boolean().default(true),
+  showNow: z.boolean().default(true),
+  showNext: z.boolean().default(true),
+  pluginVersion: z.string().default(""),
+  showCompletedTasks: z.boolean().default(true),
+  showSubtasksInTaskBlocks: z.boolean().default(true),
+  icals: z.array(icalSchema).default([]),
+  colorOverrides: z.array(colorOverrideSchema).default([]),
+  releaseNotes: z.boolean().default(true),
+  taskStatusOnCreation: z.string().default(" "),
+  eventFormatOnCreation: z.enum(["task", "bullet"]).default("task"),
+  sortTasksInPlanAfterEdit: z.boolean().default(false),
+  firstDayOfWeek: z
+    .enum(["monday", "sunday", "saturday", "friday"])
+    .default("monday"),
+  multiDayRange: z.enum(["full-week", "work-week", "3-days"]).default("3-days"),
+  showActiveClocks: z.boolean().default(false),
+  showTimelineInSidebar: z.boolean().default(true),
+  snapStepMinutes: z.number().min(1).default(10),
+  timelineColumns: timelineColumnsSchema.default({
+    planner: true,
+    timeTracker: false,
+  }),
+});
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
