@@ -628,7 +628,10 @@ export function createIndexListener(props: {
                 parent: taskEntryId,
                 start: dateFromPath.format(clockFormat),
                 // todo: this is not needed
-                end: dateFromPath.clone().add(1, "hour").format(clockFormat),
+                end: dateFromPath
+                  .clone()
+                  .add(settings.defaultDurationMinutes, "minutes")
+                  .format(clockFormat),
                 isAllDay: true,
               });
             }

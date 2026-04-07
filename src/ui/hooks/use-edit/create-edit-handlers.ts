@@ -11,6 +11,7 @@ import * as t from "../../../util/task-utils";
 
 import type { EditOperation } from "./types";
 import { EditMode } from "./types";
+import { isNotVoid } from "typed-assert";
 
 export interface UseEditHandlersProps {
   startEdit: (operation: EditOperation) => void;
@@ -55,9 +56,7 @@ export function createEditHandlers({
   function handleResizerMouseDown(task: WithTime<LocalTask>, mode: EditMode) {
     const pointerDay = get(pointerDateTime).dateTime;
 
-    if (!pointerDay) {
-      throw new Error("Day cannot be undefined on edit");
-    }
+    isNotVoid(pointerDay, "Day cannot be undefined on edit");
 
     startEdit({ task, mode });
   }
