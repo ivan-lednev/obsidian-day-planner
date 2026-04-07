@@ -78,7 +78,7 @@ export class DataviewFacade {
       this.getDataview()
         ?.pages(
           paths
-            .map((it) => `"${it.replace(/"/g, '\\"')}"`)
+            .map((it) => `"${it.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`)
             .join(" OR "),
         )
         .file.lists.array() || []
