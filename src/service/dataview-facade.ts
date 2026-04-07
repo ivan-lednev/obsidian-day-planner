@@ -76,7 +76,11 @@ export class DataviewFacade {
   getAllListsFrom = (paths: string[]) => {
     return (
       this.getDataview()
-        ?.pages(paths.map((it) => `"${it}"`).join(" OR "))
+        ?.pages(
+          paths
+            .map((it) => `"${it.replace(/"/g, '\\"')}"`)
+            .join(" OR "),
+        )
         .file.lists.array() || []
     );
   };

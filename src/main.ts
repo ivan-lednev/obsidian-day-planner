@@ -9,6 +9,7 @@ import {
 import { getAPI } from "obsidian-dataview";
 import { fromStore, get, type Readable, type Writable } from "svelte/store";
 import { isInstanceOf, isNotVoid } from "typed-assert";
+import { z } from "zod";
 
 import {
   obsidianContextKey,
@@ -69,6 +70,22 @@ import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 
+const icalSchema = z
+  .object({
+    name: z.string().default(""),
+    url: z.string().default(""),
+    color: z.string().default(""),
+    email: z.string().default(""),
+  })
+  .passthrough();
+
+const settingsSchema = z
+  .object({
+    icals: z.array(icalSchema).default([]),
+    dataviewSource: z.string().default(""),
+  })
+  .passthrough();
+
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
   private settingsStore!: Writable<DayPlannerSettings>;
@@ -82,10 +99,12 @@ export default class DayPlanner extends Plugin {
 
   async onload() {
     const { vault, metadataCache } = this.app;
+    const rawData = await this.loadData();
+    const validatedSettings = settingsSchema.safeParse(rawData);
 
     const initialSettings: DayPlannerSettings = {
       ...defaultSettings,
-      ...(await this.loadData()),
+      ...(validatedSettings.success ? validatedSettings.data : {}),
     };
 
     const getTasksApi = createGetTasksApi(this.app);

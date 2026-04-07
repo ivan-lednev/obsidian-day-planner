@@ -25,12 +25,25 @@ export const checkIcalEventsChanged = createSelectorChangePredicate(
   selectAllIcalEventsWithIcalConfigs,
 );
 
+const MAX_ICAL_SIZE = 1024 * 1024;
+
 export function createCachingFetcher() {
   const previousFetches = new Map<string, string>();
 
   return async (url: string) => {
     try {
-      const response = await request({ url });
+      const response = await request({
+        url,
+        timeout: 30_000,
+      });
+
+      if (new TextEncoder().encode(response).byteLength > MAX_ICAL_SIZE) {
+        console.warn(
+          `[Day Planner] iCal response too large for ${url}, using cache`,
+        );
+
+        return previousFetches.get(url) || "";
+      }
 
       previousFetches.set(url, response);
 

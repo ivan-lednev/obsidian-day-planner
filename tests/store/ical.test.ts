@@ -7,12 +7,15 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { initialState as initialGlobalState } from "../../src/redux/global-slice";
 import {
   icalRefreshRequested,
+  selectAllIcalEventsWithIcalConfigs,
   selectRemoteTasks,
 } from "../../src/redux/ical/ical-slice";
+import { createCachingFetcher } from "../../src/redux/ical/init-ical-listeners";
 import { initListenerMiddleware } from "../../src/redux/listener-middleware";
 import { makeStore, type RootState } from "../../src/redux/store";
 import { ListPropsParser } from "../../src/service/list-props-parser";
 import { defaultSettingsForTests } from "../../src/settings";
+import { getId } from "../../src/util/id";
 import { FakeMetadataCache, InMemoryVault } from "../test-utils";
 
 vi.mock("obsidian", () => ({
@@ -60,6 +63,9 @@ const defaultPreloadedStateForTests: Partial<RootState> = {
     },
   },
 };
+
+const defaultIcalConfig =
+  defaultPreloadedStateForTests.settings?.settings.icals[0];
 
 function makeStoreForTests(props?: { preloadedState?: Partial<RootState> }) {
   const { preloadedState = defaultPreloadedStateForTests } = props || {};
@@ -153,6 +159,79 @@ describe("ical", () => {
     const remoteTasks = selectRemoteTasks(getState());
 
     expect(remoteTasks).toHaveLength(1);
+  });
+
+  test("Large iCal responses fall back to the cached response", async () => {
+    const fetcher = createCachingFetcher();
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const cachedResponse = "BEGIN:VCALENDAR\nEND:VCALENDAR";
+
+    vi.mocked(request).mockResolvedValueOnce(cachedResponse);
+
+    expect(await fetcher("https://example.com")).toBe(cachedResponse);
+    expect(request).toHaveBeenLastCalledWith({
+      url: "https://example.com",
+      timeout: 30_000,
+    });
+
+    vi.mocked(request).mockResolvedValueOnce("x".repeat(1024 * 1024 + 1));
+
+    expect(await fetcher("https://example.com")).toBe(cachedResponse);
+    expect(warnSpy).toHaveBeenCalledWith(
+      "[Day Planner] iCal response too large for https://example.com, using cache",
+    );
+  });
+
+  test("Invalid iCal text is ignored without throwing", () => {
+    const store = makeStoreForTests({
+      preloadedState: {
+        ...defaultPreloadedStateForTests,
+        ical: {
+          icalEvents: [],
+          plainTextIcals: [
+            {
+              icalConfig: defaultIcalConfig!,
+              text: "<html>not an ical file</html>",
+            },
+          ],
+          serializedRemoteTasks: [],
+        },
+      },
+    });
+
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    expect(selectAllIcalEventsWithIcalConfigs(store.getState())).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(
+      "[Day Planner] Invalid iCal format for Test, skipping",
+    );
+  });
+
+  test("Invalid serialized remote task timestamps are ignored", () => {
+    const store = makeStoreForTests({
+      preloadedState: {
+        ...defaultPreloadedStateForTests,
+        ical: {
+          icalEvents: [],
+          plainTextIcals: [],
+          serializedRemoteTasks: [
+            {
+              calendar: defaultIcalConfig!,
+              summary: "bad timestamp",
+              rsvpStatus: "ACCEPTED",
+              startTime: "not-a-date",
+            },
+          ],
+        },
+      },
+    });
+
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    expect(selectRemoteTasks(store.getState())).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(
+      "[Day Planner] Invalid timestamp: not-a-date",
+    );
   });
 
   test.each([
@@ -257,5 +336,14 @@ describe("ical", () => {
 
   describe("Daylight savings time", () => {
     test.todo("Base case");
+  });
+});
+
+describe("getId", () => {
+  test("Creates fixed-length lowercase hex IDs", () => {
+    const ids = Array.from({ length: 1000 }, () => getId());
+
+    expect(new Set(ids)).toHaveSize(ids.length);
+    expect(ids.every((id) => /^[0-9a-f]{16}$/.test(id))).toBe(true);
   });
 });

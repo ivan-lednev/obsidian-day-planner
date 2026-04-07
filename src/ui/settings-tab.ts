@@ -1,5 +1,5 @@
 import { produce } from "immer";
-import { PluginSettingTab, Setting } from "obsidian";
+import { Notice, PluginSettingTab, Setting } from "obsidian";
 import type { Writable } from "svelte/store";
 import { isOneOf } from "typed-assert";
 
@@ -233,20 +233,48 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             }),
         );
 
-      new Setting(containerEl).setName("Remote calendar URL").addText((el) =>
-        el
-          .setPlaceholder("URL")
-          .setValue(ical.url)
-          .onChange((value: string) => {
-            const withCorrectProtocol = value.replace("webcal://", "https://");
+      new Setting(containerEl).setName("Remote calendar URL").addText((el) => {
+        el.setPlaceholder("URL").setValue(ical.url);
+        el.inputEl.addEventListener("blur", () => {
+          const value = el.getValue().trim();
 
+          if (value === "") {
             this.settingsStore.update(
               produce((draft) => {
-                draft.icals[index].url = withCorrectProtocol;
+                draft.icals[index].url = "";
               }),
             );
-          }),
-      );
+            el.setValue("");
+
+            return;
+          }
+
+          const withCorrectProtocol = value.replace(/^webcal:\/\//i, "https://");
+
+          try {
+            const parsed = new URL(withCorrectProtocol);
+
+            if (!["http:", "https:"].includes(parsed.protocol)) {
+              new Notice("Only http:// and https:// URLs are supported");
+              el.setValue(this.plugin.settings().icals[index].url);
+
+              return;
+            }
+          } catch {
+            new Notice("Invalid URL format");
+            el.setValue(this.plugin.settings().icals[index].url);
+
+            return;
+          }
+
+          this.settingsStore.update(
+            produce((draft) => {
+              draft.icals[index].url = withCorrectProtocol;
+            }),
+          );
+          el.setValue(withCorrectProtocol);
+        });
+      });
 
       new Setting(containerEl).addButton((el) =>
         el
