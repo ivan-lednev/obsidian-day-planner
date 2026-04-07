@@ -61,8 +61,16 @@ const { selectSerializedRemoteTasks } = icalSlice.selectors;
 export const selectAllIcalEventsWithIcalConfigs = createSelector(
   selectPlainTextIcals,
   (rawIcals) =>
-    rawIcals.flatMap(
-      ({ icalConfig, text }): Array<WithIcalConfig<ical.VEvent>> => {
+    rawIcals.flatMap(({ icalConfig, text }): Array<WithIcalConfig<ical.VEvent>> => {
+      if (!text.trimStart().startsWith("BEGIN:VCALENDAR")) {
+        console.warn(
+          `[Day Planner] Invalid iCal format for ${icalConfig.name}, skipping`,
+        );
+
+        return [];
+      }
+
+      try {
         const parsed = ical.parseICS(text);
 
         return Object.values(parsed)
@@ -71,15 +79,29 @@ export const selectAllIcalEventsWithIcalConfigs = createSelector(
             ...icalEvent,
             calendar: icalConfig,
           }));
-      },
-    ),
+      } catch (error) {
+        console.warn(
+          `[Day Planner] Failed to parse iCal for ${icalConfig.name}:`,
+          error,
+        );
+
+        return [];
+      }
+    }),
 );
 
 export const selectRemoteTasks = createSelector(
   selectSerializedRemoteTasks,
   (serializedRemoteTasks) =>
-    serializedRemoteTasks.map((it) => ({
-      ...it,
-      startTime: window.moment(it.startTime),
-    })),
+    serializedRemoteTasks.flatMap((it) => {
+      const startTime = window.moment(it.startTime);
+
+      if (!startTime.isValid()) {
+        console.warn(`[Day Planner] Invalid timestamp: ${it.startTime}`);
+
+        return [];
+      }
+
+      return [{ ...it, startTime }];
+    }),
 );
