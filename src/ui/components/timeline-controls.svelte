@@ -124,18 +124,6 @@
     </div>
   </div>
 
-  {#if $settings.dataviewSource}
-    <div class="pill-wrapper">
-      <Pill
-        key="filter"
-        onpointerup={() => {
-          settingsVisible = true;
-        }}
-        value={$settings.dataviewSource}
-      />
-    </div>
-  {/if}
-
   {#if settingsVisible}
     <div class="settings-wrapper">
       <SettingsControls />

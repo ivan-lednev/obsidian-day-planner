@@ -23,33 +23,8 @@
   );
 </script>
 
-<div class="dataview-source">
-  <input
-    placeholder={`-#archived and -"notes/personal"`}
-    spellcheck="false"
-    type="text"
-    bind:value={$dataviewSourceInput}
-  />
-
-  {#if $dataviewErrorMessage.length > 0}
-    <Callout type="error">
-      <ErrorMessage>
-        {$dataviewErrorMessage}
-      </ErrorMessage>
-    </Callout>
-  {/if}
-
-  <Callout type="info">
-    <a
-      href="https://blacksmithgu.github.io/obsidian-dataview/reference/sources/"
-      >Filter syntax reference</a
-    >
-  </Callout>
-</div>
-
 <div
   class="settings"
-  style:--setting-items-padding="12px"
   {@attach (el: HTMLDivElement) => {
     el.empty();
 
@@ -172,16 +147,34 @@
 ></div>
 
 <style>
-  .dataview-source {
-    display: flex;
-    flex-direction: column;
-    gap: var(--size-4-2);
+  .settings {
+    --planner-timeline-settings-font-size: var(--nav-item-size);
 
-    font-size: var(--font-ui-small);
-    color: var(--text-muted);
+    --setting-items-padding: var(--size-4-2);
+    --setting-group-heading-size: var(--planner-timeline-settings-font-size);
   }
 
-  .dataview-source input {
-    font-family: var(--font-monospace);
+  .settings :global(.setting-group .setting-item) {
+    padding: var(--size-4-2) 0;
+  }
+
+  .settings :global(.setting-group .setting-item:first-child) {
+    padding-top: 0;
+  }
+
+  .settings :global(.setting-group .setting-item:last-child) {
+    padding-bottom: 0;
+  }
+
+  .settings :global(.setting-group .setting-item-heading) {
+    padding: 0 var(--size-4-2);
+  }
+
+  .settings :global(.setting-group + .setting-group) {
+    margin-top: var(--size-4-4);
+  }
+
+  .settings :global(.setting-item-name) {
+    font-size: var(--planner-timeline-settings-font-size);
   }
 </style>
