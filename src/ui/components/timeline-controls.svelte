@@ -14,7 +14,6 @@
     ChevronRight,
     CalendarArrowUp,
   } from "./lucide";
-  import Pill from "./pill.svelte";
   import SettingsControls from "./settings-controls.svelte";
 
   const { workspaceFacade, initWeeklyView, reSync, periodicNotes } =
@@ -132,10 +131,6 @@
 </div>
 
 <style>
-  :global(.active-filter) {
-    color: var(--text-success);
-  }
-
   :global(.today),
   :global(.today:hover) {
     background-color: var(--color-accent);

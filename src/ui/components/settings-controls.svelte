@@ -3,15 +3,8 @@
   import { SettingGroup } from "obsidian";
 
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { useDataviewSource } from "../hooks/use-dataview-source";
 
-  import Callout from "./callout.svelte";
-  import ErrorMessage from "./error-message.svelte";
-
-  const { refreshDataviewFn, settings } = getObsidianContext();
-
-  const { errorMessage: dataviewErrorMessage, dataviewSourceInput } =
-    useDataviewSource({ refreshDataviewFn });
+  const { settings } = getObsidianContext();
 
   const startHourOptions = Object.fromEntries(
     range(0, 13).map((it) => [it, String(it)]),
