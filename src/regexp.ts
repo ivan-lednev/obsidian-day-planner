@@ -15,7 +15,7 @@ const amPm = "\\s?[apAP][mM](?!\\w)";
 
 const date = "\\d{4}-\\d{2}-\\d{2}";
 
-const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))(${amPm})?`;
+const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))(${amPm})?(?!\\w)`;
 const strictTime = `${hours}${strictHourMinuteSeparator}${minutes}(${amPm})?`;
 
 export const listTokenWithSpacesRegExp = new RegExp(listTokenWithSpaces);
