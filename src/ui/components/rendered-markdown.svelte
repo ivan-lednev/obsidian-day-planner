@@ -2,7 +2,9 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import type { FileLine, LocalTask } from "../../task-types";
   import { removeTimestamp } from "../../util/task-utils";
-  import { getFirstLineAsMarkdown } from "../../util/dataview";
+  import {
+    getFirstLineAsMarkdown
+  } from "../../util/dataview";
   import { deleteProps } from "../../util/props";
   import { getFirstLine, getLinesAfterFirst } from "../../util/markdown";
   import dedent from "ts-dedent";
@@ -69,15 +71,32 @@
       };
     };
   }
+
+  function toRenderableMarkdown(timeBlock: LocalTask) {
+    const formattedFirstLine = flow(
+      getFirstLineAsMarkdown,
+      deleteProps,
+      removeTimestamp,
+    )(timeBlock);
+
+    const [, ...linesAfterFirst] = timeBlock.text.split("\n");
+
+    return {
+      listItem: formattedFirstLine,
+      paragraphs: linesAfterFirst.join("\n"),
+      nestedListItems: "",
+    };
+  }
+
+  const { listItem, nestedListItems, paragraphs } = $derived(
+    toRenderableMarkdown(task),
+  );
 </script>
 
 <div class={["rendered-markdown", "planner-sticky-block-content"]}>
   <div
     class="first-line-wrapper"
-    {@attach createRenderMarkdownAttachment(
-      removeTimestamp(deleteProps(getFirstLineAsMarkdown(task))),
-      task.lines?.[0] || [],
-    )}
+    {@attach createRenderMarkdownAttachment(listItem, [])}
   ></div>
 
   {@render children?.()}
@@ -85,11 +104,7 @@
   {#if $settings.showSubtasksInTaskBlocks}
     <div
       class="lines-after-first-wrapper"
-      {@attach createRenderMarkdownAttachment(
-        // todo: they are already dedented
-        dedent(deleteProps(getLinesAfterFirst(task.text))).trimStart(),
-        task.lines?.slice(1) || [],
-      )}
+      {@attach createRenderMarkdownAttachment(paragraphs, [])}
     ></div>
   {/if}
 </div>

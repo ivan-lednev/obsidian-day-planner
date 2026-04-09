@@ -142,7 +142,6 @@
 <style>
   .settings {
     --planner-timeline-settings-font-size: var(--nav-item-size);
-
     --setting-items-padding: var(--size-4-2);
     --setting-group-heading-size: var(--planner-timeline-settings-font-size);
   }

@@ -34,11 +34,12 @@ export interface ListItemEntry {
   position: Pos;
   propsPosition?: Pos;
   path: string;
+  children?: string[];
   logEntries?: string[];
   planEntries?: string[];
 }
 
-type DenormalizedTaskEntry = Omit<
+type DenormalizedListItemEntry = Omit<
   ListItemEntry,
   "logEntries" | "planEntries"
 > & {
@@ -311,9 +312,15 @@ export const trackerSlice = createAppSlice({
   },
 });
 
+export type ListItemEntryWithChildren = Omit<ListItemEntry, "children"> & {
+  children?: ListItemEntryWithChildren[];
+};
+
 export function planEntryToLocalTask(
   logEntry: PlanEntry,
-  taskEntry: ListItemEntry,
+  listItemEntry: ListItemEntry,
+  // todo: remove previous one
+  listItemEntryWithChildren?: ListItemEntryWithChildren,
 ): LocalTask {
   const startTime = strictParse(logEntry.start);
   const durationMinutes = logEntry.end
@@ -322,14 +329,15 @@ export function planEntryToLocalTask(
       30;
 
   return {
-    status: taskEntry.task,
-    text: taskEntry.text,
-    location: { path: taskEntry.path, position: taskEntry.position },
-    symbol: taskEntry.symbol,
+    status: listItemEntry.task,
+    text: listItemEntry.text,
+    location: { path: listItemEntry.path, position: listItemEntry.position },
+    symbol: listItemEntry.symbol,
     startTime,
     durationMinutes,
     id: logEntry.id,
     isAllDayEvent: logEntry.isAllDay,
+    children: listItemEntryWithChildren?.children,
   };
 }
 
@@ -370,6 +378,7 @@ function getTextAtPosition(inputText: string, position: Pos) {
 
 type PartialPos = Omit<Pos, "end"> & { end?: Loc };
 
+// todo: move to metadata-utils
 function isInside(inner: Pos, outer: PartialPos) {
   const innerStartIsInside = inner.start.offset >= outer.start.offset;
 
@@ -380,6 +389,7 @@ function isInside(inner: Pos, outer: PartialPos) {
   return innerStartIsInside && inner.end.offset <= outer.end.offset;
 }
 
+// todo: move to metadata utils
 function getHeadingSectionPosition(cache: CachedMetadata, headingText: string) {
   const { headings } = cache;
 
@@ -405,6 +415,18 @@ function getHeadingSectionPosition(cache: CachedMetadata, headingText: string) {
     start: target.position.start,
     end: nextBoundary?.position.start,
   };
+}
+
+function createLineToChildrenLookup(listItems: ListItemCache[]) {
+  return listItems.reduce<Record<number, ListItemCache[]>>((result, item) => {
+    if (item.parent < 0) {
+      return result;
+    }
+
+    (result[item.parent] ??= []).push(item);
+
+    return result;
+  }, {});
 }
 
 export function createIndexListener(props: {
@@ -553,127 +575,152 @@ export function createIndexListener(props: {
       settings.plannerHeading,
     );
 
-    return (
-      cache.listItems?.reduce<DenormalizedTaskEntry[]>(
-        (result, listItemCache) => {
-          const fullListItemText = getTextAtPosition(
-            contents,
-            listItemCache.position,
-          );
-          const rawFirstLine = getFirstLine(fullListItemText);
+    if (!cache.listItems) {
+      return [];
+    }
 
-          const {
-            text: firstLineText,
-            symbol,
-            task,
-          } = parseListItemLine(rawFirstLine);
+    const denormalizedListItemEntries = cache.listItems.reduce<
+      DenormalizedListItemEntry[]
+    >((result, listItemCache) => {
+      const fullListItemText = getTextAtPosition(
+        contents,
+        listItemCache.position,
+      );
+      const rawFirstLine = getFirstLine(fullListItemText);
 
-          const trimmedLinesAfterFirst = fullListItemText
-            .split("\n")
-            .slice(1)
-            .map((line) => line.trim())
-            .join("\n");
+      const {
+        text: firstLineText,
+        symbol,
+        task,
+      } = parseListItemLine(rawFirstLine);
 
-          const listItemTextInIndex = firstLineText.concat(
-            "\n",
-            trimmedLinesAfterFirst,
-          );
+      const trimmedLinesAfterFirst = fullListItemText
+        .split("\n")
+        .slice(1)
+        .map((line) => line.trim())
+        .join("\n");
 
-          const taskEntryId = createId(path, listItemCache.position.start.line);
+      const listItemTextInIndex = firstLineText + "\n" + trimmedLinesAfterFirst;
 
-          const listItemEntry: DenormalizedTaskEntry = {
-            id: taskEntryId,
-            text: listItemTextInIndex,
-            symbol,
-            task,
-            position: listItemCache.position,
-            path,
-            logEntries: [],
-            planEntries: [],
-          };
+      const taskEntryId = createId(path, listItemCache.position.start.line);
 
-          if (
-            dateFromPath &&
-            isInsideDailyNoteParseScope(
-              listItemCache.position,
-              plannerHeadingSectionPosition,
-            )
-          ) {
-            const time = getTimeFromLine({
-              line: firstLineText,
-              day: dateFromPath,
-            });
-            const id = createId(taskEntryId, "daily");
-            const dayKeys = [getDayKey(dateFromPath)];
+      const listItemEntry: DenormalizedListItemEntry = {
+        id: taskEntryId,
+        text: listItemTextInIndex,
+        symbol,
+        task,
+        position: listItemCache.position,
+        path,
+        logEntries: [],
+        planEntries: [],
+      };
 
-            if (time) {
-              const { startTime, durationMinutes } = time;
-              const endTime = getEndTime({
-                startTime,
-                durationMinutes:
-                  durationMinutes ?? settings.defaultDurationMinutes,
-              });
+      if (
+        dateFromPath &&
+        isInsideDailyNoteParseScope(
+          listItemCache.position,
+          plannerHeadingSectionPosition,
+        )
+      ) {
+        const time = getTimeFromLine({
+          line: firstLineText,
+          day: dateFromPath,
+        });
+        const id = createId(taskEntryId, "daily");
+        const dayKeys = [getDayKey(dateFromPath)];
 
-              listItemEntry.planEntries.push({
-                id,
-                dayKeys,
-                parent: taskEntryId,
-                start: startTime.format(clockFormat),
-                end: endTime.format(clockFormat),
-              });
-            } else if (isTaskCache(listItemCache)) {
-              listItemEntry.planEntries.push({
-                id,
-                dayKeys,
-                parent: taskEntryId,
-                start: dateFromPath.format(clockFormat),
-                // todo: this is not needed
-                end: dateFromPath
-                  .clone()
-                  .add(settings.defaultDurationMinutes, "minutes")
-                  .format(clockFormat),
-                isAllDay: true,
-              });
-            }
-          }
+        if (time) {
+          const { startTime, durationMinutes } = time;
+          const endTime = getEndTime({
+            startTime,
+            durationMinutes: durationMinutes ?? settings.defaultDurationMinutes,
+          });
 
-          if (isTaskCache(listItemCache)) {
-            const obsidianTasksEntries = getObsidianTasksEntries({
-              firstLine: firstLineText,
-              parentId: taskEntryId,
-            });
+          listItemEntry.planEntries.push({
+            id,
+            dayKeys,
+            parent: taskEntryId,
+            start: startTime.format(clockFormat),
+            end: endTime.format(clockFormat),
+          });
+        } else if (isTaskCache(listItemCache)) {
+          listItemEntry.planEntries.push({
+            id,
+            dayKeys,
+            parent: taskEntryId,
+            start: dateFromPath.format(clockFormat),
+            // todo: this is not needed
+            end: dateFromPath
+              .clone()
+              .add(settings.defaultDurationMinutes, "minutes")
+              .format(clockFormat),
+            isAllDay: true,
+          });
+        }
+      }
 
-            listItemEntry.planEntries.push(...obsidianTasksEntries);
+      if (isTaskCache(listItemCache)) {
+        // todo: new ObsidianTasksIndexer()
+        const obsidianTasksEntries = getObsidianTasksEntries({
+          firstLine: firstLineText,
+          parentId: taskEntryId,
+        });
 
-            const listItemProps = listPropsParser.getListPropsFromListItem(
-              listItemCache,
-              fullListItemText,
-            );
+        listItemEntry.planEntries.push(...obsidianTasksEntries);
 
-            listItemEntry.propsPosition = listItemProps?.position;
-            listItemEntry.logEntries =
-              listItemProps?.parsed.planner?.log?.map(({ start, end }, index) =>
-                createLogEntry({
-                  start,
-                  end,
-                  parent: taskEntryId,
-                  id: createId(taskEntryId, index),
-                }),
-              ) || [];
-          }
+        // todo: new PropsIndexer
+        const listItemProps = listPropsParser.getListPropsFromListItem(
+          listItemCache,
+          fullListItemText,
+        );
 
-          if (
-            listItemEntry.planEntries.length > 0 ||
-            listItemEntry.logEntries.length > 0
-          ) {
-            result.push(listItemEntry);
-          }
+        // todo: cut out props here, use removeWithin(text: string, outer: Pos, inner: Pos)
 
-          return result;
-        },
-        [],
-      ) || []
-    );
+        listItemEntry.propsPosition = listItemProps?.position;
+        listItemEntry.logEntries =
+          listItemProps?.parsed.planner?.log?.map(({ start, end }, index) =>
+            createLogEntry({
+              start,
+              end,
+              parent: taskEntryId,
+              id: createId(taskEntryId, index),
+            }),
+          ) || [];
+      }
+
+      if (
+        listItemEntry.planEntries.length > 0 ||
+        listItemEntry.logEntries.length > 0
+      ) {
+        result.push(listItemEntry);
+      }
+
+      return result;
+    }, []);
+
+    if (denormalizedListItemEntries.length === 0) {
+      return denormalizedListItemEntries;
+    }
+
+    const lineToChildrenLookup = createLineToChildrenLookup(cache.listItems);
+    // const idToListItemEntry = denormalizedListItemEntries.reduce<
+    //   Record<string, DenormalizedListItemEntry>
+    // >((result, current) => {
+    //   result[current.id] = current;
+    //
+    //   return result;
+    // }, {});
+
+    return denormalizedListItemEntries.map((listItemEntry) => {
+      const children = lineToChildrenLookup[listItemEntry.position.start.line];
+
+      return {
+        ...listItemEntry,
+        children: children?.map((listItemCache) => {
+          return createId(path, listItemCache.position.start.line);
+        }),
+      };
+    });
   }
 
   async function indexFile(path: string) {

@@ -2,12 +2,15 @@ import type { Moment } from "moment";
 import { isNotVoid } from "typed-assert";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
+import type { LocalTask } from "../../task-types";
 import { strictParse } from "../../util/moment";
 import { clamp, getDayKey } from "../../util/task-utils";
 import { createAppSelector } from "../create-app-selector";
 import { selectVisibleDays } from "../global-slice";
 
 import {
+  type ListItemEntry,
+  type ListItemEntryWithChildren,
   planEntryToLocalTask,
   selectLogEntriesByDay,
   selectLogEntriesById,
@@ -57,10 +60,11 @@ export const selectLogEntriesForDay = createAppSelector(
         const isActiveLogRecordForToday = isDayKeyForToday && !logEntry.end;
 
         // todo: use adapter: logEntryToLocalTask
-        const timeBlock = {
+        const timeBlock: LocalTask = {
           id: logEntry.id,
           text: taskEntry.text,
           startTime: parsedStart,
+          status: taskEntry.task,
           symbol: "-",
           durationMinutes: parsedEnd.diff(parsedStart, "minutes"),
           ...(isActiveLogRecordForToday
@@ -144,23 +148,44 @@ export const selectPlanEntriesForDays = createAppSelector(
     selectTaskEntriesById,
     (state, dayKeys: string[]) => dayKeys,
   ],
-  (planEntriesByDay, planEntriesById, taskEntriesById, dayKeys) => {
-    const uniqueTaskIds = new Set(
+  (planEntriesByDay, planEntriesById, listItemEntriesById, dayKeys) => {
+    const uniqueListItemIds = new Set(
       dayKeys.flatMap((dayKey) => Object.keys(planEntriesByDay[dayKey] || {})),
     );
 
     return (
-      [...uniqueTaskIds]?.map((id) => {
+      [...uniqueListItemIds]?.map((id) => {
         const planEntry = planEntriesById[id];
 
         isNotVoid(planEntry, "Inconsistent index state");
 
-        const taskEntry = taskEntriesById[planEntry.parent];
+        const listItemEntry = listItemEntriesById[planEntry.parent];
 
-        isNotVoid(taskEntry, "Inconsistent index state");
+        isNotVoid(listItemEntry, "Inconsistent index state");
 
-        return planEntryToLocalTask(planEntry, taskEntry);
+        const withChildren = inflateChildren(
+          listItemEntry,
+          listItemEntriesById,
+        );
+
+        return planEntryToLocalTask(planEntry, listItemEntry, withChildren);
       }) || []
     );
   },
 );
+
+function inflateChildren(
+  listItemEntry: ListItemEntry,
+  listItemEntriesById: Record<string, ListItemEntry>,
+): ListItemEntryWithChildren {
+  return {
+    ...listItemEntry,
+    children: listItemEntry.children?.map((id) => {
+      const child = listItemEntriesById[id];
+
+      isNotVoid(child, "Inconsistent index state");
+
+      return inflateChildren(child, listItemEntriesById);
+    }),
+  };
+}

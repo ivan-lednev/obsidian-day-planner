@@ -1,5 +1,6 @@
 import type { Readable, Writable } from "svelte/store";
 import { get } from "svelte/store";
+import { isNotVoid } from "typed-assert";
 
 import type { PeriodicNotes } from "../../../service/periodic-notes";
 import { WorkspaceFacade } from "../../../service/workspace-facade";
@@ -11,7 +12,6 @@ import * as t from "../../../util/task-utils";
 
 import type { EditOperation } from "./types";
 import { EditMode } from "./types";
-import { isNotVoid } from "typed-assert";
 
 export interface UseEditHandlersProps {
   startEdit: (operation: EditOperation) => void;

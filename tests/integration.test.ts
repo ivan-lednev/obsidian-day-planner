@@ -251,6 +251,19 @@ describe("Log Records with indexes", () => {
 
   test.todo("Stores Dataview tasks");
 
+  test("Stores nested list items with positions", async () => {
+    const { getState } = await setUp();
+
+    expect(selectPlanEntriesForDays(getState(), ["2025-07-28"])).toContainEqual(
+      expect.objectContaining({
+        text: expect.stringContaining("Parent"),
+        children: [
+          expect.objectContaining({ text: expect.stringContaining("Child") }),
+        ],
+      }),
+    );
+  });
+
   test.todo(
     "Nothing gets triggered for files that do not contain any tasks or relevant props",
   );

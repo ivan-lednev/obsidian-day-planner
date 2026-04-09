@@ -3,38 +3,8 @@ import type { AttendeePartStat } from "node-ical";
 import type { Pos } from "obsidian";
 
 import type { HorizontalPlacing } from "./overlap/horizontal-placing";
+import type { ListItemEntryWithChildren } from "./redux/tracker/tracker-slice";
 import type { IcalConfig } from "./settings";
-import type { Props } from "./util/props";
-
-type EntryType = "listItem" | "task" | "icalEvent";
-
-export interface Entry {
-  type: EntryType;
-}
-
-export interface IcalEntry extends Entry {
-  type: "icalEvent";
-}
-
-export interface FsEntry extends Entry {
-  path: string;
-  props: Props;
-}
-
-export interface ListItemLikeEntry extends FsEntry {
-  symbol: string;
-  position: Pos;
-  children: string[];
-}
-
-export interface ListItemEntry extends ListItemLikeEntry {
-  type: "listItem";
-}
-
-export interface TaskEntry extends ListItemLikeEntry {
-  type: "task";
-  status: string;
-}
 
 export interface TaskLocation {
   path: string;
@@ -85,6 +55,7 @@ type Side = "top" | "bottom" | "left" | "right";
 export interface LocalTask extends ListItemTokens, BaseTask {
   text: string;
   lines?: Array<FileLine>;
+  children?: Array<ListItemEntryWithChildren>;
 
   // todo: move out to InMemoryTask
   location?: TaskLocation;

@@ -25,7 +25,7 @@ import {
 interface Node {
   text: string;
   symbol: string;
-  children: Node[];
+  children?: Node[];
   status?: string;
 }
 
@@ -59,6 +59,8 @@ const indentationPerLevel = "\t";
 // todo: use createIndentation
 export function toString(node: Node, parentIndentation = ""): string {
   const nodeText = indent(getFirstLineAsMarkdown(node), parentIndentation);
+
+  isNotVoid(node.children);
 
   return node.children.reduce((result, current) => {
     const indentation = `${indentationPerLevel}${parentIndentation}`;
