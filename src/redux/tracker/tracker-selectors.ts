@@ -174,6 +174,7 @@ export const selectPlanEntriesForDays = createAppSelector(
   },
 );
 
+// todo: we do this 3 times in different places
 function inflateChildren(
   listItemEntry: ListItemEntry,
   listItemEntriesById: Record<string, ListItemEntry>,

@@ -251,14 +251,21 @@ describe("Log Records with indexes", () => {
 
   test.todo("Stores Dataview tasks");
 
-  test("Stores nested list items with positions", async () => {
+  test("Stores nested tasks and list items with positions with no duplicates", async () => {
     const { getState } = await setUp();
 
     expect(selectPlanEntriesForDays(getState(), ["2025-07-28"])).toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Parent"),
         children: [
-          expect.objectContaining({ text: expect.stringContaining("Child") }),
+          expect.objectContaining({
+            text: expect.stringContaining("Child task"),
+            position: expect.any(Object),
+          }),
+          expect.objectContaining({
+            text: expect.stringContaining("Child list item without time"),
+            position: expect.any(Object),
+          }),
         ],
       }),
     );
@@ -382,6 +389,7 @@ describe("Editing", () => {
       expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
     });
 
+    // todo: fails because we move tasks without children right now
     test(`* Moves a nested task with text between notes
 * Does not touch invalid markdown
 * Undoes the move`, async () => {

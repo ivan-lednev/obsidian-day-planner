@@ -2,12 +2,11 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import type { FileLine, LocalTask } from "../../task-types";
   import { removeTimestamp } from "../../util/task-utils";
-  import {
-    getFirstLineAsMarkdown
-  } from "../../util/dataview";
+  import { getFirstLineAsMarkdown } from "../../util/dataview";
   import { deleteProps } from "../../util/props";
   import { getFirstLine, getLinesAfterFirst } from "../../util/markdown";
   import dedent from "ts-dedent";
+  import { flow } from "lodash/fp";
   import {
     addLineDataToCheckboxes,
     readCheckboxLineData,

@@ -1,4 +1,5 @@
 import { type PayloadAction } from "@reduxjs/toolkit";
+import { uniqBy } from "lodash/fp";
 import type {
   CachedMetadata,
   ListItemCache,
@@ -45,6 +46,7 @@ type DenormalizedListItemEntry = Omit<
 > & {
   logEntries: LogEntry[];
   planEntries: PlanEntry[];
+  children: DenormalizedListItemEntry[];
 };
 
 export interface LogEntry {
@@ -312,7 +314,10 @@ export const trackerSlice = createAppSlice({
   },
 });
 
-export type ListItemEntryWithChildren = Omit<ListItemEntry, "children"> & {
+export type ListItemEntryWithChildren = Omit<
+  DenormalizedListItemEntry,
+  "children"
+> & {
   children?: ListItemEntryWithChildren[];
 };
 
@@ -387,6 +392,22 @@ function isInside(inner: Pos, outer: PartialPos) {
   }
 
   return innerStartIsInside && inner.end.offset <= outer.end.offset;
+}
+
+function flatten<T extends { children?: T[]; id: string }>(
+  node: T,
+): Array<Omit<T, "children"> & { children?: string[] }> {
+  const { children, ...rest } = node;
+
+  return [
+    {
+      ...rest,
+      ...(children
+        ? { children: (children ?? []).map((child) => child.id) }
+        : {}),
+    },
+    ...(children ?? []).flatMap(flatten),
+  ];
 }
 
 // todo: move to metadata utils
@@ -564,6 +585,48 @@ export function createIndexListener(props: {
     return { task, symbol, text: text.trim() };
   }
 
+  function createListItemEntry(props: {
+    path: string;
+    contents: string;
+    listItemCache: ListItemCache;
+  }) {
+    const { path, listItemCache, contents } = props;
+
+    const id = createId(path, listItemCache.position.start.line);
+
+    const fullListItemText = getTextAtPosition(
+      contents,
+      listItemCache.position,
+    );
+    const rawFirstLine = getFirstLine(fullListItemText);
+
+    const {
+      text: firstLineText,
+      symbol,
+      task,
+    } = parseListItemLine(rawFirstLine);
+
+    const trimmedLinesAfterFirst = fullListItemText
+      .split("\n")
+      .slice(1)
+      .map((line) => line.trim())
+      .join("\n");
+
+    const listItemTextInIndex = firstLineText + "\n" + trimmedLinesAfterFirst;
+
+    return {
+      id,
+      text: listItemTextInIndex,
+      symbol,
+      task,
+      position: listItemCache.position,
+      path,
+      children: [],
+      logEntries: [],
+      planEntries: [],
+    };
+  }
+
   function getListItemEntries(
     cache: CachedMetadata,
     contents: string,
@@ -586,34 +649,12 @@ export function createIndexListener(props: {
         contents,
         listItemCache.position,
       );
-      const rawFirstLine = getFirstLine(fullListItemText);
 
-      const {
-        text: firstLineText,
-        symbol,
-        task,
-      } = parseListItemLine(rawFirstLine);
-
-      const trimmedLinesAfterFirst = fullListItemText
-        .split("\n")
-        .slice(1)
-        .map((line) => line.trim())
-        .join("\n");
-
-      const listItemTextInIndex = firstLineText + "\n" + trimmedLinesAfterFirst;
-
-      const taskEntryId = createId(path, listItemCache.position.start.line);
-
-      const listItemEntry: DenormalizedListItemEntry = {
-        id: taskEntryId,
-        text: listItemTextInIndex,
-        symbol,
-        task,
-        position: listItemCache.position,
+      const listItemEntry: DenormalizedListItemEntry = createListItemEntry({
         path,
-        logEntries: [],
-        planEntries: [],
-      };
+        contents,
+        listItemCache,
+      });
 
       if (
         dateFromPath &&
@@ -623,10 +664,10 @@ export function createIndexListener(props: {
         )
       ) {
         const time = getTimeFromLine({
-          line: firstLineText,
+          line: listItemEntry.text,
           day: dateFromPath,
         });
-        const id = createId(taskEntryId, "daily");
+        const id = createId(listItemEntry.id, "daily");
         const dayKeys = [getDayKey(dateFromPath)];
 
         if (time) {
@@ -639,7 +680,7 @@ export function createIndexListener(props: {
           listItemEntry.planEntries.push({
             id,
             dayKeys,
-            parent: taskEntryId,
+            parent: listItemEntry.id,
             start: startTime.format(clockFormat),
             end: endTime.format(clockFormat),
           });
@@ -647,7 +688,7 @@ export function createIndexListener(props: {
           listItemEntry.planEntries.push({
             id,
             dayKeys,
-            parent: taskEntryId,
+            parent: listItemEntry.id,
             start: dateFromPath.format(clockFormat),
             // todo: this is not needed
             end: dateFromPath
@@ -662,8 +703,8 @@ export function createIndexListener(props: {
       if (isTaskCache(listItemCache)) {
         // todo: new ObsidianTasksIndexer()
         const obsidianTasksEntries = getObsidianTasksEntries({
-          firstLine: firstLineText,
-          parentId: taskEntryId,
+          firstLine: listItemEntry.text,
+          parentId: listItemEntry.id,
         });
 
         listItemEntry.planEntries.push(...obsidianTasksEntries);
@@ -682,8 +723,8 @@ export function createIndexListener(props: {
             createLogEntry({
               start,
               end,
-              parent: taskEntryId,
-              id: createId(taskEntryId, index),
+              parent: listItemEntry.id,
+              id: createId(listItemEntry.id, index),
             }),
           ) || [];
       }
@@ -702,24 +743,41 @@ export function createIndexListener(props: {
       return denormalizedListItemEntries;
     }
 
+    // tree-building for nested list item operations
+
     const lineToChildrenLookup = createLineToChildrenLookup(cache.listItems);
-    // const idToListItemEntry = denormalizedListItemEntries.reduce<
-    //   Record<string, DenormalizedListItemEntry>
-    // >((result, current) => {
-    //   result[current.id] = current;
-    //
-    //   return result;
-    // }, {});
+    const idToListItemEntry = denormalizedListItemEntries.reduce<
+      Record<string, DenormalizedListItemEntry>
+    >((result, current) => {
+      result[current.id] = current;
 
-    return denormalizedListItemEntries.map((listItemEntry) => {
-      const children = lineToChildrenLookup[listItemEntry.position.start.line];
+      return result;
+    }, {});
 
+    // todo: move out
+    function createTree(
+      listItemEntry: DenormalizedListItemEntry,
+    ): ListItemEntryWithChildren {
       return {
         ...listItemEntry,
-        children: children?.map((listItemCache) => {
-          return createId(path, listItemCache.position.start.line);
-        }),
+        children:
+          lineToChildrenLookup[listItemEntry.position.start.line]?.map(
+            (listItemCache) => {
+              const id = createId(path, listItemCache.position.start.line);
+              const previouslyIndexed = idToListItemEntry[id];
+              const listItemEntry =
+                previouslyIndexed ||
+                createListItemEntry({ path, listItemCache, contents });
+
+              return createTree(listItemEntry);
+            },
+          ) || [],
       };
+    }
+
+    // add children recursively
+    return denormalizedListItemEntries.map((listItemEntry) => {
+      return createTree(listItemEntry);
     });
   }
 
@@ -739,11 +797,16 @@ export function createIndexListener(props: {
 
     const contents = await vault.cachedRead(file);
 
-    // todo: return normalized entries
     const denormalizedEntries = getListItemEntries(cache, contents, path);
 
+    const flatListItemEntries = uniqBy(
+      (it) => it.id,
+      denormalizedEntries.flatMap(flatten),
+    );
+
+    // todo: move into a separate function
     return {
-      taskEntries: denormalizedEntries?.map(
+      taskEntries: flatListItemEntries?.map(
         ({ logEntries, planEntries, ...rest }) => ({
           logEntries: logEntries?.map((it) => it.id),
           planEntries: planEntries?.map((it) => it.id),
