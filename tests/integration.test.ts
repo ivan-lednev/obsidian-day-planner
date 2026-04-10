@@ -275,10 +275,6 @@ describe("Log Records with indexes", () => {
     "Nothing gets triggered for files that do not contain any tasks or relevant props",
   );
 
-  test.todo("No duplicates");
-
-  test.todo("Consistency");
-
   test.todo("Old versions don't overwrite new ones");
 
   test.todo("Renaming a file removes entries by the old path");
@@ -319,7 +315,7 @@ describe("Task views", () => {
     test.todo("Edits log entries from frontmatter");
   });
 
-  test.skip("Ignores tasks and lists outside of planner section in daily notes", async () => {
+  test("Ignores tasks and lists outside of planner section in daily notes", async () => {
     const { editContext } = await setUp({
       visibleDays: ["2025-07-19"],
     });
@@ -328,15 +324,41 @@ describe("Task views", () => {
       window.moment("2025-07-19"),
     );
 
-    expect(get(displayedTasks)?.withTime).toHaveLength(1);
-    expect(get(displayedTasks)?.withTime).toMatchObject([
-      { startTime: window.moment("2025-07-19 11:00"), durationMinutes: 30 },
-    ]);
+    expect(get(displayedTasks)?.noTime).not.toContainEqual(
+      expect.objectContaining({
+        text: expect.stringContaining("Task outside of planner heading"),
+      }),
+    );
   });
 
-  test.todo("Tasks do not contain duplicates");
+  test("Combines tasks from daily notes with tasks from other files", async () => {
+    const { editContext } = await setUp({
+      visibleDays: ["2025-07-19"],
+    });
 
-  test.todo("Combines tasks from daily notes with tasks from other files");
+    const displayedTasks = editContext.getDisplayedTasksForTimeline(
+      window.moment("2025-07-19"),
+    );
+
+    const { withTime, noTime } = get(displayedTasks);
+
+    expect(withTime).toContainEqual(
+      expect.objectContaining({
+        text: expect.stringContaining("List item under planner heading"),
+      }),
+    );
+    expect(withTime).toContainEqual(
+      expect.objectContaining({
+        text: expect.stringContaining("Task with time"),
+      }),
+    );
+
+    expect(noTime).toContainEqual(
+      expect.objectContaining({
+        text: expect.stringContaining("Task without time"),
+      }),
+    );
+  });
 });
 
 describe("Editing", () => {
@@ -389,7 +411,6 @@ describe("Editing", () => {
       expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
     });
 
-    // todo: fails because we move tasks without children right now
     test(`* Moves a nested task with text between notes
 * Does not touch invalid markdown
 * Undoes the move`, async () => {
@@ -433,7 +454,7 @@ describe("Editing", () => {
   });
 
   describe("Obsidian-tasks", () => {
-    test.skip("Schedules tasks & un-schedules tasks", async () => {
+    test("Schedules tasks", async () => {
       const { editContext, moveCursorTo, vault, findByText } = await setUp({
         visibleDays: ["2025-07-19"],
       });
@@ -446,6 +467,14 @@ describe("Editing", () => {
       moveCursorTo(window.moment("2025-07-19 13:00"));
 
       await editContext.confirmEdit();
+
+      expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
+    });
+
+    test("Unschedules tasks", async () => {
+      const { editContext, moveCursorTo, vault, findByText } = await setUp({
+        visibleDays: ["2025-07-19"],
+      });
 
       editContext.handlers.handleGripMouseDown(
         findByText("Task with time"),

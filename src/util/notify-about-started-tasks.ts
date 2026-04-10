@@ -3,6 +3,7 @@ import type { Task, WithTime } from "../task-types";
 
 import { getMinutesSinceMidnight } from "./moment";
 import { createTimestamp, getOneLineSummary } from "./task-utils";
+import { emDash } from "../constants";
 
 export function notifyAboutStartedTasks(
   tasks: WithTime<Task>[],
@@ -18,6 +19,7 @@ export function notifyAboutStartedTasks(
     getMinutesSinceMidnight(firstTask.startTime),
     firstTask.durationMinutes,
     settings.timestampFormat,
+    emDash,
   );
 
   new Notification(`Task started: ${summary}
