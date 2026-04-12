@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getObsidianContext } from "../../context/obsidian-context";
   import type { FileLine, LocalTask } from "../../task-types";
-  import { removeTimestamp } from "../../util/task-utils";
+  import { removeTimestamp, toRenderableMarkdown } from "../../util/task-utils";
   import { getFirstLineAsMarkdown } from "../../util/dataview";
   import { deleteProps } from "../../util/props";
   import { getFirstLine, getLinesAfterFirst } from "../../util/markdown";
@@ -71,22 +71,6 @@
     };
   }
 
-  function toRenderableMarkdown(timeBlock: LocalTask) {
-    const formattedFirstLine = flow(
-      getFirstLineAsMarkdown,
-      deleteProps,
-      removeTimestamp,
-    )(timeBlock);
-
-    const [, ...linesAfterFirst] = timeBlock.text.split("\n");
-
-    return {
-      listItem: formattedFirstLine,
-      paragraphs: linesAfterFirst.join("\n"),
-      nestedListItems: "",
-    };
-  }
-
   const { listItem, nestedListItems, paragraphs } = $derived(
     toRenderableMarkdown(task),
   );
@@ -100,10 +84,10 @@
 
   {@render children?.()}
 
-  {#if $settings.showSubtasksInTaskBlocks}
+  {#if $settings.showSubtasksInTaskBlocks && nestedListItems}
     <div
       class="lines-after-first-wrapper"
-      {@attach createRenderMarkdownAttachment(paragraphs, [])}
+      {@attach createRenderMarkdownAttachment(nestedListItems, [])}
     ></div>
   {/if}
 </div>

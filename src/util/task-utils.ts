@@ -24,9 +24,19 @@ import {
   type WithTime,
 } from "../task-types";
 
-import { createMarkdownListTokens } from "./dataview";
+import {
+  type Node,
+  createMarkdownListTokens,
+  getFirstLineAsMarkdown,
+  getIndentationForListParagraph,
+} from "./dataview";
 import { getId } from "./id";
-import { getFirstLine, getLinesAfterFirst, removeListTokens } from "./markdown";
+import {
+  getFirstLine,
+  getLinesAfterFirst,
+  indentLines,
+  removeListTokens,
+} from "./markdown";
 import * as m from "./moment";
 import {
   addMinutes,
@@ -34,7 +44,7 @@ import {
   minutesToMoment,
   minutesToMomentOfDay,
 } from "./moment";
-import { updateScheduledPropInText } from "./props";
+import { deleteProps, updateScheduledPropInText } from "./props";
 
 export function getEndMinutes(task: {
   startTime: Moment;
@@ -344,4 +354,47 @@ export function getBlockProps(task: Task, settings: DayPlannerSettings) {
   }
 
   return result.join(` ${bullet} `);
+}
+
+export function toRenderableMarkdown(timeBlock: Node) {
+  const formattedFirstLine = flow(
+    getFirstLineAsMarkdown,
+    deleteProps,
+    removeTimestamp,
+  )(timeBlock);
+
+  const [, ...linesAfterFirst] = timeBlock.text.split("\n");
+
+  const nestedListItems = timeBlock.children
+    ?.map((child) => getIndentedText(child))
+    .join("\n");
+
+  return {
+    listItem: formattedFirstLine,
+    paragraphs: linesAfterFirst.join("\n"),
+    nestedListItems,
+  };
+}
+
+function getIndentedText(root: Node, parentIndentation: string = ""): string {
+  const firstLine = getFirstLineAsMarkdown(root);
+  const [, ...linesAfterFirst] = root.text.split("\n");
+
+
+  let listItemLineWithParagraphs = firstLine;
+
+  if (linesAfterFirst) {
+    const indentedParagraphs = indentLines(
+      linesAfterFirst,
+      getIndentationForListParagraph(),
+    ).join("\n");
+
+    listItemLineWithParagraphs += "\n" + indentedParagraphs;
+  }
+
+  return (root.children ?? []).reduce<string>((result, current) => {
+    const indentation = "\t" + parentIndentation;
+
+    return result + getIndentedText(current, indentation);
+  }, listItemLineWithParagraphs);
 }

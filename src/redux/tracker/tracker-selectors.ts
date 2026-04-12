@@ -117,7 +117,7 @@ export const selectPlanEntriesForVisibleDays = createAppSelector(
     selectVisibleDays,
   ],
   // todo: copy-pasta. Can we re-use it without breaking caching?
-  (planEntriesByDay, planEntriesById, taskEntriesById, dayKeysFull) => {
+  (planEntriesByDay, planEntriesById, listItemEntriesById, dayKeysFull) => {
     const uniqueTaskIds = new Set(
       dayKeysFull
         // todo: do not store full timestamp in store
@@ -131,11 +131,16 @@ export const selectPlanEntriesForVisibleDays = createAppSelector(
 
         isNotVoid(planEntry, "Inconsistent index state");
 
-        const taskEntry = taskEntriesById[planEntry.parent];
+        const listItemEntry = listItemEntriesById[planEntry.parent];
 
-        isNotVoid(taskEntry, "Inconsistent index state");
+        isNotVoid(listItemEntry, "Inconsistent index state");
 
-        return planEntryToLocalTask(planEntry, taskEntry);
+        const withChildren = inflateChildren(
+          listItemEntry,
+          listItemEntriesById,
+        );
+
+        return planEntryToLocalTask(planEntry, listItemEntry, withChildren);
       }) || []
     );
   },

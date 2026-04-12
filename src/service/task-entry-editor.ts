@@ -138,6 +138,7 @@ export class TaskEntryEditor {
       );
     } else {
       const afterFirstLine = {
+        // todo: replace all '+ 1' with editor-util
         line: listItemCache.position.start.line + 1,
         ch: 0,
       };

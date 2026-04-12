@@ -13,7 +13,9 @@ export interface TaskLocation {
 
 export interface ListItemTokens {
   symbol: string;
+  // todo: remove when we remove dataview
   status?: string;
+  task?: string;
 }
 
 export interface FileLine {

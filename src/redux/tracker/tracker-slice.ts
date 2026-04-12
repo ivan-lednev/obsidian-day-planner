@@ -612,7 +612,10 @@ export function createIndexListener(props: {
       .map((line) => line.trim())
       .join("\n");
 
-    const listItemTextInIndex = firstLineText + "\n" + trimmedLinesAfterFirst;
+    const listItemTextInIndex =
+      trimmedLinesAfterFirst.length > 0
+        ? firstLineText + "\n" + trimmedLinesAfterFirst
+        : firstLineText;
 
     return {
       id,
@@ -832,7 +835,9 @@ export function createIndexListener(props: {
           };
         }
       } catch (error) {
-        console.error(error);
+        console.error(
+          new Error(`Failed to parse file ${path}`, { cause: error }),
+        );
       }
 
       return undefined;

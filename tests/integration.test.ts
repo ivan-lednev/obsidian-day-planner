@@ -12,7 +12,7 @@ import {
 import { defaultSettingsForTests } from "../src/settings";
 import { EditMode } from "../src/ui/hooks/use-edit/types";
 import { strictParse } from "../src/util/moment";
-import { getDayKey } from "../src/util/task-utils";
+import { getDayKey, toRenderableMarkdown } from "../src/util/task-utils";
 
 import { setUp } from "./integration/setup";
 import { getPathToDiff } from "./test-utils";
@@ -230,8 +230,6 @@ describe("Log Records with indexes", () => {
     );
   });
 
-  test.todo("Does not store tasks & list items outside planner heading");
-
   test("Stores tasks from obsidian-tasks (scheduled)", async () => {
     const { getState } = await setUp();
 
@@ -260,6 +258,7 @@ describe("Log Records with indexes", () => {
         children: [
           expect.objectContaining({
             text: expect.stringContaining("Child task"),
+            task: " ",
             position: expect.any(Object),
           }),
           expect.objectContaining({
@@ -270,6 +269,8 @@ describe("Log Records with indexes", () => {
       }),
     );
   });
+
+  test.todo("Does not fail on list items inside other list items' lines");
 
   test.todo(
     "Nothing gets triggered for files that do not contain any tasks or relevant props",
@@ -309,11 +310,24 @@ describe("Log Records with indexes", () => {
 });
 
 describe("Task views", () => {
-  describe("Frontmatter", () => {
-    test.todo("Shows log entries from frontmatter");
+  test.only("Shows nested list items (tasks & plain list items) with their paragraphs and checkboxes", async () => {
+    const { getState } = await setUp();
 
-    test.todo("Edits log entries from frontmatter");
+    const planEntries = selectPlanEntriesForDays(getState(), ["2025-07-28"]);
+    const taskWithNestedListItems = planEntries.find((entry) =>
+      entry.text.includes("Parent"),
+    );
+
+    isNotVoid(taskWithNestedListItems);
+
+    const { nestedListItems } = toRenderableMarkdown(taskWithNestedListItems);
+
+    expect(nestedListItems).toBe(`- [ ] Child task
+  Child text
+- Child list item without time`);
   });
+
+  test.todo("Does not show code blocks in rendered markdown");
 
   test("Ignores tasks and lists outside of planner section in daily notes", async () => {
     const { editContext } = await setUp({
