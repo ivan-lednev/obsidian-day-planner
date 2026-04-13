@@ -66,6 +66,7 @@
     overflow-wrap: anywhere;
     white-space: normal;
 
+    color: var(--text-muted);
     background-color: var(--time-block-bg-color, var(--background-primary));
     border: 1px solid
       var(
