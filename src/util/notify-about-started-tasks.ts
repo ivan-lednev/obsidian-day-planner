@@ -1,15 +1,15 @@
+import { emDash } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 import type { Task, WithTime } from "../task-types";
 
 import { getMinutesSinceMidnight } from "./moment";
 import { createTimestamp, getOneLineSummary } from "./task-utils";
-import { emDash } from "../constants";
 
 export function notifyAboutStartedTasks(
   tasks: WithTime<Task>[],
   settings: DayPlannerSettings,
 ) {
-  if (tasks.length === 0) {
+  if (tasks.length === 0 && typeof Notification !== "undefined") {
     return;
   }
 
