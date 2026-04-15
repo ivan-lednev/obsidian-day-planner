@@ -6,7 +6,6 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
-  import DayOfWeekPicker from "./day-of-week-picker.svelte"
 
   import ControlButton from "./control-button.svelte";
   import {
@@ -129,8 +128,6 @@
       <SettingsControls />
     </div>
   {/if}
-
-  <DayOfWeekPicker/>
 </div>
 
 <style>

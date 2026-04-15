@@ -9,7 +9,7 @@ export function notifyAboutStartedTasks(
   tasks: WithTime<Task>[],
   settings: DayPlannerSettings,
 ) {
-  if (tasks.length === 0 && typeof Notification !== "undefined") {
+  if (typeof Notification === "undefined" || tasks.length === 0) {
     return;
   }
 

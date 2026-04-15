@@ -380,7 +380,6 @@ function getIndentedText(root: Node, parentIndentation: string = ""): string {
   const firstLine = getFirstLineAsMarkdown(root);
   const [, ...linesAfterFirst] = root.text.split("\n");
 
-
   let listItemLineWithParagraphs = firstLine;
 
   if (linesAfterFirst) {

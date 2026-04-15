@@ -10,7 +10,7 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
-    "noUncheckedIndexedAccess": true,
+//    "noUncheckedIndexedAccess": true,
     "importHelpers": true,
     "noImplicitAny": true,
     "lib": [

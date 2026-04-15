@@ -310,7 +310,7 @@ describe("Log Records with indexes", () => {
 });
 
 describe("Task views", () => {
-  test.only("Shows nested list items (tasks & plain list items) with their paragraphs and checkboxes", async () => {
+  test("Shows nested list items (tasks & plain list items) with their paragraphs and checkboxes", async () => {
     const { getState } = await setUp();
 
     const planEntries = selectPlanEntriesForDays(getState(), ["2025-07-28"]);

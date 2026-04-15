@@ -1,3 +1,4 @@
+import { Either, pipe } from "effect";
 import { takeWhile } from "lodash/fp";
 import { stringifyYaml } from "obsidian";
 import { z } from "zod";
@@ -114,10 +115,6 @@ export function clockOut(props: Props): Props {
   };
 }
 
-export function toMarkdown(props: Props) {
-  return createCodeBlock({ language: "yaml", text: stringifyYaml(props) });
-}
-
 export function createProp(
   key: string,
   value: string,
@@ -168,9 +165,21 @@ export function addTasksPluginProp(text: string, prop: string) {
 }
 
 export function toIndentedMarkdown(props: Props, column: number) {
-  const asMarkdown = toMarkdown(props);
   const indentation =
     createIndentation(column) + getIndentationForListParagraph();
 
-  return indent(asMarkdown, indentation);
+  return pipe(
+    Either.try({
+      try: () => stringifyYaml(props),
+      catch: (error) =>
+        new Error("Unable to stringify props", { cause: error }),
+    }),
+    Either.map((stringified) =>
+      createCodeBlock({
+        language: "yaml",
+        text: stringified,
+      }),
+    ),
+    Either.map((codeBlock) => indent(codeBlock, indentation)),
+  );
 }

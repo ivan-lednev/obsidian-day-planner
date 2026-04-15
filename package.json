@@ -78,6 +78,7 @@
     "@floating-ui/dom": "^1.6.11",
     "@reduxjs/toolkit": "^2.3.0",
     "chroma-js": "^3.0.0",
+    "effect": "^3.21.0",
     "fraction.js": "4.3.7",
     "immer": "^10.1.1",
     "lodash": "^4.17.21",

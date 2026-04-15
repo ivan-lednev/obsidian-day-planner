@@ -161,4 +161,11 @@
 
     margin-inline: var(--size-4-2);
   }
+
+  .tasks :global(.planner-sticky-block-content) {
+    position: sticky;
+    top: 0;
+    overflow: hidden;
+    max-height: 100%;
+  }
 </style>
