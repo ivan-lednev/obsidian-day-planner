@@ -333,6 +333,8 @@
     "fixtures/fixture-vault/2025-07-28.md": {
       "headings": [
         {
+          "heading": "Dreams",
+          "level": 1,
           "position": {
             "start": {
               "line": 2,
@@ -344,11 +346,11 @@
               "col": 8,
               "offset": 122
             }
-          },
-          "heading": "Dreams",
-          "level": 1
+          }
         },
         {
+          "heading": "Day planner",
+          "level": 1,
           "position": {
             "start": {
               "line": 6,
@@ -360,9 +362,7 @@
               "col": 13,
               "offset": 141
             }
-          },
-          "heading": "Day planner",
-          "level": 1
+          }
         }
       ],
       "sections": [
@@ -437,13 +437,14 @@
             "end": {
               "line": 14,
               "col": 25,
-              "offset": 309
+              "offset": 313
             }
           }
         }
       ],
       "listItems": [
         {
+          "parent": -4,
           "position": {
             "start": {
               "line": 4,
@@ -455,10 +456,11 @@
               "col": 2,
               "offset": 126
             }
-          },
-          "parent": -4
+          }
         },
         {
+          "parent": -8,
+          "task": " ",
           "position": {
             "start": {
               "line": 8,
@@ -470,11 +472,11 @@
               "col": 26,
               "offset": 169
             }
-          },
-          "parent": -8,
-          "task": " "
+          }
         },
         {
+          "parent": -8,
+          "task": " ",
           "position": {
             "start": {
               "line": 9,
@@ -486,11 +488,11 @@
               "col": 13,
               "offset": 210
             }
-          },
-          "parent": -8,
-          "task": " "
+          }
         },
         {
+          "parent": 9,
+          "task": " ",
           "position": {
             "start": {
               "line": 11,
@@ -502,42 +504,41 @@
               "col": 16,
               "offset": 248
             }
-          },
-          "parent": 9,
-          "task": " "
+          }
         },
         {
+          "parent": 11,
           "position": {
             "start": {
               "line": 13,
-              "col": 2,
-              "offset": 251
+              "col": 6,
+              "offset": 255
             },
             "end": {
               "line": 13,
-              "col": 34,
-              "offset": 283
+              "col": 38,
+              "offset": 287
             }
-          },
-          "parent": 9
+          }
         },
         {
+          "parent": -8,
+          "task": " ",
           "position": {
             "start": {
               "line": 14,
               "col": 0,
-              "offset": 284
+              "offset": 288
             },
             "end": {
               "line": 14,
               "col": 25,
-              "offset": 309
+              "offset": 313
             }
-          },
-          "parent": -8,
-          "task": " "
+          }
         }
-      ]
+      ],
+      "v": 1
     },
     "fixtures/fixture-vault/2025-07-20.md": {
       "v": 1

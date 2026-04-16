@@ -186,13 +186,24 @@ export function toString(task: WithTime<LocalTask>) {
     getDayKey(task.startTime),
   );
 
-  const otherLines = getLinesAfterFirst(task.text);
+  const paragraphs = task.text
+    .split("\n")
+    .slice(1)
+    .map((line) => getIndentationForListParagraph() + line)
+    .join("\n");
 
   let result = `${listTokens} ${updatedFirstLineText}`;
 
-  if (otherLines) {
+  if (paragraphs) {
     result += "\n";
-    result += otherLines;
+    result += paragraphs;
+  }
+
+  if (task.children && task.children.length > 0) {
+    result += "\n";
+    result += task.children
+      .map((child) => "\t" + getIndentedText(child))
+      .join("\n");
   }
 
   return result;
@@ -371,6 +382,7 @@ export function toRenderableMarkdown(timeBlock: Node) {
 
   return {
     listItem: formattedFirstLine,
+    // todo: no indentation is added
     paragraphs: linesAfterFirst.join("\n"),
     nestedListItems,
   };
@@ -394,6 +406,6 @@ function getIndentedText(root: Node, parentIndentation: string = ""): string {
   return (root.children ?? []).reduce<string>((result, current) => {
     const indentation = "\t" + parentIndentation;
 
-    return result + getIndentedText(current, indentation);
+    return result + "\n" + getIndentedText(current, indentation);
   }, listItemLineWithParagraphs);
 }

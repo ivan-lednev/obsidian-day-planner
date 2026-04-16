@@ -70,6 +70,12 @@ export const createUpdateHandler = (props: {
     if (mode === EditMode.CREATE) {
       const created = diff.added[0];
 
+      if (diff.added.length > 0) {
+        throw new Error(
+          "Inconsistent state: multiple tasks added in create mode",
+        );
+      }
+
       isNotVoid(created);
 
       const modalOutput = await getTextInput();

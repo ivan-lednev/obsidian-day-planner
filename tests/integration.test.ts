@@ -17,7 +17,7 @@ import { getDayKey, toRenderableMarkdown } from "../src/util/task-utils";
 import { setUp } from "./integration/setup";
 import { getPathToDiff } from "./test-utils";
 
-describe("Log Records with indexes", () => {
+describe("Indexing", () => {
   test("Stores text, path, position, props position for task entries", async () => {
     const { getState } = await setUp();
 
@@ -250,7 +250,9 @@ describe("Log Records with indexes", () => {
   test.todo("Stores Dataview tasks");
 
   test("Stores nested tasks and list items with positions with no duplicates", async () => {
-    const { getState } = await setUp();
+    const { getState } = await setUp({
+      loadedFixtures: ["2025-07-28.md"],
+    });
 
     expect(selectPlanEntriesForDays(getState(), ["2025-07-28"])).toContainEqual(
       expect.objectContaining({
@@ -260,10 +262,12 @@ describe("Log Records with indexes", () => {
             text: expect.stringContaining("Child task"),
             task: " ",
             position: expect.any(Object),
-          }),
-          expect.objectContaining({
-            text: expect.stringContaining("Child list item without time"),
-            position: expect.any(Object),
+            children: [
+              expect.objectContaining({
+                text: expect.stringContaining("Child list item without time"),
+                position: expect.any(Object),
+              }),
+            ],
           }),
         ],
       }),
