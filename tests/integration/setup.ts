@@ -11,7 +11,7 @@ import { initialState } from "../../src/redux/global-slice";
 import { createReactor, type RootState } from "../../src/redux/store";
 import {
   indexRequested,
-  selectActiveLogEntries,
+  selectTaskEntriesById,
 } from "../../src/redux/tracker/tracker-slice";
 import { TransactionWriter } from "../../src/service/diff-writer";
 import { ListPropsParser } from "../../src/service/list-props-parser";
@@ -81,12 +81,17 @@ function initTestServices(props: {
 
 export async function setUp(props?: {
   visibleDays?: string[];
+  loadedFixtures?: string[];
   settings?: DayPlannerSettings;
 }) {
-  const { visibleDays = [], settings = defaultSettingsForTests } = props || {};
+  const {
+    visibleDays = [],
+    loadedFixtures,
+    settings = defaultSettingsForTests,
+  } = props || {};
 
   const { inMemoryFiles, inMemoryDailyNotes, cachedMetadata } =
-    await loadMetadataDump();
+    await loadMetadataDump({ loadedFixtures });
 
   const {
     periodicNotes,
@@ -140,7 +145,10 @@ export async function setUp(props?: {
   });
 
   inMemoryFiles.forEach(({ path }) => {
-    isNotVoid(cachedMetadata[path], `There is no cached metadata for file with path: ${path}`);
+    isNotVoid(
+      cachedMetadata[path],
+      `There is no cached metadata for file with path: ${path}`,
+    );
 
     dispatch(dataviewChange(path));
     dispatch(indexRequested([path]));
@@ -207,10 +215,11 @@ export async function setUp(props?: {
 
   await vi.waitFor(() => {
     // todo: just wait for cache to be 'warm'
-    const isAtLeastOneLogRecordLoaded =
-      useSelector((state) => selectActiveLogEntries(state)).current.length > 0;
+    const isAtLeastOneTaskEntryLoaded =
+      Object.keys(useSelector((state) => selectTaskEntriesById(state)).current)
+        .length > 0;
 
-    expect(isAtLeastOneLogRecordLoaded).toBeTruthy();
+    expect(isAtLeastOneTaskEntryLoaded).toBeTruthy();
   });
 
   return {

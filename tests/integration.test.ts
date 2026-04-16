@@ -311,7 +311,9 @@ describe("Log Records with indexes", () => {
 
 describe("Task views", () => {
   test("Shows nested list items (tasks & plain list items) with their paragraphs and checkboxes", async () => {
-    const { getState } = await setUp();
+    const { getState } = await setUp({
+      loadedFixtures: ["2025-07-28.md"],
+    });
 
     const planEntries = selectPlanEntriesForDays(getState(), ["2025-07-28"]);
     const taskWithNestedListItems = planEntries.find((entry) =>
@@ -324,7 +326,8 @@ describe("Task views", () => {
 
     expect(nestedListItems).toBe(`- [ ] Child task
   Child text
-- Child list item without time`);
+- Child list item without time
+`);
   });
 
   test.todo("Does not show code blocks in rendered markdown");
