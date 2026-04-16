@@ -330,7 +330,7 @@ describe("Task views", () => {
 
     expect(nestedListItems).toBe(`- [ ] Child task
   Child text
-- Child list item without time
+\t- Child list item without time
 `);
   });
 

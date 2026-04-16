@@ -269,7 +269,7 @@ function mapTaskDiffToUpdate(props: {
 
   const { path } = task.location;
   const firstLine = task.location.position.start.line;
-  const lineSpan = taskTextWithUpdatedProps.split("\n").length - 1;
+  const lineSpan = taskTextWithUpdatedProps.trim().split("\n").length - 1;
   const lastLine = firstLine + lineSpan;
 
   const position = {

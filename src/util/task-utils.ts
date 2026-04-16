@@ -31,12 +31,7 @@ import {
   getIndentationForListParagraph,
 } from "./dataview";
 import { getId } from "./id";
-import {
-  getFirstLine,
-  getLinesAfterFirst,
-  indentLines,
-  removeListTokens,
-} from "./markdown";
+import { getFirstLine, indentLines, removeListTokens } from "./markdown";
 import * as m from "./moment";
 import {
   addMinutes,
@@ -202,7 +197,7 @@ export function toString(task: WithTime<LocalTask>) {
   if (task.children && task.children.length > 0) {
     result += "\n";
     result += task.children
-      .map((child) => "\t" + getIndentedText(child))
+      .map((child) => getIndentedText(child, "\t"))
       .join("\n");
   }
 
@@ -392,15 +387,16 @@ function getIndentedText(root: Node, parentIndentation: string = ""): string {
   const firstLine = getFirstLineAsMarkdown(root);
   const [, ...linesAfterFirst] = root.text.split("\n");
 
-  let listItemLineWithParagraphs = firstLine;
+  let listItemLineWithParagraphs = parentIndentation + firstLine;
 
   if (linesAfterFirst) {
     const indentedParagraphs = indentLines(
       linesAfterFirst,
-      getIndentationForListParagraph(),
+      parentIndentation + getIndentationForListParagraph(),
     ).join("\n");
 
-    listItemLineWithParagraphs += "\n" + indentedParagraphs;
+    listItemLineWithParagraphs += "\n"
+    listItemLineWithParagraphs += indentedParagraphs;
   }
 
   return (root.children ?? []).reduce<string>((result, current) => {
