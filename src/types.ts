@@ -41,14 +41,12 @@ export type PointerDateTime = {
   type: "dateTime" | "date";
 };
 
-export type RefreshDataviewFn = (source: string) => Promise<unknown>;
 export type Signal<T> = { current: T };
 
 export interface ObsidianContext {
   workspaceFacade: WorkspaceFacade;
   periodicNotes: PeriodicNotes;
   initWeeklyView: () => Promise<void>;
-  refreshDataviewFn: RefreshDataviewFn;
   dataviewLoaded: Readable<boolean>;
   renderMarkdown: RenderMarkdown;
   toggleCheckboxInFile: VaultFacade["toggleCheckboxInFile"];

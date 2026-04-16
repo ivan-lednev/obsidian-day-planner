@@ -1,14 +1,6 @@
-import {
-  MarkdownView,
-  Notice,
-  Plugin,
-  WorkspaceLeaf,
-  type MarkdownFileInfo,
-  TFile,
-} from "obsidian";
-import { getAPI } from "obsidian-dataview";
+import { Notice, Plugin, WorkspaceLeaf, TFile } from "obsidian";
 import { fromStore, get, type Readable, type Writable } from "svelte/store";
-import { isInstanceOf, isNotVoid } from "typed-assert";
+import { isNotVoid } from "typed-assert";
 
 import {
   obsidianContextKey,
@@ -39,7 +31,6 @@ import { type AppDispatch, type AppStore, createReactor } from "./redux/store";
 import { selectActiveLogEntries } from "./redux/tracker/tracker-slice";
 import { createUseSelector, createUseSelectorV2 } from "./redux/use-selector";
 import { createSvelteSignalFromReduxStore } from "./redux/use-selector";
-import { DataviewFacade } from "./service/dataview-facade";
 import { TransactionWriter } from "./service/diff-writer";
 import { ListPropsParser } from "./service/list-props-parser";
 import { MetadataCacheFacade } from "./service/metadata-cache-facade";
@@ -71,7 +62,6 @@ export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
   private settingsStore!: Writable<DayPlannerSettings>;
   private workspaceFacade!: WorkspaceFacade;
-  private dataviewFacade!: DataviewFacade;
   private periodicNotes!: PeriodicNotes;
   private taskEntryEditor!: TaskEntryEditor;
   private vaultFacade!: VaultFacade;
@@ -97,7 +87,6 @@ export default class DayPlanner extends Plugin {
       this.vaultFacade,
       this.periodicNotes,
     );
-    this.dataviewFacade = new DataviewFacade(() => getAPI(this.app), vault);
     this.metadataCacheFacade = new MetadataCacheFacade(metadataCache);
 
     const {
@@ -367,27 +356,6 @@ export default class DayPlanner extends Plugin {
     });
   };
 
-  getSTaskUnderCursor = (view: MarkdownFileInfo) => {
-    isInstanceOf(
-      view,
-      MarkdownView,
-      "You can only get tasks from markdown editor views",
-    );
-
-    const file = view.file;
-
-    isNotVoid(file, "There is no file for view");
-
-    const sTask = this.dataviewFacade.getTaskAtLine({
-      path: file.path,
-      line: view.editor.getCursor().line,
-    });
-
-    isNotVoid(sTask, "There is no task under cursor");
-
-    return sTask;
-  };
-
   private registerViews(props: {
     store: AppStore;
     dispatch: AppDispatch;
@@ -559,7 +527,6 @@ export default class DayPlanner extends Plugin {
       taskEntryEditor: this.taskEntryEditor,
       workspaceFacade: this.workspaceFacade,
       initWeeklyView: this.initWeeklyLeaf,
-      refreshDataviewFn: this.dataviewFacade.getAllTasksFrom,
       dataviewLoaded,
       renderMarkdown: createRenderMarkdown(this.app),
       toggleCheckboxInFile: this.vaultFacade.toggleCheckboxInFile,

@@ -30,7 +30,10 @@ export class TimeTrackingFeature {
   }
 
   private async initialLoad() {
-    const paths = this.vault.getMarkdownFiles().map((file) => file.path);
+    const paths = this.vault
+      .getMarkdownFiles()
+      .toSorted((a, b) => b.stat.mtime - a.stat.mtime)
+      .map((file) => file.path);
 
     chunk(TimeTrackingFeature.INITIAL_LOAD_CHUNK_SIZE, paths).forEach((batch) =>
       this.dispatch(indexRequested(batch)),
