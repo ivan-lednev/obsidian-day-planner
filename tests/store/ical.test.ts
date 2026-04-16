@@ -1,7 +1,6 @@
 import { readFile } from "fs/promises";
 
 import { type MetadataCache, request, Vault } from "obsidian";
-import { SListEntry, type STask } from "obsidian-dataview";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { initialState as initialGlobalState } from "../../src/redux/global-slice";
@@ -30,20 +29,6 @@ export async function getIcalFixture(file: string) {
   return readFile(`fixtures/${file}.txt`, {
     encoding: "utf8",
   });
-}
-
-export class FakeDataviewFacade {
-  constructor(
-    private readonly fixtures: { tasks: STask[]; lists: SListEntry[] },
-  ) {}
-
-  async getAllTasksFrom() {
-    return this.fixtures.tasks;
-  }
-
-  getAllListsFrom() {
-    return this.fixtures.lists;
-  }
 }
 
 const defaultPreloadedStateForTests: Partial<RootState> = {

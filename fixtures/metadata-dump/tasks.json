@@ -1,256 +1,6 @@
 {
   "cachedMetadata": {
-    "fixtures/frontmatter-logs.md": {
-      "sections": [
-        {
-          "type": "yaml",
-          "position": {
-            "start": {
-              "line": 0,
-              "col": 0,
-              "offset": 0
-            },
-            "end": {
-              "line": 5,
-              "col": 3,
-              "offset": 81
-            }
-          }
-        },
-        {
-          "type": "paragraph",
-          "position": {
-            "start": {
-              "line": 7,
-              "col": 0,
-              "offset": 83
-            },
-            "end": {
-              "line": 7,
-              "col": 3,
-              "offset": 86
-            }
-          }
-        }
-      ],
-      "frontmatter": {
-        "planner": {
-          "log": [
-            {
-              "start": "2025-07-19 12:00",
-              "end": "2025-07-19 14:30"
-            }
-          ]
-        }
-      },
-      "frontmatterLinks": [],
-      "v": 1,
-      "frontmatterPosition": {
-        "start": {
-          "line": 0,
-          "col": 0,
-          "offset": 0
-        },
-        "end": {
-          "line": 5,
-          "col": 3,
-          "offset": 81
-        }
-      }
-    },
-    "fixtures/2025-07-19.md": {
-      "headings": [
-        {
-          "heading": "Day planner",
-          "level": 1,
-          "position": {
-            "start": {
-              "line": 6,
-              "col": 0,
-              "offset": 84
-            },
-            "end": {
-              "line": 6,
-              "col": 13,
-              "offset": 97
-            }
-          }
-        }
-      ],
-      "sections": [
-        {
-          "type": "list",
-          "position": {
-            "start": {
-              "line": 0,
-              "col": 0,
-              "offset": 0
-            },
-            "end": {
-              "line": 0,
-              "col": 38,
-              "offset": 38
-            }
-          }
-        },
-        {
-          "type": "thematicBreak",
-          "position": {
-            "start": {
-              "line": 2,
-              "col": 0,
-              "offset": 40
-            },
-            "end": {
-              "line": 2,
-              "col": 3,
-              "offset": 43
-            }
-          }
-        },
-        {
-          "type": "list",
-          "position": {
-            "start": {
-              "line": 4,
-              "col": 0,
-              "offset": 45
-            },
-            "end": {
-              "line": 4,
-              "col": 37,
-              "offset": 82
-            }
-          }
-        },
-        {
-          "type": "heading",
-          "position": {
-            "start": {
-              "line": 6,
-              "col": 0,
-              "offset": 84
-            },
-            "end": {
-              "line": 6,
-              "col": 13,
-              "offset": 97
-            }
-          }
-        },
-        {
-          "type": "list",
-          "position": {
-            "start": {
-              "line": 8,
-              "col": 0,
-              "offset": 99
-            },
-            "end": {
-              "line": 8,
-              "col": 47,
-              "offset": 146
-            }
-          }
-        },
-        {
-          "type": "thematicBreak",
-          "position": {
-            "start": {
-              "line": 10,
-              "col": 0,
-              "offset": 148
-            },
-            "end": {
-              "line": 10,
-              "col": 3,
-              "offset": 151
-            }
-          }
-        },
-        {
-          "type": "list",
-          "position": {
-            "start": {
-              "line": 12,
-              "col": 0,
-              "offset": 153
-            },
-            "end": {
-              "line": 12,
-              "col": 10,
-              "offset": 163
-            }
-          }
-        }
-      ],
-      "listItems": [
-        {
-          "parent": -1,
-          "position": {
-            "start": {
-              "line": 0,
-              "col": 0,
-              "offset": 0
-            },
-            "end": {
-              "line": 0,
-              "col": 38,
-              "offset": 38
-            }
-          }
-        },
-        {
-          "parent": -4,
-          "task": " ",
-          "position": {
-            "start": {
-              "line": 4,
-              "col": 0,
-              "offset": 45
-            },
-            "end": {
-              "line": 4,
-              "col": 37,
-              "offset": 82
-            }
-          }
-        },
-        {
-          "parent": -8,
-          "position": {
-            "start": {
-              "line": 8,
-              "col": 0,
-              "offset": 99
-            },
-            "end": {
-              "line": 8,
-              "col": 47,
-              "offset": 146
-            }
-          }
-        },
-        {
-          "parent": -12,
-          "task": " ",
-          "position": {
-            "start": {
-              "line": 12,
-              "col": 0,
-              "offset": 153
-            },
-            "end": {
-              "line": 12,
-              "col": 10,
-              "offset": 163
-            }
-          }
-        }
-      ],
-      "v": 1
-    },
-    "fixtures/test.md": {
+    "fixtures/fixture-vault/test.md": {
       "headings": [
         {
           "heading": "Heading 1",
@@ -398,7 +148,7 @@
       ],
       "v": 1
     },
-    "fixtures/tasks.md": {
+    "fixtures/fixture-vault/tasks.md": {
       "sections": [
         {
           "type": "list",
@@ -484,7 +234,7 @@
       ],
       "v": 1
     },
-    "fixtures/one-task-two-log-records.md": {
+    "fixtures/fixture-vault/one-task-two-log-records.md": {
       "sections": [
         {
           "type": "list",
@@ -504,6 +254,8 @@
       ],
       "listItems": [
         {
+          "parent": -1,
+          "task": " ",
           "position": {
             "start": {
               "line": 0,
@@ -515,13 +267,70 @@
               "col": 5,
               "offset": 140
             }
-          },
-          "parent": -1,
-          "task": " "
+          }
         }
-      ]
+      ],
+      "v": 1
     },
-    "fixtures/2025-07-28.md": {
+    "fixtures/fixture-vault/frontmatter-logs.md": {
+      "sections": [
+        {
+          "type": "yaml",
+          "position": {
+            "start": {
+              "line": 0,
+              "col": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 5,
+              "col": 3,
+              "offset": 81
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "position": {
+            "start": {
+              "line": 7,
+              "col": 0,
+              "offset": 83
+            },
+            "end": {
+              "line": 7,
+              "col": 3,
+              "offset": 86
+            }
+          }
+        }
+      ],
+      "frontmatter": {
+        "planner": {
+          "log": [
+            {
+              "start": "2025-07-19 12:00",
+              "end": "2025-07-19 14:30"
+            }
+          ]
+        }
+      },
+      "frontmatterLinks": [],
+      "v": 1,
+      "frontmatterPosition": {
+        "start": {
+          "line": 0,
+          "col": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 5,
+          "col": 3,
+          "offset": 81
+        }
+      }
+    },
+    "fixtures/fixture-vault/2025-07-28.md": {
       "headings": [
         {
           "position": {
@@ -730,7 +539,199 @@
         }
       ]
     },
-    "fixtures/2025-07-20.md": {
+    "fixtures/fixture-vault/2025-07-20.md": {
+      "v": 1
+    },
+    "fixtures/fixture-vault/2025-07-19.md": {
+      "headings": [
+        {
+          "heading": "Day planner",
+          "level": 1,
+          "position": {
+            "start": {
+              "line": 6,
+              "col": 0,
+              "offset": 84
+            },
+            "end": {
+              "line": 6,
+              "col": 13,
+              "offset": 97
+            }
+          }
+        }
+      ],
+      "sections": [
+        {
+          "type": "list",
+          "position": {
+            "start": {
+              "line": 0,
+              "col": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "col": 38,
+              "offset": 38
+            }
+          }
+        },
+        {
+          "type": "thematicBreak",
+          "position": {
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 40
+            },
+            "end": {
+              "line": 2,
+              "col": 3,
+              "offset": 43
+            }
+          }
+        },
+        {
+          "type": "list",
+          "position": {
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 45
+            },
+            "end": {
+              "line": 4,
+              "col": 37,
+              "offset": 82
+            }
+          }
+        },
+        {
+          "type": "heading",
+          "position": {
+            "start": {
+              "line": 6,
+              "col": 0,
+              "offset": 84
+            },
+            "end": {
+              "line": 6,
+              "col": 13,
+              "offset": 97
+            }
+          }
+        },
+        {
+          "type": "list",
+          "position": {
+            "start": {
+              "line": 8,
+              "col": 0,
+              "offset": 99
+            },
+            "end": {
+              "line": 8,
+              "col": 47,
+              "offset": 146
+            }
+          }
+        },
+        {
+          "type": "thematicBreak",
+          "position": {
+            "start": {
+              "line": 10,
+              "col": 0,
+              "offset": 148
+            },
+            "end": {
+              "line": 10,
+              "col": 3,
+              "offset": 151
+            }
+          }
+        },
+        {
+          "type": "list",
+          "position": {
+            "start": {
+              "line": 12,
+              "col": 0,
+              "offset": 153
+            },
+            "end": {
+              "line": 12,
+              "col": 10,
+              "offset": 163
+            }
+          }
+        }
+      ],
+      "listItems": [
+        {
+          "parent": -1,
+          "position": {
+            "start": {
+              "line": 0,
+              "col": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "col": 38,
+              "offset": 38
+            }
+          }
+        },
+        {
+          "parent": -4,
+          "task": " ",
+          "position": {
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 45
+            },
+            "end": {
+              "line": 4,
+              "col": 37,
+              "offset": 82
+            }
+          }
+        },
+        {
+          "parent": -8,
+          "position": {
+            "start": {
+              "line": 8,
+              "col": 0,
+              "offset": 99
+            },
+            "end": {
+              "line": 8,
+              "col": 47,
+              "offset": 146
+            }
+          }
+        },
+        {
+          "parent": -12,
+          "task": " ",
+          "position": {
+            "start": {
+              "line": 12,
+              "col": 0,
+              "offset": 153
+            },
+            "end": {
+              "line": 12,
+              "col": 10,
+              "offset": 163
+            }
+          }
+        }
+      ],
       "v": 1
     }
   }

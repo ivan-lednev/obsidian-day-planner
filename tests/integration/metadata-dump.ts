@@ -3,7 +3,6 @@ import path from "node:path";
 
 import type { Moment } from "moment";
 import type { CachedMetadata } from "obsidian";
-import type { SListEntry, STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
 
 import { createInMemoryFile, type InMemoryFile } from "../test-utils";
@@ -19,8 +18,6 @@ const fixtureVaultPath = join(fixturesDirPath, "fixture-vault");
 export async function loadMetadataDump(): Promise<{
   inMemoryFiles: InMemoryFile[];
   inMemoryDailyNotes: { path: string; file: InMemoryFile; date: Moment }[];
-  tasks: STask[];
-  lists: SListEntry[];
   cachedMetadata: Record<string, CachedMetadata>;
 }> {
   const files = await readdir(fixtureVaultPath);
@@ -46,7 +43,7 @@ export async function loadMetadataDump(): Promise<{
   const rawMetadataDump = await readFile(dumpPath, "utf-8");
 
   const metadataDump = JSON.parse(rawMetadataDump);
-  const { tasks, lists, cachedMetadata } = metadataDump;
+  const { cachedMetadata } = metadataDump;
 
   const pathToInMemoryFile = Object.fromEntries(
     inMemoryFiles.map((it) => [it.path, it]),
@@ -64,8 +61,6 @@ export async function loadMetadataDump(): Promise<{
   return {
     inMemoryFiles,
     inMemoryDailyNotes,
-    tasks,
-    lists,
     cachedMetadata,
   };
 }

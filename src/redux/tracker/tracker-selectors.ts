@@ -184,9 +184,14 @@ function inflateChildren(
   listItemEntry: ListItemEntry,
   listItemEntriesById: Record<string, ListItemEntry>,
 ): ListItemEntryWithChildren {
+  const { children = [], ...rest } = listItemEntry;
+
   return {
-    ...listItemEntry,
-    children: listItemEntry.children?.map((id) => {
+    ...rest,
+    // todo: not needed here
+    logEntries: [],
+    planEntries: [],
+    children: children.map((id) => {
       const child = listItemEntriesById[id];
 
       isNotVoid(child, "Inconsistent index state");

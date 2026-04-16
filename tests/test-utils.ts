@@ -1,8 +1,6 @@
 import { diffLines } from "diff";
-import { groupBy } from "lodash/fp";
 import type { Moment } from "moment/moment";
 import { type CachedMetadata, TFile } from "obsidian";
-import { SListEntry, type STask } from "obsidian-dataview";
 import { isNotVoid } from "typed-assert";
 
 export function createInMemoryFile(props: { path: string; contents: string }) {
@@ -50,22 +48,6 @@ export class InMemoryVault {
     );
 
     return found;
-  }
-}
-
-export class FakeDataviewFacade {
-  constructor(
-    private readonly fixtures: { tasks: STask[]; lists: SListEntry[] },
-  ) {}
-
-  async getAllTasksFrom() {
-    return this.fixtures.tasks;
-  }
-
-  getAllListsFrom(paths: string[]) {
-    const pathToListEntries = groupBy((it) => it.path, this.fixtures.lists);
-
-    return paths.flatMap((path) => pathToListEntries[path] || []);
   }
 }
 

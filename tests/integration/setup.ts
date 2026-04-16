@@ -1,7 +1,6 @@
 import { noop } from "lodash/fp";
 import type { Moment } from "moment";
 import { type CachedMetadata, MetadataCache, type Vault } from "obsidian";
-import type { SListEntry, STask } from "obsidian-dataview";
 import { derived, get, writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 import { expect, vi } from "vitest";
@@ -14,7 +13,6 @@ import {
   indexRequested,
   selectActiveLogEntries,
 } from "../../src/redux/tracker/tracker-slice";
-import type { DataviewFacade } from "../../src/service/dataview-facade";
 import { TransactionWriter } from "../../src/service/diff-writer";
 import { ListPropsParser } from "../../src/service/list-props-parser";
 import type { PeriodicNotes } from "../../src/service/periodic-notes";
@@ -28,7 +26,6 @@ import { isLocal, type Task } from "../../src/task-types";
 import { useTasks } from "../../src/ui/hooks/use-tasks";
 import { getOneLineSummary } from "../../src/util/task-utils";
 import {
-  FakeDataviewFacade,
   FakeMetadataCache,
   FakePeriodicNotes,
   FakeWorkspaceFacade,
@@ -41,21 +38,13 @@ import { loadMetadataDump } from "./metadata-dump";
 function initTestServices(props: {
   inMemoryFiles: InMemoryFile[];
   inMemoryDailyNotes: { path: string; file: InMemoryFile; date: Moment }[];
-  tasks: STask[];
-  lists: SListEntry[];
   cachedMetadata: Record<string, CachedMetadata>;
 }) {
-  const { inMemoryFiles, inMemoryDailyNotes, tasks, lists, cachedMetadata } =
-    props;
+  const { inMemoryFiles, inMemoryDailyNotes, cachedMetadata } = props;
 
   const periodicNotes = new FakePeriodicNotes(
     inMemoryDailyNotes,
   ) as unknown as PeriodicNotes;
-
-  const dataviewFacade = new FakeDataviewFacade({
-    tasks,
-    lists,
-  }) as unknown as DataviewFacade;
 
   const metadataCache = new FakeMetadataCache(
     cachedMetadata,
@@ -81,7 +70,6 @@ function initTestServices(props: {
 
   return {
     periodicNotes,
-    dataviewFacade,
     metadataCache,
     vault,
     transactionWriter,
@@ -97,7 +85,7 @@ export async function setUp(props?: {
 }) {
   const { visibleDays = [], settings = defaultSettingsForTests } = props || {};
 
-  const { inMemoryFiles, inMemoryDailyNotes, tasks, lists, cachedMetadata } =
+  const { inMemoryFiles, inMemoryDailyNotes, cachedMetadata } =
     await loadMetadataDump();
 
   const {
@@ -111,8 +99,6 @@ export async function setUp(props?: {
   } = initTestServices({
     inMemoryFiles,
     inMemoryDailyNotes,
-    tasks,
-    lists,
     cachedMetadata,
   });
 
@@ -153,8 +139,8 @@ export async function setUp(props?: {
     settings: defaultSettingsForTests,
   });
 
-  inMemoryFiles.forEach(({ path, contents }) => {
-    isNotVoid(cachedMetadata[path]);
+  inMemoryFiles.forEach(({ path }) => {
+    isNotVoid(cachedMetadata[path], `There is no cached metadata for file with path: ${path}`);
 
     dispatch(dataviewChange(path));
     dispatch(indexRequested([path]));
