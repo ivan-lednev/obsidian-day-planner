@@ -1,7 +1,10 @@
 import { Menu } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
-import type { TaskEntryEditor } from "../service/task-entry-editor";
+import {
+  runWithNoticeOnError,
+  type TaskEntryEditor,
+} from "../service/task-entry-editor";
 import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { LocalTask } from "../task-types";
 import { addOpenClock } from "../util/props";
@@ -31,11 +34,17 @@ export function createRecentClockMenu(props: {
       .setTitle("Clock in")
       .setIcon("play")
       .onClick(async () => {
-        await taskEntryEditor.editProps({
-          path,
-          line,
-          editFn: (listPropsForLine) => addOpenClock(listPropsForLine),
-        });
+        await runWithNoticeOnError(
+          taskEntryEditor.editProps({
+            path,
+            line,
+            editFn: (listPropsForLine) => {
+              isNotVoid(listPropsForLine, `No list props at ${path}:${line}`);
+
+              return addOpenClock(listPropsForLine);
+            },
+          }),
+        );
       });
   });
 

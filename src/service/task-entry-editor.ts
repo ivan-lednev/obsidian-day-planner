@@ -20,13 +20,20 @@ import { MetadataCacheFacade } from "./metadata-cache-facade";
 import type { VaultFacade } from "./vault-facade";
 import { WorkspaceFacade } from "./workspace-facade";
 
-const withNoticeOnError = Effect.catchAll((error) =>
-  Effect.sync(() => {
-    new Notice(String(error));
+export const runWithNoticeOnError = <A, E>(
+  program: Effect.Effect<A, E>,
+): Promise<A | void> =>
+  pipe(
+    program,
+    Effect.catchAll((error) =>
+      Effect.sync(() => {
+        new Notice(String(error));
 
-    console.error(error);
-  }),
-);
+        console.error(error);
+      }),
+    ),
+    Effect.runPromise,
+  );
 
 export class TaskEntryEditor {
   editProps = (props: {
@@ -36,65 +43,60 @@ export class TaskEntryEditor {
   }) => {
     const { path, line, editFn } = props;
 
-    return pipe(
-      Effect.gen(this, function* () {
-        const listItem = yield* this.metadataCacheFacade.getListItemEffect(
-          path,
-          line,
+    return Effect.gen(this, function* () {
+      const listItem = yield* this.metadataCacheFacade.getListItemEffect(
+        path,
+        line,
+      );
+
+      if (!listItem.task) {
+        return yield* Effect.fail(
+          new Error(
+            `Cannot add props to an item that's not a task at ${path}:${line}`,
+          ),
         );
+      }
 
-        if (!listItem.task) {
-          return yield* Effect.fail(
-            new Error(
-              `Cannot add props to an item that's not a task at ${path}:${line}`,
-            ),
-          );
-        }
+      const listPropsForLine = yield* this.findListProps(path, line);
 
-        const listPropsForLine = yield* this.findListProps(path, line);
+      const updatedProps = yield* Effect.try({
+        try: () => editFn(listPropsForLine?.parsed),
+        catch: (error) => {
+          const cause = error instanceof Error ? error.message : String(error);
 
-        const updatedProps = yield* Effect.try({
-          try: () => editFn(listPropsForLine?.parsed),
-          catch: (error) => {
-            const cause =
-              error instanceof Error ? error.message : String(error);
+          return new Error(`Could not edit props. Cause: ${cause}`, {
+            cause: error,
+          });
+        },
+      });
 
-            return new Error(`Could not edit props. Cause: ${cause}`, {
-              cause: error,
-            });
-          },
-        });
+      const indented = yield* toIndentedMarkdown(
+        updatedProps,
+        listItem.position.start.col,
+      );
 
-        const indented = yield* toIndentedMarkdown(
-          updatedProps,
-          listItem.position.start.col,
-        );
-
-        yield* Effect.tryPromise({
-          try: () =>
-            this.vaultFacade.editFile(path, (contents) => {
-              if (listPropsForLine) {
-                return (
-                  contents.slice(0, listPropsForLine.position.start.offset) +
-                  indented +
-                  contents.slice(listPropsForLine.position.end.offset)
-                );
-              }
-
+      yield* Effect.tryPromise({
+        try: () =>
+          this.vaultFacade.editFile(path, (contents) => {
+            if (listPropsForLine) {
               return (
-                contents.slice(0, listItem.position.end.offset) +
-                "\n" +
+                contents.slice(0, listPropsForLine.position.start.offset) +
                 indented +
-                contents.slice(listItem.position.end.offset)
+                contents.slice(listPropsForLine.position.end.offset)
               );
-            }),
-          catch: (error) =>
-            new Error(`Could not edit file ${path}`, { cause: error }),
-        });
-      }),
-      withNoticeOnError,
-      Effect.runPromise,
-    );
+            }
+
+            return (
+              contents.slice(0, listItem.position.end.offset) +
+              "\n" +
+              indented +
+              contents.slice(listItem.position.end.offset)
+            );
+          }),
+        catch: (error) =>
+          new Error(`Could not edit file ${path}`, { cause: error }),
+      });
+    });
   };
 
   private findListProps = (
@@ -221,7 +223,6 @@ export class TaskEntryEditor {
           afterFirstLineEditorPos,
         );
       }),
-      withNoticeOnError,
-      Effect.runPromise,
+      runWithNoticeOnError,
     );
 }

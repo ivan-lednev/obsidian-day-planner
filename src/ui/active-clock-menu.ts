@@ -1,7 +1,10 @@
 import { Menu } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
-import type { TaskEntryEditor } from "../service/task-entry-editor";
+import {
+  runWithNoticeOnError,
+  type TaskEntryEditor,
+} from "../service/task-entry-editor";
 import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { LocalTask } from "../task-types";
 import { cancelOpenClock, clockOut } from "../util/props";
@@ -31,11 +34,17 @@ export function createActiveClockMenu(props: {
       .setTitle("Clock out")
       .setIcon("square")
       .onClick(async () => {
-        await taskEntryEditor.editProps({
-          path,
-          line,
-          editFn: (listPropsForLine) => clockOut(listPropsForLine),
-        });
+        await runWithNoticeOnError(
+          taskEntryEditor.editProps({
+            path,
+            line,
+            editFn: (listPropsForLine) => {
+              isNotVoid(listPropsForLine, `No list props at ${path}:${line}`);
+
+              return clockOut(listPropsForLine);
+            },
+          }),
+        );
       });
   });
 
@@ -44,11 +53,17 @@ export function createActiveClockMenu(props: {
       .setTitle("Cancel clock")
       .setIcon("trash-2")
       .onClick(async () => {
-        await taskEntryEditor.editProps({
-          path,
-          line,
-          editFn: (listPropsForLine) => cancelOpenClock(listPropsForLine),
-        });
+        await runWithNoticeOnError(
+          taskEntryEditor.editProps({
+            path,
+            line,
+            editFn: (listPropsForLine) => {
+              isNotVoid(listPropsForLine, `No list props at ${path}:${line}`);
+
+              return cancelOpenClock(listPropsForLine);
+            },
+          }),
+        );
       });
   });
 

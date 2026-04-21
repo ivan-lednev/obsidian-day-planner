@@ -1,4 +1,4 @@
-import { Notice } from "obsidian";
+import { Effect } from "effect";
 import { get } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 import { describe, expect, test, vi } from "vitest";
@@ -298,12 +298,14 @@ describe("Indexing", () => {
         loadedFixtures: ["2025-07-19.md"],
       });
 
-      await taskEntryEditor.editProps({
-        path: "fixtures/fixture-vault/2025-07-19.md",
-        line: 12,
-        editFn: (props) =>
-          props ? addOpenClock(props) : createPropsWithOpenClock(),
-      });
+      await Effect.runPromise(
+        taskEntryEditor.editProps({
+          path: "fixtures/fixture-vault/2025-07-19.md",
+          line: 12,
+          editFn: (props) =>
+            props ? addOpenClock(props) : createPropsWithOpenClock(),
+        }),
+      );
 
       expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
     });
@@ -315,15 +317,17 @@ describe("Indexing", () => {
         loadedFixtures: ["test.md"],
       });
 
-      await taskEntryEditor.editProps({
-        path: "fixtures/fixture-vault/test.md",
-        line: 7,
-        editFn: (props) => {
-          isNotVoid(props);
+      await Effect.runPromise(
+        taskEntryEditor.editProps({
+          path: "fixtures/fixture-vault/test.md",
+          line: 7,
+          editFn: (props) => {
+            isNotVoid(props);
 
-          return addOpenClock(props);
-        },
-      });
+            return addOpenClock(props);
+          },
+        }),
+      );
 
       expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
     });
@@ -333,17 +337,15 @@ describe("Indexing", () => {
         loadedFixtures: ["2025-07-19.md"],
       });
 
-      await taskEntryEditor.editProps({
-        path: "fixtures/fixture-vault/2025-07-19.md",
-        line: 0,
-        editFn: () => createPropsWithOpenClock(),
-      });
-
-      expect(Notice).toHaveBeenCalledWith(
-        expect.stringContaining(
-          "Cannot add props to an item that's not a task",
+      await expect(
+        Effect.runPromise(
+          taskEntryEditor.editProps({
+            path: "fixtures/fixture-vault/2025-07-19.md",
+            line: 0,
+            editFn: () => createPropsWithOpenClock(),
+          }),
         ),
-      );
+      ).rejects.toThrow("Cannot add props to an item that's not a task");
     });
 
     test("Does not clock in on tasks with active clocks", async () => {
@@ -351,19 +353,19 @@ describe("Indexing", () => {
         loadedFixtures: ["one-task-two-log-records.md"],
       });
 
-      await taskEntryEditor.editProps({
-        path: "fixtures/fixture-vault/one-task-two-log-records.md",
-        line: 0,
-        editFn: (props) => {
-          isNotVoid(props);
+      await expect(
+        Effect.runPromise(
+          taskEntryEditor.editProps({
+            path: "fixtures/fixture-vault/one-task-two-log-records.md",
+            line: 0,
+            editFn: (props) => {
+              isNotVoid(props);
 
-          return addOpenClock(props);
-        },
-      });
-
-      expect(Notice).toHaveBeenCalledWith(
-        expect.stringContaining("There is already an open clock"),
-      );
+              return addOpenClock(props);
+            },
+          }),
+        ),
+      ).rejects.toThrow("There is already an open clock");
     });
 
     test.todo("Does not mess up other child blocks in list");
