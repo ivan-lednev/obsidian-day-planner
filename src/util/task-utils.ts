@@ -395,7 +395,7 @@ function getIndentedText(root: Node, parentIndentation: string = ""): string {
       parentIndentation + getIndentationForListParagraph(),
     ).join("\n");
 
-    listItemLineWithParagraphs += "\n"
+    listItemLineWithParagraphs += "\n";
     listItemLineWithParagraphs += indentedParagraphs;
   }
 

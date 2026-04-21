@@ -32,7 +32,7 @@ export class TaskEntryEditor {
   editProps = (props: {
     path: string;
     line: number;
-    editFn: (props: Props) => Props;
+    editFn: (props?: Props) => Props;
   }) => {
     const { path, line, editFn } = props;
 
@@ -43,20 +43,26 @@ export class TaskEntryEditor {
           line,
         );
 
-        const listPropsForLine = yield* this.findListProps(path, line);
-
-        if (!listPropsForLine) {
+        if (!listItem.task) {
           return yield* Effect.fail(
-            new Error(`No list props found at ${path}:${line}`),
+            new Error(
+              `Cannot add props to an item that's not a task at ${path}:${line}`,
+            ),
           );
         }
 
+        const listPropsForLine = yield* this.findListProps(path, line);
+
         const updatedProps = yield* Effect.try({
-          try: () => editFn(listPropsForLine.parsed),
-          catch: (error) =>
-            new Error("Could not edit props", {
+          try: () => editFn(listPropsForLine?.parsed),
+          catch: (error) => {
+            const cause =
+              error instanceof Error ? error.message : String(error);
+
+            return new Error(`Could not edit props. Cause: ${cause}`, {
               cause: error,
-            }),
+            });
+          },
         });
 
         const indented = yield* toIndentedMarkdown(
@@ -66,13 +72,22 @@ export class TaskEntryEditor {
 
         yield* Effect.tryPromise({
           try: () =>
-            this.vaultFacade.editFile(
-              path,
-              (contents) =>
-                contents.slice(0, listPropsForLine.position.start.offset) +
+            this.vaultFacade.editFile(path, (contents) => {
+              if (listPropsForLine) {
+                return (
+                  contents.slice(0, listPropsForLine.position.start.offset) +
+                  indented +
+                  contents.slice(listPropsForLine.position.end.offset)
+                );
+              }
+
+              return (
+                contents.slice(0, listItem.position.end.offset) +
+                "\n" +
                 indented +
-                contents.slice(listPropsForLine.position.end.offset),
-            ),
+                contents.slice(listItem.position.end.offset)
+              );
+            }),
           catch: (error) =>
             new Error(`Could not edit file ${path}`, { cause: error }),
         });
@@ -100,6 +115,7 @@ export class TaskEntryEditor {
 
   clockInUnderCursor = () =>
     this.updateListPropsUnderCursor((props) =>
+      // todo: remove duplication
       Either.right(addOpenClock(props ?? createPropsWithOpenClock())),
     );
 

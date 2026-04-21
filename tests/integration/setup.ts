@@ -15,7 +15,9 @@ import {
 } from "../../src/redux/tracker/tracker-slice";
 import { TransactionWriter } from "../../src/service/diff-writer";
 import { ListPropsParser } from "../../src/service/list-props-parser";
+import { MetadataCacheFacade } from "../../src/service/metadata-cache-facade";
 import type { PeriodicNotes } from "../../src/service/periodic-notes";
+import { TaskEntryEditor } from "../../src/service/task-entry-editor";
 import { VaultFacade } from "../../src/service/vault-facade";
 import type { WorkspaceFacade } from "../../src/service/workspace-facade";
 import {
@@ -42,6 +44,8 @@ function initTestServices(props: {
 }) {
   const { inMemoryFiles, inMemoryDailyNotes, cachedMetadata } = props;
 
+  // Fakes:
+
   const periodicNotes = new FakePeriodicNotes(
     inMemoryDailyNotes,
   ) as unknown as PeriodicNotes;
@@ -56,17 +60,21 @@ function initTestServices(props: {
     throw new Error("Can't access tasks API inside tests");
   };
 
+  const workspaceFacade =
+    new FakeWorkspaceFacade() as unknown as WorkspaceFacade;
+
+  // Real ones:
+
   const vaultFacade = new VaultFacade(vault as unknown as Vault, getTasksApi);
 
   const transactionWriter = new TransactionWriter(vaultFacade);
-
-  const workspaceFacade =
-    new FakeWorkspaceFacade() as unknown as WorkspaceFacade;
 
   const listPropsParser = new ListPropsParser(
     vault as unknown as Vault,
     metadataCache,
   );
+
+  const metadataCacheFacade = new MetadataCacheFacade(metadataCache);
 
   return {
     periodicNotes,
@@ -76,6 +84,7 @@ function initTestServices(props: {
     workspaceFacade,
     vaultFacade,
     listPropsParser,
+    metadataCacheFacade,
   };
 }
 
@@ -101,6 +110,7 @@ export async function setUp(props?: {
     workspaceFacade,
     vaultFacade,
     listPropsParser,
+    metadataCacheFacade,
   } = initTestServices({
     inMemoryFiles,
     inMemoryDailyNotes,
@@ -143,6 +153,14 @@ export async function setUp(props?: {
     periodicNotes,
     settings: defaultSettingsForTests,
   });
+
+  const taskEntryEditor = new TaskEntryEditor(
+    getState,
+    workspaceFacade,
+    vaultFacade,
+    metadataCacheFacade,
+    listPropsParser,
+  );
 
   inMemoryFiles.forEach(({ path }) => {
     isNotVoid(
@@ -239,5 +257,6 @@ export async function setUp(props?: {
     transactionWriter,
     currentTime,
     metadataCache,
+    taskEntryEditor,
   };
 }

@@ -69,3 +69,35 @@ exports[`Editing > Obsidian-tasks > Unschedules tasks 1`] = `
 ",
 }
 `;
+
+exports[`Indexing > Clocking in > Clocks in on tasks with existing clocks 1`] = `
+{
+  "fixtures/fixture-vault/test.md": "
+-     \`\`\`yaml
+-     planner:
+-       log:
+-         - start: 2025-07-18 12:00
+-           end: 2025-07-18 14:40
+-     \`\`\`
++ 		  \`\`\`yaml
++ 		  planner:
++ 		    log:
++ 		      - start: 2025-07-18 12:00
++ 		        end: 2025-07-18 14:40
++ 		      - start: '2026-01-01 17:00:00'
++ 		  \`\`\`
+",
+}
+`;
+
+exports[`Indexing > Clocking in > Clocks in on tasks without clocks 1`] = `
+{
+  "fixtures/fixture-vault/2025-07-19.md": "
++   \`\`\`yaml
++   planner:
++     log:
++       - start: '2026-01-01 17:00:00'
++   \`\`\`
+",
+}
+`;

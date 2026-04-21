@@ -1,3 +1,4 @@
+import { Notice } from "obsidian";
 import { get } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 import { describe, expect, test, vi } from "vitest";
@@ -12,6 +13,7 @@ import {
 import { defaultSettingsForTests } from "../src/settings";
 import { EditMode } from "../src/ui/hooks/use-edit/types";
 import { strictParse } from "../src/util/moment";
+import { addOpenClock, createPropsWithOpenClock } from "../src/util/props";
 import { getDayKey, toRenderableMarkdown } from "../src/util/task-utils";
 
 import { setUp } from "./integration/setup";
@@ -289,14 +291,91 @@ describe("Indexing", () => {
   test.todo("Parses code blocks under nested tasks");
 
   describe("Clocking in", () => {
-    test.todo("Clocks in on tasks");
+    test("Clocks in on tasks without clocks", async () => {
+      vi.useFakeTimers({ now: new Date("2026-01-01 17:00") });
 
-    test.todo("Does not clock in on tasks with active clocks");
+      const { taskEntryEditor, vault } = await setUp({
+        loadedFixtures: ["2025-07-19.md"],
+      });
+
+      await taskEntryEditor.editProps({
+        path: "fixtures/fixture-vault/2025-07-19.md",
+        line: 12,
+        editFn: (props) =>
+          props ? addOpenClock(props) : createPropsWithOpenClock(),
+      });
+
+      expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
+    });
+
+    test("Clocks in on tasks with existing clocks", async () => {
+      vi.useFakeTimers({ now: new Date("2026-01-01 17:00") });
+
+      const { taskEntryEditor, vault } = await setUp({
+        loadedFixtures: ["test.md"],
+      });
+
+      await taskEntryEditor.editProps({
+        path: "fixtures/fixture-vault/test.md",
+        line: 7,
+        editFn: (props) => {
+          isNotVoid(props);
+
+          return addOpenClock(props);
+        },
+      });
+
+      expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
+    });
+
+    test("Does not clock in on bullet list items", async () => {
+      const { taskEntryEditor } = await setUp({
+        loadedFixtures: ["2025-07-19.md"],
+      });
+
+      await taskEntryEditor.editProps({
+        path: "fixtures/fixture-vault/2025-07-19.md",
+        line: 0,
+        editFn: () => createPropsWithOpenClock(),
+      });
+
+      expect(Notice).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "Cannot add props to an item that's not a task",
+        ),
+      );
+    });
+
+    test("Does not clock in on tasks with active clocks", async () => {
+      const { taskEntryEditor } = await setUp({
+        loadedFixtures: ["one-task-two-log-records.md"],
+      });
+
+      await taskEntryEditor.editProps({
+        path: "fixtures/fixture-vault/one-task-two-log-records.md",
+        line: 0,
+        editFn: (props) => {
+          isNotVoid(props);
+
+          return addOpenClock(props);
+        },
+      });
+
+      expect(Notice).toHaveBeenCalledWith(
+        expect.stringContaining("There is already an open clock"),
+      );
+    });
 
     test.todo("Does not mess up other child blocks in list");
 
+    test.todo("Keeps other props as is");
+
     test.todo(
       "For a single line in a file, adds a newline instead of appending the code block to the line",
+    );
+
+    test.todo(
+      "If a property block is messed up, it replaces it instead of adding another one",
     );
   });
 

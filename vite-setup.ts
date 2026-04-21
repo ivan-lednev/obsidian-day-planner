@@ -11,6 +11,9 @@ vi.mock("obsidian", () => ({
   parseYaml: (source: string) => {
     return yaml.load(source);
   },
+  stringifyYaml: (source: unknown) => {
+    return yaml.dump(source, { forceQuotes: false });
+  },
   Modal: class Modal {
     constructor() {
       throw new Error("Modal is not implemented in tests");
@@ -21,9 +24,7 @@ vi.mock("obsidian", () => ({
       throw new Error("SuggestModal is not implemented in tests");
     }
   },
-  Notice: class Notice {
-    constructor() {}
-  },
+  Notice: vi.fn(),
 }));
 
 vi.mock("obsidian-dataview", () => ({
