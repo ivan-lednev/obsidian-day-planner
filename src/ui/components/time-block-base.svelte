@@ -52,8 +52,6 @@
     width: var(--time-block-width, 100%);
     height: var(--time-block-height, auto);
     padding: var(--time-block-padding, 0 1px 2px);
-
-    transition: 0.05s linear;
   }
 
   .content {
@@ -71,7 +69,7 @@
     border: 1px solid
       var(
         --time-block-border-color-override,
-        var(--time-block-border-color, var(--color-base-50))
+        var(--time-block-border-color, var(--text-faint))
       );
     border-radius: var(--radius-s);
     box-shadow: var(--time-block-box-shadow);
