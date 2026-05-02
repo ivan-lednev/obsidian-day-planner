@@ -99,7 +99,7 @@
 </script>
 
 {#if $settings.timelineColumns.planner}
-  <Column visibleHours={getVisibleHours($settings)}>
+  <Column class="planner-left-column" visibleHours={getVisibleHours($settings)}>
     {#if $isToday(day)}
       <Needle autoScrollBlocked={isUnderCursor} />
     {/if}
@@ -132,7 +132,7 @@
 {/if}
 
 {#if $settings.timelineColumns.timeTracker}
-  <Column visibleHours={getVisibleHours($settings)}>
+  <Column class="planner-right-column" visibleHours={getVisibleHours($settings)}>
     {#if $isToday(day)}
       <Needle autoScrollBlocked={isUnderCursor} showBall={false} />
     {/if}
