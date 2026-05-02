@@ -283,6 +283,21 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
       }),
     );
 
+    new Setting(containerEl)
+      .setName("Show remote calendar events in a separate column")
+      .setDesc(
+        "Render timed events from remote calendars in a separate timeline column from local planner tasks.",
+      )
+      .addToggle((component) => {
+        component
+          .setValue(
+            this.plugin.settings().showRemoteCalendarEventsInSeparateColumn,
+          )
+          .onChange((value) => {
+            this.update({ showRemoteCalendarEventsInSeparateColumn: value });
+          });
+      });
+
     containerEl.createEl("h2", { text: "Date & Time Formats" });
 
     new Setting(containerEl).setName("Hour format").then((component) => {

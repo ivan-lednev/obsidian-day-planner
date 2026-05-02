@@ -3,9 +3,11 @@
   import { settings } from "../../global-store/settings";
 
   export let visibleHours: number[];
+  let className: string | string[] = "";
+  export { className as class };
 </script>
 
-<div class="column">
+<div class={["column", className]}>
   <slot />
   {#each visibleHours as hour}
     <div style:height="{getHourSize($settings)}px" class="hour-block">

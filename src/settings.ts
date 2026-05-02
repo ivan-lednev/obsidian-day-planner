@@ -50,6 +50,7 @@ export interface DayPlannerSettings {
   showUncheduledTasks: boolean;
   showUnscheduledNestedTasks: boolean;
   showTimelineInSidebar: boolean;
+  showRemoteCalendarEventsInSeparateColumn: boolean;
   showNow: boolean;
   showNext: boolean;
   showActiveClocks: boolean;
@@ -92,6 +93,7 @@ export const defaultSettings: DayPlannerSettings = {
   showTimestampInTaskBlock: false,
   showUncheduledTasks: true,
   showUnscheduledNestedTasks: true,
+  showRemoteCalendarEventsInSeparateColumn: false,
   showNow: true,
   showNext: true,
   pluginVersion: "",
