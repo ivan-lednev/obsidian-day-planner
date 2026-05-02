@@ -1,4 +1,4 @@
-import { flow, uniqBy } from "lodash/fp";
+import { uniqBy } from "lodash/fp";
 import type { Moment } from "moment";
 import { derived, type Readable, writable } from "svelte/store";
 
@@ -12,6 +12,7 @@ import type {
   WithPlacing,
   WithTime,
 } from "../../../task-types";
+import { isRemote } from "../../../task-types";
 import type {
   OnEditAbortedFn,
   OnUpdateFn,
@@ -182,20 +183,33 @@ export function useEditContext(props: {
   );
 
   function getDisplayedTasksForTimeline(day: Moment) {
-    return derived(dayToDisplayedTasks, ($dayToDisplayedTasks) => {
-      const tasksForDay =
-        $dayToDisplayedTasks[t.getDayKey(day)] || t.getEmptyTasksForDay();
+    return derived(
+      [dayToDisplayedTasks, settings],
+      ([$dayToDisplayedTasks, $settings]) => {
+        const tasksForDay =
+          $dayToDisplayedTasks[t.getDayKey(day)] || t.getEmptyTasksForDay();
 
-      const withTime: Array<WithPlacing<WithTime<Task>>> = flow(
-        uniqBy(t.getRenderKey),
-        addHorizontalPlacing,
-      )(tasksForDay.withTime);
+        const uniqueWithTime = uniqBy(t.getRenderKey)(
+          tasksForDay.withTime,
+        ) as Array<WithTime<Task>>;
+        const separateRemoteCalendars =
+          $settings.showRemoteCalendarEventsInSeparateColumn;
+        const remoteCalendarWithTime = separateRemoteCalendars
+          ? addHorizontalPlacing(uniqueWithTime.filter(isRemote))
+          : [];
+        const plannerWithTime = separateRemoteCalendars
+          ? uniqueWithTime.filter((task) => !isRemote(task))
+          : uniqueWithTime;
+        const withTime: Array<WithPlacing<WithTime<Task>>> =
+          addHorizontalPlacing(plannerWithTime);
 
-      return {
-        ...tasksForDay,
-        withTime,
-      };
-    });
+        return {
+          ...tasksForDay,
+          withTime,
+          remoteCalendarWithTime,
+        };
+      },
+    );
   }
 
   return {

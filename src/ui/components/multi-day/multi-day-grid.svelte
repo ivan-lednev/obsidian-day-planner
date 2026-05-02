@@ -52,8 +52,13 @@
   let visibleSideControls = $state<SideControls>("none");
   let timelineInternalColumnCount = $derived.by(() => {
     const columnFlags = Object.values(settingsSignal.current.timelineColumns);
+    const remoteCalendarColumn =
+      settingsSignal.current.timelineColumns.planner &&
+      settingsSignal.current.showRemoteCalendarEventsInSeparateColumn
+        ? 1
+        : 0;
 
-    return columnFlags.filter(Boolean).length;
+    return columnFlags.filter(Boolean).length + remoteCalendarColumn;
   });
 
   function toggleSideControls(toggledControls: SideControls) {

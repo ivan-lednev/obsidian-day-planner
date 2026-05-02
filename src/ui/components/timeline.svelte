@@ -129,6 +129,29 @@
       {/each}
     </div>
   </Column>
+
+  {#if settingsSignal.current.showRemoteCalendarEventsInSeparateColumn}
+    <Column
+      class="planner-right-column"
+      visibleHours={getVisibleHours($settings)}
+    >
+      {#if $isToday(day)}
+        <Needle autoScrollBlocked={isUnderCursor} />
+      {/if}
+
+      <div class="tasks absolute-stretch-x">
+        {#each $displayedTasksForTimeline.remoteCalendarWithTime as task (getRenderKey(task))}
+          <PositionedTimeBlock {task}>
+            <UnscheduledTimeBlock {task}>
+              {#snippet bottomDecoration()}
+                {getBlockProps(task, settingsSignal.current)}
+              {/snippet}
+            </UnscheduledTimeBlock>
+          </PositionedTimeBlock>
+        {/each}
+      </div>
+    </Column>
+  {/if}
 {/if}
 
 {#if $settings.timelineColumns.timeTracker}
