@@ -6,6 +6,7 @@ import { Notice } from "obsidian";
 import type { ListPropsParseResult } from "../redux/dataview/dataview-slice";
 import type { AppStore } from "../redux/store";
 import { locToEditorPosition } from "../util/editor";
+import { getErrorMessage } from "../util/error";
 import {
   addOpenClock,
   cancelOpenClock,
@@ -22,9 +23,10 @@ import { WorkspaceFacade } from "./workspace-facade";
 
 export const runWithNoticeOnError = <A, E>(
   program: Effect.Effect<A, E>,
-): Promise<A | void> =>
+): Promise<void> =>
   pipe(
     program,
+    Effect.asVoid,
     Effect.catchAll((error) =>
       Effect.sync(() => {
         new Notice(String(error));
@@ -35,7 +37,7 @@ export const runWithNoticeOnError = <A, E>(
     Effect.runPromise,
   );
 
-export class TaskEntryEditor {
+export class ListItemEntryEditor {
   editProps = (props: {
     path: string;
     line: number;
@@ -61,13 +63,10 @@ export class TaskEntryEditor {
 
       const updatedProps = yield* Effect.try({
         try: () => editFn(listPropsForLine?.parsed),
-        catch: (error) => {
-          const cause = error instanceof Error ? error.message : String(error);
-
-          return new Error(`Could not edit props. Cause: ${cause}`, {
+        catch: (error) =>
+          new Error(`Could not edit props. Cause: ${getErrorMessage(error)}`, {
             cause: error,
-          });
-        },
+          }),
       });
 
       const indented = yield* toIndentedMarkdown(
@@ -118,7 +117,7 @@ export class TaskEntryEditor {
   clockInUnderCursor = () =>
     this.updateListPropsUnderCursor((props) =>
       // todo: remove duplication
-      Either.right(addOpenClock(props ?? createPropsWithOpenClock())),
+      Either.right(props ? addOpenClock(props) : createPropsWithOpenClock()),
     );
 
   clockOutUnderCursor = () =>

@@ -3,6 +3,7 @@ import path from "path";
 import "dotenv/config";
 import fetch from "node-fetch";
 import { Command } from "commander";
+import { getErrorMessage } from "../src/util/error";
 
 const program = new Command();
 
@@ -37,9 +38,7 @@ const downloadIcs = async () => {
     fs.writeFileSync(outputPath, text);
     console.log(`ICS file saved to ${outputPath}`);
   } catch (error) {
-    console.error(
-      `Error: ${error instanceof Error ? error.message : String(error)}`,
-    );
+    console.error(getErrorMessage(error));
     process.exit(1);
   }
 };

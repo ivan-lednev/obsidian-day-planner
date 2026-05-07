@@ -94,7 +94,7 @@
 
 <style>
   .rendered-markdown {
-    --checkbox-size: var(--font-ui-small);
+    --checkbox-size: var(--planner-time-block-font-size, var(--font-ui-small));
 
     flex: 1 0 0;
     padding: var(--size-2-1) var(--size-4-1);
@@ -108,7 +108,7 @@
 
   .rendered-markdown :global(ul),
   .rendered-markdown :global(ol) {
-    padding-inline-start: 20px;
+    padding-inline-start: var(--size-4-5);
   }
 
   .rendered-markdown :global(input[type="checkbox"]) {
@@ -127,6 +127,16 @@
   }
 
   .first-line-wrapper {
-    font-weight: var(--font-semibold);
+    font-weight: var(
+      --planner-time-block-summary-font-weight,
+      var(--font-semibold)
+    );
+  }
+
+  .lines-after-first-wrapper {
+    padding-inline-start: var(
+      --planner-time-block-nested-items-padding-inline-start,
+      var(--size-4-4)
+    );
   }
 </style>

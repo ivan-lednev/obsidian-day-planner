@@ -1,10 +1,11 @@
+import { pipe } from "effect";
 import { Menu } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
 import {
   runWithNoticeOnError,
-  type TaskEntryEditor,
-} from "../service/task-entry-editor";
+  type ListItemEntryEditor,
+} from "../service/list-item-entry-editor";
 import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { LocalTask } from "../task-types";
 import { addOpenClock } from "../util/props";
@@ -12,7 +13,7 @@ import { addOpenClock } from "../util/props";
 export function createRecentClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;
   task: LocalTask;
-  taskEntryEditor: TaskEntryEditor;
+  taskEntryEditor: ListItemEntryEditor;
   workspaceFacade: WorkspaceFacade;
 }) {
   const { event, task, taskEntryEditor, workspaceFacade } = props;
@@ -33,19 +34,21 @@ export function createRecentClockMenu(props: {
     item
       .setTitle("Clock in")
       .setIcon("play")
-      .onClick(async () => {
-        await runWithNoticeOnError(
-          taskEntryEditor.editProps({
-            path,
-            line,
-            editFn: (listPropsForLine) => {
-              isNotVoid(listPropsForLine, `No list props at ${path}:${line}`);
+      .onClick(
+        async () =>
+          await pipe(
+            taskEntryEditor.editProps({
+              path,
+              line,
+              editFn: (listPropsForLine) => {
+                isNotVoid(listPropsForLine, `No list props at ${path}:${line}`);
 
-              return addOpenClock(listPropsForLine);
-            },
-          }),
-        );
-      });
+                return addOpenClock(listPropsForLine);
+              },
+            }),
+            runWithNoticeOnError,
+          ),
+      );
   });
 
   menu.addItem((item) => {

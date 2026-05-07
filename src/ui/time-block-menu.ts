@@ -1,9 +1,8 @@
 import { Menu } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
-import type { LocalTask } from "../task-types";
-
-import type { WorkspaceFacade } from "src/service/workspace-facade";
+import type { WorkspaceFacade } from "../service/workspace-facade";
+import { type LocalTask } from "../task-types";
 
 export function createTimeBlockMenu(props: {
   event: MouseEvent | TouchEvent;

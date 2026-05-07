@@ -4,6 +4,7 @@ import { derived, type Readable } from "svelte/store";
 
 import { statusBarTextLimit } from "../../constants";
 import { currentTime } from "../../global-store/current-time";
+import type DayPlanner from "../../main";
 import type { Task, WithTime } from "../../task-types";
 import { ellipsis } from "../../util/ellipsis";
 import { getDiffInMinutes } from "../../util/moment";
@@ -11,8 +12,6 @@ import { getEndTime, getOneLineSummary } from "../../util/task-utils";
 import StatusBarWidget from "../components/status-bar-widget.svelte";
 
 import type { DateRanges } from "./use-date-ranges";
-
-import type DayPlanner from "src/main";
 
 interface UseStatusBarWidgetProps {
   tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;

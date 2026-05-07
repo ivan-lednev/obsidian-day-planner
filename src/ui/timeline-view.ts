@@ -3,14 +3,13 @@ import { mount, unmount } from "svelte";
 import type { Component } from "svelte";
 
 import { dateRangeContextKey, viewTypeTimeline } from "../constants";
+import type { PeriodicNotes } from "../service/periodic-notes";
 import type { DayPlannerSettings } from "../settings";
 import type { ComponentContext, DateRange } from "../types";
 import { handleActiveLeafChange } from "../util/handle-active-leaf-change";
 
 import TimelineWithControls from "./components/timeline-with-controls.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
-
-import type { PeriodicNotes } from "src/service/periodic-notes";
 
 export default class TimelineView extends ItemView {
   private timeline?: Component;

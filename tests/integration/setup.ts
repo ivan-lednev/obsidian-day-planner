@@ -14,10 +14,10 @@ import {
   selectTaskEntriesById,
 } from "../../src/redux/tracker/tracker-slice";
 import { TransactionWriter } from "../../src/service/diff-writer";
+import { ListItemEntryEditor } from "../../src/service/list-item-entry-editor";
 import { ListPropsParser } from "../../src/service/list-props-parser";
 import { MetadataCacheFacade } from "../../src/service/metadata-cache-facade";
 import type { PeriodicNotes } from "../../src/service/periodic-notes";
-import { TaskEntryEditor } from "../../src/service/task-entry-editor";
 import { VaultFacade } from "../../src/service/vault-facade";
 import type { WorkspaceFacade } from "../../src/service/workspace-facade";
 import {
@@ -154,7 +154,7 @@ export async function setUp(props?: {
     settings: defaultSettingsForTests,
   });
 
-  const taskEntryEditor = new TaskEntryEditor(
+  const taskEntryEditor = new ListItemEntryEditor(
     getState,
     workspaceFacade,
     vaultFacade,

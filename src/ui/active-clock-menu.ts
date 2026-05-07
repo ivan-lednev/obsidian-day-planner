@@ -3,8 +3,8 @@ import { isNotVoid } from "typed-assert";
 
 import {
   runWithNoticeOnError,
-  type TaskEntryEditor,
-} from "../service/task-entry-editor";
+  type ListItemEntryEditor,
+} from "../service/list-item-entry-editor";
 import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { LocalTask } from "../task-types";
 import { cancelOpenClock, clockOut } from "../util/props";
@@ -12,7 +12,7 @@ import { cancelOpenClock, clockOut } from "../util/props";
 export function createActiveClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;
   task: LocalTask;
-  taskEntryEditor: TaskEntryEditor;
+  taskEntryEditor: ListItemEntryEditor;
   workspaceFacade: WorkspaceFacade;
 }) {
   const { event, task, taskEntryEditor, workspaceFacade } = props;

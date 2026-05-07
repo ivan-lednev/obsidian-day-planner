@@ -5,9 +5,9 @@ import type { Readable, Writable } from "svelte/store";
 
 import { type AppDispatch, type RootState } from "./redux/store";
 import { type UseSelector, type useSelectorV2 } from "./redux/use-selector";
+import type { ListItemEntryEditor } from "./service/list-item-entry-editor";
 import type { ListPropsParser } from "./service/list-props-parser";
 import type { PeriodicNotes } from "./service/periodic-notes";
-import type { TaskEntryEditor } from "./service/task-entry-editor";
 import type { VaultFacade } from "./service/vault-facade";
 import type { WorkspaceFacade } from "./service/workspace-facade";
 import type { DayPlannerSettings, IcalConfig } from "./settings";
@@ -60,7 +60,7 @@ export interface ObsidianContext {
   settingsSignal: Signal<DayPlannerSettings>;
   storeSignal: Signal<RootState>;
   pointerDateTime: Writable<PointerDateTime>;
-  taskEntryEditor: TaskEntryEditor;
+  taskEntryEditor: ListItemEntryEditor;
   dispatch: AppDispatch;
   useSelector: UseSelector;
   useSelectorV2: useSelectorV2;

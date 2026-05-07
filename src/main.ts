@@ -32,10 +32,10 @@ import { selectActiveLogEntries } from "./redux/tracker/tracker-slice";
 import { createUseSelector, createUseSelectorV2 } from "./redux/use-selector";
 import { createSvelteSignalFromReduxStore } from "./redux/use-selector";
 import { TransactionWriter } from "./service/diff-writer";
+import { ListItemEntryEditor } from "./service/list-item-entry-editor";
 import { ListPropsParser } from "./service/list-props-parser";
 import { MetadataCacheFacade } from "./service/metadata-cache-facade";
 import { PeriodicNotes } from "./service/periodic-notes";
-import { TaskEntryEditor } from "./service/task-entry-editor";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
@@ -63,7 +63,7 @@ export default class DayPlanner extends Plugin {
   private settingsStore!: Writable<DayPlannerSettings>;
   private workspaceFacade!: WorkspaceFacade;
   private periodicNotes!: PeriodicNotes;
-  private taskEntryEditor!: TaskEntryEditor;
+  private taskEntryEditor!: ListItemEntryEditor;
   private vaultFacade!: VaultFacade;
   private transactionWriter!: TransactionWriter;
   private metadataCacheFacade!: MetadataCacheFacade;
@@ -110,7 +110,7 @@ export default class DayPlanner extends Plugin {
       settings: initialSettings,
     });
 
-    this.taskEntryEditor = new TaskEntryEditor(
+    this.taskEntryEditor = new ListItemEntryEditor(
       getState,
       this.workspaceFacade,
       this.vaultFacade,

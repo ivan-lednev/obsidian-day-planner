@@ -6,14 +6,14 @@ import type {
   MetadataCache,
 } from "obsidian";
 
+import type { ListItemEntryEditor } from "../service/list-item-entry-editor";
 import type { ListPropsParser } from "../service/list-props-parser";
 import type { MetadataCacheFacade } from "../service/metadata-cache-facade";
-import type { TaskEntryEditor } from "../service/task-entry-editor";
 import { isWithOpenClock } from "../util/props";
 
 export const createEditorMenuCallback =
   (props: {
-    taskEntryEditor: TaskEntryEditor;
+    taskEntryEditor: ListItemEntryEditor;
     metadataCacheFacade: MetadataCacheFacade;
     listPropsParser: ListPropsParser;
     metadataCache: MetadataCache;

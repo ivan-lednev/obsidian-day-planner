@@ -3,20 +3,9 @@
 
   import ErrorMessage from "./error-message.svelte";
   import Callout from "./callout.svelte";
+  import { getErrorDescription } from "../../util/error";
 
   const { children }: { children: Snippet } = $props();
-
-  function getErrorDescription(error: unknown) {
-    if (error instanceof Error) {
-      return error.stack;
-    }
-
-    if (typeof error === "object") {
-      return JSON.stringify(error);
-    }
-
-    return String(error);
-  }
 </script>
 
 <svelte:boundary>

@@ -59,7 +59,8 @@
 
     flex: 1 0 0;
 
-    font-size: var(--font-ui-small);
+    font-family: var(--planner-time-block-font-family, var(--font-interface));
+    font-size: var(--planner-time-block-font-size, var(--font-ui-small));
     color: var(--text-muted);
     text-align: left;
     overflow-wrap: anywhere;

@@ -1,9 +1,8 @@
 import { type PayloadAction } from "@reduxjs/toolkit";
 import type { Pos } from "obsidian";
 
+import type { Props } from "../../util/props";
 import { createAppSlice } from "../create-app-slice";
-
-import type { Props } from "src/util/props";
 
 export type ListPropsParseResult = {
   parsed: Props;

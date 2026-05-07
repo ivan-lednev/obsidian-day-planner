@@ -1,5 +1,5 @@
 import { pipe } from "effect";
-import { fromNullable, mapError } from "effect/Effect";
+import { Effect } from "effect";
 import type { MetadataCache } from "obsidian";
 
 export class MetadataCacheFacade {
@@ -16,12 +16,12 @@ export class MetadataCacheFacade {
 
   getListItemEffect(path: string, line: number) {
     return pipe(
-      fromNullable(
+      Effect.fromNullable(
         this.metadataCache
           .getCache(path)
           ?.listItems?.find((item) => item.position?.start?.line === line),
       ),
-      mapError(() => new Error(`No list item at ${path}:${line}`)),
+      Effect.mapError(() => new Error(`No list item at ${path}:${line}`)),
     );
   }
 }
