@@ -153,7 +153,7 @@ describe("Indexing", () => {
     expect(activeClock).not.toHaveProperty("truncated");
   });
 
-  test("Returns time block views in range", async () => {
+  test("Returns time block views in range; nested blocks get parsed", async () => {
     const { getState } = await setUp();
 
     expect(
@@ -287,8 +287,6 @@ describe("Indexing", () => {
   test.todo("Renaming a file removes entries by the old path");
 
   test.todo("Ignores invalid dates, extra keys");
-
-  test.todo("Parses code blocks under nested tasks");
 
   describe("Clocking in", () => {
     test("Clocks in on tasks without clocks", async () => {
