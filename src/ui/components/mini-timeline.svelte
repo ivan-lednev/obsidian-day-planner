@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { Readable } from "svelte/store";
+  import { fromStore, type Readable } from "svelte/store";
 
   import { currentTimeSignal } from "../../global-store/current-time";
-  import { addHorizontalPlacing } from "../../overlap/overlap";
   import { isRemote, type Task, type WithTime } from "../../task-types";
-  import { doesOverlapWithRange } from "../../util/moment";
   import * as t from "../../util/task-utils";
+
+  import { MiniTimeline } from "./mini-timeline-headless.svelte.js";
 
   const {
     tasksWithTimeForToday,
@@ -13,53 +13,31 @@
     tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
   } = $props();
 
-  const blocksPerHour = 6;
-  const hours = 3;
-  const totalBlocks = blocksPerHour * hours;
-
-  const timeMarkerWidthPx = 8;
-  const timeMarkerHalfWidthPx = timeMarkerWidthPx / 2;
-  const timeMarkerOffsetPx = $derived(
-    currentTimeSignal.current.minutes() - timeMarkerHalfWidthPx,
+  const timeline = new MiniTimeline(
+    currentTimeSignal,
+    fromStore(tasksWithTimeForToday),
   );
-
-  const rangeStart = $derived(
-    currentTimeSignal.current.clone().startOf("hour"),
-  );
-  const rangeEnd = $derived(
-    currentTimeSignal.current.clone().add(hours, "hours").endOf("hour"),
-  );
-
-  const displayedBlocks = $derived.by(() => {
-    const clampedTasksForRange = $tasksWithTimeForToday
-      .filter((it) =>
-        doesOverlapWithRange(
-          { start: it.startTime, end: t.getEndTime(it) },
-          {
-            start: rangeStart,
-            end: rangeEnd,
-          },
-        ),
-      )
-      .map((it) => t.clamp(it, rangeStart, rangeEnd));
-
-    return addHorizontalPlacing(clampedTasksForRange);
-  });
 </script>
 
 <div
-  style:--time-marker-half-width-px="{timeMarkerHalfWidthPx}px"
+  style:--time-marker-half-width-px="{timeline.timeMarkerHalfWidthPx}px"
   style:--time-marker-offset-y-px="-3px"
   class="status-bar-item-segment mini-timeline"
 >
-  <div style:left="{timeMarkerOffsetPx}px" class="time-marker top"></div>
-  <div style:left="{timeMarkerOffsetPx}px" class="time-marker bottom"></div>
+  <div
+    style:left="{timeline.timeMarkerOffsetPx}px"
+    class="time-marker top"
+  ></div>
+  <div
+    style:left="{timeline.timeMarkerOffsetPx}px"
+    class="time-marker bottom"
+  ></div>
 
   <div class="mini-time-block-wrapper">
-    {#each displayedBlocks as block}
+    {#each timeline.displayedBlocks as block}
       <div
         style:width="{block.durationMinutes}px"
-        style:left="{block.startTime.clone().diff(rangeStart, `minutes`)}px"
+        style:left="{block.leftPx}px"
         style:height="{block.placing.spanPercent}%"
         style:bottom="{block.placing.offsetPercent}%"
         class="mini-time-block"
@@ -75,11 +53,11 @@
     {/each}
   </div>
 
-  {#each Array.from({ length: totalBlocks }) as _, index}
+  {#each Array.from({ length: timeline.totalBlocks }) as _, index}
     <div
       class={[
         "hour-segment",
-        (index + 1) % blocksPerHour === 0 && "hour-end-segment",
+        (index + 1) % timeline.blocksPerHour === 0 && "hour-end-segment",
       ]}
     ></div>
   {/each}
