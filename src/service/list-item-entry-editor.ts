@@ -181,11 +181,7 @@ export class ListItemEntryEditor {
         const foundListProps = yield* this.findListProps(path, line);
 
         const updatedFormattedProps = yield* pipe(
-          foundListProps,
-          Either.fromNullable(() => new Error("No list props under cursor")),
-          Either.flatMap((foundListPropsForLine) =>
-            updateFn(foundListPropsForLine.parsed),
-          ),
+          updateFn(foundListProps?.parsed),
           Either.flatMap((updatedProps) =>
             toIndentedMarkdown(updatedProps, listItemCache.position.start.col),
           ),

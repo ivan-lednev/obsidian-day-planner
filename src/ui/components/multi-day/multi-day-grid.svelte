@@ -344,9 +344,11 @@
 
   .multi-day-main-content {
     position: relative;
+
     display: flex;
     grid-area: timelines;
     flex-direction: column;
+
     min-width: 0;
   }
 

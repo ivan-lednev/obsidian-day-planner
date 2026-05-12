@@ -1,3 +1,5 @@
+import { pipe } from "effect";
+import { filter, map } from "lodash/fp";
 import type { Moment } from "moment";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
@@ -5,8 +7,6 @@ import type { Task, WithTime } from "../../task-types";
 import type { Signal } from "../../types";
 import { doesOverlapWithRange } from "../../util/moment";
 import * as t from "../../util/task-utils";
-import { filter, map } from "lodash/fp";
-import { pipe } from "effect";
 
 export class MiniTimeline {
   private readonly hours = 3;
