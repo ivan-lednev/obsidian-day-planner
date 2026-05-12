@@ -5,17 +5,14 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
-  import { selectActiveLogEntries } from "../../redux/tracker/tracker-slice";
   import type { Task } from "../../task-types";
   import { createColumnSelectionMenu } from "../column-selection-menu";
 
-  import ActiveClocks from "./active-clocks.svelte";
   import BlockList from "./block-list.svelte";
   import ControlButton from "./control-button.svelte";
   import ErrorBoundary from "./error-boundary.svelte";
   import { EllipsisVertical } from "./lucide";
   import Tree from "./obsidian/tree.svelte";
-  import RecentClocks from "./RecentClocks.svelte";
   import ResizeHandle from "./resize-handle.svelte";
   import ResizeableBox from "./resizeable-box.svelte";
   import Ruler from "./ruler.svelte";
@@ -24,9 +21,7 @@
   import Timeline from "./timeline.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
-  const { editContext, useSelector, pointerDateTime } = getObsidianContext();
-
-  const activeLogRecords = useSelector(selectActiveLogEntries);
+  const { editContext, pointerDateTime } = getObsidianContext();
 
   const getDisplayedAllDayTasksForMultiDayRow = fromStore(
     editContext.getDisplayedAllDayTasksForMultiDayRow,
@@ -53,19 +48,6 @@
 
 <ErrorBoundary>
   <TimelineControls />
-
-  {#if $settings.showActiveClocks}
-    <Tree title="Active clocks">
-      {#snippet flair()}
-        {String($activeLogRecords.length)}
-      {/snippet}
-      <ActiveClocks />
-    </Tree>
-  {/if}
-
-  <Tree title="Recent clocks">
-    <RecentClocks />
-  </Tree>
 
   {#if $settings.showUncheduledTasks}
     <Tree title="All day events">

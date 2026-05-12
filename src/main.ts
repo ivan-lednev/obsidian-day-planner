@@ -7,6 +7,7 @@ import {
   viewTypeReleaseNotes,
   viewTypeTimeline,
   viewTypeMultiDay,
+  viewTypeTimeTracker,
   icalRefreshIntervalMillis,
 } from "./constants";
 import { createUpdateHandler, getTextFromUser } from "./create-update-handler";
@@ -52,6 +53,7 @@ import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimelineView from "./ui/timeline-view";
+import TimeTrackerView from "./ui/time-tracker-view";
 import { createUndoNotice } from "./ui/undo-notice";
 import { createEnvironmentHooks } from "./util/create-environment-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
@@ -150,7 +152,11 @@ export default class DayPlanner extends Plugin {
     this.addSettingTab(new DayPlannerSettingsTab(this, this.settingsStore));
 
     await this.handleNewPluginVersion();
-    await this.initTimelineLeafSilently();
+
+    this.app.workspace.onLayoutReady(async () => {
+      await this.initLeafSilently(viewTypeTimeline);
+      await this.initLeafSilently(viewTypeTimeTracker);
+    });
 
     const timeTrackingFeature = new TimeTrackingFeature(
       this,
@@ -167,6 +173,7 @@ export default class DayPlanner extends Plugin {
     return Promise.all([
       this.detachLeavesOfType(viewTypeTimeline),
       this.detachLeavesOfType(viewTypeMultiDay),
+      this.detachLeavesOfType(viewTypeTimeTracker),
     ]);
   }
 
@@ -186,19 +193,16 @@ export default class DayPlanner extends Plugin {
     });
   };
 
-  initTimelineLeafSilently = async () => {
-    this.app.workspace.onLayoutReady(async () => {
-      const [firstExistingTimeline] =
-        this.app.workspace.getLeavesOfType(viewTypeTimeline);
-      if (firstExistingTimeline) {
-        return;
-      }
+  initLeafSilently = async (viewType: string) => {
+    const [firstExisting] = this.app.workspace.getLeavesOfType(viewType);
+    if (firstExisting) {
+      return;
+    }
 
-      await this.detachLeavesOfType(viewTypeTimeline);
+    await this.detachLeavesOfType(viewType);
 
-      await this.app.workspace.getRightLeaf(false)?.setViewState({
-        type: viewTypeTimeline,
-      });
+    await this.app.workspace.getRightLeaf(false)?.setViewState({
+      type: viewType,
     });
   };
 
@@ -574,6 +578,11 @@ export default class DayPlanner extends Plugin {
     this.registerView(
       viewTypeReleaseNotes,
       (leaf: WorkspaceLeaf) => new DayPlannerReleaseNotesView(leaf),
+    );
+
+    this.registerView(
+      viewTypeTimeTracker,
+      (leaf: WorkspaceLeaf) => new TimeTrackerView(leaf, componentContext),
     );
   }
 }

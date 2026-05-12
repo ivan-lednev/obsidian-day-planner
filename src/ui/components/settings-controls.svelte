@@ -122,17 +122,6 @@
       );
     }
 
-    new SettingGroup(el).setHeading("Time tracker").addSetting((setting) =>
-      setting.setName("Show active clocks").addToggle((toggle) =>
-        toggle.setValue($settings.showActiveClocks).onChange((value) => {
-          $settings = {
-            ...$settings,
-            showActiveClocks: value,
-          };
-        }),
-      ),
-    );
-
     return () => {
       el.empty();
     };

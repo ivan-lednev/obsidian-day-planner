@@ -52,7 +52,6 @@ export interface DayPlannerSettings {
   showTimelineInSidebar: boolean;
   showNow: boolean;
   showNext: boolean;
-  showActiveClocks: boolean;
   snapStepMinutes: number;
   pluginVersion: string;
   showCompletedTasks: boolean;
@@ -105,7 +104,6 @@ export const defaultSettings: DayPlannerSettings = {
   sortTasksInPlanAfterEdit: false,
   firstDayOfWeek: "monday",
   multiDayRange: "3-days",
-  showActiveClocks: false,
   showTimelineInSidebar: true,
   timelineColumns: { planner: true, timeTracker: false },
 };

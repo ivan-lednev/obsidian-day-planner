@@ -1,6 +1,7 @@
 export const viewTypeTimeline = "planner-timeline";
 export const viewTypeMultiDay = "planner-weekly";
 export const viewTypeReleaseNotes = "planner-release-notes";
+export const viewTypeTimeTracker = "planner-time-tracker";
 
 export const obsidianContextKey = "obsidianContext";
 export const dateRangeContextKey = "dateRangeContext";
