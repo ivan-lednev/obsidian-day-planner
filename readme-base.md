@@ -25,9 +25,6 @@ Day Planner is a community plugin for [Obsidian](https://obsidian.md/). It adds 
 
 ## How to use it
 
-> [!Warning]
-> Dataview (community plugin, [see in Obsidian](obsidian://show-plugin?id=dataview)) should be installed and enabled for the plugin to work.
-
 To open the timeline in the sidebar:
 
 - Either run the command: `Show Timeline`
