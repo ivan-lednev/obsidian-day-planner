@@ -28,7 +28,6 @@ export const settingsSlice = createAppSlice({
     ),
   }),
   selectors: {
-    selectDataviewSource: (state) => state.settings.dataviewSource,
     selectIcals: (state) => state.settings.icals,
     selectSettings: (state) => state.settings,
   },
@@ -36,5 +35,4 @@ export const settingsSlice = createAppSlice({
 
 export const { settingsUpdated, settingsLoaded } = settingsSlice.actions;
 
-export const { selectDataviewSource, selectSettings, selectIcals } =
-  settingsSlice.selectors;
+export const { selectSettings, selectIcals } = settingsSlice.selectors;

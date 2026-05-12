@@ -19,7 +19,6 @@ export function useTasks(props: {
   onUpdate: OnUpdateFn;
   onEditAborted: OnEditAbortedFn;
   pointerDateTime: Readable<PointerDateTime>;
-  dataviewChange: Readable<unknown>;
   remoteTasks: Readable<RemoteTask[]>;
   periodicNotes: PeriodicNotes;
   localTasks: Readable<LocalTask[]>;
@@ -30,7 +29,6 @@ export function useTasks(props: {
     currentTime,
     workspaceFacade,
     pointerDateTime,
-    dataviewChange,
     onUpdate,
     onEditAborted,
     remoteTasks,
@@ -49,10 +47,7 @@ export function useTasks(props: {
     },
   );
 
-  const abortEditTrigger = derived(
-    [localTasks, dataviewChange],
-    getUpdateTrigger,
-  );
+  const abortEditTrigger = derived(localTasks, getUpdateTrigger);
 
   const editContext = useEditContext({
     periodicNotes,

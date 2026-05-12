@@ -47,7 +47,6 @@ export interface ObsidianContext {
   workspaceFacade: WorkspaceFacade;
   periodicNotes: PeriodicNotes;
   initWeeklyView: () => Promise<void>;
-  dataviewLoaded: Readable<boolean>;
   renderMarkdown: RenderMarkdown;
   toggleCheckboxInFile: VaultFacade["toggleCheckboxInFile"];
   editContext: ReturnType<typeof useEditContext>;

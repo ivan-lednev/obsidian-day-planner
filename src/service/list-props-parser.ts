@@ -5,10 +5,17 @@ import {
   parseYaml,
   type Vault,
 } from "obsidian";
+import type { Pos } from "obsidian";
 
 import { codeFence } from "../constants";
-import type { LineToListProps } from "../redux/dataview/dataview-slice";
 import { type Props, propsSchema } from "../util/props";
+
+export type ListPropsParseResult = {
+  parsed: Props;
+  position: Pos;
+};
+
+export type LineToListProps = Record<number, ListPropsParseResult>;
 
 export class ListPropsParser {
   private static readonly listItemWithPropertiesMinSpan = 3;

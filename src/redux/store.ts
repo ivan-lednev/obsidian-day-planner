@@ -1,7 +1,6 @@
 import {
   type Action,
   type ConfigureStoreOptions,
-  isAnyOf,
   type ListenerEffect,
   type ListenerMiddlewareInstance,
   type ThunkAction,
@@ -9,27 +8,23 @@ import {
 } from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
 import type { MetadataCache, Vault } from "obsidian";
-import { derived, writable } from "svelte/store";
+import { writable } from "svelte/store";
 
 import type { ListPropsParser } from "../service/list-props-parser";
 import type { PeriodicNotes } from "../service/periodic-notes";
 import type { DayPlannerSettings } from "../settings";
 import type { PointerDateTime, ReduxExtraArgument } from "../types";
-import { getUpdateTrigger } from "../util/store";
 
-import { dataviewSlice, selectDataviewLoaded } from "./dataview/dataview-slice";
-import { editCanceled, globalSlice } from "./global-slice";
+import { globalSlice } from "./global-slice";
 import { icalSlice, selectRemoteTasks } from "./ical/ical-slice";
 import { initListenerMiddleware } from "./listener-middleware";
-import { selectDataviewSource, settingsSlice } from "./settings-slice";
+import { settingsSlice } from "./settings-slice";
 import { selectPlanEntriesForVisibleDays } from "./tracker/tracker-selectors";
 import { trackerSlice } from "./tracker/tracker-slice";
-import { useActionDispatched } from "./use-action-dispatched";
 import { createUseSelector, createUseSelectorV2 } from "./use-selector";
 
 const rootReducer = combineSlices(
   globalSlice,
-  dataviewSlice,
   settingsSlice,
   icalSlice,
   trackerSlice,
@@ -95,27 +90,9 @@ export function createReactor(props: {
 
   const useSelector = createUseSelector(store);
   const useSelectorV2 = createUseSelectorV2(store);
-  const actionDispatched = useActionDispatched({ listenerMiddleware });
 
   const localTasks = useSelector(selectPlanEntriesForVisibleDays);
   const remoteTasks = useSelector(selectRemoteTasks);
-  const dataviewLoaded = useSelector(selectDataviewLoaded);
-  const dataviewSource = useSelector(selectDataviewSource);
-
-  const isDataviewRefreshSignal = isAnyOf(editCanceled);
-  const dataviewRefreshSignal = derived(
-    actionDispatched,
-    ($actionDispatched, set) => {
-      if (isDataviewRefreshSignal($actionDispatched)) {
-        set($actionDispatched);
-      }
-    },
-  );
-
-  const taskUpdateTrigger = derived(
-    [dataviewRefreshSignal, dataviewSource],
-    getUpdateTrigger,
-  );
 
   const pointerDateTime = writable<PointerDateTime>({
     dateTime: window.moment(),
@@ -129,10 +106,7 @@ export function createReactor(props: {
     listenerMiddleware,
     remoteTasks,
     localTasks,
-    taskUpdateTrigger,
-    dataviewLoaded,
     pointerDateTime,
-    dataviewRefreshSignal,
     useSelector,
     useSelectorV2,
   };

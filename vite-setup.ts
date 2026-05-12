@@ -27,9 +27,6 @@ vi.mock("obsidian", () => ({
   Notice: vi.fn(),
 }));
 
-vi.mock("obsidian-dataview", () => ({
-  default: vi.fn(),
-}));
 
 function areMomentsEqual(a: Moment, b: Moment) {
   const isAMomment = moment.isMoment(a);

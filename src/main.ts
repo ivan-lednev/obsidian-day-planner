@@ -1,4 +1,4 @@
-import { Notice, Plugin, WorkspaceLeaf, TFile } from "obsidian";
+import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
 import { fromStore, get, type Readable, type Writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
@@ -24,8 +24,7 @@ import {
   toMarkdown,
   toMdastPoint,
 } from "./mdast/mdast";
-import { dataviewChange } from "./redux/dataview/dataview-slice";
-import { editCanceled, visibleDaysUpdated } from "./redux/global-slice";
+import { visibleDaysUpdated } from "./redux/global-slice";
 import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { settingsUpdated } from "./redux/settings-slice";
 import { type AppDispatch, type AppStore, createReactor } from "./redux/store";
@@ -100,10 +99,7 @@ export default class DayPlanner extends Plugin {
       listenerMiddleware,
       remoteTasks,
       localTasks,
-      taskUpdateTrigger,
-      dataviewLoaded,
       pointerDateTime,
-      dataviewRefreshSignal,
     } = createReactor({
       listPropsParser,
       vault,
@@ -129,10 +125,7 @@ export default class DayPlanner extends Plugin {
       store,
       dispatch,
       remoteTasks,
-      taskUpdateTrigger,
-      dataviewLoaded,
       pointerDateTime,
-      dataviewRefreshSignal,
       useSelector,
       useSelectorV2,
       localTasks,
@@ -367,10 +360,7 @@ export default class DayPlanner extends Plugin {
     useSelectorV2: ReturnType<typeof createUseSelectorV2>;
     remoteTasks: Readable<RemoteTask[]>;
     localTasks: Readable<LocalTask[]>;
-    taskUpdateTrigger: Readable<unknown>;
-    dataviewLoaded: Readable<boolean>;
     pointerDateTime: Writable<PointerDateTime>;
-    dataviewRefreshSignal: Readable<unknown>;
   }) {
     const {
       store,
@@ -379,9 +369,7 @@ export default class DayPlanner extends Plugin {
       useSelectorV2,
       remoteTasks,
       localTasks,
-      dataviewLoaded,
       pointerDateTime,
-      dataviewRefreshSignal,
     } = props;
 
     let currentUndoNotice: Notice | undefined;
@@ -397,8 +385,6 @@ export default class DayPlanner extends Plugin {
       },
       onEditCanceled: () => {
         new Notice("Edit canceled");
-
-        dispatch(editCanceled());
       },
       getTextInput: () => getTextFromUser(this.app),
       getConfirmationInput: (input) =>
@@ -425,7 +411,6 @@ export default class DayPlanner extends Plugin {
       periodicNotes: this.periodicNotes,
       workspaceFacade: this.workspaceFacade,
       isOnline,
-      dataviewChange: dataviewRefreshSignal,
       settingsStore: this.settingsStore,
       currentTime,
       pointerDateTime,
@@ -440,15 +425,6 @@ export default class DayPlanner extends Plugin {
     );
 
     dispatch(icalRefreshRequested());
-
-    this.registerEvent(
-      this.app.metadataCache.on(
-        // @ts-expect-error
-        "dataview:metadata-change",
-        (eventType: unknown, file: TFile) =>
-          dispatch(dataviewChange(file.path)),
-      ),
-    );
 
     this.registerDomEvent(window, "blur", editContext.cancelEdit);
     this.registerDomEvent(document, "pointerup", editContext.cancelEdit);
@@ -531,7 +507,6 @@ export default class DayPlanner extends Plugin {
       taskEntryEditor: this.taskEntryEditor,
       workspaceFacade: this.workspaceFacade,
       initWeeklyView: this.initWeeklyLeaf,
-      dataviewLoaded,
       renderMarkdown: createRenderMarkdown(this.app),
       toggleCheckboxInFile: this.vaultFacade.toggleCheckboxInFile,
       editContext,

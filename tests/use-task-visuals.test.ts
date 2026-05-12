@@ -11,9 +11,6 @@ import { baseTask } from "./edit/util/fixtures";
 vi.mock("obsidian", () => {
   return {};
 });
-vi.mock("obsidian-dataview", () => {
-  return {};
-});
 
 function getBaseUseTaskProps() {
   const cursorOffsetY = writable(0);

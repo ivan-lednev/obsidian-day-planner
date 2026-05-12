@@ -6,7 +6,6 @@ import { isNotVoid } from "typed-assert";
 import { expect, vi } from "vitest";
 
 import { createUpdateHandler } from "../../src/create-update-handler";
-import { dataviewChange } from "../../src/redux/dataview/dataview-slice";
 import { initialState } from "../../src/redux/global-slice";
 import { createReactor, type RootState } from "../../src/redux/store";
 import {
@@ -137,7 +136,6 @@ export async function setUp(props?: {
     dispatch,
     remoteTasks,
     localTasks,
-    taskUpdateTrigger,
     pointerDateTime,
   } = createReactor({
     preloadedState: {
@@ -168,7 +166,6 @@ export async function setUp(props?: {
       `There is no cached metadata for file with path: ${path}`,
     );
 
-    dispatch(dataviewChange(path));
     dispatch(indexRequested([path]));
   });
 
@@ -189,7 +186,6 @@ export async function setUp(props?: {
     periodicNotes,
     workspaceFacade,
     isOnline,
-    dataviewChange: taskUpdateTrigger,
     settingsStore,
     currentTime,
     pointerDateTime,

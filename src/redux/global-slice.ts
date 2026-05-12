@@ -21,14 +21,13 @@ export const globalSlice = createAppSlice({
         state.visibleDays = action.payload;
       },
     ),
-    editCanceled: () => {},
   }),
   selectors: {
     selectVisibleDays: (state) => state.visibleDays,
   },
 });
 
-export const { visibleDaysUpdated, editCanceled } = globalSlice.actions;
+export const { visibleDaysUpdated } = globalSlice.actions;
 
 export const { selectVisibleDays } = globalSlice.selectors;
 

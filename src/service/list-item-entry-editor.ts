@@ -3,7 +3,6 @@
 import { Effect, Either, pipe } from "effect";
 import { Notice } from "obsidian";
 
-import type { ListPropsParseResult } from "../redux/dataview/dataview-slice";
 import type { AppStore } from "../redux/store";
 import { locToEditorPosition } from "../util/editor";
 import { getErrorMessage } from "../util/error";
@@ -16,6 +15,7 @@ import {
   toIndentedMarkdown,
 } from "../util/props";
 
+import type { ListPropsParseResult } from "./list-props-parser";
 import type { ListPropsParser } from "./list-props-parser";
 import { MetadataCacheFacade } from "./metadata-cache-facade";
 import type { VaultFacade } from "./vault-facade";
