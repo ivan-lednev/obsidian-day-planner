@@ -75,7 +75,9 @@ export const createUpdateHandler = (props: {
       const modalOutput = await getTextInput();
 
       if (!modalOutput) {
-        return onEditCanceled();
+        onEditCanceled();
+
+        return false;
       }
 
       diff.added[0] = { ...created, text: modalOutput };
@@ -110,7 +112,9 @@ export const createUpdateHandler = (props: {
       });
 
       if (!confirmed) {
-        return onEditCanceled();
+        onEditCanceled();
+
+        return false;
       }
 
       await Promise.all(
@@ -126,6 +130,8 @@ export const createUpdateHandler = (props: {
 
     await transactionWriter.writeTransaction(transaction);
 
-    return onEditConfirmed();
+    onEditConfirmed();
+
+    return true;
   };
 };

@@ -23,7 +23,7 @@ function createProps({
   tasks: LocalTask[];
   settings: DayPlannerSettings;
 }) {
-  const onUpdate = vi.fn();
+  const onUpdate = vi.fn().mockResolvedValue(true);
   const onEditAborted = vi.fn();
   const workspaceFacade = vi.fn() as unknown as WorkspaceFacade;
 

@@ -41,7 +41,15 @@ export function useEditActions({
     baselineTasks.set(currentTasks);
     editOperation.set(undefined);
 
-    await onUpdate(oldBase, currentTasks, currentOperation.mode);
+    const succeeded = await onUpdate(
+      oldBase,
+      currentTasks,
+      currentOperation.mode,
+    );
+
+    if (!succeeded) {
+      baselineTasks.set(oldBase);
+    }
   }
 
   return {

@@ -20,7 +20,7 @@ export type OnUpdateFn = (
   base: Array<LocalTask>,
   next: Array<LocalTask>,
   mode: EditMode,
-) => Promise<void>;
+) => Promise<boolean>;
 
 export type OnEditAbortedFn = () => void;
 
