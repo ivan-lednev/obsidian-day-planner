@@ -32,6 +32,7 @@
     "@typescript-eslint/eslint-plugin": "^8.4.0",
     "@typescript-eslint/parser": "^8.6.0",
     "@vitest/coverage-istanbul": "^2.1.4",
+    "@vitest/ui": "^2.1.4",
     "babel": "^6.23.0",
     "builtin-modules": "^4.0.0",
     "commander": "^14.0.3",

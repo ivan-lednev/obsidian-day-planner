@@ -209,22 +209,26 @@ export default class DayPlanner extends Plugin {
     });
   };
 
-  initTimelineLeaf = async () => {
-    const [firstExistingTimeline] =
-      this.app.workspace.getLeavesOfType(viewTypeTimeline);
+  initRightPanelLeaf = async (viewType: string) => {
+    const [firstExisting] = this.app.workspace.getLeavesOfType(viewType);
 
-    if (firstExistingTimeline) {
-      this.app.workspace.revealLeaf(firstExistingTimeline);
+    if (firstExisting) {
+      this.app.workspace.revealLeaf(firstExisting);
       return;
     }
 
-    await this.detachLeavesOfType(viewTypeTimeline);
+    await this.detachLeavesOfType(viewType);
     await this.app.workspace.getRightLeaf(false)?.setViewState({
-      type: viewTypeTimeline,
+      type: viewType,
       active: true,
     });
     this.app.workspace.rightSplit.expand();
   };
+
+  initTimelineLeaf = async () => this.initRightPanelLeaf(viewTypeTimeline);
+
+  initTimeTrackerLeaf = async () =>
+    this.initRightPanelLeaf(viewTypeTimeTracker);
 
   private async handleNewPluginVersion() {
     if (this.settings().pluginVersion === currentPluginVersion) {
@@ -260,6 +264,12 @@ export default class DayPlanner extends Plugin {
       id: "show-multi-day-view",
       name: "Show multi-day planner",
       callback: this.initWeeklyLeaf,
+    });
+
+    this.addCommand({
+      id: "show-time-tracker",
+      name: "Show time tracker",
+      callback: this.initTimeTrackerLeaf,
     });
 
     this.addCommand({
