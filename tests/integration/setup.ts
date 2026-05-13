@@ -3,10 +3,12 @@ import type { Moment } from "moment";
 import { type CachedMetadata, MetadataCache, type Vault } from "obsidian";
 import { derived, get, writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
-import { expect, vi } from "vitest";
+import { expect, onTestFinished, vi } from "vitest";
 
+import { icalParseLowerLimit } from "../../src/constants";
 import { createUpdateHandler } from "../../src/create-update-handler";
 import { initialState } from "../../src/redux/global-slice";
+import { type IcalParseTaskResult } from "../../src/redux/ical/init-ical-listeners";
 import { createReactor, type RootState } from "../../src/redux/store";
 import {
   indexRequested,
@@ -25,6 +27,7 @@ import {
 } from "../../src/settings";
 import { isLocal, type Task } from "../../src/task-types";
 import { useTasks } from "../../src/ui/hooks/use-tasks";
+import { createBackgroundBatchScheduler } from "../../src/util/scheduler";
 import { getOneLineSummary } from "../../src/util/task-utils";
 import {
   FakeMetadataCache,
@@ -130,6 +133,13 @@ export async function setUp(props?: {
     settings: { settings },
   };
 
+  const icalParseScheduler =
+    createBackgroundBatchScheduler<IcalParseTaskResult>({
+      timeRemainingLowerLimit: icalParseLowerLimit,
+    });
+
+  onTestFinished(() => icalParseScheduler.cancelTasks());
+
   const {
     useSelectorV2: useSelector,
     getState,
@@ -150,6 +160,7 @@ export async function setUp(props?: {
     metadataCache,
     periodicNotes,
     settings: defaultSettingsForTests,
+    icalParseScheduler,
   });
 
   const taskEntryEditor = new ListItemEntryEditor(

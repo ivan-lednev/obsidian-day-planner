@@ -14,9 +14,11 @@ import type { ListPropsParser } from "../service/list-props-parser";
 import type { PeriodicNotes } from "../service/periodic-notes";
 import type { DayPlannerSettings } from "../settings";
 import type { PointerDateTime, ReduxExtraArgument } from "../types";
+import type { Scheduler } from "../util/scheduler";
 
 import { globalSlice } from "./global-slice";
 import { icalSlice, selectRemoteTasks } from "./ical/ical-slice";
+import type { IcalParseTaskResult } from "./ical/init-ical-listeners";
 import { initListenerMiddleware } from "./listener-middleware";
 import { settingsSlice } from "./settings-slice";
 import { selectPlanEntriesForVisibleDays } from "./tracker/tracker-selectors";
@@ -56,6 +58,7 @@ export function createReactor(props: {
   metadataCache: MetadataCache;
   periodicNotes: PeriodicNotes;
   settings: DayPlannerSettings;
+  icalParseScheduler: Scheduler<IcalParseTaskResult>;
 }) {
   const {
     preloadedState = {},
@@ -64,6 +67,7 @@ export function createReactor(props: {
     metadataCache,
     periodicNotes,
     settings,
+    icalParseScheduler,
   } = props;
 
   const listenerMiddleware = initListenerMiddleware({
@@ -73,6 +77,7 @@ export function createReactor(props: {
       metadataCache,
       periodicNotes,
       settings,
+      icalParseScheduler,
     },
   });
 

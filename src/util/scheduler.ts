@@ -80,7 +80,7 @@ export function createBackgroundBatchScheduler<T>(props: {
     onFinish: (results: T[]) => void,
     onCancel?: () => void,
   ) {
-    cancelTasks()
+    cancelTasks();
 
     currentOnFinish = onFinish;
     currentOnCancel = onCancel;

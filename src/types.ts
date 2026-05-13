@@ -3,6 +3,7 @@ import type { Moment } from "moment";
 import type { MetadataCache, Vault } from "obsidian";
 import type { Readable, Writable } from "svelte/store";
 
+import type { IcalParseTaskResult } from "./redux/ical/init-ical-listeners";
 import { type AppDispatch, type RootState } from "./redux/store";
 import { type UseSelector, type useSelectorV2 } from "./redux/use-selector";
 import type { ListItemEntryEditor } from "./service/list-item-entry-editor";
@@ -15,6 +16,7 @@ import type { LocalTask } from "./task-types";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import { type ShowPreview } from "./util/create-show-preview";
+import type { Scheduler } from "./util/scheduler";
 
 export type OnUpdateFn = (
   base: Array<LocalTask>,
@@ -87,4 +89,5 @@ export type ReduxExtraArgument = {
   vault: Vault;
   metadataCache: MetadataCache;
   periodicNotes: PeriodicNotes;
+  icalParseScheduler: Scheduler<IcalParseTaskResult>;
 };

@@ -1,8 +1,6 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
 
-import { icalParseLowerLimit } from "../constants";
 import type { ReduxExtraArgument } from "../types";
-import { createBackgroundBatchScheduler } from "../util/scheduler";
 
 import { icalRefreshRequested } from "./ical/ical-slice";
 import {
@@ -11,7 +9,6 @@ import {
   createCachingFetcher,
   createIcalFetchListener,
   createIcalParseListener,
-  type IcalParseTaskResult,
 } from "./ical/init-ical-listeners";
 import type { AppDispatch, RootState } from "./store";
 import { createIndexListener, indexRequested } from "./tracker/tracker-slice";
@@ -19,13 +16,15 @@ import { createIndexListener, indexRequested } from "./tracker/tracker-slice";
 export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
   const {
     extra,
-    extra: { listPropsParser, vault, metadataCache, periodicNotes, settings },
+    extra: {
+      listPropsParser,
+      vault,
+      metadataCache,
+      periodicNotes,
+      settings,
+      icalParseScheduler,
+    },
   } = props;
-
-  const icalParseScheduler =
-    createBackgroundBatchScheduler<IcalParseTaskResult>({
-      timeRemainingLowerLimit: icalParseLowerLimit,
-    });
 
   const listenerMiddleware = createListenerMiddleware<
     RootState,

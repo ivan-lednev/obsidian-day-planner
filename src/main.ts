@@ -9,6 +9,7 @@ import {
   viewTypeMultiDay,
   viewTypeTimeTracker,
   icalRefreshIntervalMillis,
+  icalParseLowerLimit,
 } from "./constants";
 import { createUpdateHandler, getTextFromUser } from "./create-update-handler";
 import { createDumpMetadataCommand } from "./dump-metadata";
@@ -26,6 +27,7 @@ import {
 } from "./mdast/mdast";
 import { visibleDaysUpdated } from "./redux/global-slice";
 import { icalRefreshRequested } from "./redux/ical/ical-slice";
+import { type IcalParseTaskResult } from "./redux/ical/init-ical-listeners";
 import { settingsUpdated } from "./redux/settings-slice";
 import { type AppDispatch, type AppStore, createReactor } from "./redux/store";
 import { selectActiveLogEntries } from "./redux/tracker/tracker-slice";
@@ -58,6 +60,7 @@ import { createEnvironmentHooks } from "./util/create-environment-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
+import { createBackgroundBatchScheduler } from "./util/scheduler";
 
 export default class DayPlanner extends Plugin {
   settings!: () => DayPlannerSettings;
@@ -90,6 +93,11 @@ export default class DayPlanner extends Plugin {
     );
     this.metadataCacheFacade = new MetadataCacheFacade(metadataCache);
 
+    const icalParseScheduler =
+      createBackgroundBatchScheduler<IcalParseTaskResult>({
+        timeRemainingLowerLimit: icalParseLowerLimit,
+      });
+
     const {
       store,
       getState,
@@ -106,6 +114,7 @@ export default class DayPlanner extends Plugin {
       metadataCache,
       periodicNotes: this.periodicNotes,
       settings: initialSettings,
+      icalParseScheduler,
     });
 
     this.taskEntryEditor = new ListItemEntryEditor(
@@ -118,6 +127,7 @@ export default class DayPlanner extends Plugin {
 
     this.register(() => {
       listenerMiddleware.clearListeners();
+      icalParseScheduler.cancelTasks();
     });
 
     this.initSettingsStore({ initialSettings, dispatch });
