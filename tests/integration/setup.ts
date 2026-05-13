@@ -159,7 +159,7 @@ export async function setUp(props?: {
     vault: vault as unknown as Vault,
     metadataCache,
     periodicNotes,
-    settings: defaultSettingsForTests,
+    settings,
     icalParseScheduler,
   });
 

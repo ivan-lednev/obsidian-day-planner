@@ -169,6 +169,36 @@ describe("Indexing", () => {
     );
   });
 
+  test("Deletes plan entries on file deletion", async () => {
+    const { getState, dispatch } = await setUp({
+      loadedFixtures: ["2025-07-28.md"],
+    });
+
+    expect(selectPlanEntriesForDays(getState(), ["2025-07-28"])).not.toHaveLength(0);
+
+    dispatch(fileDeleted({ path: "fixtures/fixture-vault/2025-07-28.md" }));
+
+    expect(selectPlanEntriesForDays(getState(), ["2025-07-28"])).toHaveLength(0);
+  });
+
+  test("Replaces plan entries on file re-index without duplicates", async () => {
+    const { getState, dispatch } = await setUp({
+      loadedFixtures: ["2025-07-28.md"],
+    });
+
+    const before = selectPlanEntriesForDays(getState(), ["2025-07-28"]);
+
+    expect(before.length).toBeGreaterThan(0);
+
+    dispatch(indexRequested(["fixtures/fixture-vault/2025-07-28.md"]));
+
+    await vi.waitFor(() => {
+      expect(selectPlanEntriesForDays(getState(), ["2025-07-28"])).toHaveLength(
+        before.length,
+      );
+    });
+  });
+
   test("Does not select deleted tasks within date range", async () => {
     const { dispatch, getState, metadataCache } = await setUp();
 
@@ -414,6 +444,22 @@ describe("Task views", () => {
   });
 
   test.todo("Does not show code blocks in rendered markdown");
+
+  test("With empty plannerHeading, indexes tasks outside the planner section", async () => {
+    const { getState } = await setUp({
+      visibleDays: ["2025-07-19"],
+      settings: {
+        ...defaultSettingsForTests,
+        plannerHeading: "",
+      },
+    });
+
+    expect(selectPlanEntriesForDays(getState(), ["2025-07-19"])).toContainEqual(
+      expect.objectContaining({
+        text: expect.stringContaining("Task outside of planner heading"),
+      }),
+    );
+  });
 
   test("Ignores tasks and lists outside of planner section in daily notes", async () => {
     const { editContext } = await setUp({
