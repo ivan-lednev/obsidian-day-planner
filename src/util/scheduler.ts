@@ -67,16 +67,20 @@ export function createBackgroundBatchScheduler<T>(props: {
     }
   }
 
-  function enqueueTasks(
-    newTasks: Array<() => T>,
-    onFinish: (results: T[]) => void,
-    onCancel?: () => void,
-  ) {
+  function cancelTasks() {
     if (currentTaskHandle) {
       cancelJob(currentTaskHandle);
       currentOnCancel?.();
       currentTaskHandle = null;
     }
+  }
+
+  function enqueueTasks(
+    newTasks: Array<() => T>,
+    onFinish: (results: T[]) => void,
+    onCancel?: () => void,
+  ) {
+    cancelTasks()
 
     currentOnFinish = onFinish;
     currentOnCancel = onCancel;
@@ -86,5 +90,5 @@ export function createBackgroundBatchScheduler<T>(props: {
     currentTaskHandle = enqueueJob(runTaskQueue);
   }
 
-  return { enqueueTasks };
+  return { enqueueTasks, cancelTasks };
 }
