@@ -23,7 +23,7 @@ import { initListenerMiddleware } from "./listener-middleware";
 import { settingsSlice } from "./settings-slice";
 import { selectPlanEntriesForVisibleDays } from "./tracker/tracker-selectors";
 import { trackerSlice } from "./tracker/tracker-slice";
-import { createuseSelector } from "./use-selector";
+import { createUseSelector } from "./use-selector";
 
 const rootReducer = combineSlices(
   globalSlice,
@@ -90,7 +90,7 @@ export function createReactor(props: {
 
   const { dispatch, getState } = store;
 
-  const useSelector = createuseSelector(store);
+  const useSelector = createUseSelector(store);
 
   const localTasksSignal = useSelector((state) =>
     selectPlanEntriesForVisibleDays(state),

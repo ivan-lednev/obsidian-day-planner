@@ -31,7 +31,7 @@ import { type IcalParseTaskResult } from "./redux/ical/init-ical-listeners";
 import { settingsUpdated } from "./redux/settings-slice";
 import { type AppDispatch, type AppStore, createReactor } from "./redux/store";
 import { selectActiveLogEntries } from "./redux/tracker/tracker-slice";
-import { createuseSelector } from "./redux/use-selector";
+import { createUseSelector } from "./redux/use-selector";
 import { TransactionWriter } from "./service/diff-writer";
 import { ListItemEntryEditor } from "./service/list-item-entry-editor";
 import { ListPropsParser } from "./service/list-props-parser";
@@ -373,7 +373,7 @@ export default class DayPlanner extends Plugin {
   private registerViews(props: {
     store: AppStore;
     dispatch: AppDispatch;
-    useSelector: ReturnType<typeof createuseSelector>;
+    useSelector: ReturnType<typeof createUseSelector>;
     remoteTasks: Readable<RemoteTask[]>;
     localTasks: Readable<LocalTask[]>;
     pointerDateTime: Writable<PointerDateTime>;

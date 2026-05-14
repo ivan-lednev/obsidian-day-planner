@@ -2,7 +2,7 @@ import { createSubscriber } from "svelte/reactivity";
 
 import { type AppStore, type RootState } from "./store";
 
-export function createuseSelector(reduxStore: AppStore) {
+export function createUseSelector(reduxStore: AppStore) {
   return <T>(selector: (state: RootState) => T) => {
     let previousResult = selector(reduxStore.getState());
 
@@ -36,4 +36,4 @@ export function createuseSelector(reduxStore: AppStore) {
   };
 }
 
-export type useSelector = ReturnType<typeof createuseSelector>;
+export type useSelector = ReturnType<typeof createUseSelector>;
