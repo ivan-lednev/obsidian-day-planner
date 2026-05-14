@@ -24,14 +24,16 @@ import {
   type WithTime,
 } from "../task-types";
 
+import { getId } from "./id";
 import {
   type Node,
   createMarkdownListTokens,
+  getFirstLine,
   getFirstLineAsMarkdown,
   getIndentationForListParagraph,
-} from "./dataview";
-import { getId } from "./id";
-import { getFirstLine, indentLines, removeListTokens } from "./markdown";
+  indentLines,
+  removeListTokens,
+} from "./markdown";
 import * as m from "./moment";
 import {
   addMinutes,

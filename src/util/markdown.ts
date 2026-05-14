@@ -1,12 +1,13 @@
 import { isNotVoid } from "typed-assert";
 
-import { codeFence } from "../constants";
+import { codeFence, indentBeforeListParagraph } from "../constants";
 import {
   checkboxRegExp,
   headingRegExp,
   listTokenWithSpacesRegExp,
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
+import type { ListItemTokens } from "../task-types";
 
 const baseIndentation = "\t";
 
@@ -184,4 +185,31 @@ export function createCodeBlock(props: {
   text: string;
 }) {
   return codeFence + props.language + "\n" + props.text + codeFence;
+}
+
+export interface Node {
+  text: string;
+  symbol: string;
+  children?: Node[];
+  status?: string;
+}
+
+export function getIndentationForListParagraph() {
+  return " ".repeat(indentBeforeListParagraph);
+}
+
+export function getFirstLineAsMarkdown(listItemEntry: Node) {
+  const firstLine = listItemEntry.text.split("\n")[0];
+
+  isNotVoid(firstLine);
+
+  return `${createMarkdownListTokens(listItemEntry)} ${firstLine}`;
+}
+
+export function createMarkdownListTokens(listItem: ListItemTokens) {
+  if (listItem.status === undefined && listItem.task === undefined) {
+    return listItem.symbol;
+  }
+
+  return `${listItem.symbol} ${checkbox(listItem.status || listItem.task || " ")}`;
 }

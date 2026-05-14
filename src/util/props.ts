@@ -11,8 +11,12 @@ import {
   shortScheduledPropRegExp,
 } from "../regexp";
 
-import { getIndentationForListParagraph } from "./dataview";
-import { createCodeBlock, createIndentation, indent } from "./markdown";
+import {
+  createCodeBlock,
+  createIndentation,
+  getIndentationForListParagraph,
+  indent,
+} from "./markdown";
 import { strictParse } from "./moment";
 import { appendText } from "./task-utils";
 
