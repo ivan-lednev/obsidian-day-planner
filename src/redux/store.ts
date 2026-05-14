@@ -19,17 +19,17 @@ import type { Scheduler } from "../util/scheduler";
 import { globalSlice } from "./global-slice";
 import { icalSlice, selectRemoteTasks } from "./ical/ical-slice";
 import type { IcalParseTaskResult } from "./ical/init-ical-listeners";
+import { selectPlanEntriesForVisibleDays } from "./index/index-selectors";
+import { indexSlice } from "./index/index-slice";
 import { initListenerMiddleware } from "./listener-middleware";
 import { settingsSlice } from "./settings-slice";
-import { selectPlanEntriesForVisibleDays } from "./tracker/tracker-selectors";
-import { trackerSlice } from "./tracker/tracker-slice";
 import { createUseSelector } from "./use-selector";
 
 const rootReducer = combineSlices(
   globalSlice,
   settingsSlice,
   icalSlice,
-  trackerSlice,
+  indexSlice,
 );
 
 export type RootState = ReturnType<typeof rootReducer>;

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { selectActiveLogEntries } from "../../redux/tracker/tracker-slice";
+  import { selectActiveLogEntries } from "../../redux/index/index-slice";
 
   import ActiveClocks from "./active-clocks.svelte";
   import ErrorBoundary from "./error-boundary.svelte";

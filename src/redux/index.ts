@@ -1,1 +1,1 @@
-export * from "./tracker/tracker-selectors";
+export * from "./index/index-selectors";

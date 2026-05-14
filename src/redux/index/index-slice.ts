@@ -115,7 +115,7 @@ interface FileDeletedPayload {
   path: string;
 }
 
-export const trackerSlice = createAppSlice({
+export const indexSlice = createAppSlice({
   name: "tracker",
   initialState,
   reducers: (create) => ({
@@ -353,8 +353,7 @@ export function planEntryToLocalTask(
   };
 }
 
-export const { filesIndexed, indexRequested, fileDeleted } =
-  trackerSlice.actions;
+export const { filesIndexed, indexRequested, fileDeleted } = indexSlice.actions;
 
 export const {
   selectEntriesForPath,
@@ -365,7 +364,7 @@ export const {
   selectPlanEntriesById,
   selectPlanEntriesByDay,
   selectTaskEntriesById,
-} = trackerSlice.selectors;
+} = indexSlice.selectors;
 
 type IndexRequested = ReturnType<typeof indexRequested>;
 

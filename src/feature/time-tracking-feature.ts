@@ -7,8 +7,8 @@ import {
 } from "obsidian";
 
 import type DayPlanner from "../main";
+import { fileDeleted, indexRequested } from "../redux/index/index-slice";
 import type { AppDispatch } from "../redux/store";
-import { fileDeleted, indexRequested } from "../redux/tracker/tracker-slice";
 
 export class TimeTrackingFeature {
   private static readonly INITIAL_LOAD_CHUNK_SIZE = 100;

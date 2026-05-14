@@ -9,7 +9,7 @@ import {
   indexRequested,
   selectActiveLogEntries,
   selectEntriesForPath,
-} from "../src/redux/tracker/tracker-slice";
+} from "../src/redux/index/index-slice";
 import { defaultSettingsForTests } from "../src/settings";
 import { EditMode } from "../src/ui/hooks/use-edit/types";
 import { strictParse } from "../src/util/moment";

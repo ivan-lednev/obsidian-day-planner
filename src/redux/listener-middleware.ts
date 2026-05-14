@@ -10,8 +10,8 @@ import {
   createIcalFetchListener,
   createIcalParseListener,
 } from "./ical/init-ical-listeners";
+import { createIndexListener, indexRequested } from "./index/index-slice";
 import type { AppDispatch, RootState } from "./store";
-import { createIndexListener, indexRequested } from "./tracker/tracker-slice";
 
 export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
   const {

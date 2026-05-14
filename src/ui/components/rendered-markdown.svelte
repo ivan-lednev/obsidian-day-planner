@@ -5,7 +5,7 @@
   import { addLineDataToCheckboxes } from "../../util/dom";
   import { on } from "svelte/events";
   import type { Snippet } from "svelte";
-  import type { ListItemEntryWithChildren } from "src/redux/tracker/tracker-slice";
+  import type { ListItemEntryWithChildren } from "src/redux/index/index-slice";
 
   const { task, children }: { task: LocalTask; children: Snippet } = $props();
 

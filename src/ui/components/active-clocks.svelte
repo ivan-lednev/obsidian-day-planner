@@ -5,7 +5,7 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { currentTimeSignal } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
-  import { selectActiveLogEntries } from "../../redux/tracker/tracker-slice";
+  import { selectActiveLogEntries } from "../../redux/index/index-slice";
   import type { LocalTask } from "../../task-types";
   import * as m from "../../util/moment";
   import { getDiffInMinutes } from "../../util/moment";

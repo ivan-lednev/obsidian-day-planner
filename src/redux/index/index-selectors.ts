@@ -17,8 +17,8 @@ import {
   selectPlanEntriesByDay,
   selectPlanEntriesById,
   selectTaskEntriesById,
-} from "./tracker-slice";
-import type { LogEntry } from "./tracker-slice";
+} from "./index-slice";
+import type { LogEntry } from "./index-slice";
 
 export const selectLogEntriesForDay = createAppSelector(
   [

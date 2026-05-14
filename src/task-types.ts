@@ -3,7 +3,7 @@ import type { AttendeePartStat } from "node-ical";
 import type { Pos } from "obsidian";
 
 import type { HorizontalPlacing } from "./overlap/horizontal-placing";
-import type { ListItemEntryWithChildren } from "./redux/tracker/tracker-slice";
+import type { ListItemEntryWithChildren } from "./redux/index/index-slice";
 import type { IcalConfig } from "./settings";
 
 export interface TaskLocation {

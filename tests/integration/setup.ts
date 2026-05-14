@@ -9,11 +9,11 @@ import { icalParseLowerLimit } from "../../src/constants";
 import { createUpdateHandler } from "../../src/create-update-handler";
 import { initialState } from "../../src/redux/global-slice";
 import { type IcalParseTaskResult } from "../../src/redux/ical/init-ical-listeners";
-import { createReactor, type RootState } from "../../src/redux/store";
 import {
   indexRequested,
   selectTaskEntriesById,
-} from "../../src/redux/tracker/tracker-slice";
+} from "../../src/redux/index/index-slice";
+import { createReactor, type RootState } from "../../src/redux/store";
 import { TransactionWriter } from "../../src/service/diff-writer";
 import { ListItemEntryEditor } from "../../src/service/list-item-entry-editor";
 import { ListPropsParser } from "../../src/service/list-props-parser";

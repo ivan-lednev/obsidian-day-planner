@@ -28,9 +28,9 @@ import {
 import { visibleDaysUpdated } from "./redux/global-slice";
 import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { type IcalParseTaskResult } from "./redux/ical/init-ical-listeners";
+import { selectActiveLogEntries } from "./redux/index/index-slice";
 import { settingsUpdated } from "./redux/settings-slice";
 import { type AppDispatch, type AppStore, createReactor } from "./redux/store";
-import { selectActiveLogEntries } from "./redux/tracker/tracker-slice";
 import { createUseSelector } from "./redux/use-selector";
 import { TransactionWriter } from "./service/diff-writer";
 import { ListItemEntryEditor } from "./service/list-item-entry-editor";
