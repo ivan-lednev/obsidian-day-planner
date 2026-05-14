@@ -12,6 +12,11 @@ export default defineConfig((env) => ({
       process.env.NODE_ENV || "development",
     ),
   },
+  resolve: process.env.VITEST
+    ? {
+        conditions: ["browser"],
+      }
+    : undefined,
   plugins: [
     replace([
       {
@@ -63,7 +68,7 @@ export default defineConfig((env) => ({
     rollupOptions: {
       output: {
         exports: "named" as const,
-        assetFileNames: (assetInfo) => {
+        assetFileNames: (assetInfo: { name?: string }) => {
           if (assetInfo.name === "style.css") {
             return "styles.css";
           }
