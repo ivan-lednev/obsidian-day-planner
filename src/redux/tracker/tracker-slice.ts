@@ -3,7 +3,6 @@ import { uniqBy } from "lodash/fp";
 import type {
   CachedMetadata,
   ListItemCache,
-  Loc,
   MetadataCache,
   Pos,
   Vault,
@@ -18,6 +17,14 @@ import type { PeriodicNotes } from "../../service/periodic-notes";
 import type { DayPlannerSettings } from "../../settings";
 import type { LocalTask } from "../../task-types";
 import { getFirstLine } from "../../util/markdown";
+import {
+  createLineToChildrenLookup,
+  getHeadingSectionPosition,
+  getTextAtPosition,
+  isInside,
+  isTaskCache,
+  type PartialPos,
+} from "../../util/metadata";
 import {
   getDayKeysInRange,
   getDiffInMinutes,
@@ -368,32 +375,6 @@ export function createId(...args: (string | number)[]) {
   return args.join(idSeparator);
 }
 
-// todo: move
-type TaskCache = ListItemCache & { task: string };
-
-// todo: Move
-function isTaskCache(listItemCache: ListItemCache): listItemCache is TaskCache {
-  return listItemCache.task !== undefined;
-}
-
-// todo: move
-function getTextAtPosition(inputText: string, position: Pos) {
-  return inputText.slice(position.start.offset, position.end.offset);
-}
-
-type PartialPos = Omit<Pos, "end"> & { end?: Loc };
-
-// todo: move to metadata-utils
-function isInside(inner: Pos, outer: PartialPos) {
-  const innerStartIsInside = inner.start.offset >= outer.start.offset;
-
-  if (!outer.end) {
-    return innerStartIsInside;
-  }
-
-  return innerStartIsInside && inner.end.offset <= outer.end.offset;
-}
-
 function flatten<T extends { children?: T[]; id: string }>(
   node: T,
 ): Array<Omit<T, "children"> & { children?: string[] }> {
@@ -408,46 +389,6 @@ function flatten<T extends { children?: T[]; id: string }>(
     },
     ...(children ?? []).flatMap(flatten),
   ];
-}
-
-// todo: move to metadata utils
-function getHeadingSectionPosition(cache: CachedMetadata, headingText: string) {
-  const { headings } = cache;
-
-  if (!headings) {
-    return undefined;
-  }
-
-  const targetIndex = headings.findIndex((h) => h.heading === headingText);
-
-  if (targetIndex === -1) {
-    return undefined;
-  }
-
-  const target = headings[targetIndex];
-
-  isNotVoid(target);
-
-  const nextBoundary = headings
-    .slice(targetIndex + 1)
-    .find((heading) => heading.level <= target.level);
-
-  return {
-    start: target.position.start,
-    end: nextBoundary?.position.start,
-  };
-}
-
-function createLineToChildrenLookup(listItems: ListItemCache[]) {
-  return listItems.reduce<Record<number, ListItemCache[]>>((result, item) => {
-    if (item.parent < 0) {
-      return result;
-    }
-
-    (result[item.parent] ??= []).push(item);
-
-    return result;
-  }, {});
 }
 
 export function createIndexListener(props: {

@@ -50,11 +50,11 @@
   }
 
   function createRenderMarkdownAttachment(
-    text: string,
+    markdown: string,
     lines: FileLine[] | FileLine,
   ) {
     return (el: HTMLElement) => {
-      const destroyMarkdown = renderMarkdown(el, text);
+      const destroyMarkdown = renderMarkdown(el, markdown);
 
       addLineDataToCheckboxes(el, lines);
 
