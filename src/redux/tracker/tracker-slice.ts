@@ -424,7 +424,6 @@ export function createIndexListener(props: {
     return { start, end, parent, dayKeys, id };
   }
 
-  // todo: move out
   function isInsideDailyNoteParseScope(
     position: Pos,
     plannerHeadingSectionPosition?: PartialPos,

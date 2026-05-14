@@ -34,8 +34,7 @@ export const selectLogEntriesForDay = createAppSelector(
     const endOfDay = parsedDay.clone().endOf("day");
     const isDayKeyForToday = parsedDay.isSame(currentTime, "day");
 
-    // todo: remove set
-    const uniqueLogEntryIds = [...new Set(Object.keys(byDay[dayKey] || {}))];
+    const uniqueLogEntryIds = Object.keys(byDay[dayKey] || {});
 
     const inflatedTimeBlocksWithoutActiveClocks = uniqueLogEntryIds.map(
       (logEntryId) => {
@@ -81,11 +80,7 @@ export const selectLogEntriesForDay = createAppSelector(
 );
 
 export const selectRecentLogEntries = createAppSelector(
-  [
-    // todo: use pre-defined ones
-    (state) => state.tracker.logEntries.byId,
-    (state) => state.tracker.taskEntries.byId,
-  ],
+  [selectLogEntriesById, selectTaskEntriesById],
   (logEntriesById, taskEntriesById) => {
     const taskEntryIdToLatestLogRecord = Object.values(logEntriesById)
       .flat()
