@@ -76,11 +76,11 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.6.11",
-    "@reduxjs/toolkit": "^2.3.0",
+    "@reduxjs/toolkit": "^2.11.2",
     "chroma-js": "^3.0.0",
     "effect": "^3.21.0",
     "fraction.js": "4.3.7",
-    "immer": "^10.1.1",
+    "immer": "^11.1.8",
     "lodash": "^4.17.21",
     "lucide-svelte": "^1.0.1",
     "luxon": "^3.7.1",
