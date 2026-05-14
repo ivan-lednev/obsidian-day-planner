@@ -130,9 +130,9 @@ export function useEditContext(props: {
       }
 
       const daySpan = t.getEndTime(task).diff(task.startTime, "days");
+      const shouldGoToMultiDayRow = daySpan > 1;
 
-      // If a task spans more than 24 hours, it goes to the multi-day row
-      if (daySpan > 1) {
+      if (shouldGoToMultiDayRow) {
         return task;
       }
 
