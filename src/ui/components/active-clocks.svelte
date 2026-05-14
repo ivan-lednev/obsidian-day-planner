@@ -17,13 +17,13 @@
   import Properties from "./Properties.svelte";
   import Selectable from "./selectable.svelte";
 
-  const { workspaceFacade, taskEntryEditor, useSelector } =
+  const { workspaceFacade, taskEntryEditor, useSelectorV2 } =
     getObsidianContext();
 
-  const activeLogRecords = useSelector(selectActiveLogEntries);
+  const activeLogRecords = useSelectorV2(selectActiveLogEntries);
   // todo: duplication?
   const activeLogRecordsCompat = $derived(
-    $activeLogRecords.map((it) => ({
+    activeLogRecords.current.map((it) => ({
       ...it,
       durationMinutes: getDiffInMinutes(
         it.startTime,

@@ -3,7 +3,7 @@ import type { Moment } from "moment";
 import { type CachedMetadata, MetadataCache, type Vault } from "obsidian";
 import { derived, get, writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
-import { expect, onTestFinished, vi } from "vitest";
+import { expect, vi } from "vitest";
 
 import { icalParseLowerLimit } from "../../src/constants";
 import { createUpdateHandler } from "../../src/create-update-handler";
@@ -138,10 +138,10 @@ export async function setUp(props?: {
       timeRemainingLowerLimit: icalParseLowerLimit,
     });
 
-  onTestFinished(() => icalParseScheduler.cancelTasks());
+  // onTestFinished(() => icalParseScheduler.cancelTasks());
 
   const {
-    useSelectorV2: useSelector,
+    useSelectorV2,
     getState,
     dispatch,
     remoteTasks,
@@ -215,6 +215,7 @@ export async function setUp(props?: {
 
   // this prevents the store from resetting;
   allTasks.subscribe(noop);
+  localTasks.subscribe(noop);
 
   function moveCursorTo(
     dateTime: Moment,
@@ -238,17 +239,18 @@ export async function setUp(props?: {
     return findTask((it) => getOneLineSummary(it).includes(text));
   }
 
+  const taskEntries = useSelectorV2((state) => selectTaskEntriesById(state));
+
   await vi.waitFor(() => {
     // todo: just wait for cache to be 'warm'
     const isAtLeastOneTaskEntryLoaded =
-      Object.keys(useSelector((state) => selectTaskEntriesById(state)).current)
-        .length > 0;
+      Object.keys(taskEntries.current).length > 0;
 
     expect(isAtLeastOneTaskEntryLoaded).toBeTruthy();
   });
 
   return {
-    useSelector,
+    useSelectorV2,
     getState,
     dispatch,
     tasksWithTimeForToday,

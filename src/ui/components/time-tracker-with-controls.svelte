@@ -7,15 +7,15 @@
   import Tree from "./obsidian/tree.svelte";
   import RecentClocks from "./RecentClocks.svelte";
 
-  const { useSelector } = getObsidianContext();
+  const { useSelectorV2 } = getObsidianContext();
 
-  const activeLogRecords = useSelector(selectActiveLogEntries);
+  const activeLogRecords = useSelectorV2(selectActiveLogEntries);
 </script>
 
 <ErrorBoundary>
   <Tree title="Active clocks">
     {#snippet flair()}
-      {String($activeLogRecords.length)}
+      {String(activeLogRecords.current.length)}
     {/snippet}
     <ActiveClocks />
   </Tree>

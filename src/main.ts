@@ -31,8 +31,7 @@ import { type IcalParseTaskResult } from "./redux/ical/init-ical-listeners";
 import { settingsUpdated } from "./redux/settings-slice";
 import { type AppDispatch, type AppStore, createReactor } from "./redux/store";
 import { selectActiveLogEntries } from "./redux/tracker/tracker-slice";
-import { createUseSelector, createUseSelectorV2 } from "./redux/use-selector";
-import { createSvelteSignalFromReduxStore } from "./redux/use-selector";
+import { createUseSelectorV2 } from "./redux/use-selector";
 import { TransactionWriter } from "./service/diff-writer";
 import { ListItemEntryEditor } from "./service/list-item-entry-editor";
 import { ListPropsParser } from "./service/list-props-parser";
@@ -102,7 +101,6 @@ export default class DayPlanner extends Plugin {
       store,
       getState,
       dispatch,
-      useSelector,
       useSelectorV2,
       listenerMiddleware,
       remoteTasks,
@@ -136,7 +134,6 @@ export default class DayPlanner extends Plugin {
       dispatch,
       remoteTasks,
       pointerDateTime,
-      useSelector,
       useSelectorV2,
       localTasks,
     });
@@ -376,7 +373,6 @@ export default class DayPlanner extends Plugin {
   private registerViews(props: {
     store: AppStore;
     dispatch: AppDispatch;
-    useSelector: ReturnType<typeof createUseSelector>;
     useSelectorV2: ReturnType<typeof createUseSelectorV2>;
     remoteTasks: Readable<RemoteTask[]>;
     localTasks: Readable<LocalTask[]>;
@@ -385,7 +381,6 @@ export default class DayPlanner extends Plugin {
     const {
       store,
       dispatch,
-      useSelector,
       useSelectorV2,
       remoteTasks,
       localTasks,
@@ -522,7 +517,6 @@ export default class DayPlanner extends Plugin {
     }
 
     const defaultObsidianContext: ObsidianContext = {
-      storeSignal: createSvelteSignalFromReduxStore(store),
       periodicNotes: this.periodicNotes,
       taskEntryEditor: this.taskEntryEditor,
       workspaceFacade: this.workspaceFacade,
@@ -539,7 +533,6 @@ export default class DayPlanner extends Plugin {
       settingsSignal: fromStore(settings),
       pointerDateTime,
       dispatch,
-      useSelector,
       useSelectorV2,
     };
 

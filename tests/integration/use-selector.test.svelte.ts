@@ -1,4 +1,3 @@
-import { flushSync, untrack } from "svelte";
 import { describe, expect, test } from "vitest";
 
 import { selectLogEntriesForDay } from "../../src/redux";
@@ -8,9 +7,9 @@ import { setUp } from "./setup";
 
 describe("useSelector", () => {
   test("Returns values from the store", async () => {
-    const { useSelector } = await setUp();
+    const { useSelectorV2 } = await setUp();
 
-    const logEntries = useSelector((state) =>
+    const logEntries = useSelectorV2((state) =>
       selectLogEntriesForDay(state, "2025-01-18", strictParse("2025-01-18")),
     );
 
@@ -18,11 +17,11 @@ describe("useSelector", () => {
   });
 
   test("Re-runs on reactive argument changes", async () => {
-    const { useSelector } = await setUp();
+    const { useSelectorV2 } = await setUp();
 
     let activeDay = $state("2025-01-18");
 
-    const logEntries = useSelector((state) =>
+    const logEntries = useSelectorV2((state) =>
       selectLogEntriesForDay(state, activeDay, strictParse("2025-01-18")),
     );
 

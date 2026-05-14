@@ -8,7 +8,7 @@ import {
 } from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
 import type { MetadataCache, Vault } from "obsidian";
-import { writable } from "svelte/store";
+import { toStore, writable } from "svelte/store";
 
 import type { ListPropsParser } from "../service/list-props-parser";
 import type { PeriodicNotes } from "../service/periodic-notes";
@@ -23,7 +23,7 @@ import { initListenerMiddleware } from "./listener-middleware";
 import { settingsSlice } from "./settings-slice";
 import { selectPlanEntriesForVisibleDays } from "./tracker/tracker-selectors";
 import { trackerSlice } from "./tracker/tracker-slice";
-import { createUseSelector, createUseSelectorV2 } from "./use-selector";
+import { createUseSelectorV2 } from "./use-selector";
 
 const rootReducer = combineSlices(
   globalSlice,
@@ -90,11 +90,15 @@ export function createReactor(props: {
 
   const { dispatch, getState } = store;
 
-  const useSelector = createUseSelector(store);
   const useSelectorV2 = createUseSelectorV2(store);
 
-  const localTasks = useSelector(selectPlanEntriesForVisibleDays);
-  const remoteTasks = useSelector(selectRemoteTasks);
+  const localTasksSignal = useSelectorV2((state) =>
+    selectPlanEntriesForVisibleDays(state),
+  );
+  const localTasks = toStore(() => localTasksSignal.current);
+
+  const remoteTasksSignal = useSelectorV2((state) => selectRemoteTasks(state));
+  const remoteTasks = toStore(() => remoteTasksSignal.current);
 
   const pointerDateTime = writable<PointerDateTime>({
     dateTime: window.moment(),
@@ -109,7 +113,6 @@ export function createReactor(props: {
     remoteTasks,
     localTasks,
     pointerDateTime,
-    useSelector,
     useSelectorV2,
   };
 }
