@@ -4,9 +4,6 @@ import {
   scrollOnHoverZoneHeightPercent,
   scrollSpeedPixelsPerAnimationFrame,
 } from "../constants";
-import type { FileLine } from "../task-types";
-
-import { liftToArray } from "./lift";
 
 export function isTouchEvent(event: PointerEvent) {
   return ["pen", "touch"].includes(event.pointerType);
@@ -151,23 +148,21 @@ export const checkboxInRenderedMarkdownSelector =
 
 export function addLineDataToCheckboxes(
   el: HTMLElement,
-  lines?: FileLine[] | FileLine,
+  taskLines: Array<number | undefined>,
 ) {
-  if (!lines) {
+  if (!taskLines) {
     return;
   }
 
-  const linesWithCheckboxes = liftToArray(lines).filter((line) => line.task);
-
   el.querySelectorAll(checkboxInRenderedMarkdownSelector).forEach(
     (checkbox, i) => {
-      const fileLine = linesWithCheckboxes[i];
+      const taskLine = taskLines[i];
 
-      if (!(checkbox instanceof HTMLElement) || !fileLine) {
+      if (!(checkbox instanceof HTMLElement) || !taskLine) {
         return;
       }
 
-      checkbox.dataset.line = String(fileLine.line);
+      checkbox.dataset.line = String(taskLine);
     },
   );
 }

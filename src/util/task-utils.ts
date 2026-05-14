@@ -377,7 +377,6 @@ export function toRenderableMarkdown(timeBlock: Node) {
 
   return {
     listItem: formattedFirstLine,
-    // todo: no indentation is added
     paragraphs: linesAfterFirst.join("\n"),
     nestedListItems,
   };

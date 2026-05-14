@@ -1,18 +1,11 @@
 <script lang="ts">
   import { getObsidianContext } from "../../context/obsidian-context";
-  import type { FileLine, LocalTask } from "../../task-types";
-  import { removeTimestamp, toRenderableMarkdown } from "../../util/task-utils";
-  import { getFirstLineAsMarkdown } from "../../util/dataview";
-  import { deleteProps } from "../../util/props";
-  import { getFirstLine, getLinesAfterFirst } from "../../util/markdown";
-  import dedent from "ts-dedent";
-  import { flow } from "lodash/fp";
-  import {
-    addLineDataToCheckboxes,
-    readCheckboxLineData,
-  } from "../../util/dom";
+  import type { LocalTask } from "../../task-types";
+  import { toRenderableMarkdown } from "../../util/task-utils";
+  import { addLineDataToCheckboxes } from "../../util/dom";
   import { on } from "svelte/events";
   import type { Snippet } from "svelte";
+  import type { ListItemEntryWithChildren } from "src/redux/tracker/tracker-slice";
 
   const { task, children }: { task: LocalTask; children: Snippet } = $props();
 
@@ -51,12 +44,12 @@
 
   function createRenderMarkdownAttachment(
     markdown: string,
-    lines: FileLine[] | FileLine,
+    taskLines: Array<number | undefined>,
   ) {
     return (el: HTMLElement) => {
       const destroyMarkdown = renderMarkdown(el, markdown);
 
-      addLineDataToCheckboxes(el, lines);
+      addLineDataToCheckboxes(el, taskLines);
 
       const offPointerUp = on(el, "pointerup", handlePointerUp);
       const offMouseUp = on(el, "mouseup", stopPropagationForElWithLineData);
@@ -74,12 +67,28 @@
   const { listItem, nestedListItems, paragraphs } = $derived(
     toRenderableMarkdown(task),
   );
+
+  function flatten(
+    entries: ListItemEntryWithChildren[],
+  ): ListItemEntryWithChildren[] {
+    return (
+      entries.flatMap((child) => [child, ...flatten(child.children ?? [])]) ??
+      []
+    );
+  }
+
+  const listItemLine = $derived(task.location?.position.start.line);
+  const nestedListItemLines = $derived(
+    flatten(task.children ?? [])
+      .filter((task) => task.task !== undefined)
+      .map((item) => item.position.start.line),
+  );
 </script>
 
 <div class={["rendered-markdown", "planner-sticky-block-content"]}>
   <div
     class="first-line-wrapper"
-    {@attach createRenderMarkdownAttachment(listItem, [])}
+    {@attach createRenderMarkdownAttachment(listItem, [listItemLine])}
   ></div>
 
   {@render children?.()}
@@ -87,7 +96,10 @@
   {#if $settings.showSubtasksInTaskBlocks && nestedListItems}
     <div
       class="lines-after-first-wrapper"
-      {@attach createRenderMarkdownAttachment(nestedListItems, [])}
+      {@attach createRenderMarkdownAttachment(
+        nestedListItems,
+        nestedListItemLines,
+      )}
     ></div>
   {/if}
 </div>

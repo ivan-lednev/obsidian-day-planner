@@ -174,11 +174,15 @@ describe("Indexing", () => {
       loadedFixtures: ["2025-07-28.md"],
     });
 
-    expect(selectPlanEntriesForDays(getState(), ["2025-07-28"])).not.toHaveLength(0);
+    expect(
+      selectPlanEntriesForDays(getState(), ["2025-07-28"]),
+    ).not.toHaveLength(0);
 
     dispatch(fileDeleted({ path: "fixtures/fixture-vault/2025-07-28.md" }));
 
-    expect(selectPlanEntriesForDays(getState(), ["2025-07-28"])).toHaveLength(0);
+    expect(selectPlanEntriesForDays(getState(), ["2025-07-28"])).toHaveLength(
+      0,
+    );
   });
 
   test("Replaces plan entries on file re-index without duplicates", async () => {

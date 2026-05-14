@@ -18,12 +18,6 @@ export interface ListItemTokens {
   task?: string;
 }
 
-export interface FileLine {
-  text: string;
-  line: number;
-  task: boolean;
-}
-
 export type WithPlacing<T> = T & {
   placing: HorizontalPlacing;
 };
@@ -56,7 +50,6 @@ type Side = "top" | "bottom" | "left" | "right";
 
 export interface LocalTask extends ListItemTokens, BaseTask {
   text: string;
-  lines?: Array<FileLine>;
   children?: Array<ListItemEntryWithChildren>;
 
   // todo: move out to InMemoryTask
