@@ -13,10 +13,10 @@
   import Properties from "./Properties.svelte";
   import Selectable from "./selectable.svelte";
 
-  const { workspaceFacade, useSelectorV2, taskEntryEditor } =
+  const { workspaceFacade, useSelector, taskEntryEditor } =
     getObsidianContext();
 
-  const recentLogRecords = useSelectorV2((state) =>
+  const recentLogRecords = useSelector((state) =>
     selectRecentLogEntries(state),
   );
 </script>

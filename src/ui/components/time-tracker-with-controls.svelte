@@ -7,9 +7,9 @@
   import Tree from "./obsidian/tree.svelte";
   import RecentClocks from "./RecentClocks.svelte";
 
-  const { useSelectorV2 } = getObsidianContext();
+  const { useSelector } = getObsidianContext();
 
-  const activeLogRecords = useSelectorV2(selectActiveLogEntries);
+  const activeLogRecords = useSelector(selectActiveLogEntries);
 </script>
 
 <ErrorBoundary>

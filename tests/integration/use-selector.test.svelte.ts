@@ -7,9 +7,9 @@ import { setUp } from "./setup";
 
 describe("useSelector", () => {
   test("Returns values from the store", async () => {
-    const { useSelectorV2 } = await setUp();
+    const { useSelector } = await setUp();
 
-    const logEntries = useSelectorV2((state) =>
+    const logEntries = useSelector((state) =>
       selectLogEntriesForDay(state, "2025-01-18", strictParse("2025-01-18")),
     );
 
@@ -17,11 +17,11 @@ describe("useSelector", () => {
   });
 
   test("Re-runs on reactive argument changes", async () => {
-    const { useSelectorV2 } = await setUp();
+    const { useSelector } = await setUp();
 
     let activeDay = $state("2025-01-18");
 
-    const logEntries = useSelectorV2((state) =>
+    const logEntries = useSelector((state) =>
       selectLogEntriesForDay(state, activeDay, strictParse("2025-01-18")),
     );
 

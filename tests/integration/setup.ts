@@ -141,7 +141,7 @@ export async function setUp(props?: {
   // onTestFinished(() => icalParseScheduler.cancelTasks());
 
   const {
-    useSelectorV2,
+    useSelector,
     getState,
     dispatch,
     remoteTasks,
@@ -239,7 +239,7 @@ export async function setUp(props?: {
     return findTask((it) => getOneLineSummary(it).includes(text));
   }
 
-  const taskEntries = useSelectorV2((state) => selectTaskEntriesById(state));
+  const taskEntries = useSelector((state) => selectTaskEntriesById(state));
 
   await vi.waitFor(() => {
     // todo: just wait for cache to be 'warm'
@@ -250,7 +250,7 @@ export async function setUp(props?: {
   });
 
   return {
-    useSelectorV2,
+    useSelector,
     getState,
     dispatch,
     tasksWithTimeForToday,

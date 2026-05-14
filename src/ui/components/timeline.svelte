@@ -41,13 +41,13 @@
     },
     pointerDateTime,
     settingsSignal,
-    useSelectorV2,
+    useSelector,
   } = getObsidianContext();
 
   const displayedTasksForTimeline = $derived(getDisplayedTasksForTimeline(day));
   const dayKey = $derived(getDayKey(day));
 
-  const logEntriesForDay = useSelectorV2((state) =>
+  const logEntriesForDay = useSelector((state) =>
     selectLogEntriesForDay(state, dayKey, currentTimeSignal.current),
   );
 

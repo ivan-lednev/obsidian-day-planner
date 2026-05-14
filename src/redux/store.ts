@@ -23,7 +23,7 @@ import { initListenerMiddleware } from "./listener-middleware";
 import { settingsSlice } from "./settings-slice";
 import { selectPlanEntriesForVisibleDays } from "./tracker/tracker-selectors";
 import { trackerSlice } from "./tracker/tracker-slice";
-import { createUseSelectorV2 } from "./use-selector";
+import { createuseSelector } from "./use-selector";
 
 const rootReducer = combineSlices(
   globalSlice,
@@ -90,14 +90,14 @@ export function createReactor(props: {
 
   const { dispatch, getState } = store;
 
-  const useSelectorV2 = createUseSelectorV2(store);
+  const useSelector = createuseSelector(store);
 
-  const localTasksSignal = useSelectorV2((state) =>
+  const localTasksSignal = useSelector((state) =>
     selectPlanEntriesForVisibleDays(state),
   );
   const localTasks = toStore(() => localTasksSignal.current);
 
-  const remoteTasksSignal = useSelectorV2((state) => selectRemoteTasks(state));
+  const remoteTasksSignal = useSelector((state) => selectRemoteTasks(state));
   const remoteTasks = toStore(() => remoteTasksSignal.current);
 
   const pointerDateTime = writable<PointerDateTime>({
@@ -113,7 +113,7 @@ export function createReactor(props: {
     remoteTasks,
     localTasks,
     pointerDateTime,
-    useSelectorV2,
+    useSelector,
   };
 }
 

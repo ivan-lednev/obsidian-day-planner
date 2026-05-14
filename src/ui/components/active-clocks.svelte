@@ -17,10 +17,10 @@
   import Properties from "./Properties.svelte";
   import Selectable from "./selectable.svelte";
 
-  const { workspaceFacade, taskEntryEditor, useSelectorV2 } =
+  const { workspaceFacade, taskEntryEditor, useSelector } =
     getObsidianContext();
 
-  const activeLogRecords = useSelectorV2(selectActiveLogEntries);
+  const activeLogRecords = useSelector(selectActiveLogEntries);
   // todo: duplication?
   const activeLogRecordsCompat = $derived(
     activeLogRecords.current.map((it) => ({
