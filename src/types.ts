@@ -4,8 +4,8 @@ import type { MetadataCache, Vault } from "obsidian";
 import type { Readable, Writable } from "svelte/store";
 
 import type { IcalParseTaskResult } from "./redux/ical/init-ical-listeners";
-import { type AppDispatch } from "./redux/store";
-import type { useSelector } from "./redux/use-selector";
+import { type AppDispatch, type RootState } from "./redux/store";
+import type { UseSelector } from "./redux/use-selector";
 import type { ListItemEntryEditor } from "./service/list-item-entry-editor";
 import type { ListPropsParser } from "./service/list-props-parser";
 import type { PeriodicNotes } from "./service/periodic-notes";
@@ -62,7 +62,7 @@ export interface ObsidianContext {
   pointerDateTime: Writable<PointerDateTime>;
   taskEntryEditor: ListItemEntryEditor;
   dispatch: AppDispatch;
-  useSelector: useSelector;
+  useSelector: UseSelector<RootState>;
 }
 
 export type ComponentContext = Map<string, unknown>;

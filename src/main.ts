@@ -30,8 +30,13 @@ import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { type IcalParseTaskResult } from "./redux/ical/init-ical-listeners";
 import { selectActiveLogEntries } from "./redux/index/index-slice";
 import { settingsUpdated } from "./redux/settings-slice";
-import { type AppDispatch, type AppStore, createReactor } from "./redux/store";
-import { createUseSelector } from "./redux/use-selector";
+import {
+  type AppDispatch,
+  type AppStore,
+  createReactor,
+  type RootState,
+} from "./redux/store";
+import { type UseSelector } from "./redux/use-selector";
 import { TransactionWriter } from "./service/diff-writer";
 import { ListItemEntryEditor } from "./service/list-item-entry-editor";
 import { ListPropsParser } from "./service/list-props-parser";
@@ -193,6 +198,13 @@ export default class DayPlanner extends Plugin {
     });
   };
 
+  initTimeTrackerTab = async () => {
+    await this.app.workspace.getLeaf("tab").setViewState({
+      type: viewTypeTimeTracker,
+      active: true,
+    });
+  };
+
   initLeafSilently = async (viewType: string) => {
     const [firstExisting] = this.app.workspace.getLeavesOfType(viewType);
     if (firstExisting) {
@@ -267,6 +279,12 @@ export default class DayPlanner extends Plugin {
       id: "show-time-tracker",
       name: "Show time tracker",
       callback: this.initTimeTrackerLeaf,
+    });
+
+    this.addCommand({
+      id: "show-time-tracker-tab",
+      name: "Show time tracker in regular tab",
+      callback: this.initTimeTrackerTab,
     });
 
     this.addCommand({
@@ -373,7 +391,7 @@ export default class DayPlanner extends Plugin {
   private registerViews(props: {
     store: AppStore;
     dispatch: AppDispatch;
-    useSelector: ReturnType<typeof createUseSelector>;
+    useSelector: UseSelector<RootState>;
     remoteTasks: Readable<RemoteTask[]>;
     localTasks: Readable<LocalTask[]>;
     pointerDateTime: Writable<PointerDateTime>;

@@ -1,10 +1,11 @@
+import type { Store } from "@reduxjs/toolkit";
 import { createSubscriber } from "svelte/reactivity";
 
-import { type AppStore, type RootState } from "./store";
-
-export function createUseSelector(reduxStore: AppStore) {
-  return <T>(selector: (state: RootState) => T) => {
-    let previousResult = selector(reduxStore.getState());
+export function createUseSelector<StateType>(reduxStore: Store) {
+  return <SelectorReturnType>(
+    selector: (state: StateType) => SelectorReturnType,
+  ) => {
+    let previousResult: SelectorReturnType;
 
     const subscribe = createSubscriber((update) => {
       const unsubscribeFromReduxStore = reduxStore.subscribe(() => {
@@ -17,16 +18,13 @@ export function createUseSelector(reduxStore: AppStore) {
         }
       });
 
-      return () => {
-        unsubscribeFromReduxStore();
-      };
+      return unsubscribeFromReduxStore;
     });
 
     return {
       get current() {
         subscribe();
 
-        // todo: might be a source of bugs
         const nextResult = selector(reduxStore.getState());
         previousResult = nextResult;
 
@@ -36,4 +34,6 @@ export function createUseSelector(reduxStore: AppStore) {
   };
 }
 
-export type useSelector = ReturnType<typeof createUseSelector>;
+export type UseSelector<StateType> = ReturnType<
+  typeof createUseSelector<StateType>
+>;

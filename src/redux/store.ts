@@ -90,7 +90,7 @@ export function createReactor(props: {
 
   const { dispatch, getState } = store;
 
-  const useSelector = createUseSelector(store);
+  const useSelector = createUseSelector<RootState>(store);
 
   const localTasksSignal = useSelector((state) =>
     selectPlanEntriesForVisibleDays(state),
