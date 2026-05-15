@@ -98,7 +98,6 @@ export default class MultiDayView extends ItemView {
       target: contentEl,
       context,
     });
-
   }
 
   async onClose() {
