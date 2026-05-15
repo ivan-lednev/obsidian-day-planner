@@ -20,7 +20,7 @@
     <ActiveClocks />
   </Tree>
 
-  <Tree title="Recent clocks">
+  <Tree title="Recently tracked">
     <RecentClocks />
   </Tree>
 </ErrorBoundary>
