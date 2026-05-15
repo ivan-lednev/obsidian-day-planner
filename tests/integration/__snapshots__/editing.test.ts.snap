@@ -52,6 +52,42 @@ exports[`Editing > Daily notes > Un-schedules tasks 1`] = `
 }
 `;
 
+exports[`Editing > Dataview > Schedules tasks ('brackets') 1`] = `
+{
+  "fixtures/fixture-vault/tasks.md": "
+- - [ ] Task with Dataview \`scheduled\` prop in brackets [scheduled:: 2025-07-19]
++ - [ ] 13:00 - 14:00 Task with Dataview \`scheduled\` prop in brackets [scheduled:: 2025-07-19]
+",
+}
+`;
+
+exports[`Editing > Dataview > Schedules tasks ('parens') 1`] = `
+{
+  "fixtures/fixture-vault/tasks.md": "
+- - [ ] Task with Dataview \`scheduled\` prop in parens (scheduled:: 2025-07-19)
++ - [ ] 13:00 - 14:00 Task with Dataview \`scheduled\` prop in parens (scheduled:: 2025-07-19)
+",
+}
+`;
+
+exports[`Editing > Dataview > Unschedules tasks ('brackets') 1`] = `
+{
+  "fixtures/fixture-vault/tasks.md": "
+- - [ ] 11:00 - 11:30 Task with timestamp and Dataview \`scheduled\` prop in brackets [scheduled:: 2025-07-19]
++ - [ ] Task with timestamp and Dataview \`scheduled\` prop in brackets [scheduled:: 2025-07-19]
+",
+}
+`;
+
+exports[`Editing > Dataview > Unschedules tasks ('parens') 1`] = `
+{
+  "fixtures/fixture-vault/tasks.md": "
+- - [ ] 12:00 - 12:30 Task with timestamp and Dataview \`scheduled\` prop in parens (scheduled:: 2025-07-19)
++ - [ ] Task with timestamp and Dataview \`scheduled\` prop in parens (scheduled:: 2025-07-19)
+",
+}
+`;
+
 exports[`Editing > Obsidian-tasks > Schedules tasks 1`] = `
 {
   "fixtures/fixture-vault/tasks.md": "

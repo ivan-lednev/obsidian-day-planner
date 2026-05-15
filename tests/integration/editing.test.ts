@@ -137,4 +137,58 @@ describe("Editing", () => {
       "Updates tasks plugin props without duplicating timestamps if moved to same time on another day",
     );
   });
+
+  describe("Dataview", () => {
+    test.each([
+      {
+        variant: "brackets",
+        label: "Task with Dataview `scheduled` prop in brackets",
+      },
+      {
+        variant: "parens",
+        label: "Task with Dataview `scheduled` prop in parens",
+      },
+    ])("Schedules tasks ($variant)", async ({ label }) => {
+      const { editContext, moveCursorTo, vault, findByText } = await setUp({
+        visibleDays: ["2025-07-19"],
+      });
+
+      editContext.handlers.handleGripMouseDown(
+        findByText(label),
+        EditMode.DRAG,
+      );
+
+      moveCursorTo(window.moment("2025-07-19 13:00"));
+
+      await editContext.confirmEdit();
+
+      expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
+    });
+
+    test.each([
+      {
+        variant: "brackets",
+        label: "Task with timestamp and Dataview `scheduled` prop in brackets",
+      },
+      {
+        variant: "parens",
+        label: "Task with timestamp and Dataview `scheduled` prop in parens",
+      },
+    ])("Unschedules tasks ($variant)", async ({ label }) => {
+      const { editContext, moveCursorTo, vault, findByText } = await setUp({
+        visibleDays: ["2025-07-19"],
+      });
+
+      editContext.handlers.handleGripMouseDown(
+        findByText(label),
+        EditMode.DRAG,
+      );
+
+      moveCursorTo(window.moment("2025-07-19"), "date");
+
+      await editContext.confirmEdit();
+
+      expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
+    });
+  });
 });

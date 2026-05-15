@@ -160,8 +160,8 @@ export function deleteProps(text: string) {
 export function updateScheduledPropInText(text: string, dayKey: string) {
   return text
     .replace(shortScheduledPropRegExp, `$1${dayKey}`)
-    .replace(scheduledPropRegExp, `$1${dayKey}$2`)
-    .replace(keylessScheduledPropRegExp, `$1${dayKey}$2`);
+    .replace(scheduledPropRegExp, `$1${dayKey}$3`)
+    .replace(keylessScheduledPropRegExp, `$1${dayKey}$3`);
 }
 
 export function addTasksPluginProp(text: string, prop: string) {
