@@ -104,8 +104,6 @@ export default class DayPlanner extends Plugin {
 
     const {
       store,
-      getState,
-      dispatch,
       useSelector,
       listenerMiddleware,
       remoteTasks,
@@ -120,8 +118,9 @@ export default class DayPlanner extends Plugin {
       icalParseScheduler,
     });
 
+    const { dispatch } = store
+
     this.taskEntryEditor = new ListItemEntryEditor(
-      getState,
       this.workspaceFacade,
       this.vaultFacade,
       this.metadataCacheFacade,

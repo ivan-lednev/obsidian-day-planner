@@ -88,8 +88,6 @@ export function createReactor(props: {
     },
   });
 
-  const { dispatch, getState } = store;
-
   const useSelector = createUseSelector<RootState>(store);
 
   const localTasksSignal = useSelector((state) =>
@@ -107,8 +105,6 @@ export function createReactor(props: {
 
   return {
     store,
-    getState,
-    dispatch,
     listenerMiddleware,
     remoteTasks,
     localTasks,

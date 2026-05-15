@@ -142,8 +142,7 @@ export async function setUp(props?: {
 
   const {
     useSelector,
-    getState,
-    dispatch,
+    store,
     remoteTasks,
     localTasks,
     pointerDateTime,
@@ -163,8 +162,9 @@ export async function setUp(props?: {
     icalParseScheduler,
   });
 
+  const { getState, dispatch } = store
+
   const taskEntryEditor = new ListItemEntryEditor(
-    getState,
     workspaceFacade,
     vaultFacade,
     metadataCacheFacade,

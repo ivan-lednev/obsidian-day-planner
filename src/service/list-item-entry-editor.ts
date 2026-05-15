@@ -3,7 +3,6 @@
 import { Effect, Either, pipe } from "effect";
 import { Notice } from "obsidian";
 
-import type { AppStore } from "../redux/store";
 import { locToEditorPosition } from "../util/editor";
 import { getErrorMessage } from "../util/error";
 import {
@@ -143,7 +142,6 @@ export class ListItemEntryEditor {
     );
 
   constructor(
-    private readonly getState: AppStore["getState"],
     private readonly workspaceFacade: WorkspaceFacade,
     private readonly vaultFacade: VaultFacade,
     private readonly metadataCacheFacade: MetadataCacheFacade,
