@@ -1,5 +1,6 @@
 import { produce } from "immer";
 import { PluginSettingTab, SettingGroup } from "obsidian";
+import { type Component, mount, unmount } from "svelte";
 import type { Writable } from "svelte/store";
 import { isOneOf } from "typed-assert";
 
@@ -10,7 +11,6 @@ import {
   eventFormats,
   firstDaysOfWeek,
 } from "../settings";
-import { type Component, type ComponentProps, mount, unmount } from "svelte";
 import Callout from "../ui/components/callout.svelte";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
