@@ -11,10 +11,12 @@
     children,
     type = "info",
     title = capitalize(type),
+    className,
   }: {
-    children: Snippet;
+    children?: Snippet;
     title?: string;
     type?: "error" | "warning" | "info";
+    className?: string;
   } = $props();
 
   const colors: Record<CalloutType, string> = {
@@ -26,7 +28,7 @@
   const color = $derived(colors[type]);
 </script>
 
-<div style:--callout-color={color} class="callout-wrapper">
+<div style:--callout-color={color} class={["callout-wrapper", className]}>
   <div class="callout-title">
     {#if type === "error"}
       <Zap class="planner-callout-icon" />
@@ -37,9 +39,11 @@
     {/if}
     <span class="callout-title-text">{title}</span>
   </div>
-  <div class="callout-content">
-    {@render children()}
-  </div>
+  {#if children}
+    <div class="callout-content">
+      {@render children()}
+    </div>
+  {/if}
 </div>
 
 <style>

@@ -10,8 +10,12 @@ import {
   eventFormats,
   firstDaysOfWeek,
 } from "../settings";
+import { type Component, type ComponentProps, mount, unmount } from "svelte";
+import Callout from "../ui/components/callout.svelte";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
+  private warningComponent?: Component;
+
   constructor(
     private readonly plugin: DayPlanner,
     private readonly settingsStore: Writable<DayPlannerSettings>,
@@ -20,9 +24,23 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
   }
 
   display(): void {
-    const { containerEl } = this;
+    const { containerEl, warningComponent } = this;
+
+    if (warningComponent) {
+      unmount(warningComponent);
+    }
 
     containerEl.empty();
+
+    // @ts-expect-error
+    this.warningComponent = mount(Callout, {
+      props: {
+        type: "warning",
+        title: "Any change to the settings requires a restart of Obsidian!",
+        className: "planner-settings-warning",
+      },
+      target: containerEl,
+    });
 
     const generalGroup = new SettingGroup(containerEl)
       .addSetting((setting) =>
