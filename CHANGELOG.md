@@ -1,3 +1,51 @@
+## 0.29.0
+
+**Warning: the time tracking feature is still experimental and can change at any time.**
+
+### 💥 Breaking changes
+
+- Timestamp parsing on the line is now stricter to avoid false positives:
+  - Minutes are required when a timestamp is not at the start of the line (`20` no longer matches, `20:00` does)
+  - Space is no longer accepted as the hour-minute separator (only `:` and `.`)
+- Time tracker now records it's metadata as YAML instead of Dataview props. This is the same format Obsidian uses for file props, and it's standard markdown. The old prop style is no longer supported
+- Dataview is no longer required — the plugin now parses Dataview-style inline properties on its own and reads tasks directly from Obsidian's metadata cache
+  - You can uninstall or disable the Dataview plugin if you only used it for the planner
+  - `Dataview source` setting has been removed
+- CSS class prefix changed from `day-planner-` to `planner-`. If you have custom CSS snippets targeting plugin elements, update the prefix
+- Any change to the plugin settings now requires an Obsidian restart — a warning banner is shown at the top of the settings tab
+
+### ✨ New feature: performant index
+
+**Now the plugin is MUCH faster, especially on big vaults and mobile**
+ 
+### ✨ New feature: dedicated Time Tracker view
+
+- A separate "Time Tracker" view has been split out of the timeline. It shows your active clocks and a list of recently tracked tasks
+  - Open it via the new commands:
+    - `Show time tracker` — opens the panel in the right sidebar
+    - `Show time tracker in regular tab` — opens it as a regular tab
+- Time tracker view has a 'Recently tracked' section, allowing you to start clocks on recently tracked tasks
+- Active clocks now show the task path as a clickable pill — click to reveal the task in the source file
+
+### ✨ Other improvements
+
+- Block list got a minimalistic redesign — properties are cleaner and only clickable pills get hover styling
+- Timeline auto-scrolls when you drag a block near the top or bottom edge, making it easier to move tasks across hours
+- Error boundaries were added around the major views — when something crashes inside the plugin, you get a readable error with a stack trace
+- Settings tab was reorganized into grouped sections
+- Initial plugin load is faster, and the iCal sync now kicks off on plugin init instead of waiting for the first refresh interval
+
+### 🐞 Fixed issues
+
+- Fix multi-day view horizontal scrolling
+- Fix Escape key closing the weekly/multi-day view
+- Fix Notifications crashing the plugin on Android
+- Fix lag when plugin is enabled
+- Do not store ical metadata in plugin settings
+- Fix task decorator toggle not doing anyting
+
+And many more fixes.
+
 ## 0.28.0
 
 ### 💥 Breaking changes
