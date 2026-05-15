@@ -9,6 +9,7 @@ import type {
 import type { ListItemEntryEditor } from "../service/list-item-entry-editor";
 import type { ListPropsParser } from "../service/list-props-parser";
 import type { MetadataCacheFacade } from "../service/metadata-cache-facade";
+import { isTaskCache } from "../util/metadata";
 import { isWithOpenClock } from "../util/props";
 
 export const createEditorMenuCallback =
@@ -36,7 +37,7 @@ export const createEditorMenuCallback =
     const fileCache = metadataCache.getCache(path);
     const listItemCache = metadataCacheFacade.getListItem(path, line);
 
-    if (!fileCache || !listItemCache) {
+    if (!fileCache || !listItemCache || !isTaskCache(listItemCache)) {
       return;
     }
 

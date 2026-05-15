@@ -176,6 +176,12 @@ export class ListItemEntryEditor {
           location: { path, line },
         } = yield* this.getListItemCacheUnderCursorFromLastView();
 
+        if (!listItemCache.task) {
+          return yield* Effect.fail(
+            new Error("Cannot start a clock on a regular list item"),
+          );
+        }
+
         const foundListProps = yield* this.findListProps(path, line);
 
         const updatedFormattedProps = yield* pipe(
