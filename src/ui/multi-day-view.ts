@@ -8,7 +8,6 @@ import type { DayPlannerSettings } from "../settings";
 import type { ComponentContext, DateRange } from "../types";
 import * as r from "../util/range";
 
-import HeaderActions from "./components/multi-day/header-actions.svelte";
 import MultiDayGrid from "./components/multi-day/multi-day-grid.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
 
@@ -16,7 +15,6 @@ export default class MultiDayView extends ItemView {
   private static readonly defaultDisplayText = "Multi-Day View";
   navigation = true;
   private multiDayComponent?: SvelteComponent;
-  private headerActionsComponent?: HeaderActions;
   private dateRange?: DateRange;
 
   constructor(
@@ -51,7 +49,6 @@ export default class MultiDayView extends ItemView {
   }
 
   async onOpen() {
-    const headerEl = this.containerEl.children[0];
     const contentEl = this.containerEl.children[1];
     const currentSettings = get(this.settings);
 
@@ -102,27 +99,11 @@ export default class MultiDayView extends ItemView {
       context,
     });
 
-    const viewActionsEl = headerEl.querySelector(".view-actions");
-
-    if (viewActionsEl) {
-      const customActionsEl = createDiv();
-
-      viewActionsEl.prepend(customActionsEl);
-      // @ts-expect-error
-      this.headerActionsComponent = mount(HeaderActions, {
-        target: customActionsEl,
-        context,
-      });
-    }
   }
 
   async onClose() {
     if (this.multiDayComponent) {
       await unmount(this.multiDayComponent);
-    }
-
-    if (this.headerActionsComponent) {
-      await unmount(this.headerActionsComponent);
     }
 
     this.dateRange?.untrack();

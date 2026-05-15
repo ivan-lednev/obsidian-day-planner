@@ -42,7 +42,6 @@ export interface DayPlannerSettings {
   timelineEndColor: HexString;
   timestampFormat: string;
   hourFormat: string;
-  dataviewSource: string;
   extendDurationUntilNext: boolean;
   defaultDurationMinutes: number;
   minimalDurationMinutes: number;
@@ -84,7 +83,6 @@ export const defaultSettings: DayPlannerSettings = {
   timelineEndColor: "#4d194d",
   timestampFormat: "HH:mm",
   hourFormat: "H",
-  dataviewSource: "",
   extendDurationUntilNext: false,
   defaultDurationMinutes: 30,
   minimalDurationMinutes: 10,
