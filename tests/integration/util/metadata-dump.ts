@@ -5,7 +5,7 @@ import type { Moment } from "moment";
 import type { CachedMetadata } from "obsidian";
 import { check, isNotVoid } from "typed-assert";
 
-import { createInMemoryFile, type InMemoryFile } from "../test-utils";
+import { createInMemoryFile, type InMemoryFile } from "../../util/fakes";
 
 const { join } = path.posix;
 

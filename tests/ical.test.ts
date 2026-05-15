@@ -3,24 +3,25 @@ import { readFile } from "fs/promises";
 import { type MetadataCache, request, Vault } from "obsidian";
 import { beforeEach, describe, expect, onTestFinished, test, vi } from "vitest";
 
-import { icalParseLowerLimit } from "../../src/constants";
-import { initialState as initialGlobalState } from "../../src/redux/global-slice";
+import { icalParseLowerLimit } from "../src/constants";
+import { initialState as initialGlobalState } from "../src/redux/global-slice";
 import {
   icalRefreshRequested,
   selectRemoteTasks,
-} from "../../src/redux/ical/ical-slice";
-import { type IcalParseTaskResult } from "../../src/redux/ical/init-ical-listeners";
-import { initListenerMiddleware } from "../../src/redux/listener-middleware";
-import { makeStore, type RootState } from "../../src/redux/store";
-import { ListPropsParser } from "../../src/service/list-props-parser";
-import type { PeriodicNotes } from "../../src/service/periodic-notes";
-import { defaultSettingsForTests } from "../../src/settings";
-import { createBackgroundBatchScheduler } from "../../src/util/scheduler";
+} from "../src/redux/ical/ical-slice";
+import { type IcalParseTaskResult } from "../src/redux/ical/init-ical-listeners";
+import { initListenerMiddleware } from "../src/redux/listener-middleware";
+import { makeStore, type RootState } from "../src/redux/store";
+import { ListPropsParser } from "../src/service/list-props-parser";
+import type { PeriodicNotes } from "../src/service/periodic-notes";
+import { defaultSettingsForTests } from "../src/settings";
+import { createBackgroundBatchScheduler } from "../src/util/scheduler";
+
 import {
   FakeMetadataCache,
   FakePeriodicNotes,
   InMemoryVault,
-} from "../test-utils";
+} from "./util/fakes";
 
 vi.mock("obsidian", () => ({
   request: vi.fn(),

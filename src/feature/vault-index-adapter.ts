@@ -11,7 +11,7 @@ import { fileDeleted, indexRequested } from "../redux/index/index-slice";
 import type { AppDispatch } from "../redux/store";
 
 function sortMostRecentFirst(a: TFile, b: TFile) {
-  return b.stat.mtime - a.stat.mtime
+  return b.stat.mtime - a.stat.mtime;
 }
 
 export class VaultIndexAdapter {

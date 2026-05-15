@@ -3,39 +3,39 @@ import type { Moment } from "moment";
 import { type CachedMetadata, MetadataCache, type Vault } from "obsidian";
 import { derived, get, writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
-import { expect, vi } from "vitest";
+import { expect, onTestFinished, vi } from "vitest";
 
-import { icalParseLowerLimit } from "../../src/constants";
-import { createUpdateHandler } from "../../src/create-update-handler";
-import { initialState } from "../../src/redux/global-slice";
-import { type IcalParseTaskResult } from "../../src/redux/ical/init-ical-listeners";
+import { icalParseLowerLimit } from "../../../src/constants";
+import { createUpdateHandler } from "../../../src/create-update-handler";
+import { initialState } from "../../../src/redux/global-slice";
+import { type IcalParseTaskResult } from "../../../src/redux/ical/init-ical-listeners";
 import {
   indexRequested,
   selectTaskEntriesById,
-} from "../../src/redux/index/index-slice";
-import { createReactor, type RootState } from "../../src/redux/store";
-import { TransactionWriter } from "../../src/service/diff-writer";
-import { ListItemEntryEditor } from "../../src/service/list-item-entry-editor";
-import { ListPropsParser } from "../../src/service/list-props-parser";
-import { MetadataCacheFacade } from "../../src/service/metadata-cache-facade";
-import type { PeriodicNotes } from "../../src/service/periodic-notes";
-import { VaultFacade } from "../../src/service/vault-facade";
-import type { WorkspaceFacade } from "../../src/service/workspace-facade";
+} from "../../../src/redux/index/index-slice";
+import { createReactor, type RootState } from "../../../src/redux/store";
+import { TransactionWriter } from "../../../src/service/diff-writer";
+import { ListItemEntryEditor } from "../../../src/service/list-item-entry-editor";
+import { ListPropsParser } from "../../../src/service/list-props-parser";
+import { MetadataCacheFacade } from "../../../src/service/metadata-cache-facade";
+import type { PeriodicNotes } from "../../../src/service/periodic-notes";
+import { VaultFacade } from "../../../src/service/vault-facade";
+import type { WorkspaceFacade } from "../../../src/service/workspace-facade";
 import {
   type DayPlannerSettings,
   defaultSettingsForTests,
-} from "../../src/settings";
-import { isLocal, type Task } from "../../src/task-types";
-import { useTasks } from "../../src/ui/hooks/use-tasks";
-import { createBackgroundBatchScheduler } from "../../src/util/scheduler";
-import { getOneLineSummary } from "../../src/util/task-utils";
+} from "../../../src/settings";
+import { isLocal, type Task } from "../../../src/task-types";
+import { useTasks } from "../../../src/ui/hooks/use-tasks";
+import { createBackgroundBatchScheduler } from "../../../src/util/scheduler";
+import { getOneLineSummary } from "../../../src/util/task-utils";
 import {
   FakeMetadataCache,
   FakePeriodicNotes,
   FakeWorkspaceFacade,
   InMemoryVault,
   type InMemoryFile,
-} from "../test-utils";
+} from "../../util/fakes";
 
 import { loadMetadataDump } from "./metadata-dump";
 
@@ -138,7 +138,7 @@ export async function setUp(props?: {
       timeRemainingLowerLimit: icalParseLowerLimit,
     });
 
-  // onTestFinished(() => icalParseScheduler.cancelTasks());
+  onTestFinished(() => icalParseScheduler.cancelTasks());
 
   const {
     useSelector,

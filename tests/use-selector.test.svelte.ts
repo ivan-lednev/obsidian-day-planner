@@ -2,7 +2,7 @@ import { combineSlices, configureStore, createSlice } from "@reduxjs/toolkit";
 import { flushSync } from "svelte";
 import { describe, expect, test, vi } from "vitest";
 
-import { createUseSelector } from "../../src/redux/use-selector";
+import { createUseSelector } from "../src/redux/use-selector";
 
 const rootSlice = createSlice({
   name: "test",
