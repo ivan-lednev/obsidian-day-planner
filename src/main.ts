@@ -13,7 +13,7 @@ import {
 } from "./constants";
 import { createUpdateHandler, getTextFromUser } from "./create-update-handler";
 import { createDumpMetadataCommand } from "./dump-metadata";
-import { TimeTrackingFeature } from "./feature/time-tracking-feature";
+import { VaultIndexAdapter } from "./feature/vault-index-adapter";
 import { currentTime } from "./global-store/current-time";
 import { settings } from "./global-store/settings";
 import {
@@ -163,7 +163,7 @@ export default class DayPlanner extends Plugin {
       await this.initLeafSilently(viewTypeTimeTracker);
     });
 
-    const timeTrackingFeature = new TimeTrackingFeature(
+    const timeTrackingFeature = new VaultIndexAdapter(
       this,
       this.app.workspace,
       vault,

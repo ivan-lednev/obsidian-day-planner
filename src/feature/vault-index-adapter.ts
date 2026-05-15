@@ -10,7 +10,11 @@ import type DayPlanner from "../main";
 import { fileDeleted, indexRequested } from "../redux/index/index-slice";
 import type { AppDispatch } from "../redux/store";
 
-export class TimeTrackingFeature {
+function sortMostRecentFirst(a: TFile, b: TFile) {
+  return b.stat.mtime - a.stat.mtime
+}
+
+export class VaultIndexAdapter {
   private static readonly INITIAL_LOAD_CHUNK_SIZE = 100;
 
   constructor(
@@ -32,10 +36,10 @@ export class TimeTrackingFeature {
   private async initialLoad() {
     const paths = this.vault
       .getMarkdownFiles()
-      .toSorted((a, b) => b.stat.mtime - a.stat.mtime)
+      .toSorted(sortMostRecentFirst)
       .map((file) => file.path);
 
-    chunk(TimeTrackingFeature.INITIAL_LOAD_CHUNK_SIZE, paths).forEach((batch) =>
+    chunk(VaultIndexAdapter.INITIAL_LOAD_CHUNK_SIZE, paths).forEach((batch) =>
       this.dispatch(indexRequested(batch)),
     );
   }
