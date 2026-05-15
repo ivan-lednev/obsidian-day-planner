@@ -140,29 +140,24 @@ export async function setUp(props?: {
 
   onTestFinished(() => icalParseScheduler.cancelTasks());
 
-  const {
-    useSelector,
-    store,
-    remoteTasks,
-    localTasks,
-    pointerDateTime,
-  } = createReactor({
-    preloadedState: {
-      ...defaultPreloadedStateForTests,
-      obsidian: {
-        ...initialState,
-        visibleDays,
+  const { useSelector, store, remoteTasks, localTasks, pointerDateTime } =
+    createReactor({
+      preloadedState: {
+        ...defaultPreloadedStateForTests,
+        obsidian: {
+          ...initialState,
+          visibleDays,
+        },
       },
-    },
-    listPropsParser,
-    vault: vault as unknown as Vault,
-    metadataCache,
-    periodicNotes,
-    settings,
-    icalParseScheduler,
-  });
+      listPropsParser,
+      vault: vault as unknown as Vault,
+      metadataCache,
+      periodicNotes,
+      settings,
+      icalParseScheduler,
+    });
 
-  const { getState, dispatch } = store
+  const { getState, dispatch } = store;
 
   const taskEntryEditor = new ListItemEntryEditor(
     workspaceFacade,

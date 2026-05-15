@@ -13,9 +13,8 @@
     tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
   } = $props();
 
-  const timeline = new MiniTimeline(
-    currentTimeSignal,
-    fromStore(tasksWithTimeForToday),
+  const timeline = $derived(
+    new MiniTimeline(currentTimeSignal, fromStore(tasksWithTimeForToday)),
   );
 </script>
 

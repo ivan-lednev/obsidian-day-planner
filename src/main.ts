@@ -118,7 +118,7 @@ export default class DayPlanner extends Plugin {
       icalParseScheduler,
     });
 
-    const { dispatch } = store
+    const { dispatch } = store;
 
     this.taskEntryEditor = new ListItemEntryEditor(
       this.workspaceFacade,
