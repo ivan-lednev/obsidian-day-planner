@@ -280,7 +280,26 @@ describe("Indexing", () => {
     );
   });
 
-  test.todo("Stores Dataview tasks");
+  test("Stores tasks scheduled via Dataview inline fields", async () => {
+    const { getState } = await setUp();
+
+    expect(selectPlanEntriesForDays(getState(), ["2025-07-19"])).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          text: expect.stringContaining(
+            "Task with Dataview `scheduled` prop in brackets",
+          ),
+          isAllDayEvent: true,
+        }),
+        expect.objectContaining({
+          text: expect.stringContaining(
+            "Task with Dataview `scheduled` prop in parens",
+          ),
+          isAllDayEvent: true,
+        }),
+      ]),
+    );
+  });
 
   test("Stores nested tasks and list items with positions with no duplicates", async () => {
     const { getState } = await setUp({

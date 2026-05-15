@@ -11,7 +11,7 @@ import { isNotVoid, isRecordOfType } from "typed-assert";
 
 import { clockFormat } from "../../constants";
 import { getTimeFromLine } from "../../parser/parser";
-import { listItemRegExp, shortScheduledPropRegExp } from "../../regexp";
+import { listItemRegExp, scheduledPropRegExps } from "../../regexp";
 import type { ListPropsParser } from "../../service/list-props-parser";
 import type { PeriodicNotes } from "../../service/periodic-notes";
 import type { DayPlannerSettings } from "../../settings";
@@ -439,24 +439,14 @@ export function createIndexListener(props: {
     );
   }
 
-  function parseObsidianTasksScheduledDate(line: string) {
-    const datePropMatch = line.match(shortScheduledPropRegExp);
+  function parseScheduledDateFromInlineProp(line: string) {
+    for (const regexp of scheduledPropRegExps) {
+      const dateMatch = line.match(regexp)?.groups?.["date"];
 
-    if (!datePropMatch) {
-      return undefined;
+      if (dateMatch) {
+        return strictParse(dateMatch);
+      }
     }
-
-    isRecordOfType<string>(
-      datePropMatch.groups,
-      (value) => typeof value === "string",
-      "Mismatching named regexp groups",
-    );
-
-    const dateString = datePropMatch.groups["date"];
-
-    isNotVoid(dateString);
-
-    return strictParse(dateString);
   }
 
   function getObsidianTasksEntries(props: {
@@ -465,7 +455,7 @@ export function createIndexListener(props: {
   }): PlanEntry[] {
     const { firstLine, parentId } = props;
 
-    const scheduledDate = parseObsidianTasksScheduledDate(firstLine);
+    const scheduledDate = parseScheduledDateFromInlineProp(firstLine);
 
     if (!scheduledDate) {
       return [];

@@ -38,11 +38,11 @@ export const strictTimestampAnywhereInLineRegExp = new RegExp(
 );
 
 export const scheduledPropRegExp = new RegExp(
-  `(\\[scheduled\\s*::\\s*)${datePattern}(\\])`,
+  `(\\[scheduled\\s*::\\s*)(?<date>${datePattern})(\\])`,
 );
 
 export const keylessScheduledPropRegExp = new RegExp(
-  `(\\(scheduled\\s*::\\s*)${datePattern}(\\))`,
+  `(\\(scheduled\\s*::\\s*)(?<date>${datePattern})(\\))`,
 );
 
 export const hourglass = "⏳";
