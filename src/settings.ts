@@ -64,6 +64,7 @@ export interface DayPlannerSettings {
   firstDayOfWeek: (typeof firstDaysOfWeek)[number];
   multiDayRange: "full-week" | "work-week" | "3-days";
   timelineColumns: TimelineColumns;
+  fitColumnsToScreen: boolean;
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -104,6 +105,7 @@ export const defaultSettings: DayPlannerSettings = {
   multiDayRange: "3-days",
   showTimelineInSidebar: true,
   timelineColumns: { planner: true, timeTracker: false },
+  fitColumnsToScreen: false,
 };
 
 export const defaultSettingsForTests = {

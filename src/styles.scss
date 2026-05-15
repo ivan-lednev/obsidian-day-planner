@@ -220,6 +220,39 @@
   overflow: auto;
 }
 
+.fit-columns {
+  .header-cell {
+    flex: 1 1 0 !important;
+    min-width: 150px;
+    max-width: 240px;
+    width: auto !important;
+  }
+
+  .header-cell:last-of-type {
+    flex: 1 1 0 !important;
+  }
+
+  .column {
+    flex: 1 1 0 !important;
+    min-width: 150px;
+    max-width: 240px;
+  }
+
+  .multi-day-row {
+    grid-template-columns: repeat(
+      var(--column-count),
+      minmax(150px, 1fr)
+    ) !important;
+  }
+
+  .column-tracks-wrapper {
+    grid-template-columns: repeat(
+      var(--column-count),
+      minmax(150px, 1fr)
+    ) !important;
+  }
+}
+
 .planner-settings-warning {
   margin-bottom: var(--size-4-6);
 }

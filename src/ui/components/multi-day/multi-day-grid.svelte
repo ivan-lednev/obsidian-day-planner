@@ -139,7 +139,11 @@
 <div
   bind:this={daysRef}
   style:--timeline-internal-column-count={timelineInternalColumnCount}
-  class={["planner-header-row", "day-buttons"]}
+  class={[
+    "planner-header-row",
+    "day-buttons",
+    $settings.fitColumnsToScreen && "fit-columns",
+  ]}
 >
   {#each $dateRange as day}
     <div class="header-cell">
@@ -161,7 +165,11 @@
 {#if $settings.showUncheduledTasks}
   <div
     style:--timeline-internal-column-count={timelineInternalColumnCount}
-    class={["planner-header-row", "horizontal-resize-box-wrapper"]}
+    class={[
+      "planner-header-row",
+      "horizontal-resize-box-wrapper",
+      $settings.fitColumnsToScreen && "fit-columns",
+    ]}
     use:resizeAction
   >
     <!--Note: we need this wrapper to listen to pointer events on the whole height of the row-->
@@ -193,7 +201,13 @@
 
 <ErrorBoundary>
   <div class="multi-day-main-content">
-    <Scroller class="planner-multi-day-scroller" onscroll={handleScroll}>
+    <Scroller
+      class={[
+        "planner-multi-day-scroller",
+        $settings.fitColumnsToScreen && "fit-columns",
+      ]}
+      onscroll={handleScroll}
+    >
       {#each $dateRange as day}
         <Timeline
           --column-background-color={getColumnBackgroundColor(day)}

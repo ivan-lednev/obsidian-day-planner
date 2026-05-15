@@ -72,6 +72,16 @@
         ),
       )
       .addSetting((setting) =>
+        setting.setName("Fit columns to screen").addToggle((toggle) =>
+          toggle.setValue($settings.fitColumnsToScreen).onChange((value) => {
+            $settings = {
+              ...$settings,
+              fitColumnsToScreen: value,
+            };
+          }),
+        ),
+      )
+      .addSetting((setting) =>
         setting.setName("Show completed tasks").addToggle((toggle) =>
           toggle.setValue($settings.showCompletedTasks).onChange((value) => {
             $settings = {
