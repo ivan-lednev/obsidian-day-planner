@@ -39,14 +39,12 @@ export const runWithNoticeOnError = <A, E>(
   );
 
 export class ListItemEntryEditor {
-  editProps = (props: {
-    path: string;
-    line: number;
-    editFn: (props?: Props) => Props;
-  }) => {
-    const { path, line, editFn } = props;
-
-    return Effect.gen(this, function* () {
+  private prepareEdit = (
+    path: string,
+    line: number,
+    editFn: (props?: Props) => Props,
+  ) =>
+    Effect.gen(this, function* () {
       const listItem = yield* this.metadataCacheFacade.getListItemEffect(
         path,
         line,
@@ -60,36 +58,53 @@ export class ListItemEntryEditor {
         );
       }
 
-      const listPropsForLine = yield* this.findListProps(path, line);
+      const baseProps = yield* this.findListProps(path, line);
 
-      const updatedProps = yield* Effect.try({
-        try: () => editFn(listPropsForLine?.parsed),
+      const editedProps = yield* Effect.try({
+        try: () => editFn(baseProps?.parsed),
         catch: (error) =>
           new Error(`Could not edit props. Cause: ${getErrorMessage(error)}`, {
             cause: error,
           }),
       });
 
-      const indented = yield* toIndentedMarkdown(
-        updatedProps,
+      const updatedProps = yield* toIndentedMarkdown(
+        editedProps,
         listItem.position.start.col,
+      );
+
+      return { listItem, baseProps, updatedProps };
+    });
+
+  editProps = (props: {
+    path: string;
+    line: number;
+    editFn: (props?: Props) => Props;
+  }) => {
+    const { path, line, editFn } = props;
+
+    return Effect.gen(this, function* () {
+      const { listItem, baseProps, updatedProps } = yield* this.prepareEdit(
+        path,
+        line,
+        editFn,
       );
 
       yield* Effect.tryPromise({
         try: () =>
           this.vaultFacade.editFile(path, (contents) => {
-            if (listPropsForLine) {
+            if (baseProps) {
               return (
-                contents.slice(0, listPropsForLine.position.start.offset) +
-                indented +
-                contents.slice(listPropsForLine.position.end.offset)
+                contents.slice(0, baseProps.position.start.offset) +
+                updatedProps +
+                contents.slice(baseProps.position.end.offset)
               );
             }
 
             return (
               contents.slice(0, listItem.position.end.offset) +
               "\n" +
-              indented +
+              updatedProps +
               contents.slice(listItem.position.end.offset)
             );
           }),
@@ -148,31 +163,22 @@ export class ListItemEntryEditor {
 
   clockInUnderCursor = () =>
     this.updateListPropsUnderCursor((props) =>
-      // todo: remove duplication
-      Either.right(props ? addOpenClock(props) : createPropsWithOpenClock()),
+      props ? addOpenClock(props) : createPropsWithOpenClock(),
     );
 
   clockOutUnderCursor = () =>
-    this.updateListPropsUnderCursor((props) =>
-      pipe(
-        Either.fromNullable(
-          props,
-          () => new Error("There are no props under cursor"),
-        ),
-        Either.map(clockOut),
-      ),
-    );
+    this.updateListPropsUnderCursor((props) => {
+      isNotVoid(props, "There are no props under cursor");
+
+      return clockOut(props);
+    });
 
   cancelClockUnderCursor = () =>
-    this.updateListPropsUnderCursor((props) =>
-      pipe(
-        Either.fromNullable(
-          props,
-          () => new Error("There are no props under cursor"),
-        ),
-        Either.map(cancelOpenClock),
-      ),
-    );
+    this.updateListPropsUnderCursor((props) => {
+      isNotVoid(props, "There are no props under cursor");
+
+      return cancelOpenClock(props);
+    });
 
   constructor(
     private readonly workspaceFacade: WorkspaceFacade,
@@ -181,47 +187,19 @@ export class ListItemEntryEditor {
     private readonly listPropsParser: ListPropsParser,
   ) {}
 
-  private getListItemCacheUnderCursorFromLastView = () =>
-    Effect.gen(this, function* () {
-      const location = yield* Either.try({
-        try: () => this.workspaceFacade.getLastCaretLocation(),
-        catch: (error) =>
-          new Error("Failed to get caret location", { cause: error }),
-      });
-
-      const { path, line } = location;
-
-      const listItemCache = yield* this.metadataCacheFacade.getListItemEffect(
-        path,
-        line,
-      );
-
-      return { listItemCache, location };
-    });
-
-  private updateListPropsUnderCursor = (
-    updateFn: (props?: Props) => Either.Either<Props, Error>,
-  ) =>
+  private updateListPropsUnderCursor = (updateFn: (props?: Props) => Props) =>
     pipe(
       Effect.gen(this, function* () {
-        const {
-          listItemCache,
-          location: { path, line },
-        } = yield* this.getListItemCacheUnderCursorFromLastView();
+        const { path, line } = yield* Either.try({
+          try: () => this.workspaceFacade.getLastCaretLocation(),
+          catch: (error) =>
+            new Error("Failed to get caret location", { cause: error }),
+        });
 
-        if (!listItemCache.task) {
-          return yield* Effect.fail(
-            new Error("Cannot start a clock on a regular list item"),
-          );
-        }
-
-        const foundListProps = yield* this.findListProps(path, line);
-
-        const updatedFormattedProps = yield* pipe(
-          updateFn(foundListProps?.parsed),
-          Either.flatMap((updatedProps) =>
-            toIndentedMarkdown(updatedProps, listItemCache.position.start.col),
-          ),
+        const { listItem, baseProps, updatedProps } = yield* this.prepareEdit(
+          path,
+          line,
+          updateFn,
         );
 
         const view = yield* Either.try({
@@ -230,22 +208,22 @@ export class ListItemEntryEditor {
             new Error("Could not get active markdown view", { cause: error }),
         });
 
-        if (foundListProps) {
+        if (baseProps) {
           return view.editor.replaceRange(
-            updatedFormattedProps,
-            locToEditorPosition(foundListProps.position.start),
-            locToEditorPosition(foundListProps.position.end),
+            updatedProps,
+            locToEditorPosition(baseProps.position.start),
+            locToEditorPosition(baseProps.position.end),
           );
         }
 
         const afterFirstLineEditorPos = {
-          line: listItemCache.position.start.line + 1,
+          line: listItem.position.start.line + 1,
           ch: 0,
         };
 
-        let newlyAddedProps = updatedFormattedProps + "\n";
+        let newlyAddedProps = updatedProps + "\n";
 
-        if (listItemCache.position.start.line === view.editor.lastLine()) {
+        if (listItem.position.start.line === view.editor.lastLine()) {
           newlyAddedProps = "\n" + newlyAddedProps;
         }
 
