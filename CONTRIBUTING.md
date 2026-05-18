@@ -18,6 +18,7 @@ This document describes how to make a code contribution to the repo.
 1. First describe the change via an [issue](https://github.com/ivan-lednev/obsidian-day-planner/issues).
    1. Describe a problem you're trying to solve.
    1. Describe a proposed solution.
+1. Get an approval from the maintainer **BEFORE YOU SUBMIT A PR**.
 1. Read through the [development guidelines](#development-guidelines) to make sure your code matches the style of the repo.
 
 ## How to set up a development environment
