@@ -25,13 +25,6 @@ class ConfirmationModal extends Modal {
       "planner-confirmation-modal-buttons",
       (buttonsEl) => {
         buttonsEl
-          .createEl("button", { text: "Cancel" })
-          .addEventListener("click", (e) => {
-            onCancel(e);
-            this.close();
-          });
-
-        buttonsEl
           .createEl("button", {
             cls: "mod-cta",
             text: cta,
@@ -39,6 +32,13 @@ class ConfirmationModal extends Modal {
           .addEventListener("click", async (e) => {
             await onAccept(e);
 
+            this.close();
+          });
+
+        buttonsEl
+          .createEl("button", { text: "Cancel" })
+          .addEventListener("click", (e) => {
+            onCancel(e);
             this.close();
           });
       },
