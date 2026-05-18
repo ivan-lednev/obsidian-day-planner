@@ -1,3 +1,16 @@
+## 0.30.0
+
+### ✨ New features
+
+- Edit time block text right from the timeline: right click (or tap and hold on mobile) to open a menu, select 'Edit'
+- Added 'Start', 'Stop', 'Cancel' buttons to time tracker blocks for easier access
+- You can open Timeline in a regular tab with a command: 'Show timeline in regular tab'. This way the view is more convenient on mobile
+
+### 🐞 Fixed issues
+
+- Column size is adjusted on mobile: you can fully view planned & tracked tasks on a single screen
+- 'Confirm' button is now selected by default, when confirming file creation
+
 ## 0.29.0
 
 **Warning: the time tracking feature is still experimental and can change at any time.**
