@@ -61,6 +61,16 @@ export interface ObsidianContext {
   settingsSignal: Signal<DayPlannerSettings>;
   pointerDateTime: Writable<PointerDateTime>;
   taskEntryEditor: ListItemEntryEditor;
+  // todo: rename to promptUserToEditText
+  editText: (props: {
+    initialText?: string;
+    getDescriptionText: (value: string) => string;
+  }) => Promise<string | undefined>;
+  editLine: (target: {
+    path: string;
+    position: { line: number; col: number };
+    contents: string;
+  }) => Promise<void>;
   dispatch: AppDispatch;
   useSelector: UseSelector<RootState>;
 }

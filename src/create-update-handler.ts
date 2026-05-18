@@ -7,6 +7,7 @@ import {
   getTaskDiffFromEditState,
   mapTaskDiffToUpdates,
   TransactionWriter,
+  type Update,
 } from "./service/diff-writer";
 import type { PeriodicNotes } from "./service/periodic-notes";
 import type { VaultFacade } from "./service/vault-facade";
@@ -17,14 +18,16 @@ import { EditMode } from "./ui/hooks/use-edit/types";
 import { SingleSuggestModal } from "./ui/SingleSuggestModal";
 import { applyScopedUpdates } from "./util/markdown";
 
-export async function getTextFromUser(app: App): Promise<string | undefined> {
+export async function getTextFromUser(props: {
+  app: App;
+  initialText?: string;
+  getDescriptionText: (value: string) => string;
+}): Promise<string | undefined> {
   return new Promise((resolve) => {
     new SingleSuggestModal({
-      app,
-      getDescriptionText: (value) =>
-        value.trim().length === 0
-          ? "Start typing to create a task"
-          : `Create item "${value}"`,
+      app: props.app,
+      initialValue: props.initialText,
+      getDescriptionText: props.getDescriptionText,
       onChooseSuggestion: async ({ text }) => {
         resolve(text);
       },
@@ -34,6 +37,34 @@ export async function getTextFromUser(app: App): Promise<string | undefined> {
     }).open();
   });
 }
+
+export const createEditLineHandler =
+  (props: {
+    settings: () => DayPlannerSettings;
+    transactionWriter: TransactionWriter;
+    onConfirmed: () => void;
+  }) =>
+  async (target: {
+    path: string;
+    position: { line: number; col: number };
+    contents: string;
+  }) => {
+    const update: Update = {
+      type: "updated",
+      path: target.path,
+      range: { start: target.position, end: target.position },
+      contents: target.contents,
+    };
+
+    const transaction = createTransaction({
+      updates: [update],
+      settings: props.settings(),
+    });
+
+    await props.transactionWriter.writeTransaction(transaction);
+
+    props.onConfirmed();
+  };
 
 export const createUpdateHandler = (props: {
   settings: () => DayPlannerSettings;

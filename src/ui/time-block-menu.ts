@@ -8,8 +8,9 @@ export function createTimeBlockMenu(props: {
   event: MouseEvent | TouchEvent;
   task: LocalTask;
   workspaceFacade: WorkspaceFacade;
+  onEdit: () => void;
 }) {
-  const { event, task, workspaceFacade } = props;
+  const { event, task, workspaceFacade, onEdit } = props;
   const { location } = task;
 
   // todo: remove when types are fixed
@@ -23,6 +24,10 @@ export function createTimeBlockMenu(props: {
   } = location;
 
   const menu = new Menu();
+
+  menu.addItem((item) => {
+    item.setTitle("Edit").setIcon("pencil").onClick(onEdit);
+  });
 
   menu.addItem((item) => {
     item

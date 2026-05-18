@@ -11,7 +11,11 @@ import {
   icalRefreshIntervalMillis,
   icalParseLowerLimit,
 } from "./constants";
-import { createUpdateHandler, getTextFromUser } from "./create-update-handler";
+import {
+  createEditLineHandler,
+  createUpdateHandler,
+  getTextFromUser,
+} from "./create-update-handler";
 import { createDumpMetadataCommand } from "./dump-metadata";
 import { VaultIndexAdapter } from "./feature/vault-index-adapter";
 import { currentTime } from "./global-store/current-time";
@@ -59,7 +63,7 @@ import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimeTrackerView from "./ui/time-tracker-view";
 import TimelineView from "./ui/timeline-view";
-import { createUndoNotice } from "./ui/undo-notice";
+import { UndoNotice } from "./ui/undo-notice";
 import { createEnvironmentHooks } from "./util/create-environment-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
@@ -75,6 +79,7 @@ export default class DayPlanner extends Plugin {
   private vaultFacade!: VaultFacade;
   private transactionWriter!: TransactionWriter;
   private metadataCacheFacade!: MetadataCacheFacade;
+  private undoNotice!: UndoNotice;
 
   async onload() {
     const { vault, metadataCache } = this.app;
@@ -90,6 +95,7 @@ export default class DayPlanner extends Plugin {
     this.periodicNotes = new PeriodicNotes();
     this.vaultFacade = new VaultFacade(vault, getTasksApi);
     this.transactionWriter = new TransactionWriter(this.vaultFacade);
+    this.undoNotice = new UndoNotice(this.transactionWriter.undo);
     this.workspaceFacade = new WorkspaceFacade(
       this.app.workspace,
       this.vaultFacade,
@@ -417,21 +423,23 @@ export default class DayPlanner extends Plugin {
       pointerDateTime,
     } = props;
 
-    let currentUndoNotice: Notice | undefined;
-
     const onUpdate: OnUpdateFn = createUpdateHandler({
       settings: this.settings,
       transactionWriter: this.transactionWriter,
       vaultFacade: this.vaultFacade,
       periodicNotes: this.periodicNotes,
-      onEditConfirmed: () => {
-        currentUndoNotice?.hide();
-        currentUndoNotice = createUndoNotice(this.transactionWriter.undo);
-      },
+      onEditConfirmed: this.undoNotice.show,
       onEditCanceled: () => {
         new Notice("Edit canceled");
       },
-      getTextInput: () => getTextFromUser(this.app),
+      getTextInput: () =>
+        getTextFromUser({
+          app: this.app,
+          getDescriptionText: (value) =>
+            value.trim().length === 0
+              ? "Start typing to create a task"
+              : `Create item "${value}"`,
+        }),
       getConfirmationInput: (input) =>
         askForConfirmation({
           ...input,
@@ -546,9 +554,28 @@ export default class DayPlanner extends Plugin {
       });
     }
 
+    const editLine = createEditLineHandler({
+      settings: this.settings,
+      transactionWriter: this.transactionWriter,
+      onConfirmed: this.undoNotice.show,
+    });
+
+    // todo: clean up
+    const editText: ObsidianContext["editText"] = ({
+      initialText,
+      getDescriptionText,
+    }) =>
+      getTextFromUser({
+        app: this.app,
+        initialText,
+        getDescriptionText,
+      });
+
     const defaultObsidianContext: ObsidianContext = {
       periodicNotes: this.periodicNotes,
       taskEntryEditor: this.taskEntryEditor,
+      editText,
+      editLine,
       workspaceFacade: this.workspaceFacade,
       initWeeklyView: this.initWeeklyLeaf,
       renderMarkdown: createRenderMarkdown(this.app),

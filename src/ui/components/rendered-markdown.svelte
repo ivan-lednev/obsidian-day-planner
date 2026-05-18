@@ -113,6 +113,13 @@
     color: var(--text-muted);
   }
 
+  :global(.is-mobile) .rendered-markdown {
+    --checkbox-size: var(
+      --planner-time-block-font-size,
+      var(--font-ui-smaller)
+    );
+  }
+
   .rendered-markdown :global(p),
   .rendered-markdown :global(ul) {
     margin-block: 0;

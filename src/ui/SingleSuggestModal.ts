@@ -9,6 +9,7 @@ export class SingleSuggestModal extends SuggestModal<Suggestion> {
       getDescriptionText: (input: string) => string;
       onChooseSuggestion: (suggestion: Suggestion) => void;
       onClose: () => void;
+      initialValue?: string;
     },
   ) {
     super(props.app);
@@ -17,6 +18,17 @@ export class SingleSuggestModal extends SuggestModal<Suggestion> {
       { command: "esc", purpose: "to dismiss" },
       { command: "↵", purpose: "to confirm" },
     ]);
+  }
+
+  onOpen() {
+    super.onOpen();
+
+    if (this.props.initialValue !== undefined) {
+      this.inputEl.value = this.props.initialValue;
+      // todo: this is doubtful
+      this.inputEl.dispatchEvent(new Event("input"));
+      this.inputEl.select();
+    }
   }
 
   getSuggestions(query: string) {
