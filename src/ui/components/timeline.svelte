@@ -134,7 +134,7 @@
 {#if $settings.timelineColumns.timeTracker}
   <Column visibleHours={getVisibleHours($settings)}>
     {#if $isToday(day)}
-      <Needle autoScrollBlocked={isUnderCursor} showBall={false} />
+      <Needle autoScrollBlocked={isUnderCursor} />
     {/if}
 
     <div class="tasks absolute-stretch-x">
