@@ -5,7 +5,7 @@
   import ActiveClocks from "./active-clocks.svelte";
   import ErrorBoundary from "./error-boundary.svelte";
   import Tree from "./obsidian/tree.svelte";
-  import RecentClocks from "./RecentClocks.svelte";
+  import RecentClocks from "./recent-clocks.svelte";
 
   const { useSelector } = getObsidianContext();
 

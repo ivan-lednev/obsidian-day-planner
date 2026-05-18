@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { File } from "lucide-svelte";
+  import { File, Play } from "lucide-svelte";
   import { isNotVoid } from "typed-assert";
 
   import { getObsidianContext } from "../../context/obsidian-context";
@@ -7,10 +7,11 @@
   import type { LocalTask } from "../../task-types";
   import { createRecentClockMenu } from "../recent-clock-menu";
 
+  import { runWithNoticeOnError } from "./../../service/list-item-entry-editor";
   import BlockList from "./block-list.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Pill from "./pill.svelte";
-  import Properties from "./Properties.svelte";
+  import Properties from "./properties.svelte";
   import Selectable from "./selectable.svelte";
 
   const { workspaceFacade, useSelector, taskEntryEditor } =
@@ -55,6 +56,17 @@
                   value={task.location.path.replace(/\.md$/, "")}
                 />
               {/if}
+              <Pill
+                key={Play}
+                onpointerup={async () => {
+                  isNotVoid(task.location);
+
+                  await runWithNoticeOnError(
+                    taskEntryEditor.clockInAtLocation(task.location),
+                  );
+                }}
+                value="Start"
+              />
             </Properties>
           {/snippet}
         </LocalTimeBlock>

@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { Play, Hourglass, File } from "lucide-svelte";
+  import { Play, Trash, Hourglass, File, Square } from "lucide-svelte";
   import { isNotVoid } from "typed-assert";
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { currentTimeSignal } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
   import { selectActiveLogEntries } from "../../redux/index/index-slice";
+  import { runWithNoticeOnError } from "../../service/list-item-entry-editor";
   import type { LocalTask } from "../../task-types";
   import * as m from "../../util/moment";
   import { getDiffInMinutes } from "../../util/moment";
@@ -14,7 +15,7 @@
   import BlockList from "./block-list.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Pill from "./pill.svelte";
-  import Properties from "./Properties.svelte";
+  import Properties from "./properties.svelte";
   import Selectable from "./selectable.svelte";
 
   const { workspaceFacade, taskEntryEditor, useSelector } =
@@ -76,6 +77,30 @@
                 value={m
                   .fromDiff(task.startTime, currentTimeSignal.current)
                   .format($settings.timestampFormat)}
+              />
+
+              <Pill
+                key={Square}
+                onpointerup={async () => {
+                  isNotVoid(task.location);
+
+                  await runWithNoticeOnError(
+                    taskEntryEditor.clockOutAtLocation(task.location),
+                  );
+                }}
+                value="Stop"
+              />
+
+              <Pill
+                key={Trash}
+                onpointerup={async () => {
+                  isNotVoid(task.location);
+
+                  await runWithNoticeOnError(
+                    taskEntryEditor.cancelClockAtLocation(task.location),
+                  );
+                }}
+                value="Cancel"
               />
             </Properties>
           {/snippet}

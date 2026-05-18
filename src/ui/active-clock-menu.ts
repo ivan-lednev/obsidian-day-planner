@@ -7,7 +7,6 @@ import {
 } from "../service/list-item-entry-editor";
 import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { LocalTask } from "../task-types";
-import { cancelOpenClock, clockOut } from "../util/props";
 
 export function createActiveClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;
@@ -35,15 +34,7 @@ export function createActiveClockMenu(props: {
       .setIcon("square")
       .onClick(async () => {
         await runWithNoticeOnError(
-          taskEntryEditor.editProps({
-            path,
-            line,
-            editFn: (listPropsForLine) => {
-              isNotVoid(listPropsForLine, `No list props at ${path}:${line}`);
-
-              return clockOut(listPropsForLine);
-            },
-          }),
+          taskEntryEditor.clockOutAtLocation(location),
         );
       });
   });
@@ -54,15 +45,7 @@ export function createActiveClockMenu(props: {
       .setIcon("trash-2")
       .onClick(async () => {
         await runWithNoticeOnError(
-          taskEntryEditor.editProps({
-            path,
-            line,
-            editFn: (listPropsForLine) => {
-              isNotVoid(listPropsForLine, `No list props at ${path}:${line}`);
-
-              return cancelOpenClock(listPropsForLine);
-            },
-          }),
+          taskEntryEditor.cancelClockAtLocation(location),
         );
       });
   });

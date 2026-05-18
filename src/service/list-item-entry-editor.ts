@@ -2,7 +2,9 @@
 
 import { Effect, Either, pipe } from "effect";
 import { Notice } from "obsidian";
+import { isNotVoid } from "typed-assert";
 
+import type { TaskLocation } from "../task-types";
 import { locToEditorPosition } from "../util/editor";
 import { getErrorMessage } from "../util/error";
 import {
@@ -112,6 +114,37 @@ export class ListItemEntryEditor {
           cause: error,
         }),
     });
+
+  editPropsAtLocation = (
+    location: TaskLocation,
+    editFn: (props: Props) => Props,
+  ) => {
+    const {
+      path,
+      position: {
+        start: { line },
+      },
+    } = location;
+
+    return this.editProps({
+      path,
+      line,
+      editFn: (props) => {
+        isNotVoid(props, `No list props at ${path}:${line}`);
+
+        return editFn(props);
+      },
+    });
+  };
+
+  clockInAtLocation = (location: TaskLocation) =>
+    this.editPropsAtLocation(location, addOpenClock);
+
+  clockOutAtLocation = (location: TaskLocation) =>
+    this.editPropsAtLocation(location, clockOut);
+
+  cancelClockAtLocation = (location: TaskLocation) =>
+    this.editPropsAtLocation(location, cancelOpenClock);
 
   clockInUnderCursor = () =>
     this.updateListPropsUnderCursor((props) =>
