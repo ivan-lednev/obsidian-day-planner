@@ -13,11 +13,12 @@ This document describes how to make a code contribution to the repo.
 
 ## Before development
 
-1. When contributing, please first describe the change via an [issue](https://github.com/ivan-lednev/obsidian-day-planner/issues).
-  2. Describe what your use case is.
-  3. Describe a proposed solution.
-  4. **IF YOU SUBMIT A PR WIHOUT DISCUSSING YOUR IMPLEMENTATION PLAN WITH THE MAINTAINER, YOUR PR MIGHT BE CLOSED!**
-5. Read through the [development guidelines](#development-guidelines) to make sure your code matches the style of the repo.
+**IF YOU SUBMIT A PR WIHOUT DISCUSSING YOUR IMPLEMENTATION PLAN WITH THE MAINTAINER, YOUR PR MIGHT BE CLOSED!**
+
+1. First describe the change via an [issue](https://github.com/ivan-lednev/obsidian-day-planner/issues).
+   1. Describe a problem you're trying to solve.
+   1. Describe a proposed solution.
+1. Read through the [development guidelines](#development-guidelines) to make sure your code matches the style of the repo.
 
 ## How to set up a development environment
 
