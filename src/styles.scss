@@ -116,7 +116,7 @@
 [data-type="planner-time-tracker"] .view-content,
 [data-type="planner-weekly"] .view-content {
   --scrollbar-width: 12px;
-  --timeline-flex-basis: 240px;
+  --timeline-flex-basis: 180px;
 
   --border-base: 1px solid var(--background-modifier-border);
 
@@ -132,6 +132,10 @@
   display: flex;
   flex-direction: column;
   padding: 0;
+
+  .is-mobile & {
+    --timeline-flex-basis: 120px;
+  }
 }
 
 :root {

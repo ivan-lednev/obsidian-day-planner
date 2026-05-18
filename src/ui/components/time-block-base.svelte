@@ -76,6 +76,10 @@
     box-shadow: var(--time-block-box-shadow);
   }
 
+  :global(.is-mobile) .content {
+    font-size: var(--planner-time-block-font-size, var(--font-ui-smaller));
+  }
+
   .truncated-left {
     border-left-style: dashed;
     border-left-width: 2px;

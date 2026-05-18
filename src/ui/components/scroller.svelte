@@ -73,6 +73,6 @@
 <style>
   .scroller {
     display: flex;
-    background-color: var(--background-secondary);
+    background-color: var(--background-primary);
   }
 </style>
