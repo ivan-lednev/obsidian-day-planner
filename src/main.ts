@@ -204,6 +204,13 @@ export default class DayPlanner extends Plugin {
     });
   };
 
+  initTimelineTab = async () => {
+    await this.app.workspace.getLeaf("tab").setViewState({
+      type: viewTypeTimeline,
+      active: true,
+    });
+  };
+
   initLeafSilently = async (viewType: string) => {
     const [firstExisting] = this.app.workspace.getLeavesOfType(viewType);
     if (firstExisting) {
@@ -260,6 +267,12 @@ export default class DayPlanner extends Plugin {
       id: "show-day-planner-timeline",
       name: "Show timeline",
       callback: async () => await this.initTimelineLeaf(),
+    });
+
+    this.addCommand({
+      id: "show-timeline-tab",
+      name: "Show timeline in regular tab",
+      callback: this.initTimelineTab,
     });
 
     this.addCommand({
