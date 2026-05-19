@@ -32,7 +32,6 @@ import {
   getFirstLineAsMarkdown,
   getIndentationForListParagraph,
   indentLines,
-  removeListTokens,
 } from "./markdown";
 import * as m from "./moment";
 import {

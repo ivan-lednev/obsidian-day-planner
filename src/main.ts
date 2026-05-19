@@ -535,6 +535,8 @@ export default class DayPlanner extends Plugin {
         const firstTaskWithActiveClockProp =
           currentTasksWithActiveClockProps[0];
 
+        isNotVoid(firstTaskWithActiveClockProp);
+
         const { location } = firstTaskWithActiveClockProp;
 
         isNotVoid(location);

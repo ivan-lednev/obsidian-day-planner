@@ -15,9 +15,9 @@ import type { DayPlannerSettings, IcalConfig } from "./settings";
 import type { LocalTask } from "./task-types";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
+import type { createRenderMarkdown } from "./util/create-render-markdown";
 import { type ShowPreview } from "./util/create-show-preview";
 import type { Scheduler } from "./util/scheduler";
-import type { createRenderMarkdown } from "./util/create-render-markdown";
 
 export type OnUpdateFn = (
   base: Array<LocalTask>,
@@ -37,7 +37,7 @@ export interface Overlap {
 }
 
 export type CleanUp = () => void;
-export type RenderMarkdown = ReturnType<typeof createRenderMarkdown>
+export type RenderMarkdown = ReturnType<typeof createRenderMarkdown>;
 
 export type PointerDateTime = {
   dateTime: Moment;
