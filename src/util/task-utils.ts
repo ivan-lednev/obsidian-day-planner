@@ -257,11 +257,7 @@ export function getOneLineSummary(task: Task) {
     return task.summary;
   }
 
-  return flow(
-    getFirstLine,
-    removeListTokens,
-    removeTimestampFromStart,
-  )(task.text);
+  return removeTimestampFromStart(task.text);
 }
 
 export function truncateToRange(task: WithTime<Task>, range: m.Range) {

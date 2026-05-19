@@ -1,7 +1,7 @@
 const ulToken = `[-*+]`;
 const olToken = `\\d+[.)]`;
 const listToken = `(${ulToken}|${olToken})`;
-const listTokenWithSpaces = `\\s*${listToken}\\s+`;
+const listTokenWithSpaces = `^\\s*${listToken}\\s+`;
 
 const checkbox = `\\s*\\[(?<completion>[^\\]])]\\s+`;
 
