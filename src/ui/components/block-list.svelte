@@ -4,18 +4,41 @@
 
   import { createSlide } from "./defaults";
 
-  // eslint doesn't know about Svelte generics
-  // eslint-disable-next-line no-undef
-  const { list, match }: { match: Snippet<[T]>; list: Array<T> } = $props();
+  const {
+    list,
+    match,
+    titleMatch,
+  }: {
+    // eslint-disable-next-line no-undef
+    match: Snippet<[T]>;
+    titleMatch?: Snippet<[string]>;
+    // eslint-disable-next-line no-undef
+    list: Array<T> | Record<string, Array<T>>;
+  } = $props();
 </script>
 
-{#if list.length > 0}
+<!-- eslint-disable-next-line no-undef -->
+{#snippet renderList(list: Array<T>)}
+  {#each list as foundTimeBlock, index (foundTimeBlock.id || index)}
+    {@render match(foundTimeBlock)}
+  {/each}
+{/snippet}
+
+{#if Array.isArray(list) && list.length > 0}
   <div
     class="search-results-scroller"
     transition:slide={createSlide({ axis: "y" })}
   >
-    {#each list as foundTimeBlock, index (foundTimeBlock.id || index)}
-      {@render match(foundTimeBlock)}
+    {@render renderList(list)}
+  </div>
+{:else if Object.keys(list).length > 0}
+  <div
+    class="search-results-scroller"
+    transition:slide={createSlide({ axis: "y" })}
+  >
+    {#each Object.entries(list) as [sectionTitle, foundTimeBlocks], index (sectionTitle || index)}
+      {@render titleMatch?.(sectionTitle)}
+      {@render renderList(foundTimeBlocks)}
     {/each}
   </div>
 {/if}

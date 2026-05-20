@@ -1,3 +1,4 @@
+import { groupBy } from "lodash/fp";
 import type { Moment } from "moment";
 import { isNotVoid } from "typed-assert";
 
@@ -94,13 +95,17 @@ export const selectRecentLogEntries = createAppSelector(
         return result.set(logEntry.parent, logEntry);
       }, new Map());
 
-    return [...taskEntryIdToLatestLogRecord].map(([taskEntryId, logEntry]) => {
-      const taskEntry = taskEntriesById[taskEntryId];
+    const localTasks = [...taskEntryIdToLatestLogRecord].map(
+      ([taskEntryId, logEntry]) => {
+        const taskEntry = taskEntriesById[taskEntryId];
 
-      isNotVoid(taskEntry, "Inconsistent store state");
+        isNotVoid(taskEntry, "Inconsistent store state");
 
-      return planEntryToLocalTask(logEntry, taskEntry);
-    });
+        return planEntryToLocalTask(logEntry, taskEntry);
+      },
+    );
+
+    return groupBy((task) => getDayKey(task.startTime), localTasks);
   },
 );
 

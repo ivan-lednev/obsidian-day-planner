@@ -14,7 +14,7 @@
   import Properties from "./properties.svelte";
   import Selectable from "./selectable.svelte";
 
-  const { workspaceFacade, useSelector, taskEntryEditor } =
+  const { workspaceFacade, useSelector, taskEntryEditor, settingsSignal } =
     getObsidianContext();
 
   const recentLogRecords = useSelector((state) =>
@@ -23,6 +23,11 @@
 </script>
 
 <BlockList list={recentLogRecords.current}>
+  {#snippet titleMatch(title: string)}
+    <div class="section-title">
+      {window.moment(title).format(settingsSignal.current.timelineDateFormat)}
+    </div>
+  {/snippet}
   {#snippet match(task: LocalTask)}
     <Selectable
       onSecondarySelect={(event) =>
@@ -74,3 +79,16 @@
     </Selectable>
   {/snippet}
 </BlockList>
+
+<style>
+  .section-title {
+    margin-bottom: var(--size-4-2);
+    font-size: var(--font-ui-small);
+    font-weight: var(--font-medium);
+    color: var(--text-muted);
+  }
+
+  .section-title:not(:first-child) {
+    margin-top: var(--size-4-2);
+  }
+</style>
