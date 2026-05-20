@@ -5,22 +5,29 @@ const listTokenWithSpaces = `^\\s*${listToken}\\s+`;
 
 const checkbox = `\\s*\\[(?<completion>[^\\]])]\\s+`;
 
-const durationSeparator = `\\s?-{1,2}\\s?`;
+const hours12h = "[0-1]?\\d";
+const hours24h = "[0-2]?\\d";
+const minutes = "[0-5]\\d";
+const hourMinuteSeparator = "[:.]";
+const ampm = "\\s?[apAP][mM](?!\\w)";
 
-const hours = `\\d{1,2}`;
-const minutes = `\\d{2}`;
-const hourMinuteSeparator = `[:.]`;
-const strictHourMinuteSeparator = ":";
-const amPm = "\\s?[apAP][mM](?!\\w)";
+const time12h = `(${hours12h})(?:${hourMinuteSeparator}?(${minutes}))(${ampm})`;
+const time24h = `(${hours24h})(?:${hourMinuteSeparator}(${minutes}))`;
+const time = `(?:${time12h}|${time24h})`;
+
+const timeRangeSeparator = `\\s?-\\s?`;
+const timeRange = `(?<start>${time})(?:${timeRangeSeparator}(?<end>${time}))?`;
+
+export const timeRegExp = new RegExp(time);
+
+export const timeRangeRegExp = new RegExp(timeRange, "im");
+export const timeRangeAtStartOfLineRegExp = new RegExp(`^${timeRange}`, "im");
 
 const datePattern = "\\d{4}-\\d{2}-\\d{2}";
 
-const time = `(${hours})(?:${hourMinuteSeparator}?(${minutes}))(${amPm})?`;
-const strictTime = `${hours}${strictHourMinuteSeparator}${minutes}(${amPm})?`;
-
 export const listTokenWithSpacesRegExp = new RegExp(listTokenWithSpaces);
 export const checkboxRegExp = new RegExp(checkbox);
-export const timeRegExp = new RegExp(time);
+
 export const headingRegExp = /^(#+)\s/;
 export const obsidianBlockIdRegExp = /\s\^[a-z1-9-]+$/i;
 export const listItemRegExp = new RegExp(
@@ -28,17 +35,8 @@ export const listItemRegExp = new RegExp(
   "mu",
 );
 
-export const looseTimestampAtStartOfLineRegExp = new RegExp(
-  `^(?<start>${time})(?:${durationSeparator}(?<end>${time}))?`,
-  "im",
-);
-export const strictTimestampAnywhereInLineRegExp = new RegExp(
-  `(?<start>${strictTime})(?:${durationSeparator}(?<end>${strictTime}))?`,
-  "im",
-);
-
 export const scheduledPropRegExp = new RegExp(
-  `(\\[scheduled\\s*::\\s*)(?<date>${datePattern})(\\])`,
+  `(\\[scheduled\\s*::\\s*)(?<date>${datePattern})(])`,
 );
 
 export const keylessScheduledPropRegExp = new RegExp(
@@ -57,7 +55,7 @@ export const scheduledPropRegExps = [
   shortScheduledPropRegExp,
 ];
 
-export const propRegexp = /\[([^\]]+)::([^\]]+)\]/g;
+export const propRegexp = /\[([^\]]+)::([^\]]+)]/g;
 
 export const dashOrNumberWithMultipleSpaces = /(-|\d+[.)])\s+/g;
 export const escapedSquareBracket = /\\\[/g;

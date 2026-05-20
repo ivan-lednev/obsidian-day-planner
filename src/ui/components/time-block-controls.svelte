@@ -3,7 +3,7 @@
   import { isNotVoid } from "typed-assert";
 
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { looseTimestampAtStartOfLineRegExp } from "../../regexp";
+  import { timeRangeAtStartOfLineRegExp } from "../../regexp";
   import { type LocalTask } from "../../task-types";
   import { createMarkdownListTokens, getFirstLine } from "../../util/markdown";
   import type { HTMLActionArray } from "../actions/use-actions";
@@ -41,7 +41,7 @@
 
     // todo: replace with getOnelineSummary()
     const firstLine = getFirstLine(task.text);
-    const timestampMatch = looseTimestampAtStartOfLineRegExp.exec(firstLine);
+    const timestampMatch = firstLine.match(timeRangeAtStartOfLineRegExp);
     const timestampEnd = timestampMatch ? timestampMatch[0].length : 0;
     const afterTimestamp = firstLine.slice(timestampEnd);
     const leadingSpace = afterTimestamp.match(/^\s*/)?.[0] ?? "";

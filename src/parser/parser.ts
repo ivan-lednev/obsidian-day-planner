@@ -1,47 +1,21 @@
 import type { Moment } from "moment";
 import { isNotVoid } from "typed-assert";
 
-import {
-  strictTimestampAnywhereInLineRegExp,
-  looseTimestampAtStartOfLineRegExp,
-} from "../regexp";
+import { timeRangeRegExp } from "../regexp";
 import { getDiffInMinutes } from "../util/moment";
 
-import { parseTimestamp } from "./timestamp";
+import { parseTime } from "./time";
 
-function execTimestampPatterns(line: string) {
-  const trimmed = line.trim();
-
-  return (
-    // todo: never use exec
-    looseTimestampAtStartOfLineRegExp.exec(trimmed) ||
-    strictTimestampAnywhereInLineRegExp.exec(trimmed)
-  );
-}
-
-export function testTimestampPatterns(line: string) {
-  const trimmed = line.trim();
-
-  return (
-    looseTimestampAtStartOfLineRegExp.test(trimmed) ||
-    strictTimestampAnywhereInLineRegExp.test(trimmed)
-  );
-}
-
-export function replaceOrPrependTimestamp(line: string, timestamp: string) {
-  if (looseTimestampAtStartOfLineRegExp.test(line)) {
-    return line.replace(looseTimestampAtStartOfLineRegExp, timestamp);
+export function replaceOrPrependTimeRange(line: string, timeRange: string) {
+  if (timeRangeRegExp.test(line)) {
+    return line.replace(timeRangeRegExp, timeRange);
   }
 
-  if (strictTimestampAnywhereInLineRegExp.test(line)) {
-    return line.replace(strictTimestampAnywhereInLineRegExp, timestamp);
-  }
-
-  return `${timestamp} ${line}`;
+  return `${timeRange} ${line}`;
 }
 
 export function getTimeFromLine({ line, day }: { line: string; day: Moment }) {
-  const match = execTimestampPatterns(line);
+  const match = line.match(timeRangeRegExp);
 
   if (!match?.groups) {
     return null;
@@ -56,12 +30,12 @@ export function getTimeFromLine({ line, day }: { line: string; day: Moment }) {
     "Expected to find 'start' group on a timestamp regexp match",
   );
 
-  const startTime = parseTimestamp(start, day);
+  const startTime = parseTime(start, day);
 
   let durationMinutes: number | undefined;
 
   if (end) {
-    const endTime = parseTimestamp(end, day);
+    const endTime = parseTime(end, day);
 
     // todo: handle edge, use default duration
     if (endTime.isAfter(startTime)) {

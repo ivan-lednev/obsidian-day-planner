@@ -128,8 +128,7 @@ export function applyScopedUpdates(
 }
 
 function findHeadingInLine(line: string) {
-  // todo: remove exec, it's cursed
-  const headingMatch = headingRegExp.exec(line);
+  const headingMatch = line.match(headingRegExp);
 
   if (!headingMatch) {
     return undefined;

@@ -6,12 +6,12 @@ import { isNotVoid } from "typed-assert";
 
 import { bullet, defaultDayFormat, emDash } from "../constants";
 import { settings } from "../global-store/settings";
-import { replaceOrPrependTimestamp } from "../parser/parser";
+import { replaceOrPrependTimeRange } from "../parser/parser";
 import {
-  looseTimestampAtStartOfLineRegExp,
   obsidianBlockIdRegExp,
   scheduledPropRegExps,
-  strictTimestampAnywhereInLineRegExp,
+  timeRangeAtStartOfLineRegExp,
+  timeRangeRegExp,
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
 import {
@@ -173,12 +173,12 @@ export function toString(task: WithTime<LocalTask>) {
   );
   const listTokens = createMarkdownListTokens(task);
 
-  const withUpdatedOrDeletedTimestamp = task.isAllDayEvent
-    ? removeTimestamp(getFirstLine(task.text))
-    : replaceOrPrependTimestamp(getFirstLine(task.text), updatedTimestamp);
+  const withUpdatedOrDeletedTimeRange = task.isAllDayEvent
+    ? removeTimeRange(getFirstLine(task.text))
+    : replaceOrPrependTimeRange(getFirstLine(task.text), updatedTimestamp);
 
   const updatedFirstLineText = updateScheduledPropInText(
-    withUpdatedOrDeletedTimestamp,
+    withUpdatedOrDeletedTimeRange,
     getDayKey(task.startTime),
   );
 
@@ -206,7 +206,7 @@ export function toString(task: WithTime<LocalTask>) {
 }
 
 export function appendText(taskText: string, toAppend: string) {
-  const blockIdMatch = obsidianBlockIdRegExp.exec(taskText);
+  const blockIdMatch = taskText.match(obsidianBlockIdRegExp);
 
   if (blockIdMatch) {
     const blockId = blockIdMatch[0];
@@ -256,7 +256,7 @@ export function getOneLineSummary(task: Task) {
     return task.summary;
   }
 
-  return removeTimestampFromStart(task.text);
+  return removeTimeRangeFromStartOfLine(task.text);
 }
 
 export function truncateToRange(task: WithTime<Task>, range: m.Range) {
@@ -290,18 +290,12 @@ export function truncateToRange(task: WithTime<Task>, range: m.Range) {
   return truncatedBase;
 }
 
-export function removeTimestampFromStart(text: string) {
-  return text.replace(looseTimestampAtStartOfLineRegExp, "");
+export function removeTimeRangeFromStartOfLine(text: string) {
+  return text.replace(timeRangeAtStartOfLineRegExp, "");
 }
 
-export function removeTimestamp(text: string) {
-  const withoutTimestampAtStart = removeTimestampFromStart(text);
-  const withoutTimestampInMiddle = withoutTimestampAtStart.replace(
-    strictTimestampAnywhereInLineRegExp,
-    "",
-  );
-
-  return withoutTimestampInMiddle.trim().replace(/\s+/g, " ");
+export function removeTimeRange(text: string) {
+  return text.replace(timeRangeRegExp, "").trim().replace(/\s+/g, " ");
 }
 
 export function isTimeEqual(a: LocalTask, b: LocalTask) {
@@ -363,7 +357,7 @@ export function toRenderableMarkdown(timeBlock: Node) {
   const formattedFirstLine = flow(
     getFirstLineAsMarkdown,
     deleteProps,
-    removeTimestamp,
+    removeTimeRange,
   )(timeBlock);
 
   const [, ...linesAfterFirst] = timeBlock.text.split("\n");
