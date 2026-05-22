@@ -6,7 +6,6 @@ import {
   findHeadingWithChildren,
   fromMarkdown,
   isList,
-  listIndentationSpacesToTabs,
   sortListsRecursively,
   toMarkdown,
 } from "../src/mdast/mdast";
@@ -15,19 +14,30 @@ test("roundtripping doesn't mess up Obsidian-styled markdown", () => {
   const input = `# [[Heading]]
 
 - [!] This is ![[custom syntax]] all #over the place ^block-id
-    \`\`\`js
-    console.log("this is a code block");
-    \`\`\`
+  \`\`\`js
+  console.log("this is a code block");
+  \`\`\`
+  paragraph text
+    - [ ] Task
 - [x] 1 [key:: value]
     - [ ] 2
 
 | table | blah |
-|-------|------|
+| ----- | ---- |
 | key   | val  |
+
+- [ ] Task
+  \`\`\`yaml
+  planner:
+    log:
+      - start: 2024-01-01
+  \`\`\`
+- [ ] Another task
 `;
+
   const parsed = fromMarkdown(input);
 
-  expect(toMarkdown(parsed)).toEqual(listIndentationSpacesToTabs(input));
+  expect(toMarkdown(parsed)).toEqual(input);
 });
 
 test("Find heading position", () => {
@@ -89,7 +99,7 @@ test("Sort lists recursively", () => {
 
   const actual = toMarkdown(sortListsRecursively(list));
 
-  expect(actual).toBe(listIndentationSpacesToTabs(expected));
+  expect(actual).toBe(expected);
 });
 
 test("Sort lists by time", () => {

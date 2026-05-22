@@ -61,9 +61,3 @@ export const propRegexp = /\[([^\]]+)::([^\]]+)\]/g;
 
 export const dashOrNumberWithMultipleSpaces = /(-|\d+[.)])\s+/g;
 export const escapedSquareBracket = /\\\[/g;
-export const mdastUtilListIndentationSpaces = new RegExp(
-  `^( {4})+(?=${listToken})`,
-  "gm",
-);
-
-export const repeatingNewlinesRegExp = /\n+/g;
