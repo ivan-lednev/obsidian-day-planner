@@ -8,22 +8,57 @@ import type { EditorPosition } from "obsidian";
 import { check, isExactly, isNotVoid } from "typed-assert";
 import type { Point } from "unist";
 
-import { mdastUtilNumberOfSpacesInTab } from "../constants";
 import { compareTimestamps } from "../parser/parser";
 import {
   dashOrNumberWithMultipleSpaces,
   escapedSquareBracket,
-  mdastUtilListIndentationSpaces,
+  listItemRegExp,
 } from "../regexp";
 
 export { fromMarkdown };
 
+function normalizeNestedTextIndentation(listItem: string) {
+  const lines = listItem.split("\n");
+
+  if (lines.length === 1) {
+    return listItem;
+  }
+
+  const linesAfterFirst = lines.slice(1);
+  const updatedLinesBeforeFirstNestedListLine: string[] = [];
+  let isInsideCodeBlock = false;
+
+  for (const line of linesAfterFirst) {
+    if (line.trimStart().startsWith("```")) {
+      isInsideCodeBlock = !isInsideCodeBlock;
+    }
+
+    if (!isInsideCodeBlock && listItemRegExp.test(line)) {
+      break;
+    }
+
+    updatedLinesBeforeFirstNestedListLine.push(line.replace(/^ {4}/, "  "));
+  }
+
+  const updatedLinesAfterFirst = updatedLinesBeforeFirstNestedListLine.concat(
+    linesAfterFirst.slice(updatedLinesBeforeFirstNestedListLine.length),
+  );
+
+  return lines.slice(0, 1).concat(updatedLinesAfterFirst).join("\n");
+}
+
 export function toMarkdown(nodes: Nodes) {
-  return listIndentationSpacesToTabs(
-    mdast
-      .toMarkdown(nodes, { bullet: "-", listItemIndent: "tab" })
-      .replace(dashOrNumberWithMultipleSpaces, "- ")
-      .replace(escapedSquareBracket, "["),
+  return postProcess(
+    mdast.toMarkdown(nodes, {
+      bullet: "-",
+      listItemIndent: "tab",
+      handlers: {
+        listItem: (...args) =>
+          normalizeNestedTextIndentation(
+            mdast.defaultHandlers.listItem(...args),
+          ),
+      },
+    }),
   );
 }
 
@@ -261,13 +296,8 @@ export function toMdastPoint(editorPosition: EditorPosition) {
   };
 }
 
-/**
- * mdast-util uses 4 spaces for a tab, Obsidian uses a tab character. That's why we need this conversion
- */
-export function listIndentationSpacesToTabs(input: string) {
-  return input.replace(mdastUtilListIndentationSpaces, (match) => {
-    const tabCount = match.length / mdastUtilNumberOfSpacesInTab;
-
-    return "\t".repeat(tabCount);
-  });
+function postProcess(input: string) {
+  return input
+    .replace(dashOrNumberWithMultipleSpaces, "$1 ")
+    .replace(escapedSquareBracket, "[");
 }
