@@ -63,27 +63,6 @@ exports[`Editing > Daily notes > Moves a parent task with its nested subtree bet
 }
 `;
 
-exports[`Editing > Daily notes > Sorting by time > Skips sorting if day planner heading is not found 1`] = `
-{
-  "fixtures/fixture-vault/tasks.md": "
-- - [ ] 10:00 - 10:30 Task with time ⏳ 2025-07-19
-+ - [ ] 13:30 - 14:00 Task with time ⏳ 2025-07-19
-",
-}
-`;
-
-exports[`Editing > Daily notes > Sorting by time > Sorts tasks after non-mdast edit 1`] = `
-{
-  "fixtures/fixture-vault/2025-07-28.md": "
-- - [ ] 10:00 - 11:00 Before
-+ - [ ] 08:00 - 09:00 After
-...
-- - [ ] 12:00 - 13:00 After
-+ - [ ] 10:00 - 11:00 Before
-",
-}
-`;
-
 exports[`Editing > Daily notes > Un-schedules tasks 1`] = `
 {
   "fixtures/fixture-vault/2025-07-19.md": "
