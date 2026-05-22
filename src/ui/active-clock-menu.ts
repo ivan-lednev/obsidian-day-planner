@@ -34,7 +34,7 @@ export function createActiveClockMenu(props: {
       .setIcon("square")
       .onClick(async () => {
         await runWithNoticeOnError(
-          taskEntryEditor.clockOutAtLocation(location),
+          taskEntryEditor.clockOutAtLocation({ path, line }),
         );
       });
   });
@@ -45,7 +45,7 @@ export function createActiveClockMenu(props: {
       .setIcon("trash-2")
       .onClick(async () => {
         await runWithNoticeOnError(
-          taskEntryEditor.cancelClockAtLocation(location),
+          taskEntryEditor.cancelClockAtLocation({ path, line }),
         );
       });
   });

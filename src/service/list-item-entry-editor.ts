@@ -4,7 +4,6 @@ import { Effect, Either, pipe } from "effect";
 import { Notice } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
-import type { TaskLocation } from "../task-types";
 import { locToEditorPosition } from "../util/editor";
 import { getErrorMessage } from "../util/error";
 import {
@@ -21,6 +20,11 @@ import type { ListPropsParser } from "./list-props-parser";
 import { MetadataCacheFacade } from "./metadata-cache-facade";
 import type { VaultFacade } from "./vault-facade";
 import { WorkspaceFacade } from "./workspace-facade";
+
+export interface ListItemLocation {
+  path: string;
+  line: number;
+}
 
 export const runWithNoticeOnError = <A, E>(
   program: Effect.Effect<A, E>,
@@ -130,17 +134,11 @@ export class ListItemEntryEditor {
         }),
     });
 
-  editPropsAtLocation = (
-    location: TaskLocation,
-    editFn: (props: Props) => Props,
-  ) => {
-    const {
-      path,
-      position: {
-        start: { line },
-      },
-    } = location;
-
+  editPropsAtLocation = ({
+    path,
+    line,
+    editFn,
+  }: ListItemLocation & { editFn: (props: Props) => Props }) => {
     return this.editProps({
       path,
       line,
@@ -152,14 +150,14 @@ export class ListItemEntryEditor {
     });
   };
 
-  clockInAtLocation = (location: TaskLocation) =>
-    this.editPropsAtLocation(location, addOpenClock);
+  clockInAtLocation = (location: ListItemLocation) =>
+    this.editPropsAtLocation({ ...location, editFn: addOpenClock });
 
-  clockOutAtLocation = (location: TaskLocation) =>
-    this.editPropsAtLocation(location, clockOut);
+  clockOutAtLocation = (location: ListItemLocation) =>
+    this.editPropsAtLocation({ ...location, editFn: clockOut });
 
-  cancelClockAtLocation = (location: TaskLocation) =>
-    this.editPropsAtLocation(location, cancelOpenClock);
+  cancelClockAtLocation = (location: ListItemLocation) =>
+    this.editPropsAtLocation({ ...location, editFn: cancelOpenClock });
 
   clockInUnderCursor = () =>
     this.updateListPropsUnderCursor((props) =>

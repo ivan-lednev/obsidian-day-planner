@@ -36,10 +36,7 @@ describe("Clocking in", () => {
     await Effect.runPromise(
       taskEntryEditor.clockInAtLocation({
         path: "fixtures/fixture-vault/test.md",
-        position: {
-          start: { line: 7, col: 2, offset: 0 },
-          end: { line: 7, col: 2, offset: 0 },
-        },
+        line: 7,
       }),
     );
 
@@ -55,10 +52,7 @@ describe("Clocking in", () => {
       Effect.runPromise(
         taskEntryEditor.clockInAtLocation({
           path: "fixtures/fixture-vault/2025-07-19.md",
-          position: {
-            start: { line: 0, col: 0, offset: 0 },
-            end: { line: 0, col: 0, offset: 0 },
-          },
+          line: 0,
         }),
       ),
     ).rejects.toThrow("Cannot add props to an item that's not a task");
@@ -73,10 +67,7 @@ describe("Clocking in", () => {
       Effect.runPromise(
         taskEntryEditor.clockInAtLocation({
           path: "fixtures/fixture-vault/one-task-two-log-records.md",
-          position: {
-            start: { line: 0, col: 0, offset: 0 },
-            end: { line: 0, col: 0, offset: 0 },
-          },
+          line: 0,
         }),
       ),
     ).rejects.toThrow("There is already an open clock");
@@ -106,10 +97,7 @@ describe("Clocking out", () => {
     await Effect.runPromise(
       taskEntryEditor.clockOutAtLocation({
         path: "fixtures/fixture-vault/one-task-two-log-records.md",
-        position: {
-          start: { line: 0, col: 0, offset: 0 },
-          end: { line: 0, col: 0, offset: 0 },
-        },
+        line: 0,
       }),
     );
 
@@ -125,10 +113,7 @@ describe("Clocking out", () => {
       Effect.runPromise(
         taskEntryEditor.clockOutAtLocation({
           path: "fixtures/fixture-vault/test.md",
-          position: {
-            start: { line: 7, col: 2, offset: 0 },
-            end: { line: 7, col: 2, offset: 0 },
-          },
+          line: 7,
         }),
       ),
     ).rejects.toThrow("There is no open clock");
@@ -144,10 +129,7 @@ describe("Canceling clocks", () => {
     await Effect.runPromise(
       taskEntryEditor.cancelClockAtLocation({
         path: "fixtures/fixture-vault/one-task-two-log-records.md",
-        position: {
-          start: { line: 0, col: 0, offset: 0 },
-          end: { line: 0, col: 0, offset: 0 },
-        },
+        line: 0,
       }),
     );
 
@@ -163,10 +145,7 @@ describe("Canceling clocks", () => {
       Effect.runPromise(
         taskEntryEditor.cancelClockAtLocation({
           path: "fixtures/fixture-vault/test.md",
-          position: {
-            start: { line: 7, col: 2, offset: 0 },
-            end: { line: 7, col: 2, offset: 0 },
-          },
+          line: 7,
         }),
       ),
     ).rejects.toThrow("There is no open clock");

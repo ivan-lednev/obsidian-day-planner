@@ -33,7 +33,9 @@ export function createRecentClockMenu(props: {
       .setTitle("Clock in")
       .setIcon("play")
       .onClick(async () => {
-        await runWithNoticeOnError(taskEntryEditor.clockInAtLocation(location));
+        await runWithNoticeOnError(
+          taskEntryEditor.clockInAtLocation({ path, line }),
+        );
       });
   });
 

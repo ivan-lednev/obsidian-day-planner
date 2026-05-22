@@ -85,7 +85,10 @@
                   isNotVoid(task.location);
 
                   await runWithNoticeOnError(
-                    taskEntryEditor.clockOutAtLocation(task.location),
+                    taskEntryEditor.clockOutAtLocation({
+                      path: task.location.path,
+                      line: task.location.position.start.line,
+                    }),
                   );
                 }}
                 value="Stop"
@@ -97,7 +100,10 @@
                   isNotVoid(task.location);
 
                   await runWithNoticeOnError(
-                    taskEntryEditor.cancelClockAtLocation(task.location),
+                    taskEntryEditor.cancelClockAtLocation({
+                      path: task.location.path,
+                      line: task.location.position.start.line,
+                    }),
                   );
                 }}
                 value="Cancel"

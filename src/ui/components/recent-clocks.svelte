@@ -67,7 +67,10 @@
                   isNotVoid(task.location);
 
                   await runWithNoticeOnError(
-                    taskEntryEditor.clockInAtLocation(task.location),
+                    taskEntryEditor.clockInAtLocation({
+                      path: task.location.path,
+                      line: task.location.position.start.line,
+                    }),
                   );
                 }}
                 value="Start"
