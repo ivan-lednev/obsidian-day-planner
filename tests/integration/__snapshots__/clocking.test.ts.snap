@@ -1,5 +1,13 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Canceling clocks > Cancels clocks 1`] = `
+{
+  "fixtures/fixture-vault/one-task-two-log-records.md": "
+-       - start: 2025-01-01 17:00
+",
+}
+`;
+
 exports[`Clocking in > Clocks in on tasks with existing clocks 1`] = `
 {
   "fixtures/fixture-vault/test.md": "
@@ -28,6 +36,14 @@ exports[`Clocking in > Clocks in on tasks without clocks 1`] = `
 +     log:
 +       - start: '2026-01-01 17:00:00'
 +   \`\`\`
+",
+}
+`;
+
+exports[`Clocking out > Clocks out on tasks 1`] = `
+{
+  "fixtures/fixture-vault/one-task-two-log-records.md": "
++         end: '2026-01-01 17:00:00'
 ",
 }
 `;

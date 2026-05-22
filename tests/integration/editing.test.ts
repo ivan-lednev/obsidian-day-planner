@@ -56,6 +56,28 @@ describe("Editing", () => {
       expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
     });
 
+    test("Moves a parent task with its nested subtree between notes", async () => {
+      const { editContext, moveCursorTo, vault, findByText } = await setUp({
+        visibleDays: ["2025-07-28"],
+        loadedFixtures: ["2025-07-28.md", "2025-07-19.md"],
+        settings: {
+          ...defaultSettingsForTests,
+          sortTasksInPlanAfterEdit: true,
+        },
+      });
+
+      editContext.handlers.handleGripMouseDown(
+        findByText("Parent"),
+        EditMode.DRAG,
+      );
+
+      moveCursorTo(window.moment("2025-07-19 10:00"));
+
+      await editContext.confirmEdit();
+
+      expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
+    });
+
     test(`* Moves a nested task with text between notes
 * Does not touch invalid markdown
 * Undoes the move`, async () => {
@@ -89,12 +111,6 @@ describe("Editing", () => {
       expect(
         Object.keys(getPathToDiff(vault.initialState, vault.state)).length,
       ).toBe(0);
-    });
-
-    describe("Sorting by time", () => {
-      test.todo("Sorts tasks after non-mdast edit");
-
-      test.todo("Skips sorting if day planner heading is not found");
     });
   });
 
@@ -133,9 +149,23 @@ describe("Editing", () => {
       expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
     });
 
-    test.todo(
-      "Updates tasks plugin props without duplicating timestamps if moved to same time on another day",
-    );
+    test("Updates tasks plugin props without duplicating timestamps if moved to same time on another day", async () => {
+      const { editContext, moveCursorTo, vault, findByText } = await setUp({
+        visibleDays: ["2025-07-19"],
+        loadedFixtures: ["tasks.md"],
+      });
+
+      editContext.handlers.handleGripMouseDown(
+        findByText("Task with time"),
+        EditMode.DRAG,
+      );
+
+      moveCursorTo(window.moment("2025-07-28 10:00"));
+
+      await editContext.confirmEdit();
+
+      expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
+    });
   });
 
   describe("Dataview", () => {
