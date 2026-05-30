@@ -53,6 +53,7 @@
 
       const offPointerUp = on(el, "pointerup", handlePointerUp);
       const offMouseUp = on(el, "mouseup", stopPropagationForElWithLineData);
+      // todo: fix checkboxes
       const offTouchEnd = on(el, "touchend", stopPropagationForElWithLineData);
 
       return () => {

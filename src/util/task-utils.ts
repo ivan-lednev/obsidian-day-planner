@@ -32,6 +32,7 @@ import {
   getFirstLineAsMarkdown,
   getIndentationForListParagraph,
   indentLines,
+  removeListTokens,
 } from "./markdown";
 import * as m from "./moment";
 import {
@@ -71,6 +72,7 @@ function getRemoteTaskIdentity(task: RemoteTask) {
   return key.join(keySeparator);
 }
 
+// todo: should remove?
 export function getRenderKey(task: WithTime<Task> | Task) {
   if (isRemote(task)) {
     return getRemoteTaskIdentity(task);
@@ -356,6 +358,7 @@ export function getBlockProps(task: Task, settings: DayPlannerSettings) {
 export function toRenderableMarkdown(timeBlock: Node) {
   const formattedFirstLine = flow(
     getFirstLineAsMarkdown,
+    removeListTokens,
     deleteProps,
     removeTimeRange,
   )(timeBlock);

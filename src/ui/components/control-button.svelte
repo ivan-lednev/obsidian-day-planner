@@ -20,6 +20,7 @@
   } = $props();
 </script>
 
+<!-- TODO: should be <button>? -->
 <div
   class={["clickable-icon", classes, rest.class, { "is-active": isActive }]}
   aria-disabled={disabled}

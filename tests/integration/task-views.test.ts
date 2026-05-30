@@ -29,6 +29,23 @@ describe("Task views", () => {
 `);
   });
 
+  test("Removes list tokens for plain list items", async () => {
+    const { getState } = await setUp({
+      loadedFixtures: ["2025-07-19.md"],
+    });
+
+    const planEntries = selectPlanEntriesForDays(getState(), ["2025-07-19"]);
+    const taskWithNestedListItems = planEntries.find((entry) =>
+      entry.text.includes("List item under planner heading"),
+    );
+
+    isNotVoid(taskWithNestedListItems);
+
+    const { listItem } = toRenderableMarkdown(taskWithNestedListItems);
+
+    expect(listItem).toBe("List item under planner heading");
+  });
+
   test.todo("Does not show code blocks in rendered markdown");
 
   test("With empty plannerHeading, indexes tasks outside the planner section", async () => {
