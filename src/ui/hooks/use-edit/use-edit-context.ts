@@ -88,8 +88,16 @@ export function useEditContext(props: {
   );
   const cursor = useCursor(editOperation);
 
+  const localFilteredTasks = derived(
+    [localTasks, settings],
+    ([$localTasks, $settings]) =>
+      $settings.showCompletedTasks
+        ? $localTasks
+        : $localTasks.filter((it) => it.task !== undefined),
+  );
+
   const baselineTasks = writable<LocalTask[]>([], (set) => {
-    return localTasks.subscribe(set);
+    return localFilteredTasks.subscribe(set);
   });
 
   const tasksWithPendingUpdate = derived(

@@ -4,6 +4,7 @@ import { describe, expect, test } from "vitest";
 
 import { selectPlanEntriesForDays } from "../../src/redux";
 import { defaultSettingsForTests } from "../../src/settings";
+import { isLocal } from "../../src/task-types";
 import { toRenderableMarkdown } from "../../src/util/task-utils";
 
 import { setUp } from "./util/setup";
@@ -21,9 +22,11 @@ describe("Task views", () => {
 
     isNotVoid(taskWithNestedListItems);
 
-    const { listItem, nestedListItems } = toRenderableMarkdown(taskWithNestedListItems);
+    const { listItem, nestedListItems } = toRenderableMarkdown(
+      taskWithNestedListItems,
+    );
 
-    expect(listItem).toBe("- [ ] Parent")
+    expect(listItem).toBe("- [ ] Parent");
     expect(nestedListItems).toBe(`- [ ] Child task
   Child text
 \t- Child list item without time
@@ -108,5 +111,43 @@ describe("Task views", () => {
         text: expect.stringContaining("Task without time"),
       }),
     );
+  });
+
+  test.each([
+    [
+      {
+        description: "Shows completed tasks",
+        showCompletedTasks: true,
+        expectedLength: 1,
+      },
+    ],
+    [
+      {
+        description: "Removes completed tasks",
+        showCompletedTasks: false,
+        expectedLength: 0,
+      },
+    ],
+  ])("$description", async ({ expectedLength, showCompletedTasks }) => {
+    const { editContext } = await setUp({
+      loadedFixtures: ["tasks.md"],
+      visibleDays: ["2025-07-19"],
+      settings: {
+        ...defaultSettingsForTests,
+        showCompletedTasks,
+      },
+    });
+
+    const displayedTasks = editContext.getDisplayedTasksForTimeline(
+      window.moment("2025-07-19"),
+    );
+
+    const { noTime } = get(displayedTasks);
+
+    expect(
+      noTime.filter(
+        (it) => isLocal(it) && it.text.includes("Task without time"),
+      ),
+    ).toHaveLength(expectedLength);
   });
 });

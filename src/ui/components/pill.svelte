@@ -13,7 +13,7 @@
 </script>
 
 {#if value}
-  <span class={["pill", onpointerup && "clickable"]} {onclick}>
+  <span class={["pill", onclick && "clickable"]} {onclick}>
     {#if !key}{:else if typeof key === "string"}
       {key}:
     {:else}

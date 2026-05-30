@@ -185,7 +185,7 @@
         },
         {
           "parent": -1,
-          "task": " ",
+          "task": "x",
           "position": {
             "start": {
               "line": 1,

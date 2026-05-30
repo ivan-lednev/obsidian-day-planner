@@ -63,7 +63,10 @@ This document describes how to make a code contribution to the repo.
 - There is no easy way to write E2E tests for an Obsidian plugin, so we don't do those.
 - `fixtures/` contains ICAL, markdown files & metadata on these files for integration tests. This allows us to use real Obsidian & Dataview to produce metadata on these files instead of writing it all by hand. You can update corresponding Dataview fixtures manually:
   1.  Build the plugin in dev mode
-  2.  Copy `fixture-vault` into an Obsidian vault: `cp fixture-vault <obsidian>`. If you cloned the project into a test vault, just run: `cp -r fixtures/fixture-vault/ ../../../fixtures/`
+  2.  Copy `fixture-vault` into an Obsidian vault: `cp fixture-vault <obsidian>`. If you cloned the project into a test vault, run:
+      ```shell
+      rm -r ../../../fixtures/fixture-vault && mkdir -p ../../../fixtures/fixture-vault && cp -r fixtures/fixture-vault/ ../../../fixtures/
+      ```
   3.  Open your Obsidian test vault and run the command: `Dump metadata`
 
 ### UI, Svelte guidelines
