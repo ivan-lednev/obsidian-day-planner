@@ -11,7 +11,6 @@
   import BlockList from "./block-list.svelte";
   import ControlButton from "./control-button.svelte";
   import ErrorBoundary from "./error-boundary.svelte";
-  import { EllipsisVertical } from "./lucide";
   import Tree from "./obsidian/tree.svelte";
   import ResizeHandle from "./resize-handle.svelte";
   import ResizeableBox from "./resizeable-box.svelte";
@@ -44,6 +43,8 @@
       type: "date",
     });
   }
+
+  const { timeTracker, planner } = $derived($settings.timelineColumns);
 </script>
 
 <ErrorBoundary>
@@ -92,7 +93,15 @@
             createColumnSelectionMenu({ settings, event });
           }}
         >
-          <EllipsisVertical class="planner-settings-icon" />
+          <span class="control-text">
+            {#if planner && timeTracker}
+              Planner | Tracker
+            {:else if planner}
+              Planner
+            {:else if timeTracker}
+              Tracker
+            {/if}
+          </span>
         </ControlButton>
       {/snippet}
       <Scroller
@@ -130,5 +139,14 @@
 
     font-size: var(--font-ui-small);
     color: var(--text-faint);
+  }
+
+  .control-text {
+    font-size: var(--font-ui-small);
+    color: var(--text-faint);
+  }
+
+  .control-text:hover {
+    color: var(--text-muted);
   }
 </style>
