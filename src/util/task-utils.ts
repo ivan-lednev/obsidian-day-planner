@@ -358,7 +358,7 @@ export function getBlockProps(task: Task, settings: DayPlannerSettings) {
 export function toRenderableMarkdown(timeBlock: Node) {
   const formattedFirstLine = flow(
     getFirstLineAsMarkdown,
-    removeListTokens,
+    (node) => (timeBlock.status ? node : removeListTokens(node)),
     deleteProps,
     removeTimeRange,
   )(timeBlock);

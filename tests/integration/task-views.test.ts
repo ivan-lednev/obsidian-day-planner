@@ -9,7 +9,7 @@ import { toRenderableMarkdown } from "../../src/util/task-utils";
 import { setUp } from "./util/setup";
 
 describe("Task views", () => {
-  test("Shows nested list items (tasks & plain list items) with their paragraphs and checkboxes", async () => {
+  test("Shows list item with checkbox, nested list items (tasks & plain list items) with their paragraphs and checkboxes", async () => {
     const { getState } = await setUp({
       loadedFixtures: ["2025-07-28.md"],
     });
@@ -21,8 +21,9 @@ describe("Task views", () => {
 
     isNotVoid(taskWithNestedListItems);
 
-    const { nestedListItems } = toRenderableMarkdown(taskWithNestedListItems);
+    const { listItem, nestedListItems } = toRenderableMarkdown(taskWithNestedListItems);
 
+    expect(listItem).toBe("- [ ] Parent")
     expect(nestedListItems).toBe(`- [ ] Child task
   Child text
 \t- Child list item without time
