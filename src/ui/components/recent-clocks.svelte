@@ -25,6 +25,13 @@
 <BlockList list={recentLogRecords.current}>
   {#snippet titleMatch(title: string)}
     <div class="section-title">
+      {#if window.moment(title).isSame(window.moment(), "day")}
+        Today,
+      {:else if window
+        .moment(title)
+        .isSame(window.moment().subtract(1, "day"), "day")}
+        Yesterday,
+      {/if}
       {window.moment(title).format(settingsSignal.current.timelineDateFormat)}
     </div>
   {/snippet}
@@ -92,6 +99,6 @@
   }
 
   .section-title:not(:first-child) {
-    margin-top: var(--size-4-2);
+    margin-top: var(--size-4-3);
   }
 </style>
