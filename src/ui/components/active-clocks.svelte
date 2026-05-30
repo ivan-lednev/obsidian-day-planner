@@ -57,7 +57,7 @@
               {#if task.location?.path}
                 <Pill
                   key={File}
-                  onpointerup={() => {
+                  onclick={() => {
                     isNotVoid(task.location);
 
                     return workspaceFacade.revealLineInFile(
@@ -81,7 +81,7 @@
 
               <Pill
                 key={Square}
-                onpointerup={async () => {
+                onclick={async () => {
                   isNotVoid(task.location);
 
                   await runWithNoticeOnError(
@@ -96,7 +96,7 @@
 
               <Pill
                 key={Trash}
-                onpointerup={async () => {
+                onclick={async () => {
                   isNotVoid(task.location);
 
                   await runWithNoticeOnError(

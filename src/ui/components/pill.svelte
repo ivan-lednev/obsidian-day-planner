@@ -2,18 +2,18 @@
   const {
     key,
     value,
-    onpointerup,
+    onclick,
   }: {
     // todo: once lucide-svelte supports Svelte 5, remove this
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     key?: any;
     value: string;
-    onpointerup?: () => void;
+    onclick?: () => void;
   } = $props();
 </script>
 
 {#if value}
-  <span class={["pill", onpointerup && "clickable"]} {onpointerup}>
+  <span class={["pill", onpointerup && "clickable"]} {onclick}>
     {#if !key}{:else if typeof key === "string"}
       {key}:
     {:else}

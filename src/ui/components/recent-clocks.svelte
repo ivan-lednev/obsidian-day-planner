@@ -50,7 +50,7 @@
               {#if task.location?.path}
                 <Pill
                   key={File}
-                  onpointerup={() => {
+                  onclick={() => {
                     isNotVoid(task.location);
 
                     return workspaceFacade.revealLineInFile(
@@ -63,7 +63,7 @@
               {/if}
               <Pill
                 key={Play}
-                onpointerup={async () => {
+                onclick={async () => {
                   isNotVoid(task.location);
 
                   await runWithNoticeOnError(
