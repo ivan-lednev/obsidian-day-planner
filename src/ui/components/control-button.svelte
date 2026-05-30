@@ -20,15 +20,14 @@
   } = $props();
 </script>
 
-<!-- TODO: should be <button>? -->
-<div
+<button
   class={["clickable-icon", classes, rest.class, { "is-active": isActive }]}
   aria-disabled={disabled}
   aria-label={label}
   {onclick}
 >
   {@render children()}
-</div>
+</button>
 
 <style>
   .clickable-icon {

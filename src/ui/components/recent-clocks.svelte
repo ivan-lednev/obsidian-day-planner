@@ -8,7 +8,9 @@
   import { createRecentClockMenu } from "../recent-clock-menu";
 
   import { runWithNoticeOnError } from "./../../service/list-item-entry-editor";
+  import BlockControls from "./block-controls.svelte";
   import BlockList from "./block-list.svelte";
+  import ControlButton from "./control-button.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Pill from "./pill.svelte";
   import Properties from "./properties.svelte";
@@ -52,6 +54,25 @@
           {task}
           {use}
         >
+          {#snippet blockEndDecoration()}
+            <BlockControls>
+              <ControlButton
+                label="Start tracking time on this task"
+                onclick={async () => {
+                  isNotVoid(task.location);
+
+                  await runWithNoticeOnError(
+                    taskEntryEditor.clockInAtLocation({
+                      path: task.location.path,
+                      line: task.location.position.start.line,
+                    }),
+                  );
+                }}
+              >
+                <Play class="block-control-icon svg-icon" />
+              </ControlButton>
+            </BlockControls>
+          {/snippet}
           {#snippet bottomDecoration()}
             <Properties>
               {#if task.location?.path}
@@ -68,20 +89,6 @@
                   value={task.location.path.replace(/\.md$/, "")}
                 />
               {/if}
-              <Pill
-                key={Play}
-                onclick={async () => {
-                  isNotVoid(task.location);
-
-                  await runWithNoticeOnError(
-                    taskEntryEditor.clockInAtLocation({
-                      path: task.location.path,
-                      line: task.location.position.start.line,
-                    }),
-                  );
-                }}
-                value="Start"
-              />
             </Properties>
           {/snippet}
         </LocalTimeBlock>

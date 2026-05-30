@@ -8,12 +8,19 @@
 
   interface Props {
     children: Snippet;
+    blockEndDecoration?: Snippet;
     task: Task;
     use?: ActionArray;
     onpointerup?: (event: PointerEvent) => void;
   }
 
-  const { onpointerup, children, task, use = [] }: Props = $props();
+  const {
+    onpointerup,
+    children,
+    blockEndDecoration,
+    task,
+    use = [],
+  }: Props = $props();
 
   const {
     properContrastColors: { normal, muted, faint },
@@ -37,6 +44,8 @@
     use:useActions={use}
   >
     {@render children()}
+
+    {@render blockEndDecoration?.()}
   </div>
 </div>
 
@@ -57,6 +66,8 @@
   .content {
     position: relative;
 
+    display: grid;
+    grid-template-columns: 1fr auto;
     flex: 1 0 0;
 
     font-family: var(--planner-time-block-font-family, var(--font-interface));

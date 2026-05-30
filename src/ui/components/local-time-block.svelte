@@ -11,6 +11,7 @@
   const {
     task,
     bottomDecoration,
+    blockEndDecoration,
     isActive = false,
     use = [],
     onpointerup,
@@ -18,6 +19,7 @@
     isActive?: boolean;
     task: LocalTask;
     bottomDecoration?: Snippet;
+    blockEndDecoration?: Snippet;
     use?: HTMLActionArray;
     onpointerup?: (event: PointerEvent) => void;
   } = $props();
@@ -28,6 +30,7 @@
   --time-block-box-shadow={isActive
     ? "var(--shadow-stationary), var(--shadow-border-accent)"
     : ""}
+  {blockEndDecoration}
   {onpointerup}
   {task}
   use={[...use, hoverPreview(task)]}

@@ -12,7 +12,9 @@
   import { getDiffInMinutes } from "../../util/moment";
   import { createActiveClockMenu } from "../active-clock-menu";
 
+  import BlockControls from "./block-controls.svelte";
   import BlockList from "./block-list.svelte";
+  import ControlButton from "./control-button.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Pill from "./pill.svelte";
   import Properties from "./properties.svelte";
@@ -52,6 +54,39 @@
           {task}
           {use}
         >
+          {#snippet blockEndDecoration()}
+            <BlockControls>
+              <ControlButton
+                onclick={async () => {
+                  isNotVoid(task.location);
+
+                  await runWithNoticeOnError(
+                    taskEntryEditor.cancelClockAtLocation({
+                      path: task.location.path,
+                      line: task.location.position.start.line,
+                    }),
+                  );
+                }}
+              >
+                <Square class="block-control-icon svg-icon" />
+              </ControlButton>
+
+              <ControlButton
+                onclick={async () => {
+                  isNotVoid(task.location);
+
+                  await runWithNoticeOnError(
+                    taskEntryEditor.clockOutAtLocation({
+                      path: task.location.path,
+                      line: task.location.position.start.line,
+                    }),
+                  );
+                }}
+              >
+                <Trash class="block-control-icon svg-icon" />
+              </ControlButton>
+            </BlockControls>
+          {/snippet}
           {#snippet bottomDecoration()}
             <Properties>
               {#if task.location?.path}
@@ -77,36 +112,6 @@
                 value={m
                   .fromDiff(task.startTime, currentTimeSignal.current)
                   .format($settings.timestampFormat)}
-              />
-
-              <Pill
-                key={Square}
-                onclick={async () => {
-                  isNotVoid(task.location);
-
-                  await runWithNoticeOnError(
-                    taskEntryEditor.clockOutAtLocation({
-                      path: task.location.path,
-                      line: task.location.position.start.line,
-                    }),
-                  );
-                }}
-                value="Stop"
-              />
-
-              <Pill
-                key={Trash}
-                onclick={async () => {
-                  isNotVoid(task.location);
-
-                  await runWithNoticeOnError(
-                    taskEntryEditor.cancelClockAtLocation({
-                      path: task.location.path,
-                      line: task.location.position.start.line,
-                    }),
-                  );
-                }}
-                value="Cancel"
               />
             </Properties>
           {/snippet}
