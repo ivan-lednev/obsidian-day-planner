@@ -165,7 +165,6 @@
   .tasks :global(.planner-sticky-block-content) {
     position: sticky;
     top: 0;
-    overflow: hidden;
     max-height: 100%;
   }
 </style>

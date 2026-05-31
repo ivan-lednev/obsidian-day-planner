@@ -66,6 +66,7 @@
   .content {
     position: relative;
 
+    overflow: hidden;
     display: grid;
     grid-template-columns: 1fr auto;
     flex: 1 0 0;
