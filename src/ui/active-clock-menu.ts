@@ -8,13 +8,24 @@ import {
 import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { LocalTask } from "../task-types";
 
+import type { OpenEditTimeEntryModal } from "./create-edit-time-entry-modal";
+
 export function createActiveClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;
   task: LocalTask;
+  // todo: lift to main.ts
   taskEntryEditor: ListItemEntryEditor;
   workspaceFacade: WorkspaceFacade;
+  openEditTimeEntryModal: OpenEditTimeEntryModal;
 }) {
-  const { event, task, taskEntryEditor, workspaceFacade } = props;
+  const {
+    event,
+    task,
+    taskEntryEditor,
+    workspaceFacade,
+    openEditTimeEntryModal,
+  } = props;
+
   const menu = new Menu();
   const { location } = task;
 
@@ -39,16 +50,12 @@ export function createActiveClockMenu(props: {
       });
   });
 
-  menu.addItem((item) => {
+  menu.addItem((item) =>
     item
-      .setTitle("Cancel clock")
-      .setIcon("trash-2")
-      .onClick(async () => {
-        await runWithNoticeOnError(
-          taskEntryEditor.cancelClockAtLocation({ path, line }),
-        );
-      });
-  });
+      .setTitle("Edit...")
+      .setIcon("pencil")
+      .onClick(() => openEditTimeEntryModal(task)),
+  );
 
   menu.addItem((item) => {
     item
@@ -56,6 +63,20 @@ export function createActiveClockMenu(props: {
       .setIcon("file-input")
       .onClick(async () => {
         await workspaceFacade.revealLineInFile(path, line);
+      });
+  });
+
+  menu.addSeparator();
+
+  menu.addItem((item) => {
+    item
+      .setTitle("Cancel clock")
+      .setIcon("trash-2")
+      .setWarning(true)
+      .onClick(async () => {
+        await runWithNoticeOnError(
+          taskEntryEditor.cancelClockAtLocation({ path, line }),
+        );
       });
   });
 

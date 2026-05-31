@@ -11,6 +11,7 @@ import {
   cancelOpenClock,
   clockOut,
   createPropsWithOpenClock,
+  editLogEntry,
   type Props,
   toIndentedMarkdown,
 } from "../util/props";
@@ -158,6 +159,25 @@ export class ListItemEntryEditor {
 
   cancelClockAtLocation = (location: ListItemLocation) =>
     this.editPropsAtLocation({ ...location, editFn: cancelOpenClock });
+
+  editLastClockAtLocation = (
+    location: ListItemLocation,
+    patch: { start?: string; end?: string },
+  ) =>
+    this.editPropsAtLocation({
+      ...location,
+      editFn: (props) => {
+        const log = props.planner?.log;
+
+        if (!log?.length) {
+          throw new Error("No log entries");
+        }
+
+        const last = log[log.length - 1];
+
+        return editLogEntry(props, { originalStart: last.start, patch });
+      },
+    });
 
   clockInUnderCursor = () =>
     this.updateListPropsUnderCursor((props) =>

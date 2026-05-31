@@ -53,6 +53,7 @@ import type { LocalTask, RemoteTask } from "./task-types";
 import { createGetTasksApi } from "./tasks-plugin";
 import type { ObsidianContext, OnUpdateFn, PointerDateTime } from "./types";
 import { askForConfirmation } from "./ui/confirmation-modal";
+import { createEditTimeEntryModalCreator } from "./ui/create-edit-time-entry-modal";
 import { createEditorMenuCallback } from "./ui/editor-menu";
 import { useDateRanges } from "./ui/hooks/use-date-ranges";
 import { mountStatusBarWidget } from "./ui/hooks/use-status-bar-widget";
@@ -573,8 +574,14 @@ export default class DayPlanner extends Plugin {
         getDescriptionText,
       });
 
+    const openEditTimeEntryModal = createEditTimeEntryModalCreator(
+      this.app,
+      this.taskEntryEditor,
+    );
+
     const defaultObsidianContext: ObsidianContext = {
       periodicNotes: this.periodicNotes,
+      openEditTimeEntryModal,
       taskEntryEditor: this.taskEntryEditor,
       editText,
       editLine,

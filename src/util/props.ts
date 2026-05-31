@@ -119,6 +119,44 @@ export function clockOut(props: Props): Props {
   };
 }
 
+export function editLogEntry(
+  props: Props,
+  {
+    originalStart,
+    patch,
+  }: { originalStart: string; patch: { start?: string; end?: string } },
+): Props {
+  const log = props.planner?.log;
+
+  if (!log) {
+    throw new Error("No log entries");
+  }
+
+  const index = log.findIndex((it) => it.start === originalStart);
+
+  if (index === -1) {
+    throw new Error(`Log entry not found: ${originalStart}`);
+  }
+
+  const updatedEntry = { ...log[index] };
+
+  if (patch.start !== undefined) {
+    updatedEntry.start = patch.start;
+  }
+
+  if (patch.end !== undefined) {
+    updatedEntry.end = patch.end;
+  }
+
+  return {
+    ...props,
+    planner: {
+      ...props.planner,
+      log: log.with(index, updatedEntry),
+    },
+  };
+}
+
 export function createProp(
   key: string,
   value: string,

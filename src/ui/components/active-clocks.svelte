@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Play, Trash, Hourglass, File, Square } from "lucide-svelte";
+  import {
+    Play,
+    Hourglass,
+    File,
+    Square,
+    EllipsisVertical,
+  } from "lucide-svelte";
   import { isNotVoid } from "typed-assert";
 
   import { getObsidianContext } from "../../context/obsidian-context";
@@ -20,8 +26,12 @@
   import Properties from "./properties.svelte";
   import Selectable from "./selectable.svelte";
 
-  const { workspaceFacade, taskEntryEditor, useSelector } =
-    getObsidianContext();
+  const {
+    workspaceFacade,
+    taskEntryEditor,
+    openEditTimeEntryModal,
+    useSelector,
+  } = getObsidianContext();
 
   const activeLogRecords = useSelector(selectActiveLogEntries);
   // todo: duplication?
@@ -45,6 +55,7 @@
           task,
           taskEntryEditor,
           workspaceFacade,
+          openEditTimeEntryModal,
         })}
     >
       {#snippet children({ use, onpointerup, state })}
@@ -72,18 +83,17 @@
               </ControlButton>
 
               <ControlButton
-                onclick={async () => {
-                  isNotVoid(task.location);
-
-                  await runWithNoticeOnError(
-                    taskEntryEditor.cancelClockAtLocation({
-                      path: task.location.path,
-                      line: task.location.position.start.line,
-                    }),
-                  );
+                onclick={(event: MouseEvent) => {
+                  createActiveClockMenu({
+                    task,
+                    event,
+                    taskEntryEditor,
+                    workspaceFacade,
+                    openEditTimeEntryModal,
+                  });
                 }}
               >
-                <Trash class="block-control-icon svg-icon" />
+                <EllipsisVertical class="block-control-icon svg-icon" />
               </ControlButton>
             </BlockControls>
           {/snippet}
