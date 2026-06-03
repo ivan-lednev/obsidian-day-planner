@@ -138,6 +138,30 @@
   }
 }
 
+[data-type="planner-timeline"],
+[data-type="planner-weekly"] {
+  --planner-time-block-font-size: var(--font-ui-small);
+
+  .is-mobile & {
+    --planner-time-block-font-size: var(--font-ui-smaller);
+  }
+}
+
+[data-type="planner-time-tracker"] {
+  --time-block-border: none;
+  --time-block-content-padding: var(--size-4-1);
+  --rendered-markdown-gap: var(--size-4-2);
+  --planner-time-block-font-size: var(--font-ui-small);
+
+  .is-mobile & {
+    --planner-time-block-font-size: var(--font-ui-medium);
+  }
+
+  .workspace-split.mod-root & {
+    --time-block-bg-color: var(--background-primary-alt);
+  }
+}
+
 :root {
   --planner-time-block-shadow-on-timeline: 1px 1px 2px 0 #0000001f;
 }

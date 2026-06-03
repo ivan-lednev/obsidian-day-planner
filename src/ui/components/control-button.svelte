@@ -34,6 +34,6 @@
     color: var(--color, var(--icon-color));
     white-space: nowrap;
     border: var(--control-button-border, none);
-    border-radius: var(--border-radius, var(--clickable-icon-radius));
+    border-radius: var(--border-radius, var(--radius-s));
   }
 </style>

@@ -1,5 +1,9 @@
 <script lang="ts">
+  import { Delete } from "lucide-svelte";
+
   import { clockFormat } from "../../constants";
+
+  import ControlButton from "./control-button.svelte";
 
   let {
     initialStart,
@@ -20,18 +24,21 @@
     window.moment(inputValue).format(clockFormat);
 
   let start = $derived(toInputFormat(initialStart));
-  let end = $derived(toInputFormat(initialEnd));
+  let end: string | undefined = $derived(toInputFormat(initialEnd));
 </script>
 
 <div class="modal-wrapper">
   <div class="start-end-wrapper">
-    <label>
-      Start: <input type="datetime-local" bind:value={start} />
-    </label>
-
-    <label>
-      End: <input type="datetime-local" bind:value={end} />
-    </label>
+    <input type="datetime-local" bind:value={start} />
+    <span class="arrow">→</span>
+    <input type="datetime-local" bind:value={end} />
+    <ControlButton
+      onclick={() => {
+        end = undefined;
+      }}
+    >
+      <Delete class="svg-icon" />
+    </ControlButton>
   </div>
 
   <div class="buttons-wrapper">
@@ -58,9 +65,10 @@
 
   .start-end-wrapper {
     display: flex;
-    justify-content: space-between;
-    row-gap: var(--size-4-2);
     flex-wrap: wrap;
+    gap: var(--size-4-1);
+    row-gap: var(--size-4-2);
+    align-self: center;
   }
 
   .buttons-wrapper {
@@ -70,10 +78,12 @@
     align-items: flex-end;
   }
 
-  label {
-    display: inline-flex;
-    gap: var(--size-4-2);
-    align-items: center;
-    color: var(--text-muted);
+  input[type="datetime-local"] {
+    border-radius: var(--radius-s);
+  }
+
+  .arrow {
+    margin-inline: var(--size-4-2);
+    font-size: var(--font-ui-large);
   }
 </style>

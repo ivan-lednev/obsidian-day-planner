@@ -29,10 +29,6 @@
     <div class="section-title">
       {#if window.moment(title).isSame(window.moment(), "day")}
         Today,
-      {:else if window
-        .moment(title)
-        .isSame(window.moment().subtract(1, "day"), "day")}
-        Yesterday,
       {/if}
       {window.moment(title).format(settingsSignal.current.timelineDateFormat)}
     </div>

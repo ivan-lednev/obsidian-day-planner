@@ -71,6 +71,8 @@
     grid-template-columns: 1fr auto;
     flex: 1 0 0;
 
+    padding: var(--time-block-content-padding);
+
     font-family: var(--planner-time-block-font-family, var(--font-interface));
     font-size: var(--planner-time-block-font-size, var(--font-ui-small));
     color: var(--text-muted);
@@ -79,17 +81,18 @@
     white-space: normal;
 
     background-color: var(--time-block-bg-color, var(--background-primary));
-    border: 1px solid
-      var(
-        --time-block-border-color-override,
-        var(--time-block-border-color, var(--text-faint))
-      );
+
+    /* TODO: use a single var */
+    border: var(
+      --time-block-border,
+      1px solid
+        var(
+          --time-block-border-color-override,
+          var(--time-block-border-color, var(--text-faint))
+        )
+    );
     border-radius: var(--radius-s);
     box-shadow: var(--time-block-box-shadow);
-  }
-
-  :global(.is-mobile) .content {
-    font-size: var(--planner-time-block-font-size, var(--font-ui-smaller));
   }
 
   .truncated-left {

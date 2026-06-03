@@ -112,17 +112,11 @@
     display: flex;
     flex: 1 0 0;
     flex-direction: column;
+    gap: var(--rendered-markdown-gap);
 
     padding: var(--rendered-markdown-padding, var(--size-2-1) var(--size-4-1));
 
     color: var(--text-muted);
-  }
-
-  :global(.is-mobile) .rendered-markdown {
-    --checkbox-size: var(
-      --planner-time-block-font-size,
-      var(--font-ui-smaller)
-    );
   }
 
   .rendered-markdown :global(p),

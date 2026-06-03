@@ -36,7 +36,7 @@ export function createEditTimeEntryModalCreator(
       props: {
         initialStart,
         initialEnd,
-        onConfirm: async ({ start, end }: { start: string; end: string }) => {
+        onConfirm: async ({ start, end }: { start: string; end?: string }) => {
           await runWithNoticeOnError(
             taskEntryEditor.editLastClockAtLocation(
               { path: location.path, line: location.position.start.line },

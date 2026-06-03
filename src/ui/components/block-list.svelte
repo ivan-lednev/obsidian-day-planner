@@ -8,12 +8,14 @@
     list,
     match,
     titleMatch,
+    className,
   }: {
     // eslint-disable-next-line no-undef
     match: Snippet<[T]>;
     titleMatch?: Snippet<[string]>;
     // eslint-disable-next-line no-undef
     list: Array<T> | Record<string, Array<T>>;
+    className?: string;
   } = $props();
 </script>
 
@@ -26,14 +28,14 @@
 
 {#if Array.isArray(list) && list.length > 0}
   <div
-    class="search-results-scroller"
+    class={["search-results-scroller", className]}
     transition:slide={createSlide({ axis: "y" })}
   >
     {@render renderList(list)}
   </div>
 {:else if Object.keys(list).length > 0}
   <div
-    class="search-results-scroller"
+    class={["search-results-scroller", className]}
     transition:slide={createSlide({ axis: "y" })}
   >
     {#each Object.entries(list) as [sectionTitle, foundTimeBlocks], index (sectionTitle || index)}
