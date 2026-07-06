@@ -14,6 +14,5 @@
 
     display: flex;
     align-items: flex-start;
-    padding: var(--size-4-1);
   }
 </style>

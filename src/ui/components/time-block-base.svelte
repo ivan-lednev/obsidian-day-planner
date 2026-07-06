@@ -88,10 +88,10 @@
       1px solid
         var(
           --time-block-border-color-override,
-          var(--time-block-border-color, var(--text-faint))
+          var(--time-block-border-color, var(--color-base-40))
         )
     );
-    border-radius: var(--radius-s);
+    border-radius: var(--time-block-border-radius, var(--radius-s));
     box-shadow: var(--time-block-box-shadow);
   }
 

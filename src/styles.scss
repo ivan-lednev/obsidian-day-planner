@@ -148,14 +148,10 @@
 }
 
 [data-type="planner-time-tracker"] {
-  --time-block-border: none;
+  --time-block-border: 1px solid var(--background-modifier-border);
   --time-block-content-padding: var(--size-4-1);
-  --rendered-markdown-gap: var(--size-4-2);
+  --rendered-markdown-gap: var(--size-2-3);
   --planner-time-block-font-size: var(--font-ui-small);
-
-  .is-mobile & {
-    --planner-time-block-font-size: var(--font-ui-medium);
-  }
 
   .workspace-split.mod-root & {
     --time-block-bg-color: var(--background-primary-alt);

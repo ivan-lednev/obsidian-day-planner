@@ -95,13 +95,15 @@
 
 <style>
   .section-title {
-    margin-bottom: var(--size-4-2);
+    margin-bottom: var(--size-4-3);
     font-size: var(--font-ui-small);
     font-weight: var(--font-medium);
     color: var(--text-muted);
+    margin-top: var(--size-4-3);
+    margin-inline-start: var(--size-4-4);
   }
 
   .section-title:not(:first-child) {
-    margin-top: var(--size-4-3);
+    margin-top: var(--size-4-4);
   }
 </style>

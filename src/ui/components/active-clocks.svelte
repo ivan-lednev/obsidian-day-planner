@@ -60,6 +60,7 @@
     >
       {#snippet children({ use, onpointerup, state })}
         <LocalTimeBlock
+          --time-block-border="1px solid var(--color-accent)"
           isActive={state === "secondary"}
           {onpointerup}
           {task}
