@@ -65,7 +65,9 @@
                   );
                 }}
               >
-                <Play class="block-control-icon svg-icon" />
+                {#snippet icon()}
+                  <Play class="svg-icon" />
+                {/snippet}
               </ControlButton>
             </BlockControls>
           {/snippet}
