@@ -1,3 +1,17 @@
+## 0.31.0
+
+### ✨ New features
+
+- Filter recent clocks by task text or file path
+- Edit active clock times in a modal
+- Recent log entries are grouped by day
+- Tracker blocks now have minimalistic control buttons
+- Minor styling improvements
+
+### 🐞 Fixed issues
+
+- Fix flag for hiding completed tasks
+
 ## 0.30.0
 
 ### ✨ New features
