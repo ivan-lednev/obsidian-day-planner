@@ -8,11 +8,15 @@
     title,
     flair,
     controls,
+    onpointermove,
+    onpointerup,
   }: {
     title: string;
     children: Snippet;
     flair?: Snippet;
     controls?: Snippet;
+    onpointermove?: (event: PointerEvent) => void;
+    onpointerup?: (event: PointerEvent) => void;
   } = $props();
 
   let isTreeVisible = $state(true);
@@ -27,7 +31,7 @@
 </script>
 
 <!--Partially uses Obsidian's classes for search result matches-->
-<div class="tree-container">
+<div class="tree-container" {onpointermove} {onpointerup}>
   <div class="tree-header-container">
     <div class="tree-item-self is-clickable" onclick={toggleTree}>
       <div

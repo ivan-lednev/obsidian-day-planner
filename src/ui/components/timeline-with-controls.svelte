@@ -12,8 +12,6 @@
   import ControlButton from "./control-button.svelte";
   import ErrorBoundary from "./error-boundary.svelte";
   import Tree from "./obsidian/tree.svelte";
-  import ResizeHandle from "./resize-handle.svelte";
-  import ResizeableBox from "./resizeable-box.svelte";
   import Ruler from "./ruler.svelte";
   import Scroller from "./scroller.svelte";
   import TimelineControls from "./timeline-controls.svelte";
@@ -51,34 +49,27 @@
   <TimelineControls />
 
   {#if $settings.showUncheduledTasks}
-    <Tree title="All day events">
+    <Tree
+      onpointermove={handleResizeableBoxPointerMove}
+      onpointerup={editContext.confirmEdit}
+      title="All day events"
+    >
       {#snippet flair()}
-        {String(displayedAllDayTasks.length)}
+        {#if editOperation.current}
+          Drag here to schedule all-day events
+        {:else}
+          {String(displayedAllDayTasks.length)}
+        {/if}
       {/snippet}
-      {#if editOperation.current || displayedAllDayTasks.length > 0}
-        <ResizeableBox
-          class="unscheduled-task-container"
-          onpointermove={handleResizeableBoxPointerMove}
-          onpointerup={editContext.confirmEdit}
-        >
-          {#snippet children(startEdit)}
-            {#if editOperation.current && displayedAllDayTasks.length === 0}
-              <div class="edit-prompt">
-                Drag blocks here to schedule all-day tasks
-              </div>
-            {:else if displayedAllDayTasks.length > 0}
-              <BlockList list={displayedAllDayTasks}>
-                {#snippet match(task: Task)}
-                  <UnscheduledTimeBlock
-                    --time-block-padding="var(--size-2-1) 0"
-                    {task}
-                  />
-                {/snippet}
-              </BlockList>
-            {/if}
-            <ResizeHandle on:mousedown={startEdit} />
+      {#if displayedAllDayTasks.length > 0}
+        <BlockList list={displayedAllDayTasks}>
+          {#snippet match(task: Task)}
+            <UnscheduledTimeBlock
+              --time-block-padding="var(--size-2-1) 0"
+              {task}
+            />
           {/snippet}
-        </ResizeableBox>
+        </BlockList>
       {/if}
     </Tree>
   {/if}
