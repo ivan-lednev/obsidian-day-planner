@@ -121,17 +121,6 @@
     overflow: auto;
   }
 
-  .edit-prompt {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    padding: var(--size-4-2);
-
-    font-size: var(--font-ui-small);
-    color: var(--text-faint);
-  }
-
   .control-text {
     font-size: var(--font-ui-small);
     color: var(--text-faint);

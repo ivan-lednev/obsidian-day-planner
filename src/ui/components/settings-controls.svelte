@@ -136,15 +136,7 @@
   }
 
   .settings :global(.setting-group .setting-item) {
-    padding: var(--size-4-2) 0;
-  }
-
-  .settings :global(.setting-group .setting-item:first-child) {
-    padding-top: 0;
-  }
-
-  .settings :global(.setting-group .setting-item:last-child) {
-    padding-bottom: 0;
+    padding: var(--size-4-2) var(--size-4-4);
   }
 
   .settings :global(.setting-group .setting-item-heading) {

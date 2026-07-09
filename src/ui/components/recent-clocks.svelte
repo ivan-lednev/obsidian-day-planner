@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { debounce } from "lodash";
   import { groupBy } from "lodash/fp";
   import { File, Play } from "lucide-svelte";
   import { isNotVoid } from "typed-assert";
@@ -26,9 +27,24 @@
   );
 
   let fieldState = $state("");
+  let debouncedFieldState = $state("");
+
+  const updateDebouncedFieldState = debounce((value: string) => {
+    debouncedFieldState = value;
+  }, 200);
+
+  $effect(() => {
+    updateDebouncedFieldState(fieldState);
+
+    return () => {
+      updateDebouncedFieldState.cancel();
+    };
+  });
 
   const keywords = $derived(
-    fieldState.split(/\s+/)?.map((keyword) => keyword.trim().toLowerCase()),
+    debouncedFieldState
+      .split(/\s+/)
+      ?.map((keyword) => keyword.trim().toLowerCase()),
   );
 
   const filtered = $derived(
