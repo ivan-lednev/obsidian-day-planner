@@ -93,7 +93,7 @@ export function useEditContext(props: {
     ([$localTasks, $settings]) =>
       $settings.showCompletedTasks
         ? $localTasks
-        : $localTasks.filter((it) => it.task !== undefined),
+        : $localTasks.filter((it) => !it.task || it.task.toLowerCase() !== "x"),
   );
 
   const baselineTasks = writable<LocalTask[]>([], (set) => {
