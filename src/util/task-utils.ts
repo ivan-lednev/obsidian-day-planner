@@ -398,3 +398,7 @@ function getIndentedText(root: Node, parentIndentation: string = ""): string {
     return result + "\n" + getIndentedText(current, indentation);
   }, listItemLineWithParagraphs);
 }
+
+export function isCompleted(taskCheckmark?: string) {
+  return taskCheckmark !== undefined && taskCheckmark.toLowerCase() === "x";
+}

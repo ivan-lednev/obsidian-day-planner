@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getObsidianContext } from "../../context/obsidian-context";
   import type { LocalTask } from "../../task-types";
-  import { toRenderableMarkdown } from "../../util/task-utils";
+  import { isCompleted, toRenderableMarkdown } from "../../util/task-utils";
   import { addLineDataToCheckboxes } from "../../util/dom";
   import { on } from "svelte/events";
   import type { Snippet } from "svelte";
@@ -86,7 +86,13 @@
   );
 </script>
 
-<div class={["rendered-markdown", "planner-sticky-block-content"]}>
+<div
+  class={[
+    "rendered-markdown",
+    "planner-sticky-block-content",
+    isCompleted(task.task) && "is-completed",
+  ]}
+>
   <div
     class="first-line-wrapper"
     {@attach createRenderMarkdownAttachment(listItem, [listItemLine])}
@@ -108,6 +114,7 @@
 <style>
   .rendered-markdown {
     --checkbox-size: var(--planner-time-block-font-size, var(--font-ui-small));
+    --checklist-done-color: var(--text-faint);
 
     display: flex;
     flex: 1 0 0;
@@ -117,6 +124,10 @@
     padding: var(--rendered-markdown-padding, var(--size-2-1) var(--size-4-1));
 
     color: var(--text-muted);
+  }
+
+  .rendered-markdown.is-completed {
+    color: var(--checklist-done-color);
   }
 
   .rendered-markdown :global(p),
@@ -132,16 +143,6 @@
   .rendered-markdown :global(input[type="checkbox"]) {
     top: 2px;
     margin-inline-end: 4px;
-    border-color: var(--text-muted);
-  }
-
-  .rendered-markdown :global(li) {
-    color: var(--text-muted);
-  }
-
-  .rendered-markdown :global(li.task-list-item[data-task="x"]),
-  .rendered-markdown :global(li.task-list-item[data-task="X"]) {
-    color: var(--text-faint);
   }
 
   .first-line-wrapper {
