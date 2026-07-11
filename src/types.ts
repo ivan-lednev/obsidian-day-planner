@@ -6,7 +6,7 @@ import type { Readable, Writable } from "svelte/store";
 import type { IcalParseTaskResult } from "./redux/ical/init-ical-listeners";
 import { type AppDispatch, type RootState } from "./redux/store";
 import type { UseSelector } from "./redux/use-selector";
-import type { FileIndexParser } from "./service/file-index-parser";
+import type { IndexService } from "./service/index/index-service";
 import type { ListItemEntryEditor } from "./service/list-item-entry-editor";
 import type { ListPropsParser } from "./service/list-props-parser";
 import type { PeriodicNotes } from "./service/periodic-notes";
@@ -98,7 +98,7 @@ export type DateRange = Writable<Moment[]> & { untrack: () => void };
 export type ReduxExtraArgument = {
   settings: DayPlannerSettings;
   listPropsParser: ListPropsParser;
-  fileIndexParser: FileIndexParser;
+  indexServices: IndexService[];
   vault: Vault;
   metadataCache: MetadataCache;
   periodicNotes: PeriodicNotes;

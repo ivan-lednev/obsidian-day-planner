@@ -2,7 +2,10 @@ import { type PayloadAction } from "@reduxjs/toolkit";
 import type { MetadataCache, Pos, Vault } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
-import type { FileIndexParser } from "../../service/file-index-parser";
+import type {
+  FileIndexContribution,
+  IndexService,
+} from "../../service/index/index-service";
 import type { LocalTask } from "../../task-types";
 import { getDiffInMinutes, strictParse } from "../../util/moment";
 import { createAppSlice } from "../create-app-slice";
@@ -349,12 +352,36 @@ export function createId(...args: (string | number)[]) {
   return args.join(idSeparator);
 }
 
+function mergeContributions(
+  path: string,
+  contributions: FileIndexContribution[],
+): FileIndex {
+  return contributions.reduce<FileIndex>(
+    (acc, contribution) => ({
+      path,
+      taskEntries: [
+        ...(acc.taskEntries ?? []),
+        ...(contribution.taskEntries ?? []),
+      ],
+      logEntries: [
+        ...(acc.logEntries ?? []),
+        ...(contribution.logEntries ?? []),
+      ],
+      planEntries: [
+        ...(acc.planEntries ?? []),
+        ...(contribution.planEntries ?? []),
+      ],
+    }),
+    { path },
+  );
+}
+
 export function createIndexListener(props: {
   vault: Vault;
   metadataCache: MetadataCache;
-  fileIndexParser: FileIndexParser;
+  indexServices: IndexService[];
 }): AppListenerEffect<IndexRequested> {
-  const { metadataCache, vault, fileIndexParser } = props;
+  const { metadataCache, vault, indexServices } = props;
 
   return async function onIndexRequested(action, listenerApi) {
     const paths = action.payload;
@@ -376,10 +403,11 @@ export function createIndexListener(props: {
 
         const text = await vault.cachedRead(file);
 
-        return {
-          path,
-          ...fileIndexParser.parse({ path, text, metadata }),
-        };
+        const contributions = indexServices.map((service) =>
+          service.index({ path, text, metadata }),
+        );
+
+        return mergeContributions(path, contributions);
       } catch (error) {
         console.error(
           new Error(`Failed to parse file ${path}`, { cause: error }),

@@ -16,7 +16,7 @@ import type { AppDispatch, RootState } from "./store";
 export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
   const {
     extra,
-    extra: { vault, metadataCache, fileIndexParser, icalParseScheduler },
+    extra: { vault, metadataCache, indexServices, icalParseScheduler },
   } = props;
 
   const listenerMiddleware = createListenerMiddleware<
@@ -46,7 +46,7 @@ export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
     effect: createIndexListener({
       vault,
       metadataCache,
-      fileIndexParser,
+      indexServices,
     }),
   });
 

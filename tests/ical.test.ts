@@ -12,7 +12,7 @@ import {
 import { type IcalParseTaskResult } from "../src/redux/ical/init-ical-listeners";
 import { initListenerMiddleware } from "../src/redux/listener-middleware";
 import { makeStore, type RootState } from "../src/redux/store";
-import { FileIndexParser } from "../src/service/file-index-parser";
+import { createIndexServices } from "../src/service/index/create-index-services";
 import { ListPropsParser } from "../src/service/list-props-parser";
 import type { PeriodicNotes } from "../src/service/periodic-notes";
 import { defaultSettingsForTests } from "../src/settings";
@@ -74,11 +74,11 @@ function makeStoreForTests(props?: { preloadedState?: Partial<RootState> }) {
   const listenerMiddleware = initListenerMiddleware({
     extra: {
       listPropsParser,
-      fileIndexParser: new FileIndexParser(
+      indexServices: createIndexServices({
         listPropsParser,
         periodicNotes,
-        defaultSettingsForTests,
-      ),
+        settings: defaultSettingsForTests,
+      }),
       vault: inMemoryVault,
       metadataCache,
       periodicNotes,

@@ -42,7 +42,7 @@ import {
 } from "./redux/store";
 import { type UseSelector } from "./redux/use-selector";
 import { TransactionWriter } from "./service/diff-writer";
-import { FileIndexParser } from "./service/file-index-parser";
+import { createIndexServices } from "./service/index/create-index-services";
 import { ListItemEntryEditor } from "./service/list-item-entry-editor";
 import { ListPropsParser } from "./service/list-props-parser";
 import { MetadataCacheFacade } from "./service/metadata-cache-facade";
@@ -96,11 +96,11 @@ export default class DayPlanner extends Plugin {
 
     this.periodicNotes = new PeriodicNotes();
 
-    const fileIndexParser = new FileIndexParser(
+    const indexServices = createIndexServices({
       listPropsParser,
-      this.periodicNotes,
-      initialSettings,
-    );
+      periodicNotes: this.periodicNotes,
+      settings: initialSettings,
+    });
     this.vaultFacade = new VaultFacade(vault, getTasksApi);
     this.transactionWriter = new TransactionWriter(this.vaultFacade);
     this.undoNotice = new UndoNotice(this.transactionWriter.undo);
@@ -125,7 +125,7 @@ export default class DayPlanner extends Plugin {
       pointerDateTime,
     } = createReactor({
       listPropsParser,
-      fileIndexParser,
+      indexServices,
       vault,
       metadataCache,
       periodicNotes: this.periodicNotes,
