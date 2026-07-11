@@ -115,6 +115,7 @@
   .rendered-markdown {
     --checkbox-size: var(--planner-time-block-font-size, var(--font-ui-small));
     --checklist-done-color: var(--text-faint);
+    --checkbox-border-color: var(--text-faint);
 
     display: flex;
     flex: 1 0 0;
