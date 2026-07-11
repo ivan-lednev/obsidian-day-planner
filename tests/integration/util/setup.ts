@@ -15,6 +15,7 @@ import {
 } from "../../../src/redux/index/index-slice";
 import { createReactor, type RootState } from "../../../src/redux/store";
 import { TransactionWriter } from "../../../src/service/diff-writer";
+import { FileIndexParser } from "../../../src/service/file-index-parser";
 import { ListItemEntryEditor } from "../../../src/service/list-item-entry-editor";
 import { ListPropsParser } from "../../../src/service/list-props-parser";
 import { MetadataCacheFacade } from "../../../src/service/metadata-cache-facade";
@@ -119,6 +120,12 @@ export async function setUp(props?: {
     cachedMetadata,
   });
 
+  const fileIndexParser = new FileIndexParser(
+    listPropsParser,
+    periodicNotes,
+    settings,
+  );
+
   const isOnline = writable(true);
   const settingsStore = writable(settings);
   const currentTime = writable(window.moment());
@@ -150,6 +157,7 @@ export async function setUp(props?: {
         },
       },
       listPropsParser,
+      fileIndexParser,
       vault: vault as unknown as Vault,
       metadataCache,
       periodicNotes,

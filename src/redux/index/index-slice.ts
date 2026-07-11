@@ -1,36 +1,10 @@
 import { type PayloadAction } from "@reduxjs/toolkit";
-import { uniqBy } from "lodash/fp";
-import type {
-  CachedMetadata,
-  ListItemCache,
-  MetadataCache,
-  Pos,
-  Vault,
-} from "obsidian";
-import { isNotVoid, isRecordOfType } from "typed-assert";
+import type { MetadataCache, Pos, Vault } from "obsidian";
+import { isNotVoid } from "typed-assert";
 
-import { clockFormat } from "../../constants";
-import { getTimeFromLine } from "../../parser/parser";
-import { listItemRegExp, scheduledPropRegExps } from "../../regexp";
-import type { ListPropsParser } from "../../service/list-props-parser";
-import type { PeriodicNotes } from "../../service/periodic-notes";
-import type { DayPlannerSettings } from "../../settings";
+import type { FileIndexParser } from "../../service/file-index-parser";
 import type { LocalTask } from "../../task-types";
-import { getFirstLine } from "../../util/markdown";
-import {
-  createLineToChildrenLookup,
-  getHeadingSectionPosition,
-  getTextAtPosition,
-  isInside,
-  isTaskCache,
-  type PartialPos,
-} from "../../util/metadata";
-import {
-  getDayKeysInRange,
-  getDiffInMinutes,
-  strictParse,
-} from "../../util/moment";
-import { getDayKey, getEndTime } from "../../util/task-utils";
+import { getDiffInMinutes, strictParse } from "../../util/moment";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
 
@@ -47,7 +21,7 @@ export interface ListItemEntry {
   planEntries?: string[];
 }
 
-type DenormalizedListItemEntry = Omit<
+export type DenormalizedListItemEntry = Omit<
   ListItemEntry,
   "logEntries" | "planEntries"
 > & {
@@ -375,395 +349,37 @@ export function createId(...args: (string | number)[]) {
   return args.join(idSeparator);
 }
 
-function flatten<T extends { children?: T[]; id: string }>(
-  node: T,
-): Array<Omit<T, "children"> & { children?: string[] }> {
-  const { children, ...rest } = node;
-
-  return [
-    {
-      ...rest,
-      ...(children
-        ? { children: (children ?? []).map((child) => child.id) }
-        : {}),
-    },
-    ...(children ?? []).flatMap(flatten),
-  ];
-}
-
 export function createIndexListener(props: {
-  listPropsParser: ListPropsParser;
   vault: Vault;
   metadataCache: MetadataCache;
-  periodicNotes: PeriodicNotes;
-  settings: DayPlannerSettings;
+  fileIndexParser: FileIndexParser;
 }): AppListenerEffect<IndexRequested> {
-  const { listPropsParser, metadataCache, vault, periodicNotes, settings } =
-    props;
-
-  function createLogEntry(props: {
-    start: string;
-    end?: string;
-    parent: string;
-    id: string;
-  }) {
-    const { start, end, parent, id } = props;
-
-    const parsedStart = strictParse(start);
-
-    const parsedEnd = end
-      ? strictParse(end)
-      : // TODO: P3 bug
-        //  Solution 1: dispatch dayChanged() and update active clocks then; simple & works
-        //  Solution 2: calculate dayKeys for active clocks on the fly in selectActiveLogEntries selector
-        //  Solution 3: use sorted array instead of buckets
-        window.moment();
-
-    const dayKeys: string[] = getDayKeysInRange(parsedStart, parsedEnd);
-
-    return { start, end, parent, dayKeys, id };
-  }
-
-  function isInsideDailyNoteParseScope(
-    position: Pos,
-    plannerHeadingSectionPosition?: PartialPos,
-  ) {
-    const shouldScanAllDailyNote = settings.plannerHeading.length === 0;
-
-    if (shouldScanAllDailyNote) {
-      return true;
-    }
-
-    return (
-      plannerHeadingSectionPosition &&
-      isInside(position, plannerHeadingSectionPosition)
-    );
-  }
-
-  function parseScheduledDateFromInlineProp(line: string) {
-    for (const regexp of scheduledPropRegExps) {
-      const dateMatch = line.match(regexp)?.groups?.["date"];
-
-      if (dateMatch) {
-        return strictParse(dateMatch);
-      }
-    }
-  }
-
-  function getObsidianTasksEntries(props: {
-    firstLine: string;
-    parentId: string;
-  }): PlanEntry[] {
-    const { firstLine, parentId } = props;
-
-    const scheduledDate = parseScheduledDateFromInlineProp(firstLine);
-
-    if (!scheduledDate) {
-      return [];
-    }
-
-    const result = {
-      id: createId(parentId, "tasks-scheduled"),
-      dayKeys: [getDayKey(scheduledDate)],
-      // todo P3: we can add parent id later
-      parent: parentId,
-    };
-
-    const time = getTimeFromLine({
-      line: firstLine,
-      day: scheduledDate,
-    });
-
-    if (!time) {
-      return [
-        {
-          ...result,
-          start: scheduledDate.format(clockFormat),
-          end: scheduledDate.clone().add(1, "hour").format(clockFormat),
-          isAllDay: true,
-        },
-      ];
-    }
-
-    return [
-      {
-        ...result,
-        start: time.startTime.format(clockFormat),
-        // todo: duplication
-        end: getEndTime({
-          startTime: time.startTime,
-          durationMinutes:
-            time.durationMinutes ?? settings.defaultDurationMinutes,
-        }).format(clockFormat),
-      },
-    ];
-  }
-
-  function parseListItemLine(line: string) {
-    const match = line.match(listItemRegExp);
-
-    isRecordOfType<string>(
-      match?.groups,
-      (value) => typeof value === "string",
-      "Mismatching named regexp groups",
-    );
-
-    const { symbol, text = "", task } = match.groups;
-
-    isNotVoid(symbol);
-
-    return { task, symbol, text: text.trim() };
-  }
-
-  function createListItemEntry(props: {
-    path: string;
-    contents: string;
-    listItemCache: ListItemCache;
-  }) {
-    const { path, listItemCache, contents } = props;
-
-    const id = createId(path, listItemCache.position.start.line);
-
-    const fullListItemText = getTextAtPosition(
-      contents,
-      listItemCache.position,
-    );
-    const rawFirstLine = getFirstLine(fullListItemText);
-
-    const {
-      text: firstLineText,
-      symbol,
-      task,
-    } = parseListItemLine(rawFirstLine);
-
-    const trimmedLinesAfterFirst = fullListItemText
-      .split("\n")
-      .slice(1)
-      .map((line) => line.trim())
-      .join("\n");
-
-    const listItemTextInIndex =
-      trimmedLinesAfterFirst.length > 0
-        ? firstLineText + "\n" + trimmedLinesAfterFirst
-        : firstLineText;
-
-    return {
-      id,
-      text: listItemTextInIndex,
-      symbol,
-      task,
-      position: listItemCache.position,
-      path,
-      children: [],
-      logEntries: [],
-      planEntries: [],
-    };
-  }
-
-  function getListItemEntries(
-    cache: CachedMetadata,
-    contents: string,
-    path: string,
-  ) {
-    const dateFromPath = periodicNotes.getDateFromPath(path, "day");
-    const plannerHeadingSectionPosition = getHeadingSectionPosition(
-      cache,
-      settings.plannerHeading,
-    );
-
-    if (!cache.listItems) {
-      return [];
-    }
-
-    const denormalizedListItemEntries = cache.listItems.reduce<
-      DenormalizedListItemEntry[]
-    >((result, listItemCache) => {
-      const fullListItemText = getTextAtPosition(
-        contents,
-        listItemCache.position,
-      );
-
-      const listItemEntry: DenormalizedListItemEntry = createListItemEntry({
-        path,
-        contents,
-        listItemCache,
-      });
-
-      if (
-        dateFromPath &&
-        isInsideDailyNoteParseScope(
-          listItemCache.position,
-          plannerHeadingSectionPosition,
-        )
-      ) {
-        const time = getTimeFromLine({
-          line: listItemEntry.text,
-          day: dateFromPath,
-        });
-        const id = createId(listItemEntry.id, "daily");
-        const dayKeys = [getDayKey(dateFromPath)];
-
-        if (time) {
-          const { startTime, durationMinutes } = time;
-          const endTime = getEndTime({
-            startTime,
-            durationMinutes: durationMinutes ?? settings.defaultDurationMinutes,
-          });
-
-          listItemEntry.planEntries.push({
-            id,
-            dayKeys,
-            parent: listItemEntry.id,
-            start: startTime.format(clockFormat),
-            end: endTime.format(clockFormat),
-          });
-        } else if (isTaskCache(listItemCache)) {
-          listItemEntry.planEntries.push({
-            id,
-            dayKeys,
-            parent: listItemEntry.id,
-            start: dateFromPath.format(clockFormat),
-            // todo: this is not needed
-            end: dateFromPath
-              .clone()
-              .add(settings.defaultDurationMinutes, "minutes")
-              .format(clockFormat),
-            isAllDay: true,
-          });
-        }
-      }
-
-      if (isTaskCache(listItemCache)) {
-        // todo: new ObsidianTasksIndexer()
-        const obsidianTasksEntries = getObsidianTasksEntries({
-          firstLine: listItemEntry.text,
-          parentId: listItemEntry.id,
-        });
-
-        listItemEntry.planEntries.push(...obsidianTasksEntries);
-
-        // todo: new PropsIndexer
-        const listItemProps = listPropsParser.getListPropsFromListItem(
-          listItemCache,
-          fullListItemText,
-        );
-
-        // todo: cut out props here, use removeWithin(text: string, outer: Pos, inner: Pos)
-
-        listItemEntry.propsPosition = listItemProps?.position;
-        listItemEntry.logEntries =
-          listItemProps?.parsed.planner?.log?.map(({ start, end }, index) =>
-            createLogEntry({
-              start,
-              end,
-              parent: listItemEntry.id,
-              id: createId(listItemEntry.id, index),
-            }),
-          ) || [];
-      }
-
-      if (
-        listItemEntry.planEntries.length > 0 ||
-        listItemEntry.logEntries.length > 0
-      ) {
-        result.push(listItemEntry);
-      }
-
-      return result;
-    }, []);
-
-    if (denormalizedListItemEntries.length === 0) {
-      return denormalizedListItemEntries;
-    }
-
-    // tree-building for nested list item operations
-
-    const lineToChildrenLookup = createLineToChildrenLookup(cache.listItems);
-    const idToListItemEntry = denormalizedListItemEntries.reduce<
-      Record<string, DenormalizedListItemEntry>
-    >((result, current) => {
-      result[current.id] = current;
-
-      return result;
-    }, {});
-
-    // todo: move out
-    function createTree(
-      listItemEntry: DenormalizedListItemEntry,
-    ): ListItemEntryWithChildren {
-      return {
-        ...listItemEntry,
-        children:
-          lineToChildrenLookup[listItemEntry.position.start.line]?.map(
-            (listItemCache) => {
-              const id = createId(path, listItemCache.position.start.line);
-              const previouslyIndexed = idToListItemEntry[id];
-              const listItemEntry =
-                previouslyIndexed ||
-                createListItemEntry({ path, listItemCache, contents });
-
-              return createTree(listItemEntry);
-            },
-          ) || [],
-      };
-    }
-
-    // add children recursively
-    return denormalizedListItemEntries.map((listItemEntry) => {
-      return createTree(listItemEntry);
-    });
-  }
-
-  async function indexFile(path: string) {
-    const cache = metadataCache.getCache(path);
-
-    if (!cache?.listItems) {
-      return undefined;
-    }
-
-    const file = vault.getFileByPath(path);
-
-    isNotVoid(
-      file,
-      "Inconsistent app state: indexing requested for a non-existent file",
-    );
-
-    const contents = await vault.cachedRead(file);
-
-    const denormalizedEntries = getListItemEntries(cache, contents, path);
-
-    const flatListItemEntries = uniqBy(
-      (it) => it.id,
-      denormalizedEntries.flatMap(flatten),
-    );
-
-    // todo: move into a separate function
-    return {
-      taskEntries: flatListItemEntries?.map(
-        ({ logEntries, planEntries, ...rest }) => ({
-          logEntries: logEntries?.map((it) => it.id),
-          planEntries: planEntries?.map((it) => it.id),
-          ...rest,
-        }),
-      ),
-      logEntries: denormalizedEntries.flatMap((it) => it.logEntries || []),
-      planEntries: denormalizedEntries.flatMap((it) => it.planEntries || []),
-    };
-  }
+  const { metadataCache, vault, fileIndexParser } = props;
 
   return async function onIndexRequested(action, listenerApi) {
     const paths = action.payload;
 
     const normalizedEntriesForPaths = paths.map(async (path) => {
       try {
-        const normalizedEntries = await indexFile(path);
+        const metadata = metadataCache.getCache(path);
 
-        if (normalizedEntries) {
-          return {
-            path,
-            ...normalizedEntries,
-          };
+        if (!metadata?.listItems) {
+          return undefined;
         }
+
+        const file = vault.getFileByPath(path);
+
+        isNotVoid(
+          file,
+          "Inconsistent app state: indexing requested for a non-existent file",
+        );
+
+        const text = await vault.cachedRead(file);
+
+        return {
+          path,
+          ...fileIndexParser.parse({ path, text, metadata }),
+        };
       } catch (error) {
         console.error(
           new Error(`Failed to parse file ${path}`, { cause: error }),

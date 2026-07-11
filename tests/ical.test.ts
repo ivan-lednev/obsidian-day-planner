@@ -12,6 +12,7 @@ import {
 import { type IcalParseTaskResult } from "../src/redux/ical/init-ical-listeners";
 import { initListenerMiddleware } from "../src/redux/listener-middleware";
 import { makeStore, type RootState } from "../src/redux/store";
+import { FileIndexParser } from "../src/service/file-index-parser";
 import { ListPropsParser } from "../src/service/list-props-parser";
 import type { PeriodicNotes } from "../src/service/periodic-notes";
 import { defaultSettingsForTests } from "../src/settings";
@@ -68,10 +69,16 @@ function makeStoreForTests(props?: { preloadedState?: Partial<RootState> }) {
   const inMemoryVault = new InMemoryVault([]) as unknown as Vault;
   const metadataCache = new FakeMetadataCache({}) as unknown as MetadataCache;
   const periodicNotes = new FakePeriodicNotes([]) as unknown as PeriodicNotes;
+  const listPropsParser = new ListPropsParser(inMemoryVault, metadataCache);
 
   const listenerMiddleware = initListenerMiddleware({
     extra: {
-      listPropsParser: new ListPropsParser(inMemoryVault, metadataCache),
+      listPropsParser,
+      fileIndexParser: new FileIndexParser(
+        listPropsParser,
+        periodicNotes,
+        defaultSettingsForTests,
+      ),
       vault: inMemoryVault,
       metadataCache,
       periodicNotes,
