@@ -336,7 +336,64 @@
       ],
       "v": 1
     },
-    "fixtures/fixture-vault/frontmatter-logs.md": {
+    "fixtures/fixture-vault/frontmatter-1-open-log-entry.md": {
+      "sections": [
+        {
+          "type": "yaml",
+          "position": {
+            "start": {
+              "line": 0,
+              "col": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 4,
+              "col": 3,
+              "offset": 53
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "position": {
+            "start": {
+              "line": 6,
+              "col": 0,
+              "offset": 55
+            },
+            "end": {
+              "line": 6,
+              "col": 3,
+              "offset": 58
+            }
+          }
+        }
+      ],
+      "frontmatter": {
+        "planner": {
+          "log": [
+            {
+              "start": "2025-07-19 12:00"
+            }
+          ]
+        }
+      },
+      "frontmatterLinks": [],
+      "v": 1,
+      "frontmatterPosition": {
+        "start": {
+          "line": 0,
+          "col": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 4,
+          "col": 3,
+          "offset": 53
+        }
+      }
+    },
+    "fixtures/fixture-vault/frontmatter-1-closed-log-entry.md": {
       "sections": [
         {
           "type": "yaml",

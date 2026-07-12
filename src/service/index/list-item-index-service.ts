@@ -19,11 +19,12 @@ export class ListItemIndexService implements IndexService {
   constructor(private readonly extensions: ListItemIndexExtensionService[]) {}
 
   index(props: FileWithMetadata) {
-    const denormalizedEntries = this.getListItemEntries(props);
+    const denormalizedListItemEntries =
+      this.createDenormalizedListItemEntries(props);
 
     const flatListItemEntries = uniqBy(
       (it) => it.id,
-      denormalizedEntries.flatMap(flatten),
+      denormalizedListItemEntries.flatMap(flatten),
     );
 
     return {
@@ -34,12 +35,16 @@ export class ListItemIndexService implements IndexService {
           ...rest,
         }),
       ),
-      logEntries: denormalizedEntries.flatMap((it) => it.logEntries || []),
-      planEntries: denormalizedEntries.flatMap((it) => it.planEntries || []),
+      logEntries: denormalizedListItemEntries.flatMap(
+        (it) => it.logEntries || [],
+      ),
+      planEntries: denormalizedListItemEntries.flatMap(
+        (it) => it.planEntries || [],
+      ),
     };
   }
 
-  private getListItemEntries(
+  private createDenormalizedListItemEntries(
     props: FileWithMetadata,
   ): ListItemEntryWithChildren[] {
     const { metadata, text, path } = props;

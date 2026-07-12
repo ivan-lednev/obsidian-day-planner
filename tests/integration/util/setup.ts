@@ -11,6 +11,7 @@ import { initialState } from "../../../src/redux/global-slice";
 import { type IcalParseTaskResult } from "../../../src/redux/ical/init-ical-listeners";
 import {
   indexRequested,
+  selectFileEntriesById,
   selectTaskEntriesById,
 } from "../../../src/redux/index/index-slice";
 import { createReactor, type RootState } from "../../../src/redux/store";
@@ -242,14 +243,15 @@ export async function setUp(props?: {
     return findTask((it) => getOneLineSummary(it).includes(text));
   }
 
-  const taskEntries = useSelector((state) => selectTaskEntriesById(state));
-
   await vi.waitFor(() => {
-    // todo: just wait for cache to be 'warm'
-    const isAtLeastOneTaskEntryLoaded =
-      Object.keys(taskEntries.current).length > 0;
+    // todo: replace with explicit `index.state === 'warm'`
+    const taskEntries = selectTaskEntriesById(store.getState());
+    const fileEntries = selectFileEntriesById(store.getState());
 
-    expect(isAtLeastOneTaskEntryLoaded).toBeTruthy();
+    const taskEntriesCount = Object.keys(taskEntries).length;
+    const fileEntriesCount = Object.keys(fileEntries).length;
+
+    expect(taskEntriesCount + fileEntriesCount).toBeGreaterThan(0);
   });
 
   return {

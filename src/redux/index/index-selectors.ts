@@ -9,9 +9,11 @@ import { createAppSelector } from "../create-app-selector";
 import { selectVisibleDays } from "../global-slice";
 
 import {
+  isListItemEntry,
   type ListItemEntry,
   type ListItemEntryWithChildren,
   planEntryToLocalTask,
+  selectFileEntriesById,
   selectLogEntriesByDay,
   selectLogEntriesById,
   selectPlanEntriesByDay,
@@ -25,10 +27,11 @@ export const selectLogEntriesForDay = createAppSelector(
     selectLogEntriesByDay,
     selectLogEntriesById,
     selectTaskEntriesById,
+    selectFileEntriesById,
     (state, dayKey: string) => dayKey,
     (state, dayKey, currentTime: Moment) => currentTime,
   ],
-  (byDay, byId, taskEntriesById, dayKey, currentTime) => {
+  (byDay, byId, taskEntriesById, fileEntriesById, dayKey, currentTime) => {
     const parsedDay = strictParse(dayKey);
     const startOfDay = parsedDay.clone().startOf("day");
     const endOfDay = parsedDay.clone().endOf("day");
@@ -45,10 +48,11 @@ export const selectLogEntriesForDay = createAppSelector(
           `Inconsistent store state: expected to find log entry by id ${logEntryId}`,
         );
 
-        const taskEntry = taskEntriesById[logEntry.parent];
+        const entry =
+          taskEntriesById[logEntry.parent] ?? fileEntriesById[logEntry.parent];
 
         isNotVoid(
-          taskEntry,
+          entry,
           `Inconsistent store state: task entry not found for ID: ${logEntryId}`,
         );
 
@@ -61,9 +65,9 @@ export const selectLogEntriesForDay = createAppSelector(
         // todo: use adapter: logEntryToLocalTask
         const timeBlock: LocalTask = {
           id: logEntry.id,
-          text: taskEntry.text,
+          text: entry.text,
           startTime: parsedStart,
-          status: taskEntry.task,
+          status: isListItemEntry(entry) ? entry.task : undefined,
           symbol: "-",
           durationMinutes: parsedEnd.diff(parsedStart, "minutes"),
           ...(isActiveLogRecordForToday
@@ -80,8 +84,8 @@ export const selectLogEntriesForDay = createAppSelector(
 );
 
 export const selectRecentLogEntries = createAppSelector(
-  [selectLogEntriesById, selectTaskEntriesById],
-  (logEntriesById, taskEntriesById) => {
+  [selectLogEntriesById, selectTaskEntriesById, selectFileEntriesById],
+  (logEntriesById, taskEntriesById, fileEntriesById) => {
     const taskEntryIdToLatestLogRecord = Object.values(logEntriesById)
       .flat()
       .filter((it): it is LogEntry & { end: string } => it.end !== undefined)
@@ -95,11 +99,12 @@ export const selectRecentLogEntries = createAppSelector(
       }, new Map());
 
     return [...taskEntryIdToLatestLogRecord].map(([taskEntryId, logEntry]) => {
-      const taskEntry = taskEntriesById[taskEntryId];
+      const entry =
+        taskEntriesById[taskEntryId] ?? fileEntriesById[taskEntryId];
 
-      isNotVoid(taskEntry, "Inconsistent store state");
+      isNotVoid(entry, "Inconsistent store state");
 
-      return planEntryToLocalTask(logEntry, taskEntry);
+      return planEntryToLocalTask(logEntry, entry);
     });
   },
 );

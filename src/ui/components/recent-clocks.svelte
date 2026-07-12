@@ -7,6 +7,7 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { selectRecentLogEntries } from "../../redux/index/index-selectors";
   import type { LocalTask } from "../../task-types";
+  import { removeMarkdownExtension } from "../../util/markdown";
   import { getDayKey } from "../../util/task-utils";
   import { createRecentClockMenu } from "../recent-clock-menu";
 
@@ -133,7 +134,7 @@
                       task.location.position.start.line,
                     );
                   }}
-                  value={task.location.path.replace(/\.md$/, "")}
+                  value={removeMarkdownExtension(task.location.path)}
                 />
               {/if}
             </Properties>

@@ -61,6 +61,10 @@ export function getLinesAfterFirst(text: string) {
   return text.split("\n").slice(1).join("\n");
 }
 
+export function removeMarkdownExtension(path: string) {
+  return path.replace(/\.md$/, "");
+}
+
 export function removeListTokens(text: string) {
   return text
     .replace(listTokenWithSpacesRegExp, "")

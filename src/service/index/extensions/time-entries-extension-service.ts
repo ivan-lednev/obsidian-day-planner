@@ -1,11 +1,11 @@
 import { createId } from "../../../redux/index/index-slice";
 import { isTaskCache } from "../../../util/metadata";
-import { getDayKeysInRange, strictParse } from "../../../util/moment";
 import type { ListPropsParser } from "../../list-props-parser";
 import type {
   ListItemIndexExtensionService,
   RawListItemEntryWithContext,
 } from "../list-item-index-extension-service";
+import { createLogEntry } from "../log-entry";
 
 export class TimeEntriesExtensionService
   implements ListItemIndexExtensionService
@@ -33,7 +33,7 @@ export class TimeEntriesExtensionService
         propsPosition: listItemProps?.position,
         logEntries:
           listItemProps?.parsed.planner?.log?.map(({ start, end }, index) =>
-            this.createLogEntry({
+            createLogEntry({
               start,
               end,
               parent: rawListItemEntry.id,
@@ -42,28 +42,5 @@ export class TimeEntriesExtensionService
           ) ?? [],
       };
     };
-  }
-
-  private createLogEntry(props: {
-    start: string;
-    end?: string;
-    parent: string;
-    id: string;
-  }) {
-    const { start, end, parent, id } = props;
-
-    const parsedStart = strictParse(start);
-
-    const parsedEnd = end
-      ? strictParse(end)
-      : // TODO: P3 bug
-        //  Solution 1: dispatch dayChanged() and update active clocks then; simple & works
-        //  Solution 2: calculate dayKeys for active clocks on the fly in selectActiveLogEntries selector
-        //  Solution 3: use sorted array instead of buckets
-        window.moment();
-
-    const dayKeys: string[] = getDayKeysInRange(parsedStart, parsedEnd);
-
-    return { start, end, parent, dayKeys, id };
   }
 }

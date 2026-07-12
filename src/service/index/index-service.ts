@@ -1,6 +1,7 @@
 import type { CachedMetadata } from "obsidian";
 
 import type {
+  FileSystemEntry,
   ListItemEntry,
   LogEntry,
   PlanEntry,
@@ -14,6 +15,7 @@ export interface FileWithMetadata {
 
 export interface FileIndexContribution {
   taskEntries?: ListItemEntry[];
+  fileEntries?: FileSystemEntry[];
   logEntries?: LogEntry[];
   planEntries?: PlanEntry[];
 }

@@ -11,14 +11,17 @@ import { getDiffInMinutes, strictParse } from "../../util/moment";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
 
-export interface ListItemEntry {
+export interface FileSystemEntry {
   id: string;
   text: string;
+  path: string;
+}
+
+export interface ListItemEntry extends FileSystemEntry {
   task?: string;
   symbol: string;
   position: Pos;
   propsPosition?: Pos;
-  path: string;
   children?: string[];
   logEntries?: string[];
   planEntries?: string[];
@@ -55,6 +58,10 @@ interface IndexSliceState {
     byId: Record<string, ListItemEntry>;
     byPath: Record<string, string[]>;
   };
+  fileEntries: {
+    byId: Record<string, FileSystemEntry>;
+    byPath: Record<string, string[]>;
+  };
   logEntries: {
     byId: Record<string, LogEntry>;
     byPath: Record<string, string[]>;
@@ -69,6 +76,7 @@ interface IndexSliceState {
 
 const initialState: IndexSliceState = {
   taskEntries: { byPath: {}, byId: {} },
+  fileEntries: { byPath: {}, byId: {} },
   logEntries: {
     byPath: {},
     byId: {},
@@ -84,6 +92,7 @@ const initialState: IndexSliceState = {
 interface FileIndex {
   path: string;
   taskEntries?: ListItemEntry[];
+  fileEntries?: FileSystemEntry[];
   logEntries?: LogEntry[];
   planEntries?: PlanEntry[];
 }
@@ -110,6 +119,14 @@ export const indexSlice = createAppSlice({
         });
 
         delete state.taskEntries.byPath[path];
+
+        const fileEntryIds = state.fileEntries.byPath[path] || [];
+
+        fileEntryIds.forEach((id) => {
+          delete state.fileEntries.byId[id];
+        });
+
+        delete state.fileEntries.byPath[path];
 
         // todo: copypasted
         const logEntryIds = state.logEntries.byPath[path] || [];
@@ -165,7 +182,8 @@ export const indexSlice = createAppSlice({
         const fileIndexes = action.payload;
 
         fileIndexes.forEach((fileIndex) => {
-          const { path, taskEntries, logEntries, planEntries } = fileIndex;
+          const { path, taskEntries, fileEntries, logEntries, planEntries } =
+            fileIndex;
 
           // todo: repeat for logEntries
           const previousTaskEntryIds = state.taskEntries.byPath[path] || [];
@@ -180,6 +198,20 @@ export const indexSlice = createAppSlice({
 
             taskEntries.forEach((it) => {
               state.taskEntries.byId[it.id] = it;
+            });
+          }
+
+          const previousFileEntryIds = state.fileEntries.byPath[path] || [];
+
+          previousFileEntryIds.forEach((id) => {
+            delete state.fileEntries.byId[id];
+          });
+
+          if (fileEntries) {
+            state.fileEntries.byPath[path] = fileEntries.map((it) => it.id);
+
+            fileEntries.forEach((it) => {
+              state.fileEntries.byId[it.id] = it;
             });
           }
 
@@ -271,11 +303,13 @@ export const indexSlice = createAppSlice({
         .flat()
         .filter((it) => !it.end)
         .map((logEntry) => {
-          const taskEntry = state.taskEntries.byId[logEntry.parent];
+          const entry =
+            state.taskEntries.byId[logEntry.parent] ??
+            state.fileEntries.byId[logEntry.parent];
 
-          isNotVoid(taskEntry, "Inconsistent store state");
+          isNotVoid(entry, "Inconsistent store state");
 
-          return planEntryToLocalTask(logEntry, taskEntry);
+          return planEntryToLocalTask(logEntry, entry);
         }),
     selectListPropsPosition: (state, path: string, line: number) => {
       const taskEntriesForFile = state.taskEntries.byPath[path]?.map(
@@ -293,6 +327,7 @@ export const indexSlice = createAppSlice({
     selectLogEntriesByDay: (state) => state.logEntries.byDay,
     selectLogEntriesById: (state) => state.logEntries.byId,
     selectTaskEntriesById: (state) => state.taskEntries.byId,
+    selectFileEntriesById: (state) => state.fileEntries.byId,
     selectPlanEntriesByDay: (state) => state.planEntries.byDay,
     selectPlanEntriesById: (state) => state.planEntries.byId,
   },
@@ -305,9 +340,15 @@ export type ListItemEntryWithChildren = Omit<
   children?: ListItemEntryWithChildren[];
 };
 
+export function isListItemEntry(
+  entry: ListItemEntry | FileSystemEntry,
+): entry is ListItemEntry {
+  return "position" in entry;
+}
+
 export function planEntryToLocalTask(
   logEntry: PlanEntry,
-  listItemEntry: ListItemEntry,
+  entry: ListItemEntry | FileSystemEntry,
   // todo: remove previous one
   listItemEntryWithChildren?: ListItemEntryWithChildren,
 ): LocalTask {
@@ -317,17 +358,28 @@ export function planEntryToLocalTask(
     : // todo: use settings OR logic from dataview code
       30;
 
-  return {
-    status: listItemEntry.task,
-    task: listItemEntry.task,
-    text: listItemEntry.text,
-    location: { path: listItemEntry.path, position: listItemEntry.position },
-    symbol: listItemEntry.symbol,
+  const base = {
+    text: entry.text,
     startTime,
     durationMinutes,
     id: logEntry.id,
     isAllDayEvent: logEntry.isAllDay,
     children: listItemEntryWithChildren?.children,
+  };
+
+  if (isListItemEntry(entry)) {
+    return {
+      ...base,
+      status: entry.task,
+      task: entry.task,
+      location: { path: entry.path, position: entry.position },
+      symbol: entry.symbol,
+    };
+  }
+
+  return {
+    ...base,
+    symbol: "-",
   };
 }
 
@@ -342,6 +394,7 @@ export const {
   selectPlanEntriesById,
   selectPlanEntriesByDay,
   selectTaskEntriesById,
+  selectFileEntriesById,
 } = indexSlice.selectors;
 
 type IndexRequested = ReturnType<typeof indexRequested>;
@@ -362,6 +415,10 @@ function mergeContributions(
       taskEntries: [
         ...(acc.taskEntries ?? []),
         ...(contribution.taskEntries ?? []),
+      ],
+      fileEntries: [
+        ...(acc.fileEntries ?? []),
+        ...(contribution.fileEntries ?? []),
       ],
       logEntries: [
         ...(acc.logEntries ?? []),
@@ -390,7 +447,8 @@ export function createIndexListener(props: {
       try {
         const metadata = metadataCache.getCache(path);
 
-        if (!metadata?.listItems) {
+        // todo: this is a leak: the orchestrator knows about indexer specifics
+        if (!metadata?.listItems && !metadata?.frontmatter) {
           return undefined;
         }
 

@@ -14,6 +14,7 @@
   import { selectActiveLogEntries } from "../../redux/index/index-slice";
   import { runWithNoticeOnError } from "../../service/list-item-entry-editor";
   import type { LocalTask } from "../../task-types";
+  import { removeMarkdownExtension } from "../../util/markdown";
   import * as m from "../../util/moment";
   import { getDiffInMinutes } from "../../util/moment";
   import { createActiveClockMenu } from "../active-clock-menu";
@@ -115,7 +116,7 @@
                       task.location.position.start.line,
                     );
                   }}
-                  value={task.location.path.replace(/\.md$/, "")}
+                  value={removeMarkdownExtension(task.location.path)}
                 />
               {/if}
               <Pill
