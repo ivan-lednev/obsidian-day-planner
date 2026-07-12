@@ -12,7 +12,7 @@ import {
   isListItemEntry,
   type ListItemEntry,
   type ListItemEntryWithChildren,
-  planEntryToLocalTask,
+  derivedEntryToLocalTask,
   selectFileEntriesById,
   selectLogEntriesByDay,
   selectLogEntriesById,
@@ -104,7 +104,7 @@ export const selectRecentLogEntries = createAppSelector(
 
       isNotVoid(entry, "Inconsistent store state");
 
-      return planEntryToLocalTask(logEntry, entry);
+      return derivedEntryToLocalTask(logEntry, entry);
     });
   },
 );
@@ -140,7 +140,7 @@ export const selectPlanEntriesForVisibleDays = createAppSelector(
           listItemEntriesById,
         );
 
-        return planEntryToLocalTask(planEntry, listItemEntry, withChildren);
+        return derivedEntryToLocalTask(planEntry, listItemEntry, withChildren);
       }) || []
     );
   },
@@ -173,7 +173,7 @@ export const selectPlanEntriesForDays = createAppSelector(
           listItemEntriesById,
         );
 
-        return planEntryToLocalTask(planEntry, listItemEntry, withChildren);
+        return derivedEntryToLocalTask(planEntry, listItemEntry, withChildren);
       }) || []
     );
   },
@@ -184,14 +184,14 @@ function inflateChildren(
   listItemEntry: ListItemEntry,
   listItemEntriesById: Record<string, ListItemEntry>,
 ): ListItemEntryWithChildren {
-  const { children = [], ...rest } = listItemEntry;
+  const { childIds = [], ...rest } = listItemEntry;
 
   return {
     ...rest,
     // todo: not needed here
     logEntries: [],
     planEntries: [],
-    children: children.map((id) => {
+    children: childIds.map((id) => {
       const child = listItemEntriesById[id];
 
       isNotVoid(child, "Inconsistent index state");

@@ -22,14 +22,14 @@ export interface ListItemEntry extends FileSystemEntry {
   symbol: string;
   position: Pos;
   propsPosition?: Pos;
-  children?: string[];
-  logEntries?: string[];
-  planEntries?: string[];
+  childIds?: string[];
+  logEntryIds?: string[];
+  planEntryIds?: string[];
 }
 
 export type DenormalizedListItemEntry = Omit<
   ListItemEntry,
-  "logEntries" | "planEntries"
+  "logEntryIds" | "planEntryIds" | "childIds"
 > & {
   logEntries: LogEntry[];
   planEntries: PlanEntry[];
@@ -37,20 +37,21 @@ export type DenormalizedListItemEntry = Omit<
 };
 
 export interface LogEntry {
+  id: string;
+  parent: string;
   start: string;
   end?: string;
-  parent: string;
   dayKeys: string[];
-  id: string;
 }
 
 export interface PlanEntry {
   isAllDay?: boolean;
+
+  id: string;
+  parent: string;
   start: string;
   end?: string;
-  parent: string;
   dayKeys: string[];
-  id: string;
 }
 
 interface IndexSliceState {
@@ -309,7 +310,7 @@ export const indexSlice = createAppSlice({
 
           isNotVoid(entry, "Inconsistent store state");
 
-          return planEntryToLocalTask(logEntry, entry);
+          return derivedEntryToLocalTask(logEntry, entry);
         }),
     selectListPropsPosition: (state, path: string, line: number) => {
       const taskEntriesForFile = state.taskEntries.byPath[path]?.map(
@@ -346,34 +347,35 @@ export function isListItemEntry(
   return "position" in entry;
 }
 
-export function planEntryToLocalTask(
-  logEntry: PlanEntry,
-  entry: ListItemEntry | FileSystemEntry,
-  // todo: remove previous one
+export function derivedEntryToLocalTask(
+  // todo: use another type
+  derivedEntry: PlanEntry,
+  parentEntry: ListItemEntry | FileSystemEntry,
+  // todo: it duplicates the previous one, but for files it's not needed
   listItemEntryWithChildren?: ListItemEntryWithChildren,
 ): LocalTask {
-  const startTime = strictParse(logEntry.start);
-  const durationMinutes = logEntry.end
-    ? getDiffInMinutes(strictParse(logEntry.end), startTime)
+  const startTime = strictParse(derivedEntry.start);
+  const durationMinutes = derivedEntry.end
+    ? getDiffInMinutes(strictParse(derivedEntry.end), startTime)
     : // todo: use settings OR logic from dataview code
       30;
 
   const base = {
-    text: entry.text,
+    text: parentEntry.text,
     startTime,
     durationMinutes,
-    id: logEntry.id,
-    isAllDayEvent: logEntry.isAllDay,
+    id: derivedEntry.id,
+    isAllDayEvent: derivedEntry.isAllDay,
     children: listItemEntryWithChildren?.children,
   };
 
-  if (isListItemEntry(entry)) {
+  if (isListItemEntry(parentEntry)) {
     return {
       ...base,
-      status: entry.task,
-      task: entry.task,
-      location: { path: entry.path, position: entry.position },
-      symbol: entry.symbol,
+      status: parentEntry.task,
+      task: parentEntry.task,
+      location: { path: parentEntry.path, position: parentEntry.position },
+      symbol: parentEntry.symbol,
     };
   }
 

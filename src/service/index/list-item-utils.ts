@@ -11,14 +11,14 @@ import { getTextAtPosition } from "../../util/metadata";
 
 export function flatten<T extends { children?: T[]; id: string }>(
   node: T,
-): Array<Omit<T, "children"> & { children?: string[] }> {
+): Array<Omit<T, "children"> & { childIds?: string[] }> {
   const { children, ...rest } = node;
 
   return [
     {
       ...rest,
       ...(children
-        ? { children: (children ?? []).map((child) => child.id) }
+        ? { childIds: (children ?? []).map((child) => child.id) }
         : {}),
     },
     ...(children ?? []).flatMap(flatten),

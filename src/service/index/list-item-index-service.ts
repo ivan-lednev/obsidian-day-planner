@@ -30,8 +30,8 @@ export class ListItemIndexService implements IndexService {
     return {
       taskEntries: flatListItemEntries.map(
         ({ logEntries, planEntries, ...rest }) => ({
-          logEntries: logEntries?.map((it) => it.id),
-          planEntries: planEntries?.map((it) => it.id),
+          logEntryIds: logEntries?.map((it) => it.id),
+          planEntryIds: planEntries?.map((it) => it.id),
           ...rest,
         }),
       ),
