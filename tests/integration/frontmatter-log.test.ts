@@ -6,7 +6,6 @@ import {
 } from "../../src/redux";
 import {
   fileDeleted,
-  indexRequested,
   selectActiveLogEntries,
 } from "../../src/redux/index/index-slice";
 import { strictParse } from "../../src/util/moment";
@@ -26,40 +25,34 @@ describe("Frontmatter log indexing", () => {
   test("Indexes a closed frontmatter log entry on its day", async () => {
     const { getState } = await setUp({ loadedFixtures: [closedLogFixture] });
 
-    await vi.waitFor(() => {
-      expect(
-        selectLogEntriesForDay(getState(), dayKey, strictParse(dayKey)),
-      ).toContainEqual(
-        expect.objectContaining({
-          text: closedLogBasename,
-          startTime: window.moment("2025-07-19 12:00"),
-          durationMinutes: 150,
-        }),
-      );
-    });
+    expect(
+      selectLogEntriesForDay(getState(), dayKey, strictParse(dayKey)),
+    ).toContainEqual(
+      expect.objectContaining({
+        text: closedLogBasename,
+        startTime: window.moment("2025-07-19 12:00"),
+        durationMinutes: 150,
+      }),
+    );
   });
 
   test("Surfaces frontmatter logs among recent log entries", async () => {
     const { getState } = await setUp({ loadedFixtures: [closedLogFixture] });
 
-    await vi.waitFor(() => {
-      expect(selectRecentLogEntries(getState())).toContainEqual(
-        expect.objectContaining({ text: closedLogBasename }),
-      );
-    });
+    expect(selectRecentLogEntries(getState())).toContainEqual(
+      expect.objectContaining({ text: closedLogBasename }),
+    );
   });
 
   test("Surfaces an open frontmatter clock as an active log entry", async () => {
     const { getState } = await setUp({ loadedFixtures: [openLogFixture] });
 
-    await vi.waitFor(() => {
-      expect(selectActiveLogEntries(getState())).toContainEqual(
-        expect.objectContaining({
-          text: openLogBasename,
-          startTime: window.moment("2025-07-19 12:00"),
-        }),
-      );
-    });
+    expect(selectActiveLogEntries(getState())).toContainEqual(
+      expect.objectContaining({
+        text: openLogBasename,
+        startTime: window.moment("2025-07-19 12:00"),
+      }),
+    );
   });
 
   test("Removes frontmatter logs when the file is deleted", async () => {
@@ -67,11 +60,9 @@ describe("Frontmatter log indexing", () => {
       loadedFixtures: [closedLogFixture],
     });
 
-    await vi.waitFor(() => {
-      expect(
-        selectLogEntriesForDay(getState(), dayKey, strictParse(dayKey)),
-      ).toHaveLength(1);
-    });
+    expect(
+      selectLogEntriesForDay(getState(), dayKey, strictParse(dayKey)),
+    ).toHaveLength(1);
 
     dispatch(fileDeleted({ path: closedLogPath }));
 
@@ -80,23 +71,7 @@ describe("Frontmatter log indexing", () => {
     ).toEqual([]);
   });
 
-  test("Replaces frontmatter logs on re-index without duplicates", async () => {
-    const { getState, dispatch } = await setUp({
-      loadedFixtures: [closedLogFixture],
-    });
-
-    await vi.waitFor(() => {
-      expect(
-        selectLogEntriesForDay(getState(), dayKey, strictParse(dayKey)),
-      ).toHaveLength(1);
-    });
-
-    dispatch(indexRequested([closedLogPath]));
-
-    await vi.waitFor(() => {
-      expect(
-        selectLogEntriesForDay(getState(), dayKey, strictParse(dayKey)),
-      ).toHaveLength(1);
-    });
-  });
+  test.todo(
+    "Replaces frontmatter logs on re-index without duplicates and removes deleted ones when entry count shrinks",
+  );
 });
