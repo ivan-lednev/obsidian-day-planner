@@ -142,7 +142,7 @@ export function useEditContext(props: {
     ($combinedTimeBlocks) => {
       const split: TimeBlock[] = $combinedTimeBlocks.flatMap(
         (timeBlock): TimeBlock[] | TimeBlock => {
-          if (!t.isWithTime(timeBlock) || timeBlock.isAllDayEvent) {
+          if (!t.isWithDuration(timeBlock) || timeBlock.isAllDayEvent) {
             return timeBlock;
           }
 
@@ -200,7 +200,7 @@ export function useEditContext(props: {
           })
           .map(
             (timeBlock): TimeBlock =>
-              t.isWithTime(timeBlock)
+              t.isWithDuration(timeBlock)
                 ? t.truncateToRange(timeBlock, range)
                 : timeBlock,
           );

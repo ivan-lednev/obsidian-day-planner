@@ -58,11 +58,10 @@ export function getEndTime(timeBlock: {
   return timeBlock.startTime.clone().add(timeBlock.durationMinutes, "minutes");
 }
 
-// todo: remove this inconsistency
-export function isWithTime<T extends TimeBlock>(
+export function isWithDuration<T extends TimeBlock>(
   timeBlock: T,
 ): timeBlock is WithDuration<T> {
-  return Object.hasOwn(timeBlock, "startTime") || !timeBlock.isAllDayEvent;
+  return Object.hasOwn(timeBlock, "durationMinutes");
 }
 
 const keySeparator = ":";
@@ -87,7 +86,7 @@ export function getRenderKey(timeBlock: WithDuration<TimeBlock> | TimeBlock) {
 
   const key: string[] = [];
 
-  if (isWithTime(timeBlock)) {
+  if (isWithDuration(timeBlock)) {
     key.push(
       String(getMinutesSinceMidnight(timeBlock.startTime)),
       String(getEndMinutes(timeBlock)),
@@ -352,7 +351,7 @@ export function getBlockProps(
 ) {
   const result: string[] = [];
 
-  if (settings.showTimestampInTaskBlock && isWithTime(timeBlock)) {
+  if (settings.showTimestampInTaskBlock && isWithDuration(timeBlock)) {
     result.push(
       createTimestamp(
         getMinutesSinceMidnight(timeBlock.startTime),

@@ -30,7 +30,7 @@
   }
 
   function getSpan(task: TimeBlock) {
-    if (isLocal(task) || !t.isWithTime(task)) {
+    if (isLocal(task) || !t.isWithDuration(task)) {
       return 1;
     }
 

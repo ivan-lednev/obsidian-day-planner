@@ -22,7 +22,7 @@ export function useStylesForRelationToNow(task: TimeBlock) {
       );
     }
 
-    if (t.isWithTime(task)) {
+    if (t.isWithDuration(task)) {
       return getRelationToNow(
         currentTimeSignal.current,
         task.startTime,
