@@ -18,14 +18,7 @@ export interface ListItemTokens {
   task?: string;
 }
 
-export type WithPlacing<T> = T & {
-  placing: HorizontalPlacing;
-};
-
-/**
- * A time block is a UI projection of an indexed entry
- */
-export type BaseTimeBlock = {
+interface BaseTimeBlock {
   /**
    * Time blocks get an ID on parsing. It is unique to a line in a file, not to a
    * block, visible in the UI (because blocks might get split at midnight, etc.).
@@ -35,11 +28,7 @@ export type BaseTimeBlock = {
   isAllDayEvent?: boolean;
   // TODO: move to TimeBlockView
   truncated?: Side[];
-};
-
-export type WithDuration<T> = T & {
-  durationMinutes: number;
-};
+}
 
 export interface RemoteTimeBlock extends BaseTimeBlock {
   calendar: IcalConfig;
@@ -62,6 +51,9 @@ export interface LocalTimeBlock extends ListItemTokens, BaseTimeBlock {
   durationMinutes: number;
 }
 
+/**
+ * A time block is a UI projection of an indexed entry
+ */
 export type TimeBlock = LocalTimeBlock | RemoteTimeBlock;
 
 export function isRemote(timeBlock: TimeBlock): timeBlock is RemoteTimeBlock {
@@ -71,3 +63,13 @@ export function isRemote(timeBlock: TimeBlock): timeBlock is RemoteTimeBlock {
 export function isLocal(timeBlock: TimeBlock): timeBlock is LocalTimeBlock {
   return Object.hasOwn(timeBlock, "text");
 }
+
+export type WithDuration<T> = T & {
+  durationMinutes: number;
+};
+
+export type WithPlacing<T> = T & {
+  placing: HorizontalPlacing;
+};
+
+export type TimeInterval = WithDuration<Pick<TimeBlock, "id" | "startTime">>;

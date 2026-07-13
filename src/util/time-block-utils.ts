@@ -15,7 +15,6 @@ import {
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
 import {
-  type BaseTimeBlock,
   isRemote,
   type LocalTimeBlock,
   type RemoteTimeBlock,
@@ -325,7 +324,7 @@ export function hasDateFromProp(timeBlock: LocalTimeBlock) {
   return scheduledPropRegExps.some((regexp) => regexp.test(timeBlock.text));
 }
 
-export function clamp<T extends WithDuration<BaseTimeBlock>>(
+export function clamp<T extends WithDuration<TimeBlock>>(
   timeBlock: T,
   start: Moment,
   end: Moment,

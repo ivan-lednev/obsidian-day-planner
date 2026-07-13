@@ -2,11 +2,7 @@ import Fraction from "fraction.js";
 import { partition } from "lodash/fp";
 import { isNotVoid } from "typed-assert";
 
-import type {
-  BaseTimeBlock,
-  WithPlacing,
-  WithDuration,
-} from "../time-block-types";
+import type { TimeInterval, WithPlacing } from "../time-block-types";
 import type { Overlap } from "../types";
 import { getMinutesSinceMidnight } from "../util/moment";
 import { getEndMinutes } from "../util/time-block-utils";
@@ -17,7 +13,7 @@ const empty = "empty";
 const taken = "taken";
 
 export function computeOverlap(
-  items: Array<WithDuration<BaseTimeBlock>>,
+  items: Array<TimeInterval>,
 ): Map<string, Overlap> {
   return items.reduce((overlapLookup, item) => {
     const overlapGroup = getItemsOverlappingItemAndEachOther(item, items);
@@ -27,8 +23,8 @@ export function computeOverlap(
 }
 
 function getItemsOverlappingItemAndEachOther(
-  item: WithDuration<BaseTimeBlock>,
-  items: Array<WithDuration<BaseTimeBlock>>,
+  item: TimeInterval,
+  items: Array<TimeInterval>,
 ) {
   return items
     .reduce(
@@ -53,7 +49,7 @@ function getItemsOverlappingItemAndEachOther(
 }
 
 function computeOverlapForGroup(
-  overlapGroup: Array<WithDuration<BaseTimeBlock>>,
+  overlapGroup: Array<TimeInterval>,
   previousLookup: Map<string, Overlap>,
 ) {
   const newLookup = new Map([...previousLookup]);
@@ -127,10 +123,7 @@ function computeOverlapForGroup(
   return newLookup;
 }
 
-function overlaps(
-  a: WithDuration<BaseTimeBlock>,
-  b: WithDuration<BaseTimeBlock>,
-) {
+function overlaps(a: TimeInterval, b: TimeInterval) {
   const [early, late] =
     getMinutesSinceMidnight(a.startTime) < getMinutesSinceMidnight(b.startTime)
       ? [a, b]
@@ -139,7 +132,7 @@ function overlaps(
   return getEndMinutes(early) > getMinutesSinceMidnight(late.startTime);
 }
 
-export function addHorizontalPlacing<T extends WithDuration<BaseTimeBlock>>(
+export function addHorizontalPlacing<T extends TimeInterval>(
   blocks: Array<T>,
 ): Array<WithPlacing<T>> {
   if (blocks.length === 0) {
