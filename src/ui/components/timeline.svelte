@@ -13,11 +13,7 @@
     offsetYToMinutes,
   } from "../../util/dom";
   import { minutesToMomentOfDay } from "../../util/moment";
-  import {
-    getBlockProps,
-    getDayKey,
-    getRenderKey,
-  } from "../../util/time-block-utils";
+  import { getBlockProps, getDayKey } from "../../util/time-block-utils";
   import { createGestures } from "../actions/gestures";
 
   import Column from "./column.svelte";
@@ -118,7 +114,7 @@
       onpointerup={confirmEdit}
       use:timelineGestures
     >
-      {#each $displayedTasksForTimeline.withTime as task (getRenderKey(task))}
+      {#each $displayedTasksForTimeline.withTime as task (task.id)}
         <PositionedTimeBlock {task}>
           <UnscheduledTimeBlock {task}>
             {#snippet bottomDecoration()}

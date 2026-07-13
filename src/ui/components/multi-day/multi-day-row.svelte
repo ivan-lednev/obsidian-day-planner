@@ -52,7 +52,7 @@
 </script>
 
 <div style:--column-count={dateRange.current.length} class="multi-day-row">
-  {#each displayedAllDayTasks as task (t.getRenderKey(task))}
+  {#each displayedAllDayTasks as task (task.id)}
     <UnscheduledTimeBlock
       --time-block-grid-column="{getColumnIndex(task)} / span {getSpan(task)}"
       {task}
