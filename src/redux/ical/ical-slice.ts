@@ -6,12 +6,12 @@ import {
 import ical from "node-ical";
 
 import type { IcalConfig } from "../../settings";
-import type { RemoteTask } from "../../task-types";
+import type { RemoteTimeBlock } from "../../time-block-types";
 import type { WithIcalConfig } from "../../types";
 import { createAppSlice } from "../create-app-slice";
 
 export type RawIcal = { icalConfig: IcalConfig; text: string };
-export type SerializedRemoteTask = Omit<RemoteTask, "startTime"> & {
+export type SerializedRemoteTask = Omit<RemoteTimeBlock, "startTime"> & {
   startTime: string;
 };
 

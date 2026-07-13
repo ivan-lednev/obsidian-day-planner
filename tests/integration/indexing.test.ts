@@ -12,7 +12,7 @@ import {
   selectEntriesForPath,
 } from "../../src/redux/index/index-slice";
 import { strictParse } from "../../src/util/moment";
-import { getDayKey } from "../../src/util/task-utils";
+import { getDayKey } from "../../src/util/time-block-utils";
 
 import { setUp } from "./util/setup";
 

@@ -4,7 +4,7 @@ import { isExactly } from "typed-assert";
 import type { DayPlannerSettings } from "../settings";
 import type { RelationToNow } from "../types";
 
-import { getDayKey } from "./task-utils";
+import { getDayKey } from "./time-block-utils";
 
 const moment = window.moment;
 

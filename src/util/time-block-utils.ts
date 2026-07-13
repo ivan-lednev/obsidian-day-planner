@@ -15,14 +15,14 @@ import {
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
 import {
-  type BaseTask,
+  type BaseTimeBlock,
   isRemote,
-  type LocalTask,
-  type RemoteTask,
-  type Task,
-  type TaskLocation,
-  type WithTime,
-} from "../task-types";
+  type LocalTimeBlock,
+  type RemoteTimeBlock,
+  type TimeBlock,
+  type TimeBlockLocation,
+  type WithDuration,
+} from "../time-block-types";
 
 import { getId } from "./id";
 import {
@@ -43,96 +43,106 @@ import {
 } from "./moment";
 import { deleteProps, updateScheduledPropInText } from "./props";
 
-export function getEndMinutes(task: {
+export function getEndMinutes(timeBlock: {
   startTime: Moment;
   durationMinutes: number;
 }) {
-  return getMinutesSinceMidnight(task.startTime) + task.durationMinutes;
+  return (
+    getMinutesSinceMidnight(timeBlock.startTime) + timeBlock.durationMinutes
+  );
 }
 
-export function getEndTime(task: {
+export function getEndTime(timeBlock: {
   startTime: Moment;
   durationMinutes: number;
 }) {
-  return task.startTime.clone().add(task.durationMinutes, "minutes");
+  return timeBlock.startTime.clone().add(timeBlock.durationMinutes, "minutes");
 }
 
 // todo: remove this inconsistency
-export function isWithTime<T extends Task>(task: T): task is WithTime<T> {
-  return Object.hasOwn(task, "startTime") || !task.isAllDayEvent;
+export function isWithTime<T extends TimeBlock>(
+  timeBlock: T,
+): timeBlock is WithDuration<T> {
+  return Object.hasOwn(timeBlock, "startTime") || !timeBlock.isAllDayEvent;
 }
 
 const keySeparator = ":";
 
-function getRemoteTaskIdentity(task: RemoteTask) {
+function getRemoteTimeBlockIdentity(timeBlock: RemoteTimeBlock) {
   const key: string[] = [];
 
-  key.push(task.calendar.name, task.startTime.toISOString(false), task.summary);
+  key.push(
+    timeBlock.calendar.name,
+    timeBlock.startTime.toISOString(false),
+    timeBlock.summary,
+  );
 
   return key.join(keySeparator);
 }
 
 // todo: should remove?
-export function getRenderKey(task: WithTime<Task> | Task) {
-  if (isRemote(task)) {
-    return getRemoteTaskIdentity(task);
+export function getRenderKey(timeBlock: WithDuration<TimeBlock> | TimeBlock) {
+  if (isRemote(timeBlock)) {
+    return getRemoteTimeBlockIdentity(timeBlock);
   }
 
   const key: string[] = [];
 
-  if (isWithTime(task)) {
+  if (isWithTime(timeBlock)) {
     key.push(
-      String(getMinutesSinceMidnight(task.startTime)),
-      String(getEndMinutes(task)),
+      String(getMinutesSinceMidnight(timeBlock.startTime)),
+      String(getEndMinutes(timeBlock)),
     );
   }
 
-  if (task.location) {
+  if (timeBlock.location) {
     const {
       path,
       position: {
         start: { line },
       },
-    } = task.location;
+    } = timeBlock.location;
 
     key.push(path, String(line));
   }
 
-  key.push(task.text);
+  key.push(timeBlock.text);
 
   return key.join(keySeparator);
 }
 
-export function getNotificationKey(task: WithTime<Task>) {
-  if (isRemote(task)) {
-    return getRemoteTaskIdentity(task);
+export function getNotificationKey(timeBlock: WithDuration<TimeBlock>) {
+  if (isRemote(timeBlock)) {
+    return getRemoteTimeBlockIdentity(timeBlock);
   }
 
   const key: string[] = [];
 
   key.push(
-    task.location?.path ?? "blank",
-    String(getMinutesSinceMidnight(task.startTime)),
-    String(task.durationMinutes),
-    task.text,
+    timeBlock.location?.path ?? "blank",
+    String(getMinutesSinceMidnight(timeBlock.startTime)),
+    String(timeBlock.durationMinutes),
+    timeBlock.text,
   );
 
   return key.join(keySeparator);
 }
 
 /**
- * Tasks with date prop are copied under the original task, tasks from daily
+ * Time blocks with date prop are copied under the original time block, time blocks from daily
  * notes get sent under a heading based on the new date.
  */
-export function copy(original: WithTime<LocalTask>): WithTime<LocalTask> {
-  let location: TaskLocation | undefined;
+export function copy(
+  original: WithDuration<LocalTimeBlock>,
+): WithDuration<LocalTimeBlock> {
+  let location: TimeBlockLocation | undefined;
 
   if (hasDateFromProp(original)) {
     const originalLocation = original.location;
 
     isNotVoid(
       originalLocation,
-      `Did not find location on task$ ${getOneLineSummary(original)}`,
+      `Did not find location on time block$ ${getOneLineSummary(original)}`,
     );
 
     location = produce(originalLocation, (draft) => {
@@ -159,7 +169,7 @@ export function createTimestamp(
   return `${start.format(format)}${separator}${end.format(format)}`;
 }
 
-export function getEmptyTasksForDay() {
+export function getEmptyTimeBlocksForDay() {
   return { withTime: [], noTime: [] };
 }
 
@@ -167,24 +177,24 @@ export function getDayKey(day: Moment) {
   return day.format(defaultDayFormat);
 }
 
-export function toString(task: WithTime<LocalTask>) {
+export function toString(timeBlock: WithDuration<LocalTimeBlock>) {
   const updatedTimestamp = createTimestamp(
-    getMinutesSinceMidnight(task.startTime),
-    task.durationMinutes,
+    getMinutesSinceMidnight(timeBlock.startTime),
+    timeBlock.durationMinutes,
     get(settings).timestampFormat,
   );
-  const listTokens = createMarkdownListTokens(task);
+  const listTokens = createMarkdownListTokens(timeBlock);
 
-  const withUpdatedOrDeletedTimeRange = task.isAllDayEvent
-    ? removeTimeRange(getFirstLine(task.text))
-    : replaceOrPrependTimeRange(getFirstLine(task.text), updatedTimestamp);
+  const withUpdatedOrDeletedTimeRange = timeBlock.isAllDayEvent
+    ? removeTimeRange(getFirstLine(timeBlock.text))
+    : replaceOrPrependTimeRange(getFirstLine(timeBlock.text), updatedTimestamp);
 
   const updatedFirstLineText = updateScheduledPropInText(
     withUpdatedOrDeletedTimeRange,
-    getDayKey(task.startTime),
+    getDayKey(timeBlock.startTime),
   );
 
-  const paragraphs = task.text
+  const paragraphs = timeBlock.text
     .split("\n")
     .slice(1)
     .map((line) => getIndentationForListParagraph() + line)
@@ -197,9 +207,9 @@ export function toString(task: WithTime<LocalTask>) {
     result += paragraphs;
   }
 
-  if (task.children && task.children.length > 0) {
+  if (timeBlock.children && timeBlock.children.length > 0) {
     result += "\n";
-    result += task.children
+    result += timeBlock.children
       .map((child) => getIndentedText(child, "\t"))
       .join("\n");
   }
@@ -224,10 +234,10 @@ export function create(props: {
   startMinutes: number;
   settings: DayPlannerSettings;
   text?: string;
-  location?: TaskLocation;
+  location?: TimeBlockLocation;
   status?: string;
   isAllDayEvent?: boolean;
-}): WithTime<LocalTask> {
+}): WithDuration<LocalTimeBlock> {
   const {
     day,
     startMinutes,
@@ -253,25 +263,28 @@ export function create(props: {
   };
 }
 
-export function getOneLineSummary(task: Task) {
-  if (isRemote(task)) {
-    return task.summary;
+export function getOneLineSummary(timeBlock: TimeBlock) {
+  if (isRemote(timeBlock)) {
+    return timeBlock.summary;
   }
 
-  return removeTimeRangeFromStartOfLine(task.text);
+  return removeTimeRangeFromStartOfLine(timeBlock.text);
 }
 
-export function truncateToRange(task: WithTime<Task>, range: m.Range) {
-  const start = task.startTime.clone().startOf("day");
-  const end = getEndTime(task).clone().endOf("day");
+export function truncateToRange(
+  timeBlock: WithDuration<TimeBlock>,
+  range: m.Range,
+) {
+  const start = timeBlock.startTime.clone().startOf("day");
+  const end = getEndTime(timeBlock).clone().endOf("day");
 
   const startOfRange = range.start.clone().startOf("day");
   const endOfRange = range.end.clone().add(1, "day").startOf("day");
 
-  const truncatedBase = { ...task };
+  const truncatedBase = { ...timeBlock };
 
   if (start.isBefore(startOfRange)) {
-    truncatedBase.durationMinutes = getEndTime(task).diff(
+    truncatedBase.durationMinutes = getEndTime(timeBlock).diff(
       startOfRange,
       "minutes",
     );
@@ -300,7 +313,7 @@ export function removeTimeRange(text: string) {
   return text.replace(timeRangeRegExp, "").trim().replace(/\s+/g, " ");
 }
 
-export function isTimeEqual(a: LocalTask, b: LocalTask) {
+export function isTimeEqual(a: LocalTimeBlock, b: LocalTimeBlock) {
   return (
     a.startTime.isSame(b.startTime) &&
     a.durationMinutes === b.durationMinutes &&
@@ -308,11 +321,11 @@ export function isTimeEqual(a: LocalTask, b: LocalTask) {
   );
 }
 
-export function hasDateFromProp(task: LocalTask) {
-  return scheduledPropRegExps.some((regexp) => regexp.test(task.text));
+export function hasDateFromProp(timeBlock: LocalTimeBlock) {
+  return scheduledPropRegExps.some((regexp) => regexp.test(timeBlock.text));
 }
 
-export function clamp<T extends WithTime<BaseTask>>(
+export function clamp<T extends WithDuration<BaseTimeBlock>>(
   timeBlock: T,
   start: Moment,
   end: Moment,
@@ -334,22 +347,25 @@ export function clamp<T extends WithTime<BaseTask>>(
   };
 }
 
-export function getBlockProps(task: Task, settings: DayPlannerSettings) {
+export function getBlockProps(
+  timeBlock: TimeBlock,
+  settings: DayPlannerSettings,
+) {
   const result: string[] = [];
 
-  if (settings.showTimestampInTaskBlock && isWithTime(task)) {
+  if (settings.showTimestampInTaskBlock && isWithTime(timeBlock)) {
     result.push(
       createTimestamp(
-        getMinutesSinceMidnight(task.startTime),
-        task.durationMinutes,
+        getMinutesSinceMidnight(timeBlock.startTime),
+        timeBlock.durationMinutes,
         settings.timestampFormat,
         emDash,
       ),
     );
   }
 
-  if (isRemote(task)) {
-    result.push(task.calendar.name);
+  if (isRemote(timeBlock)) {
+    result.push(timeBlock.calendar.name);
   }
 
   return result.join(` ${bullet} `);

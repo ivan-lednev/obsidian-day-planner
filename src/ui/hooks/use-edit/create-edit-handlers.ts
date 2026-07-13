@@ -5,10 +5,10 @@ import { isNotVoid } from "typed-assert";
 import type { PeriodicNotes } from "../../../service/periodic-notes";
 import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
-import type { LocalTask, WithTime } from "../../../task-types";
+import type { LocalTimeBlock, WithDuration } from "../../../time-block-types";
 import type { PointerDateTime } from "../../../types";
 import { getMinutesSinceMidnight } from "../../../util/moment";
-import * as t from "../../../util/task-utils";
+import * as t from "../../../util/time-block-utils";
 
 import type { EditOperation } from "./types";
 import { EditMode } from "./types";
@@ -53,7 +53,10 @@ export function createEditHandlers({
     });
   }
 
-  function handleResizerMouseDown(task: WithTime<LocalTask>, mode: EditMode) {
+  function handleResizerMouseDown(
+    task: WithDuration<LocalTimeBlock>,
+    mode: EditMode,
+  ) {
     const pointerDay = get(pointerDateTime).dateTime;
 
     isNotVoid(pointerDay, "Day cannot be undefined on edit");
@@ -61,7 +64,7 @@ export function createEditHandlers({
     startEdit({ task, mode });
   }
 
-  async function handleTaskMouseUp(task: LocalTask) {
+  async function handleTaskMouseUp(task: LocalTimeBlock) {
     if (get(editOperation) || !task.location) {
       return;
     }
@@ -71,7 +74,7 @@ export function createEditHandlers({
   }
 
   // todo: fix (should probably use "day")
-  function handleUnscheduledTaskGripMouseDown(task: LocalTask) {
+  function handleUnscheduledTaskGripMouseDown(task: LocalTimeBlock) {
     let pointerDay = get(pointerDateTime).dateTime;
 
     if (!pointerDay) {

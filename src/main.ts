@@ -50,8 +50,8 @@ import { PeriodicNotes } from "./service/periodic-notes";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
-import type { LocalTask, RemoteTask } from "./task-types";
 import { createGetTasksApi } from "./tasks-plugin";
+import type { LocalTimeBlock, RemoteTimeBlock } from "./time-block-types";
 import type { ObsidianContext, OnUpdateFn, PointerDateTime } from "./types";
 import { askForConfirmation } from "./ui/confirmation-modal";
 import { createEditTimeEntryModalCreator } from "./ui/create-edit-time-entry-modal";
@@ -419,8 +419,8 @@ export default class DayPlanner extends Plugin {
     store: AppStore;
     dispatch: AppDispatch;
     useSelector: UseSelector<RootState>;
-    remoteTasks: Readable<RemoteTask[]>;
-    localTasks: Readable<LocalTask[]>;
+    remoteTasks: Readable<RemoteTimeBlock[]>;
+    localTasks: Readable<LocalTimeBlock[]>;
     pointerDateTime: Writable<PointerDateTime>;
   }) {
     const {

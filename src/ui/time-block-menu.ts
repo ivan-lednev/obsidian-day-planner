@@ -2,11 +2,11 @@ import { Menu } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
 import type { WorkspaceFacade } from "../service/workspace-facade";
-import { type LocalTask } from "../task-types";
+import { type LocalTimeBlock } from "../time-block-types";
 
 export function createTimeBlockMenu(props: {
   event: MouseEvent | TouchEvent;
-  task: LocalTask;
+  task: LocalTimeBlock;
   workspaceFacade: WorkspaceFacade;
   onEdit: () => void;
 }) {

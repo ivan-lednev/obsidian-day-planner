@@ -6,7 +6,7 @@ import type { HorizontalPlacing } from "./overlap/horizontal-placing";
 import type { ListItemEntryWithChildren } from "./redux/index/index-slice";
 import type { IcalConfig } from "./settings";
 
-export interface TaskLocation {
+export interface TimeBlockLocation {
   path: string;
   position: Pos;
 }
@@ -22,9 +22,12 @@ export type WithPlacing<T> = T & {
   placing: HorizontalPlacing;
 };
 
-export type BaseTask = {
+/**
+ * A time block is a UI projection of an indexed entry
+ */
+export type BaseTimeBlock = {
   /**
-   * Tasks get an ID on parsing. It is unique to a line in a file, not to a
+   * Time blocks get an ID on parsing. It is unique to a line in a file, not to a
    * block, visible in the UI (because blocks might get split at midnight, etc.).
    */
   id: string;
@@ -34,11 +37,11 @@ export type BaseTask = {
   truncated?: Side[];
 };
 
-export type WithTime<T> = T & {
+export type WithDuration<T> = T & {
   durationMinutes: number;
 };
 
-export interface RemoteTask extends BaseTask {
+export interface RemoteTimeBlock extends BaseTimeBlock {
   calendar: IcalConfig;
   summary: string;
   rsvpStatus: AttendeePartStat;
@@ -48,26 +51,23 @@ export interface RemoteTask extends BaseTask {
 
 type Side = "top" | "bottom" | "left" | "right";
 
-export interface LocalTask extends ListItemTokens, BaseTask {
+export interface LocalTimeBlock extends ListItemTokens, BaseTimeBlock {
   text: string;
   children?: Array<ListItemEntryWithChildren>;
 
   // todo: move out to InMemoryTask
-  location?: TaskLocation;
+  location?: TimeBlockLocation;
 
   // todo: move to Time
   durationMinutes: number;
 }
 
-export type TaskWithoutComputedDuration = Omit<LocalTask, "durationMinutes"> &
-  Partial<Pick<LocalTask, "durationMinutes">>;
+export type TimeBlock = LocalTimeBlock | RemoteTimeBlock;
 
-export type Task = LocalTask | RemoteTask;
-
-export function isRemote(task: Task): task is RemoteTask {
-  return Object.hasOwn(task, "calendar");
+export function isRemote(timeBlock: TimeBlock): timeBlock is RemoteTimeBlock {
+  return Object.hasOwn(timeBlock, "calendar");
 }
 
-export function isLocal(task: Task): task is LocalTask {
-  return Object.hasOwn(task, "text");
+export function isLocal(timeBlock: TimeBlock): timeBlock is LocalTimeBlock {
+  return Object.hasOwn(timeBlock, "text");
 }

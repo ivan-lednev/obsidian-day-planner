@@ -1,7 +1,7 @@
 <script lang="ts">
   import { type Snippet } from "svelte";
 
-  import type { Task } from "../../task-types";
+  import type { TimeBlock } from "../../time-block-types";
   import type { ActionArray } from "../actions/use-actions";
   import { useActions } from "../actions/use-actions";
   import { useColorOverrides } from "../hooks/use-color.svelte";
@@ -9,7 +9,7 @@
   interface Props {
     children: Snippet;
     blockEndDecoration?: Snippet;
-    task: Task;
+    task: TimeBlock;
     use?: ActionArray;
     onpointerup?: (event: PointerEvent) => void;
   }

@@ -7,9 +7,9 @@ import {
   ListItemEntryEditor,
   runWithNoticeOnError,
 } from "../service/list-item-entry-editor";
-import type { LocalTask } from "../task-types";
+import type { LocalTimeBlock } from "../time-block-types";
 import { getFirstLine } from "../util/markdown";
-import { getEndTime } from "../util/task-utils";
+import { getEndTime } from "../util/time-block-utils";
 
 import TimeEntryEditModal from "./components/time-entry-edit-modal.svelte";
 
@@ -17,7 +17,7 @@ export function createEditTimeEntryModalCreator(
   app: App,
   taskEntryEditor: ListItemEntryEditor,
 ) {
-  return (task: LocalTask) => {
+  return (task: LocalTimeBlock) => {
     const { location } = task;
 
     isNotVoid(location);

@@ -2,15 +2,19 @@
   import { fromStore, type Readable } from "svelte/store";
 
   import { currentTimeSignal } from "../../global-store/current-time";
-  import { isRemote, type Task, type WithTime } from "../../task-types";
-  import * as t from "../../util/task-utils";
+  import {
+    isRemote,
+    type TimeBlock,
+    type WithDuration,
+  } from "../../time-block-types";
+  import * as t from "../../util/time-block-utils";
 
   import { MiniTimeline } from "./mini-timeline-headless.svelte.js";
 
   const {
     tasksWithTimeForToday,
   }: {
-    tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
+    tasksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
   } = $props();
 
   const timeline = $derived(

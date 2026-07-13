@@ -1,23 +1,23 @@
 import { emDash } from "../constants";
 import type { DayPlannerSettings } from "../settings";
-import type { Task, WithTime } from "../task-types";
+import type { TimeBlock, WithDuration } from "../time-block-types";
 
 import { getMinutesSinceMidnight } from "./moment";
-import { createTimestamp, getOneLineSummary } from "./task-utils";
+import { createTimestamp, getOneLineSummary } from "./time-block-utils";
 
 export function notifyAboutStartedTasks(
-  tasks: WithTime<Task>[],
+  timeBlocks: WithDuration<TimeBlock>[],
   settings: DayPlannerSettings,
 ) {
-  if (typeof Notification === "undefined" || tasks.length === 0) {
+  if (typeof Notification === "undefined" || timeBlocks.length === 0) {
     return;
   }
 
-  const firstTask = tasks[0];
-  const summary = getOneLineSummary(firstTask);
+  const firstTimeBlock = timeBlocks[0];
+  const summary = getOneLineSummary(firstTimeBlock);
   const timestamp = createTimestamp(
-    getMinutesSinceMidnight(firstTask.startTime),
-    firstTask.durationMinutes,
+    getMinutesSinceMidnight(firstTimeBlock.startTime),
+    firstTimeBlock.durationMinutes,
     settings.timestampFormat,
     emDash,
   );

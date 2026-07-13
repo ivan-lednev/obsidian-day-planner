@@ -2,9 +2,9 @@ import type { Moment } from "moment";
 import { isNotVoid } from "typed-assert";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
-import type { LocalTask } from "../../task-types";
+import type { LocalTimeBlock } from "../../time-block-types";
 import { strictParse } from "../../util/moment";
-import { clamp, getDayKey } from "../../util/task-utils";
+import { clamp, getDayKey } from "../../util/time-block-utils";
 import { createAppSelector } from "../create-app-selector";
 import { selectVisibleDays } from "../global-slice";
 
@@ -12,7 +12,7 @@ import {
   isListItemEntry,
   type ListItemEntry,
   type ListItemEntryWithChildren,
-  derivedEntryToLocalTask,
+  entryToTimeBlock,
   selectFileEntriesById,
   selectLogEntriesByDay,
   selectLogEntriesById,
@@ -63,7 +63,7 @@ export const selectLogEntriesForDay = createAppSelector(
         const isActiveLogRecordForToday = isDayKeyForToday && !logEntry.end;
 
         // todo: use adapter: logEntryToLocalTask
-        const timeBlock: LocalTask = {
+        const timeBlock: LocalTimeBlock = {
           id: logEntry.id,
           text: entry.text,
           startTime: parsedStart,
@@ -104,7 +104,7 @@ export const selectRecentLogEntries = createAppSelector(
 
       isNotVoid(entry, "Inconsistent store state");
 
-      return derivedEntryToLocalTask(logEntry, entry);
+      return entryToTimeBlock(logEntry, entry);
     });
   },
 );
@@ -140,7 +140,7 @@ export const selectPlanEntriesForVisibleDays = createAppSelector(
           listItemEntriesById,
         );
 
-        return derivedEntryToLocalTask(planEntry, listItemEntry, withChildren);
+        return entryToTimeBlock(planEntry, listItemEntry, withChildren);
       }) || []
     );
   },
@@ -173,7 +173,7 @@ export const selectPlanEntriesForDays = createAppSelector(
           listItemEntriesById,
         );
 
-        return derivedEntryToLocalTask(planEntry, listItemEntry, withChildren);
+        return entryToTimeBlock(planEntry, listItemEntry, withChildren);
       }) || []
     );
   },

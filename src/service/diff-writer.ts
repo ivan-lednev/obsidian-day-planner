@@ -11,9 +11,9 @@ import {
   toMarkdown,
 } from "../mdast/mdast";
 import type { DayPlannerSettings } from "../settings";
-import type { LocalTask } from "../task-types";
+import type { LocalTimeBlock } from "../time-block-types";
 import { applyScopedUpdates, getFirstLine } from "../util/markdown";
-import * as t from "../util/task-utils";
+import * as t from "../util/time-block-utils";
 
 import type { PeriodicNotes } from "./periodic-notes";
 import type { VaultFacade } from "./vault-facade";
@@ -200,12 +200,15 @@ export class TransactionWriter {
  * Describes what changed visually in a view after an edit.
  */
 export type ViewDiff = {
-  deleted?: Array<LocalTask>;
-  updated?: Array<LocalTask>;
-  added?: Array<LocalTask>;
+  deleted?: Array<LocalTimeBlock>;
+  updated?: Array<LocalTimeBlock>;
+  added?: Array<LocalTimeBlock>;
 };
 
-export function getTaskDiffFromEditState(base: LocalTask[], next: LocalTask[]) {
+export function getTaskDiffFromEditState(
+  base: LocalTimeBlock[],
+  next: LocalTimeBlock[],
+) {
   return next.reduce<Omit<Required<ViewDiff>, "deleted">>(
     (result, task) => {
       const thisTaskInBase = base.find((baseTask) => baseTask.id === task.id);
@@ -229,7 +232,7 @@ export function getTaskDiffFromEditState(base: LocalTask[], next: LocalTask[]) {
 
 function mapTaskDiffToUpdate(props: {
   type: string;
-  task: LocalTask;
+  task: LocalTimeBlock;
   settings: DayPlannerSettings;
   periodicNotes: PeriodicNotes;
 }): Update | Update[] {

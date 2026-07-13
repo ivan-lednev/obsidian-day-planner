@@ -1,9 +1,9 @@
 import type { DayPlannerSettings } from "../../settings";
-import type { Task } from "../../task-types";
-import { getOneLineSummary } from "../../util/task-utils";
+import type { TimeBlock } from "../../time-block-types";
+import { getOneLineSummary } from "../../util/time-block-utils";
 
 export function getColorOverride(
-  task: Task,
+  task: TimeBlock,
   isDarkMode: boolean,
   settings: DayPlannerSettings,
 ) {

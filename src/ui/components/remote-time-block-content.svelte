@@ -1,12 +1,12 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
-  import type { RemoteTask } from "../../task-types";
+  import type { RemoteTimeBlock } from "../../time-block-types";
 
   const {
     task,
     bottomDecoration,
-  }: { task: RemoteTask; bottomDecoration?: Snippet } = $props();
+  }: { task: RemoteTimeBlock; bottomDecoration?: Snippet } = $props();
 
   const tentative = $derived(task.rsvpStatus === "TENTATIVE");
   const declined = $derived(task.rsvpStatus === "DECLINED");

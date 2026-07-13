@@ -1,6 +1,10 @@
 import moment from "moment";
 
-import type { LocalTask, WithPlacing, WithTime } from "../../../src/task-types";
+import type {
+  LocalTimeBlock,
+  WithPlacing,
+  WithDuration,
+} from "../../../src/time-block-types";
 
 export const dayKey = "2023-01-01";
 export const day = moment(dayKey);
@@ -9,7 +13,7 @@ export const nextDay = moment(nextDayKey);
 
 export const emptyTasks = [];
 export const baseTaskStartTime = moment("2023-01-01 00:00");
-export const baseTask: WithPlacing<WithTime<LocalTask>> = {
+export const baseTask: WithPlacing<WithDuration<LocalTimeBlock>> = {
   symbol: "-",
   status: " ",
   startTime: baseTaskStartTime,
@@ -36,11 +40,11 @@ export const baseTask: WithPlacing<WithTime<LocalTask>> = {
   },
   id: "id",
 };
-export const unscheduledTask: LocalTask = {
+export const unscheduledTask: LocalTimeBlock = {
   ...baseTask,
   isAllDayEvent: true,
 };
-export const threeTasks: WithPlacing<WithTime<LocalTask>>[] = [
+export const threeTasks: WithPlacing<WithDuration<LocalTimeBlock>>[] = [
   {
     ...baseTask,
     id: "1",
@@ -57,10 +61,12 @@ export const threeTasks: WithPlacing<WithTime<LocalTask>>[] = [
     startTime: moment("2023-01-01 03:00"),
   },
 ];
-export const threeTasksOverTwoDays: WithTime<LocalTask>[] = [
+export const threeTasksOverTwoDays: WithDuration<LocalTimeBlock>[] = [
   baseTask,
   { ...baseTask, id: "2", startTime: moment("2023-01-01 01:00") },
   { ...baseTask, id: "3", startTime: moment("2023-01-02 02:00") },
 ];
-export const baseTasks: Array<WithTime<LocalTask>> = [baseTask];
-export const tasksWithUnscheduledTask: Array<LocalTask> = [unscheduledTask];
+export const baseTasks: Array<WithDuration<LocalTimeBlock>> = [baseTask];
+export const tasksWithUnscheduledTask: Array<LocalTimeBlock> = [
+  unscheduledTask,
+];

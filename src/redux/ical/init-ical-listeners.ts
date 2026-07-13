@@ -2,7 +2,7 @@ import { isEmpty } from "lodash/fp";
 import { request } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
-import type { RemoteTask, WithTime } from "../../task-types";
+import type { RemoteTimeBlock, WithDuration } from "../../time-block-types";
 import { canHappenAfter, icalEventToTasksForRange } from "../../util/ical";
 import { type Scheduler } from "../../util/scheduler";
 import {
@@ -62,7 +62,10 @@ export function createIcalFetchListener(props: {
   };
 }
 
-export type IcalParseTaskResult = RemoteTask | RemoteTask[] | undefined;
+export type IcalParseTaskResult =
+  | RemoteTimeBlock
+  | RemoteTimeBlock[]
+  | undefined;
 
 export function createIcalParseListener(props: {
   scheduler: Scheduler<IcalParseTaskResult>;
@@ -104,8 +107,9 @@ export function createIcalParseListener(props: {
     scheduler.enqueueTasks(taskComputationQueue, (tasksFromEvents) => {
       const remoteTasks = tasksFromEvents
         .flat()
-        .filter((task): task is RemoteTask | WithTime<RemoteTask> =>
-          Boolean(task),
+        .filter(
+          (task): task is RemoteTimeBlock | WithDuration<RemoteTimeBlock> =>
+            Boolean(task),
         )
         // todo: t.serialize(), t.deserialize()
         .map((it) => ({ ...it, startTime: it.startTime.toISOString() }));

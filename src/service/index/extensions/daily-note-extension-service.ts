@@ -10,7 +10,7 @@ import {
   isTaskCache,
   type PartialPos,
 } from "../../../util/metadata";
-import { getDayKey, getEndTime } from "../../../util/task-utils";
+import { getDayKey, getEndTime } from "../../../util/time-block-utils";
 import type { PeriodicNotes } from "../../periodic-notes";
 import type { FileWithMetadata } from "../index-service";
 import type {

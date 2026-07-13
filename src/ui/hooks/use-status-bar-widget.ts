@@ -5,16 +5,16 @@ import { derived, type Readable } from "svelte/store";
 import { statusBarTextLimit } from "../../constants";
 import { currentTime } from "../../global-store/current-time";
 import type DayPlanner from "../../main";
-import type { Task, WithTime } from "../../task-types";
+import type { TimeBlock, WithDuration } from "../../time-block-types";
 import { ellipsis } from "../../util/ellipsis";
 import { getDiffInMinutes } from "../../util/moment";
-import { getEndTime, getOneLineSummary } from "../../util/task-utils";
+import { getEndTime, getOneLineSummary } from "../../util/time-block-utils";
 import StatusBarWidget from "../components/status-bar-widget.svelte";
 
 import type { DateRanges } from "./use-date-ranges";
 
 interface UseStatusBarWidgetProps {
-  tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
+  tasksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
 }
 
 interface Widget {
@@ -39,7 +39,7 @@ export function minutesToTimestamp(minutes: number) {
 export function mountStatusBarWidget(props: {
   plugin: DayPlanner;
   dateRanges: DateRanges;
-  tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
+  tasksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
 }) {
   const { plugin, tasksWithTimeForToday, dateRanges } = props;
 

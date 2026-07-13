@@ -2,7 +2,11 @@
   import type { Snippet } from "svelte";
 
   import { settings } from "../../global-store/settings";
-  import type { Task, WithPlacing, WithTime } from "../../task-types";
+  import type {
+    TimeBlock,
+    WithPlacing,
+    WithDuration,
+  } from "../../time-block-types";
   import type { ActionArray } from "../actions/use-actions";
   import {
     useColoredTimeline,
@@ -15,7 +19,7 @@
     task,
   }: {
     children: Snippet;
-    task: WithPlacing<WithTime<Task>>;
+    task: WithPlacing<WithDuration<TimeBlock>>;
     use?: ActionArray;
   } = $props();
 

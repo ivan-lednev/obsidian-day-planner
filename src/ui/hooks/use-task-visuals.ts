@@ -2,7 +2,11 @@ import { derived, type Writable } from "svelte/store";
 
 import { getHiddenHoursSize } from "../../global-store/derived-settings";
 import type { DayPlannerSettings } from "../../settings";
-import type { Task, WithPlacing, WithTime } from "../../task-types";
+import type {
+  TimeBlock,
+  WithPlacing,
+  WithDuration,
+} from "../../time-block-types";
 import { getMinutesSinceMidnight } from "../../util/moment";
 
 interface UseTaskVisualsProps {
@@ -11,7 +15,7 @@ interface UseTaskVisualsProps {
 
 // todo: useTaskPosition, move to one of stores, don't call inside component
 export function useTaskVisuals(
-  task: WithPlacing<WithTime<Task>>,
+  task: WithPlacing<WithDuration<TimeBlock>>,
   { settings }: UseTaskVisualsProps,
 ) {
   const width = `${task.placing?.spanPercent || 100}%`;

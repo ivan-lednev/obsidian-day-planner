@@ -6,11 +6,11 @@ import {
   type ListItemEntryEditor,
 } from "../service/list-item-entry-editor";
 import type { WorkspaceFacade } from "../service/workspace-facade";
-import type { LocalTask } from "../task-types";
+import type { LocalTimeBlock } from "../time-block-types";
 
 export function createRecentClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;
-  task: LocalTask;
+  task: LocalTimeBlock;
   taskEntryEditor: ListItemEntryEditor;
   workspaceFacade: WorkspaceFacade;
 }) {

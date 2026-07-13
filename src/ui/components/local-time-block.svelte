@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
-  import type { LocalTask } from "../../task-types";
+  import type { LocalTimeBlock } from "../../time-block-types";
   import { hoverPreview } from "../actions/hover-preview";
   import type { HTMLActionArray } from "../actions/use-actions";
 
@@ -17,7 +17,7 @@
     onpointerup,
   }: {
     isActive?: boolean;
-    task: LocalTask;
+    task: LocalTimeBlock;
     bottomDecoration?: Snippet;
     blockEndDecoration?: Snippet;
     use?: HTMLActionArray;

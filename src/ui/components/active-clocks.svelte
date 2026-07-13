@@ -13,7 +13,7 @@
   import { settings } from "../../global-store/settings";
   import { selectActiveLogEntries } from "../../redux/index/index-slice";
   import { runWithNoticeOnError } from "../../service/list-item-entry-editor";
-  import type { LocalTask } from "../../task-types";
+  import type { LocalTimeBlock } from "../../time-block-types";
   import { removeMarkdownExtension } from "../../util/markdown";
   import * as m from "../../util/moment";
   import { getDiffInMinutes } from "../../util/moment";
@@ -22,7 +22,7 @@
   import BlockControls from "./block-controls.svelte";
   import BlockList from "./block-list.svelte";
   import ControlButton from "./control-button.svelte";
-  import LocalTimeBlock from "./local-time-block.svelte";
+  import LocalTimeBlockComponent from "./local-time-block.svelte";
   import Pill from "./pill.svelte";
   import Properties from "./properties.svelte";
   import Selectable from "./selectable.svelte";
@@ -48,7 +48,7 @@
 </script>
 
 <BlockList list={activeLogRecordsCompat}>
-  {#snippet match(task: LocalTask)}
+  {#snippet match(task: LocalTimeBlock)}
     <Selectable
       onSecondarySelect={(event) =>
         createActiveClockMenu({
@@ -60,7 +60,7 @@
         })}
     >
       {#snippet children({ use, onpointerup, state })}
-        <LocalTimeBlock
+        <LocalTimeBlockComponent
           --time-block-border="1px solid var(--color-accent)"
           isActive={state === "secondary"}
           {onpointerup}
@@ -131,7 +131,7 @@
               />
             </Properties>
           {/snippet}
-        </LocalTimeBlock>
+        </LocalTimeBlockComponent>
       {/snippet}
     </Selectable>
   {/snippet}

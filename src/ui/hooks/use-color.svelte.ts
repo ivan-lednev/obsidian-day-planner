@@ -2,17 +2,17 @@ import chroma from "chroma-js";
 
 import { getObsidianContext } from "../../context/obsidian-context";
 import { currentTimeSignal } from "../../global-store/current-time";
-import type { Task } from "../../task-types";
+import type { TimeBlock } from "../../time-block-types";
 import { getTextColorWithEnoughContrast } from "../../util/color";
 import { getRelationToNow } from "../../util/moment";
-import * as t from "../../util/task-utils";
-import { getOneLineSummary } from "../../util/task-utils";
+import * as t from "../../util/time-block-utils";
+import { getOneLineSummary } from "../../util/time-block-utils";
 
 interface UseColorProps {
-  task: Task;
+  task: TimeBlock;
 }
 
-export function useStylesForRelationToNow(task: Task) {
+export function useStylesForRelationToNow(task: TimeBlock) {
   const relationToNow = $derived.by(() => {
     if (task.isAllDayEvent) {
       return getRelationToNow(
@@ -53,7 +53,7 @@ export function useStylesForRelationToNow(task: Task) {
   };
 }
 
-export function useColoredTimeline(task: Task) {
+export function useColoredTimeline(task: TimeBlock) {
   const { settingsSignal } = getObsidianContext();
 
   const colorScale = $derived.by(() => {

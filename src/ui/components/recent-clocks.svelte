@@ -6,16 +6,16 @@
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { selectRecentLogEntries } from "../../redux/index/index-selectors";
-  import type { LocalTask } from "../../task-types";
+  import type { LocalTimeBlock } from "../../time-block-types";
   import { removeMarkdownExtension } from "../../util/markdown";
-  import { getDayKey } from "../../util/task-utils";
+  import { getDayKey } from "../../util/time-block-utils";
   import { createRecentClockMenu } from "../recent-clock-menu";
 
   import { runWithNoticeOnError } from "./../../service/list-item-entry-editor";
   import BlockControls from "./block-controls.svelte";
   import BlockList from "./block-list.svelte";
   import ControlButton from "./control-button.svelte";
-  import LocalTimeBlock from "./local-time-block.svelte";
+  import LocalTimeBlockComponent from "./local-time-block.svelte";
   import Pill from "./pill.svelte";
   import Properties from "./properties.svelte";
   import Selectable from "./selectable.svelte";
@@ -83,7 +83,7 @@
       {window.moment(title).format(settingsSignal.current.timelineDateFormat)}
     </div>
   {/snippet}
-  {#snippet match(task: LocalTask)}
+  {#snippet match(task: LocalTimeBlock)}
     <Selectable
       onSecondarySelect={(event) =>
         createRecentClockMenu({
@@ -94,7 +94,7 @@
         })}
     >
       {#snippet children({ use, onpointerup, state })}
-        <LocalTimeBlock
+        <LocalTimeBlockComponent
           isActive={state === "secondary"}
           {onpointerup}
           {task}
@@ -139,7 +139,7 @@
               {/if}
             </Properties>
           {/snippet}
-        </LocalTimeBlock>
+        </LocalTimeBlockComponent>
       {/snippet}
     </Selectable>
   {/snippet}

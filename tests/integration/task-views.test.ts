@@ -4,8 +4,8 @@ import { describe, expect, test } from "vitest";
 
 import { selectPlanEntriesForDays } from "../../src/redux";
 import { defaultSettingsForTests } from "../../src/settings";
-import { isLocal } from "../../src/task-types";
-import { toRenderableMarkdown } from "../../src/util/task-utils";
+import { isLocal } from "../../src/time-block-types";
+import { toRenderableMarkdown } from "../../src/util/time-block-utils";
 
 import { setUp } from "./util/setup";
 

@@ -5,7 +5,7 @@ import { scheduledPropRegExps } from "../../../regexp";
 import type { DayPlannerSettings } from "../../../settings";
 import { isTaskCache } from "../../../util/metadata";
 import { strictParse } from "../../../util/moment";
-import { getDayKey, getEndTime } from "../../../util/task-utils";
+import { getDayKey, getEndTime } from "../../../util/time-block-utils";
 import type {
   ListItemIndexExtensionService,
   RawListItemEntryWithContext,

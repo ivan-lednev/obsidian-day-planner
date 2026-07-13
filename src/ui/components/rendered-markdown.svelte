@@ -1,13 +1,17 @@
 <script lang="ts">
   import { getObsidianContext } from "../../context/obsidian-context";
-  import type { LocalTask } from "../../task-types";
-  import { isCompleted, toRenderableMarkdown } from "../../util/task-utils";
+  import type { LocalTimeBlock } from "../../time-block-types";
+  import {
+    isCompleted,
+    toRenderableMarkdown,
+  } from "../../util/time-block-utils";
   import { addLineDataToCheckboxes } from "../../util/dom";
   import { on } from "svelte/events";
   import type { Snippet } from "svelte";
   import type { ListItemEntryWithChildren } from "src/redux/index/index-slice";
 
-  const { task, children }: { task: LocalTask; children: Snippet } = $props();
+  const { task, children }: { task: LocalTimeBlock; children: Snippet } =
+    $props();
 
   const { renderMarkdown, toggleCheckboxInFile, settings } =
     getObsidianContext();

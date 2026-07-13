@@ -3,10 +3,10 @@ import { filter, map } from "lodash/fp";
 import type { Moment } from "moment";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
-import type { Task, WithTime } from "../../task-types";
+import type { TimeBlock, WithDuration } from "../../time-block-types";
 import type { Signal } from "../../types";
 import { doesOverlapWithRange } from "../../util/moment";
-import * as t from "../../util/task-utils";
+import * as t from "../../util/time-block-utils";
 
 export class MiniTimeline {
   private readonly hours = 3;
@@ -18,7 +18,9 @@ export class MiniTimeline {
 
   constructor(
     private readonly currentTimeSignal: Signal<Moment>,
-    private readonly tasksWithTimeForToday: Signal<Array<WithTime<Task>>>,
+    private readonly tasksWithTimeForToday: Signal<
+      Array<WithDuration<TimeBlock>>
+    >,
   ) {}
 
   timeMarkerOffsetPx = $derived(

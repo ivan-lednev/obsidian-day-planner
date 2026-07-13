@@ -3,18 +3,18 @@ import type { Moment } from "moment";
 import { derived, get, type Readable } from "svelte/store";
 
 import type { DayPlannerSettings } from "../../settings";
-import type { Task, WithTime } from "../../task-types";
-import { getEndTime, getNotificationKey } from "../../util/task-utils";
+import type { TimeBlock, WithDuration } from "../../time-block-types";
+import { getEndTime, getNotificationKey } from "../../util/time-block-utils";
 
 interface UseNewlyStartedTasksProps {
   settings: Readable<DayPlannerSettings>;
   currentTime: Readable<Moment>;
-  tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
+  tasksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
 }
 
 export function useNewlyStartedTasks(props: UseNewlyStartedTasksProps) {
   const { settings, currentTime, tasksWithTimeForToday } = props;
-  let previousTasksInProgress: Array<WithTime<Task>> = [];
+  let previousTasksInProgress: Array<WithDuration<TimeBlock>> = [];
 
   return derived([settings, currentTime], ([$settings, $currentTime]) => {
     if (!$settings.showTaskNotification) {

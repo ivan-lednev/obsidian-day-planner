@@ -18,7 +18,7 @@ import {
   indent,
 } from "./markdown";
 import { strictParse } from "./moment";
-import { appendText } from "./task-utils";
+import { appendText } from "./time-block-utils";
 
 const dateTimeSchema = z.string().refine((it) => strictParse(it).isValid());
 

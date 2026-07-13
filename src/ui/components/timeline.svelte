@@ -17,7 +17,7 @@
     getBlockProps,
     getDayKey,
     getRenderKey,
-  } from "../../util/task-utils";
+  } from "../../util/time-block-utils";
   import { createGestures } from "../actions/gestures";
 
   import Column from "./column.svelte";

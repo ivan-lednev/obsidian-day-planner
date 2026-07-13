@@ -27,10 +27,10 @@ import {
   type DayPlannerSettings,
   defaultSettingsForTests,
 } from "../../../src/settings";
-import { isLocal, type Task } from "../../../src/task-types";
+import { isLocal, type TimeBlock } from "../../../src/time-block-types";
 import { useTasks } from "../../../src/ui/hooks/use-tasks";
 import { createBackgroundBatchScheduler } from "../../../src/util/scheduler";
-import { getOneLineSummary } from "../../../src/util/task-utils";
+import { getOneLineSummary } from "../../../src/util/time-block-utils";
 import {
   FakeMetadataCache,
   FakePeriodicNotes,
@@ -231,10 +231,10 @@ export async function setUp(props?: {
     });
   }
 
-  function findTask(predicate: (task: Task) => boolean) {
+  function findTask(predicate: (task: TimeBlock) => boolean) {
     const found = get(allTasks).filter(isLocal).find(predicate);
 
-    isNotVoid(found, `Task not found`);
+    isNotVoid(found, `TimeBlock not found`);
 
     return found;
   }

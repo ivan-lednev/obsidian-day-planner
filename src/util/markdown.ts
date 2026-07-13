@@ -7,7 +7,7 @@ import {
   listTokenWithSpacesRegExp,
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
-import type { ListItemTokens } from "../task-types";
+import type { ListItemTokens } from "../time-block-types";
 
 const baseIndentation = "\t";
 

@@ -3,7 +3,7 @@ import { get } from "svelte/store";
 import { test, expect, describe } from "vitest";
 
 import { EditMode } from "../../src/ui/hooks/use-edit/types";
-import * as t from "../../src/util/task-utils";
+import * as t from "../../src/util/time-block-utils";
 
 import {
   baseTasks,

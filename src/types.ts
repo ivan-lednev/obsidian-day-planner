@@ -13,7 +13,7 @@ import type { PeriodicNotes } from "./service/periodic-notes";
 import type { VaultFacade } from "./service/vault-facade";
 import type { WorkspaceFacade } from "./service/workspace-facade";
 import type { DayPlannerSettings, IcalConfig } from "./settings";
-import type { LocalTask } from "./task-types";
+import type { LocalTimeBlock } from "./time-block-types";
 import type { OpenEditTimeEntryModal } from "./ui/create-edit-time-entry-modal";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
@@ -22,8 +22,8 @@ import { type ShowPreview } from "./util/create-show-preview";
 import type { Scheduler } from "./util/scheduler";
 
 export type OnUpdateFn = (
-  base: Array<LocalTask>,
-  next: Array<LocalTask>,
+  base: Array<LocalTimeBlock>,
+  next: Array<LocalTimeBlock>,
   mode: EditMode,
 ) => Promise<boolean>;
 

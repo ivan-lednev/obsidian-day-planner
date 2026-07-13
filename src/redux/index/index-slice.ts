@@ -6,7 +6,7 @@ import type {
   FileIndexContribution,
   IndexService,
 } from "../../service/index/index-service";
-import type { LocalTask } from "../../task-types";
+import type { LocalTimeBlock } from "../../time-block-types";
 import { getDiffInMinutes, strictParse } from "../../util/moment";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
@@ -310,7 +310,7 @@ export const indexSlice = createAppSlice({
 
           isNotVoid(entry, "Inconsistent store state");
 
-          return derivedEntryToLocalTask(logEntry, entry);
+          return entryToTimeBlock(logEntry, entry);
         }),
     selectListPropsPosition: (state, path: string, line: number) => {
       const taskEntriesForFile = state.taskEntries.byPath[path]?.map(
@@ -347,13 +347,13 @@ export function isListItemEntry(
   return "position" in entry;
 }
 
-export function derivedEntryToLocalTask(
+export function entryToTimeBlock(
   // todo: use another type
   derivedEntry: PlanEntry,
   parentEntry: ListItemEntry | FileSystemEntry,
   // todo: it duplicates the previous one, but for files it's not needed
   listItemEntryWithChildren?: ListItemEntryWithChildren,
-): LocalTask {
+): LocalTimeBlock {
   const startTime = strictParse(derivedEntry.start);
   const durationMinutes = derivedEntry.end
     ? getDiffInMinutes(strictParse(derivedEntry.end), startTime)

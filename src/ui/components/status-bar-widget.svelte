@@ -2,7 +2,7 @@
   import { fromStore, type Readable } from "svelte/store";
 
   import { settingsSignal } from "../../global-store/settings";
-  import { type Task, type WithTime } from "../../task-types";
+  import { type TimeBlock, type WithDuration } from "../../time-block-types";
   import { useStatusBarWidget } from "../hooks/use-status-bar-widget";
 
   import { SkipForward, Play } from "./lucide";
@@ -13,7 +13,7 @@
     tasksWithTimeForToday,
   }: {
     onClick: () => Promise<void>;
-    tasksWithTimeForToday: Readable<Array<WithTime<Task>>>;
+    tasksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
   } = $props();
 
   const { current, next } = $derived(
