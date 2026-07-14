@@ -5,8 +5,9 @@ export function createLogEntry(props: {
   end?: string;
   parent: string;
   id: string;
+  source: "listItemLog" | "frontmatterLog";
 }) {
-  const { start, end, parent, id } = props;
+  const { start, end, parent, id, source } = props;
 
   const parsedStart = strictParse(start);
 
@@ -20,5 +21,5 @@ export function createLogEntry(props: {
 
   const dayKeys: string[] = getDayKeysInRange(parsedStart, parsedEnd);
 
-  return { start, end, parent, dayKeys, id };
+  return { start, end, parent, dayKeys, id, source };
 }

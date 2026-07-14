@@ -30,7 +30,21 @@ interface BaseTimeBlock {
   truncated?: Side[];
 }
 
+/**
+ * Where a time block was derived from. Not yet used to narrow the shape of
+ * `LocalTimeBlock`/`RemoteTimeBlock` (see time-block-types.ts todo), only to
+ * identify the source of a given time block.
+ */
+export type TimeBlockSource =
+  | "dailyNoteDate"
+  | "tasksPluginProp"
+  | "listItemLog"
+  | "frontmatterLog"
+  | "ical"
+  | "memory";
+
 export interface RemoteTimeBlock extends BaseTimeBlock {
+  source: "ical";
   calendar: IcalConfig;
   summary: string;
   rsvpStatus: AttendeePartStat;
@@ -41,13 +55,11 @@ export interface RemoteTimeBlock extends BaseTimeBlock {
 type Side = "top" | "bottom" | "left" | "right";
 
 export interface LocalTimeBlock extends ListItemTokens, BaseTimeBlock {
+  source: Exclude<TimeBlockSource, "ical">;
   text: string;
   children?: Array<ListItemEntryWithChildren>;
 
-  // todo: move out to InMemoryTask
   location?: TimeBlockLocation;
-
-  // todo: move to Time
   durationMinutes: number;
 }
 

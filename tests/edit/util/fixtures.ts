@@ -14,6 +14,7 @@ export const nextDay = moment(nextDayKey);
 export const emptyTasks = [];
 export const baseTaskStartTime = moment("2023-01-01 00:00");
 export const baseTask: WithPlacing<WithDuration<LocalTimeBlock>> = {
+  source: "dailyNoteDate",
   symbol: "-",
   status: " ",
   startTime: baseTaskStartTime,

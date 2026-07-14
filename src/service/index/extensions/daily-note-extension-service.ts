@@ -72,6 +72,7 @@ export class DailyNoteExtensionService
               parent: rawListItemEntry.id,
               start: startTime.format(clockFormat),
               end: endTime.format(clockFormat),
+              source: "dailyNoteDate" as const,
             },
           ],
         };
@@ -85,12 +86,12 @@ export class DailyNoteExtensionService
               dayKeys,
               parent: rawListItemEntry.id,
               start: dateFromPath.format(clockFormat),
-              // todo: this is not needed
               end: dateFromPath
                 .clone()
                 .add(this.settings.defaultDurationMinutes, "minutes")
                 .format(clockFormat),
               isAllDay: true,
+              source: "dailyNoteDate" as const,
             },
           ],
         };

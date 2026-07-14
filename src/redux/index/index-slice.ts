@@ -42,6 +42,7 @@ export interface LogEntry {
   start: string;
   end?: string;
   dayKeys: string[];
+  source: "listItemLog" | "frontmatterLog";
 }
 
 export interface PlanEntry {
@@ -52,6 +53,7 @@ export interface PlanEntry {
   start: string;
   end?: string;
   dayKeys: string[];
+  source: "dailyNoteDate" | "tasksPluginProp";
 }
 
 interface IndexSliceState {
@@ -69,7 +71,7 @@ interface IndexSliceState {
     byDay: Record<string, Record<string, true>>;
   };
   planEntries: {
-    byId: Record<string, LogEntry>;
+    byId: Record<string, PlanEntry>;
     byPath: Record<string, string[]>;
     byDay: Record<string, Record<string, true>>;
   };
@@ -349,7 +351,7 @@ export function isListItemEntry(
 
 export function entryToTimeBlock(
   // todo: use another type
-  derivedEntry: PlanEntry,
+  derivedEntry: PlanEntry | LogEntry,
   parentEntry: ListItemEntry | FileSystemEntry,
   // todo: it duplicates the previous one, but for files it's not needed
   listItemEntryWithChildren?: ListItemEntryWithChildren,
@@ -361,11 +363,14 @@ export function entryToTimeBlock(
       30;
 
   const base = {
+    source: derivedEntry.source,
     text: parentEntry.text,
     startTime,
     durationMinutes,
     id: derivedEntry.id,
-    isAllDayEvent: derivedEntry.isAllDay,
+    // todo: no need to use duck typing here?
+    isAllDayEvent:
+      "isAllDay" in derivedEntry ? derivedEntry.isAllDay : undefined,
     children: listItemEntryWithChildren?.children,
   };
 

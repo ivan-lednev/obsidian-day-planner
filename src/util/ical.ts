@@ -131,6 +131,7 @@ export function icalEventToTask(
 
   return {
     id: getId(),
+    source: "ical",
     calendar: icalEvent.calendar,
     summary: icalEvent.summary || "(No title)",
     description: icalEvent.description,

@@ -61,6 +61,7 @@ export class ObsidianTasksExtensionService
       dayKeys: [getDayKey(scheduledDate)],
       // todo P3: we can add parent id later
       parent: parentId,
+      source: "tasksPluginProp" as const,
     };
 
     const time = getTimeFromLine({

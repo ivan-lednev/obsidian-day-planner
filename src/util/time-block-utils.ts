@@ -249,6 +249,7 @@ export function create(props: {
   return {
     location,
     id: getId(),
+    source: "memory",
     durationMinutes: settings.defaultDurationMinutes,
     text,
     startTime: minutesToMomentOfDay(startMinutes, day),

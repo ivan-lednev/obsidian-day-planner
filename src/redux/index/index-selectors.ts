@@ -65,6 +65,7 @@ export const selectLogEntriesForDay = createAppSelector(
         // todo: use adapter: logEntryToLocalTask
         const timeBlock: LocalTimeBlock = {
           id: logEntry.id,
+          source: logEntry.source,
           text: entry.text,
           startTime: parsedStart,
           status: isListItemEntry(entry) ? entry.task : undefined,
