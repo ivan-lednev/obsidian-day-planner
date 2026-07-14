@@ -7,7 +7,7 @@ import {
   ListItemEntryEditor,
   runWithNoticeOnError,
 } from "../service/list-item-entry-editor";
-import type { LocalTimeBlock } from "../time-block-types";
+import type { LogTimeBlock } from "../time-block-types";
 import { getFirstLine } from "../util/markdown";
 import { getEndTime } from "../util/time-block-utils";
 
@@ -17,7 +17,7 @@ export function createEditTimeEntryModalCreator(
   app: App,
   taskEntryEditor: ListItemEntryEditor,
 ) {
-  return (task: LocalTimeBlock) => {
+  return (task: LogTimeBlock) => {
     const { location } = task;
 
     isNotVoid(location);

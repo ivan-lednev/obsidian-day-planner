@@ -7,7 +7,7 @@
   } from "lucide-svelte";
 
   import { getObsidianContext } from "../../context/obsidian-context";
-  import type { LocalTimeBlock } from "../../time-block-types";
+  import type { EditableTimeBlock } from "../../time-block-types";
   import * as t from "../../util/time-block-utils";
   import { createGestures } from "../actions/gestures";
   import { EditMode } from "../hooks/use-edit/types";
@@ -17,7 +17,7 @@
 
   export let isActive: boolean;
   export let setIsActive: (value: boolean) => void;
-  export let task: LocalTimeBlock;
+  export let task: EditableTimeBlock;
 
   const {
     editContext: {

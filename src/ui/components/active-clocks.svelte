@@ -13,7 +13,7 @@
   import { settings } from "../../global-store/settings";
   import { selectActiveLogEntries } from "../../redux/index/index-slice";
   import { runWithNoticeOnError } from "../../service/list-item-entry-editor";
-  import type { LocalTimeBlock } from "../../time-block-types";
+  import type { LogTimeBlock } from "../../time-block-types";
   import { removeMarkdownExtension } from "../../util/markdown";
   import * as m from "../../util/moment";
   import { getDiffInMinutes } from "../../util/moment";
@@ -48,7 +48,7 @@
 </script>
 
 <BlockList list={activeLogRecordsCompat}>
-  {#snippet match(task: LocalTimeBlock)}
+  {#snippet match(task: LogTimeBlock)}
     <Selectable
       onSecondarySelect={(event) =>
         createActiveClockMenu({

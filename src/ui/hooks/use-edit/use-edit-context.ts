@@ -7,8 +7,9 @@ import type { PeriodicNotes } from "../../../service/periodic-notes";
 import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
 import type {
-  LocalTimeBlock,
-  TimeBlock,
+  EditableTimeBlock,
+  RemoteTimeBlock,
+  TimelineTimeBlock,
   WithPlacing,
   WithDuration,
 } from "../../../time-block-types";
@@ -26,9 +27,12 @@ import { transform } from "./transform/transform";
 import type { EditOperation } from "./types";
 import { useEditActions } from "./use-edit-actions";
 
-function groupByDay(timeBlocks: TimeBlock[]) {
+function groupByDay(timeBlocks: TimelineTimeBlock[]) {
   return timeBlocks.reduce<
-    Record<string, { withTime: TimeBlock[]; noTime: TimeBlock[] }>
+    Record<
+      string,
+      { withTime: TimelineTimeBlock[]; noTime: TimelineTimeBlock[] }
+    >
   >((result, timeBlock) => {
     const key = t.getDayKey(timeBlock.startTime);
 
@@ -51,8 +55,8 @@ export function useEditContext(props: {
   periodicNotes: PeriodicNotes;
   onUpdate: OnUpdateFn;
   settings: Readable<DayPlannerSettings>;
-  localTasks: Readable<LocalTimeBlock[]>;
-  remoteTasks: Readable<TimeBlock[]>;
+  localTasks: Readable<EditableTimeBlock[]>;
+  remoteTasks: Readable<RemoteTimeBlock[]>;
   pointerDateTime: Readable<PointerDateTime>;
   abortEditTrigger: Readable<unknown>;
   onEditAborted: OnEditAbortedFn;
@@ -97,7 +101,7 @@ export function useEditContext(props: {
           ),
   );
 
-  const baselineTimeBlocks = writable<LocalTimeBlock[]>([], (set) => {
+  const baselineTimeBlocks = writable<EditableTimeBlock[]>([], (set) => {
     return localFilteredTimeBlocks.subscribe(set);
   });
 
@@ -133,15 +137,20 @@ export function useEditContext(props: {
 
   const combinedTimeBlocks = derived(
     [remoteTimeBlocks, timeBlocksWithPendingUpdate],
-    ([$remoteTimeBlocks, $timeBlocksWithPendingUpdate]) =>
-      $remoteTimeBlocks.concat($timeBlocksWithPendingUpdate),
+    ([
+      $remoteTimeBlocks,
+      $timeBlocksWithPendingUpdate,
+    ]): TimelineTimeBlock[] => [
+      ...$remoteTimeBlocks,
+      ...$timeBlocksWithPendingUpdate,
+    ],
   );
 
   const dayToDisplayedTimeBlocks = derived(
     combinedTimeBlocks,
     ($combinedTimeBlocks) => {
-      const split: TimeBlock[] = $combinedTimeBlocks.flatMap(
-        (timeBlock): TimeBlock[] | TimeBlock => {
+      const split: TimelineTimeBlock[] = $combinedTimeBlocks.flatMap(
+        (timeBlock): TimelineTimeBlock[] | TimelineTimeBlock => {
           if (!t.isWithDuration(timeBlock) || timeBlock.isAllDayEvent) {
             return timeBlock;
           }
@@ -186,7 +195,7 @@ export function useEditContext(props: {
               return false;
             }
 
-            if ("durationMinutes" in timeBlock) {
+            if (t.isWithDuration(timeBlock)) {
               return m.doesOverlapWithRange(
                 {
                   start: timeBlock.startTime,
@@ -199,7 +208,7 @@ export function useEditContext(props: {
             return m.isWithinRange(timeBlock.startTime, range);
           })
           .map(
-            (timeBlock): TimeBlock =>
+            (timeBlock): TimelineTimeBlock =>
               t.isWithDuration(timeBlock)
                 ? t.truncateToRange(timeBlock, range)
                 : timeBlock,
@@ -213,10 +222,11 @@ export function useEditContext(props: {
         $dayToDisplayedTimeBlocks[t.getDayKey(day)] ||
         t.getEmptyTimeBlocksForDay();
 
-      const withTime: Array<WithPlacing<WithDuration<TimeBlock>>> = flow(
-        uniqBy(t.getRenderKey),
-        addHorizontalPlacing,
-      )(timeBlocksForDay.withTime);
+      const withTime: Array<WithPlacing<WithDuration<TimelineTimeBlock>>> =
+        flow(
+          uniqBy(t.getRenderKey),
+          addHorizontalPlacing,
+        )(timeBlocksForDay.withTime);
 
       return {
         ...timeBlocksForDay,

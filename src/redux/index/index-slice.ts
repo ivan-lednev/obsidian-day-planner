@@ -6,7 +6,11 @@ import type {
   FileIndexContribution,
   IndexService,
 } from "../../service/index/index-service";
-import type { LocalTimeBlock } from "../../time-block-types";
+import type {
+  IndexedTimeBlock,
+  LogTimeBlock,
+  PlanTimeBlock,
+} from "../../time-block-types";
 import { getDiffInMinutes, strictParse } from "../../util/moment";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
@@ -350,12 +354,21 @@ export function isListItemEntry(
 }
 
 export function entryToTimeBlock(
-  // todo: use another type
+  derivedEntry: PlanEntry,
+  parentEntry: ListItemEntry,
+  listItemEntryWithChildren?: ListItemEntryWithChildren,
+): PlanTimeBlock;
+export function entryToTimeBlock(
+  derivedEntry: LogEntry,
+  parentEntry: ListItemEntry | FileSystemEntry,
+  listItemEntryWithChildren?: ListItemEntryWithChildren,
+): LogTimeBlock;
+export function entryToTimeBlock(
   derivedEntry: PlanEntry | LogEntry,
   parentEntry: ListItemEntry | FileSystemEntry,
   // todo: it duplicates the previous one, but for files it's not needed
   listItemEntryWithChildren?: ListItemEntryWithChildren,
-): LocalTimeBlock {
+): IndexedTimeBlock {
   const startTime = strictParse(derivedEntry.start);
   const durationMinutes = derivedEntry.end
     ? getDiffInMinutes(strictParse(derivedEntry.end), startTime)

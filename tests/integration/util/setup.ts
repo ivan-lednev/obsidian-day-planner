@@ -27,7 +27,11 @@ import {
   type DayPlannerSettings,
   defaultSettingsForTests,
 } from "../../../src/settings";
-import { isLocal, type TimeBlock } from "../../../src/time-block-types";
+import {
+  isLocal,
+  type EditableTimeBlock,
+  type TimeBlock,
+} from "../../../src/time-block-types";
 import { useTasks } from "../../../src/ui/hooks/use-tasks";
 import { createBackgroundBatchScheduler } from "../../../src/util/scheduler";
 import { getOneLineSummary } from "../../../src/util/time-block-utils";
@@ -232,7 +236,9 @@ export async function setUp(props?: {
   }
 
   function findTask(predicate: (task: TimeBlock) => boolean) {
-    const found = get(allTasks).filter(isLocal).find(predicate);
+    const found = get(allTasks).filter(isLocal).find(predicate) as
+      | EditableTimeBlock
+      | undefined;
 
     isNotVoid(found, `TimeBlock not found`);
 

@@ -1,7 +1,7 @@
 import { isNotVoid } from "typed-assert";
 
 import type { DayPlannerSettings } from "../../../../settings";
-import { type LocalTimeBlock } from "../../../../time-block-types";
+import { type EditableTimeBlock } from "../../../../time-block-types";
 import type { PointerDateTime } from "../../../../types";
 import * as t from "../../../../util/time-block-utils";
 import { EditMode, type EditOperation } from "../types";
@@ -50,7 +50,7 @@ function getEditInteraction(mode: EditMode) {
 }
 
 export function transform(
-  baseline: LocalTimeBlock[],
+  baseline: EditableTimeBlock[],
   operation: EditOperation,
   settings: DayPlannerSettings,
   pointerDateTime: PointerDateTime,

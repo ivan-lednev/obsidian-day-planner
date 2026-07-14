@@ -11,7 +11,7 @@ import {
   toMarkdown,
 } from "../mdast/mdast";
 import type { DayPlannerSettings } from "../settings";
-import type { LocalTimeBlock } from "../time-block-types";
+import type { EditableTimeBlock } from "../time-block-types";
 import { applyScopedUpdates, getFirstLine } from "../util/markdown";
 import * as t from "../util/time-block-utils";
 
@@ -200,14 +200,14 @@ export class TransactionWriter {
  * Describes what changed visually in a view after an edit.
  */
 export type ViewDiff = {
-  deleted?: Array<LocalTimeBlock>;
-  updated?: Array<LocalTimeBlock>;
-  added?: Array<LocalTimeBlock>;
+  deleted?: Array<EditableTimeBlock>;
+  updated?: Array<EditableTimeBlock>;
+  added?: Array<EditableTimeBlock>;
 };
 
 export function getTaskDiffFromEditState(
-  base: LocalTimeBlock[],
-  next: LocalTimeBlock[],
+  base: EditableTimeBlock[],
+  next: EditableTimeBlock[],
 ) {
   return next.reduce<Omit<Required<ViewDiff>, "deleted">>(
     (result, task) => {
@@ -232,7 +232,7 @@ export function getTaskDiffFromEditState(
 
 function mapTaskDiffToUpdate(props: {
   type: string;
-  task: LocalTimeBlock;
+  task: EditableTimeBlock;
   settings: DayPlannerSettings;
   periodicNotes: PeriodicNotes;
 }): Update | Update[] {

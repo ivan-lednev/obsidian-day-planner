@@ -5,7 +5,10 @@ import { isNotVoid } from "typed-assert";
 import type { PeriodicNotes } from "../../../service/periodic-notes";
 import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
-import type { LocalTimeBlock, WithDuration } from "../../../time-block-types";
+import type {
+  EditableTimeBlock,
+  WithDuration,
+} from "../../../time-block-types";
 import type { PointerDateTime } from "../../../types";
 import { getMinutesSinceMidnight } from "../../../util/moment";
 import * as t from "../../../util/time-block-utils";
@@ -54,7 +57,7 @@ export function createEditHandlers({
   }
 
   function handleResizerMouseDown(
-    task: WithDuration<LocalTimeBlock>,
+    task: WithDuration<EditableTimeBlock>,
     mode: EditMode,
   ) {
     const pointerDay = get(pointerDateTime).dateTime;
@@ -64,7 +67,7 @@ export function createEditHandlers({
     startEdit({ task, mode });
   }
 
-  async function handleTaskMouseUp(task: LocalTimeBlock) {
+  async function handleTaskMouseUp(task: EditableTimeBlock) {
     if (get(editOperation) || !task.location) {
       return;
     }
@@ -74,7 +77,7 @@ export function createEditHandlers({
   }
 
   // todo: fix (should probably use "day")
-  function handleUnscheduledTaskGripMouseDown(task: LocalTimeBlock) {
+  function handleUnscheduledTaskGripMouseDown(task: EditableTimeBlock) {
     let pointerDay = get(pointerDateTime).dateTime;
 
     if (!pointerDay) {

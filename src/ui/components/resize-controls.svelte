@@ -2,14 +2,14 @@
   import { ArrowDownToLine, MoveVertical, FoldVertical } from "lucide-svelte";
 
   import { getObsidianContext } from "../../context/obsidian-context";
-  import type { LocalTimeBlock } from "../../time-block-types";
+  import type { EditableTimeBlock } from "../../time-block-types";
   import { createGestures } from "../actions/gestures";
   import { EditMode } from "../hooks/use-edit/types";
 
   import BlockControlButton from "./block-control-button.svelte";
   import ExpandingControls from "./expanding-controls.svelte";
 
-  export let task: LocalTimeBlock;
+  export let task: EditableTimeBlock;
   export let isActive: boolean;
   export let setIsActive: (value: boolean) => void;
   export let reverse: boolean | undefined = false;

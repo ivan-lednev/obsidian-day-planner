@@ -68,14 +68,19 @@ export interface MemoryTimeBlock extends LocalTimeBlockBase {
   source: "memory";
 }
 
-export type LocalTimeBlock =
-  | DailyNoteDateTimeBlock
-  | TasksPluginPropTimeBlock
-  | ListItemLogTimeBlock
-  | FrontmatterLogTimeBlock
-  | MemoryTimeBlock;
+export type PlanTimeBlock = DailyNoteDateTimeBlock | TasksPluginPropTimeBlock;
+
+export type LogTimeBlock = ListItemLogTimeBlock | FrontmatterLogTimeBlock;
+
+export type IndexedTimeBlock = PlanTimeBlock | LogTimeBlock;
+
+export type EditableTimeBlock = PlanTimeBlock | MemoryTimeBlock;
+
+export type LocalTimeBlock = IndexedTimeBlock | MemoryTimeBlock;
 
 export type TimeBlock = LocalTimeBlock | RemoteTimeBlock;
+
+export type TimelineTimeBlock = RemoteTimeBlock | EditableTimeBlock;
 
 export function isRemote(timeBlock: TimeBlock): timeBlock is RemoteTimeBlock {
   return Object.hasOwn(timeBlock, "calendar");

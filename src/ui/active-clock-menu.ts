@@ -6,13 +6,13 @@ import {
   type ListItemEntryEditor,
 } from "../service/list-item-entry-editor";
 import type { WorkspaceFacade } from "../service/workspace-facade";
-import type { LocalTimeBlock } from "../time-block-types";
+import type { LogTimeBlock } from "../time-block-types";
 
 import type { OpenEditTimeEntryModal } from "./create-edit-time-entry-modal";
 
 export function createActiveClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;
-  task: LocalTimeBlock;
+  task: LogTimeBlock;
   // todo: lift to main.ts
   taskEntryEditor: ListItemEntryEditor;
   workspaceFacade: WorkspaceFacade;

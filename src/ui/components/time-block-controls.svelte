@@ -4,7 +4,7 @@
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { timeRangeAtStartOfLineRegExp } from "../../regexp";
-  import { type LocalTimeBlock } from "../../time-block-types";
+  import { type EditableTimeBlock } from "../../time-block-types";
   import { createMarkdownListTokens, getFirstLine } from "../../util/markdown";
   import type { HTMLActionArray } from "../actions/use-actions";
   import { createTimeBlockMenu } from "../time-block-menu";
@@ -24,7 +24,7 @@
     task,
     timeBlock,
   }: {
-    task: LocalTimeBlock;
+    task: EditableTimeBlock;
     class?: string;
     timeBlock: Snippet<[TimeBlockProps]>;
   } = $props();

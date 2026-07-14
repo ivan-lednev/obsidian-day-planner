@@ -10,7 +10,7 @@ import {
   type DayPlannerSettings,
   defaultSettingsForTests,
 } from "../../../src/settings";
-import type { LocalTimeBlock } from "../../../src/time-block-types";
+import type { EditableTimeBlock } from "../../../src/time-block-types";
 import type { PointerDateTime } from "../../../src/types";
 import { useEditContext } from "../../../src/ui/hooks/use-edit/use-edit-context";
 
@@ -20,7 +20,7 @@ function createProps({
   tasks,
   settings,
 }: {
-  tasks: LocalTimeBlock[];
+  tasks: EditableTimeBlock[];
   settings: DayPlannerSettings;
 }) {
   const onUpdate = vi.fn().mockResolvedValue(true);

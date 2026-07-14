@@ -6,7 +6,7 @@
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { selectRecentLogEntries } from "../../redux/index/index-selectors";
-  import type { LocalTimeBlock } from "../../time-block-types";
+  import type { LogTimeBlock } from "../../time-block-types";
   import { removeMarkdownExtension } from "../../util/markdown";
   import { getDayKey } from "../../util/time-block-utils";
   import { createRecentClockMenu } from "../recent-clock-menu";
@@ -83,7 +83,7 @@
       {window.moment(title).format(settingsSignal.current.timelineDateFormat)}
     </div>
   {/snippet}
-  {#snippet match(task: LocalTimeBlock)}
+  {#snippet match(task: LogTimeBlock)}
     <Selectable
       onSecondarySelect={(event) =>
         createRecentClockMenu({

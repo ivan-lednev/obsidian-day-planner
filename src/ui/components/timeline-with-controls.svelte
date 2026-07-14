@@ -5,7 +5,7 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
-  import type { TimeBlock } from "../../time-block-types";
+  import type { TimelineTimeBlock } from "../../time-block-types";
   import { createColumnSelectionMenu } from "../column-selection-menu";
 
   import BlockList from "./block-list.svelte";
@@ -63,7 +63,7 @@
       {/snippet}
       {#if displayedAllDayTasks.length > 0}
         <BlockList list={displayedAllDayTasks}>
-          {#snippet match(task: TimeBlock)}
+          {#snippet match(task: TimelineTimeBlock)}
             <UnscheduledTimeBlock
               --time-block-padding="var(--size-2-1) 0"
               {task}

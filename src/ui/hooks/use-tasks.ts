@@ -5,7 +5,7 @@ import type { PeriodicNotes } from "../../service/periodic-notes";
 import { WorkspaceFacade } from "../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../settings";
 import type {
-  LocalTimeBlock,
+  EditableTimeBlock,
   RemoteTimeBlock,
   TimeBlock,
   WithDuration,
@@ -26,7 +26,7 @@ export function useTasks(props: {
   pointerDateTime: Readable<PointerDateTime>;
   remoteTasks: Readable<RemoteTimeBlock[]>;
   periodicNotes: PeriodicNotes;
-  localTasks: Readable<LocalTimeBlock[]>;
+  localTasks: Readable<EditableTimeBlock[]>;
 }) {
   const {
     settingsStore,

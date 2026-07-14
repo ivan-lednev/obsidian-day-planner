@@ -2,7 +2,7 @@ import type { Moment } from "moment";
 import { isNotVoid } from "typed-assert";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
-import type { LocalTimeBlock } from "../../time-block-types";
+import type { LogTimeBlock } from "../../time-block-types";
 import { strictParse } from "../../util/moment";
 import { clamp, getDayKey } from "../../util/time-block-utils";
 import { createAppSelector } from "../create-app-selector";
@@ -63,7 +63,7 @@ export const selectLogEntriesForDay = createAppSelector(
         const isActiveLogRecordForToday = isDayKeyForToday && !logEntry.end;
 
         // todo: use adapter: logEntryToLocalTask
-        const timeBlock: LocalTimeBlock = {
+        const timeBlock: LogTimeBlock = {
           id: logEntry.id,
           source: logEntry.source,
           text: entry.text,

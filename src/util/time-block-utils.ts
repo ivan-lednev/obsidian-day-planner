@@ -16,7 +16,8 @@ import {
 import type { DayPlannerSettings } from "../settings";
 import {
   isRemote,
-  type LocalTimeBlock,
+  type EditableTimeBlock,
+  type MemoryTimeBlock,
   type RemoteTimeBlock,
   type TimeBlock,
   type TimeBlockLocation,
@@ -131,8 +132,8 @@ export function getNotificationKey(timeBlock: WithDuration<TimeBlock>) {
  * notes get sent under a heading based on the new date.
  */
 export function copy(
-  original: WithDuration<LocalTimeBlock>,
-): WithDuration<LocalTimeBlock> {
+  original: WithDuration<EditableTimeBlock>,
+): WithDuration<EditableTimeBlock> {
   let location: TimeBlockLocation | undefined;
 
   if (hasDateFromProp(original)) {
@@ -175,7 +176,7 @@ export function getDayKey(day: Moment) {
   return day.format(defaultDayFormat);
 }
 
-export function toString(timeBlock: WithDuration<LocalTimeBlock>) {
+export function toString(timeBlock: WithDuration<EditableTimeBlock>) {
   const updatedTimestamp = createTimestamp(
     getMinutesSinceMidnight(timeBlock.startTime),
     timeBlock.durationMinutes,
@@ -231,7 +232,7 @@ export function create(props: {
   day: Moment;
   startMinutes: number;
   settings: DayPlannerSettings;
-}): WithDuration<LocalTimeBlock> {
+}): WithDuration<MemoryTimeBlock> {
   const { day, startMinutes, settings } = props;
 
   return {
@@ -257,10 +258,10 @@ export function getOneLineSummary(timeBlock: TimeBlock) {
   return removeTimeRangeFromStartOfLine(timeBlock.text);
 }
 
-export function truncateToRange(
-  timeBlock: WithDuration<TimeBlock>,
+export function truncateToRange<T extends WithDuration<TimeBlock>>(
+  timeBlock: T,
   range: m.Range,
-) {
+): T {
   const start = timeBlock.startTime.clone().startOf("day");
   const end = getEndTime(timeBlock).clone().endOf("day");
 
@@ -299,7 +300,7 @@ export function removeTimeRange(text: string) {
   return text.replace(timeRangeRegExp, "").trim().replace(/\s+/g, " ");
 }
 
-export function isTimeEqual(a: LocalTimeBlock, b: LocalTimeBlock) {
+export function isTimeEqual(a: EditableTimeBlock, b: EditableTimeBlock) {
   return (
     a.startTime.isSame(b.startTime) &&
     a.durationMinutes === b.durationMinutes &&
@@ -307,7 +308,7 @@ export function isTimeEqual(a: LocalTimeBlock, b: LocalTimeBlock) {
   );
 }
 
-export function hasDateFromProp(timeBlock: LocalTimeBlock) {
+export function hasDateFromProp(timeBlock: EditableTimeBlock) {
   return scheduledPropRegExps.some((regexp) => regexp.test(timeBlock.text));
 }
 

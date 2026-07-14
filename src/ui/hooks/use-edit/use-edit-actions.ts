@@ -1,15 +1,15 @@
 import { get, type Readable, type Writable } from "svelte/store";
 
 import { vibrationDurationMillis } from "../../../constants";
-import type { LocalTimeBlock } from "../../../time-block-types";
+import type { EditableTimeBlock } from "../../../time-block-types";
 import type { OnUpdateFn } from "../../../types";
 
 import type { EditOperation } from "./types";
 
 interface UseEditActionsProps {
-  baselineTasks: Writable<LocalTimeBlock[]>;
+  baselineTasks: Writable<EditableTimeBlock[]>;
   editOperation: Writable<EditOperation | undefined>;
-  tasksWithPendingUpdate: Readable<LocalTimeBlock[]>;
+  tasksWithPendingUpdate: Readable<EditableTimeBlock[]>;
   onUpdate: OnUpdateFn;
 }
 
