@@ -231,32 +231,19 @@ export function create(props: {
   day: Moment;
   startMinutes: number;
   settings: DayPlannerSettings;
-  text?: string;
-  location?: TimeBlockLocation;
-  status?: string;
-  isAllDayEvent?: boolean;
 }): WithDuration<LocalTimeBlock> {
-  const {
-    day,
-    startMinutes,
-    settings,
-    location,
-    text = "New item",
-    status,
-    isAllDayEvent = false,
-  } = props;
+  const { day, startMinutes, settings } = props;
 
   return {
-    location,
     id: getId(),
     source: "memory",
     durationMinutes: settings.defaultDurationMinutes,
-    text,
+    text: "New item",
     startTime: minutesToMomentOfDay(startMinutes, day),
-    isAllDayEvent,
+    isAllDayEvent: false,
     symbol: "-",
     status:
-      status || settings.eventFormatOnCreation === "task"
+      settings.eventFormatOnCreation === "task"
         ? settings.taskStatusOnCreation
         : undefined,
   };
