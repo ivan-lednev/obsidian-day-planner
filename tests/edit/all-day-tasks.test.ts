@@ -60,14 +60,17 @@ describe("all-day tasks", () => {
       setUp({ tasks: baseTasks });
 
     const task = baseTasks[0];
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { location, ...taskWithoutLocation } = task;
 
     handlers.handleGripMouseDown(t.copy(task), EditMode.DRAG);
     moveCursorTo(task.startTime, "date");
 
     expect(get(getDisplayedAllDayTasksForMultiDayRow)(range)).toMatchObject([
       {
-        ...task,
-        location: undefined,
+        ...taskWithoutLocation,
+        source: "unwritten",
+        destination: { type: "plannerHeading" },
         id: expect.any(String),
         isAllDayEvent: true,
       },

@@ -63,18 +63,44 @@ export const selectLogEntriesForDay = createAppSelector(
         const isActiveLogRecordForToday = isDayKeyForToday && !logEntry.end;
 
         // todo: use adapter: logEntryToLocalTask
-        const timeBlock: LogTimeBlock = {
+        const base = {
           id: logEntry.id,
-          source: logEntry.source,
           text: entry.text,
           startTime: parsedStart,
-          status: isListItemEntry(entry) ? entry.task : undefined,
           symbol: "-",
           durationMinutes: parsedEnd.diff(parsedStart, "minutes"),
           ...(isActiveLogRecordForToday
             ? { truncated: ["bottom" as const] }
             : {}),
         };
+
+        let timeBlock: LogTimeBlock;
+
+        if (isListItemEntry(entry)) {
+          if (logEntry.source === "frontmatterLog") {
+            throw new Error(
+              "Inconsistent store state: a frontmatter log entry cannot be attached to a list item",
+            );
+          }
+
+          timeBlock = {
+            ...base,
+            source: logEntry.source,
+            status: entry.task,
+            location: { path: entry.path, position: entry.position },
+          };
+        } else {
+          if (logEntry.source !== "frontmatterLog") {
+            throw new Error(
+              "Inconsistent store state: only frontmatter log entries can be attached to file entries",
+            );
+          }
+
+          timeBlock = {
+            ...base,
+            source: logEntry.source,
+          };
+        }
 
         return clamp(timeBlock, startOfDay, endOfDay);
       },

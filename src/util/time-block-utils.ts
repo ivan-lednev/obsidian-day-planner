@@ -1,15 +1,12 @@
-import { produce } from "immer";
 import { flow } from "lodash/fp";
 import type { Moment } from "moment";
 import { get } from "svelte/store";
-import { isNotVoid } from "typed-assert";
 
 import { bullet, defaultDayFormat, emDash } from "../constants";
 import { settings } from "../global-store/settings";
 import { replaceOrPrependTimeRange } from "../parser/parser";
 import {
   obsidianBlockIdRegExp,
-  scheduledPropRegExps,
   timeRangeAtStartOfLineRegExp,
   timeRangeRegExp,
 } from "../regexp";
@@ -17,11 +14,12 @@ import type { DayPlannerSettings } from "../settings";
 import {
   isRemote,
   type EditableTimeBlock,
-  type MemoryTimeBlock,
+  type PlanTimeBlock,
   type RemoteTimeBlock,
   type TimeBlock,
-  type TimeBlockLocation,
+  type UnwrittenTimeBlock,
   type WithDuration,
+  type WriteDestination,
 } from "../time-block-types";
 
 import { getId } from "./id";
@@ -128,32 +126,35 @@ export function getNotificationKey(timeBlock: WithDuration<TimeBlock>) {
 }
 
 /**
- * Time blocks with date prop are copied under the original time block, time blocks from daily
- * notes get sent under a heading based on the new date.
+ * Copies of tasks-plugin blocks go right under the original block, copies of
+ * daily-note blocks get sent under the planner heading of the note matching
+ * their start time.
  */
 export function copy(
   original: WithDuration<EditableTimeBlock>,
-): WithDuration<EditableTimeBlock> {
-  let location: TimeBlockLocation | undefined;
-
-  if (hasDateFromProp(original)) {
-    const originalLocation = original.location;
-
-    isNotVoid(
-      originalLocation,
-      `Did not find location on time block$ ${getOneLineSummary(original)}`,
-    );
-
-    location = produce(originalLocation, (draft) => {
-      draft.position.start.line = draft.position.end.line + 1;
-    });
-  }
+): WithDuration<UnwrittenTimeBlock> {
+  // Invariant: unwritten blocks never get copied in the app
+  const written = original as WithDuration<PlanTimeBlock>;
 
   return {
-    ...original,
-    location,
+    ...written,
+    location: undefined,
+    source: "unwritten",
+    destination: getCopyDestination(written),
     id: getId(),
   };
+}
+
+function getCopyDestination(original: PlanTimeBlock): WriteDestination {
+  if (original.source === "tasksPluginProp") {
+    return {
+      type: "line",
+      path: original.location.path,
+      line: original.location.position.end.line + 1,
+    };
+  }
+
+  return { type: "plannerHeading" };
 }
 
 export function createTimestamp(
@@ -232,12 +233,13 @@ export function create(props: {
   day: Moment;
   startMinutes: number;
   settings: DayPlannerSettings;
-}): WithDuration<MemoryTimeBlock> {
+}): WithDuration<UnwrittenTimeBlock> {
   const { day, startMinutes, settings } = props;
 
   return {
     id: getId(),
-    source: "memory",
+    source: "unwritten",
+    destination: { type: "plannerHeading" },
     durationMinutes: settings.defaultDurationMinutes,
     text: "New item",
     startTime: minutesToMomentOfDay(startMinutes, day),
@@ -306,10 +308,6 @@ export function isTimeEqual(a: EditableTimeBlock, b: EditableTimeBlock) {
     a.durationMinutes === b.durationMinutes &&
     a.isAllDayEvent === b.isAllDayEvent
   );
-}
-
-export function hasDateFromProp(timeBlock: EditableTimeBlock) {
-  return scheduledPropRegExps.some((regexp) => regexp.test(timeBlock.text));
 }
 
 export function clamp<T extends WithDuration<TimeBlock>>(

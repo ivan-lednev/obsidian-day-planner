@@ -358,11 +358,13 @@ export function entryToTimeBlock(
   parentEntry: ListItemEntry,
   listItemEntryWithChildren?: ListItemEntryWithChildren,
 ): PlanTimeBlock;
+
 export function entryToTimeBlock(
   derivedEntry: LogEntry,
   parentEntry: ListItemEntry | FileSystemEntry,
   listItemEntryWithChildren?: ListItemEntryWithChildren,
 ): LogTimeBlock;
+
 export function entryToTimeBlock(
   derivedEntry: PlanEntry | LogEntry,
   parentEntry: ListItemEntry | FileSystemEntry,
@@ -376,7 +378,6 @@ export function entryToTimeBlock(
       30;
 
   const base = {
-    source: derivedEntry.source,
     text: parentEntry.text,
     startTime,
     durationMinutes,
@@ -388,8 +389,15 @@ export function entryToTimeBlock(
   };
 
   if (isListItemEntry(parentEntry)) {
+    if (derivedEntry.source === "frontmatterLog") {
+      throw new Error(
+        "Inconsistent store state: a frontmatter log entry cannot be attached to a list item",
+      );
+    }
+
     return {
       ...base,
+      source: derivedEntry.source,
       status: parentEntry.task,
       task: parentEntry.task,
       location: { path: parentEntry.path, position: parentEntry.position },
@@ -397,8 +405,15 @@ export function entryToTimeBlock(
     };
   }
 
+  if (derivedEntry.source !== "frontmatterLog") {
+    throw new Error(
+      "Inconsistent store state: only frontmatter log entries can be attached to file entries",
+    );
+  }
+
   return {
     ...base,
+    source: derivedEntry.source,
     symbol: "-",
   };
 }

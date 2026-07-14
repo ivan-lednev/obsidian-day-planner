@@ -44,28 +44,67 @@ type Side = "top" | "bottom" | "left" | "right";
 interface LocalTimeBlockBase extends ListItemTokens, BaseTimeBlock {
   text: string;
   children?: Array<ListItemEntryWithChildren>;
-  location?: TimeBlockLocation;
   durationMinutes: number;
 }
 
-export interface DailyNoteDateTimeBlock extends LocalTimeBlockBase {
+/**
+ * A time block parsed from a list item in a file. Its position in the file is
+ * always known.
+ */
+interface ListItemSourcedTimeBlockBase extends LocalTimeBlockBase {
+  location: TimeBlockLocation;
+}
+
+export interface DailyNoteDateTimeBlock extends ListItemSourcedTimeBlockBase {
   source: "dailyNoteDate";
 }
 
-export interface TasksPluginPropTimeBlock extends LocalTimeBlockBase {
+export interface TasksPluginPropTimeBlock extends ListItemSourcedTimeBlockBase {
   source: "tasksPluginProp";
 }
 
-export interface ListItemLogTimeBlock extends LocalTimeBlockBase {
+export interface ListItemLogTimeBlock extends ListItemSourcedTimeBlockBase {
   source: "listItemLog";
 }
 
 export interface FrontmatterLogTimeBlock extends LocalTimeBlockBase {
   source: "frontmatterLog";
+  /**
+   * Frontmatter logs are attached to a whole file, not to a line, so they
+   * never have a position. The property is declared as always-undefined so
+   * that `location` can be read on union types without narrowing first.
+   */
+  location?: undefined;
 }
 
-export interface MemoryTimeBlock extends LocalTimeBlockBase {
-  source: "memory";
+/**
+ * Where an unwritten time block should be materialized in the vault on
+ * confirmation.
+ */
+export type WriteDestination =
+  | { type: "line"; path: string; line: number }
+  | {
+      /**
+       * The planner heading of the daily note derived from the block's start
+       * time. Resolved at write time, so dragging the block to another day
+       * retargets the note.
+       */
+      type: "plannerHeading";
+    };
+
+/**
+ * A time block that only exists in memory: it was just created or copied and
+ * has not been written to a file yet, so it has no position. Instead, it
+ * carries a destination that says where it should be written.
+ */
+export interface UnwrittenTimeBlock extends LocalTimeBlockBase {
+  source: "unwritten";
+  /**
+   * The property is declared as always-undefined so that `location` can be
+   * read on union types without narrowing first.
+   */
+  location?: undefined;
+  destination: WriteDestination;
 }
 
 export type PlanTimeBlock = DailyNoteDateTimeBlock | TasksPluginPropTimeBlock;
@@ -74,9 +113,9 @@ export type LogTimeBlock = ListItemLogTimeBlock | FrontmatterLogTimeBlock;
 
 export type IndexedTimeBlock = PlanTimeBlock | LogTimeBlock;
 
-export type EditableTimeBlock = PlanTimeBlock | MemoryTimeBlock;
+export type EditableTimeBlock = PlanTimeBlock | UnwrittenTimeBlock;
 
-export type LocalTimeBlock = IndexedTimeBlock | MemoryTimeBlock;
+export type LocalTimeBlock = IndexedTimeBlock | UnwrittenTimeBlock;
 
 export type TimeBlock = LocalTimeBlock | RemoteTimeBlock;
 
