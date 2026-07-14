@@ -30,19 +30,6 @@ interface BaseTimeBlock {
   truncated?: Side[];
 }
 
-/**
- * Where a time block was derived from. Not yet used to narrow the shape of
- * `LocalTimeBlock`/`RemoteTimeBlock` (see time-block-types.ts todo), only to
- * identify the source of a given time block.
- */
-export type TimeBlockSource =
-  | "dailyNoteDate"
-  | "tasksPluginProp"
-  | "listItemLog"
-  | "frontmatterLog"
-  | "ical"
-  | "memory";
-
 export interface RemoteTimeBlock extends BaseTimeBlock {
   source: "ical";
   calendar: IcalConfig;
@@ -54,18 +41,40 @@ export interface RemoteTimeBlock extends BaseTimeBlock {
 
 type Side = "top" | "bottom" | "left" | "right";
 
-export interface LocalTimeBlock extends ListItemTokens, BaseTimeBlock {
-  source: Exclude<TimeBlockSource, "ical">;
+interface LocalTimeBlockBase extends ListItemTokens, BaseTimeBlock {
   text: string;
   children?: Array<ListItemEntryWithChildren>;
-
   location?: TimeBlockLocation;
   durationMinutes: number;
 }
 
-/**
- * A time block is a UI projection of an indexed entry
- */
+export interface DailyNoteDateTimeBlock extends LocalTimeBlockBase {
+  source: "dailyNoteDate";
+}
+
+export interface TasksPluginPropTimeBlock extends LocalTimeBlockBase {
+  source: "tasksPluginProp";
+}
+
+export interface ListItemLogTimeBlock extends LocalTimeBlockBase {
+  source: "listItemLog";
+}
+
+export interface FrontmatterLogTimeBlock extends LocalTimeBlockBase {
+  source: "frontmatterLog";
+}
+
+export interface MemoryTimeBlock extends LocalTimeBlockBase {
+  source: "memory";
+}
+
+export type LocalTimeBlock =
+  | DailyNoteDateTimeBlock
+  | TasksPluginPropTimeBlock
+  | ListItemLogTimeBlock
+  | FrontmatterLogTimeBlock
+  | MemoryTimeBlock;
+
 export type TimeBlock = LocalTimeBlock | RemoteTimeBlock;
 
 export function isRemote(timeBlock: TimeBlock): timeBlock is RemoteTimeBlock {
