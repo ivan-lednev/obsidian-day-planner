@@ -113,6 +113,7 @@ export type TimeBlock = LocalTimeBlock | RemoteTimeBlock;
 
 export type TimelineTimeBlock = RemoteTimeBlock | EditableTimeBlock;
 
+// todo: remove
 export function isRemote(timeBlock: TimeBlock): timeBlock is RemoteTimeBlock {
   return Object.hasOwn(timeBlock, "calendar");
 }

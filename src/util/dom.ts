@@ -1,5 +1,3 @@
-import { sanitizeHTMLToDom } from "obsidian";
-
 import {
   scrollOnHoverZoneHeightPercent,
   scrollSpeedPixelsPerAnimationFrame,
@@ -50,18 +48,6 @@ export function isEventOutside(
     event.target instanceof Node &&
     !container.contains(event.target)
   );
-}
-
-export function mountSanitized(el: HTMLElement, html: string) {
-  if (!html) {
-    return;
-  }
-
-  el.empty();
-
-  const fragment = sanitizeHTMLToDom(html);
-
-  el.appendChild(fragment);
 }
 
 export function offsetYToMinutes(

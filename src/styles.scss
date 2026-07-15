@@ -118,6 +118,11 @@
   background-color: transparent;
 }
 
+[data-type="planner-timeline"] .view-header,
+[data-type="planner-time-tracker"] .view-header {
+  display: none;
+}
+
 [data-type="planner-timeline"] .view-content,
 [data-type="planner-time-tracker"] .view-content,
 [data-type="planner-weekly"] .view-content {
