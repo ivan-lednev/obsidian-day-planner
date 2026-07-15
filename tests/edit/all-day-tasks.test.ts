@@ -60,6 +60,11 @@ describe("all-day tasks", () => {
       setUp({ tasks: baseTasks });
 
     const task = baseTasks[0];
+
+    if (task.source === "unwritten") {
+      throw new Error("The fixture task must be a written one");
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { location, ...taskWithoutLocation } = task;
 

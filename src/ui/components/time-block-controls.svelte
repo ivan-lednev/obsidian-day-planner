@@ -1,6 +1,5 @@
 <script lang="ts">
   import { type Snippet } from "svelte";
-  import { isNotVoid } from "typed-assert";
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { timeRangeAtStartOfLineRegExp } from "../../regexp";
@@ -37,7 +36,9 @@
   } = getObsidianContext();
 
   async function editTaskSummary() {
-    isNotVoid(task.location);
+    if (task.source === "unwritten") {
+      throw new Error("Cannot edit the summary of an unwritten time block");
+    }
 
     // todo: replace with getOnelineSummary()
     const firstLine = getFirstLine(task.text);

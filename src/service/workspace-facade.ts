@@ -5,6 +5,7 @@ import {
   TFile,
   Workspace,
   WorkspaceLeaf,
+  type Pos,
 } from "obsidian";
 import { isInstanceOf, isNotVoid } from "typed-assert";
 
@@ -77,14 +78,16 @@ export class WorkspaceFacade {
     return view;
   };
 
-  async revealLineInFile(path: string, line: number) {
+  async revealLocation({ path, position }: { path: string; position?: Pos }) {
     const file = this.vaultFacade.getFileByPath(path);
 
     const editor = await this.openFileInEditor(file);
 
-    if (!editor) {
+    if (!editor || !position) {
       return;
     }
+
+    const line = position.start.line;
 
     this.workspace
       .getActiveViewOfType(MarkdownView)

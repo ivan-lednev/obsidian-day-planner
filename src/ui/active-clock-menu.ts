@@ -1,5 +1,4 @@
 import { Menu } from "obsidian";
-import { isNotVoid } from "typed-assert";
 
 import {
   runWithNoticeOnError,
@@ -26,11 +25,13 @@ export function createActiveClockMenu(props: {
     openEditTimeEntryModal,
   } = props;
 
+  if (task.source === "frontmatterLog") {
+    // todo: implement for frontmatterLog
+    throw new Error("Not implemented");
+  }
+
   const menu = new Menu();
   const { location } = task;
-
-  // todo: remove when types are fixed
-  isNotVoid(location);
 
   const {
     path,
@@ -62,7 +63,7 @@ export function createActiveClockMenu(props: {
       .setTitle("Reveal task in file")
       .setIcon("file-input")
       .onClick(async () => {
-        await workspaceFacade.revealLineInFile(path, line);
+        await workspaceFacade.revealLocation(location);
       });
   });
 

@@ -71,10 +71,9 @@ export interface FrontmatterLogTimeBlock extends LocalTimeBlockBase {
   source: "frontmatterLog";
   /**
    * Frontmatter logs are attached to a whole file, not to a line, so they
-   * never have a position. The property is declared as always-undefined so
-   * that `location` can be read on union types without narrowing first.
+   * have a path, but no position.
    */
-  location?: undefined;
+  path: string;
 }
 
 /**
@@ -99,17 +98,14 @@ export type WriteDestination =
  */
 export interface UnwrittenTimeBlock extends LocalTimeBlockBase {
   source: "unwritten";
-  /**
-   * The property is declared as always-undefined so that `location` can be
-   * read on union types without narrowing first.
-   */
-  location?: undefined;
   destination: WriteDestination;
 }
 
 export type PlanTimeBlock = DailyNoteDateTimeBlock | TasksPluginPropTimeBlock;
 
 export type LogTimeBlock = ListItemLogTimeBlock | FrontmatterLogTimeBlock;
+
+export type ListItemSourcedTimeBlock = PlanTimeBlock | ListItemLogTimeBlock;
 
 export type IndexedTimeBlock = PlanTimeBlock | LogTimeBlock;
 
@@ -127,6 +123,14 @@ export function isRemote(timeBlock: TimeBlock): timeBlock is RemoteTimeBlock {
 
 export function isLocal(timeBlock: TimeBlock): timeBlock is LocalTimeBlock {
   return Object.hasOwn(timeBlock, "text");
+}
+
+export function isListItemSourced(
+  timeBlock: LocalTimeBlock,
+): timeBlock is ListItemSourcedTimeBlock {
+  return (
+    timeBlock.source !== "unwritten" && timeBlock.source !== "frontmatterLog"
+  );
 }
 
 export type WithDuration<T> = T & {

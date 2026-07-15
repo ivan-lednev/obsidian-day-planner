@@ -1,6 +1,9 @@
 <script lang="ts">
   import { getObsidianContext } from "../../context/obsidian-context";
-  import type { LocalTimeBlock } from "../../time-block-types";
+  import {
+    isListItemSourced,
+    type LocalTimeBlock,
+  } from "../../time-block-types";
   import {
     isCompleted,
     toRenderableMarkdown,
@@ -31,7 +34,7 @@
   }
 
   async function handlePointerUp(event: PointerEvent) {
-    if (!task.location) {
+    if (!isListItemSourced(task)) {
       return;
     }
 
@@ -82,7 +85,10 @@
     );
   }
 
-  const listItemLine = $derived(task.location?.position.start.line);
+  // todo: frontmatter entries should never end up in this component
+  const listItemLine = $derived(
+    isListItemSourced(task) ? task.location.position.start.line : undefined,
+  );
   const nestedListItemLines = $derived(
     flatten(task.children ?? [])
       .filter((task) => task.task !== undefined)

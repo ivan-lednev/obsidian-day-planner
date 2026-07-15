@@ -1,13 +1,12 @@
 import { App, Modal } from "obsidian";
 import { mount, unmount } from "svelte";
-import { isNotVoid } from "typed-assert";
 
 import { clockFormat } from "../constants";
 import {
   ListItemEntryEditor,
   runWithNoticeOnError,
 } from "../service/list-item-entry-editor";
-import type { LogTimeBlock } from "../time-block-types";
+import type { ListItemLogTimeBlock } from "../time-block-types";
 import { getFirstLine } from "../util/markdown";
 import { getEndTime } from "../util/time-block-utils";
 
@@ -17,10 +16,8 @@ export function createEditTimeEntryModalCreator(
   app: App,
   taskEntryEditor: ListItemEntryEditor,
 ) {
-  return (task: LogTimeBlock) => {
+  return (task: ListItemLogTimeBlock) => {
     const { location } = task;
-
-    isNotVoid(location);
 
     const initialStart = task.startTime.format(clockFormat);
     const initialEnd = task.durationMinutes

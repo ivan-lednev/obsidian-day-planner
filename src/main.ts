@@ -530,7 +530,7 @@ export default class DayPlanner extends Plugin {
     this.addCommand({
       id: "jump-to-active-clock",
       name: "Jump to active clock",
-      callback: () => {
+      callback: async () => {
         const currentTasksWithActiveClockProps = selectActiveLogEntries(
           store.getState(),
         );
@@ -546,13 +546,10 @@ export default class DayPlanner extends Plugin {
 
         isNotVoid(firstTaskWithActiveClockProp);
 
-        const { location } = firstTaskWithActiveClockProp;
-
-        isNotVoid(location);
-
-        this.workspaceFacade.revealLineInFile(
-          location.path,
-          location.position?.start?.line,
+        await this.workspaceFacade.revealLocation(
+          firstTaskWithActiveClockProp.source === "frontmatterLog"
+            ? { path: firstTaskWithActiveClockProp.path }
+            : firstTaskWithActiveClockProp.location,
         );
       },
     });

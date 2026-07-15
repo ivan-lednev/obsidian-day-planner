@@ -68,16 +68,21 @@ export function createEditHandlers({
   }
 
   async function handleTaskMouseUp(task: EditableTimeBlock) {
-    if (get(editOperation) || !task.location) {
+    if (get(editOperation) || task.source === "unwritten") {
       return;
     }
 
-    const { path, position } = task.location;
-    await workspaceFacade.revealLineInFile(path, position?.start?.line);
+    await workspaceFacade.revealLocation(task.location);
   }
 
   // todo: fix (should probably use "day")
   function handleUnscheduledTaskGripMouseDown(task: EditableTimeBlock) {
+    if (task.source === "unwritten") {
+      throw new Error(
+        "Invariant violation: an unwritten time block cannot be unscheduled",
+      );
+    }
+
     let pointerDay = get(pointerDateTime).dateTime;
 
     if (!pointerDay) {
@@ -87,12 +92,9 @@ export function createEditHandlers({
 
     const withAddedTime = {
       ...task,
-      // todo: add a proper fix
-      //  in what case does a task not have a location?
-      startTime: task.location
-        ? periodicNotes.getDateFromPath(task.location.path, "day") ||
-          window.moment()
-        : window.moment(),
+      startTime:
+        periodicNotes.getDateFromPath(task.location.path, "day") ||
+        window.moment(),
     };
 
     startEdit({ task: withAddedTime, mode: EditMode.DRAG });

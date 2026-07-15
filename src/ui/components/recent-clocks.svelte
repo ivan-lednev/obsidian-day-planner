@@ -2,7 +2,6 @@
   import { debounce } from "lodash";
   import { groupBy } from "lodash/fp";
   import { File, Play } from "lucide-svelte";
-  import { isNotVoid } from "typed-assert";
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { selectRecentLogEntries } from "../../redux/index/index-selectors";
@@ -51,13 +50,17 @@
   const filtered = $derived(
     keywords.every((keyword) => keyword.length === 0)
       ? recentLogRecords.current
-      : recentLogRecords.current.filter((it) =>
-          keywords.every(
+      : recentLogRecords.current.filter((it) => {
+          // todo: remove once we unify types
+          const path =
+            it.source === "frontmatterLog" ? it.path : it.location.path;
+
+          return keywords.every(
             (keyword) =>
               it.text.toLowerCase().includes(keyword) ||
-              it.location?.path.toLowerCase().includes(keyword),
-          ),
-        ),
+              path.toLowerCase().includes(keyword),
+          );
+        }),
   );
 
   const grouped = $derived(
@@ -85,13 +88,18 @@
   {/snippet}
   {#snippet match(task: LogTimeBlock)}
     <Selectable
-      onSecondarySelect={(event) =>
+      onSecondarySelect={(event) => {
+        if (task.source === "frontmatterLog") {
+          throw new Error("Not implemented");
+        }
+
         createRecentClockMenu({
           event,
           task,
           taskEntryEditor,
           workspaceFacade,
-        })}
+        });
+      }}
     >
       {#snippet children({ use, onpointerup, state })}
         <LocalTimeBlockComponent
@@ -101,42 +109,46 @@
           {use}
         >
           {#snippet blockEndDecoration()}
-            <BlockControls>
-              <ControlButton
-                label="Start tracking time on this task"
-                onclick={async () => {
-                  isNotVoid(task.location);
-
-                  await runWithNoticeOnError(
-                    taskEntryEditor.clockInAtLocation({
-                      path: task.location.path,
-                      line: task.location.position.start.line,
-                    }),
-                  );
-                }}
-              >
-                {#snippet icon()}
-                  <Play class="svg-icon" />
-                {/snippet}
-              </ControlButton>
-            </BlockControls>
+            <!-- todo: implement for frontmatterLog -->
+            {#if task.source !== "frontmatterLog"}
+              {@const listItemTask = task}
+              <BlockControls>
+                <ControlButton
+                  label="Start tracking time on this task"
+                  onclick={async () => {
+                    await runWithNoticeOnError(
+                      taskEntryEditor.clockInAtLocation({
+                        path: listItemTask.location.path,
+                        line: listItemTask.location.position.start.line,
+                      }),
+                    );
+                  }}
+                >
+                  {#snippet icon()}
+                    <Play class="svg-icon" />
+                  {/snippet}
+                </ControlButton>
+              </BlockControls>
+            {/if}
           {/snippet}
           {#snippet bottomDecoration()}
             <Properties>
-              {#if task.location?.path}
-                <Pill
-                  key={File}
-                  onclick={() => {
-                    isNotVoid(task.location);
-
-                    return workspaceFacade.revealLineInFile(
-                      task.location.path,
-                      task.location.position.start.line,
-                    );
-                  }}
-                  value={removeMarkdownExtension(task.location.path)}
-                />
-              {/if}
+              <!-- todo: remove once we unify types -->
+              {@const logPath =
+                task.source === "frontmatterLog"
+                  ? task.path
+                  : task.location.path}
+              <Pill
+                key={File}
+                onclick={async () => {
+                  await workspaceFacade.revealLocation(
+                    task.source === "frontmatterLog"
+                      ? { path: task.path }
+                      : task.location,
+                  );
+                }}
+                value={removeMarkdownExtension(logPath)}
+              />
             </Properties>
           {/snippet}
         </LocalTimeBlockComponent>

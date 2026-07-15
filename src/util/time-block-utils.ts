@@ -12,6 +12,7 @@ import {
 } from "../regexp";
 import type { DayPlannerSettings } from "../settings";
 import {
+  isListItemSourced,
   isRemote,
   type EditableTimeBlock,
   type PlanTimeBlock,
@@ -92,7 +93,7 @@ export function getRenderKey(timeBlock: WithDuration<TimeBlock> | TimeBlock) {
     );
   }
 
-  if (timeBlock.location) {
+  if (isListItemSourced(timeBlock)) {
     const {
       path,
       position: {
@@ -108,7 +109,7 @@ export function getRenderKey(timeBlock: WithDuration<TimeBlock> | TimeBlock) {
   return key.join(keySeparator);
 }
 
-export function getNotificationKey(timeBlock: WithDuration<TimeBlock>) {
+export function getNotificationKey(timeBlock: WithDuration<PlanTimeBlock>) {
   if (isRemote(timeBlock)) {
     return getRemoteTimeBlockIdentity(timeBlock);
   }
@@ -116,7 +117,7 @@ export function getNotificationKey(timeBlock: WithDuration<TimeBlock>) {
   const key: string[] = [];
 
   key.push(
-    timeBlock.location?.path ?? "blank",
+    timeBlock.location.path,
     String(getMinutesSinceMidnight(timeBlock.startTime)),
     String(timeBlock.durationMinutes),
     timeBlock.text,
@@ -133,14 +134,17 @@ export function getNotificationKey(timeBlock: WithDuration<TimeBlock>) {
 export function copy(
   original: WithDuration<EditableTimeBlock>,
 ): WithDuration<UnwrittenTimeBlock> {
-  // Invariant: unwritten blocks never get copied in the app
-  const written = original as WithDuration<PlanTimeBlock>;
+  if (original.source === "unwritten") {
+    throw new Error("Cannot copy unwritten time blocks");
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { location, ...withoutLocation } = original;
 
   return {
-    ...written,
-    location: undefined,
+    ...withoutLocation,
     source: "unwritten",
-    destination: getCopyDestination(written),
+    destination: getCopyDestination(original),
     id: getId(),
   };
 }

@@ -1,5 +1,4 @@
 import { Menu } from "obsidian";
-import { isNotVoid } from "typed-assert";
 
 import type { WorkspaceFacade } from "../service/workspace-facade";
 import { type EditableTimeBlock } from "../time-block-types";
@@ -11,17 +10,12 @@ export function createTimeBlockMenu(props: {
   onEdit: () => void;
 }) {
   const { event, task, workspaceFacade, onEdit } = props;
+
+  if (task.source === "unwritten") {
+    throw new Error("Cannot show a menu for an unwritten time block");
+  }
+
   const { location } = task;
-
-  // todo: remove when types are fixed
-  isNotVoid(location);
-
-  const {
-    path,
-    position: {
-      start: { line },
-    },
-  } = location;
 
   const menu = new Menu();
 
@@ -34,7 +28,7 @@ export function createTimeBlockMenu(props: {
       .setTitle("Reveal task in file")
       .setIcon("file-input")
       .onClick(async () => {
-        await workspaceFacade.revealLineInFile(path, line);
+        await workspaceFacade.revealLocation(location);
       });
   });
 

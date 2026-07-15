@@ -6,7 +6,6 @@
     Square,
     EllipsisVertical,
   } from "lucide-svelte";
-  import { isNotVoid } from "typed-assert";
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { currentTimeSignal } from "../../global-store/current-time";
@@ -68,57 +67,61 @@
           {use}
         >
           {#snippet blockEndDecoration()}
-            <BlockControls>
-              <ControlButton
-                onclick={async () => {
-                  isNotVoid(task.location);
+            <!-- TODO: implement controls for frontmatterLog -->
+            {#if task.source !== "frontmatterLog"}
+              {@const listItemTask = task}
+              <BlockControls>
+                <ControlButton
+                  onclick={async () => {
+                    await runWithNoticeOnError(
+                      taskEntryEditor.clockOutAtLocation({
+                        path: listItemTask.location.path,
+                        line: listItemTask.location.position.start.line,
+                      }),
+                    );
+                  }}
+                >
+                  {#snippet icon()}
+                    <Square class="svg-icon" />
+                  {/snippet}
+                </ControlButton>
 
-                  await runWithNoticeOnError(
-                    taskEntryEditor.clockOutAtLocation({
-                      path: task.location.path,
-                      line: task.location.position.start.line,
-                    }),
-                  );
-                }}
-              >
-                {#snippet icon()}
-                  <Square class="svg-icon" />
-                {/snippet}
-              </ControlButton>
-
-              <ControlButton
-                onclick={(event: MouseEvent) => {
-                  createActiveClockMenu({
-                    task,
-                    event,
-                    taskEntryEditor,
-                    workspaceFacade,
-                    openEditTimeEntryModal,
-                  });
-                }}
-              >
-                {#snippet icon()}
-                  <EllipsisVertical class="svg-icon" />
-                {/snippet}
-              </ControlButton>
-            </BlockControls>
+                <ControlButton
+                  onclick={(event: MouseEvent) => {
+                    createActiveClockMenu({
+                      task: listItemTask,
+                      event,
+                      taskEntryEditor,
+                      workspaceFacade,
+                      openEditTimeEntryModal,
+                    });
+                  }}
+                >
+                  {#snippet icon()}
+                    <EllipsisVertical class="svg-icon" />
+                  {/snippet}
+                </ControlButton>
+              </BlockControls>
+            {/if}
           {/snippet}
           {#snippet bottomDecoration()}
             <Properties>
-              {#if task.location?.path}
-                <Pill
-                  key={File}
-                  onclick={() => {
-                    isNotVoid(task.location);
-
-                    return workspaceFacade.revealLineInFile(
-                      task.location.path,
-                      task.location.position.start.line,
-                    );
-                  }}
-                  value={removeMarkdownExtension(task.location.path)}
-                />
-              {/if}
+              <!-- todo: remove after we unify `task.path` & `task.location` -->
+              {@const logPath =
+                task.source === "frontmatterLog"
+                  ? task.path
+                  : task.location.path}
+              <Pill
+                key={File}
+                onclick={async () => {
+                  await workspaceFacade.revealLocation(
+                    task.source === "frontmatterLog"
+                      ? { path: task.path }
+                      : task.location,
+                  );
+                }}
+                value={removeMarkdownExtension(logPath)}
+              />
               <Pill
                 key={Play}
                 value={task.startTime.format($settings.timestampFormat)}

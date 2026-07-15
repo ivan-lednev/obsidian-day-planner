@@ -10,6 +10,7 @@ import { selectVisibleDays } from "../global-slice";
 
 import {
   isListItemEntry,
+  type FileSystemEntry,
   type ListItemEntry,
   type ListItemEntryWithChildren,
   entryToTimeBlock,
@@ -48,7 +49,10 @@ export const selectLogEntriesForDay = createAppSelector(
           `Inconsistent store state: expected to find log entry by id ${logEntryId}`,
         );
 
-        const entry =
+        // todo: remove once we have noUncheckedIndexedAccess
+        //  the state types are imprecise: lookups by id may return
+        //  undefined, so the union has to be spelled out for narrowing to work
+        const entry: ListItemEntry | FileSystemEntry | undefined =
           taskEntriesById[logEntry.parentId] ??
           fileEntriesById[logEntry.parentId];
 
@@ -100,6 +104,7 @@ export const selectLogEntriesForDay = createAppSelector(
           timeBlock = {
             ...base,
             source: logEntry.source,
+            path: entry.path,
           };
         }
 

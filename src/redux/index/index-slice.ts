@@ -414,6 +414,7 @@ export function entryToTimeBlock(
   return {
     ...base,
     source: derivedEntry.source,
+    path: parentEntry.path,
     symbol: "-",
   };
 }
