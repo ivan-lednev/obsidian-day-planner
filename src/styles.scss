@@ -160,7 +160,7 @@
 [data-type="planner-time-tracker"] {
   --time-block-border: 1px solid var(--background-modifier-border);
   --time-block-content-padding: var(--size-4-1);
-  --rendered-markdown-gap: var(--size-2-3);
+  --time-block-content-layout-gap: var(--size-2-3);
   --planner-time-block-font-size: var(--font-ui-small);
 
   .workspace-split.mod-root & {

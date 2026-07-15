@@ -1,3 +1,5 @@
+import { on } from "svelte/events";
+
 import {
   scrollOnHoverZoneHeightPercent,
   scrollSpeedPixelsPerAnimationFrame,
@@ -170,4 +172,44 @@ export async function readCheckboxLineData(
   event.stopPropagation();
 
   await checkFn(Number(line));
+}
+
+function stopPropagationForElWithLineData(event: Event) {
+  if (event.target instanceof HTMLElement && event.target.dataset.line) {
+    event.stopPropagation();
+  }
+}
+
+export function createRenderMarkdownAttachment({
+  renderMarkdown,
+  markdown,
+  taskLines,
+  onCheckboxLineClick,
+}: {
+  renderMarkdown: (el: HTMLElement, markdown: string) => () => void;
+  markdown: string;
+  taskLines: Array<number | undefined>;
+  onCheckboxLineClick?: (line: number) => Promise<void>;
+}) {
+  return (el: HTMLElement) => {
+    const destroyMarkdown = renderMarkdown(el, markdown);
+
+    addLineDataToCheckboxes(el, taskLines);
+
+    const offPointerUp = on(el, "pointerup", (event: PointerEvent) => {
+      if (onCheckboxLineClick) {
+        readCheckboxLineData(event, onCheckboxLineClick);
+      }
+    });
+    const offMouseUp = on(el, "mouseup", stopPropagationForElWithLineData);
+    // todo: fix checkboxes
+    const offTouchEnd = on(el, "touchend", stopPropagationForElWithLineData);
+
+    return () => {
+      destroyMarkdown();
+      offPointerUp();
+      offMouseUp();
+      offTouchEnd();
+    };
+  };
 }

@@ -5,6 +5,7 @@
   import { hoverPreview } from "../actions/hover-preview";
   import type { HTMLActionArray } from "../actions/use-actions";
 
+  import FrontmatterLogContent from "./frontmatter-log-content.svelte";
   import RenderedMarkdown from "./rendered-markdown.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
 
@@ -35,7 +36,9 @@
   {task}
   use={[...use, hoverPreview(task)]}
 >
-  <RenderedMarkdown {task}>
-    {@render bottomDecoration?.()}
-  </RenderedMarkdown>
+  {#if task.source === "frontmatterLog"}
+    <FrontmatterLogContent {bottomDecoration} {task} />
+  {:else}
+    <RenderedMarkdown {bottomDecoration} {task} />
+  {/if}
 </TimeBlockBase>
