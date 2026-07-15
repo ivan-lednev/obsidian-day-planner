@@ -1,5 +1,5 @@
+import { Array } from "effect";
 import { produce } from "immer";
-import { takeWhile } from "lodash/fp";
 import type { Node, Parent, Text as MdastText, ListItem } from "mdast";
 import type { Heading, List, Root, Nodes } from "mdast";
 import { fromMarkdown } from "mdast-util-from-markdown";
@@ -93,9 +93,9 @@ export function findHeadingWithChildren(
 
   const nodesAfterHeading = root.children.slice(planHeadingIndex + 1);
 
-  const nodesBeforeNextHeading = takeWhile(
-    (node) => node.type !== "heading" || node.depth > planHeading.depth,
+  const nodesBeforeNextHeading = Array.takeWhile(
     nodesAfterHeading,
+    (node) => node.type !== "heading" || node.depth > planHeading.depth,
   );
 
   return {

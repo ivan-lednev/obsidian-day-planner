@@ -1,4 +1,4 @@
-import { noop } from "lodash/fp";
+import { Function } from "effect";
 import type { Moment } from "moment/moment";
 import moment from "moment/moment";
 import { writable } from "svelte/store";
@@ -62,8 +62,8 @@ export function setUp({
   } = useEditContext(props);
 
   // this prevents the store from resetting;
-  dayToDisplayedTasks.subscribe(noop);
-  getDisplayedAllDayTasksForMultiDayRow.subscribe(noop);
+  dayToDisplayedTasks.subscribe(Function.constVoid);
+  getDisplayedAllDayTasksForMultiDayRow.subscribe(Function.constVoid);
 
   function moveCursorTo(
     dateTime: Moment,

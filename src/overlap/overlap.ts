@@ -1,5 +1,5 @@
+import { Array } from "effect";
 import Fraction from "fraction.js";
-import { partition } from "lodash/fp";
 import { isNotVoid } from "typed-assert";
 
 import type { TimeInterval, WithPlacing } from "../time-block-types";
@@ -54,9 +54,9 @@ function computeOverlapForGroup(
 ) {
   const newLookup = new Map([...previousLookup]);
 
-  const [itemsPlacedPreviously, itemsToBePlaced] = partition(
-    ({ id }) => newLookup.has(id),
+  const [itemsToBePlaced, itemsPlacedPreviously] = Array.partition(
     overlapGroup,
+    ({ id }) => newLookup.has(id),
   );
 
   if (itemsToBePlaced.length === 0) {
@@ -79,7 +79,7 @@ function computeOverlapForGroup(
   const columnsForNewGroup = fractionForEachNewItem.d;
   const newItemInherentSpan = fractionForEachNewItem.n;
 
-  const slots = Array(columnsForNewGroup).fill(empty);
+  const slots = Array.replicate<string>(empty, columnsForNewGroup);
 
   itemsPlacedPreviously.forEach((item) => {
     const placing = newLookup.get(item.id);

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { debounce } from "lodash";
-  import { groupBy } from "lodash/fp";
+  import { Array } from "effect";
   import { File, Play } from "lucide-svelte";
+  import { debounce } from "obsidian";
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { selectRecentLogEntries } from "../../redux/index/index-selectors";
@@ -60,7 +60,7 @@
   );
 
   const grouped = $derived(
-    groupBy((task) => getDayKey(task.startTime), filtered),
+    Array.groupBy(filtered, (task) => getDayKey(task.startTime)),
   );
 </script>
 

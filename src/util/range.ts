@@ -1,4 +1,4 @@
-import { range } from "lodash/fp";
+import { Array } from "effect";
 import type { Moment } from "moment";
 import { match } from "ts-pattern";
 
@@ -25,13 +25,8 @@ export function getFullWeek(
 ) {
   const firstDayMoment = getMomentFromDayOfWeek(moment, firstDay);
 
-  return range(1, 7).reduce(
-    (result, dayIndex) => {
-      const nextDay = firstDayMoment.clone().add(dayIndex, "day");
-
-      return [...result, nextDay];
-    },
-    [firstDayMoment],
+  return Array.makeBy(7, (dayIndex) =>
+    firstDayMoment.clone().add(dayIndex, "day"),
   );
 }
 
@@ -40,14 +35,7 @@ export function getWorkWeek(day: Moment) {
 }
 
 export function getUpcomingDays(start: Moment, count: number) {
-  return range(1, count).reduce(
-    (result, dayIndex) => {
-      const nextDay = start.clone().add(dayIndex, "day");
-
-      return [...result, nextDay];
-    },
-    [start],
-  );
+  return Array.makeBy(count, (dayIndex) => start.clone().add(dayIndex, "day"));
 }
 
 export function getNextWorkWeek(day: Moment) {

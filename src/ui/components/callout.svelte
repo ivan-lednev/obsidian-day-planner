@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { capitalize } from "lodash/fp";
   import { type Snippet } from "svelte";
 
   import { AlertTriangle, Zap } from "./lucide";
@@ -10,7 +9,7 @@
   const {
     children,
     type = "info",
-    title = capitalize(type),
+    title = type,
     className,
   }: {
     children?: Snippet;

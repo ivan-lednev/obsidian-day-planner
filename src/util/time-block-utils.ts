@@ -1,4 +1,4 @@
-import { flow } from "lodash/fp";
+import { pipe } from "effect";
 import type { Moment } from "moment";
 import { get } from "svelte/store";
 
@@ -361,12 +361,13 @@ export function getBlockProps(
 }
 
 export function toRenderableMarkdown(timeBlock: Node) {
-  const formattedFirstLine = flow(
+  const formattedFirstLine = pipe(
+    timeBlock,
     getFirstLineAsMarkdown,
     (node) => (timeBlock.status ? node : removeListTokens(node)),
     deleteProps,
     removeTimeRange,
-  )(timeBlock);
+  );
 
   const [, ...linesAfterFirst] = timeBlock.text.split("\n");
 

@@ -1,5 +1,4 @@
-import { pipe } from "effect";
-import { filter, map } from "lodash/fp";
+import { Array, pipe } from "effect";
 import type { Moment } from "moment";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
@@ -41,7 +40,7 @@ export class MiniTimeline {
   displayedBlocks = $derived(
     pipe(
       this.tasksWithTimeForToday.current,
-      filter((it) =>
+      Array.filter((it) =>
         doesOverlapWithRange(
           { start: it.startTime, end: t.getEndTime(it) },
           {
@@ -50,7 +49,7 @@ export class MiniTimeline {
           },
         ),
       ),
-      map((it) => ({
+      Array.map((it) => ({
         ...t.clamp(it, this.rangeStart, this.rangeEnd),
         leftPx: it.startTime.clone().diff(this.rangeStart, `minutes`),
       })),

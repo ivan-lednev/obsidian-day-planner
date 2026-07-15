@@ -1,4 +1,4 @@
-import { groupBy } from "lodash/fp";
+import { Array } from "effect";
 import type { Root } from "mdast";
 import { isNotVoid } from "typed-assert";
 
@@ -118,7 +118,7 @@ export function createTransaction(props: {
   afterEach?: (contents: string) => string;
 }) {
   const { updates, afterEach, settings } = props;
-  const pathToUpdates = groupBy((entry) => entry.path, updates);
+  const pathToUpdates = Array.groupBy(updates, (entry) => entry.path);
 
   return Object.entries(pathToUpdates).map(([path, updates]) => ({
     path,

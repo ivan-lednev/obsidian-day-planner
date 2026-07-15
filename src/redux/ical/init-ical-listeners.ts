@@ -1,4 +1,3 @@
-import { isEmpty } from "lodash/fp";
 import { request } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
@@ -77,7 +76,7 @@ export function createIcalParseListener(props: {
       listenerApi.getState(),
     );
 
-    if (isEmpty(icalEvents)) {
+    if (icalEvents.length === 0) {
       return;
     }
 

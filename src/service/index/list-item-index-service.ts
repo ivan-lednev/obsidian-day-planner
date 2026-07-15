@@ -1,4 +1,4 @@
-import { uniqBy } from "lodash/fp";
+import { Array } from "effect";
 import type { Pos } from "obsidian";
 
 import {
@@ -22,9 +22,9 @@ export class ListItemIndexService implements IndexService {
     const denormalizedListItemEntries =
       this.createDenormalizedListItemEntries(props);
 
-    const flatListItemEntries = uniqBy(
-      (it) => it.id,
+    const flatListItemEntries = Array.dedupeWith(
       denormalizedListItemEntries.flatMap(flatten),
+      (a, b) => a.id === b.id,
     );
 
     return {

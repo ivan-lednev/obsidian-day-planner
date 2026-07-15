@@ -1,4 +1,4 @@
-import { chunk } from "lodash/fp";
+import { Array } from "effect";
 import {
   type MetadataCache,
   TFile,
@@ -39,8 +39,8 @@ export class VaultIndexAdapter {
       .toSorted(sortMostRecentFirst)
       .map((file) => file.path);
 
-    chunk(VaultIndexAdapter.INITIAL_LOAD_CHUNK_SIZE, paths).forEach((batch) =>
-      this.dispatch(indexRequested(batch)),
+    Array.chunksOf(paths, VaultIndexAdapter.INITIAL_LOAD_CHUNK_SIZE).forEach(
+      (batch) => this.dispatch(indexRequested(batch)),
     );
   }
 

@@ -1,4 +1,4 @@
-import { flow, uniqBy } from "lodash/fp";
+import { Array, pipe } from "effect";
 import type { Moment } from "moment";
 import { derived, type Readable, writable } from "svelte/store";
 
@@ -223,10 +223,12 @@ export function useEditContext(props: {
         t.getEmptyTimeBlocksForDay();
 
       const withTime: Array<WithPlacing<WithDuration<TimelineTimeBlock>>> =
-        flow(
-          uniqBy(t.getRenderKey),
+        // todo: fix `as`
+        pipe(
+          timeBlocksForDay.withTime as Array<WithDuration<TimelineTimeBlock>>,
+          Array.dedupeWith((a, b) => t.getRenderKey(a) === t.getRenderKey(b)),
           addHorizontalPlacing,
-        )(timeBlocksForDay.withTime);
+        );
 
       return {
         ...timeBlocksForDay,

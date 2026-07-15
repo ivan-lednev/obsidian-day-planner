@@ -1,4 +1,4 @@
-import { differenceBy } from "lodash/fp";
+import { Array } from "effect";
 import type { Moment } from "moment";
 import { derived, get, type Readable } from "svelte/store";
 
@@ -34,11 +34,9 @@ export function useNewlyStartedTasks(props: UseNewlyStartedTasksProps) {
         task.source !== "unwritten",
     );
 
-    const newlyStarted = differenceBy(
-      getNotificationKey,
-      tasksInProgress,
-      previousTasksInProgress,
-    );
+    const newlyStarted = Array.differenceWith<WithDuration<PlanTimeBlock>>(
+      (a, b) => getNotificationKey(a) === getNotificationKey(b),
+    )(tasksInProgress, previousTasksInProgress);
 
     previousTasksInProgress = tasksInProgress;
 

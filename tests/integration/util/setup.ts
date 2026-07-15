@@ -1,4 +1,4 @@
-import { noop } from "lodash/fp";
+import { Function } from "effect";
 import type { Moment } from "moment";
 import { type CachedMetadata, MetadataCache, type Vault } from "obsidian";
 import { derived, get, writable } from "svelte/store";
@@ -222,8 +222,8 @@ export async function setUp(props?: {
   );
 
   // this prevents the store from resetting;
-  allTasks.subscribe(noop);
-  localTasks.subscribe(noop);
+  allTasks.subscribe(Function.constVoid);
+  localTasks.subscribe(Function.constVoid);
 
   function moveCursorTo(
     dateTime: Moment,

@@ -1,4 +1,4 @@
-import { omit } from "lodash/fp";
+import { Record } from "effect";
 import type { Moment } from "moment";
 import {
   type Subscriber,
@@ -18,7 +18,7 @@ export function useDateRanges() {
     ranges.update((previous) => ({ ...previous, [rangeKey]: range }));
 
     function untrack() {
-      ranges.update(omit([rangeKey]));
+      ranges.update(Record.remove(rangeKey));
     }
 
     function update(fn: Updater<Moment[]>) {

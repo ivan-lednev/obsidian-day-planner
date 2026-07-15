@@ -1,5 +1,4 @@
-import { Either, pipe } from "effect";
-import { takeWhile } from "lodash/fp";
+import { Array, Either, pipe } from "effect";
 import { stringifyYaml } from "obsidian";
 import { z } from "zod";
 
@@ -186,9 +185,9 @@ export function updateProp(
 }
 
 export function deleteProps(text: string) {
-  return takeWhile(
-    (line) => !line.trimStart().startsWith(codeFence),
+  return Array.takeWhile(
     text.split("\n"),
+    (line) => !line.trimStart().startsWith(codeFence),
   )
     .join("\n")
     .replaceAll(propRegexp, "")

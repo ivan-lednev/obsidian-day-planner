@@ -1,4 +1,4 @@
-import { identity } from "lodash/fp";
+import { identity } from "effect";
 
 type Entries<T> = {
   [K in keyof T]: [K, T[K]];

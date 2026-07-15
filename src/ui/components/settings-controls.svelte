@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { range } from "lodash/fp";
+  import { Array } from "effect";
   import { SettingGroup } from "obsidian";
 
   import { getObsidianContext } from "../../context/obsidian-context";
@@ -7,10 +7,10 @@
   const { settings } = getObsidianContext();
 
   const startHourOptions = Object.fromEntries(
-    range(0, 13).map((it) => [it, String(it)]),
+    Array.range(0, 12).map((it) => [it, String(it)]),
   );
   const zoomLevelOptions = Object.fromEntries(
-    range(1, 9)
+    Array.range(1, 8)
       .map(String)
       .map((it) => [it, String(it)]),
   );
