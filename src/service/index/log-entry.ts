@@ -3,11 +3,11 @@ import { getDayKeysInRange, strictParse } from "../../util/moment";
 export function createLogEntry(props: {
   start: string;
   end?: string;
-  parent: string;
+  parentId: string;
   id: string;
   source: "listItemLog" | "frontmatterLog";
 }) {
-  const { start, end, parent, id, source } = props;
+  const { start, end, parentId, id, source } = props;
 
   const parsedStart = strictParse(start);
 
@@ -21,5 +21,5 @@ export function createLogEntry(props: {
 
   const dayKeys: string[] = getDayKeysInRange(parsedStart, parsedEnd);
 
-  return { start, end, parent, dayKeys, id, source };
+  return { start, end, parentId, dayKeys, id, source };
 }

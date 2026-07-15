@@ -39,7 +39,7 @@ export class FrontmatterLogIndexService implements IndexService {
       createLogEntry({
         start,
         end,
-        parent: fileEntryId,
+        parentId: fileEntryId,
         id: createId(fileEntryId, index),
         source: "frontmatterLog",
       }),

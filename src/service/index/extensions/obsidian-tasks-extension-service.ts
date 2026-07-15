@@ -60,7 +60,7 @@ export class ObsidianTasksExtensionService
       id: createId(parentId, "tasks-scheduled"),
       dayKeys: [getDayKey(scheduledDate)],
       // todo P3: we can add parent id later
-      parent: parentId,
+      parentId,
       source: "tasksPluginProp" as const,
     };
 

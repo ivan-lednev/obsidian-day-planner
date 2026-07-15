@@ -49,7 +49,8 @@ export const selectLogEntriesForDay = createAppSelector(
         );
 
         const entry =
-          taskEntriesById[logEntry.parent] ?? fileEntriesById[logEntry.parent];
+          taskEntriesById[logEntry.parentId] ??
+          fileEntriesById[logEntry.parentId];
 
         isNotVoid(
           entry,
@@ -118,11 +119,11 @@ export const selectRecentLogEntries = createAppSelector(
       .filter((it): it is LogEntry & { end: string } => it.end !== undefined)
       .toSorted((a, b) => Date.parse(b.end) - Date.parse(a.end))
       .reduce<Map<string, LogEntry>>((result, logEntry) => {
-        if (result.has(logEntry.parent)) {
+        if (result.has(logEntry.parentId)) {
           return result;
         }
 
-        return result.set(logEntry.parent, logEntry);
+        return result.set(logEntry.parentId, logEntry);
       }, new Map());
 
     return [...taskEntryIdToLatestLogRecord].map(([taskEntryId, logEntry]) => {
@@ -158,7 +159,7 @@ export const selectPlanEntriesForVisibleDays = createAppSelector(
 
         isNotVoid(planEntry, "Inconsistent index state");
 
-        const listItemEntry = listItemEntriesById[planEntry.parent];
+        const listItemEntry = listItemEntriesById[planEntry.parentId];
 
         isNotVoid(listItemEntry, "Inconsistent index state");
 
@@ -191,7 +192,7 @@ export const selectPlanEntriesForDays = createAppSelector(
 
         isNotVoid(planEntry, "Inconsistent index state");
 
-        const listItemEntry = listItemEntriesById[planEntry.parent];
+        const listItemEntry = listItemEntriesById[planEntry.parentId];
 
         isNotVoid(listItemEntry, "Inconsistent index state");
 

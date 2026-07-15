@@ -42,7 +42,7 @@ export type DenormalizedListItemEntry = Omit<
 
 export interface LogEntry {
   id: string;
-  parent: string;
+  parentId: string;
   start: string;
   end?: string;
   dayKeys: string[];
@@ -53,7 +53,7 @@ export interface PlanEntry {
   isAllDay?: boolean;
 
   id: string;
-  parent: string;
+  parentId: string;
   start: string;
   end?: string;
   dayKeys: string[];
@@ -311,8 +311,8 @@ export const indexSlice = createAppSlice({
         .filter((it) => !it.end)
         .map((logEntry) => {
           const entry =
-            state.taskEntries.byId[logEntry.parent] ??
-            state.fileEntries.byId[logEntry.parent];
+            state.taskEntries.byId[logEntry.parentId] ??
+            state.fileEntries.byId[logEntry.parentId];
 
           isNotVoid(entry, "Inconsistent store state");
 

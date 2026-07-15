@@ -36,7 +36,7 @@ export class TimeEntriesExtensionService
             createLogEntry({
               start,
               end,
-              parent: rawListItemEntry.id,
+              parentId: rawListItemEntry.id,
               id: createId(rawListItemEntry.id, index),
               source: "listItemLog",
             }),

@@ -69,7 +69,7 @@ export class DailyNoteExtensionService
             {
               id,
               dayKeys,
-              parent: rawListItemEntry.id,
+              parentId: rawListItemEntry.id,
               start: startTime.format(clockFormat),
               end: endTime.format(clockFormat),
               source: "dailyNoteDate" as const,
@@ -84,7 +84,7 @@ export class DailyNoteExtensionService
             {
               id,
               dayKeys,
-              parent: rawListItemEntry.id,
+              parentId: rawListItemEntry.id,
               start: dateFromPath.format(clockFormat),
               end: dateFromPath
                 .clone()
