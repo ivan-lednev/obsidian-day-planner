@@ -308,13 +308,13 @@ function mapPersistedToUpdates(props: {
   const { type, task, settings, periodicNotes } = props;
   const taskTextWithUpdatedProps = t.toString(task);
 
-  const { path } = task.location;
-  const firstLine = task.location.position.start.line;
+  const { path } = task;
+  const firstLine = task.position.start.line;
   const lineSpan = taskTextWithUpdatedProps.trim().split("\n").length - 1;
   const lastLine = firstLine + lineSpan;
 
   const position = {
-    start: task.location.position.start,
+    start: task.position.start,
     end: { line: lastLine, col: 0 },
   };
 

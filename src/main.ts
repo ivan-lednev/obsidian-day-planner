@@ -546,11 +546,7 @@ export default class DayPlanner extends Plugin {
 
         isNotVoid(firstTaskWithActiveClockProp);
 
-        await this.workspaceFacade.revealLocation(
-          firstTaskWithActiveClockProp.source === "frontmatterLog"
-            ? { path: firstTaskWithActiveClockProp.path }
-            : firstTaskWithActiveClockProp.location,
-        );
+        await this.workspaceFacade.revealLocation(firstTaskWithActiveClockProp);
       },
     });
 

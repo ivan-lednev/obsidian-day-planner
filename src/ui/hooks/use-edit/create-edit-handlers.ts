@@ -72,7 +72,7 @@ export function createEditHandlers({
       return;
     }
 
-    await workspaceFacade.revealLocation(task.location);
+    await workspaceFacade.revealLocation(task);
   }
 
   // todo: fix (should probably use "day")
@@ -93,8 +93,7 @@ export function createEditHandlers({
     const withAddedTime = {
       ...task,
       startTime:
-        periodicNotes.getDateFromPath(task.location.path, "day") ||
-        window.moment(),
+        periodicNotes.getDateFromPath(task.path, "day") || window.moment(),
     };
 
     startEdit({ task: withAddedTime, mode: EditMode.DRAG });

@@ -50,17 +50,13 @@
   const filtered = $derived(
     keywords.every((keyword) => keyword.length === 0)
       ? recentLogRecords.current
-      : recentLogRecords.current.filter((it) => {
-          // todo: remove once we unify types
-          const path =
-            it.source === "frontmatterLog" ? it.path : it.location.path;
-
-          return keywords.every(
+      : recentLogRecords.current.filter((it) =>
+          keywords.every(
             (keyword) =>
               it.text.toLowerCase().includes(keyword) ||
-              path.toLowerCase().includes(keyword),
-          );
-        }),
+              it.path.toLowerCase().includes(keyword),
+          ),
+        ),
   );
 
   const grouped = $derived(
@@ -118,8 +114,8 @@
                   onclick={async () => {
                     await runWithNoticeOnError(
                       taskEntryEditor.clockInAtLocation({
-                        path: listItemTask.location.path,
-                        line: listItemTask.location.position.start.line,
+                        path: listItemTask.path,
+                        line: listItemTask.position.start.line,
                       }),
                     );
                   }}
@@ -133,21 +129,12 @@
           {/snippet}
           {#snippet bottomDecoration()}
             <Properties>
-              <!-- todo: remove once we unify types -->
-              {@const logPath =
-                task.source === "frontmatterLog"
-                  ? task.path
-                  : task.location.path}
               <Pill
                 key={File}
                 onclick={async () => {
-                  await workspaceFacade.revealLocation(
-                    task.source === "frontmatterLog"
-                      ? { path: task.path }
-                      : task.location,
-                  );
+                  await workspaceFacade.revealLocation(task);
                 }}
-                value={removeMarkdownExtension(logPath)}
+                value={removeMarkdownExtension(task.path)}
               />
             </Properties>
           {/snippet}

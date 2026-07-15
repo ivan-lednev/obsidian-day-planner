@@ -35,17 +35,16 @@ export function hoverPreview(task: LocalTimeBlock) {
         return;
       }
 
-      // todo: clean up once `path` is directly on TimeBlock
-      if (isListItemSourced(task)) {
-        showPreview(
-          el,
-          currentEvent,
-          task.location.path,
-          task.location.position.start.line,
-        );
-      } else if (task.source === "frontmatterLog") {
-        showPreview(el, currentEvent, task.path);
+      if (task.source === "unwritten") {
+        return;
       }
+
+      showPreview(
+        el,
+        currentEvent,
+        task.path,
+        isListItemSourced(task) ? task.position.start.line : undefined,
+      );
     });
 
     return {

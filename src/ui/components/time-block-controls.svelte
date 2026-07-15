@@ -63,8 +63,8 @@
     const lineStart = firstLine.slice(0, timestampEnd) + leadingSpace;
 
     await editLine({
-      path: task.location.path,
-      position: task.location.position.start,
+      path: task.path,
+      position: task.position.start,
       contents: `${createMarkdownListTokens(task)} ${lineStart}${next}`,
     });
   }

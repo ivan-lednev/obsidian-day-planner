@@ -400,7 +400,8 @@ export function entryToTimeBlock(
       source: derivedEntry.source,
       status: parentEntry.task,
       task: parentEntry.task,
-      location: { path: parentEntry.path, position: parentEntry.position },
+      path: parentEntry.path,
+      position: parentEntry.position,
       symbol: parentEntry.symbol,
     };
   }

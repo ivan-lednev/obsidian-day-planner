@@ -92,7 +92,8 @@ export const selectLogEntriesForDay = createAppSelector(
             ...base,
             source: logEntry.source,
             status: entry.task,
-            location: { path: entry.path, position: entry.position },
+            path: entry.path,
+            position: entry.position,
           };
         } else {
           if (logEntry.source !== "frontmatterLog") {

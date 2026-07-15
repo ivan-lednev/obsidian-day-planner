@@ -24,19 +24,17 @@ export const baseTask: WithPlacing<WithDuration<EditableTimeBlock>> = {
     offsetPercent: 0,
     spanPercent: 100,
   },
-  location: {
-    path: "path",
-    position: {
-      start: {
-        line: 0,
-        col: 0,
-        offset: 0,
-      },
-      end: {
-        line: 0,
-        col: 0,
-        offset: 0,
-      },
+  path: "path",
+  position: {
+    start: {
+      line: 0,
+      col: 0,
+      offset: 0,
+    },
+    end: {
+      line: 0,
+      col: 0,
+      offset: 0,
     },
   },
   id: "id",

@@ -17,8 +17,6 @@ export function createEditTimeEntryModalCreator(
   taskEntryEditor: ListItemEntryEditor,
 ) {
   return (task: ListItemLogTimeBlock) => {
-    const { location } = task;
-
     const initialStart = task.startTime.format(clockFormat);
     const initialEnd = task.durationMinutes
       ? getEndTime(task).format(clockFormat)
@@ -36,7 +34,7 @@ export function createEditTimeEntryModalCreator(
         onConfirm: async ({ start, end }: { start: string; end?: string }) => {
           await runWithNoticeOnError(
             taskEntryEditor.editLastClockAtLocation(
-              { path: location.path, line: location.position.start.line },
+              { path: task.path, line: task.position.start.line },
               { start, end },
             ),
           );

@@ -66,14 +66,14 @@ describe("all-day tasks", () => {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { location, ...taskWithoutLocation } = task;
+    const { path, position, ...taskWithoutFileLocation } = task;
 
     handlers.handleGripMouseDown(t.copy(task), EditMode.DRAG);
     moveCursorTo(task.startTime, "date");
 
     expect(get(getDisplayedAllDayTasksForMultiDayRow)(range)).toMatchObject([
       {
-        ...taskWithoutLocation,
+        ...taskWithoutFileLocation,
         source: "unwritten",
         destination: { type: "plannerHeading" },
         id: expect.any(String),

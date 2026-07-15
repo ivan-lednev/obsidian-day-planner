@@ -75,8 +75,8 @@
                   onclick={async () => {
                     await runWithNoticeOnError(
                       taskEntryEditor.clockOutAtLocation({
-                        path: listItemTask.location.path,
-                        line: listItemTask.location.position.start.line,
+                        path: listItemTask.path,
+                        line: listItemTask.position.start.line,
                       }),
                     );
                   }}
@@ -106,21 +106,12 @@
           {/snippet}
           {#snippet bottomDecoration()}
             <Properties>
-              <!-- todo: remove after we unify `task.path` & `task.location` -->
-              {@const logPath =
-                task.source === "frontmatterLog"
-                  ? task.path
-                  : task.location.path}
               <Pill
                 key={File}
                 onclick={async () => {
-                  await workspaceFacade.revealLocation(
-                    task.source === "frontmatterLog"
-                      ? { path: task.path }
-                      : task.location,
-                  );
+                  await workspaceFacade.revealLocation(task);
                 }}
-                value={removeMarkdownExtension(logPath)}
+                value={removeMarkdownExtension(task.path)}
               />
               <Pill
                 key={Play}

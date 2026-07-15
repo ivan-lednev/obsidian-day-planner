@@ -15,8 +15,6 @@ export function createTimeBlockMenu(props: {
     throw new Error("Cannot show a menu for an unwritten time block");
   }
 
-  const { location } = task;
-
   const menu = new Menu();
 
   menu.addItem((item) => {
@@ -28,7 +26,7 @@ export function createTimeBlockMenu(props: {
       .setTitle("Reveal task in file")
       .setIcon("file-input")
       .onClick(async () => {
-        await workspaceFacade.revealLocation(location);
+        await workspaceFacade.revealLocation(task);
       });
   });
 

@@ -46,7 +46,7 @@
 
     event.stopPropagation();
 
-    await toggleCheckboxInFile(task.location.path, line);
+    await toggleCheckboxInFile(task.path, line);
   }
 
   function createRenderMarkdownAttachment(
@@ -87,7 +87,7 @@
 
   // todo: frontmatter entries should never end up in this component
   const listItemLine = $derived(
-    isListItemSourced(task) ? task.location.position.start.line : undefined,
+    isListItemSourced(task) ? task.position.start.line : undefined,
   );
   const nestedListItemLines = $derived(
     flatten(task.children ?? [])

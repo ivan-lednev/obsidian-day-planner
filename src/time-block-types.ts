@@ -6,11 +6,6 @@ import type { HorizontalPlacing } from "./overlap/horizontal-placing";
 import type { ListItemEntryWithChildren } from "./redux/index/index-slice";
 import type { IcalConfig } from "./settings";
 
-export interface TimeBlockLocation {
-  path: string;
-  position: Pos;
-}
-
 export interface ListItemTokens {
   symbol: string;
   // todo: remove when we remove dataview
@@ -52,7 +47,8 @@ interface LocalTimeBlockBase extends ListItemTokens, BaseTimeBlock {
  * always known.
  */
 interface ListItemSourcedTimeBlockBase extends LocalTimeBlockBase {
-  location: TimeBlockLocation;
+  path: string;
+  position: Pos;
 }
 
 export interface DailyNoteDateTimeBlock extends ListItemSourcedTimeBlockBase {

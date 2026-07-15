@@ -99,7 +99,7 @@ export function getRenderKey(timeBlock: WithDuration<TimeBlock> | TimeBlock) {
       position: {
         start: { line },
       },
-    } = timeBlock.location;
+    } = timeBlock;
 
     key.push(path, String(line));
   }
@@ -117,7 +117,7 @@ export function getNotificationKey(timeBlock: WithDuration<PlanTimeBlock>) {
   const key: string[] = [];
 
   key.push(
-    timeBlock.location.path,
+    timeBlock.path,
     String(getMinutesSinceMidnight(timeBlock.startTime)),
     String(timeBlock.durationMinutes),
     timeBlock.text,
@@ -139,10 +139,10 @@ export function copy(
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { location, ...withoutLocation } = original;
+  const { path, position, ...withoutFileLocation } = original;
 
   return {
-    ...withoutLocation,
+    ...withoutFileLocation,
     source: "unwritten",
     destination: getCopyDestination(original),
     id: getId(),
@@ -153,8 +153,8 @@ function getCopyDestination(original: PlanTimeBlock): WriteDestination {
   if (original.source === "tasksPluginProp") {
     return {
       type: "line",
-      path: original.location.path,
-      line: original.location.position.end.line + 1,
+      path: original.path,
+      line: original.position.end.line + 1,
     };
   }
 

@@ -31,14 +31,13 @@ export function createActiveClockMenu(props: {
   }
 
   const menu = new Menu();
-  const { location } = task;
 
   const {
     path,
     position: {
       start: { line },
     },
-  } = location;
+  } = task;
 
   menu.addItem((item) => {
     return item
@@ -63,7 +62,7 @@ export function createActiveClockMenu(props: {
       .setTitle("Reveal task in file")
       .setIcon("file-input")
       .onClick(async () => {
-        await workspaceFacade.revealLocation(location);
+        await workspaceFacade.revealLocation(task);
       });
   });
 
