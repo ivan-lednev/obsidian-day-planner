@@ -26,6 +26,7 @@
   const onCheckboxLineClick = $derived(
     isListItemSourced(task)
       ? (line: number) => toggleCheckboxInFile(task.path, line)
+      // todo: should throw an error
       : undefined,
   );
 
