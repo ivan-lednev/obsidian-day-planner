@@ -42,9 +42,11 @@ import {
 } from "./redux/store";
 import { type UseSelector } from "./redux/use-selector";
 import { TransactionWriter } from "./service/diff-writer";
+import { FrontmatterLogEntryEditor } from "./service/frontmatter-log-entry-editor";
 import { createIndexServices } from "./service/index/create-index-services";
 import { ListItemEntryEditor } from "./service/list-item-entry-editor";
 import { ListPropsParser } from "./service/list-props-parser";
+import { LogEntryEditor } from "./service/log-entry-editor";
 import { MetadataCacheFacade } from "./service/metadata-cache-facade";
 import { PeriodicNotes } from "./service/periodic-notes";
 import { VaultFacade } from "./service/vault-facade";
@@ -78,6 +80,8 @@ export default class DayPlanner extends Plugin {
   private workspaceFacade!: WorkspaceFacade;
   private periodicNotes!: PeriodicNotes;
   private taskEntryEditor!: ListItemEntryEditor;
+  private frontmatterLogEntryEditor!: FrontmatterLogEntryEditor;
+  private logEntryEditor!: LogEntryEditor;
   private vaultFacade!: VaultFacade;
   private transactionWriter!: TransactionWriter;
   private metadataCacheFacade!: MetadataCacheFacade;
@@ -140,6 +144,14 @@ export default class DayPlanner extends Plugin {
       this.vaultFacade,
       this.metadataCacheFacade,
       listPropsParser,
+    );
+    this.frontmatterLogEntryEditor = new FrontmatterLogEntryEditor(
+      this.vaultFacade,
+      this.metadataCacheFacade,
+    );
+    this.logEntryEditor = new LogEntryEditor(
+      this.taskEntryEditor,
+      this.frontmatterLogEntryEditor,
     );
 
     this.register(() => {
@@ -577,13 +589,13 @@ export default class DayPlanner extends Plugin {
 
     const openEditTimeEntryModal = createEditTimeEntryModalCreator(
       this.app,
-      this.taskEntryEditor,
+      this.logEntryEditor,
     );
 
     const defaultObsidianContext: ObsidianContext = {
       periodicNotes: this.periodicNotes,
       openEditTimeEntryModal,
-      taskEntryEditor: this.taskEntryEditor,
+      logEntryEditor: this.logEntryEditor,
       editText,
       editLine,
       workspaceFacade: this.workspaceFacade,

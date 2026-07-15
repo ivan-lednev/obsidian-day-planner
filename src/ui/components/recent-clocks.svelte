@@ -19,7 +19,7 @@
   import Properties from "./properties.svelte";
   import Selectable from "./selectable.svelte";
 
-  const { workspaceFacade, useSelector, taskEntryEditor, settingsSignal } =
+  const { workspaceFacade, useSelector, logEntryEditor, settingsSignal } =
     getObsidianContext();
 
   const recentLogRecords = useSelector((state) =>
@@ -85,14 +85,10 @@
   {#snippet match(task: LogTimeBlock)}
     <Selectable
       onSecondarySelect={(event) => {
-        if (task.source === "frontmatterLog") {
-          throw new Error("Not implemented");
-        }
-
         createRecentClockMenu({
           event,
           task,
-          taskEntryEditor,
+          logEntryEditor,
           workspaceFacade,
         });
       }}
@@ -105,27 +101,18 @@
           {use}
         >
           {#snippet blockEndDecoration()}
-            <!-- todo: implement for frontmatterLog -->
-            {#if task.source !== "frontmatterLog"}
-              {@const listItemTask = task}
-              <BlockControls>
-                <ControlButton
-                  label="Start tracking time on this task"
-                  onclick={async () => {
-                    await runWithNoticeOnError(
-                      taskEntryEditor.clockInAtLocation({
-                        path: listItemTask.path,
-                        line: listItemTask.position.start.line,
-                      }),
-                    );
-                  }}
-                >
-                  {#snippet icon()}
-                    <Play class="svg-icon" />
-                  {/snippet}
-                </ControlButton>
-              </BlockControls>
-            {/if}
+            <BlockControls>
+              <ControlButton
+                label="Start tracking time on this task"
+                onclick={async () => {
+                  await runWithNoticeOnError(logEntryEditor.clockIn(task));
+                }}
+              >
+                {#snippet icon()}
+                  <Play class="svg-icon" />
+                {/snippet}
+              </ControlButton>
+            </BlockControls>
           {/snippet}
           {#snippet bottomDecoration()}
             <Properties>

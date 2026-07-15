@@ -1,36 +1,25 @@
 import { Menu } from "obsidian";
 
-import {
-  runWithNoticeOnError,
-  type ListItemEntryEditor,
-} from "../service/list-item-entry-editor";
+import { runWithNoticeOnError } from "../service/list-item-entry-editor";
+import type { LogEntryEditor } from "../service/log-entry-editor";
 import type { WorkspaceFacade } from "../service/workspace-facade";
-import type { ListItemLogTimeBlock } from "../time-block-types";
+import type { LogTimeBlock } from "../time-block-types";
 
 export function createRecentClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;
-  task: ListItemLogTimeBlock;
-  taskEntryEditor: ListItemEntryEditor;
+  task: LogTimeBlock;
+  logEntryEditor: LogEntryEditor;
   workspaceFacade: WorkspaceFacade;
 }) {
-  const { event, task, taskEntryEditor, workspaceFacade } = props;
+  const { event, task, logEntryEditor, workspaceFacade } = props;
   const menu = new Menu();
-
-  const {
-    path,
-    position: {
-      start: { line },
-    },
-  } = task;
 
   menu.addItem((item) => {
     item
       .setTitle("Clock in")
       .setIcon("play")
       .onClick(async () => {
-        await runWithNoticeOnError(
-          taskEntryEditor.clockInAtLocation({ path, line }),
-        );
+        await runWithNoticeOnError(logEntryEditor.clockIn(task));
       });
   });
 

@@ -24,4 +24,17 @@ export class MetadataCacheFacade {
       Effect.mapError(() => new Error(`No list item at ${path}:${line}`)),
     );
   }
+
+  getFrontmatterEffect(path: string) {
+    return pipe(
+      Effect.fromNullable(
+        this.metadataCache.getCache(path)?.frontmatterPosition,
+      ),
+      Effect.mapError(() => new Error(`No frontmatter at ${path}`)),
+      Effect.map((position) => ({
+        raw: this.metadataCache.getCache(path)?.frontmatter,
+        position,
+      })),
+    );
+  }
 }

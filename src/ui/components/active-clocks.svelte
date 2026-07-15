@@ -28,7 +28,7 @@
 
   const {
     workspaceFacade,
-    taskEntryEditor,
+    logEntryEditor,
     openEditTimeEntryModal,
     useSelector,
   } = getObsidianContext();
@@ -53,7 +53,7 @@
         createActiveClockMenu({
           event,
           task,
-          taskEntryEditor,
+          logEntryEditor,
           workspaceFacade,
           openEditTimeEntryModal,
         })}
@@ -67,42 +67,33 @@
           {use}
         >
           {#snippet blockEndDecoration()}
-            <!-- TODO: implement controls for frontmatterLog -->
-            {#if task.source !== "frontmatterLog"}
-              {@const listItemTask = task}
-              <BlockControls>
-                <ControlButton
-                  onclick={async () => {
-                    await runWithNoticeOnError(
-                      taskEntryEditor.clockOutAtLocation({
-                        path: listItemTask.path,
-                        line: listItemTask.position.start.line,
-                      }),
-                    );
-                  }}
-                >
-                  {#snippet icon()}
-                    <Square class="svg-icon" />
-                  {/snippet}
-                </ControlButton>
+            <BlockControls>
+              <ControlButton
+                onclick={async () => {
+                  await runWithNoticeOnError(logEntryEditor.clockOut(task));
+                }}
+              >
+                {#snippet icon()}
+                  <Square class="svg-icon" />
+                {/snippet}
+              </ControlButton>
 
-                <ControlButton
-                  onclick={(event: MouseEvent) => {
-                    createActiveClockMenu({
-                      task: listItemTask,
-                      event,
-                      taskEntryEditor,
-                      workspaceFacade,
-                      openEditTimeEntryModal,
-                    });
-                  }}
-                >
-                  {#snippet icon()}
-                    <EllipsisVertical class="svg-icon" />
-                  {/snippet}
-                </ControlButton>
-              </BlockControls>
-            {/if}
+              <ControlButton
+                onclick={(event: MouseEvent) => {
+                  createActiveClockMenu({
+                    task,
+                    event,
+                    logEntryEditor,
+                    workspaceFacade,
+                    openEditTimeEntryModal,
+                  });
+                }}
+              >
+                {#snippet icon()}
+                  <EllipsisVertical class="svg-icon" />
+                {/snippet}
+              </ControlButton>
+            </BlockControls>
           {/snippet}
           {#snippet bottomDecoration()}
             <Properties>

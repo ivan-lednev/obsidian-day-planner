@@ -1,9 +1,7 @@
 import { Menu } from "obsidian";
 
-import {
-  runWithNoticeOnError,
-  type ListItemEntryEditor,
-} from "../service/list-item-entry-editor";
+import { runWithNoticeOnError } from "../service/list-item-entry-editor";
+import type { LogEntryEditor } from "../service/log-entry-editor";
 import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { LogTimeBlock } from "../time-block-types";
 
@@ -12,41 +10,26 @@ import type { OpenEditTimeEntryModal } from "./create-edit-time-entry-modal";
 export function createActiveClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;
   task: LogTimeBlock;
-  // todo: lift to main.ts
-  taskEntryEditor: ListItemEntryEditor;
+  logEntryEditor: LogEntryEditor;
   workspaceFacade: WorkspaceFacade;
   openEditTimeEntryModal: OpenEditTimeEntryModal;
 }) {
   const {
     event,
     task,
-    taskEntryEditor,
+    logEntryEditor,
     workspaceFacade,
     openEditTimeEntryModal,
   } = props;
 
-  if (task.source === "frontmatterLog") {
-    // todo: implement for frontmatterLog
-    throw new Error("Not implemented");
-  }
-
   const menu = new Menu();
-
-  const {
-    path,
-    position: {
-      start: { line },
-    },
-  } = task;
 
   menu.addItem((item) => {
     return item
       .setTitle("Clock out")
       .setIcon("square")
       .onClick(async () => {
-        await runWithNoticeOnError(
-          taskEntryEditor.clockOutAtLocation({ path, line }),
-        );
+        await runWithNoticeOnError(logEntryEditor.clockOut(task));
       });
   });
 
@@ -74,9 +57,7 @@ export function createActiveClockMenu(props: {
       .setIcon("trash-2")
       .setWarning(true)
       .onClick(async () => {
-        await runWithNoticeOnError(
-          taskEntryEditor.cancelClockAtLocation({ path, line }),
-        );
+        await runWithNoticeOnError(logEntryEditor.cancelClock(task));
       });
   });
 

@@ -16,9 +16,11 @@ import {
 } from "../../../src/redux/index/index-slice";
 import { createReactor, type RootState } from "../../../src/redux/store";
 import { TransactionWriter } from "../../../src/service/diff-writer";
+import { FrontmatterLogEntryEditor } from "../../../src/service/frontmatter-log-entry-editor";
 import { createIndexServices } from "../../../src/service/index/create-index-services";
 import { ListItemEntryEditor } from "../../../src/service/list-item-entry-editor";
 import { ListPropsParser } from "../../../src/service/list-props-parser";
+import { LogEntryEditor } from "../../../src/service/log-entry-editor";
 import { MetadataCacheFacade } from "../../../src/service/metadata-cache-facade";
 import type { PeriodicNotes } from "../../../src/service/periodic-notes";
 import { VaultFacade } from "../../../src/service/vault-facade";
@@ -179,6 +181,16 @@ export async function setUp(props?: {
     listPropsParser,
   );
 
+  const frontmatterLogEntryEditor = new FrontmatterLogEntryEditor(
+    vaultFacade,
+    metadataCacheFacade,
+  );
+
+  const logEntryEditor = new LogEntryEditor(
+    taskEntryEditor,
+    frontmatterLogEntryEditor,
+  );
+
   inMemoryFiles.forEach(({ path }) => {
     isNotVoid(
       cachedMetadata[path],
@@ -278,5 +290,7 @@ export async function setUp(props?: {
     currentTime,
     metadataCache,
     taskEntryEditor,
+    frontmatterLogEntryEditor,
+    logEntryEditor,
   };
 }

@@ -7,8 +7,8 @@ import type { IcalParseTaskResult } from "./redux/ical/init-ical-listeners";
 import { type AppDispatch, type RootState } from "./redux/store";
 import type { UseSelector } from "./redux/use-selector";
 import type { IndexService } from "./service/index/index-service";
-import type { ListItemEntryEditor } from "./service/list-item-entry-editor";
 import type { ListPropsParser } from "./service/list-props-parser";
+import type { LogEntryEditor } from "./service/log-entry-editor";
 import type { PeriodicNotes } from "./service/periodic-notes";
 import type { VaultFacade } from "./service/vault-facade";
 import type { WorkspaceFacade } from "./service/workspace-facade";
@@ -63,7 +63,7 @@ export interface ObsidianContext {
   settings: Writable<DayPlannerSettings>;
   settingsSignal: Signal<DayPlannerSettings>;
   pointerDateTime: Writable<PointerDateTime>;
-  taskEntryEditor: ListItemEntryEditor;
+  logEntryEditor: LogEntryEditor;
   openEditTimeEntryModal: OpenEditTimeEntryModal;
   // todo: rename to promptUserToEditText
   editText: (props: {
