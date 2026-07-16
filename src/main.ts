@@ -48,12 +48,21 @@ import { ListPropsParser } from "./service/list-props-parser";
 import { LogEntryEditor } from "./service/log-entry-editor";
 import { MetadataCacheFacade } from "./service/metadata-cache-facade";
 import { PeriodicNotes } from "./service/periodic-notes";
+import {
+  MtimeSearchOrderingService,
+  type SearchOrderingService,
+} from "./service/search-ordering-service";
+import {
+  type SearchService,
+  VaultSearchService,
+} from "./service/search-service";
 import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
 import { createGetTasksApi } from "./tasks-plugin";
 import type { EditableTimeBlock, RemoteTimeBlock } from "./time-block-types";
 import type { ObsidianContext, OnUpdateFn, PointerDateTime } from "./types";
+import { ClockInOnAnythingModal } from "./ui/clock-in-on-anything-modal";
 import { askForConfirmation } from "./ui/confirmation-modal";
 import { createEditTimeEntryModalCreator } from "./ui/create-edit-time-entry-modal";
 import { createEditorMenuCallback } from "./ui/editor-menu";
@@ -81,6 +90,8 @@ export default class DayPlanner extends Plugin {
   private periodicNotes!: PeriodicNotes;
   private logEntryEditor!: LogEntryEditor;
   private vaultFacade!: VaultFacade;
+  private searchService!: SearchService;
+  private searchOrderingService!: SearchOrderingService;
   private transactionWriter!: TransactionWriter;
   private metadataCacheFacade!: MetadataCacheFacade;
   private undoNotice!: UndoNotice;
@@ -112,6 +123,8 @@ export default class DayPlanner extends Plugin {
       this.periodicNotes,
     );
     this.metadataCacheFacade = new MetadataCacheFacade(metadataCache);
+    this.searchService = new VaultSearchService(vault, metadataCache);
+    this.searchOrderingService = new MtimeSearchOrderingService(vault);
 
     const icalParseScheduler =
       createBackgroundBatchScheduler<IcalParseTaskResult>({
@@ -384,6 +397,20 @@ export default class DayPlanner extends Plugin {
       name: "Cancel clock",
       editorCallback: () =>
         runWithNoticeOnError(this.logEntryEditor.cancelClockUnderCursor()),
+    });
+
+    this.addCommand({
+      id: "clock-in-on-anything",
+      name: "Clock in on anything...",
+      callback: () => {
+        new ClockInOnAnythingModal(
+          this.app,
+          this.searchService,
+          this.searchOrderingService,
+          this.vaultFacade,
+          this.logEntryEditor,
+        ).open();
+      },
     });
   }
 

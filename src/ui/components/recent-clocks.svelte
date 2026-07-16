@@ -7,6 +7,7 @@
   import { selectRecentLogEntries } from "../../redux/index/index-selectors";
   import type { LogTimeBlock } from "../../time-block-types";
   import { runWithNoticeOnError } from "../../util/effect";
+  import { filterByKeywords } from "../../util/keyword-filter";
   import { removeMarkdownExtension } from "../../util/markdown";
   import { getDayKey } from "../../util/time-block-utils";
   import { createRecentClockMenu } from "../recent-clock-menu";
@@ -41,22 +42,11 @@
     };
   });
 
-  const keywords = $derived(
-    debouncedFieldState
-      .split(/\s+/)
-      ?.map((keyword) => keyword.trim().toLowerCase()),
-  );
-
   const filtered = $derived(
-    keywords.every((keyword) => keyword.length === 0)
-      ? recentLogRecords.current
-      : recentLogRecords.current.filter((it) =>
-          keywords.every(
-            (keyword) =>
-              it.text.toLowerCase().includes(keyword) ||
-              it.path.toLowerCase().includes(keyword),
-          ),
-        ),
+    filterByKeywords(recentLogRecords.current, debouncedFieldState, (it) => [
+      it.text,
+      it.path,
+    ]),
   );
 
   const grouped = $derived(

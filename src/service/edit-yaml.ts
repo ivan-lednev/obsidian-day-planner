@@ -172,8 +172,13 @@ export function createYamlEditTargets(deps: {
   function inFrontmatter(path: string): YamlEditTarget {
     return (editFn) =>
       Effect.gen(function* () {
-        const { raw, position } =
-          yield* metadataCacheFacade.getFrontmatterEffect(path);
+        const existingFrontmatter = yield* Effect.either(
+          metadataCacheFacade.getFrontmatterEffect(path),
+        );
+
+        const raw = Either.isRight(existingFrontmatter)
+          ? existingFrontmatter.right.raw
+          : undefined;
 
         const currentProps = yield* Effect.try({
           try: () => propsSchema.parse(raw ?? {}),
@@ -194,15 +199,22 @@ export function createYamlEditTargets(deps: {
 
         yield* Effect.tryPromise({
           try: () =>
-            vaultFacade.editFile(
-              path,
-              (contents) =>
-                contents.slice(0, position.start.offset) +
-                "---\n" +
-                updatedYaml +
-                "---" +
-                contents.slice(position.end.offset),
-            ),
+            vaultFacade.editFile(path, (contents) => {
+              if (Either.isRight(existingFrontmatter)) {
+                const { position } = existingFrontmatter.right;
+
+                // todo: use a small util for constructing frontmatter fence (can live in markdown utils.
+                return (
+                  contents.slice(0, position.start.offset) +
+                  "---\n" +
+                  updatedYaml +
+                  "---" +
+                  contents.slice(position.end.offset)
+                );
+              }
+
+              return `---\n${updatedYaml}---\n${contents}`;
+            }),
           catch: (error) =>
             new Error(`Could not edit file ${path}`, { cause: error }),
         });

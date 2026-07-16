@@ -50,6 +50,30 @@ describe("Frontmatter clocking in", () => {
   });
 });
 
+describe("Frontmatter clocking in on a file with no frontmatter yet", () => {
+  test("Creates a fresh frontmatter block and clocks in", async () => {
+    vi.useFakeTimers({ now: new Date("2026-01-01 17:00") });
+
+    const { yamlEditTargets, vault } = await setUp({
+      loadedFixtures: [
+        "frontmatter-0-no-frontmatter.md",
+        "frontmatter-1-closed-log-entry.md",
+      ],
+    });
+
+    await Effect.runPromise(
+      editYaml(
+        yamlEditTargets.inFrontmatter(
+          "fixtures/fixture-vault/frontmatter-0-no-frontmatter.md",
+        ),
+        requireProps(addOpenClock),
+      ),
+    );
+
+    expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
+  });
+});
+
 describe("Frontmatter clocking out", () => {
   test("Clocks out on a file with an active clock", async () => {
     vi.useFakeTimers({ now: new Date("2026-01-01 18:30") });

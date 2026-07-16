@@ -1,4 +1,5 @@
-import type { LogTimeBlock } from "../time-block-types";
+import type { Pos } from "obsidian";
+
 import {
   addOpenClock,
   addOpenClockOrCreateProps,
@@ -11,23 +12,30 @@ import { editYaml, requireProps, type YamlEditTargets } from "./edit-yaml";
 
 const noPropsUnderCursorMessage = "There are no props under cursor";
 
-export class LogEntryEditor {
-  private targetFor = (task: LogTimeBlock) =>
-    task.source === "frontmatterLog"
-      ? this.targets.inFrontmatter(task.path)
-      : this.targets.inListItemProps(task.path, task.position.start.line);
+// A location has a position when it's a task on a specific line; when it's
+// missing, the location is a whole file's frontmatter.
+export interface ClockableLocation {
+  path: string;
+  position?: Pos;
+}
 
-  clockIn = (task: LogTimeBlock) =>
+export class LogEntryEditor {
+  private targetFor = (task: ClockableLocation) =>
+    task.position
+      ? this.targets.inListItemProps(task.path, task.position.start.line)
+      : this.targets.inFrontmatter(task.path);
+
+  clockIn = (task: ClockableLocation) =>
     editYaml(this.targetFor(task), requireProps(addOpenClock));
 
-  clockOut = (task: LogTimeBlock) =>
+  clockOut = (task: ClockableLocation) =>
     editYaml(this.targetFor(task), requireProps(clockOut));
 
-  cancelClock = (task: LogTimeBlock) =>
+  cancelClock = (task: ClockableLocation) =>
     editYaml(this.targetFor(task), requireProps(cancelOpenClock));
 
   editLastClock = (
-    task: LogTimeBlock,
+    task: ClockableLocation,
     patch: { start?: string; end?: string },
   ) =>
     editYaml(

@@ -855,6 +855,7 @@
         }
       ],
       "v": 1
-    }
+    },
+    "fixtures/fixture-vault/frontmatter-0-no-frontmatter.md": {}
   }
 }
