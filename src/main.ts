@@ -49,7 +49,7 @@ import { LogEntryEditor } from "./service/log-entry-editor";
 import { MetadataCacheFacade } from "./service/metadata-cache-facade";
 import { PeriodicNotes } from "./service/periodic-notes";
 import {
-  MtimeSearchOrderingService,
+  DefaultSearchOrderingService,
   type SearchOrderingService,
 } from "./service/search-ordering-service";
 import {
@@ -124,7 +124,6 @@ export default class DayPlanner extends Plugin {
     );
     this.metadataCacheFacade = new MetadataCacheFacade(metadataCache);
     this.searchService = new VaultSearchService(vault, metadataCache);
-    this.searchOrderingService = new MtimeSearchOrderingService(vault);
 
     const icalParseScheduler =
       createBackgroundBatchScheduler<IcalParseTaskResult>({
@@ -149,6 +148,11 @@ export default class DayPlanner extends Plugin {
     });
 
     const { dispatch } = store;
+
+    this.searchOrderingService = new DefaultSearchOrderingService(
+      vault,
+      store.getState,
+    );
 
     const yamlEditTargets = createYamlEditTargets({
       vaultFacade: this.vaultFacade,

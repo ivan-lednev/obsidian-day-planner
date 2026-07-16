@@ -20,8 +20,8 @@ import {
   selectPlanEntriesByDay,
   selectPlanEntriesById,
   selectTaskEntriesById,
+  type ClosedLogEntry,
 } from "./index-slice";
-import type { LogEntry } from "./index-slice";
 
 export const selectLogEntriesForDay = createAppSelector(
   [
@@ -117,29 +117,50 @@ export const selectLogEntriesForDay = createAppSelector(
   },
 );
 
-export const selectRecentLogEntries = createAppSelector(
-  [selectLogEntriesById, selectTaskEntriesById, selectFileEntriesById],
-  (logEntriesById, taskEntriesById, fileEntriesById) => {
-    const taskEntryIdToLatestLogRecord = Object.values(logEntriesById)
-      .flat()
-      .filter((it): it is LogEntry & { end: string } => it.end !== undefined)
+const selectLatestClosedLogEntryByParentId = createAppSelector(
+  [selectLogEntriesById],
+  (logEntriesById) => {
+    return Object.values(logEntriesById)
+      .filter((it): it is ClosedLogEntry => it.end !== undefined)
       .toSorted((a, b) => Date.parse(b.end) - Date.parse(a.end))
-      .reduce<Map<string, LogEntry>>((result, logEntry) => {
+      .reduce<Map<string, ClosedLogEntry>>((result, logEntry) => {
         if (result.has(logEntry.parentId)) {
           return result;
         }
 
         return result.set(logEntry.parentId, logEntry);
       }, new Map());
+  },
+);
 
-    return [...taskEntryIdToLatestLogRecord].map(([taskEntryId, logEntry]) => {
-      const entry =
-        taskEntriesById[taskEntryId] ?? fileEntriesById[taskEntryId];
+export const selectRecentLogEntries = createAppSelector(
+  [
+    selectLatestClosedLogEntryByParentId,
+    selectTaskEntriesById,
+    selectFileEntriesById,
+  ],
+  (latestClosedLogEntryByParentId, taskEntriesById, fileEntriesById) => {
+    return [...latestClosedLogEntryByParentId].map(
+      ([taskEntryId, logEntry]) => {
+        const entry =
+          taskEntriesById[taskEntryId] ?? fileEntriesById[taskEntryId];
 
-      isNotVoid(entry, "Inconsistent store state");
+        isNotVoid(entry, "Inconsistent store state");
 
-      return entryToTimeBlock(logEntry, entry);
-    });
+        return entryToTimeBlock(logEntry, entry);
+      },
+    );
+  },
+);
+
+export const selectLatestClosedLogEndByParentId = createAppSelector(
+  [selectLatestClosedLogEntryByParentId],
+  (latestClosedLogEntryByParentId) => {
+    return [...latestClosedLogEntryByParentId].reduce<Map<string, number>>(
+      (result, [parentId, logEntry]) =>
+        result.set(parentId, Date.parse(logEntry.end)),
+      new Map(),
+    );
   },
 );
 

@@ -2,7 +2,7 @@ import type { ListItemCache } from "obsidian";
 import { isNotVoid, isRecordOfType } from "typed-assert";
 
 import {
-  createId,
+  createTaskEntryId,
   type DenormalizedListItemEntry,
 } from "../../redux/index/index-slice";
 import { listItemRegExp } from "../../regexp";
@@ -48,7 +48,7 @@ export function createListItemEntry(props: {
 }): DenormalizedListItemEntry {
   const { path, listItemCache, contents } = props;
 
-  const id = createId(path, listItemCache.position.start.line);
+  const id = createTaskEntryId(path, listItemCache.position.start.line);
 
   const fullListItemText = getTextAtPosition(contents, listItemCache.position);
   const rawFirstLine = getFirstLine(fullListItemText);

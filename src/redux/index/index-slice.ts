@@ -49,6 +49,10 @@ export interface LogEntry {
   source: "listItemLog" | "frontmatterLog";
 }
 
+export interface ClosedLogEntry extends LogEntry {
+  end: string;
+}
+
 export interface PlanEntry {
   isAllDay?: boolean;
 
@@ -440,6 +444,14 @@ const idSeparator = "::";
 
 export function createId(...args: (string | number)[]) {
   return args.join(idSeparator);
+}
+
+export function createTaskEntryId(path: string, line: number) {
+  return createId(path, line);
+}
+
+export function createFileEntryId(path: string) {
+  return createId(path, "frontmatter");
 }
 
 function mergeContributions(

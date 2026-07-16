@@ -14,28 +14,28 @@ const noPropsUnderCursorMessage = "There are no props under cursor";
 
 // A location has a position when it's a task on a specific line; when it's
 // missing, the location is a whole file's frontmatter.
-export interface ClockableLocation {
+export interface ClockLocation {
   path: string;
   position?: Pos;
 }
 
 export class LogEntryEditor {
-  private targetFor = (task: ClockableLocation) =>
+  private targetFor = (task: ClockLocation) =>
     task.position
       ? this.targets.inListItemProps(task.path, task.position.start.line)
       : this.targets.inFrontmatter(task.path);
 
-  clockIn = (task: ClockableLocation) =>
+  clockIn = (task: ClockLocation) =>
     editYaml(this.targetFor(task), requireProps(addOpenClock));
 
-  clockOut = (task: ClockableLocation) =>
+  clockOut = (task: ClockLocation) =>
     editYaml(this.targetFor(task), requireProps(clockOut));
 
-  cancelClock = (task: ClockableLocation) =>
+  cancelClock = (task: ClockLocation) =>
     editYaml(this.targetFor(task), requireProps(cancelOpenClock));
 
   editLastClock = (
-    task: ClockableLocation,
+    task: ClockLocation,
     patch: { start?: string; end?: string },
   ) =>
     editYaml(

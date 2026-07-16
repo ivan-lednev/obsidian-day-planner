@@ -2,7 +2,7 @@ import { Array } from "effect";
 import type { Pos } from "obsidian";
 
 import {
-  createId,
+  createTaskEntryId,
   type DenormalizedListItemEntry,
   type ListItemEntryWithChildren,
 } from "../../redux/index/index-slice";
@@ -114,7 +114,10 @@ export class ListItemIndexService implements IndexService {
         children:
           lineToChildrenLookup[listItemEntry.position.start.line]?.map(
             (listItemCache) => {
-              const id = createId(path, listItemCache.position.start.line);
+              const id = createTaskEntryId(
+                path,
+                listItemCache.position.start.line,
+              );
               const previouslyIndexed = idToListItemEntry[id];
               const childEntry =
                 previouslyIndexed ||

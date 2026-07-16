@@ -1,4 +1,4 @@
-import { createId } from "../../redux/index/index-slice";
+import { createFileEntryId, createId } from "../../redux/index/index-slice";
 import { removeMarkdownExtension } from "../../util/markdown";
 import { type Props, propsSchema } from "../../util/props";
 
@@ -33,7 +33,7 @@ export class FrontmatterLogIndexService implements IndexService {
       return {};
     }
 
-    const fileEntryId = createId(path, "frontmatter");
+    const fileEntryId = createFileEntryId(path);
 
     const logEntries = log.map(({ start, end }, index) =>
       createLogEntry({
