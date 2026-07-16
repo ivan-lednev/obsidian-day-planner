@@ -6,22 +6,23 @@ import type {
   MetadataCache,
 } from "obsidian";
 
-import type { ListItemEntryEditor } from "../service/list-item-entry-editor";
 import type { ListPropsParser } from "../service/list-props-parser";
+import type { LogEntryEditor } from "../service/log-entry-editor";
 import type { MetadataCacheFacade } from "../service/metadata-cache-facade";
+import { runWithNoticeOnError } from "../util/effect";
 import { isTaskCache } from "../util/metadata";
 import { isWithOpenClock } from "../util/props";
 
 export const createEditorMenuCallback =
   (props: {
-    taskEntryEditor: ListItemEntryEditor;
+    logEntryEditor: LogEntryEditor;
     metadataCacheFacade: MetadataCacheFacade;
     listPropsParser: ListPropsParser;
     metadataCache: MetadataCache;
   }) =>
   async (menu: Menu, editor: Editor, info: MarkdownView | MarkdownFileInfo) => {
     const {
-      taskEntryEditor,
+      logEntryEditor,
       metadataCacheFacade,
       metadataCache,
       listPropsParser,
@@ -56,21 +57,27 @@ export const createEditorMenuCallback =
         item
           .setTitle("Clock out")
           .setIcon("square")
-          .onClick(() => taskEntryEditor.clockOutUnderCursor());
+          .onClick(() =>
+            runWithNoticeOnError(logEntryEditor.clockOutUnderCursor()),
+          );
       });
 
       menu.addItem((item) => {
         item
           .setTitle("Cancel clock")
           .setIcon("trash")
-          .onClick(() => taskEntryEditor.cancelClockUnderCursor());
+          .onClick(() =>
+            runWithNoticeOnError(logEntryEditor.cancelClockUnderCursor()),
+          );
       });
     } else {
       menu.addItem((item) => {
         item
           .setTitle("Clock in")
           .setIcon("play")
-          .onClick(() => taskEntryEditor.clockInUnderCursor());
+          .onClick(() =>
+            runWithNoticeOnError(logEntryEditor.clockInUnderCursor()),
+          );
       });
     }
   };

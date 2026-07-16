@@ -1,47 +1,54 @@
 import type { LogTimeBlock } from "../time-block-types";
+import {
+  addOpenClock,
+  addOpenClockOrCreateProps,
+  cancelOpenClock,
+  clockOut,
+  editLastLogEntry,
+} from "../util/props";
 
-import type { FrontmatterLogEntryEditor } from "./frontmatter-log-entry-editor";
-import type { ListItemEntryEditor } from "./list-item-entry-editor";
+import { editYaml, requireProps, type YamlEditTargets } from "./edit-yaml";
 
-// todo: introduce a common mechanism for Frontmatter vs task props vs in-editor edits
+const noPropsUnderCursorMessage = "There are no props under cursor";
+
 export class LogEntryEditor {
-  clockIn = (task: LogTimeBlock) =>
+  private targetFor = (task: LogTimeBlock) =>
     task.source === "frontmatterLog"
-      ? this.frontmatterLogEntryEditor.clockInAtPath(task.path)
-      : this.listItemEntryEditor.clockInAtLocation({
-          path: task.path,
-          line: task.position.start.line,
-        });
+      ? this.targets.inFrontmatter(task.path)
+      : this.targets.inListItemProps(task.path, task.position.start.line);
+
+  clockIn = (task: LogTimeBlock) =>
+    editYaml(this.targetFor(task), requireProps(addOpenClock));
 
   clockOut = (task: LogTimeBlock) =>
-    task.source === "frontmatterLog"
-      ? this.frontmatterLogEntryEditor.clockOutAtPath(task.path)
-      : this.listItemEntryEditor.clockOutAtLocation({
-          path: task.path,
-          line: task.position.start.line,
-        });
+    editYaml(this.targetFor(task), requireProps(clockOut));
 
   cancelClock = (task: LogTimeBlock) =>
-    task.source === "frontmatterLog"
-      ? this.frontmatterLogEntryEditor.cancelClockAtPath(task.path)
-      : this.listItemEntryEditor.cancelClockAtLocation({
-          path: task.path,
-          line: task.position.start.line,
-        });
+    editYaml(this.targetFor(task), requireProps(cancelOpenClock));
 
   editLastClock = (
     task: LogTimeBlock,
     patch: { start?: string; end?: string },
   ) =>
-    task.source === "frontmatterLog"
-      ? this.frontmatterLogEntryEditor.editLastClockAtPath(task.path, patch)
-      : this.listItemEntryEditor.editLastClockAtLocation(
-          { path: task.path, line: task.position.start.line },
-          patch,
-        );
+    editYaml(
+      this.targetFor(task),
+      requireProps((props) => editLastLogEntry(props, patch)),
+    );
 
-  constructor(
-    private readonly listItemEntryEditor: ListItemEntryEditor,
-    private readonly frontmatterLogEntryEditor: FrontmatterLogEntryEditor,
-  ) {}
+  clockInUnderCursor = () =>
+    editYaml(this.targets.underCursor(), addOpenClockOrCreateProps);
+
+  clockOutUnderCursor = () =>
+    editYaml(
+      this.targets.underCursor(),
+      requireProps(clockOut, noPropsUnderCursorMessage),
+    );
+
+  cancelClockUnderCursor = () =>
+    editYaml(
+      this.targets.underCursor(),
+      requireProps(cancelOpenClock, noPropsUnderCursorMessage),
+    );
+
+  constructor(private readonly targets: YamlEditTargets) {}
 }

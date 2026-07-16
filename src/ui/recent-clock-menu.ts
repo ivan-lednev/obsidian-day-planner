@@ -1,9 +1,9 @@
 import { Menu } from "obsidian";
 
-import { runWithNoticeOnError } from "../service/list-item-entry-editor";
 import type { LogEntryEditor } from "../service/log-entry-editor";
 import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { LogTimeBlock } from "../time-block-types";
+import { runWithNoticeOnError } from "../util/effect";
 
 export function createRecentClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;

@@ -16,9 +16,8 @@ import {
 } from "../../../src/redux/index/index-slice";
 import { createReactor, type RootState } from "../../../src/redux/store";
 import { TransactionWriter } from "../../../src/service/diff-writer";
-import { FrontmatterLogEntryEditor } from "../../../src/service/frontmatter-log-entry-editor";
+import { createYamlEditTargets } from "../../../src/service/edit-yaml";
 import { createIndexServices } from "../../../src/service/index/create-index-services";
-import { ListItemEntryEditor } from "../../../src/service/list-item-entry-editor";
 import { ListPropsParser } from "../../../src/service/list-props-parser";
 import { LogEntryEditor } from "../../../src/service/log-entry-editor";
 import { MetadataCacheFacade } from "../../../src/service/metadata-cache-facade";
@@ -174,22 +173,14 @@ export async function setUp(props?: {
 
   const { getState, dispatch } = store;
 
-  const taskEntryEditor = new ListItemEntryEditor(
-    workspaceFacade,
+  const yamlEditTargets = createYamlEditTargets({
     vaultFacade,
     metadataCacheFacade,
     listPropsParser,
-  );
+    workspaceFacade,
+  });
 
-  const frontmatterLogEntryEditor = new FrontmatterLogEntryEditor(
-    vaultFacade,
-    metadataCacheFacade,
-  );
-
-  const logEntryEditor = new LogEntryEditor(
-    taskEntryEditor,
-    frontmatterLogEntryEditor,
-  );
+  const logEntryEditor = new LogEntryEditor(yamlEditTargets);
 
   inMemoryFiles.forEach(({ path }) => {
     isNotVoid(
@@ -289,8 +280,7 @@ export async function setUp(props?: {
     transactionWriter,
     currentTime,
     metadataCache,
-    taskEntryEditor,
-    frontmatterLogEntryEditor,
+    yamlEditTargets,
     logEntryEditor,
   };
 }

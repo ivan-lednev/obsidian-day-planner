@@ -2,9 +2,9 @@ import { App, Modal } from "obsidian";
 import { mount, unmount } from "svelte";
 
 import { clockFormat } from "../constants";
-import { runWithNoticeOnError } from "../service/list-item-entry-editor";
 import type { LogEntryEditor } from "../service/log-entry-editor";
 import type { LogTimeBlock } from "../time-block-types";
+import { runWithNoticeOnError } from "../util/effect";
 import { getFirstLine } from "../util/markdown";
 import { getEndTime } from "../util/time-block-utils";
 

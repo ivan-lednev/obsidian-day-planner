@@ -26,8 +26,8 @@
   const onCheckboxLineClick = $derived(
     isListItemSourced(task)
       ? (line: number) => toggleCheckboxInFile(task.path, line)
-      // todo: should throw an error
-      : undefined,
+      : // todo: should throw an error
+        undefined,
   );
 
   const { listItem, nestedListItems } = $derived(toRenderableMarkdown(task));

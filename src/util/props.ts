@@ -73,6 +73,10 @@ export function addOpenClock(props: Props): Props {
   };
 }
 
+export function addOpenClockOrCreateProps(props?: Props): Props {
+  return props ? addOpenClock(props) : createPropsWithOpenClock();
+}
+
 export function cancelOpenClock(props: Props): Props {
   if (!props.planner?.log) {
     throw new Error("There is no log");
@@ -154,6 +158,21 @@ export function editLogEntry(
       log: log.with(index, updatedEntry),
     },
   };
+}
+
+export function editLastLogEntry(
+  props: Props,
+  patch: { start?: string; end?: string },
+): Props {
+  const log = props.planner?.log;
+
+  if (!log?.length) {
+    throw new Error("No log entries");
+  }
+
+  const last = log[log.length - 1];
+
+  return editLogEntry(props, { originalStart: last.start, patch });
 }
 
 export function createProp(

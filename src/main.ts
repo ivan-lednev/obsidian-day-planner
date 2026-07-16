@@ -42,9 +42,8 @@ import {
 } from "./redux/store";
 import { type UseSelector } from "./redux/use-selector";
 import { TransactionWriter } from "./service/diff-writer";
-import { FrontmatterLogEntryEditor } from "./service/frontmatter-log-entry-editor";
+import { createYamlEditTargets } from "./service/edit-yaml";
 import { createIndexServices } from "./service/index/create-index-services";
-import { ListItemEntryEditor } from "./service/list-item-entry-editor";
 import { ListPropsParser } from "./service/list-props-parser";
 import { LogEntryEditor } from "./service/log-entry-editor";
 import { MetadataCacheFacade } from "./service/metadata-cache-facade";
@@ -71,6 +70,7 @@ import { UndoNotice } from "./ui/undo-notice";
 import { createEnvironmentHooks } from "./util/create-environment-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
+import { runWithNoticeOnError } from "./util/effect";
 import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
 import { createBackgroundBatchScheduler } from "./util/scheduler";
 
@@ -79,8 +79,6 @@ export default class DayPlanner extends Plugin {
   private settingsStore!: Writable<DayPlannerSettings>;
   private workspaceFacade!: WorkspaceFacade;
   private periodicNotes!: PeriodicNotes;
-  private taskEntryEditor!: ListItemEntryEditor;
-  private frontmatterLogEntryEditor!: FrontmatterLogEntryEditor;
   private logEntryEditor!: LogEntryEditor;
   private vaultFacade!: VaultFacade;
   private transactionWriter!: TransactionWriter;
@@ -139,20 +137,13 @@ export default class DayPlanner extends Plugin {
 
     const { dispatch } = store;
 
-    this.taskEntryEditor = new ListItemEntryEditor(
-      this.workspaceFacade,
-      this.vaultFacade,
-      this.metadataCacheFacade,
+    const yamlEditTargets = createYamlEditTargets({
+      vaultFacade: this.vaultFacade,
+      metadataCacheFacade: this.metadataCacheFacade,
       listPropsParser,
-    );
-    this.frontmatterLogEntryEditor = new FrontmatterLogEntryEditor(
-      this.vaultFacade,
-      this.metadataCacheFacade,
-    );
-    this.logEntryEditor = new LogEntryEditor(
-      this.taskEntryEditor,
-      this.frontmatterLogEntryEditor,
-    );
+      workspaceFacade: this.workspaceFacade,
+    });
+    this.logEntryEditor = new LogEntryEditor(yamlEditTargets);
 
     this.register(() => {
       listenerMiddleware.clearListeners();
@@ -170,7 +161,7 @@ export default class DayPlanner extends Plugin {
     });
 
     const handleEditorMenu = createEditorMenuCallback({
-      taskEntryEditor: this.taskEntryEditor,
+      logEntryEditor: this.logEntryEditor,
       metadataCacheFacade: this.metadataCacheFacade,
       metadataCache,
       listPropsParser,
@@ -375,21 +366,24 @@ export default class DayPlanner extends Plugin {
       id: "clock-in",
       icon: "play",
       name: "Clock in",
-      editorCallback: () => this.taskEntryEditor.clockInUnderCursor(),
+      editorCallback: () =>
+        runWithNoticeOnError(this.logEntryEditor.clockInUnderCursor()),
     });
 
     this.addCommand({
       icon: "square",
       id: "clock-out",
       name: "Clock out",
-      editorCallback: () => this.taskEntryEditor.clockOutUnderCursor(),
+      editorCallback: () =>
+        runWithNoticeOnError(this.logEntryEditor.clockOutUnderCursor()),
     });
 
     this.addCommand({
       icon: "trash-2",
       id: "cancel-clock",
       name: "Cancel clock",
-      editorCallback: () => this.taskEntryEditor.cancelClockUnderCursor(),
+      editorCallback: () =>
+        runWithNoticeOnError(this.logEntryEditor.cancelClockUnderCursor()),
     });
   }
 

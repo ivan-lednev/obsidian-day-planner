@@ -1,9 +1,9 @@
 import { Menu } from "obsidian";
 
-import { runWithNoticeOnError } from "../service/list-item-entry-editor";
 import type { LogEntryEditor } from "../service/log-entry-editor";
 import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { LogTimeBlock } from "../time-block-types";
+import { runWithNoticeOnError } from "../util/effect";
 
 import type { OpenEditTimeEntryModal } from "./create-edit-time-entry-modal";
 
@@ -25,12 +25,15 @@ export function createActiveClockMenu(props: {
   const menu = new Menu();
 
   menu.addItem((item) => {
-    return item
-      .setTitle("Clock out")
-      .setIcon("square")
-      .onClick(async () => {
-        await runWithNoticeOnError(logEntryEditor.clockOut(task));
-      });
+    return (
+      item
+        .setTitle("Clock out")
+        .setIcon("square")
+        // todo: code started drifting: pass onClockOut and so on
+        .onClick(async () => {
+          await runWithNoticeOnError(logEntryEditor.clockOut(task));
+        })
+    );
   });
 
   menu.addItem((item) =>

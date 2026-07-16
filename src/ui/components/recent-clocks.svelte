@@ -6,11 +6,11 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { selectRecentLogEntries } from "../../redux/index/index-selectors";
   import type { LogTimeBlock } from "../../time-block-types";
+  import { runWithNoticeOnError } from "../../util/effect";
   import { removeMarkdownExtension } from "../../util/markdown";
   import { getDayKey } from "../../util/time-block-utils";
   import { createRecentClockMenu } from "../recent-clock-menu";
 
-  import { runWithNoticeOnError } from "./../../service/list-item-entry-editor";
   import BlockControls from "./block-controls.svelte";
   import BlockList from "./block-list.svelte";
   import ControlButton from "./control-button.svelte";

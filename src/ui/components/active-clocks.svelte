@@ -11,8 +11,8 @@
   import { currentTimeSignal } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
   import { selectActiveLogEntries } from "../../redux/index/index-slice";
-  import { runWithNoticeOnError } from "../../service/list-item-entry-editor";
   import type { LogTimeBlock } from "../../time-block-types";
+  import { runWithNoticeOnError } from "../../util/effect";
   import { removeMarkdownExtension } from "../../util/markdown";
   import * as m from "../../util/moment";
   import { getDiffInMinutes } from "../../util/moment";
