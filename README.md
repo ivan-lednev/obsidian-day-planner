@@ -163,6 +163,11 @@ You can enable an additional timeline column to see the recorded clocks next to 
 
 <img src="./assets/show-time-tracker-settings.png" width="75%">
 
+Right click (or tap and hold on mobile) a clock block to open its control menu:
+
+- An active clock can be clocked out, edited or canceled
+- A completed clock can be resumed, edited or deleted
+
 #### Active clocks
 
 You can see the currently active clocks in the timeline sidebar:
@@ -175,7 +180,7 @@ A right click on an active clock will bring the control menu:
 
 #### Limitations
 
-- For now clock time blocks are read-only. This is going to be addressed in the future.
+- Clock time blocks cannot be edited by dragging yet. Use the context menu to edit clock times.
 
 ## Note on the old plugin version
 

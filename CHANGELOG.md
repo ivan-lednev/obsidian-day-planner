@@ -1,3 +1,11 @@
+## 0.33.0
+
+### ✨ New features
+
+- Time tracker blocks on the timeline now have a context menu: right click (or tap and hold on mobile) a block to control its clock
+  - An active clock can be clocked out, edited or canceled
+  - A completed clock can be resumed, edited or deleted
+
 ## 0.32.0
 
 ### ✨ New features
