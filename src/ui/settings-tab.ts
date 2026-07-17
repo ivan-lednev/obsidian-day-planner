@@ -467,6 +467,17 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
     new SettingGroup(containerEl)
       .setHeading("Status bar widget")
       .addSetting((setting) =>
+        setting
+          .setName("Show active clock and 'Clock in' button")
+          .addToggle((toggle) =>
+            toggle
+              .setValue(this.plugin.settings().showActiveClockInStatusBar)
+              .onChange((value: boolean) => {
+                this.update({ showActiveClockInStatusBar: value });
+              }),
+          ),
+      )
+      .addSetting((setting) =>
         setting.setName("Show active task").addToggle((toggle) =>
           toggle
             .setValue(this.plugin.settings().showNow)

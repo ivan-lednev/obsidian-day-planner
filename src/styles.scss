@@ -29,16 +29,6 @@
   position: relative;
 }
 
-.planner .status-bar-item-segment:hover {
-  cursor: pointer;
-}
-
-.status-bar-item.plugin-obsidian-day-planner {
-  display: flex;
-  gap: var(--size-2-2);
-  padding-block: 0;
-}
-
 .planner-progress-bar {
   overflow: hidden;
   display: flex;

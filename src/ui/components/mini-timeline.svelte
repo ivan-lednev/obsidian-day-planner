@@ -45,6 +45,7 @@
         style:bottom="{block.placing.offsetPercent}%"
         class="mini-time-block"
         aria-label={t.getOneLineSummary(block)}
+        data-tooltip-position="top"
       >
         {#if isRemote(block)}
           <div

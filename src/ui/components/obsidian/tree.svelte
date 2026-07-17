@@ -8,6 +8,7 @@
     title,
     flair,
     controls,
+    alwaysShowControls = false,
     onpointermove,
     onpointerup,
   }: {
@@ -15,6 +16,7 @@
     children: Snippet;
     flair?: Snippet;
     controls?: Snippet;
+    alwaysShowControls?: boolean;
     onpointermove?: (event: PointerEvent) => void;
     onpointerup?: (event: PointerEvent) => void;
   } = $props();
@@ -50,7 +52,7 @@
         </div>
       {/if}
     </div>
-    {#if controls && isTreeVisible}
+    {#if controls && (isTreeVisible || alwaysShowControls)}
       {@render controls()}
     {/if}
   </div>

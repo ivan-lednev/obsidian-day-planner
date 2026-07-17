@@ -65,6 +65,7 @@ export interface ObsidianContext {
   pointerDateTime: Writable<PointerDateTime>;
   logEntryEditor: LogEntryEditor;
   openEditTimeEntryModal: OpenEditTimeEntryModal;
+  openClockInOnAnythingModal: () => void;
   // todo: rename to promptUserToEditText
   editText: (props: {
     initialText?: string;

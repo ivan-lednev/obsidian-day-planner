@@ -34,4 +34,6 @@ export const GripHorizontal = obsidianIcon(lucideSvelte.GripHorizontal);
 export const Play = obsidianIcon(lucideSvelte.Play);
 export const SkipForward = obsidianIcon(lucideSvelte.SkipForward);
 export const StepForward = obsidianIcon(lucideSvelte.StepForward);
+export const Timer = obsidianIcon(lucideSvelte.Timer);
+export const Clock = obsidianIcon(lucideSvelte.Clock);
 /* eslint-enable @typescript-eslint/naming-convention */

@@ -96,6 +96,16 @@ export default class DayPlanner extends Plugin {
   private metadataCacheFacade!: MetadataCacheFacade;
   private undoNotice!: UndoNotice;
 
+  private openClockInOnAnythingModal = () => {
+    new ClockInOnAnythingModal(
+      this.app,
+      this.searchService,
+      this.searchOrderingService,
+      this.vaultFacade,
+      this.logEntryEditor,
+    ).open();
+  };
+
   async onload() {
     const { vault, metadataCache } = this.app;
 
@@ -406,15 +416,7 @@ export default class DayPlanner extends Plugin {
     this.addCommand({
       id: "clock-in-on-anything",
       name: "Clock in on anything...",
-      callback: () => {
-        new ClockInOnAnythingModal(
-          this.app,
-          this.searchService,
-          this.searchOrderingService,
-          this.vaultFacade,
-          this.logEntryEditor,
-        ).open();
-      },
+      callback: this.openClockInOnAnythingModal,
     });
   }
 
@@ -543,10 +545,20 @@ export default class DayPlanner extends Plugin {
       }),
     );
 
+    const openEditTimeEntryModal = createEditTimeEntryModalCreator(
+      this.app,
+      this.logEntryEditor,
+    );
+
     const destroyStatusBarWidget = mountStatusBarWidget({
       plugin: this,
       dateRanges,
       tasksWithTimeForToday,
+      useSelector,
+      logEntryEditor: this.logEntryEditor,
+      workspaceFacade: this.workspaceFacade,
+      openEditTimeEntryModal,
+      openClockInOnAnythingModal: this.openClockInOnAnythingModal,
     });
 
     this.register(destroyStatusBarWidget);
@@ -612,14 +624,10 @@ export default class DayPlanner extends Plugin {
         getDescriptionText,
       });
 
-    const openEditTimeEntryModal = createEditTimeEntryModalCreator(
-      this.app,
-      this.logEntryEditor,
-    );
-
     const defaultObsidianContext: ObsidianContext = {
       periodicNotes: this.periodicNotes,
       openEditTimeEntryModal,
+      openClockInOnAnythingModal: this.openClockInOnAnythingModal,
       logEntryEditor: this.logEntryEditor,
       editText,
       editLine,
