@@ -1,3 +1,19 @@
+## 0.32.0
+
+### ✨ New features
+
+- New command: 'Clock in on anything...' — search for any task or file in your vault and start a clock on it right away. Recently tracked entries show up first. Separate search terms by a space to find entries containing all the terms in any order in task text & file path
+- You can now track time on whole files: clocks are stored in the file properties (frontmatter), show up in the tracker views 
+- New status bar widget shows your active clock and a 'Clock in on anything...' button, allowing to start clocks quickly
+
+### 🐞 Fixed issues
+
+- Fix annoying layout shifts when editing blocks
+- Fix 'Show completed tasks' toggle
+- Fix creating clocks on tasks without properties
+- Debounce search input in the time tracker view
+- Minor styling improvements
+
 ## 0.31.0
 
 ### ✨ New features
