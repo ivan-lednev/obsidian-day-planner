@@ -1,9 +1,23 @@
-- 🗳️ [Add '👍' reactions under the issues important to you.](https://github.com/ivan-lednev/obsidian-day-planner/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc) This helps me prioritize my work
-- 🪲 [Report bugs and suggest features](https://github.com/ivan-lednev/obsidian-day-planner/issues)
-- ❓ [Ask questions](https://github.com/ivan-lednev/obsidian-day-planner/discussions/new?category=q-a)
-- 🛠️ [Submit pull-requests](./CONTRIBUTING.md)
-- ❤️ If this project adds value to your life, consider supporting it finantially:
-  - <a href="https://www.buymeacoffee.com/machineelf" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; margin: 20px;">
+  <div style="font-size: 0.9em;">
+    <a href="https://github.com/ivan-lednev/obsidian-day-planner/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc">Vote on issues</a>
+    · <a href="https://github.com/ivan-lednev/obsidian-day-planner/issues">Report a bug or suggest a feature</a>
+    · <a href="https://github.com/ivan-lednev/obsidian-day-planner/discussions/new?category=q-a">Ask a question</a>
+    · <a href="./CONTRIBUTING.md">Contribute code</a>
+  </div>
+
+  <div>Day Planner is free for everyone. If it helps you plan your days, please consider supporting its development.</div>
+
+  <a href="https://www.buymeacoffee.com/machineelf">
+    <img
+      src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+      alt="Buy Me A Coffee"
+      style="height: 60px !important; width: 217px !important;"
+    >
+  </a>
+
+</div>
+
 
 
 Day Planner is a community plugin for [Obsidian](https://obsidian.md/). It adds editable calendar views and basic time-tracking. Day Planner is integrated with
@@ -27,7 +41,6 @@ Day Planner is a community plugin for [Obsidian](https://obsidian.md/). It adds 
     - [Recording clocks](#recording-clocks)
     - [Clocks in timelines](#clocks-in-timelines)
     - [Active clocks](#active-clocks)
-    - [Status bar widget](#status-bar-widget)
     - [Limitations](#limitations)
 - [Note on the old plugin version](#note-on-the-old-plugin-version)
 - [Acknowledgements](#acknowledgements)
@@ -57,7 +70,7 @@ The plugin can display records from different sources:
 1. Daily notes
 2. Obsidian-tasks
 3. Online calendars
-4. Time-tracking clocks
+4. Dataview clock properties
 
 Let's go over each one of them.
 
@@ -128,13 +141,11 @@ If your organization doesn't let you share your calendar this way, you might try
 > [!Warning]
 > This feature is experimental and can break or change at any time in the near future. You can help to shape this feature by providing your feedback.
 
-You can record time spent on tasks and files and then view the records as time blocks, much like planner entries. Clock records are stored as properties on tasks or in the file frontmatter (YAML).
+You can record time spent on tasks in the form of Dataview properties and then view the records as time blocks, much like planner entries.
 
 #### Recording clocks
 
-Start a clock on any task or file with the `Clock in on anything...` command: it opens a search modal, with recently tracked entries shown first.
-
-You can also start a clock by right-clicking on a task in the editor:
+Start a clock by right-clicking on a task in the editor:
 
 <img src="./assets/clock-in-demo.png" width="75%">
 
@@ -162,13 +173,9 @@ A right click on an active clock will bring the control menu:
 
 <img src="./assets/active-clocks-menu.png" width="75%">
 
-#### Status bar widget
-
-You can show the active clock with a 'Clock in' button right in the status bar: enable it in 'Settings' > 'Status bar widget' > 'Show active clock and 'Clock in' button'.
-
 #### Limitations
 
-- Clock time blocks can't be dragged or resized on the timeline yet. You can edit clock times through the menu on active & recent clocks instead.
+- For now clock time blocks are read-only. This is going to be addressed in the future.
 
 ## Note on the old plugin version
 
