@@ -41,6 +41,18 @@ exports[`Frontmatter clocking in on a file with no frontmatter yet > Creates a f
 }
 `;
 
+exports[`Frontmatter clocking in on a file with no frontmatter yet > Creates a fresh frontmatter block when clocking in through the log entry editor 1`] = `
+{
+  "fixtures/fixture-vault/frontmatter-0-no-frontmatter.md": "
++ ---
++ planner:
++   log:
++     - start: '2026-01-01 17:00:00'
++ ---
+",
+}
+`;
+
 exports[`Frontmatter clocking out > Clocks out on a file with an active clock 1`] = `
 {
   "fixtures/fixture-vault/frontmatter-1-open-log-entry.md": "

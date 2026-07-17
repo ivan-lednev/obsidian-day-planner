@@ -13,21 +13,22 @@ import { getPathToDiff } from "../util/diff";
 import { setUp } from "./util/setup";
 
 describe("Clocking in", () => {
-  test("Clocks in on tasks without clocks", async () => {
+  test("Creates a new props block when clocking in on a task without log entries", async () => {
     vi.useFakeTimers({ now: new Date("2026-01-01 17:00") });
 
-    const { yamlEditTargets, vault } = await setUp({
+    const { logEntryEditor, vault } = await setUp({
       loadedFixtures: ["2025-07-19.md"],
     });
 
     await Effect.runPromise(
-      editYaml(
-        yamlEditTargets.inListItemProps(
-          "fixtures/fixture-vault/2025-07-19.md",
-          12,
-        ),
-        addOpenClockOrCreateProps,
-      ),
+      // todo: all the tests should be wired through this abstraction
+      logEntryEditor.clockIn({
+        path: "fixtures/fixture-vault/2025-07-19.md",
+        position: {
+          start: { line: 12, col: 0, offset: 153 },
+          end: { line: 12, col: 10, offset: 163 },
+        },
+      }),
     );
 
     expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();

@@ -1,7 +1,6 @@
 import type { Pos } from "obsidian";
 
 import {
-  addOpenClock,
   addOpenClockOrCreateProps,
   cancelOpenClock,
   clockOut,
@@ -26,7 +25,7 @@ export class LogEntryEditor {
       : this.targets.inFrontmatter(task.path);
 
   clockIn = (task: ClockLocation) =>
-    editYaml(this.targetFor(task), requireProps(addOpenClock));
+    editYaml(this.targetFor(task), addOpenClockOrCreateProps);
 
   clockOut = (task: ClockLocation) =>
     editYaml(this.targetFor(task), requireProps(clockOut));

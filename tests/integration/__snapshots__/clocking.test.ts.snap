@@ -40,6 +40,18 @@ exports[`Clocking in > Clocks in on tasks without clocks 1`] = `
 }
 `;
 
+exports[`Clocking in > Creates a new props block when clocking in on a task without log entries 1`] = `
+{
+  "fixtures/fixture-vault/2025-07-19.md": "
++   \`\`\`yaml
++   planner:
++     log:
++       - start: '2026-01-01 17:00:00'
++   \`\`\`
+",
+}
+`;
+
 exports[`Clocking out > Clocks out on tasks 1`] = `
 {
   "fixtures/fixture-vault/one-task-two-log-records.md": "

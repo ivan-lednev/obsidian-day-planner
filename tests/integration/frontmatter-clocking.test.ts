@@ -51,10 +51,10 @@ describe("Frontmatter clocking in", () => {
 });
 
 describe("Frontmatter clocking in on a file with no frontmatter yet", () => {
-  test("Creates a fresh frontmatter block and clocks in", async () => {
+  test("Creates a fresh frontmatter block when clocking in through the log entry editor", async () => {
     vi.useFakeTimers({ now: new Date("2026-01-01 17:00") });
 
-    const { yamlEditTargets, vault } = await setUp({
+    const { logEntryEditor, vault } = await setUp({
       loadedFixtures: [
         "frontmatter-0-no-frontmatter.md",
         "frontmatter-1-closed-log-entry.md",
@@ -62,12 +62,10 @@ describe("Frontmatter clocking in on a file with no frontmatter yet", () => {
     });
 
     await Effect.runPromise(
-      editYaml(
-        yamlEditTargets.inFrontmatter(
-          "fixtures/fixture-vault/frontmatter-0-no-frontmatter.md",
-        ),
-        requireProps(addOpenClock),
-      ),
+      // todo: all the tests should be wired through this abstraction
+      logEntryEditor.clockIn({
+        path: "fixtures/fixture-vault/frontmatter-0-no-frontmatter.md",
+      }),
     );
 
     expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
