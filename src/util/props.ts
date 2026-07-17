@@ -160,6 +160,28 @@ export function editLogEntry(
   };
 }
 
+export function deleteLogEntry(props: Props, originalStart: string): Props {
+  const log = props.planner?.log;
+
+  if (!log) {
+    throw new Error("No log entries");
+  }
+
+  const index = log.findIndex((it) => it.start === originalStart);
+
+  if (index === -1) {
+    throw new Error(`Log entry not found: ${originalStart}`);
+  }
+
+  return {
+    ...props,
+    planner: {
+      ...props.planner,
+      log: log.toSpliced(index, 1),
+    },
+  };
+}
+
 export function editLastLogEntry(
   props: Props,
   patch: { start?: string; end?: string },

@@ -7,6 +7,8 @@
   import { currentTimeSignal, isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
   import { selectLogEntriesForDay } from "../../redux";
+  import { selectLogEntriesById } from "../../redux/index/index-slice";
+  import type { LogTimeBlock } from "../../time-block-types";
   import {
     getPointerOffsetY,
     isTouchEvent,
@@ -15,11 +17,14 @@
   import { minutesToMomentOfDay } from "../../util/moment";
   import { getBlockProps, getDayKey } from "../../util/time-block-utils";
   import { createGestures } from "../actions/gestures";
+  import { createActiveClockMenu } from "../active-clock-menu";
+  import { createCompletedClockMenu } from "../completed-clock-menu";
 
   import Column from "./column.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
   import Needle from "./needle.svelte";
   import PositionedTimeBlock from "./positioned-time-block.svelte";
+  import Selectable from "./selectable.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   const {
@@ -38,6 +43,9 @@
     pointerDateTime,
     settingsSignal,
     useSelector,
+    logEntryEditor,
+    workspaceFacade,
+    openEditTimeEntryModal,
   } = getObsidianContext();
 
   const displayedTasksForTimeline = $derived(getDisplayedTasksForTimeline(day));
@@ -46,6 +54,40 @@
   const logEntriesForDay = useSelector((state) =>
     selectLogEntriesForDay(state, dayKey, currentTimeSignal.current),
   );
+  const logEntriesById = useSelector(selectLogEntriesById);
+
+  // todo: separate LogTimeBlockView (clamped) & LogTimeBlock
+  function showLogBlockMenu(
+    event: MouseEvent | PointerEvent | TouchEvent,
+    timeBlockView: LogTimeBlock,
+  ) {
+    const logEntry = logEntriesById.current[timeBlockView.id];
+
+    isNotVoid(logEntry, `No log entry found for block id ${timeBlockView.id}`);
+
+    const isCompleted = logEntry.end;
+
+    if (isCompleted) {
+      createCompletedClockMenu({
+        event,
+        task: timeBlockView,
+        logEntry: logEntry,
+        logEntryEditor,
+        workspaceFacade,
+        openEditTimeEntryModal,
+      });
+    } else {
+      createActiveClockMenu({
+        event,
+        task: timeBlockView,
+        logEntryEditor,
+        workspaceFacade,
+        // pass the raw entry so "Edit..." targets the real (unclamped) entry
+        openEditTimeEntryModal: (timeBlock) =>
+          openEditTimeEntryModal(timeBlock, logEntry),
+      });
+    }
+  }
 
   let el: HTMLElement | undefined = $state();
 
@@ -136,11 +178,22 @@
     <div class="tasks absolute-stretch-x">
       {#each logEntriesForDay.current as task (task.id)}
         <PositionedTimeBlock {task}>
-          <LocalTimeBlock {task}>
-            {#snippet bottomDecoration()}
-              {getBlockProps(task, settingsSignal.current)}
+          <Selectable
+            onSecondarySelect={(event) => showLogBlockMenu(event, task)}
+          >
+            {#snippet children({ use, onpointerup, state })}
+              <LocalTimeBlock
+                isActive={state === "secondary"}
+                {onpointerup}
+                {task}
+                {use}
+              >
+                {#snippet bottomDecoration()}
+                  {getBlockProps(task, settingsSignal.current)}
+                {/snippet}
+              </LocalTimeBlock>
             {/snippet}
-          </LocalTimeBlock>
+          </Selectable>
         </PositionedTimeBlock>
       {/each}
     </div>

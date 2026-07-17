@@ -14,14 +14,22 @@ export function createEditTimeEntryModalCreator(
   app: App,
   logEntryEditor: LogEntryEditor,
 ) {
-  return (task: LogTimeBlock) => {
-    const initialStart = task.startTime.format(clockFormat);
-    const initialEnd = task.durationMinutes
-      ? getEndTime(task).format(clockFormat)
-      : window.moment().format(clockFormat);
+  // todo: separate LogTimeBlockView (clamped) & LogTimeBlock
+  return (
+    timeBlock: LogTimeBlock,
+    logEntry?: { start: string; end?: string },
+  ) => {
+    const initialStart = logEntry
+      ? logEntry.start
+      : timeBlock.startTime.format(clockFormat);
+    const initialEnd = logEntry
+      ? (logEntry.end ?? window.moment().format(clockFormat))
+      : timeBlock.durationMinutes
+        ? getEndTime(timeBlock).format(clockFormat)
+        : window.moment().format(clockFormat);
 
     const modal = new Modal(app).setTitle(
-      `Edit time entry: ${getFirstLine(task.text)}`,
+      `Edit time entry: ${getFirstLine(timeBlock.text)}`,
     );
 
     const component = mount(TimeEntryEditModal, {
@@ -31,7 +39,12 @@ export function createEditTimeEntryModalCreator(
         initialEnd,
         onConfirm: async ({ start, end }: { start: string; end?: string }) => {
           await runWithNoticeOnError(
-            logEntryEditor.editLastClock(task, { start, end }),
+            logEntry
+              ? logEntryEditor.editClock(timeBlock, {
+                  originalStart: logEntry.start,
+                  patch: { start, end },
+                })
+              : logEntryEditor.editLastClock(timeBlock, { start, end }),
           );
 
           modal.close();

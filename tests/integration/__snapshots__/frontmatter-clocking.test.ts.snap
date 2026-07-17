@@ -1,5 +1,16 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Deleting frontmatter log entries > Deletes the entry matching the original start 1`] = `
+{
+  "fixtures/fixture-vault/frontmatter-1-closed-log-entry.md": "
+-   log:
+-     - start: 2025-07-19 12:00
+-       end: 2025-07-19 14:30
++   log: []
+",
+}
+`;
+
 exports[`Editing the last frontmatter log entry > Patches start and end of the last log entry 1`] = `
 {
   "fixtures/fixture-vault/frontmatter-1-closed-log-entry.md": "
@@ -25,18 +36,6 @@ exports[`Frontmatter clocking in > Clocks in on a file with a closed log entry 1
 {
   "fixtures/fixture-vault/frontmatter-1-closed-log-entry.md": "
 +     - start: '2026-01-01 17:00:00'
-",
-}
-`;
-
-exports[`Frontmatter clocking in on a file with no frontmatter yet > Creates a fresh frontmatter block and clocks in 1`] = `
-{
-  "fixtures/fixture-vault/frontmatter-0-no-frontmatter.md": "
-+ ---
-+ planner:
-+   log:
-+     - start: '2026-01-01 17:00:00'
-+ ---
 ",
 }
 `;

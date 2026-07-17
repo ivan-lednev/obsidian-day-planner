@@ -4,7 +4,9 @@ import {
   addOpenClockOrCreateProps,
   cancelOpenClock,
   clockOut,
+  deleteLogEntry,
   editLastLogEntry,
+  editLogEntry,
 } from "../util/props";
 
 import { editYaml, requireProps, type YamlEditTargets } from "./edit-yaml";
@@ -32,6 +34,21 @@ export class LogEntryEditor {
 
   cancelClock = (task: ClockLocation) =>
     editYaml(this.targetFor(task), requireProps(cancelOpenClock));
+
+  deleteClock = (task: ClockLocation, originalStart: string) =>
+    editYaml(
+      this.targetFor(task),
+      requireProps((props) => deleteLogEntry(props, originalStart)),
+    );
+
+  editClock = (
+    task: ClockLocation,
+    args: { originalStart: string; patch: { start?: string; end?: string } },
+  ) =>
+    editYaml(
+      this.targetFor(task),
+      requireProps((props) => editLogEntry(props, args)),
+    );
 
   editLastClock = (
     task: ClockLocation,

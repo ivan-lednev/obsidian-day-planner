@@ -146,6 +146,42 @@ describe("Frontmatter canceling clocks", () => {
   });
 });
 
+describe("Deleting frontmatter log entries", () => {
+  test("Deletes the entry matching the original start", async () => {
+    const { logEntryEditor, vault } = await setUp({
+      loadedFixtures: ["frontmatter-1-closed-log-entry.md"],
+    });
+
+    await Effect.runPromise(
+      logEntryEditor.deleteClock(
+        {
+          path: "fixtures/fixture-vault/frontmatter-1-closed-log-entry.md",
+        },
+        "2025-07-19 12:00",
+      ),
+    );
+
+    expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
+  });
+
+  test("Does not touch a file when no entry matches", async () => {
+    const { logEntryEditor } = await setUp({
+      loadedFixtures: ["frontmatter-1-closed-log-entry.md"],
+    });
+
+    await expect(
+      Effect.runPromise(
+        logEntryEditor.deleteClock(
+          {
+            path: "fixtures/fixture-vault/frontmatter-1-closed-log-entry.md",
+          },
+          "2020-01-01 00:00",
+        ),
+      ),
+    ).rejects.toThrow("Log entry not found: 2020-01-01 00:00");
+  });
+});
+
 describe("Editing the last frontmatter log entry", () => {
   test("Patches start and end of the last log entry", async () => {
     const { yamlEditTargets, vault } = await setUp({

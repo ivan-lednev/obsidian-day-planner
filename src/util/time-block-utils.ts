@@ -261,7 +261,7 @@ export function getOneLineSummary(timeBlock: TimeBlock) {
     return timeBlock.summary;
   }
 
-  return removeTimeRangeFromStartOfLine(timeBlock.text);
+  return pipe(timeBlock.text, getFirstLine, removeTimeRangeFromStartOfLine);
 }
 
 export function truncateToRange<T extends WithDuration<TimeBlock>>(

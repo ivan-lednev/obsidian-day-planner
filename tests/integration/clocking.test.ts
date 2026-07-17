@@ -2,12 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, test, vi } from "vitest";
 
 import { editYaml, requireProps } from "../../src/service/edit-yaml";
-import {
-  addOpenClock,
-  addOpenClockOrCreateProps,
-  cancelOpenClock,
-  clockOut,
-} from "../../src/util/props";
+import { addOpenClock, cancelOpenClock, clockOut } from "../../src/util/props";
 import { getPathToDiff } from "../util/diff";
 
 import { setUp } from "./util/setup";
@@ -134,6 +129,76 @@ describe("Clocking out", () => {
         ),
       ),
     ).rejects.toThrow("There is no open clock");
+  });
+});
+
+describe("Deleting log entries", () => {
+  test("Deletes the entry matching the original start", async () => {
+    const { logEntryEditor, vault } = await setUp({
+      loadedFixtures: ["one-task-two-log-records.md"],
+    });
+
+    await Effect.runPromise(
+      logEntryEditor.deleteClock(
+        {
+          path: "fixtures/fixture-vault/one-task-two-log-records.md",
+          position: {
+            start: { line: 0, col: 0, offset: 0 },
+            end: { line: 0, col: 10, offset: 10 },
+          },
+        },
+        "2025-01-01 13:00",
+      ),
+    );
+
+    expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
+  });
+
+  test("Does not touch a file when no entry matches", async () => {
+    const { logEntryEditor } = await setUp({
+      loadedFixtures: ["one-task-two-log-records.md"],
+    });
+
+    await expect(
+      Effect.runPromise(
+        logEntryEditor.deleteClock(
+          {
+            path: "fixtures/fixture-vault/one-task-two-log-records.md",
+            position: {
+              start: { line: 0, col: 0, offset: 0 },
+              end: { line: 0, col: 10, offset: 10 },
+            },
+          },
+          "2020-01-01 00:00",
+        ),
+      ),
+    ).rejects.toThrow("Log entry not found: 2020-01-01 00:00");
+  });
+});
+
+describe("Editing a specific log entry", () => {
+  test("Patches the entry matching the original start, not the last one", async () => {
+    const { logEntryEditor, vault } = await setUp({
+      loadedFixtures: ["one-task-two-log-records.md"],
+    });
+
+    await Effect.runPromise(
+      logEntryEditor.editClock(
+        {
+          path: "fixtures/fixture-vault/one-task-two-log-records.md",
+          position: {
+            start: { line: 0, col: 0, offset: 0 },
+            end: { line: 0, col: 10, offset: 10 },
+          },
+        },
+        {
+          originalStart: "2025-01-01 13:00",
+          patch: { start: "2025-01-01 12:30", end: "2025-01-01 14:00" },
+        },
+      ),
+    );
+
+    expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
   });
 });
 
