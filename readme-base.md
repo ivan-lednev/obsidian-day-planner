@@ -1,3 +1,6 @@
+<img src="./assets/hero-daily.png" width="100%">
+<img src="./assets/hero-weekly.png" width="100%">
+
 Day Planner is a community plugin for [Obsidian](https://obsidian.md/). It adds editable calendar views and basic time-tracking. Day Planner is integrated with
 
 - The core Daily Notes plugin.
