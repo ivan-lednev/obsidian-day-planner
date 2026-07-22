@@ -127,6 +127,7 @@ export const createUpdateHandler = (props: {
 
     const transaction = createTransaction({
       updates,
+      // todo: delete
       afterEach,
       settings: settings(),
     });

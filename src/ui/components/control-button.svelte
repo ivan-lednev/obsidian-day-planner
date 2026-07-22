@@ -13,7 +13,7 @@
     ...rest
   }: {
     label?: string;
-    class?: object;
+    class?: object | string;
     isActive?: boolean;
     disabled?: boolean;
     classes?: string;

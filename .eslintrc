@@ -50,6 +50,7 @@
     }
   ],
   "rules": {
+    "no-param-reassign": "error",
     "no-constant-condition": [
       "error",
       {

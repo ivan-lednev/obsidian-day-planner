@@ -13,11 +13,11 @@ import type { WorkspaceFacade } from "./workspace-facade";
 
 export type PropsEditFn = (props: Props | undefined) => Props;
 
-export type YamlEditTarget = (
+export type PropsEditTarget = (
   editFn: PropsEditFn,
 ) => Effect.Effect<void, Error>;
 
-export function editYaml(target: YamlEditTarget, editFn: PropsEditFn) {
+export function editYaml(target: PropsEditTarget, editFn: PropsEditFn) {
   return target(editFn);
 }
 
@@ -55,7 +55,11 @@ export function createYamlEditTargets(deps: {
     });
   }
 
-  function prepareEdit(path: string, line: number, editFn: PropsEditFn) {
+  function prepareListItemPropsEdit(
+    path: string,
+    line: number,
+    editFn: PropsEditFn,
+  ) {
     return Effect.gen(function* () {
       const listItem = yield* metadataCacheFacade.getListItemEffect(path, line);
 
@@ -86,14 +90,11 @@ export function createYamlEditTargets(deps: {
     });
   }
 
-  function inListItemProps(path: string, line: number): YamlEditTarget {
+  function inListItemProps(path: string, line: number): PropsEditTarget {
     return (editFn) =>
       Effect.gen(function* () {
-        const { listItem, baseProps, updatedProps } = yield* prepareEdit(
-          path,
-          line,
-          editFn,
-        );
+        const { listItem, baseProps, updatedProps } =
+          yield* prepareListItemPropsEdit(path, line, editFn);
 
         yield* Effect.tryPromise({
           try: () =>
@@ -119,7 +120,7 @@ export function createYamlEditTargets(deps: {
       });
   }
 
-  function underCursor(): YamlEditTarget {
+  function underCursor(): PropsEditTarget {
     return (editFn) =>
       Effect.gen(function* () {
         const { path, line } = yield* Either.try({
@@ -128,11 +129,8 @@ export function createYamlEditTargets(deps: {
             new Error("Failed to get caret location", { cause: error }),
         });
 
-        const { listItem, baseProps, updatedProps } = yield* prepareEdit(
-          path,
-          line,
-          editFn,
-        );
+        const { listItem, baseProps, updatedProps } =
+          yield* prepareListItemPropsEdit(path, line, editFn);
 
         const view = yield* Either.try({
           try: () => workspaceFacade.getActiveMarkdownView(),
@@ -169,7 +167,7 @@ export function createYamlEditTargets(deps: {
       });
   }
 
-  function inFrontmatter(path: string): YamlEditTarget {
+  function inFrontmatter(path: string): PropsEditTarget {
     return (editFn) =>
       Effect.gen(function* () {
         const existingFrontmatter = yield* Effect.either(
