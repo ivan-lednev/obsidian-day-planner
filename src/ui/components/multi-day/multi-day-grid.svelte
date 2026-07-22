@@ -7,6 +7,7 @@
   import { getObsidianContext } from "../../../context/obsidian-context";
   import { isToday } from "../../../global-store/current-time";
   import { getVisibleHours } from "../../../global-store/derived-settings";
+  import { isLastIndexOf } from "../../../util/array";
   import { isOnWeekend } from "../../../util/moment";
   import {
     getNextAdjacentRange,
@@ -196,9 +197,12 @@
 
   <div class="multi-day-main-content">
     <Scroller class="planner-multi-day-scroller" onscroll={handleScroll}>
-      {#each $dateRange as day}
+      {#each $dateRange as day, index}
         <Timeline
           --column-background-color={getColumnBackgroundColor(day)}
+          --timeline-border-inline-end={isLastIndexOf($dateRange, index)
+            ? "none"
+            : "var(--border-base)"}
           {day}
           isUnderCursor={true}
         />

@@ -136,71 +136,80 @@
   });
 </script>
 
-{#if $settings.timelineColumns.planner}
-  <Column visibleHours={getVisibleHours($settings)}>
-    {#if $isToday(day)}
-      <Needle autoScrollBlocked={isUnderCursor} />
-    {/if}
+<div class="timeline">
+  {#if $settings.timelineColumns.planner}
+    <Column visibleHours={getVisibleHours($settings)}>
+      {#if $isToday(day)}
+        <Needle autoScrollBlocked={isUnderCursor} />
+      {/if}
 
-    <div
-      bind:this={el}
-      class="tasks absolute-stretch-x"
-      onpointerdown={(event) => {
-        if (isTouchEvent(event) || event.target !== el) {
-          return;
-        }
+      <div
+        bind:this={el}
+        class="tasks absolute-stretch-x"
+        onpointerdown={(event) => {
+          if (isTouchEvent(event) || event.target !== el) {
+            return;
+          }
 
-        handleContainerPointerDown(event);
-      }}
-      onpointermove={handleContainerPointerMove}
-      onpointerup={confirmEdit}
-      use:timelineGestures
-    >
-      {#each $displayedTasksForTimeline.withTime as task (task.id)}
-        <PositionedTimeBlock {task}>
-          <UnscheduledTimeBlock {task}>
-            {#snippet bottomDecoration()}
-              {getBlockProps(task, settingsSignal.current)}
-            {/snippet}
-          </UnscheduledTimeBlock>
-        </PositionedTimeBlock>
-      {/each}
-    </div>
-  </Column>
-{/if}
+          handleContainerPointerDown(event);
+        }}
+        onpointermove={handleContainerPointerMove}
+        onpointerup={confirmEdit}
+        use:timelineGestures
+      >
+        {#each $displayedTasksForTimeline.withTime as task (task.id)}
+          <PositionedTimeBlock {task}>
+            <UnscheduledTimeBlock {task}>
+              {#snippet bottomDecoration()}
+                {getBlockProps(task, settingsSignal.current)}
+              {/snippet}
+            </UnscheduledTimeBlock>
+          </PositionedTimeBlock>
+        {/each}
+      </div>
+    </Column>
+  {/if}
 
-{#if $settings.timelineColumns.timeTracker}
-  <Column visibleHours={getVisibleHours($settings)}>
-    {#if $isToday(day)}
-      <Needle autoScrollBlocked={isUnderCursor} />
-    {/if}
+  {#if $settings.timelineColumns.timeTracker}
+    <Column visibleHours={getVisibleHours($settings)}>
+      {#if $isToday(day)}
+        <Needle autoScrollBlocked={isUnderCursor} />
+      {/if}
 
-    <div class="tasks absolute-stretch-x">
-      {#each logEntriesForDay.current as task (task.id)}
-        <PositionedTimeBlock {task}>
-          <Selectable
-            onSecondarySelect={(event) => showLogBlockMenu(event, task)}
-          >
-            {#snippet children({ use, onpointerup, state })}
-              <LocalTimeBlock
-                isActive={state === "secondary"}
-                {onpointerup}
-                {task}
-                {use}
-              >
-                {#snippet bottomDecoration()}
-                  {getBlockProps(task, settingsSignal.current)}
-                {/snippet}
-              </LocalTimeBlock>
-            {/snippet}
-          </Selectable>
-        </PositionedTimeBlock>
-      {/each}
-    </div>
-  </Column>
-{/if}
+      <div class="tasks absolute-stretch-x">
+        {#each logEntriesForDay.current as task (task.id)}
+          <PositionedTimeBlock {task}>
+            <Selectable
+              onSecondarySelect={(event) => showLogBlockMenu(event, task)}
+            >
+              {#snippet children({ use, onpointerup, state })}
+                <LocalTimeBlock
+                  isActive={state === "secondary"}
+                  {onpointerup}
+                  {task}
+                  {use}
+                >
+                  {#snippet bottomDecoration()}
+                    {getBlockProps(task, settingsSignal.current)}
+                  {/snippet}
+                </LocalTimeBlock>
+              {/snippet}
+            </Selectable>
+          </PositionedTimeBlock>
+        {/each}
+      </div>
+    </Column>
+  {/if}
+</div>
 
 <style>
+  .timeline {
+    display: flex;
+    flex: 1 1 0;
+    height: fit-content;
+    border-inline-end: var(--timeline-border-inline-end);
+  }
+
   .tasks {
     top: 0;
     bottom: 0;

@@ -40,7 +40,9 @@
     font-size: var(--font-ui-smaller);
     font-weight: var(--font-semibold);
     color: var(--text-muted);
+  }
 
+  .hour:not(:last-child) {
     border-bottom: var(--border-base);
   }
 </style>

@@ -6,6 +6,7 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { isToday } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
+  import { createColumnSelectionMenu } from "../column-selection-menu";
 
   import ControlButton from "./control-button.svelte";
   import {
@@ -15,7 +16,6 @@
     CalendarArrowUp,
   } from "./lucide";
   import SettingsControls from "./settings-controls.svelte";
-  import { createColumnSelectionMenu } from "../column-selection-menu";
 
   const { workspaceFacade, initWeeklyView, reSync, periodicNotes } =
     getObsidianContext();

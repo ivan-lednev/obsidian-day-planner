@@ -6,8 +6,8 @@ import { fallbackPartStat, icalDayKeyFormat } from "../constants";
 import type { RemoteTimeBlock, WithDuration } from "../time-block-types";
 import type { WithIcalConfig } from "../types";
 
+import { liftToArray } from "./array";
 import { getId } from "./id";
-import { liftToArray } from "./lift";
 import * as m from "./moment";
 
 export function canHappenAfter(icalEvent: ical.VEvent, date: Date) {

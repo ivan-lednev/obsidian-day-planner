@@ -20,7 +20,6 @@
   const getDisplayedAllDayTasksForMultiDayRow = fromStore(
     editContext.getDisplayedAllDayTasksForMultiDayRow,
   );
-  const editOperation = fromStore(editContext.editOperation);
 
   const dateRange = fromStore(getDateRangeContext());
   const firstDayInRange = $derived(dateRange.current[0]);
@@ -46,10 +45,10 @@
   <!--  TODO: possibly no need for block list, it only makes things worse through its animation-->
   <BlockList
     --block-list-padding="var(--size-2-1) var(--size-2-1) 0"
+    className="all-day-events"
+    list={displayedAllDayTasks}
     onpointermove={handleAllDayEventsPointerMove}
     onpointerup={editContext.confirmEdit}
-    list={displayedAllDayTasks}
-    className="all-day-events"
   >
     {#snippet match(task: TimelineTimeBlock)}
       <UnscheduledTimeBlock {task} />
@@ -57,8 +56,8 @@
     {#snippet fallback()}
       <div
         class="empty-all-day-events"
-        onpointerup={editContext.confirmEdit}
         onpointermove={handleAllDayEventsPointerMove}
+        onpointerup={editContext.confirmEdit}
       >
         No all day events
       </div>
@@ -89,15 +88,17 @@
   }
 
   .empty-all-day-events {
-    min-height: var(--size-4-6);
-    color: var(--text-faint);
-    font-size: var(--font-ui-small);
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+
+    min-height: var(--size-4-6);
+
+    font-size: var(--font-ui-small);
+    color: var(--text-faint);
   }
 
-  /*todo: scoping*/
+  /* todo: scoping */
   :global(.all-day-events),
   .empty-all-day-events {
     background-color: var(--background-primary);

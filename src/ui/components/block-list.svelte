@@ -1,8 +1,5 @@
 <script generics="T extends { id?: string }" lang="ts">
   import type { Snippet } from "svelte";
-  import { slide } from "svelte/transition";
-
-  import { createSlide } from "./defaults";
 
   const {
     list,
@@ -34,17 +31,17 @@
 
 {#if Array.isArray(list) && list.length > 0}
   <div
-    {onpointerup}
-    {onpointermove}
     class={["search-results-scroller", className]}
+    {onpointermove}
+    {onpointerup}
   >
     {@render renderList(list)}
   </div>
 {:else if Object.keys(list).length > 0}
   <div
-    {onpointerup}
-    {onpointermove}
     class={["search-results-scroller", className]}
+    {onpointermove}
+    {onpointerup}
   >
     {#each Object.entries(list) as [sectionTitle, foundTimeBlocks], index (sectionTitle || index)}
       {@render titleMatch?.(sectionTitle)}
