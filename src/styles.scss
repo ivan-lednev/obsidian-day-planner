@@ -157,6 +157,18 @@
   --planner-time-block-shadow-on-timeline: 1px 1px 2px 0 #0000001f;
 }
 
+[data-type="planner-timeline"] {
+  .view-content {
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "controls controls"
+      "corner all-day"
+      "ruler timeline";
+  }
+}
+
 [data-type="planner-weekly"] {
   .view-header {
     display: grid;

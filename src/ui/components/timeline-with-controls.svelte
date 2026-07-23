@@ -1,5 +1,6 @@
 <script lang="ts">
   import { fromStore } from "svelte/store";
+  import { isNotVoid } from "typed-assert";
 
   import { getDateRangeContext } from "../../context/date-range-context";
   import { getObsidianContext } from "../../context/obsidian-context";
@@ -31,42 +32,67 @@
     }),
   );
 
+  let rulerRef: HTMLDivElement | undefined = $state();
+
   function handleAllDayEventsPointerMove() {
+    const currentDate = dateRange.current[0];
+
+    isNotVoid(currentDate);
+
     pointerDateTime.set({
-      dateTime: dateRange.current[0],
+      dateTime: currentDate,
       type: "date",
     });
+  }
+
+  function handleScroll(event: Event) {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    if (rulerRef) {
+      rulerRef.scrollTop = event.target.scrollTop;
+    }
   }
 </script>
 
 <ErrorBoundary>
-  <TimelineControls />
+  <div class="corner"></div>
+
+  <div bind:this={rulerRef} class="ruler">
+    <Ruler visibleHours={getVisibleHours($settings)} />
+    <div class="scrollbar-filler"></div>
+  </div>
+
+  <div class="controls-row">
+    <TimelineControls />
+  </div>
 
   <!--  TODO: possibly no need for block list, it only makes things worse through its animation-->
-  <BlockList
-    --block-list-padding="var(--size-2-1) var(--size-2-1) 0"
-    className="all-day-events"
-    list={displayedAllDayTasks}
+  <div
+    class="all-day-row"
     onpointermove={handleAllDayEventsPointerMove}
     onpointerup={editContext.confirmEdit}
   >
-    {#snippet match(task: TimelineTimeBlock)}
-      <UnscheduledTimeBlock {task} />
-    {/snippet}
-    {#snippet fallback()}
-      <div
-        class="empty-all-day-events"
-        onpointermove={handleAllDayEventsPointerMove}
-        onpointerup={editContext.confirmEdit}
-      >
-        No all day events
-      </div>
-    {/snippet}
-  </BlockList>
+    <BlockList
+      --block-list-padding="var(--size-2-1) 3px 0"
+      className="all-day-events"
+      list={displayedAllDayTasks}
+    >
+      {#snippet match(task: TimelineTimeBlock)}
+        <UnscheduledTimeBlock {task} />
+      {/snippet}
+      {#snippet fallback()}
+        <div class="empty-all-day-events">No all day events</div>
+      {/snippet}
+    </BlockList>
+  </div>
 
-  <Scroller class={["planner-timeline-scroller"]}>
+  <Scroller
+    class={["planner-timeline-scroller", "timeline-row"]}
+    onscroll={handleScroll}
+  >
     {#snippet children(isUnderCursor)}
-      <Ruler visibleHours={getVisibleHours($settings)} />
       <Timeline day={firstDayInRange} {isUnderCursor} />
     {/snippet}
   </Scroller>
@@ -78,9 +104,42 @@
     height: var(--icon-s);
   }
 
+  .corner {
+    grid-area: corner;
+
+    min-height: 100%;
+
+    background-color: var(--background-primary);
+    border-block: var(--border-base);
+    border-inline-end: var(--border-base);
+  }
+
+  .ruler {
+    overflow-y: hidden;
+    grid-area: ruler;
+    box-shadow: var(--shadow-right);
+  }
+
+  .scrollbar-filler {
+    height: var(--scrollbar-width);
+    background-color: var(--background-primary);
+  }
+
+  .controls-row {
+    grid-area: controls;
+  }
+
+  .all-day-row {
+    grid-area: all-day;
+    border-block-end: var(--border-base);
+  }
+
+  :global(.timeline-row) {
+    grid-area: timeline;
+  }
+
   :global(.planner-timeline-scroller) {
     overflow: auto;
-    border-top: var(--border-base);
   }
 
   :global(.unscheduled-task-container) {
