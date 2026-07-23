@@ -25,7 +25,7 @@
   }
 
   .column:not(:last-child) {
-    border-right: var(--border-base);
+    border-right: 1px dashed var(--background-modifier-border);
   }
 
   .hour-block {

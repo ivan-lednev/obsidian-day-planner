@@ -106,9 +106,6 @@
 
   .corner {
     grid-area: corner;
-
-    min-height: 100%;
-
     background-color: var(--background-primary);
     border-block: var(--border-base);
     border-inline-end: var(--border-base);
@@ -130,7 +127,12 @@
   }
 
   .all-day-row {
+    overflow: auto;
     grid-area: all-day;
+
+    max-height: 16vh;
+
+    background-color: var(--background-primary);
     border-block-end: var(--border-base);
   }
 
@@ -150,8 +152,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
-    min-height: var(--size-4-6);
+    padding-block: var(--size-4-2);
 
     font-size: var(--font-ui-small);
     color: var(--text-faint);
