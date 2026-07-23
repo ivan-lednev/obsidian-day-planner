@@ -152,6 +152,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
     padding-block: var(--size-4-2);
 
     font-size: var(--font-ui-small);

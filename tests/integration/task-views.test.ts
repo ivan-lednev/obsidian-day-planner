@@ -29,8 +29,7 @@ describe("Task views", () => {
     expect(listItem).toBe("- [ ] Parent");
     expect(nestedListItems).toBe(`- [ ] Child task
   Child text
-\t- Child list item without time
-`);
+\t- Child list item without time`);
   });
 
   test("Removes list tokens for plain list items", async () => {

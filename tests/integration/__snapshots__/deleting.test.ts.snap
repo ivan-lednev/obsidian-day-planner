@@ -1,0 +1,23 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Deleting tasks > Deletes a parent task together with its nested subtree 1`] = `
+{
+  "fixtures/fixture-vault/2025-07-28.md": "
+- - [ ] 09:00 - 10:00 Parent
+-   Parent text
+-     - [ ] Child task
+-       Child text
+-         - Child list item without time
+",
+}
+`;
+
+exports[`Deleting tasks > Deletes a task with a subtask that has no list item paragraphs 1`] = `
+{
+  "fixtures/fixture-vault/2025-07-29.md": "
+- - [ ] 09:00 - 10:00 Task with subtasks without list item paragraphs
+-     - [ ] Subtask
+-     - [ ] Subtask
+",
+}
+`;

@@ -1,5 +1,410 @@
 {
   "cachedMetadata": {
+    "fixtures/fixture-vault/2025-07-19.md": {
+      "headings": [
+        {
+          "heading": "Day planner",
+          "level": 1,
+          "position": {
+            "start": {
+              "line": 6,
+              "col": 0,
+              "offset": 84
+            },
+            "end": {
+              "line": 6,
+              "col": 13,
+              "offset": 97
+            }
+          }
+        }
+      ],
+      "sections": [
+        {
+          "type": "list",
+          "position": {
+            "start": {
+              "line": 0,
+              "col": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "col": 38,
+              "offset": 38
+            }
+          }
+        },
+        {
+          "type": "thematicBreak",
+          "position": {
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 40
+            },
+            "end": {
+              "line": 2,
+              "col": 3,
+              "offset": 43
+            }
+          }
+        },
+        {
+          "type": "list",
+          "position": {
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 45
+            },
+            "end": {
+              "line": 4,
+              "col": 37,
+              "offset": 82
+            }
+          }
+        },
+        {
+          "type": "heading",
+          "position": {
+            "start": {
+              "line": 6,
+              "col": 0,
+              "offset": 84
+            },
+            "end": {
+              "line": 6,
+              "col": 13,
+              "offset": 97
+            }
+          }
+        },
+        {
+          "type": "list",
+          "position": {
+            "start": {
+              "line": 8,
+              "col": 0,
+              "offset": 99
+            },
+            "end": {
+              "line": 8,
+              "col": 47,
+              "offset": 146
+            }
+          }
+        },
+        {
+          "type": "thematicBreak",
+          "position": {
+            "start": {
+              "line": 10,
+              "col": 0,
+              "offset": 148
+            },
+            "end": {
+              "line": 10,
+              "col": 3,
+              "offset": 151
+            }
+          }
+        },
+        {
+          "type": "list",
+          "position": {
+            "start": {
+              "line": 12,
+              "col": 0,
+              "offset": 153
+            },
+            "end": {
+              "line": 12,
+              "col": 10,
+              "offset": 163
+            }
+          }
+        }
+      ],
+      "listItems": [
+        {
+          "parent": -1,
+          "position": {
+            "start": {
+              "line": 0,
+              "col": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "col": 38,
+              "offset": 38
+            }
+          }
+        },
+        {
+          "parent": -4,
+          "task": " ",
+          "position": {
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 45
+            },
+            "end": {
+              "line": 4,
+              "col": 37,
+              "offset": 82
+            }
+          }
+        },
+        {
+          "parent": -8,
+          "position": {
+            "start": {
+              "line": 8,
+              "col": 0,
+              "offset": 99
+            },
+            "end": {
+              "line": 8,
+              "col": 47,
+              "offset": 146
+            }
+          }
+        },
+        {
+          "parent": -12,
+          "task": " ",
+          "position": {
+            "start": {
+              "line": 12,
+              "col": 0,
+              "offset": 153
+            },
+            "end": {
+              "line": 12,
+              "col": 10,
+              "offset": 163
+            }
+          }
+        }
+      ],
+      "v": 1
+    },
+    "fixtures/fixture-vault/2025-07-20.md": {
+      "v": 1
+    },
+    "fixtures/fixture-vault/2025-07-28.md": {
+      "headings": [
+        {
+          "heading": "Dreams",
+          "level": 1,
+          "position": {
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 114
+            },
+            "end": {
+              "line": 2,
+              "col": 8,
+              "offset": 122
+            }
+          }
+        },
+        {
+          "heading": "Day planner",
+          "level": 1,
+          "position": {
+            "start": {
+              "line": 6,
+              "col": 0,
+              "offset": 128
+            },
+            "end": {
+              "line": 6,
+              "col": 13,
+              "offset": 141
+            }
+          }
+        }
+      ],
+      "sections": [
+        {
+          "type": "paragraph",
+          "position": {
+            "start": {
+              "line": 0,
+              "col": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "col": 112,
+              "offset": 112
+            }
+          }
+        },
+        {
+          "type": "heading",
+          "position": {
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 114
+            },
+            "end": {
+              "line": 2,
+              "col": 8,
+              "offset": 122
+            }
+          }
+        },
+        {
+          "type": "list",
+          "position": {
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 124
+            },
+            "end": {
+              "line": 4,
+              "col": 2,
+              "offset": 126
+            }
+          }
+        },
+        {
+          "type": "heading",
+          "position": {
+            "start": {
+              "line": 6,
+              "col": 0,
+              "offset": 128
+            },
+            "end": {
+              "line": 6,
+              "col": 13,
+              "offset": 141
+            }
+          }
+        },
+        {
+          "type": "list",
+          "position": {
+            "start": {
+              "line": 8,
+              "col": 0,
+              "offset": 143
+            },
+            "end": {
+              "line": 14,
+              "col": 25,
+              "offset": 313
+            }
+          }
+        }
+      ],
+      "listItems": [
+        {
+          "parent": -4,
+          "position": {
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 124
+            },
+            "end": {
+              "line": 4,
+              "col": 2,
+              "offset": 126
+            }
+          }
+        },
+        {
+          "parent": -8,
+          "task": " ",
+          "position": {
+            "start": {
+              "line": 8,
+              "col": 0,
+              "offset": 143
+            },
+            "end": {
+              "line": 8,
+              "col": 26,
+              "offset": 169
+            }
+          }
+        },
+        {
+          "parent": -8,
+          "task": " ",
+          "position": {
+            "start": {
+              "line": 9,
+              "col": 0,
+              "offset": 170
+            },
+            "end": {
+              "line": 10,
+              "col": 13,
+              "offset": 210
+            }
+          }
+        },
+        {
+          "parent": 9,
+          "task": " ",
+          "position": {
+            "start": {
+              "line": 11,
+              "col": 2,
+              "offset": 213
+            },
+            "end": {
+              "line": 12,
+              "col": 16,
+              "offset": 248
+            }
+          }
+        },
+        {
+          "parent": 11,
+          "position": {
+            "start": {
+              "line": 13,
+              "col": 6,
+              "offset": 255
+            },
+            "end": {
+              "line": 13,
+              "col": 38,
+              "offset": 287
+            }
+          }
+        },
+        {
+          "parent": -8,
+          "task": " ",
+          "position": {
+            "start": {
+              "line": 14,
+              "col": 0,
+              "offset": 288
+            },
+            "end": {
+              "line": 14,
+              "col": 25,
+              "offset": 313
+            }
+          }
+        }
+      ],
+      "v": 1
+    },
     "fixtures/fixture-vault/test.md": {
       "headings": [
         {
@@ -451,41 +856,7 @@
         }
       }
     },
-    "fixtures/fixture-vault/2025-07-28.md": {
-      "headings": [
-        {
-          "heading": "Dreams",
-          "level": 1,
-          "position": {
-            "start": {
-              "line": 2,
-              "col": 0,
-              "offset": 114
-            },
-            "end": {
-              "line": 2,
-              "col": 8,
-              "offset": 122
-            }
-          }
-        },
-        {
-          "heading": "Day planner",
-          "level": 1,
-          "position": {
-            "start": {
-              "line": 6,
-              "col": 0,
-              "offset": 128
-            },
-            "end": {
-              "line": 6,
-              "col": 13,
-              "offset": 141
-            }
-          }
-        }
-      ],
+    "fixtures/fixture-vault/frontmatter-0-no-frontmatter.md": {
       "sections": [
         {
           "type": "paragraph",
@@ -497,195 +868,36 @@
             },
             "end": {
               "line": 0,
-              "col": 112,
-              "offset": 112
-            }
-          }
-        },
-        {
-          "type": "heading",
-          "position": {
-            "start": {
-              "line": 2,
-              "col": 0,
-              "offset": 114
-            },
-            "end": {
-              "line": 2,
-              "col": 8,
-              "offset": 122
-            }
-          }
-        },
-        {
-          "type": "list",
-          "position": {
-            "start": {
-              "line": 4,
-              "col": 0,
-              "offset": 124
-            },
-            "end": {
-              "line": 4,
-              "col": 2,
-              "offset": 126
-            }
-          }
-        },
-        {
-          "type": "heading",
-          "position": {
-            "start": {
-              "line": 6,
-              "col": 0,
-              "offset": 128
-            },
-            "end": {
-              "line": 6,
-              "col": 13,
-              "offset": 141
-            }
-          }
-        },
-        {
-          "type": "list",
-          "position": {
-            "start": {
-              "line": 8,
-              "col": 0,
-              "offset": 143
-            },
-            "end": {
-              "line": 14,
-              "col": 25,
-              "offset": 313
-            }
-          }
-        }
-      ],
-      "listItems": [
-        {
-          "parent": -4,
-          "position": {
-            "start": {
-              "line": 4,
-              "col": 0,
-              "offset": 124
-            },
-            "end": {
-              "line": 4,
-              "col": 2,
-              "offset": 126
-            }
-          }
-        },
-        {
-          "parent": -8,
-          "task": " ",
-          "position": {
-            "start": {
-              "line": 8,
-              "col": 0,
-              "offset": 143
-            },
-            "end": {
-              "line": 8,
-              "col": 26,
-              "offset": 169
-            }
-          }
-        },
-        {
-          "parent": -8,
-          "task": " ",
-          "position": {
-            "start": {
-              "line": 9,
-              "col": 0,
-              "offset": 170
-            },
-            "end": {
-              "line": 10,
-              "col": 13,
-              "offset": 210
-            }
-          }
-        },
-        {
-          "parent": 9,
-          "task": " ",
-          "position": {
-            "start": {
-              "line": 11,
-              "col": 2,
-              "offset": 213
-            },
-            "end": {
-              "line": 12,
-              "col": 16,
-              "offset": 248
-            }
-          }
-        },
-        {
-          "parent": 11,
-          "position": {
-            "start": {
-              "line": 13,
-              "col": 6,
-              "offset": 255
-            },
-            "end": {
-              "line": 13,
-              "col": 38,
-              "offset": 287
-            }
-          }
-        },
-        {
-          "parent": -8,
-          "task": " ",
-          "position": {
-            "start": {
-              "line": 14,
-              "col": 0,
-              "offset": 288
-            },
-            "end": {
-              "line": 14,
-              "col": 25,
-              "offset": 313
+              "col": 3,
+              "offset": 3
             }
           }
         }
       ],
       "v": 1
     },
-    "fixtures/fixture-vault/2025-07-20.md": {
-      "v": 1
-    },
-    "fixtures/fixture-vault/2025-07-19.md": {
+    "fixtures/fixture-vault/2025-07-29.md": {
       "headings": [
         {
-          "heading": "Day planner",
-          "level": 1,
           "position": {
             "start": {
-              "line": 6,
+              "line": 0,
               "col": 0,
-              "offset": 84
+              "offset": 0
             },
             "end": {
-              "line": 6,
+              "line": 0,
               "col": 13,
-              "offset": 97
+              "offset": 13
             }
-          }
+          },
+          "heading": "Day planner",
+          "level": 1
         }
       ],
       "sections": [
         {
-          "type": "list",
+          "type": "heading",
           "position": {
             "start": {
               "line": 0,
@@ -694,53 +906,8 @@
             },
             "end": {
               "line": 0,
-              "col": 38,
-              "offset": 38
-            }
-          }
-        },
-        {
-          "type": "thematicBreak",
-          "position": {
-            "start": {
-              "line": 2,
-              "col": 0,
-              "offset": 40
-            },
-            "end": {
-              "line": 2,
-              "col": 3,
-              "offset": 43
-            }
-          }
-        },
-        {
-          "type": "list",
-          "position": {
-            "start": {
-              "line": 4,
-              "col": 0,
-              "offset": 45
-            },
-            "end": {
-              "line": 4,
-              "col": 37,
-              "offset": 82
-            }
-          }
-        },
-        {
-          "type": "heading",
-          "position": {
-            "start": {
-              "line": 6,
-              "col": 0,
-              "offset": 84
-            },
-            "end": {
-              "line": 6,
               "col": 13,
-              "offset": 97
+              "offset": 13
             }
           }
         },
@@ -748,114 +915,100 @@
           "type": "list",
           "position": {
             "start": {
-              "line": 8,
+              "line": 2,
               "col": 0,
-              "offset": 99
+              "offset": 15
             },
             "end": {
-              "line": 8,
-              "col": 47,
-              "offset": 146
-            }
-          }
-        },
-        {
-          "type": "thematicBreak",
-          "position": {
-            "start": {
-              "line": 10,
-              "col": 0,
-              "offset": 148
-            },
-            "end": {
-              "line": 10,
-              "col": 3,
-              "offset": 151
-            }
-          }
-        },
-        {
-          "type": "list",
-          "position": {
-            "start": {
-              "line": 12,
-              "col": 0,
-              "offset": 153
-            },
-            "end": {
-              "line": 12,
-              "col": 10,
-              "offset": 163
+              "line": 6,
+              "col": 25,
+              "offset": 157
             }
           }
         }
       ],
       "listItems": [
         {
-          "parent": -1,
           "position": {
             "start": {
-              "line": 0,
+              "line": 2,
               "col": 0,
-              "offset": 0
+              "offset": 15
             },
             "end": {
-              "line": 0,
-              "col": 38,
-              "offset": 38
+              "line": 2,
+              "col": 12,
+              "offset": 27
             }
-          }
+          },
+          "parent": -2,
+          "task": " "
         },
         {
-          "parent": -4,
-          "task": " ",
+          "position": {
+            "start": {
+              "line": 3,
+              "col": 0,
+              "offset": 28
+            },
+            "end": {
+              "line": 3,
+              "col": 67,
+              "offset": 95
+            }
+          },
+          "parent": -2,
+          "task": " "
+        },
+        {
           "position": {
             "start": {
               "line": 4,
-              "col": 0,
-              "offset": 45
+              "col": 2,
+              "offset": 98
             },
             "end": {
               "line": 4,
-              "col": 37,
-              "offset": 82
+              "col": 17,
+              "offset": 113
             }
-          }
+          },
+          "parent": 3,
+          "task": " "
         },
         {
-          "parent": -8,
           "position": {
             "start": {
-              "line": 8,
-              "col": 0,
-              "offset": 99
+              "line": 5,
+              "col": 2,
+              "offset": 116
             },
             "end": {
-              "line": 8,
-              "col": 47,
-              "offset": 146
+              "line": 5,
+              "col": 17,
+              "offset": 131
             }
-          }
+          },
+          "parent": 3,
+          "task": " "
         },
         {
-          "parent": -12,
-          "task": " ",
           "position": {
             "start": {
-              "line": 12,
+              "line": 6,
               "col": 0,
-              "offset": 153
+              "offset": 132
             },
             "end": {
-              "line": 12,
-              "col": 10,
-              "offset": 163
+              "line": 6,
+              "col": 25,
+              "offset": 157
             }
-          }
+          },
+          "parent": -2,
+          "task": " "
         }
-      ],
-      "v": 1
-    },
-    "fixtures/fixture-vault/frontmatter-0-no-frontmatter.md": {}
+      ]
+    }
   }
 }

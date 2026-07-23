@@ -12,6 +12,7 @@ import {
   icalParseLowerLimit,
 } from "./constants";
 import {
+  createDeleteTaskHandler,
   createEditLineHandler,
   createUpdateHandler,
   getTextFromUser,
@@ -613,6 +614,13 @@ export default class DayPlanner extends Plugin {
       onConfirmed: this.undoNotice.show,
     });
 
+    const deleteTask = createDeleteTaskHandler({
+      settings: this.settings,
+      periodicNotes: this.periodicNotes,
+      transactionWriter: this.transactionWriter,
+      onConfirmed: this.undoNotice.show,
+    });
+
     // todo: clean up
     const editText: ObsidianContext["editText"] = ({
       initialText,
@@ -631,6 +639,7 @@ export default class DayPlanner extends Plugin {
       logEntryEditor: this.logEntryEditor,
       editText,
       editLine,
+      deleteTask,
       workspaceFacade: this.workspaceFacade,
       initWeeklyView: this.initWeeklyLeaf,
       renderMarkdown: createRenderMarkdown(this.app),

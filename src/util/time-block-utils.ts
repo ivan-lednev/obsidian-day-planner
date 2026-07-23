@@ -388,7 +388,7 @@ function getIndentedText(root: Node, parentIndentation: string = ""): string {
 
   let listItemLineWithParagraphs = parentIndentation + firstLine;
 
-  if (linesAfterFirst) {
+  if (linesAfterFirst.length > 0) {
     const indentedParagraphs = indentLines(
       linesAfterFirst,
       parentIndentation + getIndentationForListParagraph(),

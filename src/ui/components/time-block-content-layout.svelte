@@ -18,8 +18,8 @@
 
 <div class={["layout", rest.class, completed && "is-completed"]}>
   {@render title()}
-  {@render contents?.()}
   {@render bottomDecoration?.()}
+  {@render contents?.()}
 </div>
 
 <style>

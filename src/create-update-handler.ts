@@ -12,6 +12,7 @@ import {
 import type { PeriodicNotes } from "./service/periodic-notes";
 import type { VaultFacade } from "./service/vault-facade";
 import type { DayPlannerSettings } from "./settings";
+import type { PlanTimeBlock } from "./time-block-types";
 import type { OnUpdateFn } from "./types";
 import { type ConfirmationModalProps } from "./ui/confirmation-modal";
 import { EditMode } from "./ui/hooks/use-edit/types";
@@ -58,6 +59,31 @@ export const createEditLineHandler =
 
     const transaction = createTransaction({
       updates: [update],
+      settings: props.settings(),
+    });
+
+    await props.transactionWriter.writeTransaction(transaction);
+
+    props.onConfirmed();
+  };
+
+// todo: merge with the other
+export const createDeleteTaskHandler =
+  (props: {
+    settings: () => DayPlannerSettings;
+    periodicNotes: PeriodicNotes;
+    transactionWriter: TransactionWriter;
+    onConfirmed: () => void;
+  }) =>
+  async (task: PlanTimeBlock) => {
+    const updates = mapTaskDiffToUpdates(
+      { deleted: [task] },
+      props.settings(),
+      props.periodicNotes,
+    );
+
+    const transaction = createTransaction({
+      updates,
       settings: props.settings(),
     });
 

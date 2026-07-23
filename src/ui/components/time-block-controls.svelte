@@ -33,6 +33,7 @@
     workspaceFacade,
     editText,
     editLine,
+    deleteTask,
   } = getObsidianContext();
 
   async function editTaskSummary() {
@@ -77,6 +78,7 @@
       task,
       workspaceFacade,
       onEdit: editTaskSummary,
+      onDelete: deleteTask,
     })}
   selectionBlocked={Boolean($editOperation)}
 >
