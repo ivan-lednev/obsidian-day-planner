@@ -34,6 +34,7 @@
     editText,
     editLine,
     deleteTask,
+    logEntryEditor,
   } = getObsidianContext();
 
   async function editTaskSummary() {
@@ -76,6 +77,7 @@
     createTimeBlockMenu({
       event,
       task,
+      logEntryEditor,
       workspaceFacade,
       onEdit: editTaskSummary,
       onDelete: deleteTask,
