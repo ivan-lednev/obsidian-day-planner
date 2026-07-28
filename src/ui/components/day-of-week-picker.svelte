@@ -9,11 +9,11 @@
   const {
     week,
     selectedDay,
-    onSelect,
+    onDayClick,
   }: {
     week: Moment[];
     selectedDay: Moment;
-    onSelect: (day: Moment) => void;
+    onDayClick: (day: Moment) => void | Promise<void>;
   } = $props();
 </script>
 
@@ -26,7 +26,7 @@
         classes="day-of-month-button"
         isActive={isSelected}
         label={day.format("dddd, MMMM D")}
-        onclick={() => onSelect(day)}
+        onclick={() => onDayClick(day)}
       >
         <span
           class={[

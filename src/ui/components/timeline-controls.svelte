@@ -1,5 +1,6 @@
 <script lang="ts">
   import { EllipsisVertical } from "lucide-svelte";
+  import type { Moment } from "moment";
   import { Menu } from "obsidian";
 
   import { getDateRangeContext } from "../../context/date-range-context";
@@ -37,10 +38,20 @@
     $dateRange = [selectedDay.clone().add(1, "week")];
   }
 
-  async function goToNoteForSelectedDay() {
-    const note = await periodicNotes.createDailyNoteIfNeeded(selectedDay);
+  async function goToNoteForDay(day: Moment) {
+    const note = await periodicNotes.createDailyNoteIfNeeded(day);
 
     await workspaceFacade.openFileInEditor(note);
+  }
+
+  async function handleDayClick(day: Moment) {
+    if (day.isSame(selectedDay, "day")) {
+      await goToNoteForDay(day);
+
+      return;
+    }
+
+    $dateRange = [day];
   }
 
   function handleMenuClick(event: MouseEvent) {
@@ -64,7 +75,7 @@
       item
         .setTitle("Open daily note for selected day")
         .setIcon("pencil")
-        .onClick(goToNoteForSelectedDay);
+        .onClick(() => goToNoteForDay(selectedDay));
     });
 
     menu.addSeparator();
@@ -123,13 +134,7 @@
     </div>
   </div>
 
-  <DayOfWeekPicker
-    onSelect={(day) => {
-      $dateRange = [day];
-    }}
-    {selectedDay}
-    {week}
-  />
+  <DayOfWeekPicker onDayClick={handleDayClick} {selectedDay} {week} />
 </div>
 
 <style>
