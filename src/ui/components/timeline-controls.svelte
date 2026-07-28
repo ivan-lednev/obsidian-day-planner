@@ -4,17 +4,13 @@
 
   import { getDateRangeContext } from "../../context/date-range-context";
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { isToday } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
+  import { getFullWeek } from "../../util/range";
   import { createColumnSelectionMenu } from "../column-selection-menu";
 
   import ControlButton from "./control-button.svelte";
-  import {
-    Settings,
-    ChevronLeft,
-    ChevronRight,
-    CalendarArrowUp,
-  } from "./lucide";
+  import DayOfWeekPicker from "./day-of-week-picker.svelte";
+  import { Settings, ChevronLeft, ChevronRight } from "./lucide";
   import SettingsControls from "./settings-controls.svelte";
 
   const { workspaceFacade, initWeeklyView, reSync, periodicNotes } =
@@ -24,6 +20,8 @@
   let settingsVisible = $state(false);
 
   const { timeTracker, planner } = $derived($settings.timelineColumns);
+  const selectedDay = $derived($dateRange[0]);
+  const week = $derived(getFullWeek(selectedDay, $settings.firstDayOfWeek));
 
   function toggleSettings() {
     settingsVisible = !settingsVisible;
@@ -33,24 +31,18 @@
     $dateRange = [window.moment()];
   }
 
-  async function goBack() {
-    const previousDay = $dateRange[0].clone().subtract(1, "day");
-
-    $dateRange = [previousDay];
+  function goBack() {
+    $dateRange = [selectedDay.clone().subtract(1, "week")];
   }
 
-  async function goForward() {
-    const nextDay = $dateRange[0].clone().add(1, "day");
-
-    $dateRange = [nextDay];
+  function goForward() {
+    $dateRange = [selectedDay.clone().add(1, "week")];
   }
 
-  async function goToNoteForToday() {
-    const noteForToday = await periodicNotes.createDailyNoteIfNeeded(
-      window.moment(),
-    );
+  async function goToNoteForSelectedDay() {
+    const note = await periodicNotes.createDailyNoteIfNeeded(selectedDay);
 
-    await workspaceFacade.openFileInEditor(noteForToday);
+    await workspaceFacade.openFileInEditor(note);
   }
 
   function handleReSyncClick(event: MouseEvent) {
@@ -72,9 +64,9 @@
 
     menu.addItem((item) => {
       item
-        .setTitle("Open today's daily note")
+        .setTitle("Open daily note for selected day")
         .setIcon("pencil")
-        .onClick(goToNoteForToday);
+        .onClick(goToNoteForSelectedDay);
     });
 
     menu.showAtMouseEvent(event);
@@ -84,33 +76,22 @@
 <div class="controls">
   <div class="header">
     <div class="buttons-left">
-      <ControlButton label="Go to today" onclick={goToToday}>
-        <CalendarArrowUp />
-      </ControlButton>
-      <ControlButton label="Go to previous day" onclick={goBack}>
+      <ControlButton label="Go to previous week" onclick={goBack}>
         <ChevronLeft />
       </ControlButton>
-      <ControlButton label="Go to next day" onclick={goForward}>
+      <ControlButton
+        classes="today-button"
+        label="Go to today"
+        onclick={goToToday}>Today</ControlButton
+      >
+      <ControlButton label="Go to next week" onclick={goForward}>
         <ChevronRight />
       </ControlButton>
-      <ControlButton
-        label="Go to file"
-        onclick={async () => {
-          const note = await periodicNotes.createDailyNoteIfNeeded(
-            $dateRange[0],
-          );
+    </div>
 
-          await workspaceFacade.openFileInEditor(note);
-        }}
-      >
-        <span class="date">
-          {#if $isToday($dateRange[0])}
-            🔵
-          {/if}
-
-          {$dateRange[0].format($settings.timelineDateFormat)}</span
-        >
-      </ControlButton>
+    <div class="period">
+      <span class="month">{selectedDay.format("MMM")}</span>
+      <span class="year">{selectedDay.format("YYYY")}</span>
     </div>
 
     <div class="buttons-right">
@@ -142,6 +123,14 @@
     </div>
   </div>
 
+  <DayOfWeekPicker
+    onSelect={(day) => {
+      $dateRange = [day];
+    }}
+    {selectedDay}
+    {week}
+  />
+
   {#if settingsVisible}
     <div class="settings-wrapper">
       <SettingsControls />
@@ -150,21 +139,6 @@
 </div>
 
 <style>
-  :global(.today),
-  :global(.today:hover) {
-    background-color: var(--color-accent);
-  }
-
-  .date {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: var(--font-ui-small);
-    font-weight: var(--font-medium);
-    color: var(--text-normal);
-  }
-
   :global(.mod-error) {
     color: var(--text-error);
   }
@@ -172,6 +146,7 @@
   .buttons-right,
   .buttons-left {
     display: flex;
+    align-items: center;
   }
 
   .header,
@@ -182,12 +157,38 @@
 
   .header {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
     padding-right: var(--size-4-3);
   }
 
-  .header > :global(*):last-child {
+  .buttons-right {
     justify-self: end;
+  }
+
+  .period {
+    display: flex;
+    gap: var(--size-2-1);
+    justify-self: center;
+
+    font-size: var(--font-ui-medium);
+    font-weight: var(--font-semibold);
+    white-space: nowrap;
+  }
+
+  .month {
+    color: var(--text-normal);
+  }
+
+  .year {
+    color: var(--color-accent);
+  }
+
+  .buttons-left :global(.today-button) {
+    font-size: var(--font-ui-small);
+    font-weight: var(--font-medium);
+    color: var(--text-muted);
+    text-transform: uppercase;
   }
 
   .controls {

@@ -46,9 +46,7 @@ export interface DayPlannerSettings {
   defaultDurationMinutes: number;
   minimalDurationMinutes: number;
   showTimestampInTaskBlock: boolean;
-  showUncheduledTasks: boolean;
   showUnscheduledNestedTasks: boolean;
-  showTimelineInSidebar: boolean;
   showActiveClockInStatusBar: boolean;
   showNow: boolean;
   showNext: boolean;
@@ -88,7 +86,6 @@ export const defaultSettings: DayPlannerSettings = {
   defaultDurationMinutes: 30,
   minimalDurationMinutes: 10,
   showTimestampInTaskBlock: false,
-  showUncheduledTasks: true,
   showUnscheduledNestedTasks: true,
   showNow: true,
   showNext: true,
@@ -103,7 +100,6 @@ export const defaultSettings: DayPlannerSettings = {
   sortTasksInPlanAfterEdit: false,
   firstDayOfWeek: "monday",
   multiDayRange: "3-days",
-  showTimelineInSidebar: true,
   showActiveClockInStatusBar: true,
   timelineColumns: { planner: true, timeTracker: false },
 };

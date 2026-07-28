@@ -28,7 +28,7 @@ export function getMomentFromDayOfWeek(
   startingDay: Moment,
   firstDayOFWeek: DayPlannerSettings["firstDayOfWeek"],
 ) {
-  const startOfIsoWeek = startingDay.startOf("isoWeek");
+  const startOfIsoWeek = startingDay.clone().startOf("isoWeek");
   const subtractDays: Record<DayPlannerSettings["firstDayOfWeek"], number> = {
     monday: 0,
     sunday: 1,

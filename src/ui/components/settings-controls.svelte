@@ -52,16 +52,6 @@
     new SettingGroup(el)
       .setHeading("Timeline")
       .addSetting((setting) =>
-        setting.setName("Show timeline").addToggle((toggle) =>
-          toggle.setValue($settings.showTimelineInSidebar).onChange((value) => {
-            $settings = {
-              ...$settings,
-              showTimelineInSidebar: value,
-            };
-          }),
-        ),
-      )
-      .addSetting((setting) =>
         setting.setName("Auto-scroll to now").addToggle((toggle) =>
           toggle.setValue($settings.centerNeedle).onChange((value) => {
             $settings = {
@@ -94,33 +84,19 @@
         ),
       );
 
-    const allDayEventsGroup = new SettingGroup(el)
-      .setHeading("All day events")
-      .addSetting((setting) =>
-        setting.setName("Show all day events").addToggle((toggle) =>
-          toggle.setValue($settings.showUncheduledTasks).onChange((value) => {
+    // todo: use this setting
+    new SettingGroup(el).setHeading("All day events").addSetting((setting) =>
+      setting.setName("Show sub-tasks as blocks").addToggle((toggle) =>
+        toggle
+          .setValue($settings.showUnscheduledNestedTasks)
+          .onChange((value) => {
             $settings = {
               ...$settings,
-              showUncheduledTasks: value,
+              showUnscheduledNestedTasks: value,
             };
           }),
-        ),
-      );
-
-    if ($settings.showUncheduledTasks) {
-      allDayEventsGroup.addSetting((setting) =>
-        setting.setName("Show sub-tasks as blocks").addToggle((toggle) =>
-          toggle
-            .setValue($settings.showUnscheduledNestedTasks)
-            .onChange((value) => {
-              $settings = {
-                ...$settings,
-                showUnscheduledNestedTasks: value,
-              };
-            }),
-        ),
-      );
-    }
+      ),
+    );
 
     return () => {
       el.empty();

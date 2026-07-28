@@ -121,13 +121,11 @@
 
 <ErrorBoundary>
   <div class="corner">
-    {#if $settings.showUncheduledTasks}
-      <GripHorizontal
-        class="horizontal-grip"
-        onmousedown={startResizing}
-        ontouchstart={startResizing}
-      />
-    {/if}
+    <GripHorizontal
+      class="horizontal-grip"
+      onmousedown={startResizing}
+      ontouchstart={startResizing}
+    />
   </div>
 
   <div bind:this={rulerRef} class="ruler">
@@ -162,27 +160,25 @@
     {/each}
   </div>
 
-  {#if $settings.showUncheduledTasks}
+  <div
+    style:--timeline-internal-column-count={timelineInternalColumnCount}
+    class={["planner-header-row", "horizontal-resize-box-wrapper"]}
+    use:resizeAction
+  >
+    <!--Note: we need this wrapper to listen to pointer events on the whole height of the row-->
     <div
-      style:--timeline-internal-column-count={timelineInternalColumnCount}
-      class={["planner-header-row", "horizontal-resize-box-wrapper"]}
-      use:resizeAction
+      bind:this={multiDayRowRef}
+      class="multi-day-row-wrapper"
+      onpointermove={handlePointerMove}
+      onpointerup={editContext.confirmEdit}
     >
-      <!--Note: we need this wrapper to listen to pointer events on the whole height of the row-->
-      <div
-        bind:this={multiDayRowRef}
-        class="multi-day-row-wrapper"
-        onpointermove={handlePointerMove}
-        onpointerup={editContext.confirmEdit}
-      >
-        <MultiDayRow />
-      </div>
-      <ColumnTracksOverlay
-        columnCount={$dateRange.length}
-        bind:el={columnTrackOverlayEl}
-      />
+      <MultiDayRow />
     </div>
-  {/if}
+    <ColumnTracksOverlay
+      columnCount={$dateRange.length}
+      bind:el={columnTrackOverlayEl}
+    />
+  </div>
 
   {#if visibleSideControls !== "none"}
     <div
