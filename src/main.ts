@@ -75,6 +75,7 @@ import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
 import TimeTrackerView from "./ui/time-tracker-view";
+import { createTimelineSettingsModalOpener } from "./ui/timeline-settings-modal";
 import TimelineView from "./ui/timeline-view";
 import { UndoNotice } from "./ui/undo-notice";
 import { createEnvironmentHooks } from "./util/create-environment-hooks";
@@ -551,6 +552,11 @@ export default class DayPlanner extends Plugin {
       this.logEntryEditor,
     );
 
+    const openTimelineSettingsModal = createTimelineSettingsModalOpener(
+      this.app,
+      settings,
+    );
+
     const destroyStatusBarWidget = mountStatusBarWidget({
       plugin: this,
       dateRanges,
@@ -635,6 +641,7 @@ export default class DayPlanner extends Plugin {
     const defaultObsidianContext: ObsidianContext = {
       periodicNotes: this.periodicNotes,
       openEditTimeEntryModal,
+      openTimelineSettingsModal,
       openClockInOnAnythingModal: this.openClockInOnAnythingModal,
       logEntryEditor: this.logEntryEditor,
       editText,

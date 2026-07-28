@@ -1,7 +1,6 @@
 <script lang="ts">
   import { type Moment } from "moment";
   import { get } from "svelte/store";
-  import { slide } from "svelte/transition";
 
   import { getDateRangeContext } from "../../../context/date-range-context";
   import { getObsidianContext } from "../../../context/obsidian-context";
@@ -20,7 +19,6 @@
   import { createColumnChangeMenu } from "../../column-change-menu";
   import { createColumnSelectionMenu } from "../../column-selection-menu";
   import ControlButton from "../control-button.svelte";
-  import { createSlide } from "../defaults";
   import ErrorBoundary from "../error-boundary.svelte";
   import {
     Settings,
@@ -33,7 +31,6 @@
   } from "../lucide";
   import Ruler from "../ruler.svelte";
   import Scroller from "../scroller.svelte";
-  import SettingsControls from "../settings-controls.svelte";
   import Timeline from "../timeline.svelte";
 
   import ColumnTracksOverlay from "./column-tracks-overlay.svelte";
@@ -45,22 +42,15 @@
     pointerDateTime,
     editContext,
     settingsSignal,
+    openTimelineSettingsModal,
   } = getObsidianContext();
   const dateRange = getDateRangeContext();
 
-  type SideControls = "none" | "settings";
-
-  let visibleSideControls = $state<SideControls>("none");
   let timelineInternalColumnCount = $derived.by(() => {
     const columnFlags = Object.values(settingsSignal.current.timelineColumns);
 
     return columnFlags.filter(Boolean).length;
   });
-
-  function toggleSideControls(toggledControls: SideControls) {
-    visibleSideControls =
-      visibleSideControls === toggledControls ? "none" : toggledControls;
-  }
 
   function getColumnBackgroundColor(day: Moment) {
     return isOnWeekend(day) ? "var(--background-primary)" : "";
@@ -180,17 +170,6 @@
     />
   </div>
 
-  {#if visibleSideControls !== "none"}
-    <div
-      class="side-controls-wrapper"
-      transition:slide={createSlide({ axis: "x" })}
-    >
-      {#if visibleSideControls === "settings"}
-        <SettingsControls />
-      {/if}
-    </div>
-  {/if}
-
   <div class="multi-day-main-content">
     <Scroller class="planner-multi-day-scroller" onscroll={handleScroll}>
       {#each $dateRange as day, index}
@@ -206,10 +185,7 @@
     </Scroller>
 
     <div class="controls-sidebar">
-      <ControlButton
-        isActive={visibleSideControls === "settings"}
-        onclick={() => toggleSideControls("settings")}
-      >
+      <ControlButton label="Settings" onclick={openTimelineSettingsModal}>
         <Settings />
       </ControlButton>
 
@@ -384,12 +360,5 @@
   .header-cell:last-of-type {
     flex: 1 0 calc(var(--cell-flex-basis) + var(--scrollbar-width));
     border-right: none;
-  }
-
-  .side-controls-wrapper {
-    grid-area: settings;
-    width: min(320px, 50vw);
-    padding-inline: var(--size-4-3);
-    border-left: var(--border-base);
   }
 </style>

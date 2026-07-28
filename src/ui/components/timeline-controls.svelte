@@ -10,22 +10,20 @@
 
   import ControlButton from "./control-button.svelte";
   import DayOfWeekPicker from "./day-of-week-picker.svelte";
-  import { Settings, ChevronLeft, ChevronRight } from "./lucide";
-  import SettingsControls from "./settings-controls.svelte";
+  import { ChevronLeft, ChevronRight } from "./lucide";
 
-  const { workspaceFacade, initWeeklyView, reSync, periodicNotes } =
-    getObsidianContext();
+  const {
+    workspaceFacade,
+    initWeeklyView,
+    reSync,
+    periodicNotes,
+    openTimelineSettingsModal,
+  } = getObsidianContext();
   const dateRange = getDateRangeContext();
-
-  let settingsVisible = $state(false);
 
   const { timeTracker, planner } = $derived($settings.timelineColumns);
   const selectedDay = $derived($dateRange[0]);
   const week = $derived(getFullWeek(selectedDay, $settings.firstDayOfWeek));
-
-  function toggleSettings() {
-    settingsVisible = !settingsVisible;
-  }
 
   function goToToday() {
     $dateRange = [window.moment()];
@@ -45,7 +43,7 @@
     await workspaceFacade.openFileInEditor(note);
   }
 
-  function handleReSyncClick(event: MouseEvent) {
+  function handleMenuClick(event: MouseEvent) {
     const menu = new Menu();
 
     menu.addItem((item) =>
@@ -68,6 +66,15 @@
         .setIcon("pencil")
         .onClick(goToNoteForSelectedDay);
     });
+
+    menu.addSeparator();
+
+    menu.addItem((item) =>
+      item
+        .setTitle("View settings")
+        .setIcon("settings")
+        .onClick(openTimelineSettingsModal),
+    );
 
     menu.showAtMouseEvent(event);
   }
@@ -110,15 +117,8 @@
           Tracker
         {/if}
       </ControlButton>
-      <ControlButton onclick={handleReSyncClick}>
+      <ControlButton label="More options" onclick={handleMenuClick}>
         <EllipsisVertical class="svg-icon" />
-      </ControlButton>
-      <ControlButton
-        isActive={settingsVisible}
-        label="Settings"
-        onclick={toggleSettings}
-      >
-        <Settings />
       </ControlButton>
     </div>
   </div>
@@ -130,12 +130,6 @@
     {selectedDay}
     {week}
   />
-
-  {#if settingsVisible}
-    <div class="settings-wrapper">
-      <SettingsControls />
-    </div>
-  {/if}
 </div>
 
 <style>
@@ -200,17 +194,6 @@
     padding: var(--size-4-2) 0 var(--size-4-2) var(--size-4-3);
 
     font-size: var(--font-ui-small);
-  }
-
-  .settings-wrapper {
-    overflow: scroll;
-    display: flex;
-    flex-direction: column;
-    gap: var(--size-4-2);
-  }
-
-  .settings-wrapper > :global(*) {
-    padding-right: var(--size-4-1);
   }
 
   .controls :global(.control-text) {

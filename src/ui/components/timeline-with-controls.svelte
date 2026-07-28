@@ -99,11 +99,6 @@
 </ErrorBoundary>
 
 <style>
-  :global(svg.svg-icon.planner-settings-icon) {
-    width: var(--icon-s);
-    height: var(--icon-s);
-  }
-
   .corner {
     grid-area: corner;
     background-color: var(--background-primary);

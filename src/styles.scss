@@ -178,11 +178,11 @@
   .view-content {
     display: grid;
     grid-template-rows: auto auto 1fr;
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: auto 1fr;
     grid-template-areas:
-      "corner dates settings"
-      "corner multiday settings"
-      "ruler timelines settings";
+      "corner dates"
+      "corner multiday"
+      "ruler timelines";
   }
 
   .view-actions {
