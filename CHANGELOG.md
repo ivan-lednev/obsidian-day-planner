@@ -1,3 +1,16 @@
+## 0.35.0
+
+### ✨ New features
+
+- Plan blocks can now be clocked in from the timeline: right click (or tap and hold on mobile) a block and select 'Clock in'
+- The timeline takes up less space when opened in a regular tab: the month, the column selector and the '⋮' button are gone from the view itself
+  - All of them moved to the tab menu: right click the tab (or use the '⋮' button in its header) to re-sync internet calendars, open the multi-day planner or the daily note for the selected day, pick visible columns and open the view settings
+  - The tab title now shows the month and the year of the selected day
+
+### 🐞 Fixed issues
+
+- Underscores in links and other Obsidian syntax are no longer escaped with a backslash when a task gets edited
+
 ## 0.34.0
 
 ### 💥 Breaking changes
