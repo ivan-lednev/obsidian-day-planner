@@ -12,6 +12,7 @@ import { compareTimestamps } from "../parser/parser";
 import {
   dashOrNumberWithMultipleSpaces,
   escapedSquareBracket,
+  escapedUnderscore,
   listItemRegExp,
 } from "../regexp";
 
@@ -299,5 +300,6 @@ export function toMdastPoint(editorPosition: EditorPosition) {
 function postProcess(input: string) {
   return input
     .replace(dashOrNumberWithMultipleSpaces, "$1 ")
-    .replace(escapedSquareBracket, "[");
+    .replace(escapedSquareBracket, "[")
+    .replace(escapedUnderscore, "_");
 }

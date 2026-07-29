@@ -13,7 +13,7 @@ import {
 test("roundtripping doesn't mess up Obsidian-styled markdown", () => {
   const input = `# [[Heading]]
 
-- [!] This is ![[custom syntax]] all #over the place ^block-id
+- [!] This is ![[custom_syntax]] all #over the place ^block-id
   \`\`\`js
   console.log("this is a code block");
   \`\`\`
