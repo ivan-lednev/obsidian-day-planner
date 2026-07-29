@@ -1,26 +1,43 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
+import type { Moment } from "moment";
+import { ItemView, Menu, WorkspaceLeaf } from "obsidian";
 import { mount, unmount } from "svelte";
 import type { Component } from "svelte";
+import { get, writable, type Writable } from "svelte/store";
 
-import { dateRangeContextKey, viewTypeTimeline } from "../constants";
+import {
+  dateRangeContextKey,
+  isInSidebarContextKey,
+  viewTypeTimeline,
+} from "../constants";
 import type { PeriodicNotes } from "../service/periodic-notes";
+import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
 import type { ComponentContext, DateRange } from "../types";
 import { handleActiveLeafChange } from "../util/handle-active-leaf-change";
+import { setViewTitle } from "../util/view";
 
 import TimelineWithControls from "./components/timeline-with-controls.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
+import type { OpenTimelineSettingsModal } from "./timeline-settings-modal";
+import { addTimelineViewMenuItems } from "./timeline-view-menu";
 
 export default class TimelineView extends ItemView {
+  private static readonly defaultDisplayText = "Timeline";
+  private static readonly titleFormat = "MMM YYYY";
   private timeline?: Component;
   private dateRange?: DateRange;
+  private readonly isInSidebar = writable(false);
 
   constructor(
     leaf: WorkspaceLeaf,
-    private readonly settings: () => DayPlannerSettings,
+    private readonly settings: Writable<DayPlannerSettings>,
     private readonly componentContext: ComponentContext,
     private readonly dateRanges: ReturnType<typeof useDateRanges>,
     private readonly periodicNotes: PeriodicNotes,
+    private readonly workspaceFacade: WorkspaceFacade,
+    private readonly initWeeklyView: () => Promise<void>,
+    private readonly reSync: () => void,
+    private readonly openTimelineSettingsModal: OpenTimelineSettingsModal,
   ) {
     super(leaf);
   }
@@ -30,19 +47,39 @@ export default class TimelineView extends ItemView {
   }
 
   getDisplayText(): string {
-    return "Timeline";
+    const selectedDay = this.getSelectedDay();
+
+    if (this.isMountedInSidebar() || !selectedDay) {
+      return TimelineView.defaultDisplayText;
+    }
+
+    return selectedDay.format(TimelineView.titleFormat);
   }
 
   getIcon() {
-    return this.settings().timelineIcon;
+    return get(this.settings).timelineIcon;
+  }
+
+  onPaneMenu(menu: Menu, source: string) {
+    super.onPaneMenu(menu, source);
+
+    addTimelineViewMenuItems(menu, {
+      reSync: this.reSync,
+      initWeeklyView: this.initWeeklyView,
+      openTimelineSettingsModal: this.openTimelineSettingsModal,
+      settings: this.settings,
+      openFileForDay: (day: Moment) => this.workspaceFacade.openFileForDay(day),
+      getSelectedDay: this.getSelectedDay,
+    });
   }
 
   async onOpen() {
     const contentEl = this.containerEl.children[1];
 
     this.dateRange = this.dateRanges.trackRange([window.moment()]);
+    this.register(this.dateRange.subscribe(this.updateTabTitleAndHeader));
     this.registerEvent(
-      this.app.workspace.on("active-leaf-change", (leaf) => {
+      this.workspaceFacade.onActiveLeafChange((leaf) => {
         if (!this.dateRange) {
           return;
         }
@@ -51,9 +88,16 @@ export default class TimelineView extends ItemView {
       }),
     );
 
-    const context = new Map([
+    // Note: a leaf can be dragged between the sidebar and the main area
+    this.registerEvent(
+      this.workspaceFacade.onLayoutChange(this.updateTabTitleAndHeader),
+    );
+    this.updateTabTitleAndHeader();
+
+    const context = new Map<string, unknown>([
       ...this.componentContext,
       [dateRangeContextKey, this.dateRange],
+      [isInSidebarContextKey, this.isInSidebar],
     ]);
 
     // @ts-expect-error
@@ -70,4 +114,22 @@ export default class TimelineView extends ItemView {
 
     this.dateRange?.untrack();
   }
+
+  private isMountedInSidebar() {
+    return this.workspaceFacade.isLeafInSidebar(this.leaf);
+  }
+
+  private getSelectedDay = () => {
+    if (!this.dateRange) {
+      return undefined;
+    }
+
+    return get(this.dateRange)?.[0];
+  };
+
+  private updateTabTitleAndHeader = () => {
+    this.isInSidebar.set(this.isMountedInSidebar());
+
+    setViewTitle(this, this.getDisplayText());
+  };
 }

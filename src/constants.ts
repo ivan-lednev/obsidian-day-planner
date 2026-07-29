@@ -5,6 +5,7 @@ export const viewTypeTimeTracker = "planner-time-tracker";
 
 export const obsidianContextKey = "obsidianContext";
 export const dateRangeContextKey = "dateRangeContext";
+export const isInSidebarContextKey = "isInSidebarContext";
 
 export const defaultDayFormat = "YYYY-MM-DD";
 export const icalDayKeyFormat = "YYYY-MM-DD";

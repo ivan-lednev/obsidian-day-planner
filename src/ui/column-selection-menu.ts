@@ -1,56 +1,62 @@
 import { Menu } from "obsidian";
 import { get, type Writable } from "svelte/store";
 
-import type { DayPlannerSettings, TimelineColumns } from "../settings";
+import type { DayPlannerSettings, TimelineColumnType } from "../settings";
+
+const columnTitles: Record<TimelineColumnType, string> = {
+  planner: "Show planner",
+  timeTracker: "Show time tracker",
+};
+
+export function addColumnSelectionItems(props: {
+  menu: Menu;
+  settings: Writable<DayPlannerSettings>;
+  section?: string;
+}) {
+  const { menu, settings, section } = props;
+
+  const currentColumns = get(settings).timelineColumns;
+  const visibleColumnCount =
+    Object.values(currentColumns).filter(Boolean).length;
+
+  Object.entries(columnTitles).forEach(([column, title]) => {
+    const isVisible = currentColumns[column as TimelineColumnType];
+    const isLastVisibleColumn = isVisible && visibleColumnCount === 1;
+
+    menu.addItem((item) => {
+      if (section) {
+        item.setSection(section);
+      }
+
+      item
+        .setTitle(title)
+        .setChecked(isVisible)
+        .setDisabled(isLastVisibleColumn)
+        .onClick(() => {
+          if (isLastVisibleColumn) {
+            return;
+          }
+
+          settings.update((previous) => ({
+            ...previous,
+            timelineColumns: {
+              ...previous.timelineColumns,
+              [column]: !isVisible,
+            },
+          }));
+        });
+    });
+  });
+}
 
 export function createColumnSelectionMenu(props: {
   settings: Writable<DayPlannerSettings>;
   event: MouseEvent;
 }) {
   const { settings, event } = props;
+  const menu = new Menu();
 
-  const { planner, timeTracker } = get(settings).timelineColumns;
+  addColumnSelectionItems({ menu, settings });
 
-  function updateColumns(next: TimelineColumns) {
-    settings.update((previous) => ({
-      ...previous,
-      timelineColumns: next,
-    }));
-  }
-
-  new Menu()
-    .addItem((item) =>
-      item
-        .setTitle("Show Planner")
-        .setChecked(planner && !timeTracker)
-        .onClick(() => {
-          updateColumns({
-            planner: true,
-            timeTracker: false,
-          });
-        }),
-    )
-    .addItem((item) =>
-      item
-        .setTitle("Show Time Tracker")
-        .setChecked(!planner && timeTracker)
-        .onClick(() => {
-          updateColumns({
-            planner: false,
-            timeTracker: true,
-          });
-        }),
-    )
-    .addItem((item) =>
-      item
-        .setTitle("Show Planner & Time Tracker")
-        .setChecked(planner && timeTracker)
-        .onClick(() => {
-          updateColumns({
-            planner: true,
-            timeTracker: true,
-          });
-        }),
-    )
-    .showAtMouseEvent(event);
+  menu.showAtMouseEvent(event);
 }

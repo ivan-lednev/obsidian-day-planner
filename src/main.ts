@@ -638,6 +638,8 @@ export default class DayPlanner extends Plugin {
         getDescriptionText,
       });
 
+    const reSync = () => dispatch(icalRefreshRequested());
+
     const defaultObsidianContext: ObsidianContext = {
       periodicNotes: this.periodicNotes,
       openEditTimeEntryModal,
@@ -654,7 +656,7 @@ export default class DayPlanner extends Plugin {
       editContext,
       showPreview: createShowPreview(this.app),
       isModPressed,
-      reSync: () => dispatch(icalRefreshRequested()),
+      reSync,
       isOnline,
       isDarkMode,
       settings,
@@ -673,10 +675,14 @@ export default class DayPlanner extends Plugin {
       (leaf: WorkspaceLeaf) =>
         new TimelineView(
           leaf,
-          this.settings,
+          this.settingsStore,
           componentContext,
           dateRanges,
           this.periodicNotes,
+          this.workspaceFacade,
+          this.initWeeklyLeaf,
+          reSync,
+          openTimelineSettingsModal,
         ),
     );
 

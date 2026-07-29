@@ -25,6 +25,24 @@ export class WorkspaceFacade {
     private readonly periodicNotes: PeriodicNotes,
   ) {}
 
+  onLayoutChange(handler: () => void) {
+    return this.workspace.on("layout-change", handler);
+  }
+
+  onActiveLeafChange(handler: (leaf: WorkspaceLeaf | null) => void) {
+    return this.workspace.on("active-leaf-change", handler);
+  }
+
+  isLeafInSidebar(leaf: WorkspaceLeaf) {
+    const root = leaf.getRoot();
+
+    // Note: leaves in pop-out windows have their own root, and Obsidian shows
+    // the native header there, same as in the main area
+    return (
+      root === this.workspace.leftSplit || root === this.workspace.rightSplit
+    );
+  }
+
   async openFileInEditor(file: TFile) {
     const leafWithThisFile = this.workspace
       .getLeavesOfType("markdown")

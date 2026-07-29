@@ -4,10 +4,11 @@
   import { Menu } from "obsidian";
 
   import { getDateRangeContext } from "../../context/date-range-context";
+  import { getIsInSidebarContext } from "../../context/is-in-sidebar-context";
   import { getObsidianContext } from "../../context/obsidian-context";
   import { settings } from "../../global-store/settings";
   import { getFullWeek } from "../../util/range";
-  import { createColumnSelectionMenu } from "../column-selection-menu";
+  import { addTimelineViewMenuItems } from "../timeline-view-menu";
 
   import ControlButton from "./control-button.svelte";
   import DayOfWeekPicker from "./day-of-week-picker.svelte";
@@ -15,14 +16,14 @@
 
   const {
     workspaceFacade,
-    initWeeklyView,
-    reSync,
     periodicNotes,
+    reSync,
+    initWeeklyView,
     openTimelineSettingsModal,
   } = getObsidianContext();
   const dateRange = getDateRangeContext();
+  const isInSidebar = getIsInSidebarContext();
 
-  const { timeTracker, planner } = $derived($settings.timelineColumns);
   const selectedDay = $derived($dateRange[0]);
   const week = $derived(getFullWeek(selectedDay, $settings.firstDayOfWeek));
 
@@ -57,35 +58,14 @@
   function handleMenuClick(event: MouseEvent) {
     const menu = new Menu();
 
-    menu.addItem((item) =>
-      item
-        .setTitle("Re-sync internet calendars")
-        .setIcon("sync")
-        .onClick(reSync),
-    );
-
-    menu.addItem((item) =>
-      item
-        .setTitle("Open multi-day planner")
-        .setIcon("table-2")
-        .onClick(initWeeklyView),
-    );
-
-    menu.addItem((item) => {
-      item
-        .setTitle("Open daily note for selected day")
-        .setIcon("pencil")
-        .onClick(() => goToNoteForDay(selectedDay));
+    addTimelineViewMenuItems(menu, {
+      reSync,
+      initWeeklyView,
+      openTimelineSettingsModal,
+      settings,
+      openFileForDay: (day: Moment) => workspaceFacade.openFileForDay(day),
+      getSelectedDay: () => selectedDay,
     });
-
-    menu.addSeparator();
-
-    menu.addItem((item) =>
-      item
-        .setTitle("View settings")
-        .setIcon("settings")
-        .onClick(openTimelineSettingsModal),
-    );
 
     menu.showAtMouseEvent(event);
   }
@@ -107,31 +87,14 @@
       </ControlButton>
     </div>
 
-    <div class="period">
-      <span class="month">{selectedDay.format("MMM")}</span>
-      <span class="year">{selectedDay.format("YYYY")}</span>
-    </div>
-
-    <div class="buttons-right">
-      <ControlButton
-        class="control-text"
-        label="Select visible columns"
-        onclick={(event) => {
-          createColumnSelectionMenu({ settings, event });
-        }}
-      >
-        {#if planner && timeTracker}
-          Planner | Tracker
-        {:else if planner}
-          Planner
-        {:else if timeTracker}
-          Tracker
-        {/if}
-      </ControlButton>
-      <ControlButton label="More options" onclick={handleMenuClick}>
-        <EllipsisVertical class="svg-icon" />
-      </ControlButton>
-    </div>
+    {#if $isInSidebar}
+      <div class="period">{selectedDay.format("MMM YYYY")}</div>
+      <div class="buttons-right">
+        <ControlButton label="More options" onclick={handleMenuClick}>
+          <EllipsisVertical class="svg-icon" />
+        </ControlButton>
+      </div>
+    {/if}
   </div>
 
   <DayOfWeekPicker onDayClick={handleDayClick} {selectedDay} {week} />
@@ -156,38 +119,30 @@
 
   .header {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
     padding-right: var(--size-4-3);
   }
 
   .buttons-right {
+    grid-column: 3;
     justify-self: end;
   }
 
   .period {
-    display: flex;
-    gap: var(--size-2-1);
     justify-self: center;
 
-    font-size: var(--font-ui-medium);
-    font-weight: var(--font-semibold);
+    font-family: var(--file-header-font);
+    font-size: var(--file-header-font-size);
+    font-weight: var(--font-medium);
+    color: var(--text-muted);
     white-space: nowrap;
-  }
-
-  .month {
-    color: var(--text-normal);
-  }
-
-  .year {
-    color: var(--color-accent);
   }
 
   .buttons-left :global(.today-button) {
     font-size: var(--font-ui-small);
     font-weight: var(--font-medium);
     color: var(--text-muted);
-    text-transform: uppercase;
   }
 
   .controls {
@@ -199,14 +154,5 @@
     padding: var(--size-4-2) 0 var(--size-4-2) var(--size-4-3);
 
     font-size: var(--font-ui-small);
-  }
-
-  .controls :global(.control-text) {
-    font-size: var(--font-ui-small);
-    color: var(--text-faint);
-  }
-
-  .controls :global(.control-text:hover) {
-    color: var(--text-muted);
   }
 </style>

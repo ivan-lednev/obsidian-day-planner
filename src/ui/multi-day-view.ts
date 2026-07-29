@@ -7,6 +7,7 @@ import { dateRangeContextKey, viewTypeMultiDay } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 import type { ComponentContext, DateRange } from "../types";
 import * as r from "../util/range";
+import { setViewTitle } from "../util/view";
 
 import MultiDayGrid from "./components/multi-day/multi-day-grid.svelte";
 import { useDateRanges } from "./hooks/use-date-ranges";
@@ -108,11 +109,6 @@ export default class MultiDayView extends ItemView {
   }
 
   private updateTabTitleAndHeader = (range: Moment[]) => {
-    const newText = r.toString(range);
-
-    // @ts-expect-error: undocumented API
-    this.titleEl?.setText(newText);
-    // @ts-expect-error: undocumented API
-    this.leaf.updateHeader?.();
+    setViewTitle(this, r.toString(range));
   };
 }
