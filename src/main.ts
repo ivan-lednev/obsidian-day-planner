@@ -33,7 +33,7 @@ import {
 import { visibleDaysUpdated } from "./redux/global-slice";
 import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { type IcalParseTaskResult } from "./redux/ical/init-ical-listeners";
-import { selectActiveLogEntries } from "./redux/index/index-slice";
+import { selectActiveLogEntries } from "./redux/index/index-selectors";
 import { settingsUpdated } from "./redux/settings-slice";
 import {
   type AppDispatch,

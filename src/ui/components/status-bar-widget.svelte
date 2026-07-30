@@ -4,7 +4,7 @@
   import { statusBarTextLimit } from "../../constants";
   import { currentTimeSignal } from "../../global-store/current-time";
   import { settingsSignal } from "../../global-store/settings";
-  import { selectActiveLogEntries } from "../../redux/index/index-slice";
+  import { selectActiveLogEntries } from "../../redux/index/index-selectors";
   import type { RootState } from "../../redux/store";
   import type { UseSelector } from "../../redux/use-selector";
   import type { LogEntryEditor } from "../../service/log-entry-editor";

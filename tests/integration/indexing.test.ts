@@ -2,13 +2,13 @@ import { isNotVoid } from "typed-assert";
 import { describe, expect, test, vi } from "vitest";
 
 import {
+  selectActiveLogEntries,
   selectLogEntriesForDay,
   selectPlanEntriesForDays,
 } from "../../src/redux";
 import {
   fileDeleted,
   indexRequested,
-  selectActiveLogEntries,
   selectEntriesForPath,
 } from "../../src/redux/index/index-slice";
 import { strictParse } from "../../src/util/moment";

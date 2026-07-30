@@ -1,13 +1,11 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  selectActiveLogEntries,
   selectLogEntriesForDay,
   selectRecentLogEntries,
 } from "../../src/redux";
-import {
-  fileDeleted,
-  selectActiveLogEntries,
-} from "../../src/redux/index/index-slice";
+import { fileDeleted } from "../../src/redux/index/index-slice";
 import { strictParse } from "../../src/util/moment";
 
 import { setUp } from "./util/setup";

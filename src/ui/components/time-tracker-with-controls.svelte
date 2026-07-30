@@ -3,7 +3,7 @@
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { currentTimeSignal } from "../../global-store/current-time";
-  import { selectActiveLogEntries } from "../../redux/index/index-slice";
+  import { selectActiveLogEntries } from "../../redux/index/index-selectors";
 
   import ActiveClocks from "./active-clocks.svelte";
   import ControlButton from "./control-button.svelte";

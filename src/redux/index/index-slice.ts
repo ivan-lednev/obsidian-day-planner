@@ -1,5 +1,4 @@
 import { type PayloadAction } from "@reduxjs/toolkit";
-import type { Moment } from "moment";
 import type { MetadataCache, Pos, Vault } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
@@ -9,8 +8,6 @@ import type {
 } from "../../service/index/index-service";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
-
-import { logEntryToTimeBlock } from "./entry-to-time-block";
 
 export interface FileSystemEntry {
   id: string;
@@ -306,25 +303,6 @@ export const indexSlice = createAppSlice({
         (it) => state.taskEntries.byId[it],
       );
     },
-    // todo: should be memoized or stored in the index
-    // todo: rename
-    selectActiveLogEntries: (state, currentTime: Moment) =>
-      Object.values(state.logEntries.byId)
-        .flat()
-        .filter((it) => !it.end)
-        .map((logEntry) => {
-          const entry =
-            state.taskEntries.byId[logEntry.parentId] ??
-            state.fileEntries.byId[logEntry.parentId];
-
-          isNotVoid(entry, "Inconsistent store state");
-
-          return logEntryToTimeBlock({
-            logEntry,
-            parentEntry: entry,
-            currentTime,
-          });
-        }),
     selectListPropsPosition: (state, path: string, line: number) => {
       const taskEntriesForFile = state.taskEntries.byPath[path]?.map(
         (it) => state.taskEntries.byId[it],
@@ -358,7 +336,6 @@ export const { filesIndexed, indexRequested, fileDeleted } = indexSlice.actions;
 
 export const {
   selectEntriesForPath,
-  selectActiveLogEntries,
   selectLogEntriesByDay,
   selectLogEntriesById,
   selectListPropsPosition,

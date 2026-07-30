@@ -2,6 +2,7 @@ import type { Moment } from "moment";
 import { isNotVoid } from "typed-assert";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
+import type { LogTimeBlock } from "../../time-block-types";
 import { strictParse, toMinutePrecision } from "../../util/moment";
 import { clamp, getDayKey } from "../../util/time-block-utils";
 import { createAppSelector } from "../create-app-selector";
@@ -13,7 +14,6 @@ import {
   planEntryToTimeBlock,
 } from "./entry-to-time-block";
 import {
-  type FileSystemEntry,
   type ListItemEntry,
   type ListItemEntryWithChildren,
   selectFileEntriesById,
@@ -51,10 +51,7 @@ export const selectLogEntriesForDay = createAppSelector(
           `Inconsistent store state: expected to find log entry by id ${logEntryId}`,
         );
 
-        // todo: remove once we have noUncheckedIndexedAccess
-        //  the state types are imprecise: lookups by id may return
-        //  undefined, so the union has to be spelled out for narrowing to work
-        const entry: ListItemEntry | FileSystemEntry | undefined =
+        const entry =
           taskEntriesById[logEntry.parentId] ??
           fileEntriesById[logEntry.parentId];
 
@@ -78,6 +75,43 @@ export const selectLogEntriesForDay = createAppSelector(
     );
 
     return addHorizontalPlacing(inflatedTimeBlocksWithoutActiveClocks);
+  },
+);
+
+const selectOpenLogEntries = createAppSelector(
+  [selectLogEntriesById],
+  (logEntriesById) => Object.values(logEntriesById).filter((it) => !it.end),
+);
+
+const emptyActiveLogEntries: LogTimeBlock[] = [];
+
+export const selectActiveLogEntries = createAppSelector(
+  [
+    selectOpenLogEntries,
+    selectTaskEntriesById,
+    selectFileEntriesById,
+    (state, currentTime: Moment) => toMinutePrecision(currentTime).valueOf(),
+  ],
+  (openLogEntries, taskEntriesById, fileEntriesById, minuteTimestamp) => {
+    if (openLogEntries.length === 0) {
+      return emptyActiveLogEntries;
+    }
+
+    const currentTime = window.moment(minuteTimestamp);
+
+    return openLogEntries.map((logEntry) => {
+      const entry =
+        taskEntriesById[logEntry.parentId] ??
+        fileEntriesById[logEntry.parentId];
+
+      isNotVoid(entry, "Inconsistent store state");
+
+      return logEntryToTimeBlock({
+        logEntry,
+        parentEntry: entry,
+        currentTime,
+      });
+    });
   },
 );
 
