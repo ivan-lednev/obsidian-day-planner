@@ -52,6 +52,9 @@ function createProps({
 export function setUp({
   tasks = baseTasks,
   settings = defaultSettingsForTests,
+}: {
+  tasks?: EditableTimeBlock[];
+  settings?: DayPlannerSettings;
 } = {}) {
   const props = createProps({ tasks, settings });
   const {

@@ -22,10 +22,18 @@ export function useDateRanges() {
     }
 
     function update(fn: Updater<Moment[]>) {
-      ranges.update((previous) => ({
-        ...previous,
-        [rangeKey]: fn(previous[rangeKey]),
-      }));
+      ranges.update((previous) => {
+        const current = previous[rangeKey];
+
+        if (!current) {
+          return previous;
+        }
+
+        return {
+          ...previous,
+          [rangeKey]: fn(current),
+        };
+      });
     }
 
     function set(value: Moment[]) {
@@ -36,7 +44,13 @@ export function useDateRanges() {
     }
 
     function subscribe(fn: Subscriber<Moment[]>) {
-      return ranges.subscribe((next) => fn(next[rangeKey]));
+      return ranges.subscribe((next) => {
+        const current = next[rangeKey];
+
+        if (current) {
+          fn(current);
+        }
+      });
     }
 
     return {

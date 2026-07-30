@@ -2,6 +2,7 @@ import type { Moment } from "moment";
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { mount, unmount } from "svelte";
 import { derived, get, type Writable } from "svelte/store";
+import { isNotVoid } from "typed-assert";
 
 import { dateRangeContextKey, viewTypeMultiDay } from "../constants";
 import type { DayPlannerSettings } from "../settings";
@@ -51,6 +52,9 @@ export default class MultiDayView extends ItemView {
 
   async onOpen() {
     const contentEl = this.containerEl.children[1];
+
+    isNotVoid(contentEl);
+
     const currentSettings = get(this.settings);
 
     const range = r.createRange(

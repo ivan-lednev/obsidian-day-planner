@@ -2,6 +2,7 @@
   import { EllipsisVertical } from "lucide-svelte";
   import type { Moment } from "moment";
   import { Menu } from "obsidian";
+  import { isNotVoid } from "typed-assert";
 
   import { getDateRangeContext } from "../../context/date-range-context";
   import { getIsInSidebarContext } from "../../context/is-in-sidebar-context";
@@ -24,7 +25,13 @@
   const dateRange = getDateRangeContext();
   const isInSidebar = getIsInSidebarContext();
 
-  const selectedDay = $derived($dateRange[0]);
+  const selectedDay = $derived.by(() => {
+    const day = $dateRange[0];
+
+    isNotVoid(day);
+
+    return day;
+  });
   const week = $derived(getFullWeek(selectedDay, $settings.firstDayOfWeek));
 
   function goToToday() {

@@ -23,12 +23,25 @@
   );
 
   const dateRange = fromStore(getDateRangeContext());
-  const firstDayInRange = $derived(dateRange.current[0]);
+  const firstDayInRange = $derived.by(() => {
+    const first = dateRange.current[0];
+
+    isNotVoid(first);
+
+    return first;
+  });
+  const lastDayInRange = $derived.by(() => {
+    const last = dateRange.current.at(-1);
+
+    isNotVoid(last);
+
+    return last;
+  });
 
   const displayedAllDayTasks = $derived(
     getDisplayedAllDayTasksForMultiDayRow.current({
       start: firstDayInRange,
-      end: dateRange.current[dateRange.current.length - 1],
+      end: lastDayInRange,
     }),
   );
 

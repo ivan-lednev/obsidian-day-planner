@@ -1,4 +1,5 @@
 import type { Moment } from "moment/moment";
+import { isNotVoid } from "typed-assert";
 
 import { timeRegExp } from "../regexp";
 
@@ -13,6 +14,9 @@ export function parseTime(asText: string, day: Moment) {
 
   const hours = hours12h ?? hours24h;
   const minutes = minutes12h ?? minutes24h;
+
+  isNotVoid(hours);
+  isNotVoid(minutes);
 
   let parsedHours = parseInt(hours);
 

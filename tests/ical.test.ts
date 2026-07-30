@@ -221,10 +221,10 @@ describe("ical", () => {
 
     expect(remoteTasks).toHaveLength(2);
 
-    expect(remoteTasks[0].startTime).toEqual(
+    expect(remoteTasks[0]?.startTime).toEqual(
       window.moment("2025-04-09T00:00:00.000Z"),
     );
-    expect(remoteTasks[1].startTime).toEqual(
+    expect(remoteTasks[1]?.startTime).toEqual(
       window.moment("2025-04-11T00:00:00.000Z"),
     );
   });
@@ -245,10 +245,10 @@ describe("ical", () => {
 
     expect(remoteTasks).toHaveLength(2);
 
-    expect(remoteTasks[0].startTime).toEqual(
+    expect(remoteTasks[0]?.startTime).toEqual(
       window.moment("2025-04-09T00:00:00.000Z"),
     );
-    expect(remoteTasks[1].startTime).toEqual(
+    expect(remoteTasks[1]?.startTime).toEqual(
       window.moment("2026-04-09T00:00:00.000Z"),
     );
   });

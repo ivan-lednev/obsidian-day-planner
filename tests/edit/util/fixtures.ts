@@ -43,7 +43,11 @@ export const unscheduledTask: EditableTimeBlock = {
   ...baseTask,
   isAllDayEvent: true,
 };
-export const threeTasks: WithPlacing<WithDuration<EditableTimeBlock>>[] = [
+export const threeTasks: [
+  WithPlacing<WithDuration<EditableTimeBlock>>,
+  WithPlacing<WithDuration<EditableTimeBlock>>,
+  WithPlacing<WithDuration<EditableTimeBlock>>,
+] = [
   {
     ...baseTask,
     id: "1",
@@ -65,7 +69,5 @@ export const threeTasksOverTwoDays: WithDuration<EditableTimeBlock>[] = [
   { ...baseTask, id: "2", startTime: moment("2023-01-01 01:00") },
   { ...baseTask, id: "3", startTime: moment("2023-01-02 02:00") },
 ];
-export const baseTasks: Array<WithDuration<EditableTimeBlock>> = [baseTask];
-export const tasksWithUnscheduledTask: Array<EditableTimeBlock> = [
-  unscheduledTask,
-];
+export const baseTasks: [WithDuration<EditableTimeBlock>] = [baseTask];
+export const tasksWithUnscheduledTask: [EditableTimeBlock] = [unscheduledTask];

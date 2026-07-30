@@ -1,6 +1,7 @@
 import type { MetadataCache, Pos, Vault } from "obsidian";
 
 import { filterByKeywords } from "../util/keyword-filter";
+import { getFirstLine } from "../util/markdown";
 import { isTaskCache } from "../util/metadata";
 
 import { createListItemEntry } from "./index/list-item-utils";
@@ -51,7 +52,7 @@ export class VaultSearchService implements SearchService {
             listItemCache,
           });
 
-          return { ...entry, text: entry.text.split("\n")[0] };
+          return { ...entry, text: getFirstLine(entry.text) };
         });
 
         return filterByKeywords(entries, query, (entry) => [

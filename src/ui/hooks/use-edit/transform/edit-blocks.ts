@@ -1,3 +1,5 @@
+import { isNotVoid } from "typed-assert";
+
 interface Block {
   id: string;
   start: number;
@@ -78,6 +80,8 @@ function propagate(
     ) {
       const nextOfTheRest = result[nextOfTheRestIndex];
 
+      isNotVoid(nextOfTheRest);
+
       if (
         block.end > nextOfTheRest.start &&
         !initiallyOverlap(block, nextOfTheRest)
@@ -131,6 +135,9 @@ export function editBlocks(
   const updatedBlocks = blocks.map((block) => ({ ...block }));
 
   const targetBlock = updatedBlocks[targetIndex];
+
+  isNotVoid(targetBlock);
+
   const updatedBlock = editBlock(targetBlock, newCoords, editType, minDuration);
 
   if (interaction === "none") {

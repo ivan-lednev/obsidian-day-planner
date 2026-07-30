@@ -3,6 +3,7 @@ import { ItemView, Menu, WorkspaceLeaf } from "obsidian";
 import { mount, unmount } from "svelte";
 import type { Component } from "svelte";
 import { get, writable, type Writable } from "svelte/store";
+import { isNotVoid } from "typed-assert";
 
 import {
   dateRangeContextKey,
@@ -75,6 +76,8 @@ export default class TimelineView extends ItemView {
 
   async onOpen() {
     const contentEl = this.containerEl.children[1];
+
+    isNotVoid(contentEl);
 
     this.dateRange = this.dateRanges.trackRange([window.moment()]);
     this.register(this.dateRange.subscribe(this.updateTabTitleAndHeader));

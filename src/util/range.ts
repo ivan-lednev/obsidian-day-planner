@@ -1,6 +1,7 @@
 import { Array } from "effect";
 import type { Moment } from "moment";
 import { match } from "ts-pattern";
+import { isNotVoid } from "typed-assert";
 
 import { defaultRangeDayFormat } from "../constants";
 import type { DayPlannerSettings } from "../settings";
@@ -59,8 +60,14 @@ export function getPreviousAdjacentRange(range: Moment[]) {
 }
 
 export function toString(range: Moment[]) {
-  const start = range[0].format(defaultRangeDayFormat);
-  const end = range[range.length - 1].format(defaultRangeDayFormat);
+  const first = range[0];
+  const last = range.at(-1);
+
+  isNotVoid(first);
+  isNotVoid(last);
+
+  const start = first.format(defaultRangeDayFormat);
+  const end = last.format(defaultRangeDayFormat);
 
   return `${start}–${end}`;
 }

@@ -2,7 +2,7 @@ import { produce } from "immer";
 import { PluginSettingTab, SettingGroup } from "obsidian";
 import { type Component, mount, unmount } from "svelte";
 import type { Writable } from "svelte/store";
-import { isOneOf } from "typed-assert";
+import { isNotVoid, isOneOf } from "typed-assert";
 
 import { icons } from "../constants";
 import type DayPlanner from "../main";
@@ -244,7 +244,11 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             el.setValue(ical.color).onChange((value: string) => {
               this.settingsStore.update(
                 produce((draft) => {
-                  draft.icals[index].color = value;
+                  const ical = draft.icals[index];
+
+                  isNotVoid(ical);
+
+                  ical.color = value;
                 }),
               );
             }),
@@ -260,7 +264,11 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
                 .onChange((value: string) => {
                   this.settingsStore.update(
                     produce((draft) => {
-                      draft.icals[index].name = value;
+                      const ical = draft.icals[index];
+
+                      isNotVoid(ical);
+
+                      ical.name = value;
                     }),
                   );
                 }),
@@ -278,7 +286,11 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
                 .onChange((value: string) => {
                   this.settingsStore.update(
                     produce((draft) => {
-                      draft.icals[index].email = value.trim();
+                      const ical = draft.icals[index];
+
+                      isNotVoid(ical);
+
+                      ical.email = value.trim();
                     }),
                   );
                 }),
@@ -297,7 +309,11 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
 
                 this.settingsStore.update(
                   produce((draft) => {
-                    draft.icals[index].url = withCorrectProtocol;
+                    const ical = draft.icals[index];
+
+                    isNotVoid(ical);
+
+                    ical.url = withCorrectProtocol;
                   }),
                 );
               }),
@@ -628,7 +644,11 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
             el.setValue(colorOverride.color).onChange((value: string) => {
               this.settingsStore.update(
                 produce((draft) => {
-                  draft.colorOverrides[index].color = value;
+                  const colorOverride = draft.colorOverrides[index];
+
+                  isNotVoid(colorOverride);
+
+                  colorOverride.color = value;
                 }),
               );
             }),
@@ -639,7 +659,11 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
               .onChange((value: string) => {
                 this.settingsStore.update(
                   produce((draft) => {
-                    draft.colorOverrides[index].darkModeColor = value;
+                    const colorOverride = draft.colorOverrides[index];
+
+                    isNotVoid(colorOverride);
+
+                    colorOverride.darkModeColor = value;
                   }),
                 );
               }),

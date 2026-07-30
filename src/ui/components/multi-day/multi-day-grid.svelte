@@ -1,6 +1,7 @@
 <script lang="ts">
   import { type Moment } from "moment";
   import { get } from "svelte/store";
+  import { isNotVoid } from "typed-assert";
 
   import { getDateRangeContext } from "../../../context/date-range-context";
   import { getObsidianContext } from "../../../context/obsidian-context";
@@ -99,9 +100,14 @@
       (event.clientX - viewportToElOffsetX + multiDayRowRef.scrollLeft) /
         pixelsPerDay,
     );
+    const dayHoveredOver = currentDateRange[indexOfDayHoveredOver];
+
+    if (!dayHoveredOver) {
+      return;
+    }
 
     pointerDateTime.set({
-      dateTime: currentDateRange[indexOfDayHoveredOver],
+      dateTime: dayHoveredOver,
       type: "date",
     });
   }
@@ -219,7 +225,11 @@
         onclick={() => {
           dateRange.update(
             $settings.multiDayRange === "work-week"
-              ? ([firstDay]) => getNextWorkWeek(firstDay)
+              ? ([firstDay]) => {
+                  isNotVoid(firstDay);
+
+                  return getNextWorkWeek(firstDay);
+                }
               : getNextAdjacentRange,
           );
         }}
@@ -232,7 +242,11 @@
         onclick={() => {
           dateRange.update(
             $settings.multiDayRange === "work-week"
-              ? ([firstDay]) => getPreviousWorkWeek(firstDay)
+              ? ([firstDay]) => {
+                  isNotVoid(firstDay);
+
+                  return getPreviousWorkWeek(firstDay);
+                }
               : getPreviousAdjacentRange,
           );
         }}

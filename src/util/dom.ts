@@ -1,4 +1,5 @@
 import { on } from "svelte/events";
+import { isNotVoid } from "typed-assert";
 
 import {
   scrollOnHoverZoneHeightPercent,
@@ -17,6 +18,8 @@ export function getIsomorphicClientY(
   }
 
   const firstTouch = event.touches[0];
+
+  isNotVoid(firstTouch);
 
   return firstTouch.pageY;
 }

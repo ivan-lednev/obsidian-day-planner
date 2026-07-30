@@ -1,3 +1,5 @@
+import { isNotVoid } from "typed-assert";
+
 /**
  * Source:https://github.com/hperrin/svelte-material-ui
  */
@@ -39,6 +41,9 @@ export function useActions(
   if (actions) {
     for (let i = 0; i < actions.length; i++) {
       const actionEntry = actions[i];
+
+      isNotVoid(actionEntry);
+
       const action = Array.isArray(actionEntry) ? actionEntry[0] : actionEntry;
       if (Array.isArray(actionEntry) && actionEntry.length > 1) {
         actionReturns.push(

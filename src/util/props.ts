@@ -1,5 +1,6 @@
 import { Array, Either, pipe } from "effect";
 import { stringifyYaml } from "obsidian";
+import { isNotVoid } from "typed-assert";
 import { z } from "zod";
 
 import { clockFormat, codeFence } from "../constants";
@@ -108,8 +109,12 @@ export function clockOut(props: Props): Props {
     throw new Error("There is no open clock");
   }
 
+  const openClock = props.planner.log[openClockIndex];
+
+  isNotVoid(openClock);
+
   const updatedOpenClock = {
-    ...props.planner.log[openClockIndex],
+    ...openClock,
     end: window.moment().format(clockFormat),
   };
 
@@ -141,7 +146,11 @@ export function editLogEntry(
     throw new Error(`Log entry not found: ${originalStart}`);
   }
 
-  const updatedEntry = { ...log[index] };
+  const entry = log[index];
+
+  isNotVoid(entry);
+
+  const updatedEntry = { ...entry };
 
   if (patch.start !== undefined) {
     updatedEntry.start = patch.start;
@@ -192,7 +201,9 @@ export function editLastLogEntry(
     throw new Error("No log entries");
   }
 
-  const last = log[log.length - 1];
+  const last = log.at(-1);
+
+  isNotVoid(last);
 
   return editLogEntry(props, { originalStart: last.start, patch });
 }
@@ -220,7 +231,12 @@ export function updateProp(
   }
 
   const captureGroups = match[0];
+
+  isNotVoid(captureGroups);
+
   const [, key, previousValue] = captureGroups;
+
+  isNotVoid(previousValue);
 
   return `[${key}::${updateFn(previousValue)}]`;
 }

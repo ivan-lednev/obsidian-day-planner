@@ -9,6 +9,7 @@ import {
   DEFAULT_DAILY_NOTE_FORMAT,
   getDailyNoteSettings,
 } from "obsidian-daily-notes-interface";
+import { isNotVoid } from "typed-assert";
 
 export class PeriodicNotes {
   readonly DEFAULT_DAILY_NOTE_FORMAT = DEFAULT_DAILY_NOTE_FORMAT;
@@ -63,7 +64,11 @@ function join(...partSegments: string[]) {
   // Split the inputs into a list of path commands.
   let parts: string[] = [];
   for (let i = 0, l = partSegments.length; i < l; i++) {
-    parts = parts.concat(partSegments[i].split("/"));
+    const partSegment = partSegments[i];
+
+    isNotVoid(partSegment);
+
+    parts = parts.concat(partSegment.split("/"));
   }
   // Interpret the path commands to get the new resolved path.
   const newParts: string[] = [];

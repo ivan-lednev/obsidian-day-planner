@@ -90,6 +90,7 @@ export function findHeadingWithChildren(
 
   const planHeading = root.children[planHeadingIndex];
 
+  isNotVoid(planHeading);
   isHeading(planHeading);
 
   const nodesAfterHeading = root.children.slice(planHeadingIndex + 1);

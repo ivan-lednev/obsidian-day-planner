@@ -1,3 +1,5 @@
+import { isNotVoid } from "typed-assert";
+
 import { emDash } from "../constants";
 import type { DayPlannerSettings } from "../settings";
 import type { TimeBlock, WithDuration } from "../time-block-types";
@@ -14,6 +16,9 @@ export function notifyAboutStartedTasks(
   }
 
   const firstTimeBlock = timeBlocks[0];
+
+  isNotVoid(firstTimeBlock);
+
   const summary = getOneLineSummary(firstTimeBlock);
   const timestamp = createTimestamp(
     getMinutesSinceMidnight(firstTimeBlock.startTime),

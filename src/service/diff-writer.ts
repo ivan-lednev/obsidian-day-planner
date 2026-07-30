@@ -100,7 +100,11 @@ function applyRangeUpdate(lines: string[], rangeUpdate: RangeUpdate) {
   const count = endLine - startLine + 1;
 
   if (rangeUpdate.type === "updated") {
-    const indentation = result[startLine].substring(0, startCol);
+    const lineToUpdate = result[startLine];
+
+    isNotVoid(lineToUpdate);
+
+    const indentation = lineToUpdate.substring(0, startCol);
     const updatedLine = indentation + rangeUpdate.contents;
 
     // todo: use Array.prototype.with
