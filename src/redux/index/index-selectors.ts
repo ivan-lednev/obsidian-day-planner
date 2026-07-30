@@ -4,7 +4,7 @@ import { isNotVoid } from "typed-assert";
 import { addHorizontalPlacing } from "../../overlap/overlap";
 import type { LogTimeBlock } from "../../time-block-types";
 import { strictParse, toMinutePrecision } from "../../util/moment";
-import { clamp } from "../../util/time-block-utils";
+import { clampToTimeRange } from "../../util/time-block-utils";
 import { createAppSelector } from "../create-app-selector";
 import { selectVisibleDays } from "../date-ranges-slice";
 
@@ -66,7 +66,10 @@ export const selectLogTimeBlocksForDay = createAppSelector(
           currentTime,
         });
 
-        const clamped = clamp(timeBlock, startOfDay, endOfDay);
+        const clamped = clampToTimeRange(timeBlock, {
+          start: startOfDay,
+          end: endOfDay,
+        });
 
         return timeBlock.isRunning && isDayKeyForToday
           ? { ...clamped, truncated: ["bottom" as const] }

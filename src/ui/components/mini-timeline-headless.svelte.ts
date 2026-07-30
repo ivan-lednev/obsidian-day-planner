@@ -50,7 +50,10 @@ export class MiniTimeline {
         ),
       ),
       Array.map((it) => ({
-        ...t.clamp(it, this.rangeStart, this.rangeEnd),
+        ...t.clampToTimeRange(it, {
+          start: this.rangeStart,
+          end: this.rangeEnd,
+        }),
         leftPx: it.startTime.clone().diff(this.rangeStart, `minutes`),
       })),
       addHorizontalPlacing,

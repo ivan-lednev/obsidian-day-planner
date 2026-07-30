@@ -215,7 +215,7 @@ export function useEditContext(props: {
           .map(
             (timeBlock): TimelineTimeBlock =>
               t.isWithDuration(timeBlock)
-                ? t.truncateToRange(timeBlock, range)
+                ? t.truncateToDayRange(timeBlock, range)
                 : timeBlock,
           );
       },
