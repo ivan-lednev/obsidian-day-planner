@@ -10,7 +10,7 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { currentTimeSignal } from "../../global-store/current-time";
   import { settings } from "../../global-store/settings";
-  import { selectActiveLogEntries } from "../../redux/index/index-selectors";
+  import { selectActiveLogTimeBlocks } from "../../redux/index/index-selectors";
   import type { LogTimeBlock } from "../../time-block-types";
   import { runWithNoticeOnError } from "../../util/effect";
   import { removeMarkdownExtension } from "../../util/markdown";
@@ -33,7 +33,7 @@
   } = getObsidianContext();
 
   const activeLogRecords = useSelector((state) =>
-    selectActiveLogEntries(state, currentTimeSignal.current),
+    selectActiveLogTimeBlocks(state, currentTimeSignal.current),
   );
 </script>
 

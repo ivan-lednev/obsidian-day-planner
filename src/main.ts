@@ -32,7 +32,7 @@ import {
 } from "./mdast/mdast";
 import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { type IcalParseTaskResult } from "./redux/ical/init-ical-listeners";
-import { selectActiveLogEntries } from "./redux/index/index-selectors";
+import { selectActiveLogTimeBlocks } from "./redux/index/index-selectors";
 import { settingsUpdated } from "./redux/settings-slice";
 import {
   type AppDispatch,
@@ -583,23 +583,22 @@ export default class DayPlanner extends Plugin {
       id: "jump-to-active-clock",
       name: "Jump to active clock",
       callback: async () => {
-        const currentTasksWithActiveClockProps = selectActiveLogEntries(
+        const activeLogTimeBlocks = selectActiveLogTimeBlocks(
           store.getState(),
           window.moment(),
         );
 
-        if (currentTasksWithActiveClockProps.length === 0) {
+        if (activeLogTimeBlocks.length === 0) {
           new Notice("No active clocks found");
 
           return;
         }
 
-        const firstTaskWithActiveClockProp =
-          currentTasksWithActiveClockProps[0];
+        const firstActiveLogTimeBlock = activeLogTimeBlocks[0];
 
-        isNotVoid(firstTaskWithActiveClockProp);
+        isNotVoid(firstActiveLogTimeBlock);
 
-        await this.workspaceFacade.revealLocation(firstTaskWithActiveClockProp);
+        await this.workspaceFacade.revealLocation(firstActiveLogTimeBlock);
       },
     });
 

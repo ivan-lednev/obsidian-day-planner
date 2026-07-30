@@ -2,9 +2,9 @@ import { isNotVoid } from "typed-assert";
 import { describe, expect, test, vi } from "vitest";
 
 import {
-  selectActiveLogEntries,
-  selectLogEntriesForDay,
-  selectPlanEntriesForDays,
+  selectActiveLogTimeBlocks,
+  selectLogTimeBlocksForDay,
+  selectPlanTimeBlocksForDays,
 } from "../../src/redux";
 import {
   fileDeleted,
@@ -60,7 +60,7 @@ describe("Indexing", () => {
     const { getState } = await setUp();
 
     expect(
-      selectActiveLogEntries(getState(), window.moment("2025-01-01 18:30")),
+      selectActiveLogTimeBlocks(getState(), window.moment("2025-01-01 18:30")),
     ).toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Task"),
@@ -87,7 +87,7 @@ describe("Indexing", () => {
     ).toBeFalsy();
 
     expect(
-      selectLogEntriesForDay(getState(), "2025-01-01", window.moment()),
+      selectLogTimeBlocksForDay(getState(), "2025-01-01", window.moment()),
     ).toEqual([]);
   });
 
@@ -126,7 +126,7 @@ describe("Indexing", () => {
     const now = window.moment();
 
     expect(
-      selectLogEntriesForDay(getState(), getDayKey(now), now),
+      selectLogTimeBlocksForDay(getState(), getDayKey(now), now),
     ).toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Task"),
@@ -140,13 +140,13 @@ describe("Indexing", () => {
     const now = window.moment();
     const yesterday = now.clone().subtract(1, "day");
 
-    const logEntriesForYesterday = selectLogEntriesForDay(
+    const logTimeBlocksForYesterday = selectLogTimeBlocksForDay(
       getState(),
       getDayKey(yesterday),
       now,
     );
 
-    const activeClock = logEntriesForYesterday.find((it) =>
+    const activeClock = logTimeBlocksForYesterday.find((it) =>
       it.text.includes("Task"),
     );
 
@@ -157,7 +157,7 @@ describe("Indexing", () => {
     const { getState } = await setUp();
 
     expect(
-      selectLogEntriesForDay(
+      selectLogTimeBlocksForDay(
         getState(),
         "2025-07-18",
         strictParse("2025-07-18"),
@@ -175,14 +175,14 @@ describe("Indexing", () => {
     });
 
     expect(
-      selectPlanEntriesForDays(getState(), ["2025-07-28"]),
+      selectPlanTimeBlocksForDays(getState(), ["2025-07-28"]),
     ).not.toHaveLength(0);
 
     dispatch(fileDeleted({ path: "fixtures/fixture-vault/2025-07-28.md" }));
 
-    expect(selectPlanEntriesForDays(getState(), ["2025-07-28"])).toHaveLength(
-      0,
-    );
+    expect(
+      selectPlanTimeBlocksForDays(getState(), ["2025-07-28"]),
+    ).toHaveLength(0);
   });
 
   test("Replaces plan entries on file re-index without duplicates", async () => {
@@ -190,16 +190,16 @@ describe("Indexing", () => {
       loadedFixtures: ["2025-07-28.md"],
     });
 
-    const before = selectPlanEntriesForDays(getState(), ["2025-07-28"]);
+    const before = selectPlanTimeBlocksForDays(getState(), ["2025-07-28"]);
 
     expect(before.length).toBeGreaterThan(0);
 
     dispatch(indexRequested(["fixtures/fixture-vault/2025-07-28.md"]));
 
     await vi.waitFor(() => {
-      expect(selectPlanEntriesForDays(getState(), ["2025-07-28"])).toHaveLength(
-        before.length,
-      );
+      expect(
+        selectPlanTimeBlocksForDays(getState(), ["2025-07-28"]),
+      ).toHaveLength(before.length);
     });
   });
 
@@ -219,7 +219,7 @@ describe("Indexing", () => {
 
     await vi.waitFor(() => {
       expect(
-        selectLogEntriesForDay(
+        selectLogTimeBlocksForDay(
           getState(),
           "2025-07-18",
           strictParse("2025-07-18"),
@@ -235,7 +235,9 @@ describe("Indexing", () => {
   test("Stores tasks from daily notes basing their start time on daily note path", async () => {
     const { getState } = await setUp();
 
-    expect(selectPlanEntriesForDays(getState(), ["2025-07-28"])).toMatchObject([
+    expect(
+      selectPlanTimeBlocksForDays(getState(), ["2025-07-28"]),
+    ).toMatchObject([
       {
         text: expect.stringContaining("Before"),
       },
@@ -254,7 +256,7 @@ describe("Indexing", () => {
   test("Stores list items from daily notes basing their start time on daily note path", async () => {
     const { getState } = await setUp();
 
-    expect(selectPlanEntriesForDays(getState(), ["2025-07-19"])).toEqual(
+    expect(selectPlanTimeBlocksForDays(getState(), ["2025-07-19"])).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           text: expect.stringContaining("List item under planner heading"),
@@ -269,7 +271,7 @@ describe("Indexing", () => {
   test("Stores tasks from obsidian-tasks (scheduled)", async () => {
     const { getState } = await setUp();
 
-    expect(selectPlanEntriesForDays(getState(), ["2025-07-19"])).toEqual(
+    expect(selectPlanTimeBlocksForDays(getState(), ["2025-07-19"])).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           text: expect.stringContaining("Task with time"),
@@ -286,7 +288,7 @@ describe("Indexing", () => {
   test("Stores tasks scheduled via Dataview inline fields", async () => {
     const { getState } = await setUp();
 
-    expect(selectPlanEntriesForDays(getState(), ["2025-07-19"])).toEqual(
+    expect(selectPlanTimeBlocksForDays(getState(), ["2025-07-19"])).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           text: expect.stringContaining(
@@ -309,7 +311,9 @@ describe("Indexing", () => {
       loadedFixtures: ["2025-07-28.md"],
     });
 
-    expect(selectPlanEntriesForDays(getState(), ["2025-07-28"])).toContainEqual(
+    expect(
+      selectPlanTimeBlocksForDays(getState(), ["2025-07-28"]),
+    ).toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Parent"),
         children: [

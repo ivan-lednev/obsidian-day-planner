@@ -20,7 +20,7 @@ import type { Scheduler } from "../util/scheduler";
 import { dateRangesSlice } from "./date-ranges-slice";
 import { icalSlice, selectRemoteTimeBlocks } from "./ical/ical-slice";
 import type { IcalParseTaskResult } from "./ical/init-ical-listeners";
-import { selectPlanEntriesForVisibleDays } from "./index/index-selectors";
+import { selectPlanTimeBlocksForVisibleDays } from "./index/index-selectors";
 import { indexSlice } from "./index/index-slice";
 import { initListenerMiddleware } from "./listener-middleware";
 import { settingsSlice } from "./settings-slice";
@@ -95,7 +95,7 @@ export function createReactor(props: {
   const useSelector = createUseSelector<RootState>(store);
 
   const localTimeBlocksSignal = useSelector((state) =>
-    selectPlanEntriesForVisibleDays(state),
+    selectPlanTimeBlocksForVisibleDays(state),
   );
   const localTimeBlocks = toStore(() => localTimeBlocksSignal.current);
 

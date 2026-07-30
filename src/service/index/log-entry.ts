@@ -15,7 +15,7 @@ export function createLogEntry(props: {
     ? strictParse(end)
     : // TODO: P3 bug
       //  Solution 1: dispatch dayChanged() and update active clocks then; simple & works
-      //  Solution 2: calculate dayKeys for active clocks on the fly in selectActiveLogEntries selector
+      //  Solution 2: calculate dayKeys for active clocks on the fly in selectActiveLogTimeBlocks selector
       //  Solution 3: use sorted array instead of buckets
       window.moment();
 

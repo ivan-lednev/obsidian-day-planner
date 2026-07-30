@@ -6,7 +6,7 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import { currentTimeSignal, isToday } from "../../global-store/current-time";
   import { getVisibleHours, snap } from "../../global-store/derived-settings";
-  import { selectLogEntriesForDay } from "../../redux";
+  import { selectLogTimeBlocksForDay } from "../../redux";
   import { selectLogEntriesById } from "../../redux/index/index-slice";
   import type { LogTimeBlock } from "../../time-block-types";
   import {
@@ -54,7 +54,7 @@
   const dayKey = $derived(getDayKey(day));
 
   const logEntriesForDay = useSelector((state) =>
-    selectLogEntriesForDay(state, dayKey, currentTimeSignal.current),
+    selectLogTimeBlocksForDay(state, dayKey, currentTimeSignal.current),
   );
   const logEntriesById = useSelector(selectLogEntriesById);
 

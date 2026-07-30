@@ -1,9 +1,9 @@
 import { describe, expect, test } from "vitest";
 
 import {
-  selectActiveLogEntries,
-  selectLogEntriesForDay,
-  selectRecentLogEntries,
+  selectActiveLogTimeBlocks,
+  selectLogTimeBlocksForDay,
+  selectRecentLogTimeBlocks,
 } from "../../src/redux";
 import { fileDeleted } from "../../src/redux/index/index-slice";
 import { strictParse } from "../../src/util/moment";
@@ -24,7 +24,7 @@ describe("Frontmatter log indexing", () => {
     const { getState } = await setUp({ loadedFixtures: [closedLogFixture] });
 
     expect(
-      selectLogEntriesForDay(getState(), dayKey, strictParse(dayKey)),
+      selectLogTimeBlocksForDay(getState(), dayKey, strictParse(dayKey)),
     ).toContainEqual(
       expect.objectContaining({
         text: closedLogBasename,
@@ -37,7 +37,7 @@ describe("Frontmatter log indexing", () => {
   test("Surfaces frontmatter logs among recent log entries", async () => {
     const { getState } = await setUp({ loadedFixtures: [closedLogFixture] });
 
-    expect(selectRecentLogEntries(getState())).toContainEqual(
+    expect(selectRecentLogTimeBlocks(getState())).toContainEqual(
       expect.objectContaining({ text: closedLogBasename }),
     );
   });
@@ -46,7 +46,7 @@ describe("Frontmatter log indexing", () => {
     const { getState } = await setUp({ loadedFixtures: [openLogFixture] });
 
     expect(
-      selectActiveLogEntries(getState(), window.moment("2025-07-19 13:30")),
+      selectActiveLogTimeBlocks(getState(), window.moment("2025-07-19 13:30")),
     ).toContainEqual(
       expect.objectContaining({
         text: openLogBasename,
@@ -62,13 +62,13 @@ describe("Frontmatter log indexing", () => {
     });
 
     expect(
-      selectLogEntriesForDay(getState(), dayKey, strictParse(dayKey)),
+      selectLogTimeBlocksForDay(getState(), dayKey, strictParse(dayKey)),
     ).toHaveLength(1);
 
     dispatch(fileDeleted({ path: closedLogPath }));
 
     expect(
-      selectLogEntriesForDay(getState(), dayKey, strictParse(dayKey)),
+      selectLogTimeBlocksForDay(getState(), dayKey, strictParse(dayKey)),
     ).toEqual([]);
   });
 

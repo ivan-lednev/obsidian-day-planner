@@ -25,7 +25,7 @@ import {
   type ClosedLogEntry,
 } from "./index-slice";
 
-export const selectLogEntriesForDay = createAppSelector(
+export const selectLogTimeBlocksForDay = createAppSelector(
   [
     selectLogEntriesByDay,
     selectLogEntriesById,
@@ -83,9 +83,9 @@ const selectOpenLogEntries = createAppSelector(
   (logEntriesById) => Object.values(logEntriesById).filter((it) => !it.end),
 );
 
-const emptyActiveLogEntries: LogTimeBlock[] = [];
+const emptyActiveLogTimeBlocks: LogTimeBlock[] = [];
 
-export const selectActiveLogEntries = createAppSelector(
+export const selectActiveLogTimeBlocks = createAppSelector(
   [
     selectOpenLogEntries,
     selectTaskEntriesById,
@@ -94,7 +94,7 @@ export const selectActiveLogEntries = createAppSelector(
   ],
   (openLogEntries, taskEntriesById, fileEntriesById, minuteTimestamp) => {
     if (openLogEntries.length === 0) {
-      return emptyActiveLogEntries;
+      return emptyActiveLogTimeBlocks;
     }
 
     const currentTime = window.moment(minuteTimestamp);
@@ -131,7 +131,7 @@ const selectLatestClosedLogEntryByParentId = createAppSelector(
   },
 );
 
-export const selectRecentLogEntries = createAppSelector(
+export const selectRecentLogTimeBlocks = createAppSelector(
   [
     selectLatestClosedLogEntryByParentId,
     selectTaskEntriesById,
@@ -163,7 +163,7 @@ export const selectLatestClosedLogEndByParentId = createAppSelector(
   },
 );
 
-export const selectPlanEntriesForVisibleDays = createAppSelector(
+export const selectPlanTimeBlocksForVisibleDays = createAppSelector(
   [
     selectPlanEntriesByDay,
     selectPlanEntriesById,
@@ -201,7 +201,7 @@ export const selectPlanEntriesForVisibleDays = createAppSelector(
   },
 );
 
-export const selectPlanEntriesForDays = createAppSelector(
+export const selectPlanTimeBlocksForDays = createAppSelector(
   [
     selectPlanEntriesByDay,
     selectPlanEntriesById,

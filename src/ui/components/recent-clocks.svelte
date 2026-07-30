@@ -4,7 +4,7 @@
   import { debounce } from "obsidian";
 
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { selectRecentLogEntries } from "../../redux/index/index-selectors";
+  import { selectRecentLogTimeBlocks } from "../../redux/index/index-selectors";
   import type { LogTimeBlock } from "../../time-block-types";
   import { runWithNoticeOnError } from "../../util/effect";
   import { filterByKeywords } from "../../util/keyword-filter";
@@ -24,7 +24,7 @@
     getObsidianContext();
 
   const recentLogRecords = useSelector((state) =>
-    selectRecentLogEntries(state),
+    selectRecentLogTimeBlocks(state),
   );
 
   let fieldState = $state("");
