@@ -10,7 +10,7 @@
   import type { ActionArray } from "../actions/use-actions";
   import {
     useColoredTimeline,
-    useStylesForRelationToNow,
+    useColorsForRelationToNow,
   } from "../hooks/use-color.svelte";
   import { useTimeBlockVisuals } from "../hooks/use-time-block-visuals";
 
@@ -27,7 +27,7 @@
     useTimeBlockVisuals(timeBlock, { settingsStore }),
   );
 
-  const relationToNow = $derived(useStylesForRelationToNow(timeBlock));
+  const relationToNow = $derived(useColorsForRelationToNow(timeBlock));
 
   const padding = $derived(
     timeBlock.truncated?.includes("bottom") ? "0 1px 0" : undefined,

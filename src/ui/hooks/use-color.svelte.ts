@@ -12,7 +12,7 @@ interface UseColorProps {
   timeBlock: TimeBlock;
 }
 
-export function useStylesForRelationToNow(timeBlock: TimeBlock) {
+export function useColorsForRelationToNow(timeBlock: TimeBlock) {
   const relationToNow = $derived.by(() => {
     if (timeBlock.isAllDayEvent) {
       return getRelationToNow(

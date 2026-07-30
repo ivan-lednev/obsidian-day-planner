@@ -161,3 +161,9 @@ export function getDayKeysInRange(start: Moment, end: Moment) {
 export function strictParse(value: string) {
   return window.moment(value, window.moment.ISO_8601, true);
 }
+
+export function minutesToTimestamp(minutes: number) {
+  return window.moment
+    .utc(window.moment.duration(minutes, "minutes").asMilliseconds())
+    .format("HH:mm");
+}
