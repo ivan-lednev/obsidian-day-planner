@@ -589,6 +589,7 @@ export default class DayPlanner extends Plugin {
       callback: async () => {
         const currentTasksWithActiveClockProps = selectActiveLogEntries(
           store.getState(),
+          window.moment(),
         );
 
         if (currentTasksWithActiveClockProps.length === 0) {

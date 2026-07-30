@@ -15,7 +15,6 @@
   import { runWithNoticeOnError } from "../../util/effect";
   import { removeMarkdownExtension } from "../../util/markdown";
   import * as m from "../../util/moment";
-  import { getDiffInMinutes } from "../../util/moment";
   import { createActiveClockMenu } from "../active-clock-menu";
 
   import BlockControls from "./block-controls.svelte";
@@ -33,20 +32,12 @@
     useSelector,
   } = getObsidianContext();
 
-  const activeLogRecords = useSelector(selectActiveLogEntries);
-  // todo: duplication?
-  const activeLogRecordsCompat = $derived(
-    activeLogRecords.current.map((it) => ({
-      ...it,
-      durationMinutes: getDiffInMinutes(
-        it.startTime,
-        currentTimeSignal.current,
-      ),
-    })),
+  const activeLogRecords = useSelector((state) =>
+    selectActiveLogEntries(state, currentTimeSignal.current),
   );
 </script>
 
-<BlockList list={activeLogRecordsCompat}>
+<BlockList list={activeLogRecords.current}>
   {#snippet match(task: LogTimeBlock)}
     <Selectable
       onSecondarySelect={(event) =>

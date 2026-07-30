@@ -1,13 +1,12 @@
 import { derived, type Writable } from "svelte/store";
 
-import { getHiddenHoursSize } from "../../global-store/derived-settings";
+import { momentToTimelineOffset } from "../../global-store/derived-settings";
 import type { DayPlannerSettings } from "../../settings";
 import type {
   TimeBlock,
   WithPlacing,
   WithDuration,
 } from "../../time-block-types";
-import { getMinutesSinceMidnight } from "../../util/moment";
 
 interface UseTaskVisualsProps {
   settings: Writable<DayPlannerSettings>;
@@ -22,11 +21,7 @@ export function useTaskVisuals(
   const left = `${task.placing?.offsetPercent || 0}%`;
 
   const offset = derived(settings, ($settings) => {
-    const number =
-      getMinutesSinceMidnight(task.startTime) * $settings.zoomLevel -
-      getHiddenHoursSize($settings);
-
-    return `${number}px`;
+    return `${momentToTimelineOffset(task.startTime, $settings)}px`;
   });
 
   const height = derived(settings, ($settings) => {

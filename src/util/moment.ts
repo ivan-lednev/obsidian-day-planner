@@ -14,6 +14,10 @@ export function getMinutesSinceMidnight(moment: Moment) {
   return moment.diff(moment.clone().startOf("day"), "minutes");
 }
 
+export function toMinutePrecision(moment: Moment) {
+  return moment.clone().startOf("minute");
+}
+
 export function toMinutes(time: string) {
   const parsed = moment(time, defaultTimestampFormat);
 

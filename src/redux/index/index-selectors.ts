@@ -2,18 +2,20 @@ import type { Moment } from "moment";
 import { isNotVoid } from "typed-assert";
 
 import { addHorizontalPlacing } from "../../overlap/overlap";
-import type { LogTimeBlock } from "../../time-block-types";
-import { strictParse } from "../../util/moment";
+import { strictParse, toMinutePrecision } from "../../util/moment";
 import { clamp, getDayKey } from "../../util/time-block-utils";
 import { createAppSelector } from "../create-app-selector";
 import { selectVisibleDays } from "../global-slice";
 
 import {
-  isListItemEntry,
+  closedLogEntryToTimeBlock,
+  logEntryToTimeBlock,
+  planEntryToTimeBlock,
+} from "./entry-to-time-block";
+import {
   type FileSystemEntry,
   type ListItemEntry,
   type ListItemEntryWithChildren,
-  entryToTimeBlock,
   selectFileEntriesById,
   selectLogEntriesByDay,
   selectLogEntriesById,
@@ -35,7 +37,7 @@ export const selectLogEntriesForDay = createAppSelector(
   (byDay, byId, taskEntriesById, fileEntriesById, dayKey, currentTime) => {
     const parsedDay = strictParse(dayKey);
     const startOfDay = parsedDay.clone().startOf("day");
-    const endOfDay = parsedDay.clone().endOf("day");
+    const endOfDay = toMinutePrecision(parsedDay.clone().endOf("day"));
     const isDayKeyForToday = parsedDay.isSame(currentTime, "day");
 
     const uniqueLogEntryIds = Object.keys(byDay[dayKey] || {});
@@ -61,55 +63,17 @@ export const selectLogEntriesForDay = createAppSelector(
           `Inconsistent store state: task entry not found for ID: ${logEntryId}`,
         );
 
-        const parsedStart = strictParse(logEntry.start);
-        const parsedEnd = logEntry.end
-          ? strictParse(logEntry.end)
-          : currentTime;
-        const isActiveLogRecordForToday = isDayKeyForToday && !logEntry.end;
+        const timeBlock = logEntryToTimeBlock({
+          logEntry,
+          parentEntry: entry,
+          currentTime,
+        });
 
-        // todo: use adapter: logEntryToLocalTask
-        const base = {
-          id: logEntry.id,
-          text: entry.text,
-          startTime: parsedStart,
-          symbol: "-",
-          durationMinutes: parsedEnd.diff(parsedStart, "minutes"),
-          ...(isActiveLogRecordForToday
-            ? { truncated: ["bottom" as const] }
-            : {}),
-        };
+        const clamped = clamp(timeBlock, startOfDay, endOfDay);
 
-        let timeBlock: LogTimeBlock;
-
-        if (isListItemEntry(entry)) {
-          if (logEntry.source === "frontmatterLog") {
-            throw new Error(
-              "Inconsistent store state: a frontmatter log entry cannot be attached to a list item",
-            );
-          }
-
-          timeBlock = {
-            ...base,
-            source: logEntry.source,
-            status: entry.task,
-            path: entry.path,
-            position: entry.position,
-          };
-        } else {
-          if (logEntry.source !== "frontmatterLog") {
-            throw new Error(
-              "Inconsistent store state: only frontmatter log entries can be attached to file entries",
-            );
-          }
-
-          timeBlock = {
-            ...base,
-            source: logEntry.source,
-            path: entry.path,
-          };
-        }
-
-        return clamp(timeBlock, startOfDay, endOfDay);
+        return timeBlock.isRunning && isDayKeyForToday
+          ? { ...clamped, truncated: ["bottom" as const] }
+          : clamped;
       },
     );
 
@@ -147,7 +111,8 @@ export const selectRecentLogEntries = createAppSelector(
 
         isNotVoid(entry, "Inconsistent store state");
 
-        return entryToTimeBlock(logEntry, entry);
+        // todo: filter out active clocks
+        return closedLogEntryToTimeBlock({ logEntry, parentEntry: entry });
       },
     );
   },
@@ -195,7 +160,11 @@ export const selectPlanEntriesForVisibleDays = createAppSelector(
           listItemEntriesById,
         );
 
-        return entryToTimeBlock(planEntry, listItemEntry, withChildren);
+        return planEntryToTimeBlock({
+          planEntry,
+          parentEntry: listItemEntry,
+          listItemEntryWithChildren: withChildren,
+        });
       }) || []
     );
   },
@@ -228,7 +197,11 @@ export const selectPlanEntriesForDays = createAppSelector(
           listItemEntriesById,
         );
 
-        return entryToTimeBlock(planEntry, listItemEntry, withChildren);
+        return planEntryToTimeBlock({
+          planEntry,
+          parentEntry: listItemEntry,
+          listItemEntryWithChildren: withChildren,
+        });
       }) || []
     );
   },

@@ -59,11 +59,25 @@ export interface TasksPluginPropTimeBlock extends ListItemSourcedTimeBlockBase {
   source: "tasksPluginProp";
 }
 
-export interface ListItemLogTimeBlock extends ListItemSourcedTimeBlockBase {
+/**
+ * A running clock has no end in the file: the end of the block was resolved
+ * against the current moment, so consumers that care about the difference
+ * between a real and a resolved end read it here instead of going back to the
+ * index entry.
+ */
+interface WithRunningState {
+  isRunning: boolean;
+}
+
+export interface ListItemLogTimeBlock
+  extends ListItemSourcedTimeBlockBase,
+    WithRunningState {
   source: "listItemLog";
 }
 
-export interface FrontmatterLogTimeBlock extends LocalTimeBlockBase {
+export interface FrontmatterLogTimeBlock
+  extends LocalTimeBlockBase,
+    WithRunningState {
   source: "frontmatterLog";
   /**
    * Frontmatter logs are attached to a whole file, not to a line, so they

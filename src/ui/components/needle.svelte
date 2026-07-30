@@ -1,8 +1,7 @@
 <script lang="ts">
   import { currentTimeSignal } from "../../global-store/current-time";
-  import { timeToTimelineOffset } from "../../global-store/derived-settings";
+  import { momentToTimelineOffset } from "../../global-store/derived-settings";
   import { settings } from "../../global-store/settings";
-  import { getMinutesSinceMidnight } from "../../util/moment";
 
   interface Props {
     autoScrollBlocked?: boolean;
@@ -12,10 +11,7 @@
 
   let el: HTMLDivElement;
   const coords = $derived(
-    timeToTimelineOffset(
-      getMinutesSinceMidnight(currentTimeSignal.current),
-      $settings,
-    ),
+    momentToTimelineOffset(currentTimeSignal.current, $settings),
   );
 
   function scrollIntoView() {

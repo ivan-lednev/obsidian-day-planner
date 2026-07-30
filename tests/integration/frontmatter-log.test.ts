@@ -47,10 +47,13 @@ describe("Frontmatter log indexing", () => {
   test("Surfaces an open frontmatter clock as an active log entry", async () => {
     const { getState } = await setUp({ loadedFixtures: [openLogFixture] });
 
-    expect(selectActiveLogEntries(getState())).toContainEqual(
+    expect(
+      selectActiveLogEntries(getState(), window.moment("2025-07-19 13:30")),
+    ).toContainEqual(
       expect.objectContaining({
         text: openLogBasename,
         startTime: window.moment("2025-07-19 12:00"),
+        durationMinutes: 90,
       }),
     );
   });

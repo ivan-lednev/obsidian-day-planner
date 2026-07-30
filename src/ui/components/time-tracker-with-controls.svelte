@@ -2,6 +2,7 @@
   import { Plus } from "lucide-svelte";
 
   import { getObsidianContext } from "../../context/obsidian-context";
+  import { currentTimeSignal } from "../../global-store/current-time";
   import { selectActiveLogEntries } from "../../redux/index/index-slice";
 
   import ActiveClocks from "./active-clocks.svelte";
@@ -12,7 +13,9 @@
 
   const { useSelector, openClockInOnAnythingModal } = getObsidianContext();
 
-  const activeLogRecords = useSelector(selectActiveLogEntries);
+  const activeLogRecords = useSelector((state) =>
+    selectActiveLogEntries(state, currentTimeSignal.current),
+  );
 </script>
 
 <ErrorBoundary>

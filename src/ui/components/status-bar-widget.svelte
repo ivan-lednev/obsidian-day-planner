@@ -50,7 +50,11 @@
     showActiveClockInStatusBar,
   } = $derived(settingsSignal.current);
 
-  const activeLogRecords = $derived(useSelector(selectActiveLogEntries));
+  const activeLogRecords = $derived(
+    useSelector((state) =>
+      selectActiveLogEntries(state, currentTimeSignal.current),
+    ),
+  );
 
   const newestActiveClock = $derived(
     activeLogRecords.current

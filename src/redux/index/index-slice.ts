@@ -1,4 +1,5 @@
 import { type PayloadAction } from "@reduxjs/toolkit";
+import type { Moment } from "moment";
 import type { MetadataCache, Pos, Vault } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
@@ -6,14 +7,10 @@ import type {
   FileIndexContribution,
   IndexService,
 } from "../../service/index/index-service";
-import type {
-  IndexedTimeBlock,
-  LogTimeBlock,
-  PlanTimeBlock,
-} from "../../time-block-types";
-import { getDiffInMinutes, strictParse } from "../../util/moment";
 import { createAppSlice } from "../create-app-slice";
 import type { AppListenerEffect } from "../store";
+
+import { logEntryToTimeBlock } from "./entry-to-time-block";
 
 export interface FileSystemEntry {
   id: string;
@@ -49,6 +46,7 @@ export interface LogEntry {
   source: "listItemLog" | "frontmatterLog";
 }
 
+// todo: add RunningLogEntry
 export interface ClosedLogEntry extends LogEntry {
   end: string;
 }
@@ -59,7 +57,7 @@ export interface PlanEntry {
   id: string;
   parentId: string;
   start: string;
-  end?: string;
+  end: string;
   dayKeys: string[];
   source: "dailyNoteDate" | "tasksPluginProp";
 }
@@ -309,7 +307,8 @@ export const indexSlice = createAppSlice({
       );
     },
     // todo: should be memoized or stored in the index
-    selectActiveLogEntries: (state) =>
+    // todo: rename
+    selectActiveLogEntries: (state, currentTime: Moment) =>
       Object.values(state.logEntries.byId)
         .flat()
         .filter((it) => !it.end)
@@ -320,7 +319,11 @@ export const indexSlice = createAppSlice({
 
           isNotVoid(entry, "Inconsistent store state");
 
-          return entryToTimeBlock(logEntry, entry);
+          return logEntryToTimeBlock({
+            logEntry,
+            parentEntry: entry,
+            currentTime,
+          });
         }),
     selectListPropsPosition: (state, path: string, line: number) => {
       const taskEntriesForFile = state.taskEntries.byPath[path]?.map(
@@ -350,79 +353,6 @@ export type ListItemEntryWithChildren = Omit<
 > & {
   children?: ListItemEntryWithChildren[];
 };
-
-export function isListItemEntry(
-  entry: ListItemEntry | FileSystemEntry,
-): entry is ListItemEntry {
-  return "position" in entry;
-}
-
-export function entryToTimeBlock(
-  derivedEntry: PlanEntry,
-  parentEntry: ListItemEntry,
-  listItemEntryWithChildren?: ListItemEntryWithChildren,
-): PlanTimeBlock;
-
-export function entryToTimeBlock(
-  derivedEntry: LogEntry,
-  parentEntry: ListItemEntry | FileSystemEntry,
-  listItemEntryWithChildren?: ListItemEntryWithChildren,
-): LogTimeBlock;
-
-export function entryToTimeBlock(
-  derivedEntry: PlanEntry | LogEntry,
-  parentEntry: ListItemEntry | FileSystemEntry,
-  // todo: it duplicates the previous one, but for files it's not needed
-  listItemEntryWithChildren?: ListItemEntryWithChildren,
-): IndexedTimeBlock {
-  const startTime = strictParse(derivedEntry.start);
-  const durationMinutes = derivedEntry.end
-    ? getDiffInMinutes(strictParse(derivedEntry.end), startTime)
-    : // todo: use settings OR logic from dataview code
-      30;
-
-  const base = {
-    text: parentEntry.text,
-    startTime,
-    durationMinutes,
-    id: derivedEntry.id,
-    // todo: no need to use duck typing here?
-    isAllDayEvent:
-      "isAllDay" in derivedEntry ? derivedEntry.isAllDay : undefined,
-    children: listItemEntryWithChildren?.children,
-  };
-
-  if (isListItemEntry(parentEntry)) {
-    if (derivedEntry.source === "frontmatterLog") {
-      throw new Error(
-        "Inconsistent store state: a frontmatter log entry cannot be attached to a list item",
-      );
-    }
-
-    return {
-      ...base,
-      source: derivedEntry.source,
-      status: parentEntry.task,
-      task: parentEntry.task,
-      path: parentEntry.path,
-      position: parentEntry.position,
-      symbol: parentEntry.symbol,
-    };
-  }
-
-  if (derivedEntry.source !== "frontmatterLog") {
-    throw new Error(
-      "Inconsistent store state: only frontmatter log entries can be attached to file entries",
-    );
-  }
-
-  return {
-    ...base,
-    source: derivedEntry.source,
-    path: parentEntry.path,
-    symbol: "-",
-  };
-}
 
 export const { filesIndexed, indexRequested, fileDeleted } = indexSlice.actions;
 

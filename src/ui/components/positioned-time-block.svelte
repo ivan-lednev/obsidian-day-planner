@@ -29,6 +29,10 @@
 
   const relationToNow = $derived(useStylesForRelationToNow(task));
 
+  const padding = $derived(
+    task.truncated?.includes("bottom") ? "0 1px 0" : undefined,
+  );
+
   const coloredTimeline = $derived(useColoredTimeline(task));
   const { normal, muted, faint } = $derived(
     coloredTimeline.properContrastColors,
@@ -42,6 +46,7 @@
   style:--text-normal={normal}
   style:--time-block-height={$height}
   style:--time-block-left={left}
+  style:--time-block-padding={padding}
   style:--time-block-position="absolute"
   style:--time-block-top={$offset}
   style:--time-block-width={width}

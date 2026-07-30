@@ -59,10 +59,13 @@ describe("Indexing", () => {
   test("Returns time block views for active log entries", async () => {
     const { getState } = await setUp();
 
-    expect(selectActiveLogEntries(getState())).toContainEqual(
+    expect(
+      selectActiveLogEntries(getState(), window.moment("2025-01-01 18:30")),
+    ).toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Task"),
         startTime: window.moment("2025-01-01 17:00"),
+        durationMinutes: 90,
       }),
     );
   });
