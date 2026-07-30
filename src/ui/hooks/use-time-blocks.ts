@@ -64,7 +64,7 @@ export function useTimeBlocks(props: {
     workspaceFacade,
     onUpdate,
     onEditAborted,
-    settings: settingsStore,
+    settingsStore,
     localTimeBlocks,
     remoteTimeBlocks,
     pointerDateTime,
@@ -72,7 +72,7 @@ export function useTimeBlocks(props: {
   });
 
   const newlyStartedTimeBlocks = useNewlyStartedTimeBlocks({
-    settings: settingsStore,
+    settingsStore,
     timeBlocksWithTimeForToday,
     currentTime,
   });

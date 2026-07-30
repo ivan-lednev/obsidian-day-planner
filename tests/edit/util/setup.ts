@@ -28,7 +28,7 @@ function createProps({
   const workspaceFacade = vi.fn() as unknown as WorkspaceFacade;
 
   return {
-    settings: writable(settings),
+    settingsStore: writable(settings),
     onUpdate,
     onEditAborted,
     workspaceFacade,

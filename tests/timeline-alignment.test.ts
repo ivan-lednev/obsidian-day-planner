@@ -3,7 +3,7 @@ import { get } from "svelte/store";
 import { describe, expect, test } from "vitest";
 
 import { momentToTimelineOffset } from "../src/global-store/derived-settings";
-import { settings } from "../src/global-store/settings";
+import { settingsStore } from "../src/global-store/settings";
 import { logEntryToTimeBlock } from "../src/redux/index/entry-to-time-block";
 import type { ListItemEntry, LogEntry } from "../src/redux/index/index-slice";
 import { useTimeBlockVisuals } from "../src/ui/hooks/use-time-block-visuals";
@@ -45,7 +45,7 @@ function getBottomOffset(times: {
 }) {
   const { offset, height } = useTimeBlockVisuals(
     { ...baseTimeBlock, ...times },
-    { settings },
+    { settingsStore },
   );
 
   return parseFloat(get(offset)) + parseFloat(get(height));
@@ -62,7 +62,7 @@ describe("Blocks on the timeline", () => {
       );
 
       expect(getBottomOffset(times)).toBe(
-        momentToTimelineOffset(currentTime, get(settings)),
+        momentToTimelineOffset(currentTime, get(settingsStore)),
       );
     },
   );

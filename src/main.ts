@@ -1,5 +1,5 @@
 import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
-import { fromStore, get, type Readable, type Writable } from "svelte/store";
+import { get, type Readable, type Writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
 import {
@@ -20,7 +20,7 @@ import {
 import { createDumpMetadataCommand } from "./dump-metadata";
 import { VaultIndexAdapter } from "./feature/vault-index-adapter";
 import { currentTime } from "./global-store/current-time";
-import { settings } from "./global-store/settings";
+import { settingsSignal, settingsStore } from "./global-store/settings";
 import {
   compareByTimestampInText,
   fromMarkdown,
@@ -85,7 +85,7 @@ import { notifyAboutStartedTimeBlocks } from "./util/notify-about-started-time-b
 import { createBackgroundBatchScheduler } from "./util/scheduler";
 
 export default class DayPlanner extends Plugin {
-  settings!: () => DayPlannerSettings;
+  getSettings!: () => DayPlannerSettings;
   private settingsStore!: Writable<DayPlannerSettings>;
   private workspaceFacade!: WorkspaceFacade;
   private periodicNotes!: PeriodicNotes;
@@ -293,7 +293,7 @@ export default class DayPlanner extends Plugin {
     this.initRightPanelLeaf(viewTypeTimeTracker);
 
   private async handleNewPluginVersion() {
-    if (this.settings().pluginVersion === currentPluginVersion) {
+    if (this.getSettings().pluginVersion === currentPluginVersion) {
       return;
     }
 
@@ -302,7 +302,7 @@ export default class DayPlanner extends Plugin {
       pluginVersion: currentPluginVersion,
     }));
 
-    if (this.settings().releaseNotes) {
+    if (this.getSettings().releaseNotes) {
       this.app.workspace.onLayoutReady(async () => {
         await this.showReleaseNotes();
       });
@@ -428,18 +428,18 @@ export default class DayPlanner extends Plugin {
   }) {
     const { initialSettings, dispatch } = props;
 
-    settings.set(initialSettings);
+    settingsStore.set(initialSettings);
 
     this.register(
-      settings.subscribe(async (newValue) => {
+      settingsStore.subscribe(async (newValue) => {
         dispatch(settingsUpdated(newValue));
 
         await this.saveData(newValue);
       }),
     );
 
-    this.settingsStore = settings;
-    this.settings = () => get(settings);
+    this.settingsStore = settingsStore;
+    this.getSettings = () => get(settingsStore);
   }
 
   private async detachLeavesOfType(type: string) {
@@ -476,7 +476,7 @@ export default class DayPlanner extends Plugin {
     } = props;
 
     const onUpdate: OnUpdateFn = createUpdateHandler({
-      settings: this.settings,
+      getSettings: this.getSettings,
       transactionWriter: this.transactionWriter,
       vaultFacade: this.vaultFacade,
       periodicNotes: this.periodicNotes,
@@ -550,7 +550,7 @@ export default class DayPlanner extends Plugin {
 
     const openTimelineSettingsModal = createTimelineSettingsModalOpener(
       this.app,
-      settings,
+      settingsStore,
     );
 
     const destroyStatusBarWidget = mountStatusBarWidget({
@@ -568,7 +568,7 @@ export default class DayPlanner extends Plugin {
 
     this.register(
       newlyStartedTimeBlocks.subscribe((value) =>
-        notifyAboutStartedTimeBlocks(value, this.settings()),
+        notifyAboutStartedTimeBlocks(value, this.getSettings()),
       ),
     );
     this.addCommand({
@@ -611,13 +611,13 @@ export default class DayPlanner extends Plugin {
     }
 
     const editLine = createEditLineHandler({
-      settings: this.settings,
+      getSettings: this.getSettings,
       transactionWriter: this.transactionWriter,
       onConfirmed: this.undoNotice.show,
     });
 
     const deleteTimeBlock = createDeleteTimeBlockHandler({
-      settings: this.settings,
+      getSettings: this.getSettings,
       periodicNotes: this.periodicNotes,
       transactionWriter: this.transactionWriter,
       onConfirmed: this.undoNotice.show,
@@ -655,8 +655,8 @@ export default class DayPlanner extends Plugin {
       reSync,
       isOnline,
       isDarkMode,
-      settings,
-      settingsSignal: fromStore(settings),
+      settingsStore,
+      settingsSignal,
       pointerDateTime,
       dispatch,
       useSelector,

@@ -3,7 +3,7 @@ import type { Moment } from "moment";
 import { get } from "svelte/store";
 
 import { bullet, defaultDayFormat, emDash } from "../constants";
-import { settings } from "../global-store/settings";
+import { settingsStore } from "../global-store/settings";
 import { replaceOrPrependTimeRange } from "../parser/parser";
 import {
   obsidianBlockIdRegExp,
@@ -185,7 +185,7 @@ export function toString(timeBlock: WithDuration<EditableTimeBlock>) {
   const updatedTimestamp = createTimestamp(
     getMinutesSinceMidnight(timeBlock.startTime),
     timeBlock.durationMinutes,
-    get(settings).timestampFormat,
+    get(settingsStore).timestampFormat,
   );
   const listTokens = createMarkdownListTokens(timeBlock);
 

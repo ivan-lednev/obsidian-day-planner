@@ -1,7 +1,7 @@
 <script lang="ts">
   import { currentTimeSignal } from "../../global-store/current-time";
   import { momentToTimelineOffset } from "../../global-store/derived-settings";
-  import { settings } from "../../global-store/settings";
+  import { settingsStore } from "../../global-store/settings";
 
   interface Props {
     autoScrollBlocked?: boolean;
@@ -11,11 +11,11 @@
 
   let el: HTMLDivElement;
   const coords = $derived(
-    momentToTimelineOffset(currentTimeSignal.current, $settings),
+    momentToTimelineOffset(currentTimeSignal.current, $settingsStore),
   );
 
   function scrollIntoView() {
-    if ($settings.centerNeedle && !autoScrollBlocked) {
+    if ($settingsStore.centerNeedle && !autoScrollBlocked) {
       el?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }

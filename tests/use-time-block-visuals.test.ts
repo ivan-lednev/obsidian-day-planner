@@ -3,7 +3,7 @@ import { get, writable } from "svelte/store";
 import { vi, test, expect } from "vitest";
 
 import { currentTime } from "../src/global-store/current-time";
-import { settings } from "../src/global-store/settings";
+import { settingsStore } from "../src/global-store/settings";
 import { useTimeBlockVisuals } from "../src/ui/hooks/use-time-block-visuals";
 
 import { baseTimeBlock } from "./edit/util/fixtures";
@@ -15,7 +15,7 @@ vi.mock("obsidian", () => {
 function getBaseUseTimeBlockProps() {
   const cursorOffsetY = writable(0);
   return {
-    settings,
+    settingsStore,
     currentTime,
     cursorOffsetY,
     onUpdate: vi.fn(),
@@ -40,7 +40,7 @@ test.skip("tasks change position and size when zoom level changes", () => {
   );
 
   // TODO: this is leaking state to other tests, need to copy settings
-  settings.update((previous) => ({
+  settingsStore.update((previous) => ({
     ...previous,
     zoomLevel: 1,
   }));

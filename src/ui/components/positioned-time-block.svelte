@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
-  import { settings } from "../../global-store/settings";
+  import { settingsStore } from "../../global-store/settings";
   import type {
     TimeBlock,
     WithPlacing,
@@ -24,7 +24,7 @@
   } = $props();
 
   const { height, offset, width, left } = $derived(
-    useTimeBlockVisuals(timeBlock, { settings }),
+    useTimeBlockVisuals(timeBlock, { settingsStore }),
   );
 
   const relationToNow = $derived(useStylesForRelationToNow(timeBlock));

@@ -47,6 +47,13 @@ export type PointerDateTime = {
   type: "dateTime" | "date";
 };
 
+/**
+ * Naming: `settings` is always a plain `DayPlannerSettings` value,
+ * `settingsStore` is always the writable store and `settingsSignal` is always
+ * the signal over it. The `Signal` suffix is only carried where a same-named
+ * store exists to disambiguate from — signals without a store counterpart
+ * (`isDarkMode`, everything `useSelector` returns) go unsuffixed.
+ */
 export type Signal<T> = { current: T };
 
 export interface ObsidianContext {
@@ -61,7 +68,7 @@ export interface ObsidianContext {
   reSync: () => void;
   isOnline: Readable<boolean>;
   isDarkMode: Signal<boolean>;
-  settings: Writable<DayPlannerSettings>;
+  settingsStore: Writable<DayPlannerSettings>;
   settingsSignal: Signal<DayPlannerSettings>;
   pointerDateTime: Writable<PointerDateTime>;
   logEntryEditor: LogEntryEditor;

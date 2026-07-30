@@ -5,7 +5,7 @@
   import { getDateRangeContext } from "../../context/date-range-context";
   import { getObsidianContext } from "../../context/obsidian-context";
   import { getVisibleHours } from "../../global-store/derived-settings";
-  import { settings } from "../../global-store/settings";
+  import { settingsStore } from "../../global-store/settings";
   import type { TimelineTimeBlock } from "../../time-block-types";
 
   import BlockList from "./block-list.svelte";
@@ -73,7 +73,7 @@
   <div class="corner"></div>
 
   <div bind:this={rulerRef} class="ruler">
-    <Ruler visibleHours={getVisibleHours($settings)} />
+    <Ruler visibleHours={getVisibleHours($settingsStore)} />
     <div class="scrollbar-filler"></div>
   </div>
 

@@ -38,7 +38,7 @@
 
   const {
     workspaceFacade,
-    settings,
+    settingsStore,
     pointerDateTime,
     editContext,
     settingsSignal,
@@ -126,7 +126,7 @@
   <div bind:this={rulerRef} class="ruler">
     <Ruler
       --ruler-box-shadow="var(--shadow-right)"
-      visibleHours={getVisibleHours($settings)}
+      visibleHours={getVisibleHours($settingsStore)}
     />
     <div class="scrollbar-filler"></div>
   </div>
@@ -149,7 +149,7 @@
             🔵
           {/if}
 
-          {day.format($settings.timelineDateFormat)}
+          {day.format($settingsStore.timelineDateFormat)}
         </ControlButton>
       </div>
     {/each}
@@ -196,14 +196,14 @@
 
       <ControlButton
         label="Change columns"
-        onclick={(event) => createColumnChangeMenu({ event, settings })}
+        onclick={(event) => createColumnChangeMenu({ event, settingsStore })}
       >
         <Columns3 />
       </ControlButton>
 
       <ControlButton
         label="Configure columns"
-        onclick={(event) => createColumnSelectionMenu({ event, settings })}
+        onclick={(event) => createColumnSelectionMenu({ event, settingsStore })}
       >
         <TableColumnsSplit />
       </ControlButton>
@@ -212,7 +212,10 @@
         label="Show current period"
         onclick={() => {
           dateRange.set(
-            r.createRange($settings.multiDayRange, $settings.firstDayOfWeek),
+            r.createRange(
+              $settingsStore.multiDayRange,
+              $settingsStore.firstDayOfWeek,
+            ),
           );
         }}
       >
@@ -223,7 +226,7 @@
         label="Show next period"
         onclick={() => {
           dateRange.update(
-            $settings.multiDayRange === "work-week"
+            $settingsStore.multiDayRange === "work-week"
               ? ([firstDay]) => {
                   isNotVoid(firstDay);
 
@@ -240,7 +243,7 @@
         label="Show previous period"
         onclick={() => {
           dateRange.update(
-            $settings.multiDayRange === "work-week"
+            $settingsStore.multiDayRange === "work-week"
               ? ([firstDay]) => {
                   isNotVoid(firstDay);
 

@@ -41,7 +41,7 @@ export async function getTextFromUser(props: {
 
 export const createEditLineHandler =
   (props: {
-    settings: () => DayPlannerSettings;
+    getSettings: () => DayPlannerSettings;
     transactionWriter: TransactionWriter;
     onConfirmed: () => void;
   }) =>
@@ -59,7 +59,7 @@ export const createEditLineHandler =
 
     const transaction = createTransaction({
       updates: [update],
-      settings: props.settings(),
+      settings: props.getSettings(),
     });
 
     await props.transactionWriter.writeTransaction(transaction);
@@ -70,7 +70,7 @@ export const createEditLineHandler =
 // todo: merge with the other
 export const createDeleteTimeBlockHandler =
   (props: {
-    settings: () => DayPlannerSettings;
+    getSettings: () => DayPlannerSettings;
     periodicNotes: PeriodicNotes;
     transactionWriter: TransactionWriter;
     onConfirmed: () => void;
@@ -78,13 +78,13 @@ export const createDeleteTimeBlockHandler =
   async (timeBlock: PlanTimeBlock) => {
     const updates = mapTimeBlockDiffToUpdates(
       { deleted: [timeBlock] },
-      props.settings(),
+      props.getSettings(),
       props.periodicNotes,
     );
 
     const transaction = createTransaction({
       updates,
-      settings: props.settings(),
+      settings: props.getSettings(),
     });
 
     await props.transactionWriter.writeTransaction(transaction);
@@ -93,7 +93,7 @@ export const createDeleteTimeBlockHandler =
   };
 
 export const createUpdateHandler = (props: {
-  settings: () => DayPlannerSettings;
+  getSettings: () => DayPlannerSettings;
   transactionWriter: TransactionWriter;
   vaultFacade: VaultFacade;
   periodicNotes: PeriodicNotes;
@@ -103,7 +103,7 @@ export const createUpdateHandler = (props: {
   getConfirmationInput: (input: ConfirmationModalProps) => Promise<boolean>;
 }): OnUpdateFn => {
   const {
-    settings,
+    getSettings,
     transactionWriter,
     vaultFacade,
     onEditCanceled,
@@ -140,13 +140,17 @@ export const createUpdateHandler = (props: {
       diff.added[0] = { ...created, text: modalOutput };
     }
 
-    const updates = mapTimeBlockDiffToUpdates(diff, settings(), periodicNotes);
+    const updates = mapTimeBlockDiffToUpdates(
+      diff,
+      getSettings(),
+      periodicNotes,
+    );
 
-    const afterEach = settings().sortTasksInPlanAfterEdit
+    const afterEach = getSettings().sortTasksInPlanAfterEdit
       ? (contents: string) =>
           applyScopedUpdates(
             contents,
-            settings().plannerHeading,
+            getSettings().plannerHeading,
             sortListsRecursivelyInMarkdown,
           )
       : undefined;
@@ -155,7 +159,7 @@ export const createUpdateHandler = (props: {
       updates,
       // todo: delete
       afterEach,
-      settings: settings(),
+      settings: getSettings(),
     });
 
     const updatePaths = [...new Set([...transaction.map(({ path }) => path)])];

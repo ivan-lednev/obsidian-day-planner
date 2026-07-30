@@ -31,7 +31,7 @@ export default class TimelineView extends ItemView {
 
   constructor(
     leaf: WorkspaceLeaf,
-    private readonly settings: Writable<DayPlannerSettings>,
+    private readonly settingsStore: Writable<DayPlannerSettings>,
     private readonly componentContext: ComponentContext,
     private readonly dateRanges: ReturnType<typeof useDateRanges>,
     private readonly periodicNotes: PeriodicNotes,
@@ -58,7 +58,7 @@ export default class TimelineView extends ItemView {
   }
 
   getIcon() {
-    return get(this.settings).timelineIcon;
+    return get(this.settingsStore).timelineIcon;
   }
 
   onPaneMenu(menu: Menu, source: string) {
@@ -68,7 +68,7 @@ export default class TimelineView extends ItemView {
       reSync: this.reSync,
       initWeeklyView: this.initWeeklyView,
       openTimelineSettingsModal: this.openTimelineSettingsModal,
-      settings: this.settings,
+      settingsStore: this.settingsStore,
       openFileForDay: (day: Moment) => this.workspaceFacade.openFileForDay(day),
       getSelectedDay: this.getSelectedDay,
     });

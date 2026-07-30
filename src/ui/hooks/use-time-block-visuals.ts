@@ -9,23 +9,23 @@ import type {
 } from "../../time-block-types";
 
 interface UseTimeBlockVisualsProps {
-  settings: Writable<DayPlannerSettings>;
+  settingsStore: Writable<DayPlannerSettings>;
 }
 
 // todo: useTimeBlockPosition, move to one of stores, don't call inside component
 export function useTimeBlockVisuals(
   timeBlock: WithPlacing<WithDuration<TimeBlock>>,
-  { settings }: UseTimeBlockVisualsProps,
+  { settingsStore }: UseTimeBlockVisualsProps,
 ) {
   const width = `${timeBlock.placing?.spanPercent || 100}%`;
   const left = `${timeBlock.placing?.offsetPercent || 0}%`;
 
-  const offset = derived(settings, ($settings) => {
-    return `${momentToTimelineOffset(timeBlock.startTime, $settings)}px`;
+  const offset = derived(settingsStore, ($settingsStore) => {
+    return `${momentToTimelineOffset(timeBlock.startTime, $settingsStore)}px`;
   });
 
-  const height = derived(settings, ($settings) => {
-    return `${timeBlock.durationMinutes * $settings.zoomLevel}px`;
+  const height = derived(settingsStore, ($settingsStore) => {
+    return `${timeBlock.durationMinutes * $settingsStore.zoomLevel}px`;
   });
 
   return {

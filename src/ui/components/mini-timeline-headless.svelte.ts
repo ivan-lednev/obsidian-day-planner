@@ -17,7 +17,7 @@ export class MiniTimeline {
 
   constructor(
     private readonly currentTimeSignal: Signal<Moment>,
-    private readonly timeBlocksWithTimeForToday: Signal<
+    private readonly timeBlocksWithTimeForTodaySignal: Signal<
       Array<WithDuration<TimeBlock>>
     >,
   ) {}
@@ -39,7 +39,7 @@ export class MiniTimeline {
 
   displayedBlocks = $derived(
     pipe(
-      this.timeBlocksWithTimeForToday.current,
+      this.timeBlocksWithTimeForTodaySignal.current,
       Array.filter((it) =>
         doesOverlapWithRange(
           { start: it.startTime, end: t.getEndTime(it) },

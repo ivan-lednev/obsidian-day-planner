@@ -10,7 +10,7 @@ export interface TimelineViewMenuProps {
   initWeeklyView: ObsidianContext["initWeeklyView"];
   openTimelineSettingsModal: ObsidianContext["openTimelineSettingsModal"];
   openFileForDay: ObsidianContext["workspaceFacade"]["openFileForDay"];
-  settings: ObsidianContext["settings"];
+  settingsStore: ObsidianContext["settingsStore"];
   getSelectedDay: () => Moment | undefined;
 }
 
@@ -23,7 +23,7 @@ export function addTimelineViewMenuItems(
     initWeeklyView,
     openTimelineSettingsModal,
     openFileForDay,
-    settings,
+    settingsStore,
     getSelectedDay,
   } = props;
 
@@ -60,7 +60,7 @@ export function addTimelineViewMenuItems(
   );
 
   // Note: a section of their own makes Obsidian separate them with lines
-  addColumnSelectionItems({ menu, settings, section: "columns" });
+  addColumnSelectionItems({ menu, settingsStore, section: "columns" });
 
   menu.addItem((item) =>
     item

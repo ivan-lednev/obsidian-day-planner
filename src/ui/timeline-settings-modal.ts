@@ -15,9 +15,9 @@ const zoomLevelOptions = Object.fromEntries(
 
 export function createTimelineSettingsModalOpener(
   app: App,
-  settings: Writable<DayPlannerSettings>,
+  settingsStore: Writable<DayPlannerSettings>,
 ) {
-  const current = () => get(settings);
+  const current = () => get(settingsStore);
 
   return () => {
     const modal = new Modal(app).setTitle("Timeline settings");
@@ -30,7 +30,7 @@ export function createTimelineSettingsModalOpener(
             .addOptions(startHourOptions)
             .setValue(String(current().startHour))
             .onChange((value) => {
-              settings.update((previous) => ({
+              settingsStore.update((previous) => ({
                 ...previous,
                 startHour: Number(value),
               }));
@@ -43,7 +43,7 @@ export function createTimelineSettingsModalOpener(
             .addOptions(zoomLevelOptions)
             .setValue(String(current().zoomLevel))
             .onChange((value) => {
-              settings.update((previous) => ({
+              settingsStore.update((previous) => ({
                 ...previous,
                 zoomLevel: Number(value),
               }));
@@ -56,7 +56,7 @@ export function createTimelineSettingsModalOpener(
       .addSetting((setting) =>
         setting.setName("Auto-scroll to now").addToggle((toggle) =>
           toggle.setValue(current().centerNeedle).onChange((value) => {
-            settings.update((previous) => ({
+            settingsStore.update((previous) => ({
               ...previous,
               centerNeedle: value,
             }));
@@ -66,7 +66,7 @@ export function createTimelineSettingsModalOpener(
       .addSetting((setting) =>
         setting.setName("Show completed tasks").addToggle((toggle) =>
           toggle.setValue(current().showCompletedTasks).onChange((value) => {
-            settings.update((previous) => ({
+            settingsStore.update((previous) => ({
               ...previous,
               showCompletedTasks: value,
             }));
@@ -78,7 +78,7 @@ export function createTimelineSettingsModalOpener(
           toggle
             .setValue(current().showSubtasksInTaskBlocks)
             .onChange((value) => {
-              settings.update((previous) => ({
+              settingsStore.update((previous) => ({
                 ...previous,
                 showSubtasksInTaskBlocks: value,
               }));
@@ -94,7 +94,7 @@ export function createTimelineSettingsModalOpener(
           toggle
             .setValue(current().showUnscheduledNestedTasks)
             .onChange((value) => {
-              settings.update((previous) => ({
+              settingsStore.update((previous) => ({
                 ...previous,
                 showUnscheduledNestedTasks: value,
               }));

@@ -54,7 +54,7 @@ export function useEditContext(props: {
   workspaceFacade: WorkspaceFacade;
   periodicNotes: PeriodicNotes;
   onUpdate: OnUpdateFn;
-  settings: Readable<DayPlannerSettings>;
+  settingsStore: Readable<DayPlannerSettings>;
   localTimeBlocks: Readable<EditableTimeBlock[]>;
   remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
   pointerDateTime: Readable<PointerDateTime>;
@@ -66,7 +66,7 @@ export function useEditContext(props: {
     periodicNotes,
     onEditAborted,
     onUpdate,
-    settings,
+    settingsStore,
     localTimeBlocks,
     remoteTimeBlocks,
     pointerDateTime,
@@ -92,9 +92,9 @@ export function useEditContext(props: {
   const cursor = useCursor(editOperation);
 
   const localFilteredTimeBlocks = derived(
-    [localTimeBlocks, settings],
-    ([$localTimeBlocks, $settings]) =>
-      $settings.showCompletedTasks
+    [localTimeBlocks, settingsStore],
+    ([$localTimeBlocks, $settingsStore]) =>
+      $settingsStore.showCompletedTasks
         ? $localTimeBlocks
         : $localTimeBlocks.filter(
             (it) => !it.task || it.task.toLowerCase() !== "x",
@@ -106,13 +106,18 @@ export function useEditContext(props: {
   });
 
   const timeBlocksWithPendingUpdate = derived(
-    [editOperation, baselineTimeBlocks, settings, pointerDateTime],
-    ([$editOperation, $baselineTimeBlocks, $settings, $pointerDateTime]) => {
+    [editOperation, baselineTimeBlocks, settingsStore, pointerDateTime],
+    ([
+      $editOperation,
+      $baselineTimeBlocks,
+      $settingsStore,
+      $pointerDateTime,
+    ]) => {
       return $editOperation
         ? transform(
             $baselineTimeBlocks,
             $editOperation,
-            $settings,
+            $settingsStore,
             $pointerDateTime,
           )
         : $baselineTimeBlocks;
@@ -132,7 +137,7 @@ export function useEditContext(props: {
     workspaceFacade,
     startEdit,
     editOperation,
-    settings,
+    settingsStore,
   });
 
   const combinedTimeBlocks = derived(

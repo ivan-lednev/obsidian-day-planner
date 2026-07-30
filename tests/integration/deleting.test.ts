@@ -16,7 +16,7 @@ describe("Deleting tasks", () => {
     );
 
     const deleteTimeBlock = createDeleteTimeBlockHandler({
-      settings: () => defaultSettingsForTests,
+      getSettings: () => defaultSettingsForTests,
       periodicNotes,
       transactionWriter,
       onConfirmed: () => {},
@@ -35,7 +35,7 @@ describe("Deleting tasks", () => {
     );
 
     const deleteTimeBlock = createDeleteTimeBlockHandler({
-      settings: () => defaultSettingsForTests,
+      getSettings: () => defaultSettingsForTests,
       periodicNotes,
       transactionWriter,
       onConfirmed: () => {},

@@ -33,7 +33,7 @@
   }: { day: Moment; isUnderCursor?: boolean } = $props();
 
   const {
-    settings,
+    settingsStore,
     editContext: {
       confirmEdit,
       handlers: { handleContainerMouseDown },
@@ -96,7 +96,7 @@
   function updatePointerDateTime(event: MouseEvent | TouchEvent) {
     isNotVoid(el);
 
-    const newOffsetY = snap(getPointerOffsetY(el, event), $settings);
+    const newOffsetY = snap(getPointerOffsetY(el, event), $settingsStore);
     const minutesSinceMidnight = offsetYToMinutes(
       newOffsetY,
       settingsSignal.current.zoomLevel,
@@ -139,8 +139,8 @@
 </script>
 
 <div class="timeline">
-  {#if $settings.timelineColumns.planner}
-    <Column visibleHours={getVisibleHours($settings)}>
+  {#if $settingsStore.timelineColumns.planner}
+    <Column visibleHours={getVisibleHours($settingsStore)}>
       {#if $isToday(day)}
         <Needle autoScrollBlocked={isUnderCursor} />
       {/if}
@@ -172,8 +172,8 @@
     </Column>
   {/if}
 
-  {#if $settings.timelineColumns.timeTracker}
-    <Column visibleHours={getVisibleHours($settings)}>
+  {#if $settingsStore.timelineColumns.timeTracker}
+    <Column visibleHours={getVisibleHours($settingsStore)}>
       {#if $isToday(day)}
         <Needle autoScrollBlocked={isUnderCursor} />
       {/if}

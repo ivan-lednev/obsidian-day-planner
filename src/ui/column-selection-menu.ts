@@ -10,12 +10,12 @@ const columnTitles: Record<TimelineColumnType, string> = {
 
 export function addColumnSelectionItems(props: {
   menu: Menu;
-  settings: Writable<DayPlannerSettings>;
+  settingsStore: Writable<DayPlannerSettings>;
   section?: string;
 }) {
-  const { menu, settings, section } = props;
+  const { menu, settingsStore, section } = props;
 
-  const currentColumns = get(settings).timelineColumns;
+  const currentColumns = get(settingsStore).timelineColumns;
   const visibleColumnCount =
     Object.values(currentColumns).filter(Boolean).length;
 
@@ -37,7 +37,7 @@ export function addColumnSelectionItems(props: {
             return;
           }
 
-          settings.update((previous) => ({
+          settingsStore.update((previous) => ({
             ...previous,
             timelineColumns: {
               ...previous.timelineColumns,
@@ -50,13 +50,13 @@ export function addColumnSelectionItems(props: {
 }
 
 export function createColumnSelectionMenu(props: {
-  settings: Writable<DayPlannerSettings>;
+  settingsStore: Writable<DayPlannerSettings>;
   event: MouseEvent;
 }) {
-  const { settings, event } = props;
+  const { settingsStore, event } = props;
   const menu = new Menu();
 
-  addColumnSelectionItems({ menu, settings });
+  addColumnSelectionItems({ menu, settingsStore });
 
   menu.showAtMouseEvent(event);
 }

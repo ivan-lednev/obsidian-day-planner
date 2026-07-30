@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getHourSize } from "../../global-store/derived-settings";
-  import { settings } from "../../global-store/settings";
+  import { settingsStore } from "../../global-store/settings";
 
   export let visibleHours: number[];
 </script>
@@ -8,9 +8,9 @@
 <div class="column">
   <slot />
   {#each visibleHours as hour}
-    <div style:height="{getHourSize($settings)}px" class="hour-block">
+    <div style:height="{getHourSize($settingsStore)}px" class="hour-block">
       <div
-        style:height="{getHourSize($settings) / 2}px"
+        style:height="{getHourSize($settingsStore) / 2}px"
         class="half-hour-separator"
       ></div>
     </div>

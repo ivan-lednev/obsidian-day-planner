@@ -9,7 +9,7 @@
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { currentTimeSignal } from "../../global-store/current-time";
-  import { settings } from "../../global-store/settings";
+  import { settingsStore } from "../../global-store/settings";
   import { selectActiveLogTimeBlocks } from "../../redux/index/index-selectors";
   import type { LogTimeBlock } from "../../time-block-types";
   import { runWithNoticeOnError } from "../../util/effect";
@@ -99,13 +99,15 @@
               />
               <Pill
                 key={Play}
-                value={timeBlock.startTime.format($settings.timestampFormat)}
+                value={timeBlock.startTime.format(
+                  $settingsStore.timestampFormat,
+                )}
               />
               <Pill
                 key={Hourglass}
                 value={m
                   .fromDiff(timeBlock.startTime, currentTimeSignal.current)
-                  .format($settings.timestampFormat)}
+                  .format($settingsStore.timestampFormat)}
               />
             </Properties>
           {/snippet}

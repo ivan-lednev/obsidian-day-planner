@@ -7,7 +7,7 @@
   import { getDateRangeContext } from "../../context/date-range-context";
   import { getIsInSidebarContext } from "../../context/is-in-sidebar-context";
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { settings } from "../../global-store/settings";
+  import { settingsStore } from "../../global-store/settings";
   import { getFullWeek } from "../../util/range";
   import { addTimelineViewMenuItems } from "../timeline-view-menu";
 
@@ -32,7 +32,9 @@
 
     return day;
   });
-  const week = $derived(getFullWeek(selectedDay, $settings.firstDayOfWeek));
+  const week = $derived(
+    getFullWeek(selectedDay, $settingsStore.firstDayOfWeek),
+  );
 
   function goToToday() {
     dateRange.set([window.moment()]);
@@ -69,7 +71,7 @@
       reSync,
       initWeeklyView,
       openTimelineSettingsModal,
-      settings,
+      settingsStore,
       openFileForDay: (day: Moment) => workspaceFacade.openFileForDay(day),
       getSelectedDay: () => selectedDay,
     });

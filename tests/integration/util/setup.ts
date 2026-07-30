@@ -191,7 +191,7 @@ export async function setUp(props?: {
   });
 
   const onUpdate = createUpdateHandler({
-    settings: () => settings,
+    getSettings: () => settings,
     transactionWriter,
     vaultFacade,
     periodicNotes,

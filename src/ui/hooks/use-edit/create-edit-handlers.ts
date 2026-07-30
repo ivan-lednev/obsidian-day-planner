@@ -20,7 +20,7 @@ export interface UseEditHandlersProps {
   startEdit: (operation: EditOperation) => void;
   workspaceFacade: WorkspaceFacade;
   editOperation: Writable<EditOperation | undefined>;
-  settings: Readable<DayPlannerSettings>;
+  settingsStore: Readable<DayPlannerSettings>;
   pointerDateTime: Readable<PointerDateTime>;
   periodicNotes: PeriodicNotes;
 }
@@ -30,7 +30,7 @@ export function createEditHandlers({
   periodicNotes,
   startEdit,
   editOperation,
-  settings,
+  settingsStore,
   pointerDateTime,
 }: UseEditHandlersProps) {
   function handleContainerMouseDown() {
@@ -47,7 +47,7 @@ export function createEditHandlers({
     const newTimeBlock = t.create({
       day: pointerDay,
       startMinutes: pointerMinutes,
-      settings: get(settings),
+      settings: get(settingsStore),
     });
 
     startEdit({

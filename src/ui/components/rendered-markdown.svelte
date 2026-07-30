@@ -20,7 +20,7 @@
     bottomDecoration,
   }: { timeBlock: LocalTimeBlock; bottomDecoration?: Snippet } = $props();
 
-  const { renderMarkdown, toggleCheckboxInFile, settings } =
+  const { renderMarkdown, toggleCheckboxInFile, settingsStore } =
     getObsidianContext();
 
   const onCheckboxLineClick = $derived(
@@ -71,7 +71,7 @@
   {/snippet}
 
   {#snippet contents()}
-    {#if $settings.showSubtasksInTaskBlocks && nestedListItems}
+    {#if $settingsStore.showSubtasksInTaskBlocks && nestedListItems}
       <div
         class="markdown-wrapper lines-after-first-wrapper"
         {@attach createRenderMarkdownAttachment({

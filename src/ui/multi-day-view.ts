@@ -20,7 +20,7 @@ export default class MultiDayView extends ItemView {
 
   constructor(
     leaf: WorkspaceLeaf,
-    private readonly settings: Writable<DayPlannerSettings>,
+    private readonly settingsStore: Writable<DayPlannerSettings>,
     private readonly componentContext: ComponentContext,
     private readonly dateRanges: ReturnType<typeof useDateRanges>,
   ) {
@@ -48,7 +48,7 @@ export default class MultiDayView extends ItemView {
 
     isNotVoid(contentEl);
 
-    const currentSettings = get(this.settings);
+    const currentSettings = get(this.settingsStore);
 
     const range = r.createRange(
       currentSettings.multiDayRange,
@@ -61,15 +61,18 @@ export default class MultiDayView extends ItemView {
     this.register(dateRange.onChange(this.updateTabTitleAndHeader));
     this.updateTabTitleAndHeader();
 
-    const relevantSettingsSignal = derived(this.settings, ($settings) => {
-      return {
-        multiDayRange: $settings.multiDayRange,
-        firstDayOfWeek: $settings.firstDayOfWeek,
-      };
-    });
+    const relevantSettingsSignal = derived(
+      this.settingsStore,
+      ($settingsStore) => {
+        return {
+          multiDayRange: $settingsStore.multiDayRange,
+          firstDayOfWeek: $settingsStore.firstDayOfWeek,
+        };
+      },
+    );
 
     // todo: remove manual state synchronization
-    const initialSettings = get(this.settings);
+    const initialSettings = get(this.settingsStore);
     let previousMultiDayRange = initialSettings.multiDayRange;
     let previousFirstDayOfWeek = initialSettings.firstDayOfWeek;
 
