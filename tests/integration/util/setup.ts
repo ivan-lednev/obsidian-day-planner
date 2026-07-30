@@ -12,7 +12,7 @@ import { type IcalParseTaskResult } from "../../../src/redux/ical/init-ical-list
 import {
   indexRequested,
   selectFileEntriesById,
-  selectTaskEntriesById,
+  selectListItemEntriesById,
 } from "../../../src/redux/index/index-slice";
 import { createReactor, type RootState } from "../../../src/redux/store";
 import { TransactionWriter } from "../../../src/service/diff-writer";
@@ -254,13 +254,13 @@ export async function setUp(props?: {
 
   await vi.waitFor(() => {
     // todo: replace with explicit `index.state === 'warm'`
-    const taskEntries = selectTaskEntriesById(store.getState());
+    const listItemEntries = selectListItemEntriesById(store.getState());
     const fileEntries = selectFileEntriesById(store.getState());
 
-    const taskEntriesCount = Object.keys(taskEntries).length;
+    const listItemEntriesCount = Object.keys(listItemEntries).length;
     const fileEntriesCount = Object.keys(fileEntries).length;
 
-    expect(taskEntriesCount + fileEntriesCount).toBeGreaterThan(0);
+    expect(listItemEntriesCount + fileEntriesCount).toBeGreaterThan(0);
   });
 
   return {

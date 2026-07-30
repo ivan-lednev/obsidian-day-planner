@@ -14,7 +14,7 @@ export interface FileWithMetadata {
 }
 
 export interface FileIndexContribution {
-  taskEntries?: ListItemEntry[];
+  listItemEntries?: ListItemEntry[];
   fileEntries?: FileSystemEntry[];
   logEntries?: LogEntry[];
   planEntries?: PlanEntry[];

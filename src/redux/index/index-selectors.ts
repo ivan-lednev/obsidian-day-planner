@@ -21,7 +21,7 @@ import {
   selectLogEntriesById,
   selectPlanEntriesByDay,
   selectPlanEntriesById,
-  selectTaskEntriesById,
+  selectListItemEntriesById,
   type ClosedLogEntry,
 } from "./index-slice";
 
@@ -29,12 +29,12 @@ export const selectLogTimeBlocksForDay = createAppSelector(
   [
     selectLogEntriesByDay,
     selectLogEntriesById,
-    selectTaskEntriesById,
+    selectListItemEntriesById,
     selectFileEntriesById,
     (state, dayKey: string) => dayKey,
     (state, dayKey, currentTime: Moment) => currentTime,
   ],
-  (byDay, byId, taskEntriesById, fileEntriesById, dayKey, currentTime) => {
+  (byDay, byId, listItemEntriesById, fileEntriesById, dayKey, currentTime) => {
     const parsedDay = strictParse(dayKey);
     const startOfDay = parsedDay.clone().startOf("day");
     const endOfDay = toMinutePrecision(parsedDay.clone().endOf("day"));
@@ -52,12 +52,12 @@ export const selectLogTimeBlocksForDay = createAppSelector(
         );
 
         const entry =
-          taskEntriesById[logEntry.parentId] ??
+          listItemEntriesById[logEntry.parentId] ??
           fileEntriesById[logEntry.parentId];
 
         isNotVoid(
           entry,
-          `Inconsistent store state: task entry not found for ID: ${logEntryId}`,
+          `Inconsistent store state: parent entry not found for log entry ${logEntryId}`,
         );
 
         const timeBlock = logEntryToTimeBlock({
@@ -88,11 +88,11 @@ const emptyActiveLogTimeBlocks: LogTimeBlock[] = [];
 export const selectActiveLogTimeBlocks = createAppSelector(
   [
     selectOpenLogEntries,
-    selectTaskEntriesById,
+    selectListItemEntriesById,
     selectFileEntriesById,
     (state, currentTime: Moment) => toMinutePrecision(currentTime).valueOf(),
   ],
-  (openLogEntries, taskEntriesById, fileEntriesById, minuteTimestamp) => {
+  (openLogEntries, listItemEntriesById, fileEntriesById, minuteTimestamp) => {
     if (openLogEntries.length === 0) {
       return emptyActiveLogTimeBlocks;
     }
@@ -101,7 +101,7 @@ export const selectActiveLogTimeBlocks = createAppSelector(
 
     return openLogEntries.map((logEntry) => {
       const entry =
-        taskEntriesById[logEntry.parentId] ??
+        listItemEntriesById[logEntry.parentId] ??
         fileEntriesById[logEntry.parentId];
 
       isNotVoid(entry, "Inconsistent store state");
@@ -134,14 +134,15 @@ const selectLatestClosedLogEntryByParentId = createAppSelector(
 export const selectRecentLogTimeBlocks = createAppSelector(
   [
     selectLatestClosedLogEntryByParentId,
-    selectTaskEntriesById,
+    selectListItemEntriesById,
     selectFileEntriesById,
   ],
-  (latestClosedLogEntryByParentId, taskEntriesById, fileEntriesById) => {
+  (latestClosedLogEntryByParentId, listItemEntriesById, fileEntriesById) => {
     return [...latestClosedLogEntryByParentId].map(
-      ([taskEntryId, logEntry]) => {
+      ([listItemEntryId, logEntry]) => {
         const entry =
-          taskEntriesById[taskEntryId] ?? fileEntriesById[taskEntryId];
+          listItemEntriesById[listItemEntryId] ??
+          fileEntriesById[listItemEntryId];
 
         isNotVoid(entry, "Inconsistent store state");
 
@@ -167,7 +168,7 @@ export const selectPlanTimeBlocksForVisibleDays = createAppSelector(
   [
     selectPlanEntriesByDay,
     selectPlanEntriesById,
-    selectTaskEntriesById,
+    selectListItemEntriesById,
     selectVisibleDays,
   ],
   // todo: copy-pasta. Can we re-use it without breaking caching?
@@ -205,16 +206,16 @@ export const selectPlanTimeBlocksForDays = createAppSelector(
   [
     selectPlanEntriesByDay,
     selectPlanEntriesById,
-    selectTaskEntriesById,
+    selectListItemEntriesById,
     (state, dayKeys: string[]) => dayKeys,
   ],
   (planEntriesByDay, planEntriesById, listItemEntriesById, dayKeys) => {
-    const uniqueListItemIds = new Set(
+    const uniquePlanEntryIds = new Set(
       dayKeys.flatMap((dayKey) => Object.keys(planEntriesByDay[dayKey] || {})),
     );
 
     return (
-      [...uniqueListItemIds]?.map((id) => {
+      [...uniquePlanEntryIds]?.map((id) => {
         const planEntry = planEntriesById[id];
 
         isNotVoid(planEntry, "Inconsistent index state");

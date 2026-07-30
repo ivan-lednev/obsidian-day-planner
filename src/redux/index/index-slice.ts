@@ -60,7 +60,7 @@ export interface PlanEntry {
 }
 
 interface IndexSliceState {
-  taskEntries: {
+  listItemEntries: {
     byId: Record<string, ListItemEntry>;
     byPath: Record<string, string[]>;
   };
@@ -81,7 +81,7 @@ interface IndexSliceState {
 }
 
 const initialState: IndexSliceState = {
-  taskEntries: { byPath: {}, byId: {} },
+  listItemEntries: { byPath: {}, byId: {} },
   fileEntries: { byPath: {}, byId: {} },
   logEntries: {
     byPath: {},
@@ -97,7 +97,7 @@ const initialState: IndexSliceState = {
 
 interface FileIndex {
   path: string;
-  taskEntries?: ListItemEntry[];
+  listItemEntries?: ListItemEntry[];
   fileEntries?: FileSystemEntry[];
   logEntries?: LogEntry[];
   planEntries?: PlanEntry[];
@@ -118,13 +118,13 @@ export const indexSlice = createAppSlice({
       (state, action: PayloadAction<FileDeletedPayload>) => {
         const { path } = action.payload;
 
-        const taskEntryIds = state.taskEntries.byPath[path] || [];
+        const listItemEntryIds = state.listItemEntries.byPath[path] || [];
 
-        taskEntryIds.forEach((id) => {
-          delete state.taskEntries.byId[id];
+        listItemEntryIds.forEach((id) => {
+          delete state.listItemEntries.byId[id];
         });
 
-        delete state.taskEntries.byPath[path];
+        delete state.listItemEntries.byPath[path];
 
         const fileEntryIds = state.fileEntries.byPath[path] || [];
 
@@ -188,22 +188,30 @@ export const indexSlice = createAppSlice({
         const fileIndexes = action.payload;
 
         fileIndexes.forEach((fileIndex) => {
-          const { path, taskEntries, fileEntries, logEntries, planEntries } =
-            fileIndex;
+          const {
+            path,
+            listItemEntries,
+            fileEntries,
+            logEntries,
+            planEntries,
+          } = fileIndex;
 
           // todo: repeat for logEntries
-          const previousTaskEntryIds = state.taskEntries.byPath[path] || [];
+          const previousListItemEntryIds =
+            state.listItemEntries.byPath[path] || [];
 
-          previousTaskEntryIds.forEach((id) => {
-            delete state.taskEntries.byId[id];
+          previousListItemEntryIds.forEach((id) => {
+            delete state.listItemEntries.byId[id];
           });
 
           // todo: copy pasta
-          if (taskEntries) {
-            state.taskEntries.byPath[path] = taskEntries.map((it) => it.id);
+          if (listItemEntries) {
+            state.listItemEntries.byPath[path] = listItemEntries.map(
+              (it) => it.id,
+            );
 
-            taskEntries.forEach((it) => {
-              state.taskEntries.byId[it.id] = it;
+            listItemEntries.forEach((it) => {
+              state.listItemEntries.byId[it.id] = it;
             });
           }
 
@@ -299,26 +307,26 @@ export const indexSlice = createAppSlice({
   }),
   selectors: {
     selectEntriesForPath: (state, path) => {
-      return state.taskEntries.byPath[path]?.map(
-        (it) => state.taskEntries.byId[it],
+      return state.listItemEntries.byPath[path]?.map(
+        (it) => state.listItemEntries.byId[it],
       );
     },
     selectListPropsPosition: (state, path: string, line: number) => {
-      const taskEntriesForFile = state.taskEntries.byPath[path]?.map(
-        (it) => state.taskEntries.byId[it],
+      const listItemEntriesForFile = state.listItemEntries.byPath[path]?.map(
+        (it) => state.listItemEntries.byId[it],
       );
 
-      const taskEntryAtLine = taskEntriesForFile?.find(
+      const listItemEntryAtLine = listItemEntriesForFile?.find(
         // todo: redux should not keep explicit undefined here
         // todo: this is broken for line 0
         (it) => it?.position.start.line && it.position.start.line === line,
       );
 
-      return taskEntryAtLine?.propsPosition;
+      return listItemEntryAtLine?.propsPosition;
     },
     selectLogEntriesByDay: (state) => state.logEntries.byDay,
     selectLogEntriesById: (state) => state.logEntries.byId,
-    selectTaskEntriesById: (state) => state.taskEntries.byId,
+    selectListItemEntriesById: (state) => state.listItemEntries.byId,
     selectFileEntriesById: (state) => state.fileEntries.byId,
     selectPlanEntriesByDay: (state) => state.planEntries.byDay,
     selectPlanEntriesById: (state) => state.planEntries.byId,
@@ -341,7 +349,7 @@ export const {
   selectListPropsPosition,
   selectPlanEntriesById,
   selectPlanEntriesByDay,
-  selectTaskEntriesById,
+  selectListItemEntriesById,
   selectFileEntriesById,
 } = indexSlice.selectors;
 
@@ -353,7 +361,7 @@ export function createId(...args: (string | number)[]) {
   return args.join(idSeparator);
 }
 
-export function createTaskEntryId(path: string, line: number) {
+export function createListItemEntryId(path: string, line: number) {
   return createId(path, line);
 }
 
@@ -368,9 +376,9 @@ function mergeContributions(
   return contributions.reduce<FileIndex>(
     (acc, contribution) => ({
       path,
-      taskEntries: [
-        ...(acc.taskEntries ?? []),
-        ...(contribution.taskEntries ?? []),
+      listItemEntries: [
+        ...(acc.listItemEntries ?? []),
+        ...(contribution.listItemEntries ?? []),
       ],
       fileEntries: [
         ...(acc.fileEntries ?? []),

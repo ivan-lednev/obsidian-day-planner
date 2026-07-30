@@ -2,7 +2,7 @@ import { Array } from "effect";
 import type { Pos } from "obsidian";
 
 import {
-  createTaskEntryId,
+  createListItemEntryId,
   type DenormalizedListItemEntry,
   type ListItemEntryWithChildren,
 } from "../../redux/index/index-slice";
@@ -28,7 +28,7 @@ export class ListItemIndexService implements IndexService {
     );
 
     return {
-      taskEntries: flatListItemEntries.map(
+      listItemEntries: flatListItemEntries.map(
         ({ logEntries, planEntries, ...rest }) => ({
           logEntryIds: logEntries?.map((it) => it.id),
           planEntryIds: planEntries?.map((it) => it.id),
@@ -114,7 +114,7 @@ export class ListItemIndexService implements IndexService {
         children:
           lineToChildrenLookup[listItemEntry.position.start.line]?.map(
             (listItemCache) => {
-              const id = createTaskEntryId(
+              const id = createListItemEntryId(
                 path,
                 listItemCache.position.start.line,
               );

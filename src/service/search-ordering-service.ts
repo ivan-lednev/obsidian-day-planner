@@ -3,7 +3,7 @@ import type { Vault } from "obsidian";
 import { selectLatestClosedLogEndByParentId } from "../redux/index/index-selectors";
 import {
   createFileEntryId,
-  createTaskEntryId,
+  createListItemEntryId,
 } from "../redux/index/index-slice";
 import type { RootState } from "../redux/store";
 
@@ -27,7 +27,7 @@ export class DefaultSearchOrderingService implements SearchOrderingService {
     function getLatestClosedLogEndTimestamp(match: Match) {
       const id =
         match.type === "task"
-          ? createTaskEntryId(match.path, match.position.start.line)
+          ? createListItemEntryId(match.path, match.position.start.line)
           : createFileEntryId(match.path);
 
       return latestClosedLogEndByParentId.get(id) ?? 0;

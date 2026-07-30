@@ -36,7 +36,7 @@ function logEntry(props: {
 function fakeState(logEntries: LogEntry[]): RootState {
   return {
     tracker: {
-      taskEntries: { byId: {}, byPath: {} },
+      listItemEntries: { byId: {}, byPath: {} },
       fileEntries: { byId: {}, byPath: {} },
       logEntries: {
         byId: Object.fromEntries(logEntries.map((it) => [it.id, it])),
