@@ -7,11 +7,11 @@ import { runWithNoticeOnError } from "../util/effect";
 
 export function createRecentClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;
-  task: LogTimeBlock;
+  timeBlock: LogTimeBlock;
   logEntryEditor: LogEntryEditor;
   workspaceFacade: WorkspaceFacade;
 }) {
-  const { event, task, logEntryEditor, workspaceFacade } = props;
+  const { event, timeBlock, logEntryEditor, workspaceFacade } = props;
   const menu = new Menu();
 
   menu.addItem((item) => {
@@ -19,7 +19,7 @@ export function createRecentClockMenu(props: {
       .setTitle("Clock in")
       .setIcon("play")
       .onClick(async () => {
-        await runWithNoticeOnError(logEntryEditor.clockIn(task));
+        await runWithNoticeOnError(logEntryEditor.clockIn(timeBlock));
       });
   });
 
@@ -28,7 +28,7 @@ export function createRecentClockMenu(props: {
       .setTitle("Reveal task in file")
       .setIcon("file-input")
       .onClick(async () => {
-        await workspaceFacade.revealLocation(task);
+        await workspaceFacade.revealLocation(timeBlock);
       });
   });
 

@@ -6,15 +6,16 @@
   import TimeBlockContentLayout from "./time-block-content-layout.svelte";
 
   const {
-    task,
+    timeBlock,
     bottomDecoration,
-  }: { task: FrontmatterLogTimeBlock; bottomDecoration?: Snippet } = $props();
+  }: { timeBlock: FrontmatterLogTimeBlock; bottomDecoration?: Snippet } =
+    $props();
 </script>
 
 <TimeBlockContentLayout {bottomDecoration}>
   {#snippet title()}
     <div class="file-name">
-      {task.text}
+      {timeBlock.text}
     </div>
   {/snippet}
 </TimeBlockContentLayout>

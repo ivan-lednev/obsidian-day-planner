@@ -7,16 +7,16 @@ import type { OnUpdateFn } from "../../../types";
 import type { EditOperation } from "./types";
 
 interface UseEditActionsProps {
-  baselineTasks: Writable<EditableTimeBlock[]>;
+  baselineTimeBlocks: Writable<EditableTimeBlock[]>;
   editOperation: Writable<EditOperation | undefined>;
-  tasksWithPendingUpdate: Readable<EditableTimeBlock[]>;
+  timeBlocksWithPendingUpdate: Readable<EditableTimeBlock[]>;
   onUpdate: OnUpdateFn;
 }
 
 export function useEditActions({
   editOperation,
-  baselineTasks,
-  tasksWithPendingUpdate,
+  baselineTimeBlocks,
+  timeBlocksWithPendingUpdate,
   onUpdate,
 }: UseEditActionsProps) {
   function startEdit(operation: EditOperation) {
@@ -35,20 +35,20 @@ export function useEditActions({
       return;
     }
 
-    const oldBase = get(baselineTasks);
-    const currentTasks = get(tasksWithPendingUpdate);
+    const oldBase = get(baselineTimeBlocks);
+    const currentTimeBlocks = get(timeBlocksWithPendingUpdate);
 
-    baselineTasks.set(currentTasks);
+    baselineTimeBlocks.set(currentTimeBlocks);
     editOperation.set(undefined);
 
     const succeeded = await onUpdate(
       oldBase,
-      currentTasks,
+      currentTimeBlocks,
       currentOperation.mode,
     );
 
     if (!succeeded) {
-      baselineTasks.set(oldBase);
+      baselineTimeBlocks.set(oldBase);
     }
   }
 

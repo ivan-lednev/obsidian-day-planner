@@ -16,21 +16,23 @@
   import TimeBlockContentLayout from "./time-block-content-layout.svelte";
 
   const {
-    task,
+    timeBlock,
     bottomDecoration,
-  }: { task: LocalTimeBlock; bottomDecoration?: Snippet } = $props();
+  }: { timeBlock: LocalTimeBlock; bottomDecoration?: Snippet } = $props();
 
   const { renderMarkdown, toggleCheckboxInFile, settings } =
     getObsidianContext();
 
   const onCheckboxLineClick = $derived(
-    isListItemSourced(task)
-      ? (line: number) => toggleCheckboxInFile(task.path, line)
+    isListItemSourced(timeBlock)
+      ? (line: number) => toggleCheckboxInFile(timeBlock.path, line)
       : // todo: should throw an error
         undefined,
   );
 
-  const { listItem, nestedListItems } = $derived(toRenderableMarkdown(task));
+  const { listItem, nestedListItems } = $derived(
+    toRenderableMarkdown(timeBlock),
+  );
 
   function flatten(
     entries: ListItemEntryWithChildren[],
@@ -42,18 +44,18 @@
   }
 
   const listItemLine = $derived(
-    isListItemSourced(task) ? task.position.start.line : undefined,
+    isListItemSourced(timeBlock) ? timeBlock.position.start.line : undefined,
   );
   const nestedListItemLines = $derived(
-    flatten(task.children ?? [])
-      .filter((task) => task.task !== undefined)
+    flatten(timeBlock.children ?? [])
+      .filter((child) => child.task !== undefined)
       .map((item) => item.position.start.line),
   );
 </script>
 
 <TimeBlockContentLayout
   class="planner-sticky-block-content"
-  completed={isCompleted(task.task)}
+  completed={isCompleted(timeBlock.task)}
   {bottomDecoration}
 >
   {#snippet title()}

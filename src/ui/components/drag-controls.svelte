@@ -17,7 +17,7 @@
 
   export let isActive: boolean;
   export let setIsActive: (value: boolean) => void;
-  export let task: EditableTimeBlock;
+  export let timeBlock: EditableTimeBlock;
 
   const {
     editContext: {
@@ -33,7 +33,7 @@
       label="Move block"
       use={[
         createGestures({
-          onpanmove: () => handleGripMouseDown(task, EditMode.DRAG),
+          onpanmove: () => handleGripMouseDown(timeBlock, EditMode.DRAG),
         }),
       ]}
     >
@@ -46,21 +46,22 @@
       label="Copy block"
       use={[
         createGestures({
-          onpanmove: () => handleGripMouseDown(t.copy(task), EditMode.DRAG),
+          onpanmove: () =>
+            handleGripMouseDown(t.copy(timeBlock), EditMode.DRAG),
         }),
       ]}
     >
       <Copy class="svg-icon" />
     </BlockControlButton>
 
-    {#if !task.isAllDayEvent}
+    {#if !timeBlock.isAllDayEvent}
       <BlockControlButton
         cursor="grab"
         label="Move block and push neighboring blocks"
         use={[
           createGestures({
             onpanmove: () =>
-              handleGripMouseDown(task, EditMode.DRAG_AND_SHIFT_OTHERS),
+              handleGripMouseDown(timeBlock, EditMode.DRAG_AND_SHIFT_OTHERS),
           }),
         ]}
       >
@@ -72,7 +73,7 @@
         use={[
           createGestures({
             onpanmove: () =>
-              handleGripMouseDown(task, EditMode.DRAG_AND_SHRINK_OTHERS),
+              handleGripMouseDown(timeBlock, EditMode.DRAG_AND_SHRINK_OTHERS),
           }),
         ]}
       >

@@ -2,7 +2,7 @@ import { request } from "obsidian";
 import { isNotVoid } from "typed-assert";
 
 import type { RemoteTimeBlock, WithDuration } from "../../time-block-types";
-import { canHappenAfter, icalEventToTasksForRange } from "../../util/ical";
+import { canHappenAfter, icalEventToTimeBlocksForRange } from "../../util/ical";
 import { type Scheduler } from "../../util/scheduler";
 import {
   selectSortedDedupedVisibleDays,
@@ -14,7 +14,7 @@ import { createSelectorChangePredicate } from "../util";
 
 import {
   icalsFetched,
-  remoteTasksUpdated,
+  remoteTimeBlocksUpdated,
   selectAllIcalEventsWithIcalConfigs,
 } from "./ical-slice";
 
@@ -98,22 +98,27 @@ export function createIcalParseListener(props: {
       canHappenAfter(icalEvent, startOfEarliestDay),
     );
 
-    const taskComputationQueue = relevantIcalEvents.flatMap(
+    const timeBlockComputationQueue = relevantIcalEvents.flatMap(
       (icalEvent) => () =>
-        icalEventToTasksForRange(icalEvent, earliestDay, latestDay),
+        icalEventToTimeBlocksForRange(icalEvent, earliestDay, latestDay),
     );
 
-    scheduler.enqueueTasks(taskComputationQueue, (tasksFromEvents) => {
-      const remoteTasks = tasksFromEvents
-        .flat()
-        .filter(
-          (task): task is RemoteTimeBlock | WithDuration<RemoteTimeBlock> =>
-            Boolean(task),
-        )
-        // todo: t.serialize(), t.deserialize()
-        .map((it) => ({ ...it, startTime: it.startTime.toISOString() }));
+    scheduler.enqueueTasks(
+      timeBlockComputationQueue,
+      (timeBlocksFromEvents) => {
+        const remoteTimeBlocks = timeBlocksFromEvents
+          .flat()
+          .filter(
+            (
+              timeBlock,
+            ): timeBlock is RemoteTimeBlock | WithDuration<RemoteTimeBlock> =>
+              Boolean(timeBlock),
+          )
+          // todo: t.serialize(), t.deserialize()
+          .map((it) => ({ ...it, startTime: it.startTime.toISOString() }));
 
-      listenerApi.dispatch(remoteTasksUpdated(remoteTasks));
-    });
+        listenerApi.dispatch(remoteTimeBlocksUpdated(remoteTimeBlocks));
+      },
+    );
   };
 }

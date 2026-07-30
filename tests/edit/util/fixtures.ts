@@ -11,13 +11,13 @@ export const day = moment(dayKey);
 export const nextDayKey = "2023-01-02";
 export const nextDay = moment(nextDayKey);
 
-export const emptyTasks = [];
-export const baseTaskStartTime = moment("2023-01-01 00:00");
-export const baseTask: WithPlacing<WithDuration<EditableTimeBlock>> = {
+export const emptyTimeBlocks = [];
+export const baseTimeBlockStartTime = moment("2023-01-01 00:00");
+export const baseTimeBlock: WithPlacing<WithDuration<EditableTimeBlock>> = {
   source: "dailyNoteDate",
   symbol: "-",
   status: " ",
-  startTime: baseTaskStartTime,
+  startTime: baseTimeBlockStartTime,
   durationMinutes: 60,
   text: "text",
   placing: {
@@ -39,35 +39,39 @@ export const baseTask: WithPlacing<WithDuration<EditableTimeBlock>> = {
   },
   id: "id",
 };
-export const unscheduledTask: EditableTimeBlock = {
-  ...baseTask,
+export const unscheduledTimeBlock: EditableTimeBlock = {
+  ...baseTimeBlock,
   isAllDayEvent: true,
 };
-export const threeTasks: [
+export const threeTimeBlocks: [
   WithPlacing<WithDuration<EditableTimeBlock>>,
   WithPlacing<WithDuration<EditableTimeBlock>>,
   WithPlacing<WithDuration<EditableTimeBlock>>,
 ] = [
   {
-    ...baseTask,
+    ...baseTimeBlock,
     id: "1",
     startTime: moment("2023-01-01 01:00"),
   },
   {
-    ...baseTask,
+    ...baseTimeBlock,
     id: "2",
     startTime: moment("2023-01-01 02:00"),
   },
   {
-    ...baseTask,
+    ...baseTimeBlock,
     id: "3",
     startTime: moment("2023-01-01 03:00"),
   },
 ];
-export const threeTasksOverTwoDays: WithDuration<EditableTimeBlock>[] = [
-  baseTask,
-  { ...baseTask, id: "2", startTime: moment("2023-01-01 01:00") },
-  { ...baseTask, id: "3", startTime: moment("2023-01-02 02:00") },
+export const threeTimeBlocksOverTwoDays: WithDuration<EditableTimeBlock>[] = [
+  baseTimeBlock,
+  { ...baseTimeBlock, id: "2", startTime: moment("2023-01-01 01:00") },
+  { ...baseTimeBlock, id: "3", startTime: moment("2023-01-02 02:00") },
 ];
-export const baseTasks: [WithDuration<EditableTimeBlock>] = [baseTask];
-export const tasksWithUnscheduledTask: [EditableTimeBlock] = [unscheduledTask];
+export const baseTimeBlocks: [WithDuration<EditableTimeBlock>] = [
+  baseTimeBlock,
+];
+export const timeBlocksWithUnscheduledTimeBlock: [EditableTimeBlock] = [
+  unscheduledTimeBlock,
+];

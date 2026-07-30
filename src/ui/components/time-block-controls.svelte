@@ -20,12 +20,12 @@
   }
 
   const {
-    task,
     timeBlock,
+    content,
   }: {
-    task: EditableTimeBlock;
+    timeBlock: EditableTimeBlock;
     class?: string;
-    timeBlock: Snippet<[TimeBlockProps]>;
+    content: Snippet<[TimeBlockProps]>;
   } = $props();
 
   const {
@@ -33,17 +33,17 @@
     workspaceFacade,
     editText,
     editLine,
-    deleteTask,
+    deleteTimeBlock,
     logEntryEditor,
   } = getObsidianContext();
 
-  async function editTaskSummary() {
-    if (task.source === "unwritten") {
+  async function editTimeBlockSummary() {
+    if (timeBlock.source === "unwritten") {
       throw new Error("Cannot edit the summary of an unwritten time block");
     }
 
     // todo: replace with getOnelineSummary()
-    const firstLine = getFirstLine(task.text);
+    const firstLine = getFirstLine(timeBlock.text);
     const timestampMatch = firstLine.match(timeRangeAtStartOfLineRegExp);
     const timestampEnd = timestampMatch ? timestampMatch[0].length : 0;
     const afterTimestamp = firstLine.slice(timestampEnd);
@@ -65,9 +65,9 @@
     const lineStart = firstLine.slice(0, timestampEnd) + leadingSpace;
 
     await editLine({
-      path: task.path,
-      position: task.position.start,
-      contents: `${createMarkdownListTokens(task)} ${lineStart}${next}`,
+      path: timeBlock.path,
+      position: timeBlock.position.start,
+      contents: `${createMarkdownListTokens(timeBlock)} ${lineStart}${next}`,
     });
   }
 </script>
@@ -76,18 +76,18 @@
   onSecondarySelect={(event) =>
     createTimeBlockMenu({
       event,
-      task,
+      timeBlock,
       logEntryEditor,
       workspaceFacade,
-      onEdit: editTaskSummary,
-      onDelete: deleteTask,
+      onEdit: editTimeBlockSummary,
+      onDelete: deleteTimeBlock,
     })}
   selectionBlocked={Boolean($editOperation)}
 >
   {#snippet children(selectable)}
     <FloatingControls active={selectable.state === "primary"}>
       {#snippet anchor(floatingControls)}
-        {@render timeBlock({
+        {@render content({
           isActive: selectable.state !== "none",
           onPointerUp: selectable.onpointerup,
           use: [...selectable.use, ...floatingControls.actions],
@@ -99,19 +99,25 @@
           --expanding-controls-position="absolute"
           {isActive}
           {setIsActive}
-          {task}
+          {timeBlock}
         />
       {/snippet}
 
       {#snippet bottom({ isActive, setIsActive })}
-        {#if !task.isAllDayEvent}
-          <ResizeControls {isActive} reverse {setIsActive} {task} />
+        {#if !timeBlock.isAllDayEvent}
+          <ResizeControls {isActive} reverse {setIsActive} {timeBlock} />
         {/if}
       {/snippet}
 
       {#snippet top({ isActive, setIsActive })}
-        {#if !task.isAllDayEvent}
-          <ResizeControls fromTop {isActive} reverse {setIsActive} {task} />
+        {#if !timeBlock.isAllDayEvent}
+          <ResizeControls
+            fromTop
+            {isActive}
+            reverse
+            {setIsActive}
+            {timeBlock}
+          />
         {/if}
       {/snippet}
     </FloatingControls>

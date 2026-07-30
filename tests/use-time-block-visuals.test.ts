@@ -4,15 +4,15 @@ import { vi, test, expect } from "vitest";
 
 import { currentTime } from "../src/global-store/current-time";
 import { settings } from "../src/global-store/settings";
-import { useTaskVisuals } from "../src/ui/hooks/use-task-visuals";
+import { useTimeBlockVisuals } from "../src/ui/hooks/use-time-block-visuals";
 
-import { baseTask } from "./edit/util/fixtures";
+import { baseTimeBlock } from "./edit/util/fixtures";
 
 vi.mock("obsidian", () => {
   return {};
 });
 
-function getBaseUseTaskProps() {
+function getBaseUseTimeBlockProps() {
   const cursorOffsetY = writable(0);
   return {
     settings,
@@ -24,9 +24,9 @@ function getBaseUseTaskProps() {
 }
 
 test("derives task offset from settings and time", () => {
-  const { offset, height } = useTaskVisuals(
-    { ...baseTask, startTime: moment("2023-01-01 13:00") },
-    getBaseUseTaskProps(),
+  const { offset, height } = useTimeBlockVisuals(
+    { ...baseTimeBlock, startTime: moment("2023-01-01 13:00") },
+    getBaseUseTimeBlockProps(),
   );
 
   expect(get(offset)).toEqual("840px");
@@ -34,7 +34,10 @@ test("derives task offset from settings and time", () => {
 });
 
 test.skip("tasks change position and size when zoom level changes", () => {
-  const { offset, height } = useTaskVisuals(baseTask, getBaseUseTaskProps());
+  const { offset, height } = useTimeBlockVisuals(
+    baseTimeBlock,
+    getBaseUseTimeBlockProps(),
+  );
 
   // TODO: this is leaking state to other tests, need to copy settings
   settings.update((previous) => ({

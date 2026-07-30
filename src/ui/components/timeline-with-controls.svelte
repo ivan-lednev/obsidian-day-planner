@@ -18,8 +18,8 @@
 
   const { editContext, pointerDateTime } = getObsidianContext();
 
-  const getDisplayedAllDayTasksForMultiDayRow = fromStore(
-    editContext.getDisplayedAllDayTasksForMultiDayRow,
+  const getDisplayedAllDayTimeBlocksForMultiDayRow = fromStore(
+    editContext.getDisplayedAllDayTimeBlocksForMultiDayRow,
   );
 
   const dateRange = getDateRangeContext();
@@ -38,8 +38,8 @@
     return last;
   });
 
-  const displayedAllDayTasks = $derived(
-    getDisplayedAllDayTasksForMultiDayRow.current({
+  const displayedAllDayTimeBlocks = $derived(
+    getDisplayedAllDayTimeBlocksForMultiDayRow.current({
       start: firstDayInRange,
       end: lastDayInRange,
     }),
@@ -90,10 +90,10 @@
     <BlockList
       --block-list-padding="var(--size-2-1) 3px 0"
       className="all-day-events"
-      list={displayedAllDayTasks}
+      list={displayedAllDayTimeBlocks}
     >
-      {#snippet match(task: TimelineTimeBlock)}
-        <UnscheduledTimeBlock {task} />
+      {#snippet match(timeBlock: TimelineTimeBlock)}
+        <UnscheduledTimeBlock {timeBlock} />
       {/snippet}
       {#snippet fallback()}
         <div class="empty-all-day-events">No all day events</div>
@@ -152,7 +152,7 @@
     overflow: auto;
   }
 
-  :global(.unscheduled-task-container) {
+  :global(.unscheduled-time-block-container) {
     overflow: auto;
   }
 

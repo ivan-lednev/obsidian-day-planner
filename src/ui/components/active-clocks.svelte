@@ -38,12 +38,12 @@
 </script>
 
 <BlockList list={activeLogRecords.current}>
-  {#snippet match(task: LogTimeBlock)}
+  {#snippet match(timeBlock: LogTimeBlock)}
     <Selectable
       onSecondarySelect={(event) =>
         createActiveClockMenu({
           event,
-          task,
+          timeBlock,
           logEntryEditor,
           workspaceFacade,
           openEditTimeEntryModal,
@@ -54,14 +54,16 @@
           --time-block-border="1px solid var(--color-accent)"
           isActive={state === "secondary"}
           {onpointerup}
-          {task}
+          {timeBlock}
           {use}
         >
           {#snippet blockEndDecoration()}
             <BlockControls>
               <ControlButton
                 onclick={async () => {
-                  await runWithNoticeOnError(logEntryEditor.clockOut(task));
+                  await runWithNoticeOnError(
+                    logEntryEditor.clockOut(timeBlock),
+                  );
                 }}
               >
                 {#snippet icon()}
@@ -72,7 +74,7 @@
               <ControlButton
                 onclick={(event: MouseEvent) => {
                   createActiveClockMenu({
-                    task,
+                    timeBlock,
                     event,
                     logEntryEditor,
                     workspaceFacade,
@@ -91,18 +93,18 @@
               <Pill
                 key={File}
                 onclick={async () => {
-                  await workspaceFacade.revealLocation(task);
+                  await workspaceFacade.revealLocation(timeBlock);
                 }}
-                value={removeMarkdownExtension(task.path)}
+                value={removeMarkdownExtension(timeBlock.path)}
               />
               <Pill
                 key={Play}
-                value={task.startTime.format($settings.timestampFormat)}
+                value={timeBlock.startTime.format($settings.timestampFormat)}
               />
               <Pill
                 key={Hourglass}
                 value={m
-                  .fromDiff(task.startTime, currentTimeSignal.current)
+                  .fromDiff(timeBlock.startTime, currentTimeSignal.current)
                   .format($settings.timestampFormat)}
               />
             </Properties>

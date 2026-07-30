@@ -57,34 +57,36 @@ export function transform(
 ) {
   const result = baseline.slice();
 
-  const isInBaseline = baseline.find((task) => task.id === operation.task.id);
+  const isInBaseline = baseline.find(
+    (timeBlock) => timeBlock.id === operation.timeBlock.id,
+  );
 
   if (!isInBaseline) {
     result.push({
-      ...operation.task,
+      ...operation.timeBlock,
       startTime: pointerDateTime.dateTime,
     });
   }
 
-  const indexOfEditedTask = result.findIndex(
-    (task) => task.id === operation.task.id,
+  const indexOfEditedTimeBlock = result.findIndex(
+    (timeBlock) => timeBlock.id === operation.timeBlock.id,
   );
 
   if (pointerDateTime.type === "date") {
-    return result.with(indexOfEditedTask, {
-      ...operation.task,
+    return result.with(indexOfEditedTimeBlock, {
+      ...operation.timeBlock,
       isAllDayEvent: true,
       startTime: pointerDateTime.dateTime,
       durationMinutes: 60,
     });
   }
 
-  result[indexOfEditedTask] = {
-    ...operation.task,
+  result[indexOfEditedTimeBlock] = {
+    ...operation.timeBlock,
     isAllDayEvent: false,
   };
 
-  const idToTaskLookup = new Map(result.map((it) => [it.id, it]));
+  const idToTimeBlockLookup = new Map(result.map((it) => [it.id, it]));
 
   const editableBlocks = result
     .map((it) => ({
@@ -96,7 +98,7 @@ export function transform(
 
   const transformed = editBlocks(
     editableBlocks,
-    operation.task.id,
+    operation.timeBlock.id,
     pointerDateTime.dateTime.unix(),
     getEditType(operation.mode),
     getEditInteraction(operation.mode),
@@ -104,12 +106,12 @@ export function transform(
   );
 
   return transformed.map((it) => {
-    const task = idToTaskLookup.get(it.id);
+    const timeBlock = idToTimeBlockLookup.get(it.id);
 
-    isNotVoid(task);
+    isNotVoid(timeBlock);
 
     return {
-      ...task,
+      ...timeBlock,
       startTime: window.moment.unix(it.start),
       durationMinutes: (it.end - it.start) / 60,
     };

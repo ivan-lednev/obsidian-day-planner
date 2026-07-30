@@ -44,40 +44,42 @@ export function createEditHandlers({
     const pointerMinutes = getMinutesSinceMidnight(pointerDay);
 
     // todo: use datetime
-    const newTask = t.create({
+    const newTimeBlock = t.create({
       day: pointerDay,
       startMinutes: pointerMinutes,
       settings: get(settings),
     });
 
     startEdit({
-      task: newTask,
+      timeBlock: newTimeBlock,
       mode: EditMode.CREATE,
     });
   }
 
   function handleResizerMouseDown(
-    task: WithDuration<EditableTimeBlock>,
+    timeBlock: WithDuration<EditableTimeBlock>,
     mode: EditMode,
   ) {
     const pointerDay = get(pointerDateTime).dateTime;
 
     isNotVoid(pointerDay, "Day cannot be undefined on edit");
 
-    startEdit({ task, mode });
+    startEdit({ timeBlock, mode });
   }
 
-  async function handleTaskMouseUp(task: EditableTimeBlock) {
-    if (get(editOperation) || task.source === "unwritten") {
+  async function handleTimeBlockMouseUp(timeBlock: EditableTimeBlock) {
+    if (get(editOperation) || timeBlock.source === "unwritten") {
       return;
     }
 
-    await workspaceFacade.revealLocation(task);
+    await workspaceFacade.revealLocation(timeBlock);
   }
 
   // todo: fix (should probably use "day")
-  function handleUnscheduledTaskGripMouseDown(task: EditableTimeBlock) {
-    if (task.source === "unwritten") {
+  function handleUnscheduledTimeBlockGripMouseDown(
+    timeBlock: EditableTimeBlock,
+  ) {
+    if (timeBlock.source === "unwritten") {
       throw new Error(
         "Invariant violation: an unwritten time block cannot be unscheduled",
       );
@@ -91,20 +93,20 @@ export function createEditHandlers({
     }
 
     const withAddedTime = {
-      ...task,
+      ...timeBlock,
       startTime:
-        periodicNotes.getDateFromPath(task.path, "day") || window.moment(),
+        periodicNotes.getDateFromPath(timeBlock.path, "day") || window.moment(),
     };
 
-    startEdit({ task: withAddedTime, mode: EditMode.DRAG });
+    startEdit({ timeBlock: withAddedTime, mode: EditMode.DRAG });
   }
 
   return {
     handleGripMouseDown: handleResizerMouseDown,
     handleContainerMouseDown,
     handleResizerMouseDown,
-    handleTaskMouseUp,
-    handleUnscheduledTaskGripMouseDown,
+    handleTimeBlockMouseUp,
+    handleUnscheduledTimeBlockGripMouseDown,
   };
 }
 

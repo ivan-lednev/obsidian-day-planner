@@ -10,8 +10,8 @@
   import UnscheduledTimeBlock from "../unscheduled-time-block.svelte";
 
   const { editContext } = getObsidianContext();
-  const getDisplayedAllDayTasksForMultiDayRow = fromStore(
-    editContext.getDisplayedAllDayTasksForMultiDayRow,
+  const getDisplayedAllDayTimeBlocksForMultiDayRow = fromStore(
+    editContext.getDisplayedAllDayTimeBlocksForMultiDayRow,
   );
 
   const dateRange = getDateRangeContext();
@@ -30,46 +30,50 @@
     return last;
   });
 
-  const displayedAllDayTasks = $derived(
-    getDisplayedAllDayTasksForMultiDayRow.current({
+  const displayedAllDayTimeBlocks = $derived(
+    getDisplayedAllDayTimeBlocksForMultiDayRow.current({
       start: firstDayInRange,
       end: lastDayInRange,
     }),
   );
 
   function getDaySpanFromDurationMinutes(
-    remoteTask: WithDuration<RemoteTimeBlock>,
+    remoteTimeBlock: WithDuration<RemoteTimeBlock>,
   ) {
-    return t.getEndTime(remoteTask).diff(remoteTask.startTime, "days");
+    return t
+      .getEndTime(remoteTimeBlock)
+      .diff(remoteTimeBlock.startTime, "days");
   }
 
-  function getSpan(task: TimeBlock) {
-    if (isLocal(task) || !t.isWithDuration(task)) {
+  function getSpan(timeBlock: TimeBlock) {
+    if (isLocal(timeBlock) || !t.isWithDuration(timeBlock)) {
       return 1;
     }
 
-    return getDaySpanFromDurationMinutes(task);
+    return getDaySpanFromDurationMinutes(timeBlock);
   }
 
-  function getColumnIndex(task: TimeBlock) {
+  function getColumnIndex(timeBlock: TimeBlock) {
     const foundIndex = dateRange.current.findIndex((date) =>
-      date.isSame(task.startTime, "day"),
+      date.isSame(timeBlock.startTime, "day"),
     );
 
     if (foundIndex > -1) {
       return foundIndex + 1;
     }
 
-    // the task starts before the first day in the range
+    // the time block starts before the first day in the range
     return 1;
   }
 </script>
 
 <div style:--column-count={dateRange.current.length} class="multi-day-row">
-  {#each displayedAllDayTasks as task (task.id)}
+  {#each displayedAllDayTimeBlocks as timeBlock (timeBlock.id)}
     <UnscheduledTimeBlock
-      --time-block-grid-column="{getColumnIndex(task)} / span {getSpan(task)}"
-      {task}
+      --time-block-grid-column="{getColumnIndex(timeBlock)} / span {getSpan(
+        timeBlock,
+      )}"
+      {timeBlock}
     />
   {/each}
 </div>

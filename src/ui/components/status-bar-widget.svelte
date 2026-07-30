@@ -22,7 +22,7 @@
 
   const {
     onClick,
-    tasksWithTimeForToday,
+    timeBlocksWithTimeForToday,
     useSelector,
     logEntryEditor,
     workspaceFacade,
@@ -30,7 +30,7 @@
     openClockInOnAnythingModal,
   }: {
     onClick: () => Promise<void>;
-    tasksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
+    timeBlocksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
     useSelector: UseSelector<RootState>;
     logEntryEditor: LogEntryEditor;
     workspaceFacade: WorkspaceFacade;
@@ -39,7 +39,7 @@
   } = $props();
 
   const { current, next } = $derived(
-    fromStore(useStatusBarWidget({ tasksWithTimeForToday })).current,
+    fromStore(useStatusBarWidget({ timeBlocksWithTimeForToday })).current,
   );
 
   const {
@@ -71,7 +71,7 @@
 
     createActiveClockMenu({
       event,
-      task: newestActiveClock,
+      timeBlock: newestActiveClock,
       logEntryEditor,
       workspaceFacade,
       openEditTimeEntryModal,
@@ -147,7 +147,7 @@
 
 {#if progressIndicator === "mini-timeline"}
   <div class="status-bar-item mini-timeline">
-    <MiniTimeline {tasksWithTimeForToday} />
+    <MiniTimeline {timeBlocksWithTimeForToday} />
   </div>
 {/if}
 

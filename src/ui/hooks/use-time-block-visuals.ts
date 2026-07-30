@@ -8,24 +8,24 @@ import type {
   WithDuration,
 } from "../../time-block-types";
 
-interface UseTaskVisualsProps {
+interface UseTimeBlockVisualsProps {
   settings: Writable<DayPlannerSettings>;
 }
 
-// todo: useTaskPosition, move to one of stores, don't call inside component
-export function useTaskVisuals(
-  task: WithPlacing<WithDuration<TimeBlock>>,
-  { settings }: UseTaskVisualsProps,
+// todo: useTimeBlockPosition, move to one of stores, don't call inside component
+export function useTimeBlockVisuals(
+  timeBlock: WithPlacing<WithDuration<TimeBlock>>,
+  { settings }: UseTimeBlockVisualsProps,
 ) {
-  const width = `${task.placing?.spanPercent || 100}%`;
-  const left = `${task.placing?.offsetPercent || 0}%`;
+  const width = `${timeBlock.placing?.spanPercent || 100}%`;
+  const left = `${timeBlock.placing?.offsetPercent || 0}%`;
 
   const offset = derived(settings, ($settings) => {
-    return `${momentToTimelineOffset(task.startTime, $settings)}px`;
+    return `${momentToTimelineOffset(timeBlock.startTime, $settings)}px`;
   });
 
   const height = derived(settings, ($settings) => {
-    return `${task.durationMinutes * $settings.zoomLevel}px`;
+    return `${timeBlock.durationMinutes * $settings.zoomLevel}px`;
   });
 
   return {

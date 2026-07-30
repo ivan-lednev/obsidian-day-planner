@@ -37,7 +37,7 @@
     editContext: {
       confirmEdit,
       handlers: { handleContainerMouseDown },
-      getDisplayedTasksForTimeline,
+      getDisplayedTimeBlocksForTimeline,
       editOperation,
     },
     pointerDateTime,
@@ -48,7 +48,9 @@
     openEditTimeEntryModal,
   } = getObsidianContext();
 
-  const displayedTasksForTimeline = $derived(getDisplayedTasksForTimeline(day));
+  const displayedTimeBlocksForTimeline = $derived(
+    getDisplayedTimeBlocksForTimeline(day),
+  );
   const dayKey = $derived(getDayKey(day));
 
   const logEntriesForDay = useSelector((state) =>
@@ -70,7 +72,7 @@
     if (isCompleted) {
       createCompletedClockMenu({
         event,
-        task: timeBlockView,
+        timeBlock: timeBlockView,
         logEntry: logEntry,
         logEntryEditor,
         workspaceFacade,
@@ -79,7 +81,7 @@
     } else {
       createActiveClockMenu({
         event,
-        task: timeBlockView,
+        timeBlock: timeBlockView,
         logEntryEditor,
         workspaceFacade,
         // pass the raw entry so "Edit..." targets the real (unclamped) entry
@@ -157,11 +159,11 @@
         onpointerup={confirmEdit}
         use:timelineGestures
       >
-        {#each $displayedTasksForTimeline.withTime as task (task.id)}
-          <PositionedTimeBlock {task}>
-            <UnscheduledTimeBlock {task}>
+        {#each $displayedTimeBlocksForTimeline.withTime as timeBlock (timeBlock.id)}
+          <PositionedTimeBlock {timeBlock}>
+            <UnscheduledTimeBlock {timeBlock}>
               {#snippet bottomDecoration()}
-                {getBlockProps(task, settingsSignal.current)}
+                {getBlockProps(timeBlock, settingsSignal.current)}
               {/snippet}
             </UnscheduledTimeBlock>
           </PositionedTimeBlock>
@@ -177,20 +179,20 @@
       {/if}
 
       <div class="tasks absolute-stretch-x">
-        {#each logEntriesForDay.current as task (task.id)}
-          <PositionedTimeBlock {task}>
+        {#each logEntriesForDay.current as timeBlock (timeBlock.id)}
+          <PositionedTimeBlock {timeBlock}>
             <Selectable
-              onSecondarySelect={(event) => showLogBlockMenu(event, task)}
+              onSecondarySelect={(event) => showLogBlockMenu(event, timeBlock)}
             >
               {#snippet children({ use, onpointerup, state })}
                 <LocalTimeBlock
                   isActive={state === "secondary"}
                   {onpointerup}
-                  {task}
+                  {timeBlock}
                   {use}
                 >
                   {#snippet bottomDecoration()}
-                    {getBlockProps(task, settingsSignal.current)}
+                    {getBlockProps(timeBlock, settingsSignal.current)}
                   {/snippet}
                 </LocalTimeBlock>
               {/snippet}

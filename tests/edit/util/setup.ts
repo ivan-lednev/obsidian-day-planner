@@ -14,13 +14,13 @@ import type { EditableTimeBlock } from "../../../src/time-block-types";
 import type { PointerDateTime } from "../../../src/types";
 import { useEditContext } from "../../../src/ui/hooks/use-edit/use-edit-context";
 
-import { baseTasks } from "./fixtures";
+import { baseTimeBlocks } from "./fixtures";
 
 function createProps({
-  tasks,
+  timeBlocks,
   settings,
 }: {
-  tasks: EditableTimeBlock[];
+  timeBlocks: EditableTimeBlock[];
   settings: DayPlannerSettings;
 }) {
   const onUpdate = vi.fn().mockResolvedValue(true);
@@ -33,8 +33,8 @@ function createProps({
     onEditAborted,
     workspaceFacade,
     abortEditTrigger: writable(),
-    localTasks: writable(tasks),
-    remoteTasks: writable([]),
+    localTimeBlocks: writable(timeBlocks),
+    remoteTimeBlocks: writable([]),
     pointerDateTime: writable<PointerDateTime>({
       dateTime: moment("2023-01-01 00:00"),
       type: "dateTime",
@@ -50,23 +50,23 @@ function createProps({
 }
 
 export function setUp({
-  tasks = baseTasks,
+  timeBlocks = baseTimeBlocks,
   settings = defaultSettingsForTests,
 }: {
-  tasks?: EditableTimeBlock[];
+  timeBlocks?: EditableTimeBlock[];
   settings?: DayPlannerSettings;
 } = {}) {
-  const props = createProps({ tasks, settings });
+  const props = createProps({ timeBlocks, settings });
   const {
     handlers,
-    dayToDisplayedTasks,
-    getDisplayedAllDayTasksForMultiDayRow,
+    dayToDisplayedTimeBlocks,
+    getDisplayedAllDayTimeBlocksForMultiDayRow,
     confirmEdit,
   } = useEditContext(props);
 
   // this prevents the store from resetting;
-  dayToDisplayedTasks.subscribe(Function.constVoid);
-  getDisplayedAllDayTasksForMultiDayRow.subscribe(Function.constVoid);
+  dayToDisplayedTimeBlocks.subscribe(Function.constVoid);
+  getDisplayedAllDayTimeBlocksForMultiDayRow.subscribe(Function.constVoid);
 
   function moveCursorTo(
     dateTime: Moment,
@@ -81,8 +81,8 @@ export function setUp({
   return {
     handlers,
     moveCursorTo,
-    dayToDisplayedTasks,
-    getDisplayedAllDayTasksForMultiDayRow,
+    dayToDisplayedTimeBlocks,
+    getDisplayedAllDayTimeBlocksForMultiDayRow,
     confirmEdit,
     props,
   };

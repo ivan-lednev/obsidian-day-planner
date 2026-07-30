@@ -18,7 +18,7 @@ import type { PointerDateTime, ReduxExtraArgument } from "../types";
 import type { Scheduler } from "../util/scheduler";
 
 import { dateRangesSlice } from "./date-ranges-slice";
-import { icalSlice, selectRemoteTasks } from "./ical/ical-slice";
+import { icalSlice, selectRemoteTimeBlocks } from "./ical/ical-slice";
 import type { IcalParseTaskResult } from "./ical/init-ical-listeners";
 import { selectPlanEntriesForVisibleDays } from "./index/index-selectors";
 import { indexSlice } from "./index/index-slice";
@@ -94,13 +94,15 @@ export function createReactor(props: {
 
   const useSelector = createUseSelector<RootState>(store);
 
-  const localTasksSignal = useSelector((state) =>
+  const localTimeBlocksSignal = useSelector((state) =>
     selectPlanEntriesForVisibleDays(state),
   );
-  const localTasks = toStore(() => localTasksSignal.current);
+  const localTimeBlocks = toStore(() => localTimeBlocksSignal.current);
 
-  const remoteTasksSignal = useSelector((state) => selectRemoteTasks(state));
-  const remoteTasks = toStore(() => remoteTasksSignal.current);
+  const remoteTimeBlocksSignal = useSelector((state) =>
+    selectRemoteTimeBlocks(state),
+  );
+  const remoteTimeBlocks = toStore(() => remoteTimeBlocksSignal.current);
 
   const pointerDateTime = writable<PointerDateTime>({
     dateTime: window.moment(),
@@ -110,8 +112,8 @@ export function createReactor(props: {
   return {
     store,
     listenerMiddleware,
-    remoteTasks,
-    localTasks,
+    remoteTimeBlocks,
+    localTimeBlocks,
     pointerDateTime,
     useSelector,
   };

@@ -172,12 +172,12 @@ export const selectPlanEntriesForVisibleDays = createAppSelector(
   ],
   // todo: copy-pasta. Can we re-use it without breaking caching?
   (planEntriesByDay, planEntriesById, listItemEntriesById, dayKeys) => {
-    const uniqueTaskIds = new Set(
+    const uniquePlanEntryIds = new Set(
       dayKeys.flatMap((dayKey) => Object.keys(planEntriesByDay[dayKey] || {})),
     );
 
     return (
-      [...uniqueTaskIds]?.map((id) => {
+      [...uniquePlanEntryIds]?.map((id) => {
         const planEntry = planEntriesById[id];
 
         isNotVoid(planEntry, "Inconsistent index state");

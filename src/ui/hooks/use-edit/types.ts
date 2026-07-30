@@ -17,6 +17,6 @@ export enum EditMode {
 }
 
 export interface EditOperation {
-  task: WithDuration<EditableTimeBlock>;
+  timeBlock: WithDuration<EditableTimeBlock>;
   mode: EditMode;
 }

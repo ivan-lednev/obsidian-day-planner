@@ -10,7 +10,7 @@
   import TimeBlockBase from "./time-block-base.svelte";
 
   const {
-    task,
+    timeBlock,
     bottomDecoration,
     blockEndDecoration,
     isActive = false,
@@ -18,7 +18,7 @@
     onpointerup,
   }: {
     isActive?: boolean;
-    task: LocalTimeBlock;
+    timeBlock: LocalTimeBlock;
     bottomDecoration?: Snippet;
     blockEndDecoration?: Snippet;
     use?: HTMLActionArray;
@@ -33,12 +33,12 @@
     : ""}
   {blockEndDecoration}
   {onpointerup}
-  {task}
-  use={[...use, hoverPreview(task)]}
+  {timeBlock}
+  use={[...use, hoverPreview(timeBlock)]}
 >
-  {#if task.source === "frontmatterLog"}
-    <FrontmatterLogContent {bottomDecoration} {task} />
+  {#if timeBlock.source === "frontmatterLog"}
+    <FrontmatterLogContent {bottomDecoration} {timeBlock} />
   {:else}
-    <RenderedMarkdown {bottomDecoration} {task} />
+    <RenderedMarkdown {bottomDecoration} {timeBlock} />
   {/if}
 </TimeBlockBase>

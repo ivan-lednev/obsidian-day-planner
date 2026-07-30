@@ -7,7 +7,7 @@ import type { TimeBlock, WithDuration } from "../time-block-types";
 import { getMinutesSinceMidnight } from "./moment";
 import { createTimestamp, getOneLineSummary } from "./time-block-utils";
 
-export function notifyAboutStartedTasks(
+export function notifyAboutStartedTimeBlocks(
   timeBlocks: WithDuration<TimeBlock>[],
   settings: DayPlannerSettings,
 ) {

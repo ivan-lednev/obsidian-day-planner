@@ -13,7 +13,7 @@ import { editYaml, requireProps, type YamlEditTargets } from "./edit-yaml";
 
 const noPropsUnderCursorMessage = "There are no props under cursor";
 
-// A location has a position when it's a task on a specific line; when it's
+// A location has a position when it's a list item on a specific line; when it's
 // missing, the location is a whole file's frontmatter.
 export interface ClockLocation {
   path: string;
@@ -21,41 +21,44 @@ export interface ClockLocation {
 }
 
 export class LogEntryEditor {
-  private targetFor = (task: ClockLocation) =>
-    task.position
-      ? this.targets.inListItemProps(task.path, task.position.start.line)
-      : this.targets.inFrontmatter(task.path);
+  private targetFor = (location: ClockLocation) =>
+    location.position
+      ? this.targets.inListItemProps(
+          location.path,
+          location.position.start.line,
+        )
+      : this.targets.inFrontmatter(location.path);
 
-  clockIn = (task: ClockLocation) =>
-    editYaml(this.targetFor(task), addOpenClockOrCreateProps);
+  clockIn = (location: ClockLocation) =>
+    editYaml(this.targetFor(location), addOpenClockOrCreateProps);
 
-  clockOut = (task: ClockLocation) =>
-    editYaml(this.targetFor(task), requireProps(clockOut));
+  clockOut = (location: ClockLocation) =>
+    editYaml(this.targetFor(location), requireProps(clockOut));
 
-  cancelClock = (task: ClockLocation) =>
-    editYaml(this.targetFor(task), requireProps(cancelOpenClock));
+  cancelClock = (location: ClockLocation) =>
+    editYaml(this.targetFor(location), requireProps(cancelOpenClock));
 
-  deleteClock = (task: ClockLocation, originalStart: string) =>
+  deleteClock = (location: ClockLocation, originalStart: string) =>
     editYaml(
-      this.targetFor(task),
+      this.targetFor(location),
       requireProps((props) => deleteLogEntry(props, originalStart)),
     );
 
   editClock = (
-    task: ClockLocation,
+    location: ClockLocation,
     args: { originalStart: string; patch: { start?: string; end?: string } },
   ) =>
     editYaml(
-      this.targetFor(task),
+      this.targetFor(location),
       requireProps((props) => editLogEntry(props, args)),
     );
 
   editLastClock = (
-    task: ClockLocation,
+    location: ClockLocation,
     patch: { start?: string; end?: string },
   ) =>
     editYaml(
-      this.targetFor(task),
+      this.targetFor(location),
       requireProps((props) => editLastLogEntry(props, patch)),
     );
 

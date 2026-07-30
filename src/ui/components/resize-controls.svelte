@@ -9,7 +9,7 @@
   import BlockControlButton from "./block-control-button.svelte";
   import ExpandingControls from "./expanding-controls.svelte";
 
-  export let task: EditableTimeBlock;
+  export let timeBlock: EditableTimeBlock;
   export let isActive: boolean;
   export let setIsActive: (value: boolean) => void;
   export let reverse: boolean | undefined = false;
@@ -31,7 +31,7 @@
         createGestures({
           onpanmove: () =>
             handleResizerMouseDown(
-              task,
+              timeBlock,
               fromTop ? EditMode.RESIZE_FROM_TOP : EditMode.RESIZE,
             ),
         }),
@@ -48,7 +48,7 @@
         createGestures({
           onpanmove: () => {
             handleResizerMouseDown(
-              task,
+              timeBlock,
               fromTop
                 ? EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS
                 : EditMode.RESIZE_AND_SHIFT_OTHERS,
@@ -66,7 +66,7 @@
         createGestures({
           onpanmove: () => {
             handleResizerMouseDown(
-              task,
+              timeBlock,
               fromTop
                 ? EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS
                 : EditMode.RESIZE_AND_SHRINK_OTHERS,

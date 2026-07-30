@@ -9,7 +9,7 @@ import type { OpenEditTimeEntryModal } from "./create-edit-time-entry-modal";
 
 export function createCompletedClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;
-  task: LogTimeBlock;
+  timeBlock: LogTimeBlock;
   logEntry: { start: string; end?: string };
   logEntryEditor: LogEntryEditor;
   workspaceFacade: WorkspaceFacade;
@@ -17,7 +17,7 @@ export function createCompletedClockMenu(props: {
 }) {
   const {
     event,
-    task,
+    timeBlock,
     logEntry,
     logEntryEditor,
     workspaceFacade,
@@ -31,7 +31,7 @@ export function createCompletedClockMenu(props: {
       .setTitle("Resume")
       .setIcon("play")
       .onClick(async () => {
-        await runWithNoticeOnError(logEntryEditor.clockIn(task));
+        await runWithNoticeOnError(logEntryEditor.clockIn(timeBlock));
       }),
   );
 
@@ -39,7 +39,7 @@ export function createCompletedClockMenu(props: {
     item
       .setTitle("Edit...")
       .setIcon("pencil")
-      .onClick(() => openEditTimeEntryModal(task, logEntry)),
+      .onClick(() => openEditTimeEntryModal(timeBlock, logEntry)),
   );
 
   menu.addItem((item) => {
@@ -47,7 +47,7 @@ export function createCompletedClockMenu(props: {
       .setTitle("Reveal task in file")
       .setIcon("file-input")
       .onClick(async () => {
-        await workspaceFacade.revealLocation(task);
+        await workspaceFacade.revealLocation(timeBlock);
       });
   });
 
@@ -60,7 +60,7 @@ export function createCompletedClockMenu(props: {
       .setWarning(true)
       .onClick(async () => {
         await runWithNoticeOnError(
-          logEntryEditor.deleteClock(task, logEntry.start),
+          logEntryEditor.deleteClock(timeBlock, logEntry.start),
         );
       });
   });

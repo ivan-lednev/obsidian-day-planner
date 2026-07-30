@@ -53,26 +53,26 @@ function hasExceptionForDate(icalEvent: ical.VEvent, date: Date) {
   });
 }
 
-export function icalEventToTasksForRange(
+export function icalEventToTimeBlocksForRange(
   icalEvent: WithIcalConfig<ical.VEvent>,
   start: Moment,
   end: Moment,
 ) {
   if (!icalEvent.rrule) {
-    return onceOffIcalEventToTaskForRange(icalEvent, start, end);
+    return onceOffIcalEventToTimeBlockForRange(icalEvent, start, end);
   }
 
-  const tasksFromRecurrenceOverrides = Object.values(
+  const timeBlocksFromRecurrenceOverrides = Object.values(
     icalEvent?.recurrences || {},
   ).reduce<RemoteTimeBlock[]>((result, override) => {
-    const task = onceOffIcalEventToTaskForRange(
+    const timeBlock = onceOffIcalEventToTimeBlockForRange(
       { ...override, calendar: icalEvent.calendar },
       start,
       end,
     );
 
-    if (task) {
-      result.push(task);
+    if (timeBlock) {
+      result.push(timeBlock);
     }
 
     return result;
@@ -86,14 +86,14 @@ export function icalEventToTasksForRange(
         !hasExceptionForDate(icalEvent, date),
     );
 
-  const tasksFromRecurrences = recurrences.map((date) =>
-    icalEventToTask(icalEvent, date),
+  const timeBlocksFromRecurrences = recurrences.map((date) =>
+    icalEventToTimeBlock(icalEvent, date),
   );
 
-  return tasksFromRecurrences.concat(tasksFromRecurrenceOverrides);
+  return timeBlocksFromRecurrences.concat(timeBlocksFromRecurrenceOverrides);
 }
 
-function onceOffIcalEventToTaskForRange(
+function onceOffIcalEventToTimeBlockForRange(
   icalEvent: WithIcalConfig<ical.VEvent>,
   start: Moment,
   end: Moment,
@@ -110,11 +110,11 @@ function onceOffIcalEventToTaskForRange(
       { start: startOfRange, end: endOfRangeExclusive },
     )
   ) {
-    return icalEventToTask(icalEvent, icalEvent.start);
+    return icalEventToTimeBlock(icalEvent, icalEvent.start);
   }
 }
 
-export function icalEventToTask(
+export function icalEventToTimeBlock(
   icalEvent: WithIcalConfig<ical.VEvent>,
   date: Date,
 ): RemoteTimeBlock | WithDuration<RemoteTimeBlock> {

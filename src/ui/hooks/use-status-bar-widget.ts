@@ -19,7 +19,7 @@ import type { OpenEditTimeEntryModal } from "../create-edit-time-entry-modal";
 import { keepRangeOnToday, type DateRanges } from "./use-date-ranges";
 
 interface UseStatusBarWidgetProps {
-  tasksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
+  timeBlocksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
 }
 
 interface Widget {
@@ -44,7 +44,7 @@ export function minutesToTimestamp(minutes: number) {
 export function mountStatusBarWidget(props: {
   plugin: DayPlanner;
   dateRanges: DateRanges;
-  tasksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
+  timeBlocksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
   useSelector: UseSelector<RootState>;
   logEntryEditor: LogEntryEditor;
   workspaceFacade: WorkspaceFacade;
@@ -53,7 +53,7 @@ export function mountStatusBarWidget(props: {
 }) {
   const {
     plugin,
-    tasksWithTimeForToday,
+    timeBlocksWithTimeForToday,
     dateRanges,
     useSelector,
     logEntryEditor,
@@ -74,7 +74,7 @@ export function mountStatusBarWidget(props: {
     target: statusBarWidgetContainer,
     props: {
       onClick: plugin.initTimelineLeaf,
-      tasksWithTimeForToday,
+      timeBlocksWithTimeForToday,
       useSelector,
       logEntryEditor,
       workspaceFacade,
@@ -92,23 +92,23 @@ export function mountStatusBarWidget(props: {
 }
 
 export function useStatusBarWidget({
-  tasksWithTimeForToday,
+  timeBlocksWithTimeForToday,
 }: UseStatusBarWidgetProps) {
   return derived(
-    [tasksWithTimeForToday, currentTime],
-    ([$tasksWithTimeForToday, $currentTime]) => {
-      const currentItem = $tasksWithTimeForToday.find(
+    [timeBlocksWithTimeForToday, currentTime],
+    ([$timeBlocksWithTimeForToday, $currentTime]) => {
+      const currentItem = $timeBlocksWithTimeForToday.find(
         (item) =>
           item.startTime.isBefore($currentTime) &&
           getEndTime(item).isAfter($currentTime),
       );
 
       // TODO: add tests
-      const nextItem = $tasksWithTimeForToday
+      const nextItem = $timeBlocksWithTimeForToday
         .slice()
         // todo: remote dupilcation
         .sort((a, b) => a.startTime.diff(b.startTime))
-        .find((task) => task.startTime.isAfter($currentTime));
+        .find((timeBlock) => timeBlock.startTime.isAfter($currentTime));
 
       const widget: Widget = {};
 

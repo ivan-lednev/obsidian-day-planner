@@ -12,7 +12,7 @@ import {
   icalParseLowerLimit,
 } from "./constants";
 import {
-  createDeleteTaskHandler,
+  createDeleteTimeBlockHandler,
   createEditLineHandler,
   createUpdateHandler,
   getTextFromUser,
@@ -69,7 +69,7 @@ import { createEditTimeEntryModalCreator } from "./ui/create-edit-time-entry-mod
 import { createEditorMenuCallback } from "./ui/editor-menu";
 import { useDateRanges } from "./ui/hooks/use-date-ranges";
 import { mountStatusBarWidget } from "./ui/hooks/use-status-bar-widget";
-import { useTasks } from "./ui/hooks/use-tasks";
+import { useTimeBlocks } from "./ui/hooks/use-time-blocks";
 import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
@@ -81,7 +81,7 @@ import { createEnvironmentHooks } from "./util/create-environment-hooks";
 import { createRenderMarkdown } from "./util/create-render-markdown";
 import { createShowPreview } from "./util/create-show-preview";
 import { runWithNoticeOnError } from "./util/effect";
-import { notifyAboutStartedTasks } from "./util/notify-about-started-tasks";
+import { notifyAboutStartedTimeBlocks } from "./util/notify-about-started-time-blocks";
 import { createBackgroundBatchScheduler } from "./util/scheduler";
 
 export default class DayPlanner extends Plugin {
@@ -145,8 +145,8 @@ export default class DayPlanner extends Plugin {
       store,
       useSelector,
       listenerMiddleware,
-      remoteTasks,
-      localTasks,
+      remoteTimeBlocks,
+      localTimeBlocks,
       pointerDateTime,
     } = createReactor({
       listPropsParser,
@@ -182,11 +182,11 @@ export default class DayPlanner extends Plugin {
     this.registerViews({
       store,
       dispatch,
-      remoteTasks,
+      remoteTimeBlocks,
       pointerDateTime,
       useSelector,
       listenerMiddleware,
-      localTasks,
+      localTimeBlocks,
     });
 
     const handleEditorMenu = createEditorMenuCallback({
@@ -461,8 +461,8 @@ export default class DayPlanner extends Plugin {
     dispatch: AppDispatch;
     useSelector: UseSelector<RootState>;
     listenerMiddleware: AppListenerMiddlewareInstance;
-    remoteTasks: Readable<RemoteTimeBlock[]>;
-    localTasks: Readable<EditableTimeBlock[]>;
+    remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
+    localTimeBlocks: Readable<EditableTimeBlock[]>;
     pointerDateTime: Writable<PointerDateTime>;
   }) {
     const {
@@ -470,8 +470,8 @@ export default class DayPlanner extends Plugin {
       dispatch,
       useSelector,
       listenerMiddleware,
-      remoteTasks,
-      localTasks,
+      remoteTimeBlocks,
+      localTimeBlocks,
       pointerDateTime,
     } = props;
 
@@ -513,18 +513,19 @@ export default class DayPlanner extends Plugin {
       listenerMiddleware,
     });
 
-    const { tasksWithTimeForToday, editContext, newlyStartedTasks } = useTasks({
-      onUpdate,
-      onEditAborted,
-      periodicNotes: this.periodicNotes,
-      workspaceFacade: this.workspaceFacade,
-      isOnline,
-      settingsStore: this.settingsStore,
-      currentTime,
-      pointerDateTime,
-      remoteTasks,
-      localTasks,
-    });
+    const { timeBlocksWithTimeForToday, editContext, newlyStartedTimeBlocks } =
+      useTimeBlocks({
+        onUpdate,
+        onEditAborted,
+        periodicNotes: this.periodicNotes,
+        workspaceFacade: this.workspaceFacade,
+        isOnline,
+        settingsStore: this.settingsStore,
+        currentTime,
+        pointerDateTime,
+        remoteTimeBlocks,
+        localTimeBlocks,
+      });
 
     this.registerInterval(
       window.setInterval(() => {
@@ -555,7 +556,7 @@ export default class DayPlanner extends Plugin {
     const destroyStatusBarWidget = mountStatusBarWidget({
       plugin: this,
       dateRanges,
-      tasksWithTimeForToday,
+      timeBlocksWithTimeForToday,
       useSelector,
       logEntryEditor: this.logEntryEditor,
       workspaceFacade: this.workspaceFacade,
@@ -566,8 +567,8 @@ export default class DayPlanner extends Plugin {
     this.register(destroyStatusBarWidget);
 
     this.register(
-      newlyStartedTasks.subscribe((value) =>
-        notifyAboutStartedTasks(value, this.settings()),
+      newlyStartedTimeBlocks.subscribe((value) =>
+        notifyAboutStartedTimeBlocks(value, this.settings()),
       ),
     );
     this.addCommand({
@@ -616,7 +617,7 @@ export default class DayPlanner extends Plugin {
       onConfirmed: this.undoNotice.show,
     });
 
-    const deleteTask = createDeleteTaskHandler({
+    const deleteTimeBlock = createDeleteTimeBlockHandler({
       settings: this.settings,
       periodicNotes: this.periodicNotes,
       transactionWriter: this.transactionWriter,
@@ -644,7 +645,7 @@ export default class DayPlanner extends Plugin {
       logEntryEditor: this.logEntryEditor,
       editText,
       editLine,
-      deleteTask,
+      deleteTimeBlock,
       workspaceFacade: this.workspaceFacade,
       initWeeklyView: this.initWeeklyLeaf,
       renderMarkdown: createRenderMarkdown(this.app),

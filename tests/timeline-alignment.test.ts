@@ -6,9 +6,9 @@ import { momentToTimelineOffset } from "../src/global-store/derived-settings";
 import { settings } from "../src/global-store/settings";
 import { logEntryToTimeBlock } from "../src/redux/index/entry-to-time-block";
 import type { ListItemEntry, LogEntry } from "../src/redux/index/index-slice";
-import { useTaskVisuals } from "../src/ui/hooks/use-task-visuals";
+import { useTimeBlockVisuals } from "../src/ui/hooks/use-time-block-visuals";
 
-import { baseTask } from "./edit/util/fixtures";
+import { baseTimeBlock } from "./edit/util/fixtures";
 
 const emptyPoint = { line: 0, col: 0, offset: 0 };
 
@@ -43,8 +43,8 @@ function getBottomOffset(times: {
   startTime: moment.Moment;
   durationMinutes: number;
 }) {
-  const { offset, height } = useTaskVisuals(
-    { ...baseTask, ...times },
+  const { offset, height } = useTimeBlockVisuals(
+    { ...baseTimeBlock, ...times },
     { settings },
   );
 

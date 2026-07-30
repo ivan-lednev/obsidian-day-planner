@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { createDeleteTaskHandler } from "../../src/create-update-handler";
+import { createDeleteTimeBlockHandler } from "../../src/create-update-handler";
 import { defaultSettingsForTests } from "../../src/settings";
 import type { PlanTimeBlock } from "../../src/time-block-types";
 import { getPathToDiff } from "../util/diff";
@@ -15,14 +15,14 @@ describe("Deleting tasks", () => {
       },
     );
 
-    const deleteTask = createDeleteTaskHandler({
+    const deleteTimeBlock = createDeleteTimeBlockHandler({
       settings: () => defaultSettingsForTests,
       periodicNotes,
       transactionWriter,
       onConfirmed: () => {},
     });
 
-    await deleteTask(findByText("Parent") as PlanTimeBlock);
+    await deleteTimeBlock(findByText("Parent") as PlanTimeBlock);
 
     expect(getPathToDiff(vault.initialState, vault.state)).toMatchSnapshot();
   });
@@ -34,14 +34,14 @@ describe("Deleting tasks", () => {
       },
     );
 
-    const deleteTask = createDeleteTaskHandler({
+    const deleteTimeBlock = createDeleteTimeBlockHandler({
       settings: () => defaultSettingsForTests,
       periodicNotes,
       transactionWriter,
       onConfirmed: () => {},
     });
 
-    await deleteTask(
+    await deleteTimeBlock(
       findByText(
         "Task with subtasks without list item paragraphs",
       ) as PlanTimeBlock,

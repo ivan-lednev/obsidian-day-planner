@@ -9,7 +9,7 @@
   interface Props {
     children: Snippet;
     blockEndDecoration?: Snippet;
-    task: TimeBlock;
+    timeBlock: TimeBlock;
     use?: ActionArray;
     onpointerup?: (event: PointerEvent) => void;
   }
@@ -18,14 +18,14 @@
     onpointerup,
     children,
     blockEndDecoration,
-    task,
+    timeBlock,
     use = [],
   }: Props = $props();
 
   const {
     properContrastColors: { normal, muted, faint },
     backgroundColor,
-  } = $derived(useColorOverrides({ task }));
+  } = $derived(useColorOverrides({ timeBlock }));
 </script>
 
 <div class="padding">
@@ -36,9 +36,9 @@
     style:--time-block-bg-color={backgroundColor}
     class={[
       "content",
-      task.truncated?.includes("left") && "truncated-left",
-      task.truncated?.includes("right") && "truncated-right",
-      task.truncated?.includes("bottom") && "truncated-bottom",
+      timeBlock.truncated?.includes("left") && "truncated-left",
+      timeBlock.truncated?.includes("right") && "truncated-right",
+      timeBlock.truncated?.includes("bottom") && "truncated-bottom",
     ]}
     {onpointerup}
     use:useActions={use}

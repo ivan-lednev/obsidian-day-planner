@@ -10,35 +10,37 @@ import type {
 } from "../../time-block-types";
 import { getEndTime, getNotificationKey } from "../../util/time-block-utils";
 
-interface UseNewlyStartedTasksProps {
+interface UseNewlyStartedTimeBlocksProps {
   settings: Readable<DayPlannerSettings>;
   currentTime: Readable<Moment>;
-  tasksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
+  timeBlocksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
 }
 
-export function useNewlyStartedTasks(props: UseNewlyStartedTasksProps) {
-  const { settings, currentTime, tasksWithTimeForToday } = props;
-  let previousTasksInProgress: Array<WithDuration<PlanTimeBlock>> = [];
+export function useNewlyStartedTimeBlocks(
+  props: UseNewlyStartedTimeBlocksProps,
+) {
+  const { settings, currentTime, timeBlocksWithTimeForToday } = props;
+  let previousTimeBlocksInProgress: Array<WithDuration<PlanTimeBlock>> = [];
 
   return derived([settings, currentTime], ([$settings, $currentTime]) => {
     if (!$settings.showTaskNotification) {
       return [];
     }
 
-    const tasksInProgress = get(tasksWithTimeForToday).filter<
+    const timeBlocksInProgress = get(timeBlocksWithTimeForToday).filter<
       WithDuration<PlanTimeBlock>
     >(
-      (task): task is PlanTimeBlock =>
-        task.startTime.isBefore($currentTime) &&
-        getEndTime(task).isAfter($currentTime) &&
-        task.source !== "unwritten",
+      (timeBlock): timeBlock is PlanTimeBlock =>
+        timeBlock.startTime.isBefore($currentTime) &&
+        getEndTime(timeBlock).isAfter($currentTime) &&
+        timeBlock.source !== "unwritten",
     );
 
     const newlyStarted = Array.differenceWith<WithDuration<PlanTimeBlock>>(
       (a, b) => getNotificationKey(a) === getNotificationKey(b),
-    )(tasksInProgress, previousTasksInProgress);
+    )(timeBlocksInProgress, previousTimeBlocksInProgress);
 
-    previousTasksInProgress = tasksInProgress;
+    previousTimeBlocksInProgress = timeBlocksInProgress;
 
     return newlyStarted;
   });

@@ -55,8 +55,8 @@ export function useEditContext(props: {
   periodicNotes: PeriodicNotes;
   onUpdate: OnUpdateFn;
   settings: Readable<DayPlannerSettings>;
-  localTasks: Readable<EditableTimeBlock[]>;
-  remoteTasks: Readable<RemoteTimeBlock[]>;
+  localTimeBlocks: Readable<EditableTimeBlock[]>;
+  remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
   pointerDateTime: Readable<PointerDateTime>;
   abortEditTrigger: Readable<unknown>;
   onEditAborted: OnEditAbortedFn;
@@ -67,8 +67,8 @@ export function useEditContext(props: {
     onEditAborted,
     onUpdate,
     settings,
-    localTasks: localTimeBlocks,
-    remoteTasks: remoteTimeBlocks,
+    localTimeBlocks,
+    remoteTimeBlocks,
     pointerDateTime,
     abortEditTrigger,
   } = props;
@@ -121,8 +121,8 @@ export function useEditContext(props: {
 
   const { startEdit, confirmEdit, cancelEdit } = useEditActions({
     editOperation,
-    baselineTasks: baselineTimeBlocks,
-    tasksWithPendingUpdate: timeBlocksWithPendingUpdate,
+    baselineTimeBlocks,
+    timeBlocksWithPendingUpdate,
     onUpdate,
   });
 
@@ -240,12 +240,12 @@ export function useEditContext(props: {
   return {
     handlers,
     cursor,
-    dayToDisplayedTasks: dayToDisplayedTimeBlocks,
+    dayToDisplayedTimeBlocks,
     confirmEdit,
     cancelEdit,
     editOperation,
-    getDisplayedTasksForTimeline: getDisplayedTimeBlocksForTimeline,
-    getDisplayedAllDayTasksForMultiDayRow:
+    getDisplayedTimeBlocksForTimeline,
+    getDisplayedAllDayTimeBlocksForMultiDayRow:
       getDisplayedAllDayTimeBlocksForMultiDayRow,
   };
 }

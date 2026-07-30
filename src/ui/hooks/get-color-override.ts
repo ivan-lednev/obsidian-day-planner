@@ -3,12 +3,12 @@ import type { TimeBlock } from "../../time-block-types";
 import { getOneLineSummary } from "../../util/time-block-utils";
 
 export function getColorOverride(
-  task: TimeBlock,
+  timeBlock: TimeBlock,
   isDarkMode: boolean,
   settings: DayPlannerSettings,
 ) {
   const colorOverride = settings.colorOverrides.find((override) =>
-    getOneLineSummary(task).includes(override.text),
+    getOneLineSummary(timeBlock).includes(override.text),
   );
 
   if (colorOverride) {

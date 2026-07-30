@@ -12,13 +12,13 @@
   import { MiniTimeline } from "./mini-timeline-headless.svelte.js";
 
   const {
-    tasksWithTimeForToday,
+    timeBlocksWithTimeForToday,
   }: {
-    tasksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
+    timeBlocksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
   } = $props();
 
   const timeline = $derived(
-    new MiniTimeline(currentTimeSignal, fromStore(tasksWithTimeForToday)),
+    new MiniTimeline(currentTimeSignal, fromStore(timeBlocksWithTimeForToday)),
   );
 </script>
 

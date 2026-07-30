@@ -141,11 +141,11 @@ export function addHorizontalPlacing<T extends TimeInterval>(
 
   const overlapLookup = computeOverlap(blocks);
 
-  return blocks.map((task) => {
-    const overlap = overlapLookup.get(task.id);
+  return blocks.map((timeBlock) => {
+    const overlap = overlapLookup.get(timeBlock.id);
 
     return {
-      ...task,
+      ...timeBlock,
       placing: getHorizontalPlacing(overlap),
     };
   });

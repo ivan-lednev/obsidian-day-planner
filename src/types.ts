@@ -78,7 +78,7 @@ export interface ObsidianContext {
     position: { line: number; col: number };
     contents: string;
   }) => Promise<void>;
-  deleteTask: (task: PlanTimeBlock) => Promise<void>;
+  deleteTimeBlock: (task: PlanTimeBlock) => Promise<void>;
   dispatch: AppDispatch;
   useSelector: UseSelector<RootState>;
 }

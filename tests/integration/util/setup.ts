@@ -33,7 +33,7 @@ import {
   type EditableTimeBlock,
   type TimeBlock,
 } from "../../../src/time-block-types";
-import { useTasks } from "../../../src/ui/hooks/use-tasks";
+import { useTimeBlocks } from "../../../src/ui/hooks/use-time-blocks";
 import { createBackgroundBatchScheduler } from "../../../src/util/scheduler";
 import { getOneLineSummary } from "../../../src/util/time-block-utils";
 import {
@@ -153,17 +153,22 @@ export async function setUp(props?: {
 
   onTestFinished(() => icalParseScheduler.cancelTasks());
 
-  const { useSelector, store, remoteTasks, localTasks, pointerDateTime } =
-    createReactor({
-      preloadedState: defaultPreloadedStateForTests,
-      listPropsParser,
-      indexServices,
-      vault: vault as unknown as Vault,
-      metadataCache,
-      periodicNotes,
-      settings,
-      icalParseScheduler,
-    });
+  const {
+    useSelector,
+    store,
+    remoteTimeBlocks,
+    localTimeBlocks,
+    pointerDateTime,
+  } = createReactor({
+    preloadedState: defaultPreloadedStateForTests,
+    listPropsParser,
+    indexServices,
+    vault: vault as unknown as Vault,
+    metadataCache,
+    periodicNotes,
+    settings,
+    icalParseScheduler,
+  });
 
   const { getState, dispatch } = store;
 
@@ -196,31 +201,32 @@ export async function setUp(props?: {
     getConfirmationInput: () => Promise.resolve(true),
   });
 
-  const { tasksWithTimeForToday, editContext, newlyStartedTasks } = useTasks({
-    onUpdate,
-    onEditAborted: () => {},
-    periodicNotes,
-    workspaceFacade,
-    isOnline,
-    settingsStore,
-    currentTime,
-    pointerDateTime,
-    remoteTasks,
-    localTasks,
-  });
+  const { timeBlocksWithTimeForToday, editContext, newlyStartedTimeBlocks } =
+    useTimeBlocks({
+      onUpdate,
+      onEditAborted: () => {},
+      periodicNotes,
+      workspaceFacade,
+      isOnline,
+      settingsStore,
+      currentTime,
+      pointerDateTime,
+      remoteTimeBlocks,
+      localTimeBlocks,
+    });
 
-  const allTasks = derived(
-    editContext.dayToDisplayedTasks,
-    ($dayToDisplayedTasks) => {
-      return Object.values($dayToDisplayedTasks).flatMap(
+  const allTimeBlocks = derived(
+    editContext.dayToDisplayedTimeBlocks,
+    ($dayToDisplayedTimeBlocks) => {
+      return Object.values($dayToDisplayedTimeBlocks).flatMap(
         ({ withTime, noTime }) => withTime.concat(noTime),
       );
     },
   );
 
   // this prevents the store from resetting;
-  allTasks.subscribe(Function.constVoid);
-  localTasks.subscribe(Function.constVoid);
+  allTimeBlocks.subscribe(Function.constVoid);
+  localTimeBlocks.subscribe(Function.constVoid);
 
   function moveCursorTo(
     dateTime: Moment,
@@ -232,8 +238,8 @@ export async function setUp(props?: {
     });
   }
 
-  function findTask(predicate: (task: TimeBlock) => boolean) {
-    const found = get(allTasks).filter(isLocal).find(predicate) as
+  function findTimeBlock(predicate: (timeBlock: TimeBlock) => boolean) {
+    const found = get(allTimeBlocks).filter(isLocal).find(predicate) as
       | EditableTimeBlock
       | undefined;
 
@@ -243,7 +249,7 @@ export async function setUp(props?: {
   }
 
   function findByText(text: string) {
-    return findTask((it) => getOneLineSummary(it).includes(text));
+    return findTimeBlock((it) => getOneLineSummary(it).includes(text));
   }
 
   await vi.waitFor(() => {
@@ -261,16 +267,16 @@ export async function setUp(props?: {
     useSelector,
     getState,
     dispatch,
-    tasksWithTimeForToday,
+    timeBlocksWithTimeForToday,
     editContext,
-    newlyStartedTasks,
+    newlyStartedTimeBlocks,
     periodicNotes,
     moveCursorTo,
     onUpdate,
     vault,
-    findTask,
+    findTimeBlock,
     findByText,
-    allTasks,
+    allTimeBlocks,
     transactionWriter,
     currentTime,
     metadataCache,

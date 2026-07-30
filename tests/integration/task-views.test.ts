@@ -72,11 +72,11 @@ describe("Task views", () => {
       visibleDays: ["2025-07-19"],
     });
 
-    const displayedTasks = editContext.getDisplayedTasksForTimeline(
+    const displayedTimeBlocks = editContext.getDisplayedTimeBlocksForTimeline(
       window.moment("2025-07-19"),
     );
 
-    expect(get(displayedTasks)?.noTime).not.toContainEqual(
+    expect(get(displayedTimeBlocks)?.noTime).not.toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Task outside of planner heading"),
       }),
@@ -88,11 +88,11 @@ describe("Task views", () => {
       visibleDays: ["2025-07-19"],
     });
 
-    const displayedTasks = editContext.getDisplayedTasksForTimeline(
+    const displayedTimeBlocks = editContext.getDisplayedTimeBlocksForTimeline(
       window.moment("2025-07-19"),
     );
 
-    const { withTime, noTime } = get(displayedTasks);
+    const { withTime, noTime } = get(displayedTimeBlocks);
 
     expect(withTime).toContainEqual(
       expect.objectContaining({
@@ -137,11 +137,11 @@ describe("Task views", () => {
       },
     });
 
-    const displayedTasks = editContext.getDisplayedTasksForTimeline(
+    const displayedTimeBlocks = editContext.getDisplayedTimeBlocksForTimeline(
       window.moment("2025-07-19"),
     );
 
-    const { noTime } = get(displayedTasks);
+    const { noTime } = get(displayedTimeBlocks);
 
     expect(
       noTime.filter(

@@ -12,28 +12,28 @@
     useColoredTimeline,
     useStylesForRelationToNow,
   } from "../hooks/use-color.svelte";
-  import { useTaskVisuals } from "../hooks/use-task-visuals";
+  import { useTimeBlockVisuals } from "../hooks/use-time-block-visuals";
 
   const {
     children,
-    task,
+    timeBlock,
   }: {
     children: Snippet;
-    task: WithPlacing<WithDuration<TimeBlock>>;
+    timeBlock: WithPlacing<WithDuration<TimeBlock>>;
     use?: ActionArray;
   } = $props();
 
   const { height, offset, width, left } = $derived(
-    useTaskVisuals(task, { settings }),
+    useTimeBlockVisuals(timeBlock, { settings }),
   );
 
-  const relationToNow = $derived(useStylesForRelationToNow(task));
+  const relationToNow = $derived(useStylesForRelationToNow(timeBlock));
 
   const padding = $derived(
-    task.truncated?.includes("bottom") ? "0 1px 0" : undefined,
+    timeBlock.truncated?.includes("bottom") ? "0 1px 0" : undefined,
   );
 
-  const coloredTimeline = $derived(useColoredTimeline(task));
+  const coloredTimeline = $derived(useColoredTimeline(timeBlock));
   const { normal, muted, faint } = $derived(
     coloredTimeline.properContrastColors,
   );

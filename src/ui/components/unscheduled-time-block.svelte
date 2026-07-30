@@ -9,27 +9,27 @@
   import TimeBlockControls from "./time-block-controls.svelte";
 
   const {
-    task,
+    timeBlock,
     bottomDecoration,
   }: {
-    task: TimelineTimeBlock;
+    timeBlock: TimelineTimeBlock;
     class?: string;
     bottomDecoration?: Snippet;
   } = $props();
 </script>
 
-{#if isRemote(task)}
-  <TimeBlockBase {task}>
-    <RemoteTimeBlockContent {bottomDecoration} {task} />
+{#if isRemote(timeBlock)}
+  <TimeBlockBase {timeBlock}>
+    <RemoteTimeBlockContent {bottomDecoration} {timeBlock} />
   </TimeBlockBase>
 {:else}
-  <TimeBlockControls {task}>
-    {#snippet timeBlock({ isActive, onPointerUp, use })}
+  <TimeBlockControls {timeBlock}>
+    {#snippet content({ isActive, onPointerUp, use })}
       <LocalTimeBlock
         {bottomDecoration}
         {isActive}
         onpointerup={onPointerUp}
-        {task}
+        {timeBlock}
         {use}
       />
     {/snippet}

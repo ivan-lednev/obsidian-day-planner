@@ -3,7 +3,7 @@ import { derived, writable } from "svelte/store";
 import { getObsidianContext } from "../../context/obsidian-context";
 import { isListItemSourced, type LocalTimeBlock } from "../../time-block-types";
 
-export function hoverPreview(task: LocalTimeBlock) {
+export function hoverPreview(timeBlock: LocalTimeBlock) {
   return (el: HTMLElement) => {
     const { isModPressed, showPreview } = getObsidianContext();
     let currentEvent: MouseEvent | undefined;
@@ -35,15 +35,17 @@ export function hoverPreview(task: LocalTimeBlock) {
         return;
       }
 
-      if (task.source === "unwritten") {
+      if (timeBlock.source === "unwritten") {
         return;
       }
 
       showPreview(
         el,
         currentEvent,
-        task.path,
-        isListItemSourced(task) ? task.position.start.line : undefined,
+        timeBlock.path,
+        isListItemSourced(timeBlock)
+          ? timeBlock.position.start.line
+          : undefined,
       );
     });
 

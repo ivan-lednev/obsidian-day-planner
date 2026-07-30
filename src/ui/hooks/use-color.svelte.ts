@@ -9,24 +9,24 @@ import * as t from "../../util/time-block-utils";
 import { getOneLineSummary } from "../../util/time-block-utils";
 
 interface UseColorProps {
-  task: TimeBlock;
+  timeBlock: TimeBlock;
 }
 
-export function useStylesForRelationToNow(task: TimeBlock) {
+export function useStylesForRelationToNow(timeBlock: TimeBlock) {
   const relationToNow = $derived.by(() => {
-    if (task.isAllDayEvent) {
+    if (timeBlock.isAllDayEvent) {
       return getRelationToNow(
         currentTimeSignal.current,
-        task.startTime.clone().startOf("day"),
-        task.startTime.clone().endOf("day"),
+        timeBlock.startTime.clone().startOf("day"),
+        timeBlock.startTime.clone().endOf("day"),
       );
     }
 
-    if (t.isWithDuration(task)) {
+    if (t.isWithDuration(timeBlock)) {
       return getRelationToNow(
         currentTimeSignal.current,
-        task.startTime,
-        t.getEndTime(task),
+        timeBlock.startTime,
+        t.getEndTime(timeBlock),
       );
     }
 
@@ -34,7 +34,7 @@ export function useStylesForRelationToNow(task: TimeBlock) {
   });
 
   const borderColor = $derived(
-    relationToNow === "present" && !task.isAllDayEvent
+    relationToNow === "present" && !timeBlock.isAllDayEvent
       ? "var(--color-accent)"
       : "",
   );
@@ -53,7 +53,7 @@ export function useStylesForRelationToNow(task: TimeBlock) {
   };
 }
 
-export function useColoredTimeline(task: TimeBlock) {
+export function useColoredTimeline(timeBlock: TimeBlock) {
   const { settingsSignal } = getObsidianContext();
 
   const colorScale = $derived.by(() => {
@@ -66,7 +66,8 @@ export function useColoredTimeline(task: TimeBlock) {
     const { timelineColored, startHour } = settingsSignal.current;
 
     if (timelineColored) {
-      const scaleKey = (task.startTime.hour() - startHour) / (24 - startHour);
+      const scaleKey =
+        (timeBlock.startTime.hour() - startHour) / (24 - startHour);
 
       return colorScale(scaleKey).hex();
     }
@@ -96,14 +97,14 @@ export function useColoredTimeline(task: TimeBlock) {
   };
 }
 
-export function useColorOverrides({ task }: UseColorProps) {
+export function useColorOverrides({ timeBlock }: UseColorProps) {
   const { settingsSignal, isDarkMode } = getObsidianContext();
 
   const colorOverride = $derived.by(() => {
     const { colorOverrides } = settingsSignal.current;
 
     return colorOverrides.find((override) =>
-      getOneLineSummary(task).includes(override.text),
+      getOneLineSummary(timeBlock).includes(override.text),
     );
   });
 

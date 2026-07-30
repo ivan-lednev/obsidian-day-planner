@@ -7,7 +7,7 @@ import { icalParseLowerLimit } from "../src/constants";
 import { initialState as initialDateRangesState } from "../src/redux/date-ranges-slice";
 import {
   icalRefreshRequested,
-  selectRemoteTasks,
+  selectRemoteTimeBlocks,
 } from "../src/redux/ical/ical-slice";
 import { type IcalParseTaskResult } from "../src/redux/ical/init-ical-listeners";
 import { initListenerMiddleware } from "../src/redux/listener-middleware";
@@ -115,10 +115,10 @@ async function setUp(props: {
 
   dispatch(icalRefreshRequested());
 
-  await vi.waitUntil(() => selectRemoteTasks(getState()).length > 0);
+  await vi.waitUntil(() => selectRemoteTimeBlocks(getState()).length > 0);
 
   return {
-    remoteTasks: selectRemoteTasks(getState()),
+    remoteTimeBlocks: selectRemoteTimeBlocks(getState()),
     dispatch,
     getState,
   };
@@ -130,12 +130,12 @@ describe("ical", () => {
   });
 
   test("Tasks contain RSVP status, description, location", async () => {
-    const { remoteTasks } = await setUp({
+    const { remoteTimeBlocks } = await setUp({
       icalFixtureFileName: "google-tentative-attendee",
       visibleDays: ["2024-09-26"],
     });
 
-    expect(remoteTasks).toEqual([
+    expect(remoteTimeBlocks).toEqual([
       expect.objectContaining({
         summary: "tentative-status",
         description: "tentative-description",
@@ -162,9 +162,9 @@ describe("ical", () => {
     dispatch(icalRefreshRequested());
 
     await vi.waitFor(() => expect(request).toHaveBeenCalledTimes(2));
-    const remoteTasks = selectRemoteTasks(getState());
+    const remoteTimeBlocks = selectRemoteTimeBlocks(getState());
 
-    expect(remoteTasks).toHaveLength(1);
+    expect(remoteTimeBlocks).toHaveLength(1);
   });
 
   test.each([
@@ -173,29 +173,29 @@ describe("ical", () => {
   ])(
     "Shows multi-day tasks that start before or after the visible range, row $#",
     async (...visibleDays) => {
-      const { remoteTasks } = await setUp({
+      const { remoteTimeBlocks } = await setUp({
         icalFixtureFileName: "google-event-stretching-5-days",
         visibleDays,
       });
 
-      expect(remoteTasks).toHaveLength(1);
+      expect(remoteTimeBlocks).toHaveLength(1);
     },
   );
 
   test("Events don't get duplicated if they fall within 2 separate ranges", async () => {
-    const { remoteTasks } = await setUp({
+    const { remoteTimeBlocks } = await setUp({
       icalFixtureFileName: "google-event-stretching-5-days",
       visibleDays: ["2024-10-12", "2024-10-16"],
     });
 
-    expect(remoteTasks).toHaveLength(1);
+    expect(remoteTimeBlocks).toHaveLength(1);
   });
 
   // TODO: check out https://github.com/jens-maus/node-ical/issues/36
   //  this odd behavior comes from the 'fix' to that bug
   //  need to avoid this:`["2025-03-26T00:00:00.000Z", "2025-03-27T23:00:00.000Z"]`
   test.skip("A recurrent 2-day event spans exactly 2 days", async () => {
-    const { remoteTasks } = await setUp({
+    const { remoteTimeBlocks } = await setUp({
       icalFixtureFileName: "google-2-day-event-every-wed",
       visibleDays: [
         "2025-04-07",
@@ -206,7 +206,7 @@ describe("ical", () => {
       ],
     });
 
-    expect(remoteTasks).toEqual([
+    expect(remoteTimeBlocks).toEqual([
       expect.objectContaining({
         durationMinutes: 60 * 24 * 2,
       }),
@@ -214,23 +214,23 @@ describe("ical", () => {
   });
 
   test.skip("Deleted recurrences don't show up as tasks", async () => {
-    const { remoteTasks } = await setUp({
+    const { remoteTimeBlocks } = await setUp({
       icalFixtureFileName: "google-deleted-recurrence",
       visibleDays: ["2025-04-09", "2025-04-10", "2025-04-11"],
     });
 
-    expect(remoteTasks).toHaveLength(2);
+    expect(remoteTimeBlocks).toHaveLength(2);
 
-    expect(remoteTasks[0]?.startTime).toEqual(
+    expect(remoteTimeBlocks[0]?.startTime).toEqual(
       window.moment("2025-04-09T00:00:00.000Z"),
     );
-    expect(remoteTasks[1]?.startTime).toEqual(
+    expect(remoteTimeBlocks[1]?.startTime).toEqual(
       window.moment("2025-04-11T00:00:00.000Z"),
     );
   });
 
   test.skip("Yearly recurrences do not show up every month", async () => {
-    const { remoteTasks } = await setUp({
+    const { remoteTimeBlocks } = await setUp({
       icalFixtureFileName: "google-yearly-recurrence",
       visibleDays: [
         "2025-04-09",
@@ -243,23 +243,23 @@ describe("ical", () => {
       ],
     });
 
-    expect(remoteTasks).toHaveLength(2);
+    expect(remoteTimeBlocks).toHaveLength(2);
 
-    expect(remoteTasks[0]?.startTime).toEqual(
+    expect(remoteTimeBlocks[0]?.startTime).toEqual(
       window.moment("2025-04-09T00:00:00.000Z"),
     );
-    expect(remoteTasks[1]?.startTime).toEqual(
+    expect(remoteTimeBlocks[1]?.startTime).toEqual(
       window.moment("2026-04-09T00:00:00.000Z"),
     );
   });
 
   test("Last visible day is inclusive, i.e. events happening on the last day of the range get displayed", async () => {
-    const { remoteTasks } = await setUp({
+    const { remoteTimeBlocks } = await setUp({
       icalFixtureFileName: "google-recurring-with-exception-and-location",
       visibleDays: ["2024-09-29"],
     });
 
-    expect(remoteTasks).toHaveLength(1);
+    expect(remoteTimeBlocks).toHaveLength(1);
   });
 
   test.todo("Recurring workday all-day tasks do not show up on Sunday");

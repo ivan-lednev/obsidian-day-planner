@@ -10,16 +10,22 @@ import { runWithNoticeOnError } from "../util/effect";
 
 export function createTimeBlockMenu(props: {
   event: MouseEvent | TouchEvent;
-  task: EditableTimeBlock;
+  timeBlock: EditableTimeBlock;
   logEntryEditor: LogEntryEditor;
   workspaceFacade: WorkspaceFacade;
   onEdit: () => void;
-  onDelete: (task: PlanTimeBlock) => Promise<void>;
+  onDelete: (timeBlock: PlanTimeBlock) => Promise<void>;
 }) {
-  const { event, task, logEntryEditor, workspaceFacade, onEdit, onDelete } =
-    props;
+  const {
+    event,
+    timeBlock,
+    logEntryEditor,
+    workspaceFacade,
+    onEdit,
+    onDelete,
+  } = props;
 
-  if (task.source === "unwritten") {
+  if (timeBlock.source === "unwritten") {
     throw new Error("Cannot show a menu for an unwritten time block");
   }
 
@@ -30,7 +36,7 @@ export function createTimeBlockMenu(props: {
       .setTitle("Clock in")
       .setIcon("play")
       .onClick(async () => {
-        await runWithNoticeOnError(logEntryEditor.clockIn(task));
+        await runWithNoticeOnError(logEntryEditor.clockIn(timeBlock));
       });
   });
 
@@ -43,7 +49,7 @@ export function createTimeBlockMenu(props: {
       .setTitle("Reveal task in file")
       .setIcon("file-input")
       .onClick(async () => {
-        await workspaceFacade.revealLocation(task);
+        await workspaceFacade.revealLocation(timeBlock);
       });
   });
 
@@ -55,7 +61,7 @@ export function createTimeBlockMenu(props: {
       .setIcon("trash-2")
       .setWarning(true)
       .onClick(async () => {
-        await onDelete(task);
+        await onDelete(timeBlock);
       });
   });
 
