@@ -7,7 +7,7 @@ import { type Scheduler } from "../../util/scheduler";
 import {
   selectSortedDedupedVisibleDays,
   selectVisibleDays,
-} from "../global-slice";
+} from "../date-ranges-slice";
 import { selectIcals } from "../settings-slice";
 import type { AppListenerEffect } from "../store";
 import { createSelectorChangePredicate } from "../util";

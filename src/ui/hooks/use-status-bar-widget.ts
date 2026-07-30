@@ -16,7 +16,7 @@ import { getEndTime, getOneLineSummary } from "../../util/time-block-utils";
 import StatusBarWidget from "../components/status-bar-widget.svelte";
 import type { OpenEditTimeEntryModal } from "../create-edit-time-entry-modal";
 
-import type { DateRanges } from "./use-date-ranges";
+import { keepRangeOnToday, type DateRanges } from "./use-date-ranges";
 
 interface UseStatusBarWidgetProps {
   tasksWithTimeForToday: Readable<Array<WithDuration<TimeBlock>>>;
@@ -67,7 +67,8 @@ export function mountStatusBarWidget(props: {
   statusBarWidgetContainer.removeClasses(["status-bar-item"]);
   statusBarWidgetContainer.addClass("planner-status-bar-widget-root");
 
-  const { untrack } = dateRanges.trackRange([window.moment()]);
+  const dateRange = dateRanges.trackRange([window.moment()]);
+  const unsubscribeFromCurrentTime = keepRangeOnToday(dateRange, currentTime);
 
   const component = mount(StatusBarWidget, {
     target: statusBarWidgetContainer,
@@ -83,7 +84,8 @@ export function mountStatusBarWidget(props: {
   });
 
   return async () => {
-    untrack();
+    unsubscribeFromCurrentTime();
+    dateRange.untrack();
 
     await unmount(component);
   };

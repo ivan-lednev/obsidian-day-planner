@@ -1,6 +1,5 @@
 <script lang="ts">
   import { type Moment } from "moment";
-  import { get } from "svelte/store";
   import { isNotVoid } from "typed-assert";
 
   import { getDateRangeContext } from "../../../context/date-range-context";
@@ -89,7 +88,7 @@
       return;
     }
 
-    const currentDateRange = get(dateRange);
+    const currentDateRange = dateRange.current;
 
     const viewportToElOffsetX = multiDayRowRef.getBoundingClientRect().left;
     const containerWidth = multiDayRowRef.scrollWidth;
@@ -137,7 +136,7 @@
     style:--timeline-internal-column-count={timelineInternalColumnCount}
     class={["planner-header-row", "day-buttons"]}
   >
-    {#each $dateRange as day}
+    {#each dateRange.current as day}
       <div class="header-cell">
         <ControlButton
           --border-radius="0"
@@ -171,17 +170,17 @@
       <MultiDayRow />
     </div>
     <ColumnTracksOverlay
-      columnCount={$dateRange.length}
+      columnCount={dateRange.current.length}
       bind:el={columnTrackOverlayEl}
     />
   </div>
 
   <div class="multi-day-main-content">
     <Scroller class="planner-multi-day-scroller" onscroll={handleScroll}>
-      {#each $dateRange as day, index}
+      {#each dateRange.current as day, index}
         <Timeline
           --column-background-color={getColumnBackgroundColor(day)}
-          --timeline-border-inline-end={isLastIndexOf($dateRange, index)
+          --timeline-border-inline-end={isLastIndexOf(dateRange.current, index)
             ? "none"
             : "var(--border-base)"}
           {day}

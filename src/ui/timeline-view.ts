@@ -79,8 +79,10 @@ export default class TimelineView extends ItemView {
 
     isNotVoid(contentEl);
 
-    this.dateRange = this.dateRanges.trackRange([window.moment()]);
-    this.register(this.dateRange.subscribe(this.updateTabTitleAndHeader));
+    const dateRange = this.dateRanges.trackRange([window.moment()]);
+
+    this.dateRange = dateRange;
+    this.register(dateRange.onChange(this.updateTabTitleAndHeader));
     this.registerEvent(
       this.workspaceFacade.onActiveLeafChange((leaf) => {
         if (!this.dateRange) {
@@ -127,7 +129,7 @@ export default class TimelineView extends ItemView {
       return undefined;
     }
 
-    return get(this.dateRange)?.[0];
+    return this.dateRange.current[0];
   };
 
   private updateTabTitleAndHeader = () => {

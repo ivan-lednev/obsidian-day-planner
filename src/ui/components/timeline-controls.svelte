@@ -26,7 +26,7 @@
   const isInSidebar = getIsInSidebarContext();
 
   const selectedDay = $derived.by(() => {
-    const day = $dateRange[0];
+    const day = dateRange.current[0];
 
     isNotVoid(day);
 
@@ -35,15 +35,15 @@
   const week = $derived(getFullWeek(selectedDay, $settings.firstDayOfWeek));
 
   function goToToday() {
-    $dateRange = [window.moment()];
+    dateRange.set([window.moment()]);
   }
 
   function goBack() {
-    $dateRange = [selectedDay.clone().subtract(1, "week")];
+    dateRange.set([selectedDay.clone().subtract(1, "week")]);
   }
 
   function goForward() {
-    $dateRange = [selectedDay.clone().add(1, "week")];
+    dateRange.set([selectedDay.clone().add(1, "week")]);
   }
 
   async function goToNoteForDay(day: Moment) {
@@ -59,7 +59,7 @@
       return;
     }
 
-    $dateRange = [day];
+    dateRange.set([day]);
   }
 
   function handleMenuClick(event: MouseEvent) {

@@ -7,7 +7,7 @@ import { expect, onTestFinished, vi } from "vitest";
 
 import { icalParseLowerLimit } from "../../../src/constants";
 import { createUpdateHandler } from "../../../src/create-update-handler";
-import { initialState } from "../../../src/redux/global-slice";
+import { initialState } from "../../../src/redux/date-ranges-slice";
 import { type IcalParseTaskResult } from "../../../src/redux/ical/init-ical-listeners";
 import {
   indexRequested,
@@ -139,9 +139,9 @@ export async function setUp(props?: {
   const onEditCanceled = vi.fn();
   const onEditConfirmed = vi.fn();
   const defaultPreloadedStateForTests: Partial<RootState> = {
-    obsidian: {
+    dateRanges: {
       ...initialState,
-      visibleDays,
+      ranges: { testRange: visibleDays },
     },
     settings: { settings },
   };
@@ -155,13 +155,7 @@ export async function setUp(props?: {
 
   const { useSelector, store, remoteTasks, localTasks, pointerDateTime } =
     createReactor({
-      preloadedState: {
-        ...defaultPreloadedStateForTests,
-        obsidian: {
-          ...initialState,
-          visibleDays,
-        },
-      },
+      preloadedState: defaultPreloadedStateForTests,
       listPropsParser,
       indexServices,
       vault: vault as unknown as Vault,

@@ -4,7 +4,7 @@ import { type MetadataCache, request, Vault } from "obsidian";
 import { beforeEach, describe, expect, onTestFinished, test, vi } from "vitest";
 
 import { icalParseLowerLimit } from "../src/constants";
-import { initialState as initialGlobalState } from "../src/redux/global-slice";
+import { initialState as initialDateRangesState } from "../src/redux/date-ranges-slice";
 import {
   icalRefreshRequested,
   selectRemoteTasks,
@@ -37,9 +37,9 @@ export async function getIcalFixture(file: string) {
 }
 
 const defaultPreloadedStateForTests: Partial<RootState> = {
-  obsidian: {
-    ...initialGlobalState,
-    visibleDays: defaultVisibleDays,
+  dateRanges: {
+    ...initialDateRangesState,
+    ranges: { testRange: defaultVisibleDays },
   },
   settings: {
     settings: {
@@ -106,9 +106,9 @@ async function setUp(props: {
   const { dispatch, getState } = makeStoreForTests({
     preloadedState: {
       ...defaultPreloadedStateForTests,
-      obsidian: {
-        ...initialGlobalState,
-        visibleDays,
+      dateRanges: {
+        ...initialDateRangesState,
+        ranges: { testRange: visibleDays },
       },
     },
   });

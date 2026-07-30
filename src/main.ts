@@ -30,13 +30,13 @@ import {
   toMarkdown,
   toMdastPoint,
 } from "./mdast/mdast";
-import { visibleDaysUpdated } from "./redux/global-slice";
 import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { type IcalParseTaskResult } from "./redux/ical/init-ical-listeners";
 import { selectActiveLogEntries } from "./redux/index/index-selectors";
 import { settingsUpdated } from "./redux/settings-slice";
 import {
   type AppDispatch,
+  type AppListenerMiddlewareInstance,
   type AppStore,
   createReactor,
   type RootState,
@@ -70,7 +70,6 @@ import { createEditorMenuCallback } from "./ui/editor-menu";
 import { useDateRanges } from "./ui/hooks/use-date-ranges";
 import { mountStatusBarWidget } from "./ui/hooks/use-status-bar-widget";
 import { useTasks } from "./ui/hooks/use-tasks";
-import { useVisibleDays } from "./ui/hooks/use-visible-days";
 import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
@@ -186,6 +185,7 @@ export default class DayPlanner extends Plugin {
       remoteTasks,
       pointerDateTime,
       useSelector,
+      listenerMiddleware,
       localTasks,
     });
 
@@ -460,6 +460,7 @@ export default class DayPlanner extends Plugin {
     store: AppStore;
     dispatch: AppDispatch;
     useSelector: UseSelector<RootState>;
+    listenerMiddleware: AppListenerMiddlewareInstance;
     remoteTasks: Readable<RemoteTimeBlock[]>;
     localTasks: Readable<EditableTimeBlock[]>;
     pointerDateTime: Writable<PointerDateTime>;
@@ -468,6 +469,7 @@ export default class DayPlanner extends Plugin {
       store,
       dispatch,
       useSelector,
+      listenerMiddleware,
       remoteTasks,
       localTasks,
       pointerDateTime,
@@ -505,8 +507,11 @@ export default class DayPlanner extends Plugin {
       workspace: this.app.workspace,
     });
 
-    const dateRanges = useDateRanges();
-    const visibleDays = useVisibleDays(dateRanges.ranges);
+    const dateRanges = useDateRanges({
+      store,
+      useSelector,
+      listenerMiddleware,
+    });
 
     const { tasksWithTimeForToday, editContext, newlyStartedTasks } = useTasks({
       onUpdate,
@@ -537,16 +542,6 @@ export default class DayPlanner extends Plugin {
         document.body.style.cursor = bodyCursor;
       }),
     );
-    this.register(
-      visibleDays.subscribe((days) => {
-        dispatch(
-          // without the offset, an event right of UTC is going to be displayed as the previous day
-          // a visible day in my zone is 2025-04-15, but in UTC it's 2025-04-14T22:00:00, and getDayKey returns 2025-04-14
-          visibleDaysUpdated(days.map((it) => it.toISOString(true))),
-        );
-      }),
-    );
-
     const openEditTimeEntryModal = createEditTimeEntryModalCreator(
       this.app,
       this.logEntryEditor,

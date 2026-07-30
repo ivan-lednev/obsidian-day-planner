@@ -4,9 +4,9 @@ import { isNotVoid } from "typed-assert";
 import { addHorizontalPlacing } from "../../overlap/overlap";
 import type { LogTimeBlock } from "../../time-block-types";
 import { strictParse, toMinutePrecision } from "../../util/moment";
-import { clamp, getDayKey } from "../../util/time-block-utils";
+import { clamp } from "../../util/time-block-utils";
 import { createAppSelector } from "../create-app-selector";
-import { selectVisibleDays } from "../global-slice";
+import { selectVisibleDays } from "../date-ranges-slice";
 
 import {
   closedLogEntryToTimeBlock,
@@ -171,12 +171,9 @@ export const selectPlanEntriesForVisibleDays = createAppSelector(
     selectVisibleDays,
   ],
   // todo: copy-pasta. Can we re-use it without breaking caching?
-  (planEntriesByDay, planEntriesById, listItemEntriesById, dayKeysFull) => {
+  (planEntriesByDay, planEntriesById, listItemEntriesById, dayKeys) => {
     const uniqueTaskIds = new Set(
-      dayKeysFull
-        // todo: do not store full timestamp in store
-        .map((key) => getDayKey(strictParse(key)))
-        .flatMap((dayKey) => Object.keys(planEntriesByDay[dayKey] || {})),
+      dayKeys.flatMap((dayKey) => Object.keys(planEntriesByDay[dayKey] || {})),
     );
 
     return (

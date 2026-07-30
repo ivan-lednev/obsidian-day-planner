@@ -14,7 +14,7 @@
     editContext.getDisplayedAllDayTasksForMultiDayRow,
   );
 
-  const dateRange = fromStore(getDateRangeContext());
+  const dateRange = getDateRangeContext();
   const firstDayInRange = $derived.by(() => {
     const first = dateRange.current[0];
 

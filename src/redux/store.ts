@@ -17,7 +17,7 @@ import type { DayPlannerSettings } from "../settings";
 import type { PointerDateTime, ReduxExtraArgument } from "../types";
 import type { Scheduler } from "../util/scheduler";
 
-import { globalSlice } from "./global-slice";
+import { dateRangesSlice } from "./date-ranges-slice";
 import { icalSlice, selectRemoteTasks } from "./ical/ical-slice";
 import type { IcalParseTaskResult } from "./ical/init-ical-listeners";
 import { selectPlanEntriesForVisibleDays } from "./index/index-selectors";
@@ -27,7 +27,7 @@ import { settingsSlice } from "./settings-slice";
 import { createUseSelector } from "./use-selector";
 
 const rootReducer = combineSlices(
-  globalSlice,
+  dateRangesSlice,
   settingsSlice,
   icalSlice,
   indexSlice,

@@ -1,4 +1,3 @@
-import type { Moment } from "moment";
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { mount, unmount } from "svelte";
 import { derived, get, type Writable } from "svelte/store";
@@ -37,13 +36,7 @@ export default class MultiDayView extends ItemView {
       return MultiDayView.defaultDisplayText;
     }
 
-    const currentDateRange = get(this.dateRange);
-
-    if (!currentDateRange) {
-      return MultiDayView.defaultDisplayText;
-    }
-
-    return r.toString(get(this.dateRange));
+    return r.toString(this.dateRange.current);
   }
 
   getIcon() {
@@ -62,8 +55,11 @@ export default class MultiDayView extends ItemView {
       currentSettings.firstDayOfWeek,
     );
 
-    this.dateRange = this.dateRanges.trackRange(range);
-    this.register(this.dateRange.subscribe(this.updateTabTitleAndHeader));
+    const dateRange = this.dateRanges.trackRange(range);
+
+    this.dateRange = dateRange;
+    this.register(dateRange.onChange(this.updateTabTitleAndHeader));
+    this.updateTabTitleAndHeader();
 
     const relevantSettingsSignal = derived(this.settings, ($settings) => {
       return {
@@ -112,7 +108,7 @@ export default class MultiDayView extends ItemView {
     this.dateRange?.untrack();
   }
 
-  private updateTabTitleAndHeader = (range: Moment[]) => {
-    setViewTitle(this, r.toString(range));
+  private updateTabTitleAndHeader = () => {
+    setViewTitle(this, this.getDisplayText());
   };
 }
