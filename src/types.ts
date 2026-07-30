@@ -39,7 +39,6 @@ export interface Overlap {
   fraction?: Fraction;
 }
 
-export type CleanUp = () => void;
 export type RenderMarkdown = ReturnType<typeof createRenderMarkdown>;
 
 export type PointerDateTime = {
@@ -103,17 +102,6 @@ declare global {
 }
 
 export type WithIcalConfig<T> = T & { calendar: IcalConfig };
-
-export type DateRange = {
-  readonly current: Moment[];
-  set: (days: Moment[]) => void;
-  update: (fn: (days: Moment[]) => Moment[]) => void;
-  /**
-   * Reacts to changes with a side effect. For reactive reads use `current`
-   */
-  onChange: (listener: () => void) => CleanUp;
-  untrack: () => void;
-};
 
 export type ReduxExtraArgument = {
   settings: DayPlannerSettings;

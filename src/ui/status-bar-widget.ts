@@ -3,6 +3,7 @@ import { type Readable } from "svelte/store";
 
 import { currentTime } from "../global-store/current-time";
 import type DayPlanner from "../main";
+import { keepRangeOnToday, type DateRanges } from "../redux/date-ranges";
 import type { RootState } from "../redux/store";
 import type { UseSelector } from "../redux/use-selector";
 import type { LogEntryEditor } from "../service/log-entry-editor";
@@ -10,7 +11,6 @@ import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { TimeBlock, WithDuration } from "../time-block-types";
 
 import StatusBarWidget from "./components/status-bar-widget.svelte";
-import { keepRangeOnToday, type DateRanges } from "./hooks/use-date-ranges";
 import type { OpenLogEntryEditModal } from "./log-entry-edit-modal";
 
 export function mountStatusBarWidget(props: {

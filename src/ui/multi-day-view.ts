@@ -1,16 +1,16 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { mount, unmount } from "svelte";
-import { derived, get, type Writable } from "svelte/store";
+import { derived, get, toStore, type Writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
 import { dateRangeContextKey, viewTypeMultiDay } from "../constants";
+import type { DateRange, DateRanges } from "../redux/date-ranges";
 import type { DayPlannerSettings } from "../settings";
-import type { ComponentContext, DateRange } from "../types";
+import type { ComponentContext } from "../types";
 import * as r from "../util/range";
 import { setViewTitle } from "../util/view";
 
 import MultiDayGrid from "./components/multi-day/multi-day-grid.svelte";
-import { useDateRanges } from "./hooks/use-date-ranges";
 
 export default class MultiDayView extends ItemView {
   private static readonly defaultDisplayText = "Multi-Day View";
@@ -22,7 +22,7 @@ export default class MultiDayView extends ItemView {
     leaf: WorkspaceLeaf,
     private readonly settingsStore: Writable<DayPlannerSettings>,
     private readonly componentContext: ComponentContext,
-    private readonly dateRanges: ReturnType<typeof useDateRanges>,
+    private readonly dateRanges: DateRanges,
   ) {
     super(leaf);
   }
@@ -58,8 +58,9 @@ export default class MultiDayView extends ItemView {
     const dateRange = this.dateRanges.trackRange(range);
 
     this.dateRange = dateRange;
-    this.register(dateRange.onChange(this.updateTabTitleAndHeader));
-    this.updateTabTitleAndHeader();
+    this.register(
+      toStore(() => dateRange.current).subscribe(this.updateTabTitleAndHeader),
+    );
 
     const relevantSettingsSignal = derived(
       this.settingsStore,
@@ -109,6 +110,7 @@ export default class MultiDayView extends ItemView {
     }
 
     this.dateRange?.untrack();
+    this.dateRange = undefined;
   }
 
   private updateTabTitleAndHeader = () => {

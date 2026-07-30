@@ -1,30 +1,37 @@
 import type { Moment } from "moment";
 import type { Readable } from "svelte/store";
+import { isNotVoid } from "typed-assert";
+
+import { getId } from "../util/id";
+import { getDayKey } from "../util/time-block-utils";
 
 import {
   rangeTracked,
   rangeUntracked,
   rangeUpdated,
-  selectDayKeysForRange,
   selectDaysForRange,
-} from "../../redux/date-ranges-slice";
-import type {
-  AppListenerMiddlewareInstance,
-  AppStore,
-  RootState,
-} from "../../redux/store";
-import type { UseSelector } from "../../redux/use-selector";
-import { createSelectorChangePredicate } from "../../redux/util";
-import type { DateRange } from "../../types";
-import { getId } from "../../util/id";
-import { getDayKey } from "../../util/time-block-utils";
+} from "./date-ranges-slice";
+import type { AppStore, RootState } from "./store";
+import type { UseSelector } from "./use-selector";
 
-export function useDateRanges(props: {
+export type DateRange = {
+  readonly current: Moment[];
+  /**
+   * A tracked range always holds at least one day, so these skip the null-checks
+   * that reading `current` by index would need
+   */
+  readonly first: Moment;
+  readonly last: Moment;
+  set: (days: Moment[]) => void;
+  update: (fn: (days: Moment[]) => Moment[]) => void;
+  untrack: () => void;
+};
+
+export function createDateRanges(props: {
   store: AppStore;
   useSelector: UseSelector<RootState>;
-  listenerMiddleware: AppListenerMiddlewareInstance;
 }) {
-  const { store, useSelector, listenerMiddleware } = props;
+  const { store, useSelector } = props;
 
   function trackRange(initial: Moment[]): DateRange {
     const id = getId();
@@ -41,17 +48,23 @@ export function useDateRanges(props: {
       get current() {
         return days.current;
       },
+      get first() {
+        const first = days.current[0];
+
+        isNotVoid(first, "Date range is empty");
+
+        return first;
+      },
+      get last() {
+        const last = days.current.at(-1);
+
+        isNotVoid(last, "Date range is empty");
+
+        return last;
+      },
       set,
       update(fn: (days: Moment[]) => Moment[]) {
         set(fn(days.current));
-      },
-      onChange(listener: () => void) {
-        return listenerMiddleware.startListening({
-          predicate: createSelectorChangePredicate((state: RootState) =>
-            selectDayKeysForRange(state, id),
-          ),
-          effect: listener,
-        });
       },
       untrack() {
         store.dispatch(rangeUntracked({ id }));
@@ -62,7 +75,7 @@ export function useDateRanges(props: {
   return { trackRange };
 }
 
-export type DateRanges = ReturnType<typeof useDateRanges>;
+export type DateRanges = ReturnType<typeof createDateRanges>;
 
 export function keepRangeOnToday(
   dateRange: DateRange,

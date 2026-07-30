@@ -17,6 +17,7 @@ import type { DayPlannerSettings } from "../settings";
 import type { PointerDateTime, ReduxExtraArgument } from "../types";
 import type { Scheduler } from "../util/scheduler";
 
+import { createDateRanges } from "./date-ranges";
 import { dateRangesSlice } from "./date-ranges-slice";
 import { icalSlice, selectRemoteTimeBlocks } from "./ical/ical-slice";
 import type { IcalParseTaskResult } from "./ical/init-ical-listeners";
@@ -93,6 +94,7 @@ export function createReactor(props: {
   });
 
   const useSelector = createUseSelector<RootState>(store);
+  const dateRanges = createDateRanges({ store, useSelector });
 
   const localTimeBlocksSignal = useSelector((state) =>
     selectPlanTimeBlocksForVisibleDays(state),
@@ -116,6 +118,7 @@ export function createReactor(props: {
     localTimeBlocks,
     pointerDateTime,
     useSelector,
+    dateRanges,
   };
 }
 

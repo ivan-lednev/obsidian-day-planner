@@ -1,7 +1,7 @@
 import { FileView, WorkspaceLeaf } from "obsidian";
 
+import type { DateRange } from "../redux/date-ranges";
 import type { PeriodicNotes } from "../service/periodic-notes";
-import type { DateRange } from "../types";
 
 export function handleActiveLeafChange(
   leaf: WorkspaceLeaf | null,
@@ -18,8 +18,8 @@ export function handleActiveLeafChange(
   );
 
   if (
-    dayUserSwitchedTo?.isSame(timelineDateRange.current[0], "day") ||
-    !dayUserSwitchedTo
+    !dayUserSwitchedTo ||
+    dayUserSwitchedTo.isSame(timelineDateRange.first, "day")
   ) {
     return;
   }

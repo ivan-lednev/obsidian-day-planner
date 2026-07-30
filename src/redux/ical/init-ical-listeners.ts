@@ -4,25 +4,15 @@ import { isNotVoid } from "typed-assert";
 import type { RemoteTimeBlock, WithDuration } from "../../time-block-types";
 import { canHappenAfter, icalEventToTimeBlocksForRange } from "../../util/ical";
 import { type Scheduler } from "../../util/scheduler";
-import {
-  selectSortedDedupedVisibleDays,
-  selectVisibleDays,
-} from "../date-ranges-slice";
+import { selectSortedDedupedVisibleDays } from "../date-ranges-slice";
 import { selectIcals } from "../settings-slice";
 import type { AppListenerEffect } from "../store";
-import { createSelectorChangePredicate } from "../util";
 
 import {
   icalsFetched,
   remoteTimeBlocksUpdated,
   selectAllIcalEventsWithIcalConfigs,
 } from "./ical-slice";
-
-export const checkVisibleDaysChanged =
-  createSelectorChangePredicate(selectVisibleDays);
-export const checkIcalEventsChanged = createSelectorChangePredicate(
-  selectAllIcalEventsWithIcalConfigs,
-);
 
 export function createCachingFetcher() {
   const previousFetches = new Map<string, string>();

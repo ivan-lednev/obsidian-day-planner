@@ -2,7 +2,7 @@ import type { Moment } from "moment";
 import { ItemView, Menu, WorkspaceLeaf } from "obsidian";
 import { mount, unmount } from "svelte";
 import type { Component } from "svelte";
-import { get, writable, type Writable } from "svelte/store";
+import { get, toStore, writable, type Writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
 import {
@@ -10,15 +10,15 @@ import {
   isInSidebarContextKey,
   viewTypeTimeline,
 } from "../constants";
+import type { DateRange, DateRanges } from "../redux/date-ranges";
 import type { PeriodicNotes } from "../service/periodic-notes";
 import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { DayPlannerSettings } from "../settings";
-import type { ComponentContext, DateRange } from "../types";
+import type { ComponentContext } from "../types";
 import { handleActiveLeafChange } from "../util/handle-active-leaf-change";
 import { setViewTitle } from "../util/view";
 
 import TimelineWithControls from "./components/timeline-with-controls.svelte";
-import { useDateRanges } from "./hooks/use-date-ranges";
 import type { OpenTimelineSettingsModal } from "./timeline-settings-modal";
 import { addTimelineViewMenuItems } from "./timeline-view-menu";
 
@@ -33,7 +33,7 @@ export default class TimelineView extends ItemView {
     leaf: WorkspaceLeaf,
     private readonly settingsStore: Writable<DayPlannerSettings>,
     private readonly componentContext: ComponentContext,
-    private readonly dateRanges: ReturnType<typeof useDateRanges>,
+    private readonly dateRanges: DateRanges,
     private readonly periodicNotes: PeriodicNotes,
     private readonly workspaceFacade: WorkspaceFacade,
     private readonly initWeeklyView: () => Promise<void>,
@@ -82,7 +82,9 @@ export default class TimelineView extends ItemView {
     const dateRange = this.dateRanges.trackRange([window.moment()]);
 
     this.dateRange = dateRange;
-    this.register(dateRange.onChange(this.updateTabTitleAndHeader));
+    this.register(
+      toStore(() => dateRange.current).subscribe(this.updateTabTitleAndHeader),
+    );
     this.registerEvent(
       this.workspaceFacade.onActiveLeafChange((leaf) => {
         if (!this.dateRange) {
@@ -97,7 +99,6 @@ export default class TimelineView extends ItemView {
     this.registerEvent(
       this.workspaceFacade.onLayoutChange(this.updateTabTitleAndHeader),
     );
-    this.updateTabTitleAndHeader();
 
     const context = new Map<string, unknown>([
       ...this.componentContext,
@@ -118,6 +119,7 @@ export default class TimelineView extends ItemView {
     }
 
     this.dateRange?.untrack();
+    this.dateRange = undefined;
   }
 
   private isMountedInSidebar() {

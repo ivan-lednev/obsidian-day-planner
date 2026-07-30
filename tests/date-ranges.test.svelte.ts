@@ -1,39 +1,22 @@
-import { createListenerMiddleware } from "@reduxjs/toolkit";
 import { flushSync } from "svelte";
-import { writable } from "svelte/store";
+import { toStore, writable } from "svelte/store";
 import { describe, expect, test } from "vitest";
 
+import { createDateRanges, keepRangeOnToday } from "../src/redux/date-ranges";
 import {
   selectSortedDedupedVisibleDays,
   selectVisibleDays,
 } from "../src/redux/date-ranges-slice";
-import {
-  makeStore,
-  type AppDispatch,
-  type RootState,
-} from "../src/redux/store";
+import { makeStore, type RootState } from "../src/redux/store";
 import { createUseSelector } from "../src/redux/use-selector";
-import type { ReduxExtraArgument } from "../src/types";
-import {
-  keepRangeOnToday,
-  useDateRanges,
-} from "../src/ui/hooks/use-date-ranges";
 
 function setUp() {
-  const listenerMiddleware = createListenerMiddleware<
-    RootState,
-    AppDispatch,
-    ReduxExtraArgument
-  >();
-  const store = makeStore({
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().prepend(listenerMiddleware.middleware),
-  });
+  const store = makeStore({});
   const useSelector = createUseSelector<RootState>(store);
 
   return {
     store,
-    dateRanges: useDateRanges({ store, useSelector, listenerMiddleware }),
+    dateRanges: createDateRanges({ store, useSelector }),
   };
 }
 
@@ -184,36 +167,66 @@ describe("date ranges", () => {
     ]);
   });
 
-  test("onChange only reacts to this range, and stops after unsubscribing", () => {
+  test("first and last read the ends of the range", () => {
+    const { dateRanges } = setUp();
+
+    const range = dateRanges.trackRange([
+      window.moment("2025-07-30"),
+      window.moment("2025-07-31"),
+      window.moment("2025-08-01"),
+    ]);
+
+    expect(range.first).toEqual(window.moment("2025-07-30"));
+    expect(range.last).toEqual(window.moment("2025-08-01"));
+  });
+
+  test("first and last throw once the range is untracked", () => {
+    const { dateRanges } = setUp();
+
+    const range = dateRanges.trackRange([window.moment("2025-07-30")]);
+
+    range.untrack();
+
+    expect(() => range.first).toThrow("Date range is empty");
+    expect(() => range.last).toThrow("Date range is empty");
+  });
+
+  test("a store over a range only reacts to that range, and stops after unsubscribing", () => {
     const { dateRanges } = setUp();
 
     const range = dateRanges.trackRange([window.moment("2025-07-30")]);
 
     let runs = 0;
-    const unsubscribe = range.onChange(() => {
+    const unsubscribe = toStore(() => range.current).subscribe(() => {
       runs++;
     });
 
-    range.set([window.moment("2025-07-31")]);
-
     expect(runs).toBe(1);
+
+    range.set([window.moment("2025-07-31")]);
+    flushSync();
+
+    expect(runs).toBe(2);
     expect(range.current).toEqual([window.moment("2025-07-31")]);
 
     const other = dateRanges.trackRange([window.moment("2025-09-01")]);
 
     other.set([window.moment("2025-09-02")]);
+    flushSync();
 
-    expect(runs).toBe(1);
+    expect(runs).toBe(2);
 
     range.set([window.moment("2025-07-31")]);
+    flushSync();
 
-    expect(runs).toBe(1);
+    expect(runs).toBe(2);
 
     unsubscribe();
 
     range.set([window.moment("2025-08-01")]);
+    flushSync();
 
-    expect(runs).toBe(1);
+    expect(runs).toBe(2);
   });
 
   test("keepRangeOnToday moves the range to the new day after midnight", () => {

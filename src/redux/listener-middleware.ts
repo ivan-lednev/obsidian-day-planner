@@ -2,16 +2,19 @@ import { createListenerMiddleware } from "@reduxjs/toolkit";
 
 import type { ReduxExtraArgument } from "../types";
 
-import { icalRefreshRequested } from "./ical/ical-slice";
+import { selectVisibleDays } from "./date-ranges-slice";
 import {
-  checkIcalEventsChanged,
-  checkVisibleDaysChanged,
+  icalRefreshRequested,
+  selectAllIcalEventsWithIcalConfigs,
+} from "./ical/ical-slice";
+import {
   createCachingFetcher,
   createIcalFetchListener,
   createIcalParseListener,
 } from "./ical/init-ical-listeners";
 import { createIndexListener, indexRequested } from "./index/index-slice";
 import type { AppDispatch, RootState } from "./store";
+import { createSelectorChangePredicate } from "./util";
 
 export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
   const {
@@ -32,10 +35,21 @@ export function initListenerMiddleware(props: { extra: ReduxExtraArgument }) {
     effect: createIcalFetchListener({ fetcher: createCachingFetcher() }),
   });
 
+  // Change predicates record what they saw, so every listener needs its own
+  const checkIcalEventsChanged = createSelectorChangePredicate(
+    selectAllIcalEventsWithIcalConfigs,
+  );
+  const checkVisibleDaysChanged =
+    createSelectorChangePredicate(selectVisibleDays);
+
   listenerMiddleware.startListening({
-    predicate: (action, currentState) =>
-      checkIcalEventsChanged(action, currentState) ||
-      checkVisibleDaysChanged(action, currentState),
+    // Both predicates have to run on every action, so no short-circuiting here
+    predicate: (action, currentState) => {
+      const icalEventsChanged = checkIcalEventsChanged(action, currentState);
+      const visibleDaysChanged = checkVisibleDaysChanged(action, currentState);
+
+      return icalEventsChanged || visibleDaysChanged;
+    },
     effect: createIcalParseListener({
       scheduler: icalParseScheduler,
     }),

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { type Moment } from "moment";
-  import { isNotVoid } from "typed-assert";
 
   import { getDateRangeContext } from "../../../context/date-range-context";
   import { getObsidianContext } from "../../../context/obsidian-context";
@@ -227,11 +226,7 @@
         onclick={() => {
           dateRange.update(
             $settingsStore.multiDayRange === "work-week"
-              ? ([firstDay]) => {
-                  isNotVoid(firstDay);
-
-                  return getNextWorkWeek(firstDay);
-                }
+              ? () => getNextWorkWeek(dateRange.first)
               : getNextAdjacentRange,
           );
         }}
@@ -244,11 +239,7 @@
         onclick={() => {
           dateRange.update(
             $settingsStore.multiDayRange === "work-week"
-              ? ([firstDay]) => {
-                  isNotVoid(firstDay);
-
-                  return getPreviousWorkWeek(firstDay);
-                }
+              ? () => getPreviousWorkWeek(dateRange.first)
               : getPreviousAdjacentRange,
           );
         }}

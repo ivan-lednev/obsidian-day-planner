@@ -30,13 +30,13 @@ import {
   toMarkdown,
   toMdastPoint,
 } from "./mdast/mdast";
+import type { DateRanges } from "./redux/date-ranges";
 import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { type IcalParseTaskResult } from "./redux/ical/init-ical-listeners";
 import { selectActiveLogTimeBlocks } from "./redux/index/index-selectors";
 import { settingsUpdated } from "./redux/settings-slice";
 import {
   type AppDispatch,
-  type AppListenerMiddlewareInstance,
   type AppStore,
   createReactor,
   type RootState,
@@ -66,7 +66,6 @@ import type { ObsidianContext, OnUpdateFn, PointerDateTime } from "./types";
 import { ClockInOnAnythingModal } from "./ui/clock-in-on-anything-modal";
 import { askForConfirmation } from "./ui/confirmation-modal";
 import { createEditorMenuCallback } from "./ui/editor-menu";
-import { useDateRanges } from "./ui/hooks/use-date-ranges";
 import { useTimeBlocks } from "./ui/hooks/use-time-blocks";
 import { createLogEntryEditModalOpener } from "./ui/log-entry-edit-modal";
 import MultiDayView from "./ui/multi-day-view";
@@ -148,6 +147,7 @@ export default class DayPlanner extends Plugin {
       remoteTimeBlocks,
       localTimeBlocks,
       pointerDateTime,
+      dateRanges,
     } = createReactor({
       listPropsParser,
       indexServices,
@@ -185,8 +185,8 @@ export default class DayPlanner extends Plugin {
       remoteTimeBlocks,
       pointerDateTime,
       useSelector,
-      listenerMiddleware,
       localTimeBlocks,
+      dateRanges,
     });
 
     const handleEditorMenu = createEditorMenuCallback({
@@ -460,19 +460,19 @@ export default class DayPlanner extends Plugin {
     store: AppStore;
     dispatch: AppDispatch;
     useSelector: UseSelector<RootState>;
-    listenerMiddleware: AppListenerMiddlewareInstance;
     remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
     localTimeBlocks: Readable<EditableTimeBlock[]>;
     pointerDateTime: Writable<PointerDateTime>;
+    dateRanges: DateRanges;
   }) {
     const {
       store,
       dispatch,
       useSelector,
-      listenerMiddleware,
       remoteTimeBlocks,
       localTimeBlocks,
       pointerDateTime,
+      dateRanges,
     } = props;
 
     const onUpdate: OnUpdateFn = createUpdateHandler({
@@ -505,12 +505,6 @@ export default class DayPlanner extends Plugin {
 
     const { isDarkMode, isOnline, isModPressed } = createEnvironmentHooks({
       workspace: this.app.workspace,
-    });
-
-    const dateRanges = useDateRanges({
-      store,
-      useSelector,
-      listenerMiddleware,
     });
 
     const { timeBlocksWithTimeForToday, editContext, newlyStartedTimeBlocks } =

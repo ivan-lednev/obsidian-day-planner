@@ -1,6 +1,5 @@
 <script lang="ts">
   import { fromStore } from "svelte/store";
-  import { isNotVoid } from "typed-assert";
 
   import { getDateRangeContext } from "../../context/date-range-context";
   import { getObsidianContext } from "../../context/obsidian-context";
@@ -23,20 +22,8 @@
   );
 
   const dateRange = getDateRangeContext();
-  const firstDayInRange = $derived.by(() => {
-    const first = dateRange.current[0];
-
-    isNotVoid(first);
-
-    return first;
-  });
-  const lastDayInRange = $derived.by(() => {
-    const last = dateRange.current.at(-1);
-
-    isNotVoid(last);
-
-    return last;
-  });
+  const firstDayInRange = $derived(dateRange.first);
+  const lastDayInRange = $derived(dateRange.last);
 
   const displayedAllDayTimeBlocks = $derived(
     getDisplayedAllDayTimeBlocksForMultiDayRow.current({
@@ -48,12 +35,8 @@
   let rulerRef: HTMLDivElement | undefined = $state();
 
   function handleAllDayEventsPointerMove() {
-    const currentDate = dateRange.current[0];
-
-    isNotVoid(currentDate);
-
     pointerDateTime.set({
-      dateTime: currentDate,
+      dateTime: dateRange.first,
       type: "date",
     });
   }
