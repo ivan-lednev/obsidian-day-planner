@@ -28,7 +28,7 @@
   const {
     workspaceFacade,
     logEntryEditor,
-    openEditTimeEntryModal,
+    openLogEntryEditModal,
     useSelector,
   } = getObsidianContext();
 
@@ -46,7 +46,7 @@
           timeBlock,
           logEntryEditor,
           workspaceFacade,
-          openEditTimeEntryModal,
+          openLogEntryEditModal,
         })}
     >
       {#snippet children({ use, onpointerup, state })}
@@ -78,7 +78,7 @@
                     event,
                     logEntryEditor,
                     workspaceFacade,
-                    openEditTimeEntryModal,
+                    openLogEntryEditModal,
                   });
                 }}
               >

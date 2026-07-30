@@ -5,21 +5,21 @@ import type { WorkspaceFacade } from "../service/workspace-facade";
 import type { LogTimeBlock } from "../time-block-types";
 import { runWithNoticeOnError } from "../util/effect";
 
-import type { OpenEditTimeEntryModal } from "./create-edit-time-entry-modal";
+import type { OpenLogEntryEditModal } from "./log-entry-edit-modal";
 
 export function createActiveClockMenu(props: {
   event: PointerEvent | MouseEvent | TouchEvent;
   timeBlock: LogTimeBlock;
   logEntryEditor: LogEntryEditor;
   workspaceFacade: WorkspaceFacade;
-  openEditTimeEntryModal: OpenEditTimeEntryModal;
+  openLogEntryEditModal: OpenLogEntryEditModal;
 }) {
   const {
     event,
     timeBlock,
     logEntryEditor,
     workspaceFacade,
-    openEditTimeEntryModal,
+    openLogEntryEditModal,
   } = props;
 
   const menu = new Menu();
@@ -40,7 +40,7 @@ export function createActiveClockMenu(props: {
     item
       .setTitle("Edit...")
       .setIcon("pencil")
-      .onClick(() => openEditTimeEntryModal(timeBlock)),
+      .onClick(() => openLogEntryEditModal(timeBlock)),
   );
 
   menu.addItem((item) => {

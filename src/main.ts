@@ -65,11 +65,11 @@ import type { EditableTimeBlock, RemoteTimeBlock } from "./time-block-types";
 import type { ObsidianContext, OnUpdateFn, PointerDateTime } from "./types";
 import { ClockInOnAnythingModal } from "./ui/clock-in-on-anything-modal";
 import { askForConfirmation } from "./ui/confirmation-modal";
-import { createEditTimeEntryModalCreator } from "./ui/create-edit-time-entry-modal";
 import { createEditorMenuCallback } from "./ui/editor-menu";
 import { useDateRanges } from "./ui/hooks/use-date-ranges";
 import { mountStatusBarWidget } from "./ui/hooks/use-status-bar-widget";
 import { useTimeBlocks } from "./ui/hooks/use-time-blocks";
+import { createLogEntryEditModalOpener } from "./ui/log-entry-edit-modal";
 import MultiDayView from "./ui/multi-day-view";
 import { DayPlannerReleaseNotesView } from "./ui/release-notes";
 import { DayPlannerSettingsTab } from "./ui/settings-tab";
@@ -543,7 +543,7 @@ export default class DayPlanner extends Plugin {
         document.body.style.cursor = bodyCursor;
       }),
     );
-    const openEditTimeEntryModal = createEditTimeEntryModalCreator(
+    const openLogEntryEditModal = createLogEntryEditModalOpener(
       this.app,
       this.logEntryEditor,
     );
@@ -560,7 +560,7 @@ export default class DayPlanner extends Plugin {
       useSelector,
       logEntryEditor: this.logEntryEditor,
       workspaceFacade: this.workspaceFacade,
-      openEditTimeEntryModal,
+      openLogEntryEditModal,
       openClockInOnAnythingModal: this.openClockInOnAnythingModal,
     });
 
@@ -638,7 +638,7 @@ export default class DayPlanner extends Plugin {
 
     const defaultObsidianContext: ObsidianContext = {
       periodicNotes: this.periodicNotes,
-      openEditTimeEntryModal,
+      openLogEntryEditModal,
       openTimelineSettingsModal,
       openClockInOnAnythingModal: this.openClockInOnAnythingModal,
       logEntryEditor: this.logEntryEditor,

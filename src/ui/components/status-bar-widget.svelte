@@ -14,8 +14,8 @@
   import { fromDiff } from "../../util/moment";
   import { getOneLineSummary } from "../../util/time-block-utils";
   import { createActiveClockMenu } from "../active-clock-menu";
-  import type { OpenEditTimeEntryModal } from "../create-edit-time-entry-modal";
   import { useStatusBarWidget } from "../hooks/use-status-bar-widget";
+  import type { OpenLogEntryEditModal } from "../log-entry-edit-modal";
 
   import { SkipForward, Play, Timer } from "./lucide";
   import MiniTimeline from "./mini-timeline.svelte";
@@ -26,7 +26,7 @@
     useSelector,
     logEntryEditor,
     workspaceFacade,
-    openEditTimeEntryModal,
+    openLogEntryEditModal,
     openClockInOnAnythingModal,
   }: {
     onClick: () => Promise<void>;
@@ -34,7 +34,7 @@
     useSelector: UseSelector<RootState>;
     logEntryEditor: LogEntryEditor;
     workspaceFacade: WorkspaceFacade;
-    openEditTimeEntryModal: OpenEditTimeEntryModal;
+    openLogEntryEditModal: OpenLogEntryEditModal;
     openClockInOnAnythingModal: () => void;
   } = $props();
 
@@ -74,7 +74,7 @@
       timeBlock: newestActiveClock,
       logEntryEditor,
       workspaceFacade,
-      openEditTimeEntryModal,
+      openLogEntryEditModal,
     });
   }
 </script>

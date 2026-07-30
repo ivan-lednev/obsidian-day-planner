@@ -14,7 +14,7 @@ import { ellipsis } from "../../util/ellipsis";
 import { getDiffInMinutes } from "../../util/moment";
 import { getEndTime, getOneLineSummary } from "../../util/time-block-utils";
 import StatusBarWidget from "../components/status-bar-widget.svelte";
-import type { OpenEditTimeEntryModal } from "../create-edit-time-entry-modal";
+import type { OpenLogEntryEditModal } from "../log-entry-edit-modal";
 
 import { keepRangeOnToday, type DateRanges } from "./use-date-ranges";
 
@@ -48,7 +48,7 @@ export function mountStatusBarWidget(props: {
   useSelector: UseSelector<RootState>;
   logEntryEditor: LogEntryEditor;
   workspaceFacade: WorkspaceFacade;
-  openEditTimeEntryModal: OpenEditTimeEntryModal;
+  openLogEntryEditModal: OpenLogEntryEditModal;
   openClockInOnAnythingModal: () => void;
 }) {
   const {
@@ -58,7 +58,7 @@ export function mountStatusBarWidget(props: {
     useSelector,
     logEntryEditor,
     workspaceFacade,
-    openEditTimeEntryModal,
+    openLogEntryEditModal,
     openClockInOnAnythingModal,
   } = props;
 
@@ -78,7 +78,7 @@ export function mountStatusBarWidget(props: {
       useSelector,
       logEntryEditor,
       workspaceFacade,
-      openEditTimeEntryModal,
+      openLogEntryEditModal,
       openClockInOnAnythingModal,
     },
   });

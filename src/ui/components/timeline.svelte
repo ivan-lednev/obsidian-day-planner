@@ -45,7 +45,7 @@
     useSelector,
     logEntryEditor,
     workspaceFacade,
-    openEditTimeEntryModal,
+    openLogEntryEditModal,
   } = getObsidianContext();
 
   const displayedTimeBlocksForTimeline = $derived(
@@ -76,7 +76,7 @@
         logEntry: logEntry,
         logEntryEditor,
         workspaceFacade,
-        openEditTimeEntryModal,
+        openLogEntryEditModal,
       });
     } else {
       createActiveClockMenu({
@@ -85,8 +85,8 @@
         logEntryEditor,
         workspaceFacade,
         // pass the raw entry so "Edit..." targets the real (unclamped) entry
-        openEditTimeEntryModal: (timeBlock) =>
-          openEditTimeEntryModal(timeBlock, logEntry),
+        openLogEntryEditModal: (timeBlock) =>
+          openLogEntryEditModal(timeBlock, logEntry),
       });
     }
   }

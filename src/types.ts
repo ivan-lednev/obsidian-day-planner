@@ -14,9 +14,9 @@ import type { VaultFacade } from "./service/vault-facade";
 import type { WorkspaceFacade } from "./service/workspace-facade";
 import type { DayPlannerSettings, IcalConfig } from "./settings";
 import type { EditableTimeBlock, PlanTimeBlock } from "./time-block-types";
-import type { OpenEditTimeEntryModal } from "./ui/create-edit-time-entry-modal";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
+import type { OpenLogEntryEditModal } from "./ui/log-entry-edit-modal";
 import type { OpenTimelineSettingsModal } from "./ui/timeline-settings-modal";
 import type { createRenderMarkdown } from "./util/create-render-markdown";
 import { type ShowPreview } from "./util/create-show-preview";
@@ -65,7 +65,7 @@ export interface ObsidianContext {
   settingsSignal: Signal<DayPlannerSettings>;
   pointerDateTime: Writable<PointerDateTime>;
   logEntryEditor: LogEntryEditor;
-  openEditTimeEntryModal: OpenEditTimeEntryModal;
+  openLogEntryEditModal: OpenLogEntryEditModal;
   openTimelineSettingsModal: OpenTimelineSettingsModal;
   openClockInOnAnythingModal: () => void;
   // todo: rename to promptUserToEditText

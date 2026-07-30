@@ -7,9 +7,7 @@ import type {
 } from "../list-item-index-extension-service";
 import { createLogEntry } from "../log-entry";
 
-export class TimeEntriesExtensionService
-  implements ListItemIndexExtensionService
-{
+export class LogEntryExtensionService implements ListItemIndexExtensionService {
   constructor(private readonly listPropsParser: ListPropsParser) {}
 
   forFile() {
