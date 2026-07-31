@@ -138,8 +138,12 @@ export function copy(
     throw new Error("Cannot copy unwritten time blocks");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { path, position, ...withoutFileLocation } = original;
+  const withoutFileLocation: WithDuration<UnwrittenTimeBlock> = {
+    ...original,
+    source: "unwritten",
+    destination: getCopyDestination(original),
+    id: getId(),
+  };
 
   return {
     ...withoutFileLocation,

@@ -122,7 +122,8 @@
           "const"
         ],
         "format": [
-          "camelCase"
+          "camelCase",
+          "PascalCase"
         ]
       }
     ]

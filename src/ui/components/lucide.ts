@@ -13,7 +13,6 @@ const obsidianIcon =
     return IconComponent(internals, newProps);
   };
 
-/* eslint-disable @typescript-eslint/naming-convention */
 export const Ellipsis = obsidianIcon(lucideSvelte.Ellipsis);
 export const EllipsisVertical = obsidianIcon(lucideSvelte.EllipsisVertical);
 export const Settings = obsidianIcon(lucideSvelte.Settings);
@@ -33,4 +32,3 @@ export const SkipForward = obsidianIcon(lucideSvelte.SkipForward);
 export const StepForward = obsidianIcon(lucideSvelte.StepForward);
 export const Timer = obsidianIcon(lucideSvelte.Timer);
 export const Clock = obsidianIcon(lucideSvelte.Clock);
-/* eslint-enable @typescript-eslint/naming-convention */

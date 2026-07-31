@@ -3,7 +3,7 @@
   "name": "Day Planner",
   "version": "0.35.0",
   "minAppVersion": "1.6.0",
-  "description": "A day planner with clean UI and readable syntax",
+  "description": "Turn tasks from daily notes, the Tasks plugin, and calendars into time blocks on an editable timeline, with built-in time tracker.",
   "author": "James Lynch, continued by Ivan Lednev",
   "authorUrl": "https://github.com/ivan-lednev",
   "fundingUrl": "https://www.buymeacoffee.com/machineelf",
