@@ -1,7 +1,7 @@
 {
   "id": "obsidian-day-planner",
   "name": "Day Planner",
-  "version": "0.35.0",
+  "version": "0.35.1",
   "minAppVersion": "1.6.0",
   "description": "Turn tasks from daily notes, the Tasks plugin, and calendars into time blocks on an editable timeline, with built-in time tracker.",
   "author": "James Lynch, continued by Ivan Lednev",

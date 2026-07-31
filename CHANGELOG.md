@@ -1,3 +1,15 @@
+## 0.35.1
+
+### 🐞 Fixed issues
+
+- The active clock block on the timeline no longer lags behind the current time indicator
+- The status bar widget now updates when the day changes
+
+### 🔧 Under the hood
+
+- Internal cleanup: stricter type checks and consistent naming across the codebase
+- Updated the plugin description in the community plugin list
+
 ## 0.35.0
 
 ### ✨ New features
