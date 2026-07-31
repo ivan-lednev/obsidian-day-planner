@@ -22,6 +22,7 @@
 
   import Column from "./column.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
+  import NeedleClockControl from "./needle-clock-control.svelte";
   import Needle from "./needle.svelte";
   import PositionedTimeBlock from "./positioned-time-block.svelte";
   import Selectable from "./selectable.svelte";
@@ -175,7 +176,11 @@
   {#if $settingsStore.timelineColumns.timeTracker}
     <Column visibleHours={getVisibleHours($settingsStore)}>
       {#if $isToday(day)}
-        <Needle autoScrollBlocked={isUnderCursor} />
+        <Needle autoScrollBlocked={isUnderCursor}>
+          {#snippet controls()}
+            <NeedleClockControl />
+          {/snippet}
+        </Needle>
       {/if}
 
       <div class="tasks absolute-stretch-x">

@@ -138,15 +138,16 @@ export function copy(
     throw new Error("Cannot copy unwritten time blocks");
   }
 
-  const withoutFileLocation: WithDuration<UnwrittenTimeBlock> = {
-    ...original,
-    source: "unwritten",
-    destination: getCopyDestination(original),
-    id: getId(),
-  };
-
   return {
-    ...withoutFileLocation,
+    text: original.text,
+    status: original.status,
+    symbol: original.symbol,
+    task: original.task,
+    startTime: original.startTime,
+    durationMinutes: original.durationMinutes,
+    isAllDayEvent: original.isAllDayEvent,
+    truncated: original.truncated,
+    children: original.children,
     source: "unwritten",
     destination: getCopyDestination(original),
     id: getId(),

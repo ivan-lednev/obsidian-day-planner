@@ -118,6 +118,12 @@ export const selectActiveLogTimeBlocks = createAppSelector(
   },
 );
 
+export const selectNewestActiveLogTimeBlock = createAppSelector(
+  [selectActiveLogTimeBlocks],
+  (activeLogTimeBlocks) =>
+    activeLogTimeBlocks.toSorted((a, b) => b.startTime.diff(a.startTime)).at(0),
+);
+
 const selectLatestClosedLogEntryByParentId = createAppSelector(
   [selectLogEntriesById],
   (logEntriesById) => {

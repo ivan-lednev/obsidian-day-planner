@@ -4,7 +4,7 @@
   import { statusBarTextLimit } from "../../constants";
   import { currentTimeSignal } from "../../global-store/current-time";
   import { settingsSignal } from "../../global-store/settings";
-  import { selectActiveLogTimeBlocks } from "../../redux/index/index-selectors";
+  import { selectNewestActiveLogTimeBlock } from "../../redux/index/index-selectors";
   import type { RootState } from "../../redux/store";
   import type { UseSelector } from "../../redux/use-selector";
   import type { LogEntryEditor } from "../../service/log-entry-editor";
@@ -50,17 +50,13 @@
     showActiveClockInStatusBar,
   } = $derived(settingsSignal.current);
 
-  const activeLogRecords = $derived(
+  const newestActiveClockSignal = $derived(
     useSelector((state) =>
-      selectActiveLogTimeBlocks(state, currentTimeSignal.current),
+      selectNewestActiveLogTimeBlock(state, currentTimeSignal.current),
     ),
   );
 
-  const newestActiveClock = $derived(
-    activeLogRecords.current
-      .toSorted((a, b) => b.startTime.diff(a.startTime))
-      .at(0),
-  );
+  const newestActiveClock = $derived(newestActiveClockSignal.current);
 
   function handleClockClick(event: MouseEvent) {
     if (!newestActiveClock) {

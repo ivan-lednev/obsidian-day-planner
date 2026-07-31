@@ -39,10 +39,12 @@ export const baseTimeBlock: WithPlacing<WithDuration<EditableTimeBlock>> = {
   },
   id: "id",
 };
+
 export const unscheduledTimeBlock: EditableTimeBlock = {
   ...baseTimeBlock,
   isAllDayEvent: true,
 };
+
 export const threeTimeBlocks: [
   WithPlacing<WithDuration<EditableTimeBlock>>,
   WithPlacing<WithDuration<EditableTimeBlock>>,
@@ -64,14 +66,17 @@ export const threeTimeBlocks: [
     startTime: moment("2023-01-01 03:00"),
   },
 ];
+
 export const threeTimeBlocksOverTwoDays: WithDuration<EditableTimeBlock>[] = [
   baseTimeBlock,
   { ...baseTimeBlock, id: "2", startTime: moment("2023-01-01 01:00") },
   { ...baseTimeBlock, id: "3", startTime: moment("2023-01-02 02:00") },
 ];
-export const baseTimeBlocks: [WithDuration<EditableTimeBlock>] = [
+
+export const baseTimeBlocks: [WithPlacing<WithDuration<EditableTimeBlock>>] = [
   baseTimeBlock,
 ];
+
 export const timeBlocksWithUnscheduledTimeBlock: [EditableTimeBlock] = [
   unscheduledTimeBlock,
 ];

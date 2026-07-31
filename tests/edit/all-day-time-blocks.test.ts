@@ -79,7 +79,7 @@ describe("all-day tasks", () => {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { path, position, ...taskWithoutFileLocation } = timeBlock;
+    const { path, position, placing, ...taskWithoutFileLocation } = timeBlock;
 
     handlers.handleGripMouseDown(t.copy(timeBlock), EditMode.DRAG);
     moveCursorTo(timeBlock.startTime, "date");

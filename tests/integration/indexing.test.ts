@@ -4,6 +4,7 @@ import { describe, expect, test, vi } from "vitest";
 import {
   selectActiveLogTimeBlocks,
   selectLogTimeBlocksForDay,
+  selectNewestActiveLogTimeBlock,
   selectPlanTimeBlocksForDays,
 } from "../../src/redux";
 import {
@@ -68,6 +69,20 @@ describe("Indexing", () => {
         durationMinutes: 90,
       }),
     );
+  });
+
+  test("Returns the most recently started active log entry", async () => {
+    const { getState } = await setUp();
+
+    expect(
+      selectNewestActiveLogTimeBlock(
+        getState(),
+        window.moment("2025-07-19 12:30"),
+      ),
+    ).toMatchObject({
+      path: "fixtures/fixture-vault/frontmatter-1-open-log-entry.md",
+      startTime: window.moment("2025-07-19 12:00"),
+    });
   });
 
   test("Deletes entries on file deletion", async () => {
