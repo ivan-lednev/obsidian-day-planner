@@ -7,7 +7,6 @@
     WithPlacing,
     WithDuration,
   } from "../../time-block-types";
-  import type { ActionArray } from "../actions/use-actions";
   import {
     useColoredTimeline,
     useColorsForRelationToNow,
@@ -20,7 +19,6 @@
   }: {
     children: Snippet;
     timeBlock: WithPlacing<WithDuration<TimeBlock>>;
-    use?: ActionArray;
   } = $props();
 
   const { height, offset, width, left } = $derived(

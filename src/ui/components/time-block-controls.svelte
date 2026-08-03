@@ -1,11 +1,11 @@
 <script lang="ts">
   import { type Snippet } from "svelte";
+  import type { Attachment } from "svelte/attachments";
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { timeRangeAtStartOfLineRegExp } from "../../regexp";
   import { type EditableTimeBlock } from "../../time-block-types";
   import { createMarkdownListTokens, getFirstLine } from "../../util/markdown";
-  import type { HTMLActionArray } from "../actions/use-actions";
   import { createTimeBlockMenu } from "../time-block-menu";
 
   import DragControls from "./drag-controls.svelte";
@@ -16,7 +16,9 @@
   interface TimeBlockProps {
     isActive: boolean;
     onPointerUp: (event: PointerEvent) => void;
-    use: HTMLActionArray;
+    gestures: Attachment<HTMLElement>;
+    clearOnPointerUpOutside: Attachment<HTMLElement>;
+    anchor: Attachment<HTMLElement>;
   }
 
   const {
@@ -84,13 +86,15 @@
     })}
   selectionBlocked={Boolean($editOperation)}
 >
-  {#snippet children(selectable)}
-    <FloatingControls active={selectable.state === "primary"}>
-      {#snippet anchor(floatingControls)}
+  {#snippet children({ gestures, clearOnPointerUpOutside, state, onpointerup })}
+    <FloatingControls active={state === "primary"}>
+      {#snippet anchor({ anchor })}
         {@render content({
-          isActive: selectable.state !== "none",
-          onPointerUp: selectable.onpointerup,
-          use: [...selectable.use, ...floatingControls.actions],
+          isActive: state !== "none",
+          onPointerUp: onpointerup,
+          gestures,
+          clearOnPointerUpOutside,
+          anchor,
         })}
       {/snippet}
 

@@ -83,12 +83,18 @@
         });
       }}
     >
-      {#snippet children({ use, onpointerup, state })}
+      {#snippet children({
+        gestures,
+        clearOnPointerUpOutside,
+        onpointerup,
+        state,
+      })}
         <LocalTimeBlockComponent
           isActive={state === "secondary"}
           {onpointerup}
           {timeBlock}
-          {use}
+          {@attach gestures}
+          {@attach clearOnPointerUpOutside}
         >
           {#snippet blockEndDecoration()}
             <BlockControls>

@@ -1,19 +1,17 @@
 <script lang="ts">
-  import type { ActionArray } from "../actions/use-actions";
-  import { useActions } from "../actions/use-actions";
+  import type { Snippet } from "svelte";
 
-  export let cursor: string | undefined = "";
-  export let label: string;
-  export let use: ActionArray = [];
+  interface Props {
+    children: Snippet;
+    cursor?: string;
+    label: string;
+  }
+
+  const { children, cursor = "", label, ...rest }: Props = $props();
 </script>
 
-<div
-  style:cursor
-  class="clickable-icon"
-  aria-label={label}
-  use:useActions={use}
->
-  <slot />
+<div style:cursor class="clickable-icon" aria-label={label} {...rest}>
+  {@render children()}
 </div>
 
 <style>

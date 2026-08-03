@@ -158,7 +158,7 @@
         }}
         onpointermove={handleContainerPointerMove}
         onpointerup={confirmEdit}
-        use:timelineGestures
+        {@attach timelineGestures}
       >
         {#each $displayedTimeBlocksForTimeline.withTime as timeBlock (timeBlock.id)}
           <PositionedTimeBlock {timeBlock}>
@@ -189,12 +189,18 @@
             <Selectable
               onSecondarySelect={(event) => showLogBlockMenu(event, timeBlock)}
             >
-              {#snippet children({ use, onpointerup, state })}
+              {#snippet children({
+                gestures,
+                clearOnPointerUpOutside,
+                onpointerup,
+                state,
+              })}
                 <LocalTimeBlock
                   isActive={state === "secondary"}
                   {onpointerup}
                   {timeBlock}
-                  {use}
+                  {@attach gestures}
+                  {@attach clearOnPointerUpOutside}
                 >
                   {#snippet bottomDecoration()}
                     {getBlockProps(timeBlock, settingsSignal.current)}

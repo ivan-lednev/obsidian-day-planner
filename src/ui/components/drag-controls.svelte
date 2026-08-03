@@ -31,11 +31,9 @@
     <BlockControlButton
       cursor="grab"
       label="Move block"
-      use={[
-        createGestures({
-          onpanmove: () => handleGripMouseDown(timeBlock, EditMode.DRAG),
-        }),
-      ]}
+      {@attach createGestures({
+        onpanmove: () => handleGripMouseDown(timeBlock, EditMode.DRAG),
+      })}
     >
       <GripVertical class="svg-icon" />
     </BlockControlButton>
@@ -44,12 +42,9 @@
     <BlockControlButton
       cursor="grab"
       label="Copy block"
-      use={[
-        createGestures({
-          onpanmove: () =>
-            handleGripMouseDown(t.copy(timeBlock), EditMode.DRAG),
-        }),
-      ]}
+      {@attach createGestures({
+        onpanmove: () => handleGripMouseDown(t.copy(timeBlock), EditMode.DRAG),
+      })}
     >
       <Copy class="svg-icon" />
     </BlockControlButton>
@@ -58,24 +53,20 @@
       <BlockControlButton
         cursor="grab"
         label="Move block and push neighboring blocks"
-        use={[
-          createGestures({
-            onpanmove: () =>
-              handleGripMouseDown(timeBlock, EditMode.DRAG_AND_SHIFT_OTHERS),
-          }),
-        ]}
+        {@attach createGestures({
+          onpanmove: () =>
+            handleGripMouseDown(timeBlock, EditMode.DRAG_AND_SHIFT_OTHERS),
+        })}
       >
         <ArrowDownToLine class="svg-icon" />
       </BlockControlButton>
       <BlockControlButton
         cursor="grab"
         label="Move block and shrink neighboring blocks"
-        use={[
-          createGestures({
-            onpanmove: () =>
-              handleGripMouseDown(timeBlock, EditMode.DRAG_AND_SHRINK_OTHERS),
-          }),
-        ]}
+        {@attach createGestures({
+          onpanmove: () =>
+            handleGripMouseDown(timeBlock, EditMode.DRAG_AND_SHRINK_OTHERS),
+        })}
       >
         <FoldVertical class="svg-icon" />
       </BlockControlButton>

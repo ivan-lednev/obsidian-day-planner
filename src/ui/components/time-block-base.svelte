@@ -2,15 +2,12 @@
   import { type Snippet } from "svelte";
 
   import type { TimeBlock } from "../../time-block-types";
-  import type { ActionArray } from "../actions/use-actions";
-  import { useActions } from "../actions/use-actions";
   import { useColorOverrides } from "../hooks/use-color.svelte";
 
   interface Props {
     children: Snippet;
     blockEndDecoration?: Snippet;
     timeBlock: TimeBlock;
-    use?: ActionArray;
     onpointerup?: (event: PointerEvent) => void;
   }
 
@@ -19,7 +16,7 @@
     children,
     blockEndDecoration,
     timeBlock,
-    use = [],
+    ...rest
   }: Props = $props();
 
   const {
@@ -41,7 +38,7 @@
       timeBlock.truncated?.includes("bottom") && "truncated-bottom",
     ]}
     {onpointerup}
-    use:useActions={use}
+    {...rest}
   >
     {@render children()}
 
