@@ -511,8 +511,6 @@ export default class DayPlanner extends Plugin {
       useTimeBlocks({
         onUpdate,
         onEditAborted,
-        periodicNotes: this.periodicNotes,
-        workspaceFacade: this.workspaceFacade,
         isOnline,
         settingsStore: this.settingsStore,
         currentTime,

@@ -1,8 +1,6 @@
 import type { Moment } from "moment";
 import { derived, type Readable, type Writable } from "svelte/store";
 
-import type { PeriodicNotes } from "../../service/periodic-notes";
-import { WorkspaceFacade } from "../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../settings";
 import type {
   EditableTimeBlock,
@@ -20,19 +18,15 @@ export function useTimeBlocks(props: {
   settingsStore: Writable<DayPlannerSettings>;
   isOnline: Readable<boolean>;
   currentTime: Readable<Moment>;
-  workspaceFacade: WorkspaceFacade;
   onUpdate: OnUpdateFn;
   onEditAborted: OnEditAbortedFn;
   pointerDateTime: Readable<PointerDateTime>;
   remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
-  periodicNotes: PeriodicNotes;
   localTimeBlocks: Readable<EditableTimeBlock[]>;
 }) {
   const {
     settingsStore,
-    periodicNotes,
     currentTime,
-    workspaceFacade,
     pointerDateTime,
     onUpdate,
     onEditAborted,
@@ -60,8 +54,6 @@ export function useTimeBlocks(props: {
   const abortEditTrigger = derived(localTimeBlocks, getUpdateTrigger);
 
   const editContext = useEditContext({
-    periodicNotes,
-    workspaceFacade,
     onUpdate,
     onEditAborted,
     settingsStore,

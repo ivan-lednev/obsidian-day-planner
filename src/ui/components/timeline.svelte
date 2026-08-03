@@ -33,7 +33,7 @@
     settingsStore,
     editContext: {
       confirmEdit,
-      handlers: { handleContainerMouseDown },
+      startCreate,
       getDisplayedTimeBlocksForTimeline,
       editOperation,
     },
@@ -96,7 +96,7 @@
 
   function handleContainerPointerDown(event: MouseEvent | TouchEvent) {
     plannerPointer.sync(event);
-    handleContainerMouseDown();
+    startCreate();
   }
 
   function handleContainerPointerMove(event: MouseEvent | TouchEvent) {

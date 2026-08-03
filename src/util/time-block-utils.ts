@@ -34,12 +34,7 @@ import {
   removeListTokens,
 } from "./markdown";
 import * as m from "./moment";
-import {
-  addMinutes,
-  getMinutesSinceMidnight,
-  minutesToMoment,
-  minutesToMomentOfDay,
-} from "./moment";
+import { addMinutes, getMinutesSinceMidnight, minutesToMoment } from "./moment";
 import { deleteProps, updateScheduledPropInText } from "./props";
 
 export function getEndMinutes(timeBlock: {
@@ -239,11 +234,10 @@ export function appendText(taskText: string, toAppend: string) {
 }
 
 export function create(props: {
-  day: Moment;
-  startMinutes: number;
+  startTime: Moment;
   settings: DayPlannerSettings;
 }): WithDuration<UnwrittenTimeBlock> {
-  const { day, startMinutes, settings } = props;
+  const { startTime, settings } = props;
 
   return {
     id: getId(),
@@ -251,7 +245,7 @@ export function create(props: {
     destination: { type: "plannerHeading" },
     durationMinutes: settings.defaultDurationMinutes,
     text: "New item",
-    startTime: minutesToMomentOfDay(startMinutes, day),
+    startTime: startTime.clone(),
     isAllDayEvent: false,
     symbol: "-",
     status:

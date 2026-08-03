@@ -16,9 +16,7 @@
   export let fromTop: boolean | undefined = false;
 
   const {
-    editContext: {
-      handlers: { handleResizerMouseDown },
-    },
+    editContext: { startEdit },
   } = getObsidianContext();
 </script>
 
@@ -29,10 +27,10 @@
       label="Resize block"
       {@attach createGestures({
         onpanmove: () =>
-          handleResizerMouseDown(
+          startEdit({
             timeBlock,
-            fromTop ? EditMode.RESIZE_FROM_TOP : EditMode.RESIZE,
-          ),
+            mode: fromTop ? EditMode.RESIZE_FROM_TOP : EditMode.RESIZE,
+          }),
       })}
     >
       <MoveVertical class="svg-icon" />
@@ -44,12 +42,12 @@
       label="Resize block and push neighboring blocks"
       {@attach createGestures({
         onpanmove: () =>
-          handleResizerMouseDown(
+          startEdit({
             timeBlock,
-            fromTop
+            mode: fromTop
               ? EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS
               : EditMode.RESIZE_AND_SHIFT_OTHERS,
-          ),
+          }),
       })}
     >
       <ArrowDownToLine class="svg-icon" />
@@ -59,12 +57,12 @@
       label="Resize block and shrink neighboring blocks"
       {@attach createGestures({
         onpanmove: () =>
-          handleResizerMouseDown(
+          startEdit({
             timeBlock,
-            fromTop
+            mode: fromTop
               ? EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS
               : EditMode.RESIZE_AND_SHRINK_OTHERS,
-          ),
+          }),
       })}
     >
       <FoldVertical class="svg-icon" />

@@ -20,12 +20,12 @@ function createUserInputPromise() {
 
 describe("create", () => {
   test("when creating and dragging, task duration changes", () => {
-    const { handlers, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+    const { startCreate, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
       timeBlocks: emptyTimeBlocks,
     });
 
     moveCursorTo(moment("2023-01-01 01:00"));
-    handlers.handleContainerMouseDown();
+    startCreate();
     moveCursorTo(moment("2023-01-01 02:00"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
@@ -43,7 +43,7 @@ describe("create", () => {
   describe("text input modal", () => {
     test("phantom block is visible while waiting for text input", async () => {
       const {
-        handlers,
+        startCreate,
         moveCursorTo,
         dayToDisplayedTimeBlocks,
         confirmEdit,
@@ -54,7 +54,7 @@ describe("create", () => {
       props.onUpdate.mockReturnValueOnce(userInputPromise.promise);
 
       moveCursorTo(moment("2023-01-01 01:00"));
-      handlers.handleContainerMouseDown();
+      startCreate();
       moveCursorTo(moment("2023-01-01 02:00"));
 
       const pendingConfirm = confirmEdit();
@@ -76,7 +76,7 @@ describe("create", () => {
 
     test("phantom block disappears after text input is canceled", async () => {
       const {
-        handlers,
+        startCreate,
         moveCursorTo,
         dayToDisplayedTimeBlocks,
         confirmEdit,
@@ -87,7 +87,7 @@ describe("create", () => {
       props.onUpdate.mockReturnValueOnce(userInputPromise.promise);
 
       moveCursorTo(moment("2023-01-01 01:00"));
-      handlers.handleContainerMouseDown();
+      startCreate();
       moveCursorTo(moment("2023-01-01 02:00"));
 
       const pendingConfirm = confirmEdit();

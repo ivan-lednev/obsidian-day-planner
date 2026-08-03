@@ -205,8 +205,6 @@ export async function setUp(props?: {
     useTimeBlocks({
       onUpdate,
       onEditAborted: () => {},
-      periodicNotes,
-      workspaceFacade,
       isOnline,
       settingsStore,
       currentTime,

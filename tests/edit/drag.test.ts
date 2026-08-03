@@ -10,9 +10,9 @@ import { setUp } from "./util/setup";
 
 describe("drag", () => {
   test("when drag starts, target task reacts to cursor", () => {
-    const { handlers, moveCursorTo, dayToDisplayedTimeBlocks } = setUp();
+    const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp();
 
-    handlers.handleGripMouseDown(baseTimeBlock, EditMode.DRAG);
+    startEdit({ timeBlock: baseTimeBlock, mode: EditMode.DRAG });
     moveCursorTo(moment("2023-01-01 01:00"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
@@ -28,14 +28,14 @@ describe("drag", () => {
 
   describe("drag many", () => {
     test("tasks below react to shifting selected task once there is overlap", () => {
-      const { handlers, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+      const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
         timeBlocks: threeTimeBlocks,
       });
 
-      handlers.handleGripMouseDown(
-        threeTimeBlocks[1],
-        EditMode.DRAG_AND_SHIFT_OTHERS,
-      );
+      startEdit({
+        timeBlock: threeTimeBlocks[1],
+        mode: EditMode.DRAG_AND_SHIFT_OTHERS,
+      });
       moveCursorTo(moment("2023-01-01 03:00"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
@@ -59,15 +59,15 @@ describe("drag", () => {
     });
 
     test("tasks below stay in initial position once the overlap is reversed, tasks above shift as well", () => {
-      const { handlers, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+      const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
         timeBlocks: threeTimeBlocks,
         settings: { ...defaultSettingsForTests },
       });
 
-      handlers.handleGripMouseDown(
-        threeTimeBlocks[1],
-        EditMode.DRAG_AND_SHIFT_OTHERS,
-      );
+      startEdit({
+        timeBlock: threeTimeBlocks[1],
+        mode: EditMode.DRAG_AND_SHIFT_OTHERS,
+      });
       moveCursorTo(moment("2023-01-01 03:00"));
       moveCursorTo(moment("2023-01-01 01:00"));
 
@@ -96,14 +96,14 @@ describe("drag", () => {
 
   describe("drag and shrink others", () => {
     test("Next task shrinks up to minimal duration and starts moving down", () => {
-      const { handlers, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+      const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
         timeBlocks: threeTimeBlocks,
       });
 
-      handlers.handleGripMouseDown(
-        threeTimeBlocks[1],
-        EditMode.DRAG_AND_SHRINK_OTHERS,
-      );
+      startEdit({
+        timeBlock: threeTimeBlocks[1],
+        mode: EditMode.DRAG_AND_SHRINK_OTHERS,
+      });
       moveCursorTo(moment("2023-01-01 03:00"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({

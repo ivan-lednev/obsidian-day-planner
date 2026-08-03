@@ -11,9 +11,9 @@ import { setUp } from "./util/setup";
 
 describe("resize", () => {
   test("resizing changes duration", () => {
-    const { handlers, moveCursorTo, dayToDisplayedTimeBlocks } = setUp();
+    const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp();
 
-    handlers.handleResizerMouseDown(baseTimeBlock, EditMode.RESIZE);
+    startEdit({ timeBlock: baseTimeBlock, mode: EditMode.RESIZE });
     moveCursorTo(moment("2023-01-01 03:00"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
@@ -24,9 +24,9 @@ describe("resize", () => {
   });
 
   test("Resize from top works the same way", () => {
-    const { handlers, moveCursorTo, dayToDisplayedTimeBlocks } = setUp();
+    const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp();
 
-    handlers.handleResizerMouseDown(baseTimeBlock, EditMode.RESIZE_FROM_TOP);
+    startEdit({ timeBlock: baseTimeBlock, mode: EditMode.RESIZE_FROM_TOP });
     moveCursorTo(moment("2023-01-01 00:30"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
@@ -39,9 +39,9 @@ describe("resize", () => {
   });
 
   test("Once the minimal duration is reached, the task starts shifting down", () => {
-    const { handlers, moveCursorTo, dayToDisplayedTimeBlocks } = setUp();
+    const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp();
 
-    handlers.handleResizerMouseDown(baseTimeBlock, EditMode.RESIZE_FROM_TOP);
+    startEdit({ timeBlock: baseTimeBlock, mode: EditMode.RESIZE_FROM_TOP });
     moveCursorTo(moment("2023-01-01 01:30"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
@@ -58,14 +58,14 @@ describe("resize", () => {
 
   describe("resize many", () => {
     test("resizing with neighbors shifts neighbors as well", () => {
-      const { handlers, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+      const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
         timeBlocks: threeTimeBlocks,
       });
 
-      handlers.handleResizerMouseDown(
-        threeTimeBlocks[1],
-        EditMode.RESIZE_AND_SHIFT_OTHERS,
-      );
+      startEdit({
+        timeBlock: threeTimeBlocks[1],
+        mode: EditMode.RESIZE_AND_SHIFT_OTHERS,
+      });
       moveCursorTo(moment("2023-01-01 04:00"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
@@ -83,14 +83,14 @@ describe("resize", () => {
     });
 
     test("Resizing from top works the same way", () => {
-      const { handlers, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+      const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
         timeBlocks: threeTimeBlocks,
       });
 
-      handlers.handleResizerMouseDown(
-        threeTimeBlocks[1],
-        EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS,
-      );
+      startEdit({
+        timeBlock: threeTimeBlocks[1],
+        mode: EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS,
+      });
       moveCursorTo(moment("2023-01-01 01:30"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
@@ -118,14 +118,14 @@ describe("resize", () => {
 
   describe("Resize and shrink others", () => {
     test("Resizing shrinks neighbors & when they reach minimal duration, they start shifting", () => {
-      const { handlers, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+      const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
         timeBlocks: threeTimeBlocks,
       });
 
-      handlers.handleResizerMouseDown(
-        threeTimeBlocks[1],
-        EditMode.RESIZE_AND_SHRINK_OTHERS,
-      );
+      startEdit({
+        timeBlock: threeTimeBlocks[1],
+        mode: EditMode.RESIZE_AND_SHRINK_OTHERS,
+      });
       moveCursorTo(moment("2023-01-01 04:00"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
@@ -147,14 +147,14 @@ describe("resize", () => {
     });
 
     test("Resizing from top works the same way", () => {
-      const { handlers, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+      const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
         timeBlocks: threeTimeBlocks,
       });
 
-      handlers.handleResizerMouseDown(
-        threeTimeBlocks[1],
-        EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS,
-      );
+      startEdit({
+        timeBlock: threeTimeBlocks[1],
+        mode: EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS,
+      });
       moveCursorTo(moment("2023-01-01 00:30"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({

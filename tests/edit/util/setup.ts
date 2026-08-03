@@ -4,8 +4,6 @@ import moment from "moment/moment";
 import { writable } from "svelte/store";
 import { vi } from "vitest";
 
-import type { PeriodicNotes } from "../../../src/service/periodic-notes";
-import { WorkspaceFacade } from "../../../src/service/workspace-facade";
 import {
   type DayPlannerSettings,
   defaultSettingsForTests,
@@ -25,13 +23,11 @@ function createProps({
 }) {
   const onUpdate = vi.fn().mockResolvedValue(true);
   const onEditAborted = vi.fn();
-  const workspaceFacade = vi.fn() as unknown as WorkspaceFacade;
 
   return {
     settingsStore: writable(settings),
     onUpdate,
     onEditAborted,
-    workspaceFacade,
     abortEditTrigger: writable(),
     localTimeBlocks: writable(timeBlocks),
     remoteTimeBlocks: writable([]),
@@ -39,13 +35,6 @@ function createProps({
       dateTime: moment("2023-01-01 00:00"),
       type: "dateTime",
     }),
-    periodicNotes: {
-      getDateFromPath: vi.fn(() => null),
-      getDailyNoteSettings: vi.fn(() => ({
-        format: "YYYY-MM-DD",
-        folder: ".",
-      })),
-    } as unknown as PeriodicNotes,
   };
 }
 
@@ -58,7 +47,8 @@ export function setUp({
 } = {}) {
   const props = createProps({ timeBlocks, settings });
   const {
-    handlers,
+    startEdit,
+    startCreate,
     dayToDisplayedTimeBlocks,
     getDisplayedAllDayTimeBlocksForMultiDayRow,
     confirmEdit,
@@ -79,7 +69,8 @@ export function setUp({
   }
 
   return {
-    handlers,
+    startEdit,
+    startCreate,
     moveCursorTo,
     dayToDisplayedTimeBlocks,
     getDisplayedAllDayTimeBlocksForMultiDayRow,

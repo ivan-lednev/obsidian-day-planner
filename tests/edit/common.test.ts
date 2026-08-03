@@ -15,12 +15,12 @@ import { setUp } from "./util/setup";
 
 describe("drag one & common edit mechanics", () => {
   test("after edit confirmation, tasks freeze and stop reacting to cursor", async () => {
-    const { handlers, moveCursorTo, dayToDisplayedTimeBlocks, confirmEdit } =
+    const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks, confirmEdit } =
       setUp({
         timeBlocks: threeTimeBlocks,
       });
 
-    handlers.handleGripMouseDown(threeTimeBlocks[1], EditMode.DRAG);
+    startEdit({ timeBlock: threeTimeBlocks[1], mode: EditMode.DRAG });
     moveCursorTo(moment("2023-01-01 03:00"));
 
     await confirmEdit();
@@ -39,11 +39,11 @@ describe("drag one & common edit mechanics", () => {
   });
 
   test("Edits are interruptible", async () => {
-    const { handlers, props, confirmEdit } = setUp({
+    const { startEdit, props, confirmEdit } = setUp({
       timeBlocks: threeTimeBlocks,
     });
 
-    handlers.handleGripMouseDown(threeTimeBlocks[1], EditMode.DRAG);
+    startEdit({ timeBlock: threeTimeBlocks[1], mode: EditMode.DRAG });
     props.abortEditTrigger.set(getUpdateTrigger());
 
     await confirmEdit();
@@ -52,9 +52,9 @@ describe("drag one & common edit mechanics", () => {
   });
 
   test.skip("when a task is set to its current time, nothing happens", async () => {
-    const { handlers, confirmEdit, props } = setUp();
+    const { startEdit, confirmEdit, props } = setUp();
 
-    handlers.handleGripMouseDown(baseTimeBlock, EditMode.DRAG);
+    startEdit({ timeBlock: baseTimeBlock, mode: EditMode.DRAG });
     await confirmEdit();
 
     expect(props.onUpdate).not.toHaveBeenCalled();
@@ -104,7 +104,7 @@ describe("drag one & common edit mechanics", () => {
       };
       const {
         dayToDisplayedTimeBlocks,
-        handlers,
+        startEdit,
         moveCursorTo,
         confirmEdit,
         props,
@@ -112,7 +112,7 @@ describe("drag one & common edit mechanics", () => {
         timeBlocks: [timeBlock],
       });
 
-      handlers.handleGripMouseDown(timeBlock, EditMode.DRAG);
+      startEdit({ timeBlock: timeBlock, mode: EditMode.DRAG });
       moveCursorTo(moment("2023-01-01 23:00"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
@@ -160,11 +160,11 @@ describe("drag one & common edit mechanics", () => {
         id: "1",
       };
 
-      const { handlers, moveCursorTo, confirmEdit, props } = setUp({
+      const { startEdit, moveCursorTo, confirmEdit, props } = setUp({
         timeBlocks: [timeBlock],
       });
 
-      handlers.handleGripMouseDown(timeBlock, EditMode.DRAG);
+      startEdit({ timeBlock: timeBlock, mode: EditMode.DRAG });
       moveCursorTo(moment("2023-01-01 23:30"));
 
       await confirmEdit();
@@ -190,11 +190,11 @@ describe("drag one & common edit mechanics", () => {
         id: "1",
       };
 
-      const { dayToDisplayedTimeBlocks, moveCursorTo, handlers } = setUp({
+      const { dayToDisplayedTimeBlocks, moveCursorTo, startEdit } = setUp({
         timeBlocks: [timeBlock],
       });
 
-      handlers.handleGripMouseDown(timeBlock, EditMode.RESIZE);
+      startEdit({ timeBlock: timeBlock, mode: EditMode.RESIZE });
       moveCursorTo(moment("2023-01-02 02:00"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({

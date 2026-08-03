@@ -1,10 +1,8 @@
 import { Array, pipe } from "effect";
 import type { Moment } from "moment";
-import { derived, type Readable, writable } from "svelte/store";
+import { derived, get, type Readable, writable } from "svelte/store";
 
 import { addHorizontalPlacing } from "../../../overlap/overlap";
-import type { PeriodicNotes } from "../../../service/periodic-notes";
-import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
 import type {
   EditableTimeBlock,
@@ -21,10 +19,9 @@ import type {
 import * as m from "../../../util/moment";
 import * as t from "../../../util/time-block-utils";
 
-import { createEditHandlers } from "./create-edit-handlers";
 import { useCursor } from "./cursor";
 import { transform } from "./transform/transform";
-import type { EditOperation } from "./types";
+import { EditMode, type EditOperation } from "./types";
 import { useEditActions } from "./use-edit-actions";
 
 function groupByDay(timeBlocks: TimelineTimeBlock[]) {
@@ -51,8 +48,6 @@ function groupByDay(timeBlocks: TimelineTimeBlock[]) {
 }
 
 export function useEditContext(props: {
-  workspaceFacade: WorkspaceFacade;
-  periodicNotes: PeriodicNotes;
   onUpdate: OnUpdateFn;
   settingsStore: Readable<DayPlannerSettings>;
   localTimeBlocks: Readable<EditableTimeBlock[]>;
@@ -62,8 +57,6 @@ export function useEditContext(props: {
   onEditAborted: OnEditAbortedFn;
 }) {
   const {
-    workspaceFacade,
-    periodicNotes,
     onEditAborted,
     onUpdate,
     settingsStore,
@@ -131,14 +124,15 @@ export function useEditContext(props: {
     onUpdate,
   });
 
-  const handlers = createEditHandlers({
-    periodicNotes,
-    pointerDateTime,
-    workspaceFacade,
-    startEdit,
-    editOperation,
-    settingsStore,
-  });
+  function startCreate() {
+    startEdit({
+      timeBlock: t.create({
+        startTime: get(pointerDateTime).dateTime,
+        settings: get(settingsStore),
+      }),
+      mode: EditMode.CREATE,
+    });
+  }
 
   const combinedTimeBlocks = derived(
     [remoteTimeBlocks, timeBlocksWithPendingUpdate],
@@ -243,14 +237,14 @@ export function useEditContext(props: {
   }
 
   return {
-    handlers,
     cursor,
     dayToDisplayedTimeBlocks,
+    startEdit,
+    startCreate,
     confirmEdit,
     cancelEdit,
     editOperation,
     getDisplayedTimeBlocksForTimeline,
-    getDisplayedAllDayTimeBlocksForMultiDayRow:
-      getDisplayedAllDayTimeBlocksForMultiDayRow,
+    getDisplayedAllDayTimeBlocksForMultiDayRow,
   };
 }
