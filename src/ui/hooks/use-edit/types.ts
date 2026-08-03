@@ -1,5 +1,6 @@
 import type {
   EditableTimeBlock,
+  TimeInterval,
   WithDuration,
 } from "../../../time-block-types";
 
@@ -16,7 +17,13 @@ export enum EditMode {
   CREATE = "CREATE",
 }
 
-export interface EditOperation {
-  timeBlock: WithDuration<EditableTimeBlock>;
+export type EditableInterval = TimeInterval & {
+  isAllDayEvent?: boolean;
+};
+
+export interface EditOperation<
+  Block extends EditableInterval = WithDuration<EditableTimeBlock>,
+> {
+  timeBlock: Block;
   mode: EditMode;
 }

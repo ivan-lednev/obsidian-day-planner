@@ -1,5 +1,5 @@
 import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
-import { get, type Readable, type Writable } from "svelte/store";
+import { derived, get, type Readable, type Writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 
 import {
@@ -521,6 +521,12 @@ export default class DayPlanner extends Plugin {
         localTimeBlocks,
       });
 
+    // Once the time tracker column becomes editable, its operation joins this
+    // one instead of every consumer growing a second subscription.
+    const isEditing = derived(editContext.editOperation, ($editOperation) =>
+      Boolean($editOperation),
+    );
+
     this.registerInterval(
       window.setInterval(() => {
         dispatch(icalRefreshRequested());
@@ -644,6 +650,7 @@ export default class DayPlanner extends Plugin {
       renderMarkdown: createRenderMarkdown(this.app),
       toggleCheckboxInFile: this.vaultFacade.toggleCheckboxInFile,
       editContext,
+      isEditing,
       showPreview: createShowPreview(this.app),
       isModPressed,
       reSync,

@@ -21,13 +21,11 @@
 
   const { startScroll, stopScroll } = createAutoScroll();
 
-  const {
-    editContext: { editOperation },
-  } = getObsidianContext();
+  const { isEditing } = getObsidianContext();
 
   const blockPanOnEdit: Attachment<HTMLElement> = (el) =>
     on(el, "touchmove", (event) => {
-      if ($editOperation) {
+      if ($isEditing) {
         event.preventDefault();
       }
     });
@@ -44,7 +42,7 @@
   }}
   onpointerleave={stopScroll}
   onpointermove={(event) => {
-    if (!$editOperation || !el) {
+    if (!$isEditing || !el) {
       return;
     }
 

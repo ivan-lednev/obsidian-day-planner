@@ -5,18 +5,14 @@
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import { currentTimeSignal, isToday } from "../../global-store/current-time";
-  import { getVisibleHours, snap } from "../../global-store/derived-settings";
+  import { getVisibleHours } from "../../global-store/derived-settings";
   import { selectLogTimeBlocksForDay } from "../../redux";
   import { selectLogEntriesById } from "../../redux/index/index-slice";
   import type { LogTimeBlock } from "../../time-block-types";
-  import {
-    getPointerOffsetY,
-    isTouchEvent,
-    offsetYToMinutes,
-  } from "../../util/dom";
-  import { minutesToMomentOfDay } from "../../util/moment";
+  import { isTouchEvent } from "../../util/dom";
   import { getBlockProps, getDayKey } from "../../util/time-block-utils";
   import { createGestures } from "../actions/gestures";
+  import { trackPointerDateTime } from "../actions/track-pointer-date-time";
   import { createActiveClockMenu } from "../active-clock-menu";
   import { createCompletedClockMenu } from "../completed-clock-menu";
 
@@ -92,42 +88,28 @@
     }
   }
 
-  let el: HTMLElement | undefined = $state();
-
-  function updatePointerDateTime(event: MouseEvent | TouchEvent) {
-    isNotVoid(el);
-
-    const newOffsetY = snap(getPointerOffsetY(el, event), $settingsStore);
-    const minutesSinceMidnight = offsetYToMinutes(
-      newOffsetY,
-      settingsSignal.current.zoomLevel,
-      settingsSignal.current.startHour,
-    );
-    const dateTime = minutesToMomentOfDay(
-      minutesSinceMidnight,
-      window.moment(day),
-    );
-    const previousDateTime = get(pointerDateTime).dateTime;
-
-    if (!dateTime.isSame(previousDateTime, "minute")) {
-      pointerDateTime.set({ dateTime, type: "dateTime" });
-    }
-  }
+  const plannerPointer = trackPointerDateTime({
+    getDay: () => day,
+    pointerDateTime,
+    settingsSignal,
+  });
 
   function handleContainerPointerDown(event: MouseEvent | TouchEvent) {
-    updatePointerDateTime(event);
+    plannerPointer.sync(event);
     handleContainerMouseDown();
   }
 
   function handleContainerPointerMove(event: MouseEvent | TouchEvent) {
+    // Deliberately the planner's own operation and not `isEditing`: the pointer
+    // should only follow the column that is actually being edited.
     if (get(editOperation)) {
-      updatePointerDateTime(event);
+      plannerPointer.sync(event);
     }
   }
 
   const timelineGestures = createGestures({
     onlongpress: (event) => {
-      if (event.target !== el) {
+      if (!plannerPointer.isOnBackground(event)) {
         return;
       }
 
@@ -147,10 +129,9 @@
       {/if}
 
       <div
-        bind:this={el}
         class="tasks absolute-stretch-x"
         onpointerdown={(event) => {
-          if (isTouchEvent(event) || event.target !== el) {
+          if (isTouchEvent(event) || !plannerPointer.isOnBackground(event)) {
             return;
           }
 
@@ -158,6 +139,7 @@
         }}
         onpointermove={handleContainerPointerMove}
         onpointerup={confirmEdit}
+        {@attach plannerPointer.attachment}
         {@attach timelineGestures}
       >
         {#each $displayedTimeBlocksForTimeline.withTime as timeBlock (timeBlock.id)}

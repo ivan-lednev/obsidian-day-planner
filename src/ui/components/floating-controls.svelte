@@ -31,9 +31,7 @@
 
   const { active, anchor, ...snippets }: Props = $props();
 
-  const {
-    editContext: { editOperation },
-  } = getObsidianContext();
+  const { isEditing } = getObsidianContext();
 
   let anchorEl: HTMLElement | undefined;
 
@@ -83,7 +81,7 @@
 
 {@render anchor({ anchor: setAnchor })}
 
-{#if !$editOperation && active}
+{#if !$isEditing && active}
   <ShowActiveOrAll blocks={controls}>
     {#snippet block({ isActive, setIsActive, name, floatingUi })}
       <FloatingUi

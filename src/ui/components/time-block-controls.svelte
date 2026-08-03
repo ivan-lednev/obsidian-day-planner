@@ -31,7 +31,7 @@
   } = $props();
 
   const {
-    editContext: { editOperation },
+    isEditing,
     workspaceFacade,
     editText,
     editLine,
@@ -84,7 +84,7 @@
       onEdit: editTimeBlockSummary,
       onDelete: deleteTimeBlock,
     })}
-  selectionBlocked={Boolean($editOperation)}
+  selectionBlocked={$isEditing}
 >
   {#snippet children({ gestures, clearOnPointerUpOutside, state, onpointerup })}
     <FloatingControls active={state === "primary"}>
