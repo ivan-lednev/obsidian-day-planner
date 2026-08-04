@@ -1,3 +1,4 @@
+import type { Moment } from "moment";
 import moment from "moment";
 
 import type {
@@ -13,13 +14,13 @@ export const nextDay = moment(nextDayKey);
 
 export const emptyTimeBlocks = [];
 export const baseTimeBlockStartTime = moment("2023-01-01 00:00");
-export const baseTimeBlock: WithPlacing<WithDuration<EditableTimeBlock>> = {
-  source: "dailyNoteDate",
+
+const timeBlockDefaults = {
+  source: "dailyNoteDate" as const,
   symbol: "-",
   status: " ",
   startTime: baseTimeBlockStartTime,
   durationMinutes: 60,
-  text: "text",
   placing: {
     offsetPercent: 0,
     spanPercent: 100,
@@ -37,40 +38,50 @@ export const baseTimeBlock: WithPlacing<WithDuration<EditableTimeBlock>> = {
       offset: 0,
     },
   },
-  id: "id",
 };
 
-export const unscheduledTimeBlock: EditableTimeBlock = {
-  ...baseTimeBlock,
+/**
+ * Text is derived from the id so that no two blocks share a render key: it is
+ * built from time, path, line and text, and blocks that collide on it get
+ * deduped before they reach a column.
+ */
+export function createTimeBlock(
+  id: string,
+  overrides: Partial<{
+    startTime: Moment;
+    durationMinutes: number;
+    isAllDayEvent: boolean;
+    text: string;
+  }> = {},
+): WithPlacing<WithDuration<EditableTimeBlock>> {
+  return {
+    ...timeBlockDefaults,
+    id,
+    text: `text ${id}`,
+    ...overrides,
+  };
+}
+
+export const baseTimeBlock = createTimeBlock("id");
+
+export const unscheduledTimeBlock: EditableTimeBlock = createTimeBlock("id", {
   isAllDayEvent: true,
-};
+});
 
 export const threeTimeBlocks: [
   WithPlacing<WithDuration<EditableTimeBlock>>,
   WithPlacing<WithDuration<EditableTimeBlock>>,
   WithPlacing<WithDuration<EditableTimeBlock>>,
 ] = [
-  {
-    ...baseTimeBlock,
-    id: "1",
-    startTime: moment("2023-01-01 01:00"),
-  },
-  {
-    ...baseTimeBlock,
-    id: "2",
-    startTime: moment("2023-01-01 02:00"),
-  },
-  {
-    ...baseTimeBlock,
-    id: "3",
-    startTime: moment("2023-01-01 03:00"),
-  },
+  createTimeBlock("1", { startTime: moment("2023-01-01 01:00") }),
+  createTimeBlock("2", { startTime: moment("2023-01-01 02:00") }),
+  createTimeBlock("3", { startTime: moment("2023-01-01 03:00") }),
 ];
 
 export const threeTimeBlocksOverTwoDays: WithDuration<EditableTimeBlock>[] = [
   baseTimeBlock,
-  { ...baseTimeBlock, id: "2", startTime: moment("2023-01-01 01:00") },
-  { ...baseTimeBlock, id: "3", startTime: moment("2023-01-02 02:00") },
+  createTimeBlock("2", { startTime: moment("2023-01-01 01:00") }),
+  createTimeBlock("3", { startTime: moment("2023-01-02 02:00") }),
 ];
 
 export const baseTimeBlocks: [WithPlacing<WithDuration<EditableTimeBlock>>] = [

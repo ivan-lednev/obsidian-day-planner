@@ -7,6 +7,7 @@ import { getUpdateTrigger } from "../../src/util/store";
 
 import {
   baseTimeBlock,
+  createTimeBlock,
   dayKey,
   nextDayKey,
   threeTimeBlocks,
@@ -15,10 +16,9 @@ import { setUp } from "./util/setup";
 
 describe("drag one & common edit mechanics", () => {
   test("after edit confirmation, tasks freeze and stop reacting to cursor", async () => {
-    const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks, confirmEdit } =
-      setUp({
-        timeBlocks: threeTimeBlocks,
-      });
+    const { startEdit, moveCursorTo, getBlocksForDay, confirmEdit } = setUp({
+      timeBlocks: threeTimeBlocks,
+    });
 
     startEdit({ timeBlock: threeTimeBlocks[1], mode: EditMode.DRAG });
     moveCursorTo(moment("2023-01-01 03:00"));
@@ -27,13 +27,11 @@ describe("drag one & common edit mechanics", () => {
 
     moveCursorTo(moment("2023-01-02 05:00"));
 
-    expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: [
-        { id: "1" },
-        { id: "2", startTime: moment("2023-01-01 03:00") },
-        { id: "3" },
-      ],
-    });
+    expect(getBlocksForDay(dayKey)).toMatchObject([
+      { id: "1" },
+      { id: "2", startTime: moment("2023-01-01 03:00") },
+      { id: "3" },
+    ]);
   });
 
   test("Edits are interruptible", async () => {
@@ -60,72 +58,59 @@ describe("drag one & common edit mechanics", () => {
 
   describe("Tasks crossing midnight", () => {
     test("Splits multi-day tasks into single-day tasks", () => {
-      const { dayToDisplayedTimeBlocks } = setUp({
+      const { getBlocksForDay } = setUp({
         timeBlocks: [
-          {
-            ...baseTimeBlock,
+          createTimeBlock("1", {
             startTime: moment("2023-01-01 23:00"),
             durationMinutes: 120,
-            id: "1",
-          },
+          }),
         ],
       });
 
-      expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: [
-          {
-            id: "1",
-            startTime: moment("2023-01-01 23:00"),
-            durationMinutes: 59,
-          },
-        ],
-        [nextDayKey]: [
-          {
-            id: "1",
-            startTime: moment("2023-01-02 00:00"),
-            durationMinutes: 60,
-          },
-        ],
-      });
+      expect(getBlocksForDay(dayKey)).toMatchObject([
+        {
+          id: "1",
+          startTime: moment("2023-01-01 23:00"),
+          durationMinutes: 59,
+        },
+      ]);
+      expect(getBlocksForDay(nextDayKey)).toMatchObject([
+        {
+          id: "1",
+          startTime: moment("2023-01-02 00:00"),
+          durationMinutes: 60,
+        },
+      ]);
     });
 
     test("Can turn a single day task into 2 tasks if it spans midnight", async () => {
-      const timeBlock = {
-        ...baseTimeBlock,
+      const timeBlock = createTimeBlock("1", {
         startTime: moment("2023-01-01 22:00"),
         durationMinutes: 120,
-        id: "1",
-      };
-      const {
-        dayToDisplayedTimeBlocks,
-        startEdit,
-        moveCursorTo,
-        confirmEdit,
-        props,
-      } = setUp({
-        timeBlocks: [timeBlock],
       });
+      const { getBlocksForDay, startEdit, moveCursorTo, confirmEdit, props } =
+        setUp({
+          timeBlocks: [timeBlock],
+        });
 
       startEdit({ timeBlock: timeBlock, mode: EditMode.DRAG });
       moveCursorTo(moment("2023-01-01 23:00"));
 
-      expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: [
-          {
-            id: "1",
-            startTime: moment("2023-01-01 23:00"),
-            // todo: where is the extra minute?
-            durationMinutes: 59,
-          },
-        ],
-        [nextDayKey]: [
-          {
-            id: "1",
-            startTime: moment("2023-01-02 00:00"),
-            durationMinutes: 60,
-          },
-        ],
-      });
+      expect(getBlocksForDay(dayKey)).toMatchObject([
+        {
+          id: "1",
+          startTime: moment("2023-01-01 23:00"),
+          // todo: where is the extra minute?
+          durationMinutes: 59,
+        },
+      ]);
+      expect(getBlocksForDay(nextDayKey)).toMatchObject([
+        {
+          id: "1",
+          startTime: moment("2023-01-02 00:00"),
+          durationMinutes: 60,
+        },
+      ]);
 
       await confirmEdit();
 
@@ -143,12 +128,10 @@ describe("drag one & common edit mechanics", () => {
     });
 
     test("Editing the first task of a split works", async () => {
-      const timeBlock = {
-        ...baseTimeBlock,
+      const timeBlock = createTimeBlock("1", {
         startTime: moment("2023-01-01 22:00"),
         durationMinutes: 180,
-        id: "1",
-      };
+      });
 
       const { startEdit, moveCursorTo, confirmEdit, props } = setUp({
         timeBlocks: [timeBlock],
@@ -173,36 +156,32 @@ describe("drag one & common edit mechanics", () => {
     });
 
     test("Editing the second task of a split works", async () => {
-      const timeBlock = {
-        ...baseTimeBlock,
+      const timeBlock = createTimeBlock("1", {
         startTime: moment("2023-01-01 23:00"),
         durationMinutes: 120,
-        id: "1",
-      };
+      });
 
-      const { dayToDisplayedTimeBlocks, moveCursorTo, startEdit } = setUp({
+      const { getBlocksForDay, moveCursorTo, startEdit } = setUp({
         timeBlocks: [timeBlock],
       });
 
       startEdit({ timeBlock: timeBlock, mode: EditMode.RESIZE });
       moveCursorTo(moment("2023-01-02 02:00"));
 
-      expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: [
-          {
-            id: "1",
-            startTime: moment("2023-01-01 23:00"),
-            durationMinutes: 59,
-          },
-        ],
-        [nextDayKey]: [
-          {
-            id: "1",
-            startTime: moment("2023-01-02 00:00"),
-            durationMinutes: 120,
-          },
-        ],
-      });
+      expect(getBlocksForDay(dayKey)).toMatchObject([
+        {
+          id: "1",
+          startTime: moment("2023-01-01 23:00"),
+          durationMinutes: 59,
+        },
+      ]);
+      expect(getBlocksForDay(nextDayKey)).toMatchObject([
+        {
+          id: "1",
+          startTime: moment("2023-01-02 00:00"),
+          durationMinutes: 120,
+        },
+      ]);
     });
   });
 
@@ -211,13 +190,11 @@ describe("drag one & common edit mechanics", () => {
       return days * 60 * 24;
     }
 
-    const multiDayTimeBlock = {
-      ...baseTimeBlock,
+    const multiDayTimeBlock = createTimeBlock("1", {
       isAllDayEvent: true,
       startTime: moment("2023-01-05 00:00"),
       durationMinutes: daysToMinutes(4),
-      id: "1",
-    };
+    });
 
     test.each([
       {

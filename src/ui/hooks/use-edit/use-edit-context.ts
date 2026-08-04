@@ -100,16 +100,6 @@ export function useEditContext(props: {
     onUpdate,
   });
 
-  function startCreate() {
-    startEdit({
-      timeBlock: t.create({
-        startTime: get(pointerDateTime).dateTime,
-        settings: get(settingsStore),
-      }),
-      mode: EditMode.CREATE,
-    });
-  }
-
   const combinedTimeBlocks = derived(
     [remoteTimeBlocks, timeBlocksWithPendingUpdate],
     ([
@@ -143,9 +133,18 @@ export function useEditContext(props: {
     );
   }
 
+  function startCreate() {
+    startEdit({
+      timeBlock: t.create({
+        startTime: get(pointerDateTime).dateTime,
+        settings: get(settingsStore),
+      }),
+      mode: EditMode.CREATE,
+    });
+  }
+
   return {
     cursor,
-    dayToDisplayedTimeBlocks,
     startEdit,
     startCreate,
     confirmEdit,

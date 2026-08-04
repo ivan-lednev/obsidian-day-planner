@@ -210,7 +210,9 @@ export async function setUp(props?: {
     });
 
   // this prevents the store from resetting;
-  editContext.dayToDisplayedTimeBlocks.subscribe(Function.constVoid);
+  editContext.getDisplayedAllDayTimeBlocksForMultiDayRow.subscribe(
+    Function.constVoid,
+  );
   localTimeBlocks.subscribe(Function.constVoid);
 
   function moveCursorTo(

@@ -1,5 +1,4 @@
 import moment from "moment";
-import { get } from "svelte/store";
 import { test, expect, describe } from "vitest";
 
 import { defaultSettingsForTests } from "../../src/settings";
@@ -11,48 +10,42 @@ import { setUp } from "./util/setup";
 
 describe("resize", () => {
   test("resizing changes duration", () => {
-    const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp();
+    const { startEdit, moveCursorTo, getBlocksForDay } = setUp();
 
     startEdit({ timeBlock: baseTimeBlock, mode: EditMode.RESIZE });
     moveCursorTo(moment("2023-01-01 03:00"));
 
-    expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: [{ durationMinutes: 180 }],
-    });
+    expect(getBlocksForDay(dayKey)).toMatchObject([{ durationMinutes: 180 }]);
   });
 
   test("Resize from top works the same way", () => {
-    const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp();
+    const { startEdit, moveCursorTo, getBlocksForDay } = setUp();
 
     startEdit({ timeBlock: baseTimeBlock, mode: EditMode.RESIZE_FROM_TOP });
     moveCursorTo(moment("2023-01-01 00:30"));
 
-    expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: [
-        { durationMinutes: 30, startTime: moment("2023-01-01 00:30") },
-      ],
-    });
+    expect(getBlocksForDay(dayKey)).toMatchObject([
+      { durationMinutes: 30, startTime: moment("2023-01-01 00:30") },
+    ]);
   });
 
   test("Once the minimal duration is reached, the task starts shifting down", () => {
-    const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp();
+    const { startEdit, moveCursorTo, getBlocksForDay } = setUp();
 
     startEdit({ timeBlock: baseTimeBlock, mode: EditMode.RESIZE_FROM_TOP });
     moveCursorTo(moment("2023-01-01 01:30"));
 
-    expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: [
-        {
-          durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
-          startTime: moment("2023-01-01 01:30"),
-        },
-      ],
-    });
+    expect(getBlocksForDay(dayKey)).toMatchObject([
+      {
+        durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
+        startTime: moment("2023-01-01 01:30"),
+      },
+    ]);
   });
 
   describe("resize many", () => {
     test("resizing with neighbors shifts neighbors as well", () => {
-      const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+      const { startEdit, moveCursorTo, getBlocksForDay } = setUp({
         timeBlocks: threeTimeBlocks,
       });
 
@@ -62,20 +55,18 @@ describe("resize", () => {
       });
       moveCursorTo(moment("2023-01-01 04:00"));
 
-      expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: [
-          { id: "1" },
-          { id: "2" },
-          {
-            id: "3",
-            startTime: moment("2023-01-01 04:00"),
-          },
-        ],
-      });
+      expect(getBlocksForDay(dayKey)).toMatchObject([
+        { id: "1" },
+        { id: "2" },
+        {
+          id: "3",
+          startTime: moment("2023-01-01 04:00"),
+        },
+      ]);
     });
 
     test("Resizing from top works the same way", () => {
-      const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+      const { startEdit, moveCursorTo, getBlocksForDay } = setUp({
         timeBlocks: threeTimeBlocks,
       });
 
@@ -85,30 +76,28 @@ describe("resize", () => {
       });
       moveCursorTo(moment("2023-01-01 01:30"));
 
-      expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: [
-          {
-            id: "1",
-            startTime: moment("2023-01-01 00:30"),
-            durationMinutes: toMinutes("01:00"),
-          },
-          {
-            id: "2",
-            startTime: moment("2023-01-01 01:30"),
-            durationMinutes: toMinutes("01:30"),
-          },
-          {
-            id: "3",
-            startTime: moment("2023-01-01 03:00"),
-          },
-        ],
-      });
+      expect(getBlocksForDay(dayKey)).toMatchObject([
+        {
+          id: "1",
+          startTime: moment("2023-01-01 00:30"),
+          durationMinutes: toMinutes("01:00"),
+        },
+        {
+          id: "2",
+          startTime: moment("2023-01-01 01:30"),
+          durationMinutes: toMinutes("01:30"),
+        },
+        {
+          id: "3",
+          startTime: moment("2023-01-01 03:00"),
+        },
+      ]);
     });
   });
 
   describe("Resize and shrink others", () => {
     test("Resizing shrinks neighbors & when they reach minimal duration, they start shifting", () => {
-      const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+      const { startEdit, moveCursorTo, getBlocksForDay } = setUp({
         timeBlocks: threeTimeBlocks,
       });
 
@@ -118,24 +107,22 @@ describe("resize", () => {
       });
       moveCursorTo(moment("2023-01-01 04:00"));
 
-      expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: [
-          { id: "1" },
-          {
-            id: "2",
-            durationMinutes: toMinutes("02:00"),
-          },
-          {
-            id: "3",
-            startTime: moment("2023-01-01 04:00"),
-            durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
-          },
-        ],
-      });
+      expect(getBlocksForDay(dayKey)).toMatchObject([
+        { id: "1" },
+        {
+          id: "2",
+          durationMinutes: toMinutes("02:00"),
+        },
+        {
+          id: "3",
+          startTime: moment("2023-01-01 04:00"),
+          durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
+        },
+      ]);
     });
 
     test("Resizing from top works the same way", () => {
-      const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+      const { startEdit, moveCursorTo, getBlocksForDay } = setUp({
         timeBlocks: threeTimeBlocks,
       });
 
@@ -145,23 +132,21 @@ describe("resize", () => {
       });
       moveCursorTo(moment("2023-01-01 00:30"));
 
-      expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: [
-          {
-            id: "1",
-            durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
-          },
-          {
-            id: "2",
-            startTime: moment("2023-01-01 00:30"),
-            durationMinutes: toMinutes("02:30"),
-          },
-          {
-            id: "3",
-            startTime: moment("2023-01-01 03:00"),
-          },
-        ],
-      });
+      expect(getBlocksForDay(dayKey)).toMatchObject([
+        {
+          id: "1",
+          durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
+        },
+        {
+          id: "2",
+          startTime: moment("2023-01-01 00:30"),
+          durationMinutes: toMinutes("02:30"),
+        },
+        {
+          id: "3",
+          startTime: moment("2023-01-01 03:00"),
+        },
+      ]);
     });
   });
 });

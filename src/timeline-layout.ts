@@ -21,11 +21,11 @@ export function getVisibleTimeBlocks<Block extends { task?: string }>(
   return timeBlocks.filter((it) => !t.isCompleted(it.task));
 }
 
-export function spansMoreThanOneDay(timeBlock: WithDuration<TimeBlock>) {
+function spansMoreThanOneDay(timeBlock: WithDuration<TimeBlock>) {
   return t.getEndTime(timeBlock).diff(timeBlock.startTime, "days") > 1;
 }
 
-export function splitAcrossDays<Block extends WithDuration<TimeBlock>>(
+function splitAcrossDays<Block extends WithDuration<TimeBlock>>(
   timeBlock: Block,
 ): Block[] {
   return m
@@ -37,7 +37,7 @@ export function splitAcrossDays<Block extends WithDuration<TimeBlock>>(
     }));
 }
 
-export function toDayChunks(timeBlock: TimelineTimeBlock): TimelineTimeBlock[] {
+function toDayChunks(timeBlock: TimelineTimeBlock): TimelineTimeBlock[] {
   if (!t.isWithDuration(timeBlock) || timeBlock.isAllDayEvent) {
     return [timeBlock];
   }

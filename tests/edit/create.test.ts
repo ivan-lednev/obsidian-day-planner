@@ -1,5 +1,4 @@
 import moment from "moment";
-import { get } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 import { test, expect, describe } from "vitest";
 
@@ -20,7 +19,7 @@ function createUserInputPromise() {
 
 describe("create", () => {
   test("when creating and dragging, task duration changes", () => {
-    const { startCreate, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+    const { startCreate, moveCursorTo, getBlocksForDay } = setUp({
       timeBlocks: emptyTimeBlocks,
     });
 
@@ -28,25 +27,18 @@ describe("create", () => {
     startCreate();
     moveCursorTo(moment("2023-01-01 02:00"));
 
-    expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: [
-        {
-          startTime: moment("2023-01-01 01:00"),
-          durationMinutes: 60,
-        },
-      ],
-    });
+    expect(getBlocksForDay(dayKey)).toMatchObject([
+      {
+        startTime: moment("2023-01-01 01:00"),
+        durationMinutes: 60,
+      },
+    ]);
   });
 
   describe("text input modal", () => {
     test("phantom block is visible while waiting for text input", async () => {
-      const {
-        startCreate,
-        moveCursorTo,
-        dayToDisplayedTimeBlocks,
-        confirmEdit,
-        props,
-      } = setUp({ timeBlocks: emptyTimeBlocks });
+      const { startCreate, moveCursorTo, getBlocksForDay, confirmEdit, props } =
+        setUp({ timeBlocks: emptyTimeBlocks });
 
       const userInputPromise = createUserInputPromise();
       props.onUpdate.mockReturnValueOnce(userInputPromise.promise);
@@ -57,27 +49,20 @@ describe("create", () => {
 
       const pendingConfirm = confirmEdit();
 
-      expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: [
-          expect.objectContaining({
-            startTime: moment("2023-01-01 01:00"),
-            durationMinutes: 60,
-          }),
-        ],
-      });
+      expect(getBlocksForDay(dayKey)).toMatchObject([
+        expect.objectContaining({
+          startTime: moment("2023-01-01 01:00"),
+          durationMinutes: 60,
+        }),
+      ]);
 
       userInputPromise.resolve(true);
       await pendingConfirm;
     });
 
     test("phantom block disappears after text input is canceled", async () => {
-      const {
-        startCreate,
-        moveCursorTo,
-        dayToDisplayedTimeBlocks,
-        confirmEdit,
-        props,
-      } = setUp({ timeBlocks: emptyTimeBlocks });
+      const { startCreate, moveCursorTo, getBlocksForDay, confirmEdit, props } =
+        setUp({ timeBlocks: emptyTimeBlocks });
 
       const userInputPromise = createUserInputPromise();
       props.onUpdate.mockReturnValueOnce(userInputPromise.promise);
@@ -90,8 +75,7 @@ describe("create", () => {
       userInputPromise.resolve(false);
       await pendingConfirm;
 
-      const timeBlocks = get(dayToDisplayedTimeBlocks)[dayKey] ?? [];
-      expect(timeBlocks).toHaveLength(0);
+      expect(getBlocksForDay(dayKey)).toHaveLength(0);
     });
   });
 });

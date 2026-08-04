@@ -1,7 +1,7 @@
 import { Function } from "effect";
 import type { Moment } from "moment/moment";
 import moment from "moment/moment";
-import { writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 import { vi } from "vitest";
 
 import {
@@ -12,7 +12,7 @@ import type { EditableTimeBlock } from "../../../src/time-block-types";
 import type { PointerDateTime } from "../../../src/types";
 import { useEditContext } from "../../../src/ui/hooks/use-edit/use-edit-context";
 
-import { baseTimeBlocks } from "./fixtures";
+import { baseTimeBlocks, day } from "./fixtures";
 
 function createProps({
   timeBlocks,
@@ -49,13 +49,15 @@ export function setUp({
   const {
     startEdit,
     startCreate,
-    dayToDisplayedTimeBlocks,
+    getDisplayedTimeBlocksForTimeline,
     getDisplayedAllDayTimeBlocksForMultiDayRow,
     confirmEdit,
   } = useEditContext(props);
 
+  const blocksForDay = getDisplayedTimeBlocksForTimeline(day);
+
   // this prevents the store from resetting;
-  dayToDisplayedTimeBlocks.subscribe(Function.constVoid);
+  blocksForDay.subscribe(Function.constVoid);
   getDisplayedAllDayTimeBlocksForMultiDayRow.subscribe(Function.constVoid);
 
   function moveCursorTo(
@@ -68,11 +70,15 @@ export function setUp({
     });
   }
 
+  function getBlocksForDay(dayKey: string) {
+    return get(getDisplayedTimeBlocksForTimeline(moment(dayKey)));
+  }
+
   return {
     startEdit,
     startCreate,
     moveCursorTo,
-    dayToDisplayedTimeBlocks,
+    getBlocksForDay,
     getDisplayedAllDayTimeBlocksForMultiDayRow,
     confirmEdit,
     props,

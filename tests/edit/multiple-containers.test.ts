@@ -1,5 +1,4 @@
 import moment from "moment";
-import { get } from "svelte/store";
 import { test, expect, describe } from "vitest";
 
 import { EditMode } from "../../src/ui/hooks/use-edit/types";
@@ -7,6 +6,7 @@ import { EditMode } from "../../src/ui/hooks/use-edit/types";
 import {
   baseTimeBlock,
   baseTimeBlocks,
+  createTimeBlock,
   dayKey,
   emptyTimeBlocks,
   nextDayKey,
@@ -17,53 +17,53 @@ import { setUp } from "./util/setup";
 
 describe("moving tasks between containers", () => {
   test("with no edit operation in progress, nothing happens on mouse move", () => {
-    const { moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+    const { moveCursorTo, getBlocksForDay } = setUp({
       timeBlocks: baseTimeBlocks,
     });
 
-    const initial = get(dayToDisplayedTimeBlocks);
+    const initial = getBlocksForDay(dayKey);
 
     moveCursorTo(moment("2023-01-01 01:00"));
 
-    expect(get(dayToDisplayedTimeBlocks)).toEqual(initial);
+    expect(getBlocksForDay(dayKey)).toEqual(initial);
   });
 
   test("scheduling works between days", () => {
-    const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+    const { startEdit, moveCursorTo, getBlocksForDay } = setUp({
       timeBlocks: timeBlocksWithUnscheduledTimeBlock,
     });
 
     startEdit({ timeBlock: baseTimeBlock, mode: EditMode.DRAG });
     moveCursorTo(moment("2023-01-02 01:00"));
 
-    expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [nextDayKey]: [{ startTime: moment("2023-01-02 01:00") }],
-    });
+    expect(getBlocksForDay(nextDayKey)).toMatchObject([
+      { startTime: moment("2023-01-02 01:00") },
+    ]);
   });
 
   test("drag works between days", () => {
-    const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+    const { startEdit, moveCursorTo, getBlocksForDay } = setUp({
       timeBlocks: [
         baseTimeBlock,
-        { ...baseTimeBlock, id: "2", startTime: moment("2023-01-01 01:00") },
-        { ...baseTimeBlock, id: "3", startTime: moment("2023-01-02 01:00") },
+        createTimeBlock("2", { startTime: moment("2023-01-01 01:00") }),
+        createTimeBlock("3", { startTime: moment("2023-01-02 01:00") }),
       ],
     });
 
     startEdit({ timeBlock: baseTimeBlock, mode: EditMode.DRAG });
     moveCursorTo(moment("2023-01-02 01:00"));
 
-    expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: [{ id: "2", startTime: moment("2023-01-01 01:00") }],
-      [nextDayKey]: [
-        { startTime: moment("2023-01-02 01:00") },
-        { id: "3", startTime: moment("2023-01-02 01:00") },
-      ],
-    });
+    expect(getBlocksForDay(dayKey)).toMatchObject([
+      { id: "2", startTime: moment("2023-01-01 01:00") },
+    ]);
+    expect(getBlocksForDay(nextDayKey)).toMatchObject([
+      { startTime: moment("2023-01-02 01:00") },
+      { id: "3", startTime: moment("2023-01-02 01:00") },
+    ]);
   });
 
   test("drag many works between days", () => {
-    const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+    const { startEdit, moveCursorTo, getBlocksForDay } = setUp({
       timeBlocks: threeTimeBlocksOverTwoDays,
     });
 
@@ -73,17 +73,15 @@ describe("moving tasks between containers", () => {
     });
     moveCursorTo(moment("2023-01-02 02:00"));
 
-    expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [nextDayKey]: [
-        { startTime: moment("2023-01-02 02:00") },
-        { id: "2", startTime: moment("2023-01-02 03:00") },
-        { id: "3", startTime: moment("2023-01-02 04:00") },
-      ],
-    });
+    expect(getBlocksForDay(nextDayKey)).toMatchObject([
+      { startTime: moment("2023-01-02 02:00") },
+      { id: "2", startTime: moment("2023-01-02 03:00") },
+      { id: "3", startTime: moment("2023-01-02 04:00") },
+    ]);
   });
 
   test("drag many does not mess with other days", () => {
-    const { startEdit, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+    const { startEdit, moveCursorTo, getBlocksForDay } = setUp({
       timeBlocks: threeTimeBlocksOverTwoDays,
     });
 
@@ -93,17 +91,17 @@ describe("moving tasks between containers", () => {
     });
     moveCursorTo(moment("2023-01-01 05:00"));
 
-    expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: [
-        { startTime: moment("2023-01-01 05:00") },
-        { startTime: moment("2023-01-01 06:00") },
-      ],
-      [nextDayKey]: [{ id: "3", startTime: moment("2023-01-02 02:00") }],
-    });
+    expect(getBlocksForDay(dayKey)).toMatchObject([
+      { startTime: moment("2023-01-01 05:00") },
+      { startTime: moment("2023-01-01 06:00") },
+    ]);
+    expect(getBlocksForDay(nextDayKey)).toMatchObject([
+      { id: "3", startTime: moment("2023-01-02 02:00") },
+    ]);
   });
 
   test.skip("create works between days", () => {
-    const { startCreate, moveCursorTo, dayToDisplayedTimeBlocks } = setUp({
+    const { startCreate, moveCursorTo, getBlocksForDay } = setUp({
       timeBlocks: emptyTimeBlocks,
     });
 
@@ -111,21 +109,19 @@ describe("moving tasks between containers", () => {
     startCreate();
     moveCursorTo(moment("2023-01-02 02:00"));
 
-    expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [nextDayKey]: [
-        { startTime: moment("2023-01-02 01:00"), durationMinutes: 60 },
-      ],
-    });
+    expect(getBlocksForDay(nextDayKey)).toMatchObject([
+      { startTime: moment("2023-01-02 01:00"), durationMinutes: 60 },
+    ]);
   });
 
   // todo: fix
   test("resize doesn't works between days", () => {
-    const { startEdit, dayToDisplayedTimeBlocks } = setUp();
+    const { startEdit, getBlocksForDay } = setUp();
 
     startEdit({ timeBlock: baseTimeBlock, mode: EditMode.RESIZE });
 
-    expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: [{ id: "id", startTime: moment("2023-01-01 00:00") }],
-    });
+    expect(getBlocksForDay(dayKey)).toMatchObject([
+      { id: "id", startTime: moment("2023-01-01 00:00") },
+    ]);
   });
 });
