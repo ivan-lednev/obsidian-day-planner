@@ -34,7 +34,7 @@ export interface RemoteTimeBlock extends BaseTimeBlock {
   location?: string;
 }
 
-type Side = "top" | "bottom" | "left" | "right";
+export type Side = "top" | "bottom" | "left" | "right";
 
 interface LocalTimeBlockBase extends ListItemTokens, BaseTimeBlock {
   text: string;

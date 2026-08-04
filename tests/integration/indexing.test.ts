@@ -139,7 +139,7 @@ describe("Indexing", () => {
     });
   });
 
-  test("Returns truncated active log entries for today's range", async () => {
+  test("Marks an active clock as continuing past the bottom of today's column", async () => {
     const now = window.moment();
     const { editContext } = await setUp({ visibleDays: [getDayKey(now)] });
 
@@ -148,12 +148,12 @@ describe("Indexing", () => {
     ).toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Task"),
-        truncated: ["bottom"],
+        truncated: expect.arrayContaining(["bottom"]),
       }),
     );
   });
 
-  test("Does not truncate active log entries in yesterday's view", async () => {
+  test("Clips an active clock crossing midnight to yesterday's column", async () => {
     const now = window.moment();
     const yesterday = now.clone().subtract(1, "day");
     const { editContext } = await setUp({
@@ -168,7 +168,10 @@ describe("Indexing", () => {
       it.text.includes("Task"),
     );
 
-    expect(activeClock).not.toHaveProperty("truncated");
+    expect(activeClock).toMatchObject({
+      startTime: yesterday.clone().startOf("day"),
+      truncated: ["top", "bottom"],
+    });
   });
 
   test("Returns time block views in range; nested blocks get parsed", async () => {

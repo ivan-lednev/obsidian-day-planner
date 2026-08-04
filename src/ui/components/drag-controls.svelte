@@ -8,7 +8,6 @@
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import type { EditableTimeBlock } from "../../time-block-types";
-  import * as t from "../../util/time-block-utils";
   import { createGestures } from "../actions/gestures";
   import { EditMode } from "../hooks/use-edit/types";
 
@@ -20,7 +19,7 @@
   export let timeBlock: EditableTimeBlock;
 
   const {
-    editContext: { startEdit },
+    editContext: { startEdit, startCopy },
   } = getObsidianContext();
 </script>
 
@@ -41,8 +40,7 @@
       cursor="grab"
       label="Copy block"
       {@attach createGestures({
-        onpanmove: () =>
-          startEdit({ timeBlock: t.copy(timeBlock), mode: EditMode.DRAG }),
+        onpanmove: () => startCopy(timeBlock),
       })}
     >
       <Copy class="svg-icon" />

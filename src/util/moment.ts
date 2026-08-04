@@ -78,26 +78,6 @@ export function getRelationToNow(
   return "present";
 }
 
-export function splitMultiday(
-  start: Moment,
-  end: Moment,
-  chunks: Array<[Moment, Moment]> = [],
-): Array<[Moment, Moment]> {
-  if (!start.isValid() || !end.isValid()) {
-    throw new Error(`Invalid Moment objects: ${start}, ${end}`);
-  }
-
-  const endOfDayForStart = start.clone().endOf("day");
-
-  if (end.isBefore(endOfDayForStart)) {
-    return [...chunks, [start, end]];
-  }
-
-  const newStart = start.clone().add(1, "day").startOf("day");
-
-  return splitMultiday(newStart, end, [...chunks, [start, endOfDayForStart]]);
-}
-
 export function getEarliestMoment(moments: Moment[]) {
   return moments.reduce((result, current) => {
     if (current.isBefore(result)) {

@@ -23,51 +23,6 @@ export function getVisibleTimeBlocks<Block extends { task?: string }>(
   return timeBlocks.filter((it) => !t.isCompleted(it.task));
 }
 
-function spansMoreThanOneDay(timeBlock: WithDuration<TimeBlock>) {
-  return t.getEndTime(timeBlock).diff(timeBlock.startTime, "days") > 1;
-}
-
-function splitAcrossDays<Block extends WithDuration<TimeBlock>>(
-  timeBlock: Block,
-): Block[] {
-  return m
-    .splitMultiday(timeBlock.startTime, t.getEndTime(timeBlock))
-    .map(([startTime, endTime]) => ({
-      ...timeBlock,
-      startTime,
-      durationMinutes: m.getDiffInMinutes(startTime, endTime),
-    }));
-}
-
-function toDayChunks(timeBlock: TimelineTimeBlock): TimelineTimeBlock[] {
-  if (!t.isWithDuration(timeBlock) || timeBlock.isAllDayEvent) {
-    return [timeBlock];
-  }
-
-  if (spansMoreThanOneDay(timeBlock)) {
-    return [timeBlock];
-  }
-
-  return splitAcrossDays(timeBlock);
-}
-
-export function groupTimedBlocksByDay(timeBlocks: TimelineTimeBlock[]) {
-  return timeBlocks
-    .filter((timeBlock) => !timeBlock.isAllDayEvent)
-    .flatMap(toDayChunks)
-    .reduce<Record<string, TimelineTimeBlock[]>>((result, timeBlock) => {
-      const key = t.getDayKey(timeBlock.startTime);
-
-      if (!result[key]) {
-        result[key] = [];
-      }
-
-      result[key].push(timeBlock);
-
-      return result;
-    }, {});
-}
-
 function overlapsRange(timeBlock: TimelineTimeBlock, range: m.Range) {
   if (t.isWithDuration(timeBlock)) {
     return m.doesOverlapWithRange(
@@ -99,51 +54,65 @@ export function getAllDayTimeBlocksInRange(
     );
 }
 
-export function layOutDayColumn(
-  timeBlocks: Array<WithDuration<TimelineTimeBlock>>,
-) {
-  return pipe(
-    timeBlocks,
-    Array.dedupeWith((a, b) => t.getRenderKey(a) === t.getRenderKey(b)),
-    addHorizontalPlacing,
+function isWithinRange(timeBlock: TimeBlock, dayRange: m.Range) {
+  if (m.isWithinRange(timeBlock.startTime, dayRange)) {
+    return true;
+  }
+
+  return (
+    t.isWithDuration(timeBlock) &&
+    m.doesOverlapWithRange(
+      { start: timeBlock.startTime, end: t.getEndTime(timeBlock) },
+      dayRange,
+    )
   );
 }
 
-/**
- * Log blocks get clipped to the day instead of being split at midnight like
- * planner blocks: a clock that ran across midnight shows up in every day it
- * touches as a partial block. A clock that is still running gets marked as
- * continuing past the bottom of today's column.
- */
+export function layOutDayColumn<T extends TimeBlock>(props: {
+  timeBlocks: T[];
+  day: Moment;
+}) {
+  const { timeBlocks, day } = props;
+
+  const startOfDay = day.clone().startOf("day");
+  const dayRange = { start: startOfDay, end: startOfDay.clone().add(1, "day") };
+
+  return pipe(
+    timeBlocks,
+    Array.filter(
+      // todo: filter out `isAllDayEvent` before this
+      (timeBlock) =>
+        !timeBlock.isAllDayEvent && isWithinRange(timeBlock, dayRange),
+    ),
+    Array.map((timeBlock) =>
+      t.isWithDuration(timeBlock)
+        ? // todo: fix `as`: TS cannot relate the generic block type to the helper
+          (t.clipToColumnRange(
+            timeBlock as WithDuration<TimeBlock>,
+            dayRange,
+          ) as WithDuration<T>)
+        : timeBlock,
+    ),
+    Array.dedupeWith((a, b) => t.getRenderKey(a) === t.getRenderKey(b)),
+    // todo: fix `as`: blocks without a duration can slip through to placing
+    (deduped) => addHorizontalPlacing(deduped as Array<WithDuration<T>>),
+  );
+}
+
 export function layOutLogDayColumn(props: {
   timeBlocks: LogTimeBlock[];
   day: Moment;
   currentTime: Moment;
 }) {
   const { timeBlocks, day, currentTime } = props;
-
-  const startOfDay = day.clone().startOf("day");
-  const clampRange = {
-    start: startOfDay,
-    end: m.toMinutePrecision(day.clone().endOf("day")),
-  };
   const isDayToday = day.isSame(currentTime, "day");
 
-  return pipe(
-    timeBlocks,
-    Array.filter((timeBlock) =>
-      m.doesOverlapWithRange(
-        { start: timeBlock.startTime, end: t.getEndTime(timeBlock) },
-        { start: startOfDay, end: startOfDay.clone().add(1, "day") },
-      ),
-    ),
-    Array.map((timeBlock) => {
-      const clamped = t.clampToTimeRange(timeBlock, clampRange);
-
-      return timeBlock.isRunning && isDayToday
-        ? { ...clamped, truncated: ["bottom" as const] }
-        : clamped;
-    }),
-    addHorizontalPlacing,
+  return layOutDayColumn({ timeBlocks, day }).map((timeBlock) =>
+    timeBlock.isRunning && isDayToday
+      ? {
+          ...timeBlock,
+          truncated: [...(timeBlock.truncated ?? []), "bottom" as const],
+        }
+      : timeBlock,
   );
 }

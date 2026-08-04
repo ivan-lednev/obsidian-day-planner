@@ -2,6 +2,10 @@ import moment from "moment";
 import { get } from "svelte/store";
 import { test, expect, describe } from "vitest";
 
+import type {
+  EditableTimeBlock,
+  WithDuration,
+} from "../../src/time-block-types";
 import { EditMode } from "../../src/ui/hooks/use-edit/types";
 import { getUpdateTrigger } from "../../src/util/store";
 
@@ -57,7 +61,7 @@ describe("drag one & common edit mechanics", () => {
   });
 
   describe("Tasks crossing midnight", () => {
-    test("Splits multi-day tasks into single-day tasks", () => {
+    test("Clips a task crossing midnight to each day, marking the cut edges", () => {
       const { getBlocksForDay } = setUp({
         timeBlocks: [
           createTimeBlock("1", {
@@ -71,7 +75,8 @@ describe("drag one & common edit mechanics", () => {
         {
           id: "1",
           startTime: moment("2023-01-01 23:00"),
-          durationMinutes: 59,
+          durationMinutes: 60,
+          truncated: ["bottom"],
         },
       ]);
       expect(getBlocksForDay(nextDayKey)).toMatchObject([
@@ -79,6 +84,7 @@ describe("drag one & common edit mechanics", () => {
           id: "1",
           startTime: moment("2023-01-02 00:00"),
           durationMinutes: 60,
+          truncated: ["top"],
         },
       ]);
     });
@@ -100,8 +106,7 @@ describe("drag one & common edit mechanics", () => {
         {
           id: "1",
           startTime: moment("2023-01-01 23:00"),
-          // todo: where is the extra minute?
-          durationMinutes: 59,
+          durationMinutes: 60,
         },
       ]);
       expect(getBlocksForDay(nextDayKey)).toMatchObject([
@@ -172,7 +177,7 @@ describe("drag one & common edit mechanics", () => {
         {
           id: "1",
           startTime: moment("2023-01-01 23:00"),
-          durationMinutes: 59,
+          durationMinutes: 60,
         },
       ]);
       expect(getBlocksForDay(nextDayKey)).toMatchObject([
@@ -182,6 +187,52 @@ describe("drag one & common edit mechanics", () => {
           durationMinutes: 120,
         },
       ]);
+    });
+
+    test.todo(
+      "Dragging a split task to the second column does not leave the original task in its file",
+    );
+
+    test.todo(
+      "Displayed time in time block props matches original, not split time",
+    );
+
+    test("Dragging the clipped part of a block edits the whole block", async () => {
+      const timeBlock = createTimeBlock("1", {
+        startTime: moment("2023-01-01 23:00"),
+        durationMinutes: 120,
+      });
+      const { getBlocksForDay, startEdit, moveCursorTo, confirmEdit, props } =
+        setUp({
+          timeBlocks: [timeBlock],
+        });
+
+      const [clippedToNextDay] = getBlocksForDay(nextDayKey);
+
+      expect(clippedToNextDay).toMatchObject({
+        startTime: moment("2023-01-02 00:00"),
+        durationMinutes: 60,
+      });
+
+      startEdit({
+        timeBlock: clippedToNextDay as WithDuration<EditableTimeBlock>,
+        mode: EditMode.DRAG,
+      });
+      moveCursorTo(moment("2023-01-02 05:00"));
+
+      await confirmEdit();
+
+      expect(props.onUpdate).toHaveBeenCalledWith(
+        expect.anything(),
+        [
+          expect.objectContaining({
+            id: "1",
+            startTime: moment("2023-01-02 05:00"),
+            durationMinutes: 120,
+          }),
+        ],
+        expect.anything(),
+      );
     });
   });
 

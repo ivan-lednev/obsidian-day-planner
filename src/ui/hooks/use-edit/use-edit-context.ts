@@ -7,12 +7,10 @@ import type {
   LogTimeBlock,
   RemoteTimeBlock,
   TimelineTimeBlock,
-  WithDuration,
 } from "../../../time-block-types";
 import {
   getAllDayTimeBlocksInRange,
   getVisibleTimeBlocks,
-  groupTimedBlocksByDay,
   layOutDayColumn,
   layOutLogDayColumn,
 } from "../../../timeline-layout";
@@ -99,7 +97,7 @@ export function useEditContext(props: {
     },
   );
 
-  const { startEdit, confirmEdit, cancelEdit } = useEditActions({
+  const { startEdit, startCopy, confirmEdit, cancelEdit } = useEditActions({
     editOperation,
     baselineTimeBlocks,
     timeBlocksWithPendingUpdate,
@@ -117,11 +115,6 @@ export function useEditContext(props: {
     ],
   );
 
-  const dayToDisplayedTimeBlocks = derived(
-    combinedTimeBlocks,
-    groupTimedBlocksByDay,
-  );
-
   const getDisplayedAllDayTimeBlocksForMultiDayRow = derived(
     combinedTimeBlocks,
     ($combinedTimeBlocks) => (range: m.Range) =>
@@ -129,13 +122,8 @@ export function useEditContext(props: {
   );
 
   function getDisplayedTimeBlocksForTimeline(day: Moment) {
-    return derived(dayToDisplayedTimeBlocks, ($dayToDisplayedTimeBlocks) =>
-      layOutDayColumn(
-        // todo: fix `as`
-        ($dayToDisplayedTimeBlocks[t.getDayKey(day)] || []) as Array<
-          WithDuration<TimelineTimeBlock>
-        >,
-      ),
+    return derived(combinedTimeBlocks, ($combinedTimeBlocks) =>
+      layOutDayColumn({ timeBlocks: $combinedTimeBlocks, day }),
     );
   }
 
@@ -165,6 +153,7 @@ export function useEditContext(props: {
   return {
     cursor,
     startEdit,
+    startCopy,
     startCreate,
     confirmEdit,
     cancelEdit,

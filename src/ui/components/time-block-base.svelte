@@ -35,6 +35,7 @@
       "content",
       timeBlock.truncated?.includes("left") && "truncated-left",
       timeBlock.truncated?.includes("right") && "truncated-right",
+      timeBlock.truncated?.includes("top") && "truncated-top",
       timeBlock.truncated?.includes("bottom") && "truncated-bottom",
     ]}
     {onpointerup}
@@ -104,6 +105,13 @@
     border-right-width: 2px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+  }
+
+  .truncated-top {
+    border-top-style: dashed;
+    border-top-width: 2px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
 
   .truncated-bottom {
