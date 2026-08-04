@@ -7,7 +7,7 @@
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { selectLogEntriesById } from "../../redux/index/index-slice";
-  import type { LogTimeBlock } from "../../time-block-types";
+  import { isLog, type LogTimeBlock } from "../../time-block-types";
   import { isTouchEvent } from "../../util/dom";
   import { getBlockProps } from "../../util/time-block-utils";
   import { createGestures } from "../actions/gestures";
@@ -17,10 +17,10 @@
 
   import Column from "./column.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
+  import LogTimeBlockControls from "./log-time-block-controls.svelte";
   import NeedleClockControl from "./needle-clock-control.svelte";
   import Needle from "./needle.svelte";
   import PositionedTimeBlock from "./positioned-time-block.svelte";
-  import Selectable from "./selectable.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   const {
@@ -93,16 +93,32 @@
     settingsSignal,
   });
 
+  const trackerPointer = trackPointerDateTime({
+    getDay: () => day,
+    pointerDateTime,
+    settingsSignal,
+  });
+
   function handleContainerPointerDown(event: MouseEvent | TouchEvent) {
     plannerPointer.sync(event);
     startCreate();
   }
 
+  // Deliberately the block being edited and not `isEditing`: both columns share
+  // one pointer, so only the column that owns the edit may move it.
   function handleContainerPointerMove(event: MouseEvent | TouchEvent) {
-    // Deliberately the planner's own operation and not `isEditing`: the pointer
-    // should only follow the column that is actually being edited.
-    if (get(editOperation)) {
+    const operation = get(editOperation);
+
+    if (operation && !isLog(operation.timeBlock)) {
       plannerPointer.sync(event);
+    }
+  }
+
+  function handleTrackerPointerMove(event: MouseEvent | TouchEvent) {
+    const operation = get(editOperation);
+
+    if (operation && isLog(operation.timeBlock)) {
+      trackerPointer.sync(event);
     }
   }
 
@@ -115,6 +131,12 @@
       handleContainerPointerDown(event);
     },
     onpanmove: handleContainerPointerMove,
+    onpanend: confirmEdit,
+    options: { mouseSupport: false },
+  });
+
+  const trackerGestures = createGestures({
+    onpanmove: handleTrackerPointerMove,
     onpanend: confirmEdit,
     options: { mouseSupport: false },
   });
@@ -164,31 +186,40 @@
         </Needle>
       {/if}
 
-      <div class="tasks absolute-stretch-x">
+      <div
+        class="tasks absolute-stretch-x"
+        onpointermove={handleTrackerPointerMove}
+        onpointerup={confirmEdit}
+        {@attach trackerPointer.attachment}
+        {@attach trackerGestures}
+      >
         {#each $displayedLogTimeBlocksForTimeline as timeBlock (timeBlock.id)}
           <PositionedTimeBlock {timeBlock}>
-            <Selectable
+            <LogTimeBlockControls
               onSecondarySelect={(event) => showLogBlockMenu(event, timeBlock)}
+              {timeBlock}
             >
-              {#snippet children({
+              {#snippet content({
+                isActive,
+                onPointerUp,
                 gestures,
                 clearOnPointerUpOutside,
-                onpointerup,
-                state,
+                anchor,
               })}
                 <LocalTimeBlock
-                  isActive={state === "secondary"}
-                  {onpointerup}
+                  {isActive}
+                  onpointerup={onPointerUp}
                   {timeBlock}
                   {@attach gestures}
                   {@attach clearOnPointerUpOutside}
+                  {@attach anchor}
                 >
                   {#snippet bottomDecoration()}
                     {getBlockProps(timeBlock, settingsSignal.current)}
                   {/snippet}
                 </LocalTimeBlock>
               {/snippet}
-            </Selectable>
+            </LogTimeBlockControls>
           </PositionedTimeBlock>
         {/each}
       </div>

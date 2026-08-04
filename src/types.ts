@@ -13,7 +13,11 @@ import type { PeriodicNotes } from "./service/periodic-notes";
 import type { VaultFacade } from "./service/vault-facade";
 import type { WorkspaceFacade } from "./service/workspace-facade";
 import type { DayPlannerSettings, IcalConfig } from "./settings";
-import type { EditableTimeBlock, PlanTimeBlock } from "./time-block-types";
+import type {
+  EditableTimeBlock,
+  LogTimeBlock,
+  PlanTimeBlock,
+} from "./time-block-types";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import type { OpenLogEntryEditModal } from "./ui/log-entry-edit-modal";
@@ -26,6 +30,15 @@ export type OnUpdateFn = (
   base: Array<EditableTimeBlock>,
   next: Array<EditableTimeBlock>,
   mode: EditMode,
+) => Promise<boolean>;
+
+/**
+ * Log entries are patched in place through the log entry editor, so unlike
+ * {@link OnUpdateFn} this one gets no edit mode and produces no undo step.
+ */
+export type OnLogUpdateFn = (
+  base: Array<LogTimeBlock>,
+  next: Array<LogTimeBlock>,
 ) => Promise<boolean>;
 
 export type OnEditAbortedFn = () => void;

@@ -6,6 +6,7 @@ import { isNotVoid } from "typed-assert";
 import { expect, onTestFinished, vi } from "vitest";
 
 import { icalParseLowerLimit } from "../../../src/constants";
+import { createLogUpdateHandler } from "../../../src/create-log-update-handler";
 import { createUpdateHandler } from "../../../src/create-update-handler";
 import { initialState } from "../../../src/redux/date-ranges-slice";
 import { type IcalParseTaskResult } from "../../../src/redux/ical/init-ical-listeners";
@@ -155,6 +156,7 @@ export async function setUp(props?: {
     remoteTimeBlocks,
     localTimeBlocks,
     logTimeBlocks,
+    indexState,
     pointerDateTime,
   } = createReactor({
     preloadedState: defaultPreloadedStateForTests,
@@ -199,9 +201,15 @@ export async function setUp(props?: {
     getConfirmationInput: () => Promise.resolve(true),
   });
 
+  const onLogUpdate = createLogUpdateHandler({
+    logEntryEditor,
+    getState,
+  });
+
   const { timeBlocksWithTimeForToday, editContext, newlyStartedTimeBlocks } =
     useTimeBlocks({
       onUpdate,
+      onLogUpdate,
       onEditAborted: () => {},
       isOnline,
       settingsStore,
@@ -210,6 +218,7 @@ export async function setUp(props?: {
       remoteTimeBlocks,
       localTimeBlocks,
       logTimeBlocks,
+      indexState,
     });
 
   // this prevents the store from resetting;

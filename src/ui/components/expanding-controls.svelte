@@ -15,7 +15,7 @@
     setIsActive: (value: boolean) => void;
     reverse?: boolean;
     initial: Snippet;
-    expanded: Snippet;
+    expanded?: Snippet;
   } = $props();
 
   const { isActive, reverse = false, initial, expanded } = $derived(props);
@@ -51,7 +51,7 @@
   }}
   transition:fade={{ duration: transitionDurationShort }}
 >
-  {#if isActive}
+  {#if isActive && expanded}
     <div class="expanded-wrapper" transition:slide={createSlide({ axis: "x" })}>
       {@render expanded()}
     </div>

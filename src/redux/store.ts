@@ -26,7 +26,7 @@ import {
   selectLogTimeBlocksForVisibleDays,
   selectPlanTimeBlocksForVisibleDays,
 } from "./index/index-selectors";
-import { indexSlice } from "./index/index-slice";
+import { indexSlice, selectIndexState } from "./index/index-slice";
 import { initListenerMiddleware } from "./listener-middleware";
 import { settingsSlice } from "./settings-slice";
 import { createUseSelector } from "./use-selector";
@@ -113,6 +113,9 @@ export function createReactor(props: {
   );
   const logTimeBlocks = toStore(() => logTimeBlocksSignal.current);
 
+  const indexStateSignal = useSelector(selectIndexState);
+  const indexState = toStore(() => indexStateSignal.current);
+
   const remoteTimeBlocksSignal = useSelector((state) =>
     selectRemoteTimeBlocks(state),
   );
@@ -129,6 +132,7 @@ export function createReactor(props: {
     remoteTimeBlocks,
     localTimeBlocks,
     logTimeBlocks,
+    indexState,
     pointerDateTime,
     useSelector,
     dateRanges,

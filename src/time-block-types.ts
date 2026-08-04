@@ -144,6 +144,12 @@ export function isListItemSourced(
   );
 }
 
+export function isLog(timeBlock: LocalTimeBlock): timeBlock is LogTimeBlock {
+  return (
+    timeBlock.source === "listItemLog" || timeBlock.source === "frontmatterLog"
+  );
+}
+
 export type WithDuration<T> = T & {
   durationMinutes: number;
 };

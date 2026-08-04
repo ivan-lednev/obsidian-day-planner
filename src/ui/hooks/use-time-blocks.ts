@@ -9,7 +9,12 @@ import type {
   TimeBlock,
   WithDuration,
 } from "../../time-block-types";
-import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../../types";
+import type {
+  OnEditAbortedFn,
+  OnLogUpdateFn,
+  OnUpdateFn,
+  PointerDateTime,
+} from "../../types";
 import { getUpdateTrigger } from "../../util/store";
 
 import { useEditContext } from "./use-edit/use-edit-context";
@@ -20,21 +25,25 @@ export function useTimeBlocks(props: {
   isOnline: Readable<boolean>;
   currentTime: Readable<Moment>;
   onUpdate: OnUpdateFn;
+  onLogUpdate: OnLogUpdateFn;
   onEditAborted: OnEditAbortedFn;
   pointerDateTime: Readable<PointerDateTime>;
   remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
   localTimeBlocks: Readable<EditableTimeBlock[]>;
   logTimeBlocks: Readable<LogTimeBlock[]>;
+  indexState: Readable<unknown>;
 }) {
   const {
     settingsStore,
     currentTime,
     pointerDateTime,
     onUpdate,
+    onLogUpdate,
     onEditAborted,
     remoteTimeBlocks,
     localTimeBlocks,
     logTimeBlocks,
+    indexState,
   } = props;
 
   const timeBlocksWithTimeForToday = derived(
@@ -54,10 +63,11 @@ export function useTimeBlocks(props: {
     },
   );
 
-  const abortEditTrigger = derived(localTimeBlocks, getUpdateTrigger);
+  const abortEditTrigger = derived(indexState, getUpdateTrigger);
 
   const editContext = useEditContext({
     onUpdate,
+    onLogUpdate,
     onEditAborted,
     settingsStore,
     localTimeBlocks,

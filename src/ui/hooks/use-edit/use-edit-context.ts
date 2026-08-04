@@ -1,12 +1,13 @@
 import type { Moment } from "moment";
-import { derived, get, type Readable, writable } from "svelte/store";
+import { derived, type Readable, writable } from "svelte/store";
 
 import type { DayPlannerSettings } from "../../../settings";
-import type {
-  EditableTimeBlock,
-  LogTimeBlock,
-  RemoteTimeBlock,
-  TimelineTimeBlock,
+import {
+  isLog,
+  type EditableTimeBlock,
+  type LogTimeBlock,
+  type RemoteTimeBlock,
+  type TimelineTimeBlock,
 } from "../../../time-block-types";
 import {
   getAllDayTimeBlocksInRange,
@@ -16,31 +17,38 @@ import {
 } from "../../../timeline-layout";
 import type {
   OnEditAbortedFn,
+  OnLogUpdateFn,
   OnUpdateFn,
   PointerDateTime,
 } from "../../../types";
 import * as m from "../../../util/moment";
-import * as t from "../../../util/time-block-utils";
 
 import { useCursor } from "./cursor";
 import { transform } from "./transform/transform";
-import { EditMode, type EditOperation } from "./types";
+import { type EditOperation } from "./types";
 import { useEditActions } from "./use-edit-actions";
 
 export function useEditContext(props: {
   onUpdate: OnUpdateFn;
+  onLogUpdate: OnLogUpdateFn;
   settingsStore: Readable<DayPlannerSettings>;
   localTimeBlocks: Readable<EditableTimeBlock[]>;
   logTimeBlocks: Readable<LogTimeBlock[]>;
   remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
   currentTime: Readable<Moment>;
   pointerDateTime: Readable<PointerDateTime>;
+  /**
+   * Fires on anything that reindexes a file. Edits are written back at line
+   * positions taken from the index, so any indexing pass can invalidate an
+   * edit in progress, whichever column started it.
+   */
   abortEditTrigger: Readable<unknown>;
   onEditAborted: OnEditAbortedFn;
 }) {
   const {
     onEditAborted,
     onUpdate,
+    onLogUpdate,
     settingsStore,
     localTimeBlocks,
     logTimeBlocks,
@@ -78,6 +86,12 @@ export function useEditContext(props: {
     return localFilteredTimeBlocks.subscribe(set);
   });
 
+  // Log blocks skip `getVisibleTimeBlocks`: hiding a clock because the task it
+  // belongs to is done would hide time that was actually spent.
+  const logBaselineTimeBlocks = writable<LogTimeBlock[]>([], (set) => {
+    return logTimeBlocks.subscribe(set);
+  });
+
   const timeBlocksWithPendingUpdate = derived(
     [editOperation, baselineTimeBlocks, settingsStore, pointerDateTime],
     ([
@@ -86,23 +100,56 @@ export function useEditContext(props: {
       $settingsStore,
       $pointerDateTime,
     ]) => {
-      return $editOperation
-        ? transform(
-            $baselineTimeBlocks,
-            $editOperation,
-            $settingsStore,
-            $pointerDateTime,
-          )
-        : $baselineTimeBlocks;
+      const timeBlock = $editOperation?.timeBlock;
+
+      if (!$editOperation || !timeBlock || isLog(timeBlock)) {
+        return $baselineTimeBlocks;
+      }
+
+      return transform(
+        $baselineTimeBlocks,
+        { timeBlock, mode: $editOperation.mode },
+        $settingsStore,
+        $pointerDateTime,
+      );
     },
   );
 
-  const { startEdit, startCopy, confirmEdit, cancelEdit } = useEditActions({
-    editOperation,
-    baselineTimeBlocks,
-    timeBlocksWithPendingUpdate,
-    onUpdate,
-  });
+  const logTimeBlocksWithPendingUpdate = derived(
+    [editOperation, logBaselineTimeBlocks, settingsStore, pointerDateTime],
+    ([
+      $editOperation,
+      $logBaselineTimeBlocks,
+      $settingsStore,
+      $pointerDateTime,
+    ]) => {
+      const timeBlock = $editOperation?.timeBlock;
+
+      if (!$editOperation || !timeBlock || !isLog(timeBlock)) {
+        return $logBaselineTimeBlocks;
+      }
+
+      return transform(
+        $logBaselineTimeBlocks,
+        { timeBlock, mode: $editOperation.mode },
+        $settingsStore,
+        $pointerDateTime,
+      );
+    },
+  );
+
+  const { startEdit, startCopy, confirmEdit, cancelEdit, startCreate } =
+    useEditActions({
+      editOperation,
+      baselineTimeBlocks,
+      logBaselineTimeBlocks,
+      timeBlocksWithPendingUpdate,
+      logTimeBlocksWithPendingUpdate,
+      onUpdate,
+      onLogUpdate,
+      pointerDateTime,
+      settingsStore,
+    });
 
   const combinedTimeBlocks = derived(
     [remoteTimeBlocks, timeBlocksWithPendingUpdate],
@@ -127,27 +174,16 @@ export function useEditContext(props: {
     );
   }
 
-  // todo: log blocks are not editable yet, so they skip the transform
   function getDisplayedLogTimeBlocksForTimeline(day: Moment) {
     return derived(
-      [logTimeBlocks, currentTime],
-      ([$logTimeBlocks, $currentTime]) =>
+      [logTimeBlocksWithPendingUpdate, currentTime],
+      ([$logTimeBlocksWithPendingUpdate, $currentTime]) =>
         layOutLogDayColumn({
-          timeBlocks: $logTimeBlocks,
+          timeBlocks: $logTimeBlocksWithPendingUpdate,
           day,
           currentTime: $currentTime,
         }),
     );
-  }
-
-  function startCreate() {
-    startEdit({
-      timeBlock: t.create({
-        startTime: get(pointerDateTime).dateTime,
-        settings: get(settingsStore),
-      }),
-      mode: EditMode.CREATE,
-    });
   }
 
   return {

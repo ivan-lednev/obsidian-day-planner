@@ -22,11 +22,13 @@ function createProps({
   settings: DayPlannerSettings;
 }) {
   const onUpdate = vi.fn().mockResolvedValue(true);
+  const onLogUpdate = vi.fn().mockResolvedValue(true);
   const onEditAborted = vi.fn();
 
   return {
     settingsStore: writable(settings),
     onUpdate,
+    onLogUpdate,
     onEditAborted,
     abortEditTrigger: writable(),
     localTimeBlocks: writable(timeBlocks),

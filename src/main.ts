@@ -11,6 +11,7 @@ import {
   icalRefreshIntervalMillis,
   icalParseLowerLimit,
 } from "./constants";
+import { createLogUpdateHandler } from "./create-log-update-handler";
 import {
   createDeleteTimeBlockHandler,
   createEditLineHandler,
@@ -151,6 +152,7 @@ export default class DayPlanner extends Plugin {
       remoteTimeBlocks,
       localTimeBlocks,
       logTimeBlocks,
+      indexState,
       pointerDateTime,
       dateRanges,
     } = createReactor({
@@ -193,6 +195,7 @@ export default class DayPlanner extends Plugin {
       useSelector,
       localTimeBlocks,
       logTimeBlocks,
+      indexState,
       dateRanges,
     });
 
@@ -470,6 +473,7 @@ export default class DayPlanner extends Plugin {
     remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
     localTimeBlocks: Readable<EditableTimeBlock[]>;
     logTimeBlocks: Readable<LogTimeBlock[]>;
+    indexState: Readable<unknown>;
     pointerDateTime: Writable<PointerDateTime>;
     dateRanges: DateRanges;
   }) {
@@ -480,6 +484,7 @@ export default class DayPlanner extends Plugin {
       remoteTimeBlocks,
       localTimeBlocks,
       logTimeBlocks,
+      indexState,
       pointerDateTime,
       dateRanges,
     } = props;
@@ -508,6 +513,11 @@ export default class DayPlanner extends Plugin {
         }),
     });
 
+    const onLogUpdate = createLogUpdateHandler({
+      logEntryEditor: this.logEntryEditor,
+      getState: store.getState,
+    });
+
     const onEditAborted = () => {
       new Notice("Tasks changed externally; edit canceled");
     };
@@ -519,6 +529,7 @@ export default class DayPlanner extends Plugin {
     const { timeBlocksWithTimeForToday, editContext, newlyStartedTimeBlocks } =
       useTimeBlocks({
         onUpdate,
+        onLogUpdate,
         onEditAborted,
         isOnline,
         settingsStore: this.settingsStore,
@@ -527,6 +538,7 @@ export default class DayPlanner extends Plugin {
         remoteTimeBlocks,
         localTimeBlocks,
         logTimeBlocks,
+        indexState,
       });
 
     // Once the time tracker column becomes editable, its operation joins this
