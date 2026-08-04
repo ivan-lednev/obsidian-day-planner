@@ -1,16 +1,22 @@
-import { Array, pipe } from "effect";
 import type { Moment } from "moment";
 import { derived, get, type Readable, writable } from "svelte/store";
 
-import { addHorizontalPlacing } from "../../../overlap/overlap";
 import type { DayPlannerSettings } from "../../../settings";
 import type {
   EditableTimeBlock,
   RemoteTimeBlock,
   TimelineTimeBlock,
-  WithPlacing,
   WithDuration,
 } from "../../../time-block-types";
+import {
+  getAllDayTimeBlocksInRange,
+  getEmptyTimeBlocksForDay,
+  getVisibleTimeBlocks,
+  groupTimeBlocksByDay,
+  layOutDayColumn,
+  type PlacedTimeBlocksForDay,
+  toDayChunks,
+} from "../../../timeline-layout";
 import type {
   OnEditAbortedFn,
   OnUpdateFn,
@@ -23,29 +29,6 @@ import { useCursor } from "./cursor";
 import { transform } from "./transform/transform";
 import { EditMode, type EditOperation } from "./types";
 import { useEditActions } from "./use-edit-actions";
-
-function groupByDay(timeBlocks: TimelineTimeBlock[]) {
-  return timeBlocks.reduce<
-    Record<
-      string,
-      { withTime: TimelineTimeBlock[]; noTime: TimelineTimeBlock[] }
-    >
-  >((result, timeBlock) => {
-    const key = t.getDayKey(timeBlock.startTime);
-
-    if (!result[key]) {
-      result[key] = { withTime: [], noTime: [] };
-    }
-
-    if (timeBlock.isAllDayEvent) {
-      result[key].noTime.push(timeBlock);
-    } else {
-      result[key].withTime.push(timeBlock);
-    }
-
-    return result;
-  }, {});
-}
 
 export function useEditContext(props: {
   onUpdate: OnUpdateFn;
@@ -87,11 +70,7 @@ export function useEditContext(props: {
   const localFilteredTimeBlocks = derived(
     [localTimeBlocks, settingsStore],
     ([$localTimeBlocks, $settingsStore]) =>
-      $settingsStore.showCompletedTasks
-        ? $localTimeBlocks
-        : $localTimeBlocks.filter(
-            (it) => !it.task || it.task.toLowerCase() !== "x",
-          ),
+      getVisibleTimeBlocks($localTimeBlocks, $settingsStore),
   );
 
   const baselineTimeBlocks = writable<EditableTimeBlock[]>([], (set) => {
@@ -147,93 +126,33 @@ export function useEditContext(props: {
 
   const dayToDisplayedTimeBlocks = derived(
     combinedTimeBlocks,
-    ($combinedTimeBlocks) => {
-      const split: TimelineTimeBlock[] = $combinedTimeBlocks.flatMap(
-        (timeBlock): TimelineTimeBlock[] | TimelineTimeBlock => {
-          if (!t.isWithDuration(timeBlock) || timeBlock.isAllDayEvent) {
-            return timeBlock;
-          }
-
-          const daySpan = t
-            .getEndTime(timeBlock)
-            .diff(timeBlock.startTime, "days");
-          const shouldGoToMultiDayRow = daySpan > 1;
-
-          if (shouldGoToMultiDayRow) {
-            return timeBlock;
-          }
-
-          const chunks = m.splitMultiday(
-            timeBlock.startTime,
-            t.getEndTime(timeBlock),
-          );
-
-          return chunks.map(([startTime, endTime]) => ({
-            ...timeBlock,
-            startTime,
-            durationMinutes: m.getDiffInMinutes(startTime, endTime),
-          }));
-        },
-      );
-
-      return groupByDay(split);
-    },
+    ($combinedTimeBlocks) =>
+      groupTimeBlocksByDay($combinedTimeBlocks.flatMap(toDayChunks)),
   );
 
   const getDisplayedAllDayTimeBlocksForMultiDayRow = derived(
-    [combinedTimeBlocks],
-    ([$combinedTimeBlocks]) =>
-      (range: m.Range) => {
-        const startOfRange = range.start.clone().startOf("day");
-        const endOfRange = range.end.clone().add(1, "day").startOf("day");
-
-        return $combinedTimeBlocks
-          .filter((timeBlock) => {
-            // TODO: a limitation to be removed later
-            if (!timeBlock.isAllDayEvent) {
-              return false;
-            }
-
-            if (t.isWithDuration(timeBlock)) {
-              return m.doesOverlapWithRange(
-                {
-                  start: timeBlock.startTime,
-                  end: t.getEndTime(timeBlock),
-                },
-                { start: startOfRange, end: endOfRange },
-              );
-            }
-
-            return m.isWithinRange(timeBlock.startTime, range);
-          })
-          .map(
-            (timeBlock): TimelineTimeBlock =>
-              t.isWithDuration(timeBlock)
-                ? t.truncateToDayRange(timeBlock, range)
-                : timeBlock,
-          );
-      },
+    combinedTimeBlocks,
+    ($combinedTimeBlocks) => (range: m.Range) =>
+      getAllDayTimeBlocksInRange($combinedTimeBlocks, range),
   );
 
   function getDisplayedTimeBlocksForTimeline(day: Moment) {
-    return derived(dayToDisplayedTimeBlocks, ($dayToDisplayedTimeBlocks) => {
-      const timeBlocksForDay =
-        $dayToDisplayedTimeBlocks[t.getDayKey(day)] ||
-        t.getEmptyTimeBlocksForDay();
+    return derived(
+      dayToDisplayedTimeBlocks,
+      ($dayToDisplayedTimeBlocks): PlacedTimeBlocksForDay => {
+        const timeBlocksForDay =
+          $dayToDisplayedTimeBlocks[t.getDayKey(day)] ||
+          getEmptyTimeBlocksForDay();
 
-      const withTime: Array<WithPlacing<WithDuration<TimelineTimeBlock>>> =
-        // todo: fix `as`
-        pipe(
-          timeBlocksForDay.withTime as Array<WithDuration<TimelineTimeBlock>>,
-          Array.dedupeWith((a, b) => t.getRenderKey(a) === t.getRenderKey(b)),
-          addHorizontalPlacing,
-        );
-
-      return {
-        ...timeBlocksForDay,
-        withTime,
-      };
-    });
+        return {
+          ...timeBlocksForDay,
+          // todo: fix `as`
+          withTime: layOutDayColumn(
+            timeBlocksForDay.withTime as Array<WithDuration<TimelineTimeBlock>>,
+          ),
+        };
+      },
+    );
   }
 
   return {

@@ -173,10 +173,6 @@ export function createTimestamp(
   return `${start.format(format)}${separator}${end.format(format)}`;
 }
 
-export function getEmptyTimeBlocksForDay() {
-  return { withTime: [], noTime: [] };
-}
-
 export function getDayKey(day: Moment) {
   return day.format(defaultDayFormat);
 }
