@@ -66,7 +66,7 @@
 
     display: flex;
 
-    padding: var(--size-2-1);
+    padding: var(--size-4-1);
 
     color: var(--text-on-accent);
 
@@ -75,7 +75,7 @@
     border-radius: 50%;
 
     :global(.is-mobile) & {
-      --icon-size: var(--size-4-5);
+      padding: var(--size-2-3);
     }
   }
 
