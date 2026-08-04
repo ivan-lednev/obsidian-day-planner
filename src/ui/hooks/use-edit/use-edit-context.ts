@@ -10,12 +10,9 @@ import type {
 } from "../../../time-block-types";
 import {
   getAllDayTimeBlocksInRange,
-  getEmptyTimeBlocksForDay,
   getVisibleTimeBlocks,
-  groupTimeBlocksByDay,
+  groupTimedBlocksByDay,
   layOutDayColumn,
-  type PlacedTimeBlocksForDay,
-  toDayChunks,
 } from "../../../timeline-layout";
 import type {
   OnEditAbortedFn,
@@ -126,8 +123,7 @@ export function useEditContext(props: {
 
   const dayToDisplayedTimeBlocks = derived(
     combinedTimeBlocks,
-    ($combinedTimeBlocks) =>
-      groupTimeBlocksByDay($combinedTimeBlocks.flatMap(toDayChunks)),
+    groupTimedBlocksByDay,
   );
 
   const getDisplayedAllDayTimeBlocksForMultiDayRow = derived(
@@ -137,21 +133,13 @@ export function useEditContext(props: {
   );
 
   function getDisplayedTimeBlocksForTimeline(day: Moment) {
-    return derived(
-      dayToDisplayedTimeBlocks,
-      ($dayToDisplayedTimeBlocks): PlacedTimeBlocksForDay => {
-        const timeBlocksForDay =
-          $dayToDisplayedTimeBlocks[t.getDayKey(day)] ||
-          getEmptyTimeBlocksForDay();
-
-        return {
-          ...timeBlocksForDay,
-          // todo: fix `as`
-          withTime: layOutDayColumn(
-            timeBlocksForDay.withTime as Array<WithDuration<TimelineTimeBlock>>,
-          ),
-        };
-      },
+    return derived(dayToDisplayedTimeBlocks, ($dayToDisplayedTimeBlocks) =>
+      layOutDayColumn(
+        // todo: fix `as`
+        ($dayToDisplayedTimeBlocks[t.getDayKey(day)] || []) as Array<
+          WithDuration<TimelineTimeBlock>
+        >,
+      ),
     );
   }
 

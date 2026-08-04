@@ -142,7 +142,7 @@
         {@attach plannerPointer.attachment}
         {@attach timelineGestures}
       >
-        {#each $displayedTimeBlocksForTimeline.withTime as timeBlock (timeBlock.id)}
+        {#each $displayedTimeBlocksForTimeline as timeBlock (timeBlock.id)}
           <PositionedTimeBlock {timeBlock}>
             <UnscheduledTimeBlock {timeBlock}>
               {#snippet bottomDecoration()}

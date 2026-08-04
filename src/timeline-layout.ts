@@ -6,24 +6,9 @@ import type {
   TimeBlock,
   TimelineTimeBlock,
   WithDuration,
-  WithPlacing,
 } from "./time-block-types";
 import * as m from "./util/moment";
 import * as t from "./util/time-block-utils";
-
-export type TimeBlocksForDay = {
-  withTime: TimelineTimeBlock[];
-  noTime: TimelineTimeBlock[];
-};
-
-export type PlacedTimeBlocksForDay = {
-  withTime: Array<WithPlacing<WithDuration<TimelineTimeBlock>>>;
-  noTime: TimelineTimeBlock[];
-};
-
-export function getEmptyTimeBlocksForDay(): TimeBlocksForDay {
-  return { withTime: [], noTime: [] };
-}
 
 export function getVisibleTimeBlocks<Block extends { task?: string }>(
   timeBlocks: Block[],
@@ -64,25 +49,21 @@ export function toDayChunks(timeBlock: TimelineTimeBlock): TimelineTimeBlock[] {
   return splitAcrossDays(timeBlock);
 }
 
-export function groupTimeBlocksByDay(timeBlocks: TimelineTimeBlock[]) {
-  return timeBlocks.reduce<Record<string, TimeBlocksForDay>>(
-    (result, timeBlock) => {
+export function groupTimedBlocksByDay(timeBlocks: TimelineTimeBlock[]) {
+  return timeBlocks
+    .filter((timeBlock) => !timeBlock.isAllDayEvent)
+    .flatMap(toDayChunks)
+    .reduce<Record<string, TimelineTimeBlock[]>>((result, timeBlock) => {
       const key = t.getDayKey(timeBlock.startTime);
 
       if (!result[key]) {
-        result[key] = getEmptyTimeBlocksForDay();
+        result[key] = [];
       }
 
-      if (timeBlock.isAllDayEvent) {
-        result[key].noTime.push(timeBlock);
-      } else {
-        result[key].withTime.push(timeBlock);
-      }
+      result[key].push(timeBlock);
 
       return result;
-    },
-    {},
-  );
+    }, {});
 }
 
 function overlapsRange(timeBlock: TimelineTimeBlock, range: m.Range) {

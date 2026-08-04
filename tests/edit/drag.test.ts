@@ -16,13 +16,11 @@ describe("drag", () => {
     moveCursorTo(moment("2023-01-01 01:00"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: {
-        withTime: [
-          {
-            startTime: moment("2023-01-01 01:00"),
-          },
-        ],
-      },
+      [dayKey]: [
+        {
+          startTime: moment("2023-01-01 01:00"),
+        },
+      ],
     });
   });
 
@@ -39,22 +37,20 @@ describe("drag", () => {
       moveCursorTo(moment("2023-01-01 03:00"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: {
-          withTime: [
-            {
-              id: "1",
-              startTime: moment("2023-01-01 01:00"),
-            },
-            {
-              id: "2",
-              startTime: moment("2023-01-01 03:00"),
-            },
-            {
-              id: "3",
-              startTime: moment("2023-01-01 04:00"),
-            },
-          ],
-        },
+        [dayKey]: [
+          {
+            id: "1",
+            startTime: moment("2023-01-01 01:00"),
+          },
+          {
+            id: "2",
+            startTime: moment("2023-01-01 03:00"),
+          },
+          {
+            id: "3",
+            startTime: moment("2023-01-01 04:00"),
+          },
+        ],
       });
     });
 
@@ -72,22 +68,20 @@ describe("drag", () => {
       moveCursorTo(moment("2023-01-01 01:00"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: {
-          withTime: [
-            {
-              id: "1",
-              startTime: moment("2023-01-01 00:00"),
-            },
-            {
-              id: "2",
-              startTime: moment("2023-01-01 01:00"),
-            },
-            {
-              id: "3",
-              startTime: moment("2023-01-01 03:00"),
-            },
-          ],
-        },
+        [dayKey]: [
+          {
+            id: "1",
+            startTime: moment("2023-01-01 00:00"),
+          },
+          {
+            id: "2",
+            startTime: moment("2023-01-01 01:00"),
+          },
+          {
+            id: "3",
+            startTime: moment("2023-01-01 03:00"),
+          },
+        ],
       });
     });
 
@@ -107,23 +101,21 @@ describe("drag", () => {
       moveCursorTo(moment("2023-01-01 03:00"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: {
-          withTime: [
-            {
-              id: "1",
-              startTime: moment("2023-01-01 01:00"),
-            },
-            {
-              id: "2",
-              startTime: moment("2023-01-01 03:00"),
-            },
-            {
-              id: "3",
-              durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
-              startTime: moment("2023-01-01 04:00"),
-            },
-          ],
-        },
+        [dayKey]: [
+          {
+            id: "1",
+            startTime: moment("2023-01-01 01:00"),
+          },
+          {
+            id: "2",
+            startTime: moment("2023-01-01 03:00"),
+          },
+          {
+            id: "3",
+            durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
+            startTime: moment("2023-01-01 04:00"),
+          },
+        ],
       });
     });
   });

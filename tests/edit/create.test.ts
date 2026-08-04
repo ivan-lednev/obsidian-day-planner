@@ -29,14 +29,12 @@ describe("create", () => {
     moveCursorTo(moment("2023-01-01 02:00"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: {
-        withTime: [
-          {
-            startTime: moment("2023-01-01 01:00"),
-            durationMinutes: 60,
-          },
-        ],
-      },
+      [dayKey]: [
+        {
+          startTime: moment("2023-01-01 01:00"),
+          durationMinutes: 60,
+        },
+      ],
     });
   });
 
@@ -60,14 +58,12 @@ describe("create", () => {
       const pendingConfirm = confirmEdit();
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: {
-          withTime: [
-            expect.objectContaining({
-              startTime: moment("2023-01-01 01:00"),
-              durationMinutes: 60,
-            }),
-          ],
-        },
+        [dayKey]: [
+          expect.objectContaining({
+            startTime: moment("2023-01-01 01:00"),
+            durationMinutes: 60,
+          }),
+        ],
       });
 
       userInputPromise.resolve(true);
@@ -94,8 +90,8 @@ describe("create", () => {
       userInputPromise.resolve(false);
       await pendingConfirm;
 
-      const withTime = get(dayToDisplayedTimeBlocks)[dayKey]?.withTime ?? [];
-      expect(withTime).toHaveLength(0);
+      const timeBlocks = get(dayToDisplayedTimeBlocks)[dayKey] ?? [];
+      expect(timeBlocks).toHaveLength(0);
     });
   });
 });

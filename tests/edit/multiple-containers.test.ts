@@ -37,9 +37,7 @@ describe("moving tasks between containers", () => {
     moveCursorTo(moment("2023-01-02 01:00"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [nextDayKey]: {
-        withTime: [{ startTime: moment("2023-01-02 01:00") }],
-      },
+      [nextDayKey]: [{ startTime: moment("2023-01-02 01:00") }],
     });
   });
 
@@ -56,15 +54,11 @@ describe("moving tasks between containers", () => {
     moveCursorTo(moment("2023-01-02 01:00"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: {
-        withTime: [{ id: "2", startTime: moment("2023-01-01 01:00") }],
-      },
-      [nextDayKey]: {
-        withTime: [
-          { startTime: moment("2023-01-02 01:00") },
-          { id: "3", startTime: moment("2023-01-02 01:00") },
-        ],
-      },
+      [dayKey]: [{ id: "2", startTime: moment("2023-01-01 01:00") }],
+      [nextDayKey]: [
+        { startTime: moment("2023-01-02 01:00") },
+        { id: "3", startTime: moment("2023-01-02 01:00") },
+      ],
     });
   });
 
@@ -80,13 +74,11 @@ describe("moving tasks between containers", () => {
     moveCursorTo(moment("2023-01-02 02:00"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [nextDayKey]: {
-        withTime: [
-          { startTime: moment("2023-01-02 02:00") },
-          { id: "2", startTime: moment("2023-01-02 03:00") },
-          { id: "3", startTime: moment("2023-01-02 04:00") },
-        ],
-      },
+      [nextDayKey]: [
+        { startTime: moment("2023-01-02 02:00") },
+        { id: "2", startTime: moment("2023-01-02 03:00") },
+        { id: "3", startTime: moment("2023-01-02 04:00") },
+      ],
     });
   });
 
@@ -102,15 +94,11 @@ describe("moving tasks between containers", () => {
     moveCursorTo(moment("2023-01-01 05:00"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: {
-        withTime: [
-          { startTime: moment("2023-01-01 05:00") },
-          { startTime: moment("2023-01-01 06:00") },
-        ],
-      },
-      [nextDayKey]: {
-        withTime: [{ id: "3", startTime: moment("2023-01-02 02:00") }],
-      },
+      [dayKey]: [
+        { startTime: moment("2023-01-01 05:00") },
+        { startTime: moment("2023-01-01 06:00") },
+      ],
+      [nextDayKey]: [{ id: "3", startTime: moment("2023-01-02 02:00") }],
     });
   });
 
@@ -124,11 +112,9 @@ describe("moving tasks between containers", () => {
     moveCursorTo(moment("2023-01-02 02:00"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [nextDayKey]: {
-        withTime: [
-          { startTime: moment("2023-01-02 01:00"), durationMinutes: 60 },
-        ],
-      },
+      [nextDayKey]: [
+        { startTime: moment("2023-01-02 01:00"), durationMinutes: 60 },
+      ],
     });
   });
 
@@ -139,9 +125,7 @@ describe("moving tasks between containers", () => {
     startEdit({ timeBlock: baseTimeBlock, mode: EditMode.RESIZE });
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: {
-        withTime: [{ id: "id", startTime: moment("2023-01-01 00:00") }],
-      },
+      [dayKey]: [{ id: "id", startTime: moment("2023-01-01 00:00") }],
     });
   });
 });

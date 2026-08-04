@@ -28,13 +28,11 @@ describe("drag one & common edit mechanics", () => {
     moveCursorTo(moment("2023-01-02 05:00"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: {
-        withTime: [
-          { id: "1" },
-          { id: "2", startTime: moment("2023-01-01 03:00") },
-          { id: "3" },
-        ],
-      },
+      [dayKey]: [
+        { id: "1" },
+        { id: "2", startTime: moment("2023-01-01 03:00") },
+        { id: "3" },
+      ],
     });
   });
 
@@ -74,24 +72,20 @@ describe("drag one & common edit mechanics", () => {
       });
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: {
-          withTime: [
-            {
-              id: "1",
-              startTime: moment("2023-01-01 23:00"),
-              durationMinutes: 59,
-            },
-          ],
-        },
-        [nextDayKey]: {
-          withTime: [
-            {
-              id: "1",
-              startTime: moment("2023-01-02 00:00"),
-              durationMinutes: 60,
-            },
-          ],
-        },
+        [dayKey]: [
+          {
+            id: "1",
+            startTime: moment("2023-01-01 23:00"),
+            durationMinutes: 59,
+          },
+        ],
+        [nextDayKey]: [
+          {
+            id: "1",
+            startTime: moment("2023-01-02 00:00"),
+            durationMinutes: 60,
+          },
+        ],
       });
     });
 
@@ -116,25 +110,21 @@ describe("drag one & common edit mechanics", () => {
       moveCursorTo(moment("2023-01-01 23:00"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: {
-          withTime: [
-            {
-              id: "1",
-              startTime: moment("2023-01-01 23:00"),
-              // todo: where is the extra minute?
-              durationMinutes: 59,
-            },
-          ],
-        },
-        [nextDayKey]: {
-          withTime: [
-            {
-              id: "1",
-              startTime: moment("2023-01-02 00:00"),
-              durationMinutes: 60,
-            },
-          ],
-        },
+        [dayKey]: [
+          {
+            id: "1",
+            startTime: moment("2023-01-01 23:00"),
+            // todo: where is the extra minute?
+            durationMinutes: 59,
+          },
+        ],
+        [nextDayKey]: [
+          {
+            id: "1",
+            startTime: moment("2023-01-02 00:00"),
+            durationMinutes: 60,
+          },
+        ],
       });
 
       await confirmEdit();
@@ -198,24 +188,20 @@ describe("drag one & common edit mechanics", () => {
       moveCursorTo(moment("2023-01-02 02:00"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: {
-          withTime: [
-            {
-              id: "1",
-              startTime: moment("2023-01-01 23:00"),
-              durationMinutes: 59,
-            },
-          ],
-        },
-        [nextDayKey]: {
-          withTime: [
-            {
-              id: "1",
-              startTime: moment("2023-01-02 00:00"),
-              durationMinutes: 120,
-            },
-          ],
-        },
+        [dayKey]: [
+          {
+            id: "1",
+            startTime: moment("2023-01-01 23:00"),
+            durationMinutes: 59,
+          },
+        ],
+        [nextDayKey]: [
+          {
+            id: "1",
+            startTime: moment("2023-01-02 00:00"),
+            durationMinutes: 120,
+          },
+        ],
       });
     });
   });

@@ -1,7 +1,7 @@
 import { Function } from "effect";
 import type { Moment } from "moment";
 import { type CachedMetadata, MetadataCache, type Vault } from "obsidian";
-import { derived, get, writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 import { expect, onTestFinished, vi } from "vitest";
 
@@ -28,11 +28,7 @@ import {
   type DayPlannerSettings,
   defaultSettingsForTests,
 } from "../../../src/settings";
-import {
-  isLocal,
-  type EditableTimeBlock,
-  type TimeBlock,
-} from "../../../src/time-block-types";
+import { type EditableTimeBlock } from "../../../src/time-block-types";
 import { useTimeBlocks } from "../../../src/ui/hooks/use-time-blocks";
 import { createBackgroundBatchScheduler } from "../../../src/util/scheduler";
 import { getOneLineSummary } from "../../../src/util/time-block-utils";
@@ -213,17 +209,8 @@ export async function setUp(props?: {
       localTimeBlocks,
     });
 
-  const allTimeBlocks = derived(
-    editContext.dayToDisplayedTimeBlocks,
-    ($dayToDisplayedTimeBlocks) => {
-      return Object.values($dayToDisplayedTimeBlocks).flatMap(
-        ({ withTime, noTime }) => withTime.concat(noTime),
-      );
-    },
-  );
-
   // this prevents the store from resetting;
-  allTimeBlocks.subscribe(Function.constVoid);
+  editContext.dayToDisplayedTimeBlocks.subscribe(Function.constVoid);
   localTimeBlocks.subscribe(Function.constVoid);
 
   function moveCursorTo(
@@ -236,10 +223,8 @@ export async function setUp(props?: {
     });
   }
 
-  function findTimeBlock(predicate: (timeBlock: TimeBlock) => boolean) {
-    const found = get(allTimeBlocks).filter(isLocal).find(predicate) as
-      | EditableTimeBlock
-      | undefined;
+  function findTimeBlock(predicate: (timeBlock: EditableTimeBlock) => boolean) {
+    const found = get(localTimeBlocks).find(predicate);
 
     isNotVoid(found, `TimeBlock not found`);
 
@@ -274,7 +259,6 @@ export async function setUp(props?: {
     vault,
     findTimeBlock,
     findByText,
-    allTimeBlocks,
     transactionWriter,
     currentTime,
     metadataCache,

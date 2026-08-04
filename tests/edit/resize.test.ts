@@ -17,9 +17,7 @@ describe("resize", () => {
     moveCursorTo(moment("2023-01-01 03:00"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: {
-        withTime: [{ durationMinutes: 180 }],
-      },
+      [dayKey]: [{ durationMinutes: 180 }],
     });
   });
 
@@ -30,11 +28,9 @@ describe("resize", () => {
     moveCursorTo(moment("2023-01-01 00:30"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: {
-        withTime: [
-          { durationMinutes: 30, startTime: moment("2023-01-01 00:30") },
-        ],
-      },
+      [dayKey]: [
+        { durationMinutes: 30, startTime: moment("2023-01-01 00:30") },
+      ],
     });
   });
 
@@ -45,14 +41,12 @@ describe("resize", () => {
     moveCursorTo(moment("2023-01-01 01:30"));
 
     expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-      [dayKey]: {
-        withTime: [
-          {
-            durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
-            startTime: moment("2023-01-01 01:30"),
-          },
-        ],
-      },
+      [dayKey]: [
+        {
+          durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
+          startTime: moment("2023-01-01 01:30"),
+        },
+      ],
     });
   });
 
@@ -69,16 +63,14 @@ describe("resize", () => {
       moveCursorTo(moment("2023-01-01 04:00"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: {
-          withTime: [
-            { id: "1" },
-            { id: "2" },
-            {
-              id: "3",
-              startTime: moment("2023-01-01 04:00"),
-            },
-          ],
-        },
+        [dayKey]: [
+          { id: "1" },
+          { id: "2" },
+          {
+            id: "3",
+            startTime: moment("2023-01-01 04:00"),
+          },
+        ],
       });
     });
 
@@ -94,24 +86,22 @@ describe("resize", () => {
       moveCursorTo(moment("2023-01-01 01:30"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: {
-          withTime: [
-            {
-              id: "1",
-              startTime: moment("2023-01-01 00:30"),
-              durationMinutes: toMinutes("01:00"),
-            },
-            {
-              id: "2",
-              startTime: moment("2023-01-01 01:30"),
-              durationMinutes: toMinutes("01:30"),
-            },
-            {
-              id: "3",
-              startTime: moment("2023-01-01 03:00"),
-            },
-          ],
-        },
+        [dayKey]: [
+          {
+            id: "1",
+            startTime: moment("2023-01-01 00:30"),
+            durationMinutes: toMinutes("01:00"),
+          },
+          {
+            id: "2",
+            startTime: moment("2023-01-01 01:30"),
+            durationMinutes: toMinutes("01:30"),
+          },
+          {
+            id: "3",
+            startTime: moment("2023-01-01 03:00"),
+          },
+        ],
       });
     });
   });
@@ -129,20 +119,18 @@ describe("resize", () => {
       moveCursorTo(moment("2023-01-01 04:00"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: {
-          withTime: [
-            { id: "1" },
-            {
-              id: "2",
-              durationMinutes: toMinutes("02:00"),
-            },
-            {
-              id: "3",
-              startTime: moment("2023-01-01 04:00"),
-              durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
-            },
-          ],
-        },
+        [dayKey]: [
+          { id: "1" },
+          {
+            id: "2",
+            durationMinutes: toMinutes("02:00"),
+          },
+          {
+            id: "3",
+            startTime: moment("2023-01-01 04:00"),
+            durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
+          },
+        ],
       });
     });
 
@@ -158,23 +146,21 @@ describe("resize", () => {
       moveCursorTo(moment("2023-01-01 00:30"));
 
       expect(get(dayToDisplayedTimeBlocks)).toMatchObject({
-        [dayKey]: {
-          withTime: [
-            {
-              id: "1",
-              durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
-            },
-            {
-              id: "2",
-              startTime: moment("2023-01-01 00:30"),
-              durationMinutes: toMinutes("02:30"),
-            },
-            {
-              id: "3",
-              startTime: moment("2023-01-01 03:00"),
-            },
-          ],
-        },
+        [dayKey]: [
+          {
+            id: "1",
+            durationMinutes: defaultSettingsForTests.minimalDurationMinutes,
+          },
+          {
+            id: "2",
+            startTime: moment("2023-01-01 00:30"),
+            durationMinutes: toMinutes("02:30"),
+          },
+          {
+            id: "3",
+            startTime: moment("2023-01-01 03:00"),
+          },
+        ],
       });
     });
   });
