@@ -2,7 +2,7 @@ import { get } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 import { describe, expect, test } from "vitest";
 
-import { selectPlanTimeBlocksForDays } from "../../src/redux";
+import { selectPlanTimeBlocksForVisibleDays } from "../../src/redux";
 import { defaultSettingsForTests } from "../../src/settings";
 import { isLocal } from "../../src/time-block-types";
 import { toRenderableMarkdown } from "../../src/util/time-block-utils";
@@ -24,9 +24,10 @@ describe("Task views", () => {
   test("Shows list item with checkbox, nested list items (tasks & plain list items) with their paragraphs and checkboxes", async () => {
     const { getState } = await setUp({
       loadedFixtures: ["2025-07-28.md"],
+      visibleDays: ["2025-07-28"],
     });
 
-    const planEntries = selectPlanTimeBlocksForDays(getState(), ["2025-07-28"]);
+    const planEntries = selectPlanTimeBlocksForVisibleDays(getState());
     const taskWithNestedListItems = planEntries.find((entry) =>
       entry.text.includes("Parent"),
     );
@@ -46,9 +47,10 @@ describe("Task views", () => {
   test("Removes list tokens for plain list items", async () => {
     const { getState } = await setUp({
       loadedFixtures: ["2025-07-19.md"],
+      visibleDays: ["2025-07-19"],
     });
 
-    const planEntries = selectPlanTimeBlocksForDays(getState(), ["2025-07-19"]);
+    const planEntries = selectPlanTimeBlocksForVisibleDays(getState());
     const taskWithNestedListItems = planEntries.find((entry) =>
       entry.text.includes("List item under planner heading"),
     );
@@ -71,9 +73,7 @@ describe("Task views", () => {
       },
     });
 
-    expect(
-      selectPlanTimeBlocksForDays(getState(), ["2025-07-19"]),
-    ).toContainEqual(
+    expect(selectPlanTimeBlocksForVisibleDays(getState())).toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Task outside of planner heading"),
       }),

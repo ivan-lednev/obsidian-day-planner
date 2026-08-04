@@ -1,8 +1,10 @@
 import { Array, pipe } from "effect";
+import type { Moment } from "moment";
 
 import { addHorizontalPlacing } from "./overlap/overlap";
 import type { DayPlannerSettings } from "./settings";
 import type {
+  LogTimeBlock,
   TimeBlock,
   TimelineTimeBlock,
   WithDuration,
@@ -103,6 +105,45 @@ export function layOutDayColumn(
   return pipe(
     timeBlocks,
     Array.dedupeWith((a, b) => t.getRenderKey(a) === t.getRenderKey(b)),
+    addHorizontalPlacing,
+  );
+}
+
+/**
+ * Log blocks get clipped to the day instead of being split at midnight like
+ * planner blocks: a clock that ran across midnight shows up in every day it
+ * touches as a partial block. A clock that is still running gets marked as
+ * continuing past the bottom of today's column.
+ */
+export function layOutLogDayColumn(props: {
+  timeBlocks: LogTimeBlock[];
+  day: Moment;
+  currentTime: Moment;
+}) {
+  const { timeBlocks, day, currentTime } = props;
+
+  const startOfDay = day.clone().startOf("day");
+  const clampRange = {
+    start: startOfDay,
+    end: m.toMinutePrecision(day.clone().endOf("day")),
+  };
+  const isDayToday = day.isSame(currentTime, "day");
+
+  return pipe(
+    timeBlocks,
+    Array.filter((timeBlock) =>
+      m.doesOverlapWithRange(
+        { start: timeBlock.startTime, end: t.getEndTime(timeBlock) },
+        { start: startOfDay, end: startOfDay.clone().add(1, "day") },
+      ),
+    ),
+    Array.map((timeBlock) => {
+      const clamped = t.clampToTimeRange(timeBlock, clampRange);
+
+      return timeBlock.isRunning && isDayToday
+        ? { ...clamped, truncated: ["bottom" as const] }
+        : clamped;
+    }),
     addHorizontalPlacing,
   );
 }

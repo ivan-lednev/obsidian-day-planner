@@ -30,7 +30,9 @@ function createProps({
     onEditAborted,
     abortEditTrigger: writable(),
     localTimeBlocks: writable(timeBlocks),
+    logTimeBlocks: writable([]),
     remoteTimeBlocks: writable([]),
+    currentTime: writable(moment("2023-01-01 00:00")),
     pointerDateTime: writable<PointerDateTime>({
       dateTime: moment("2023-01-01 00:00"),
       type: "dateTime",

@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import {
   selectActiveLogTimeBlocks,
-  selectLogTimeBlocksForDay,
+  selectLogTimeBlocksForVisibleDays,
   selectRecentLogTimeBlocks,
 } from "../../src/redux";
 import { fileDeleted } from "../../src/redux/index/index-slice";
@@ -21,10 +21,13 @@ const dayKey = "2025-07-19";
 
 describe("Frontmatter log indexing", () => {
   test("Indexes a closed frontmatter log entry on its day", async () => {
-    const { getState } = await setUp({ loadedFixtures: [closedLogFixture] });
+    const { getState } = await setUp({
+      loadedFixtures: [closedLogFixture],
+      visibleDays: [dayKey],
+    });
 
     expect(
-      selectLogTimeBlocksForDay(getState(), dayKey, strictParse(dayKey)),
+      selectLogTimeBlocksForVisibleDays(getState(), strictParse(dayKey)),
     ).toContainEqual(
       expect.objectContaining({
         text: closedLogBasename,
@@ -59,16 +62,17 @@ describe("Frontmatter log indexing", () => {
   test("Removes frontmatter logs when the file is deleted", async () => {
     const { getState, dispatch } = await setUp({
       loadedFixtures: [closedLogFixture],
+      visibleDays: [dayKey],
     });
 
     expect(
-      selectLogTimeBlocksForDay(getState(), dayKey, strictParse(dayKey)),
+      selectLogTimeBlocksForVisibleDays(getState(), strictParse(dayKey)),
     ).toHaveLength(1);
 
     dispatch(fileDeleted({ path: closedLogPath }));
 
     expect(
-      selectLogTimeBlocksForDay(getState(), dayKey, strictParse(dayKey)),
+      selectLogTimeBlocksForVisibleDays(getState(), strictParse(dayKey)),
     ).toEqual([]);
   });
 

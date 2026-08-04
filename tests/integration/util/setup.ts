@@ -154,6 +154,7 @@ export async function setUp(props?: {
     store,
     remoteTimeBlocks,
     localTimeBlocks,
+    logTimeBlocks,
     pointerDateTime,
   } = createReactor({
     preloadedState: defaultPreloadedStateForTests,
@@ -164,6 +165,7 @@ export async function setUp(props?: {
     periodicNotes,
     settings,
     icalParseScheduler,
+    currentTime,
   });
 
   const { getState, dispatch } = store;
@@ -207,6 +209,7 @@ export async function setUp(props?: {
       pointerDateTime,
       remoteTimeBlocks,
       localTimeBlocks,
+      logTimeBlocks,
     });
 
   // this prevents the store from resetting;

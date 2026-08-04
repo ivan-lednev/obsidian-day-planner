@@ -61,7 +61,11 @@ import { VaultFacade } from "./service/vault-facade";
 import { WorkspaceFacade } from "./service/workspace-facade";
 import { type DayPlannerSettings, defaultSettings } from "./settings";
 import { createGetTasksApi } from "./tasks-plugin";
-import type { EditableTimeBlock, RemoteTimeBlock } from "./time-block-types";
+import type {
+  EditableTimeBlock,
+  LogTimeBlock,
+  RemoteTimeBlock,
+} from "./time-block-types";
 import type { ObsidianContext, OnUpdateFn, PointerDateTime } from "./types";
 import { ClockInOnAnythingModal } from "./ui/clock-in-on-anything-modal";
 import { askForConfirmation } from "./ui/confirmation-modal";
@@ -146,6 +150,7 @@ export default class DayPlanner extends Plugin {
       listenerMiddleware,
       remoteTimeBlocks,
       localTimeBlocks,
+      logTimeBlocks,
       pointerDateTime,
       dateRanges,
     } = createReactor({
@@ -156,6 +161,7 @@ export default class DayPlanner extends Plugin {
       periodicNotes: this.periodicNotes,
       settings: initialSettings,
       icalParseScheduler,
+      currentTime,
     });
 
     const { dispatch } = store;
@@ -186,6 +192,7 @@ export default class DayPlanner extends Plugin {
       pointerDateTime,
       useSelector,
       localTimeBlocks,
+      logTimeBlocks,
       dateRanges,
     });
 
@@ -462,6 +469,7 @@ export default class DayPlanner extends Plugin {
     useSelector: UseSelector<RootState>;
     remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
     localTimeBlocks: Readable<EditableTimeBlock[]>;
+    logTimeBlocks: Readable<LogTimeBlock[]>;
     pointerDateTime: Writable<PointerDateTime>;
     dateRanges: DateRanges;
   }) {
@@ -471,6 +479,7 @@ export default class DayPlanner extends Plugin {
       useSelector,
       remoteTimeBlocks,
       localTimeBlocks,
+      logTimeBlocks,
       pointerDateTime,
       dateRanges,
     } = props;
@@ -517,6 +526,7 @@ export default class DayPlanner extends Plugin {
         pointerDateTime,
         remoteTimeBlocks,
         localTimeBlocks,
+        logTimeBlocks,
       });
 
     // Once the time tracker column becomes editable, its operation joins this

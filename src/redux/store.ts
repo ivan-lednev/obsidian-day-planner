@@ -7,8 +7,9 @@ import {
   type TypedStartListening,
 } from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
+import type { Moment } from "moment";
 import type { MetadataCache, Vault } from "obsidian";
-import { toStore, writable } from "svelte/store";
+import { fromStore, type Readable, toStore, writable } from "svelte/store";
 
 import type { IndexService } from "../service/index/index-service";
 import type { ListPropsParser } from "../service/list-props-parser";
@@ -21,7 +22,10 @@ import { createDateRanges } from "./date-ranges";
 import { dateRangesSlice } from "./date-ranges-slice";
 import { icalSlice, selectRemoteTimeBlocks } from "./ical/ical-slice";
 import type { IcalParseTaskResult } from "./ical/init-ical-listeners";
-import { selectPlanTimeBlocksForVisibleDays } from "./index/index-selectors";
+import {
+  selectLogTimeBlocksForVisibleDays,
+  selectPlanTimeBlocksForVisibleDays,
+} from "./index/index-selectors";
 import { indexSlice } from "./index/index-slice";
 import { initListenerMiddleware } from "./listener-middleware";
 import { settingsSlice } from "./settings-slice";
@@ -62,6 +66,7 @@ export function createReactor(props: {
   periodicNotes: PeriodicNotes;
   settings: DayPlannerSettings;
   icalParseScheduler: Scheduler<IcalParseTaskResult>;
+  currentTime: Readable<Moment>;
 }) {
   const {
     preloadedState = {},
@@ -72,6 +77,7 @@ export function createReactor(props: {
     periodicNotes,
     settings,
     icalParseScheduler,
+    currentTime,
   } = props;
 
   const listenerMiddleware = initListenerMiddleware({
@@ -101,6 +107,12 @@ export function createReactor(props: {
   );
   const localTimeBlocks = toStore(() => localTimeBlocksSignal.current);
 
+  const currentTimeSignal = fromStore(currentTime);
+  const logTimeBlocksSignal = useSelector((state) =>
+    selectLogTimeBlocksForVisibleDays(state, currentTimeSignal.current),
+  );
+  const logTimeBlocks = toStore(() => logTimeBlocksSignal.current);
+
   const remoteTimeBlocksSignal = useSelector((state) =>
     selectRemoteTimeBlocks(state),
   );
@@ -116,6 +128,7 @@ export function createReactor(props: {
     listenerMiddleware,
     remoteTimeBlocks,
     localTimeBlocks,
+    logTimeBlocks,
     pointerDateTime,
     useSelector,
     dateRanges,

@@ -4,13 +4,12 @@
   import { isNotVoid } from "typed-assert";
 
   import { getObsidianContext } from "../../context/obsidian-context";
-  import { currentTimeSignal, isToday } from "../../global-store/current-time";
+  import { isToday } from "../../global-store/current-time";
   import { getVisibleHours } from "../../global-store/derived-settings";
-  import { selectLogTimeBlocksForDay } from "../../redux";
   import { selectLogEntriesById } from "../../redux/index/index-slice";
   import type { LogTimeBlock } from "../../time-block-types";
   import { isTouchEvent } from "../../util/dom";
-  import { getBlockProps, getDayKey } from "../../util/time-block-utils";
+  import { getBlockProps } from "../../util/time-block-utils";
   import { createGestures } from "../actions/gestures";
   import { trackPointerDateTime } from "../actions/track-pointer-date-time";
   import { createActiveClockMenu } from "../active-clock-menu";
@@ -35,6 +34,7 @@
       confirmEdit,
       startCreate,
       getDisplayedTimeBlocksForTimeline,
+      getDisplayedLogTimeBlocksForTimeline,
       editOperation,
     },
     pointerDateTime,
@@ -48,11 +48,10 @@
   const displayedTimeBlocksForTimeline = $derived(
     getDisplayedTimeBlocksForTimeline(day),
   );
-  const dayKey = $derived(getDayKey(day));
-
-  const logEntriesForDay = useSelector((state) =>
-    selectLogTimeBlocksForDay(state, dayKey, currentTimeSignal.current),
+  const displayedLogTimeBlocksForTimeline = $derived(
+    getDisplayedLogTimeBlocksForTimeline(day),
   );
+
   const logEntriesById = useSelector(selectLogEntriesById);
 
   // todo: separate LogTimeBlockView (clamped) & LogTimeBlock
@@ -166,7 +165,7 @@
       {/if}
 
       <div class="tasks absolute-stretch-x">
-        {#each logEntriesForDay.current as timeBlock (timeBlock.id)}
+        {#each $displayedLogTimeBlocksForTimeline as timeBlock (timeBlock.id)}
           <PositionedTimeBlock {timeBlock}>
             <Selectable
               onSecondarySelect={(event) => showLogBlockMenu(event, timeBlock)}

@@ -4,6 +4,7 @@ import { derived, type Readable, type Writable } from "svelte/store";
 import type { DayPlannerSettings } from "../../settings";
 import type {
   EditableTimeBlock,
+  LogTimeBlock,
   RemoteTimeBlock,
   TimeBlock,
   WithDuration,
@@ -23,6 +24,7 @@ export function useTimeBlocks(props: {
   pointerDateTime: Readable<PointerDateTime>;
   remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
   localTimeBlocks: Readable<EditableTimeBlock[]>;
+  logTimeBlocks: Readable<LogTimeBlock[]>;
 }) {
   const {
     settingsStore,
@@ -32,6 +34,7 @@ export function useTimeBlocks(props: {
     onEditAborted,
     remoteTimeBlocks,
     localTimeBlocks,
+    logTimeBlocks,
   } = props;
 
   const timeBlocksWithTimeForToday = derived(
@@ -58,7 +61,9 @@ export function useTimeBlocks(props: {
     onEditAborted,
     settingsStore,
     localTimeBlocks,
+    logTimeBlocks,
     remoteTimeBlocks,
+    currentTime,
     pointerDateTime,
     abortEditTrigger,
   });

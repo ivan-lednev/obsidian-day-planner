@@ -4,6 +4,7 @@ import { derived, get, type Readable, writable } from "svelte/store";
 import type { DayPlannerSettings } from "../../../settings";
 import type {
   EditableTimeBlock,
+  LogTimeBlock,
   RemoteTimeBlock,
   TimelineTimeBlock,
   WithDuration,
@@ -13,6 +14,7 @@ import {
   getVisibleTimeBlocks,
   groupTimedBlocksByDay,
   layOutDayColumn,
+  layOutLogDayColumn,
 } from "../../../timeline-layout";
 import type {
   OnEditAbortedFn,
@@ -31,7 +33,9 @@ export function useEditContext(props: {
   onUpdate: OnUpdateFn;
   settingsStore: Readable<DayPlannerSettings>;
   localTimeBlocks: Readable<EditableTimeBlock[]>;
+  logTimeBlocks: Readable<LogTimeBlock[]>;
   remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
+  currentTime: Readable<Moment>;
   pointerDateTime: Readable<PointerDateTime>;
   abortEditTrigger: Readable<unknown>;
   onEditAborted: OnEditAbortedFn;
@@ -41,7 +45,9 @@ export function useEditContext(props: {
     onUpdate,
     settingsStore,
     localTimeBlocks,
+    logTimeBlocks,
     remoteTimeBlocks,
+    currentTime,
     pointerDateTime,
     abortEditTrigger,
   } = props;
@@ -133,6 +139,19 @@ export function useEditContext(props: {
     );
   }
 
+  // todo: log blocks are not editable yet, so they skip the transform
+  function getDisplayedLogTimeBlocksForTimeline(day: Moment) {
+    return derived(
+      [logTimeBlocks, currentTime],
+      ([$logTimeBlocks, $currentTime]) =>
+        layOutLogDayColumn({
+          timeBlocks: $logTimeBlocks,
+          day,
+          currentTime: $currentTime,
+        }),
+    );
+  }
+
   function startCreate() {
     startEdit({
       timeBlock: t.create({
@@ -151,6 +170,7 @@ export function useEditContext(props: {
     cancelEdit,
     editOperation,
     getDisplayedTimeBlocksForTimeline,
+    getDisplayedLogTimeBlocksForTimeline,
     getDisplayedAllDayTimeBlocksForMultiDayRow,
   };
 }
