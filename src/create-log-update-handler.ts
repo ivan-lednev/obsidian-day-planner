@@ -5,7 +5,7 @@ import { selectLogEntriesById } from "./redux/index/index-slice";
 import type { RootState } from "./redux/store";
 import type { ClockLocation, LogEntryEditor } from "./service/log-entry-editor";
 import type { LogTimeBlock } from "./time-block-types";
-import type { OnLogUpdateFn } from "./types";
+import type { OnUpdateFn } from "./types";
 import { runWithNoticeOnError } from "./util/effect";
 import { getEndTime } from "./util/time-block-utils";
 
@@ -29,7 +29,7 @@ function hasMovedInTime(a: LogTimeBlock, b: LogTimeBlock) {
 export const createLogUpdateHandler = (props: {
   logEntryEditor: LogEntryEditor;
   getState: () => RootState;
-}): OnLogUpdateFn => {
+}): OnUpdateFn<LogTimeBlock> => {
   const { logEntryEditor, getState } = props;
 
   return async (base, next) => {

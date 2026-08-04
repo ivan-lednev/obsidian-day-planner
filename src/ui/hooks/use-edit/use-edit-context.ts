@@ -13,11 +13,9 @@ import {
   getAllDayTimeBlocksInRange,
   getVisibleTimeBlocks,
   layOutDayColumn,
-  layOutLogDayColumn,
 } from "../../../timeline-layout";
 import type {
   OnEditAbortedFn,
-  OnLogUpdateFn,
   OnUpdateFn,
   PointerDateTime,
 } from "../../../types";
@@ -30,18 +28,12 @@ import { useEditActions } from "./use-edit-actions";
 
 export function useEditContext(props: {
   onUpdate: OnUpdateFn;
-  onLogUpdate: OnLogUpdateFn;
+  onLogUpdate: OnUpdateFn<LogTimeBlock>;
   settingsStore: Readable<DayPlannerSettings>;
   localTimeBlocks: Readable<EditableTimeBlock[]>;
   logTimeBlocks: Readable<LogTimeBlock[]>;
   remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
-  currentTime: Readable<Moment>;
   pointerDateTime: Readable<PointerDateTime>;
-  /**
-   * Fires on anything that reindexes a file. Edits are written back at line
-   * positions taken from the index, so any indexing pass can invalidate an
-   * edit in progress, whichever column started it.
-   */
   abortEditTrigger: Readable<unknown>;
   onEditAborted: OnEditAbortedFn;
 }) {
@@ -53,7 +45,6 @@ export function useEditContext(props: {
     localTimeBlocks,
     logTimeBlocks,
     remoteTimeBlocks,
-    currentTime,
     pointerDateTime,
     abortEditTrigger,
   } = props;
@@ -176,12 +167,11 @@ export function useEditContext(props: {
 
   function getDisplayedLogTimeBlocksForTimeline(day: Moment) {
     return derived(
-      [logTimeBlocksWithPendingUpdate, currentTime],
-      ([$logTimeBlocksWithPendingUpdate, $currentTime]) =>
-        layOutLogDayColumn({
+      logTimeBlocksWithPendingUpdate,
+      ($logTimeBlocksWithPendingUpdate) =>
+        layOutDayColumn({
           timeBlocks: $logTimeBlocksWithPendingUpdate,
           day,
-          currentTime: $currentTime,
         }),
     );
   }

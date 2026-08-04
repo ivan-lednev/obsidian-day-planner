@@ -4,7 +4,6 @@ import type { Moment } from "moment";
 import { addHorizontalPlacing } from "./overlap/overlap";
 import type { DayPlannerSettings } from "./settings";
 import type {
-  LogTimeBlock,
   TimeBlock,
   TimelineTimeBlock,
   WithDuration,
@@ -96,23 +95,5 @@ export function layOutDayColumn<T extends TimeBlock>(props: {
     Array.dedupeWith((a, b) => t.getRenderKey(a) === t.getRenderKey(b)),
     // todo: fix `as`: blocks without a duration can slip through to placing
     (deduped) => addHorizontalPlacing(deduped as Array<WithDuration<T>>),
-  );
-}
-
-export function layOutLogDayColumn(props: {
-  timeBlocks: LogTimeBlock[];
-  day: Moment;
-  currentTime: Moment;
-}) {
-  const { timeBlocks, day, currentTime } = props;
-  const isDayToday = day.isSame(currentTime, "day");
-
-  return layOutDayColumn({ timeBlocks, day }).map((timeBlock) =>
-    timeBlock.isRunning && isDayToday
-      ? {
-          ...timeBlock,
-          truncated: [...(timeBlock.truncated ?? []), "bottom" as const],
-        }
-      : timeBlock,
   );
 }

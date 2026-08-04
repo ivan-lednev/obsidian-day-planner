@@ -8,11 +8,7 @@ import {
   type LogTimeBlock,
   type WithDuration,
 } from "../../../time-block-types";
-import type {
-  OnLogUpdateFn,
-  OnUpdateFn,
-  PointerDateTime,
-} from "../../../types";
+import type { OnUpdateFn, PointerDateTime } from "../../../types";
 import * as t from "../../../util/time-block-utils";
 
 import { EditMode, type EditOperation } from "./types";
@@ -24,7 +20,7 @@ interface UseEditActionsProps {
   timeBlocksWithPendingUpdate: Readable<EditableTimeBlock[]>;
   logTimeBlocksWithPendingUpdate: Readable<LogTimeBlock[]>;
   onUpdate: OnUpdateFn;
-  onLogUpdate: OnLogUpdateFn;
+  onLogUpdate: OnUpdateFn<LogTimeBlock>;
   settingsStore: Readable<DayPlannerSettings>;
   pointerDateTime: Readable<PointerDateTime>;
 }
@@ -97,16 +93,11 @@ export function useEditActions({
     editOperation.set(undefined);
   }
 
-  /**
-   * The baseline takes the pending update right away so that blocks do not
-   * jump back to where they were while the write is in flight; a failed write
-   * puts the old baseline back. The pending update has to be read before the
-   * operation is dropped, or it collapses back to the baseline.
-   */
   async function commit<Block>(
     baseline: Writable<Block[]>,
     pendingUpdate: Readable<Block[]>,
-    write: (base: Block[], next: Block[]) => Promise<boolean>,
+    write: OnUpdateFn<Block>,
+    mode: EditMode,
   ) {
     const oldBase = get(baseline);
     const currentTimeBlocks = get(pendingUpdate);
@@ -114,7 +105,7 @@ export function useEditActions({
     baseline.set(currentTimeBlocks);
     editOperation.set(undefined);
 
-    const succeeded = await write(oldBase, currentTimeBlocks);
+    const succeeded = await write(oldBase, currentTimeBlocks, mode);
 
     if (!succeeded) {
       baseline.set(oldBase);
@@ -128,11 +119,14 @@ export function useEditActions({
       return;
     }
 
-    if (isLog(currentOperation.timeBlock)) {
+    const { timeBlock, mode } = currentOperation;
+
+    if (isLog(timeBlock)) {
       await commit(
         logBaselineTimeBlocks,
         logTimeBlocksWithPendingUpdate,
         onLogUpdate,
+        mode,
       );
 
       return;
@@ -141,7 +135,8 @@ export function useEditActions({
     await commit(
       baselineTimeBlocks,
       timeBlocksWithPendingUpdate,
-      (base, next) => onUpdate(base, next, currentOperation.mode),
+      onUpdate,
+      mode,
     );
   }
 

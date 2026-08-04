@@ -2,6 +2,7 @@
   import { type Snippet } from "svelte";
 
   import type { TimeBlock } from "../../time-block-types";
+  import { getCutEdges } from "../../util/time-block-utils";
   import { useColorOverrides } from "../hooks/use-color.svelte";
 
   interface Props {
@@ -23,6 +24,8 @@
     properContrastColors: { normal, muted, faint },
     backgroundColor,
   } = $derived(useColorOverrides({ timeBlock }));
+
+  const cutEdges = $derived(getCutEdges(timeBlock));
 </script>
 
 <div class="padding">
@@ -33,10 +36,10 @@
     style:--time-block-bg-color={backgroundColor}
     class={[
       "content",
-      timeBlock.truncated?.includes("left") && "truncated-left",
-      timeBlock.truncated?.includes("right") && "truncated-right",
-      timeBlock.truncated?.includes("top") && "truncated-top",
-      timeBlock.truncated?.includes("bottom") && "truncated-bottom",
+      cutEdges.includes("left") && "truncated-left",
+      cutEdges.includes("right") && "truncated-right",
+      cutEdges.includes("top") && "truncated-top",
+      cutEdges.includes("bottom") && "truncated-bottom",
     ]}
     {onpointerup}
     {...rest}

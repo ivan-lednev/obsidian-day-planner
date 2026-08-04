@@ -14,7 +14,7 @@ import {
   selectEntriesForPath,
 } from "../../src/redux/index/index-slice";
 import { strictParse } from "../../src/util/moment";
-import { getDayKey } from "../../src/util/time-block-utils";
+import { getCutEdges, getDayKey } from "../../src/util/time-block-utils";
 
 import { setUp } from "./util/setup";
 
@@ -143,14 +143,16 @@ describe("Indexing", () => {
     const now = window.moment();
     const { editContext } = await setUp({ visibleDays: [getDayKey(now)] });
 
-    expect(
-      get(editContext.getDisplayedLogTimeBlocksForTimeline(now)),
-    ).toContainEqual(
-      expect.objectContaining({
-        text: expect.stringContaining("Task"),
-        truncated: expect.arrayContaining(["bottom"]),
-      }),
-    );
+    const activeClock = get(
+      editContext.getDisplayedLogTimeBlocksForTimeline(now),
+    ).find((it) => it.text.includes("Task"));
+
+    isNotVoid(activeClock);
+
+    // Today's column does not clip a running clock: its end is the current
+    // moment, which is inside the day.
+    expect(activeClock.truncated).not.toContain("bottom");
+    expect(getCutEdges(activeClock)).toContain("bottom");
   });
 
   test("Clips an active clock crossing midnight to yesterday's column", async () => {

@@ -156,7 +156,7 @@ export async function setUp(props?: {
     remoteTimeBlocks,
     localTimeBlocks,
     logTimeBlocks,
-    indexState,
+    abortEditTrigger,
     pointerDateTime,
   } = createReactor({
     preloadedState: defaultPreloadedStateForTests,
@@ -218,7 +218,7 @@ export async function setUp(props?: {
       remoteTimeBlocks,
       localTimeBlocks,
       logTimeBlocks,
-      indexState,
+      abortEditTrigger,
     });
 
   // this prevents the store from resetting;

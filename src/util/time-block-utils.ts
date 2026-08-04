@@ -13,6 +13,8 @@ import {
 import type { DayPlannerSettings } from "../settings";
 import {
   isListItemSourced,
+  isLocal,
+  isLog,
   isRemote,
   type EditableTimeBlock,
   type PlanTimeBlock,
@@ -322,6 +324,16 @@ export function isTimeEqual(a: EditableTimeBlock, b: EditableTimeBlock) {
     a.durationMinutes === b.durationMinutes &&
     a.isAllDayEvent === b.isAllDayEvent
   );
+}
+
+export function getCutEdges(timeBlock: TimeBlock): Side[] {
+  const cutEdges = timeBlock.truncated ?? [];
+
+  if (!isLocal(timeBlock) || !isLog(timeBlock) || !timeBlock.isRunning) {
+    return cutEdges;
+  }
+
+  return cutEdges.includes("bottom") ? cutEdges : [...cutEdges, "bottom"];
 }
 
 export function getBlockProps(

@@ -152,7 +152,7 @@ export default class DayPlanner extends Plugin {
       remoteTimeBlocks,
       localTimeBlocks,
       logTimeBlocks,
-      indexState,
+      abortEditTrigger,
       pointerDateTime,
       dateRanges,
     } = createReactor({
@@ -195,7 +195,7 @@ export default class DayPlanner extends Plugin {
       useSelector,
       localTimeBlocks,
       logTimeBlocks,
-      indexState,
+      abortEditTrigger,
       dateRanges,
     });
 
@@ -473,7 +473,7 @@ export default class DayPlanner extends Plugin {
     remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
     localTimeBlocks: Readable<EditableTimeBlock[]>;
     logTimeBlocks: Readable<LogTimeBlock[]>;
-    indexState: Readable<unknown>;
+    abortEditTrigger: Readable<unknown>;
     pointerDateTime: Writable<PointerDateTime>;
     dateRanges: DateRanges;
   }) {
@@ -484,7 +484,7 @@ export default class DayPlanner extends Plugin {
       remoteTimeBlocks,
       localTimeBlocks,
       logTimeBlocks,
-      indexState,
+      abortEditTrigger,
       pointerDateTime,
       dateRanges,
     } = props;
@@ -538,11 +538,10 @@ export default class DayPlanner extends Plugin {
         remoteTimeBlocks,
         localTimeBlocks,
         logTimeBlocks,
-        indexState,
+        abortEditTrigger,
       });
 
-    // Once the time tracker column becomes editable, its operation joins this
-    // one instead of every consumer growing a second subscription.
+    // Both columns share one operation, so this covers editing in either.
     const isEditing = derived(editContext.editOperation, ($editOperation) =>
       Boolean($editOperation),
     );

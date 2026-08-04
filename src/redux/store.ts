@@ -9,7 +9,13 @@ import {
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
 import type { Moment } from "moment";
 import type { MetadataCache, Vault } from "obsidian";
-import { fromStore, type Readable, toStore, writable } from "svelte/store";
+import {
+  derived,
+  fromStore,
+  type Readable,
+  toStore,
+  writable,
+} from "svelte/store";
 
 import type { IndexService } from "../service/index/index-service";
 import type { ListPropsParser } from "../service/list-props-parser";
@@ -17,6 +23,7 @@ import type { PeriodicNotes } from "../service/periodic-notes";
 import type { DayPlannerSettings } from "../settings";
 import type { PointerDateTime, ReduxExtraArgument } from "../types";
 import type { Scheduler } from "../util/scheduler";
+import { getUpdateTrigger } from "../util/store";
 
 import { createDateRanges } from "./date-ranges";
 import { dateRangesSlice } from "./date-ranges-slice";
@@ -116,6 +123,12 @@ export function createReactor(props: {
   const indexStateSignal = useSelector(selectIndexState);
   const indexState = toStore(() => indexStateSignal.current);
 
+  /**
+   * Edits are written back at line positions taken from the index, so any
+   * indexing pass can invalidate an edit in progress.
+   */
+  const abortEditTrigger = derived(indexState, getUpdateTrigger);
+
   const remoteTimeBlocksSignal = useSelector((state) =>
     selectRemoteTimeBlocks(state),
   );
@@ -132,7 +145,7 @@ export function createReactor(props: {
     remoteTimeBlocks,
     localTimeBlocks,
     logTimeBlocks,
-    indexState,
+    abortEditTrigger,
     pointerDateTime,
     useSelector,
     dateRanges,
