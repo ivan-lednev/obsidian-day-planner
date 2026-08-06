@@ -1,11 +1,7 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import { slide, fade } from "svelte/transition";
+  import { slide } from "svelte/transition";
 
-  import {
-    transitionDurationShort,
-    vibrationDurationMillis,
-  } from "../../constants";
   import { isTouchEvent } from "../../util/dom";
 
   import { createSlide } from "./defaults";
@@ -21,7 +17,6 @@
   const { isActive, reverse = false, initial, expanded } = $derived(props);
 
   function setIsActive(isActive: boolean) {
-    navigator.vibrate?.(vibrationDurationMillis);
     props.setIsActive(isActive);
   }
 </script>
@@ -49,7 +44,6 @@
       setIsActive(!isActive);
     }
   }}
-  transition:fade={{ duration: transitionDurationShort }}
 >
   {#if isActive && expanded}
     <div class="expanded-wrapper" transition:slide={createSlide({ axis: "x" })}>

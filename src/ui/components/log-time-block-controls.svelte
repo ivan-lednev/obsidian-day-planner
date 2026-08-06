@@ -5,10 +5,12 @@
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import type { LogTimeBlock, WithDuration } from "../../time-block-types";
+  import { createGestures } from "../actions/gestures";
   import { EditMode } from "../hooks/use-edit/types";
 
+  import BlockControlButton from "./block-control-button.svelte";
+  import ExpandingControls from "./expanding-controls.svelte";
   import FloatingControls from "./floating-controls.svelte";
-  import LogEditControl from "./log-edit-control.svelte";
   import Selectable from "./selectable.svelte";
 
   interface TimeBlockProps {
@@ -29,7 +31,10 @@
     content: Snippet<[TimeBlockProps]>;
   } = $props();
 
-  const { isEditing } = getObsidianContext();
+  const {
+    isEditing,
+    editContext: { startEdit },
+  } = getObsidianContext();
 </script>
 
 <Selectable {onSecondarySelect} selectionBlocked={$isEditing}>
@@ -47,51 +52,61 @@
 
       {#snippet topEnd({ isActive, setIsActive })}
         {#if !timeBlock.isRunning}
-          <LogEditControl
+          <ExpandingControls
             --expanding-controls-position="absolute"
             {isActive}
-            label="Move clock"
-            mode={EditMode.DRAG}
             {setIsActive}
-            {timeBlock}
           >
-            {#snippet icon()}
-              <GripVertical class="svg-icon" />
+            {#snippet initial()}
+              <BlockControlButton
+                cursor="grab"
+                label="Move clock"
+                {@attach createGestures({
+                  onpanmove: () =>
+                    startEdit({ timeBlock, mode: EditMode.DRAG }),
+                })}
+              >
+                <GripVertical class="svg-icon" />
+              </BlockControlButton>
             {/snippet}
-          </LogEditControl>
+          </ExpandingControls>
         {/if}
       {/snippet}
 
       {#snippet bottom({ isActive, setIsActive })}
         {#if !timeBlock.isRunning}
-          <LogEditControl
-            {isActive}
-            label="Move the end of the clock"
-            mode={EditMode.RESIZE}
-            reverse
-            {setIsActive}
-            {timeBlock}
-          >
-            {#snippet icon()}
-              <MoveVertical class="svg-icon" />
+          <ExpandingControls {isActive} reverse {setIsActive}>
+            {#snippet initial()}
+              <BlockControlButton
+                cursor="grab"
+                label="Move the end of the clock"
+                {@attach createGestures({
+                  onpanmove: () =>
+                    startEdit({ timeBlock, mode: EditMode.RESIZE }),
+                })}
+              >
+                <MoveVertical class="svg-icon" />
+              </BlockControlButton>
             {/snippet}
-          </LogEditControl>
+          </ExpandingControls>
         {/if}
       {/snippet}
 
       {#snippet top({ isActive, setIsActive })}
-        <LogEditControl
-          {isActive}
-          label="Move the start of the clock"
-          mode={EditMode.RESIZE_FROM_TOP}
-          reverse
-          {setIsActive}
-          {timeBlock}
-        >
-          {#snippet icon()}
-            <MoveVertical class="svg-icon" />
+        <ExpandingControls {isActive} reverse {setIsActive}>
+          {#snippet initial()}
+            <BlockControlButton
+              cursor="grab"
+              label="Move the start of the clock"
+              {@attach createGestures({
+                onpanmove: () =>
+                  startEdit({ timeBlock, mode: EditMode.RESIZE_FROM_TOP }),
+              })}
+            >
+              <MoveVertical class="svg-icon" />
+            </BlockControlButton>
           {/snippet}
-        </LogEditControl>
+        </ExpandingControls>
       {/snippet}
     </FloatingControls>
   {/snippet}

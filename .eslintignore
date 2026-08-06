@@ -10,7 +10,7 @@ src/ui/components/active-clocks.svelte
 src/ui/components/drag-controls.svelte
 src/ui/components/floating-controls.svelte
 src/ui/components/local-time-block.svelte
-src/ui/components/log-edit-control.svelte
+src/ui/components/log-time-block-controls.svelte
 src/ui/components/multi-day/multi-day-grid.svelte
 src/ui/components/recent-clocks.svelte
 src/ui/components/rendered-markdown.svelte
