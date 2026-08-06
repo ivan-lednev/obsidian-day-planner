@@ -13,11 +13,15 @@ import {
 import type { DayPlannerSettings } from "../settings";
 import {
   isListItemSourced,
+  isLocal,
+  isLog,
   isRemote,
   type EditableTimeBlock,
   type PlanTimeBlock,
   type RemoteTimeBlock,
+  type Side,
   type TimeBlock,
+  type UnwrittenLogTimeBlock,
   type UnwrittenTimeBlock,
   type WithDuration,
   type WriteDestination,
@@ -34,12 +38,7 @@ import {
   removeListTokens,
 } from "./markdown";
 import * as m from "./moment";
-import {
-  addMinutes,
-  getMinutesSinceMidnight,
-  minutesToMoment,
-  minutesToMomentOfDay,
-} from "./moment";
+import { addMinutes, getMinutesSinceMidnight, minutesToMoment } from "./moment";
 import { deleteProps, updateScheduledPropInText } from "./props";
 
 export function getEndMinutes(timeBlock: {
@@ -178,10 +177,6 @@ export function createTimestamp(
   return `${start.format(format)}${separator}${end.format(format)}`;
 }
 
-export function getEmptyTimeBlocksForDay() {
-  return { withTime: [], noTime: [] };
-}
-
 export function getDayKey(day: Moment) {
   return day.format(defaultDayFormat);
 }
@@ -239,11 +234,10 @@ export function appendText(taskText: string, toAppend: string) {
 }
 
 export function create(props: {
-  day: Moment;
-  startMinutes: number;
+  startTime: Moment;
   settings: DayPlannerSettings;
 }): WithDuration<UnwrittenTimeBlock> {
-  const { day, startMinutes, settings } = props;
+  const { startTime, settings } = props;
 
   return {
     id: getId(),
@@ -251,13 +245,29 @@ export function create(props: {
     destination: { type: "plannerHeading" },
     durationMinutes: settings.defaultDurationMinutes,
     text: "New item",
-    startTime: minutesToMomentOfDay(startMinutes, day),
+    startTime: startTime.clone(),
     isAllDayEvent: false,
     symbol: "-",
     status:
       settings.eventFormatOnCreation === "task"
         ? settings.taskStatusOnCreation
         : undefined,
+  };
+}
+
+export function createLog(props: {
+  startTime: Moment;
+  settings: DayPlannerSettings;
+}): WithDuration<UnwrittenLogTimeBlock> {
+  const { startTime, settings } = props;
+
+  return {
+    id: getId(),
+    source: "unwrittenLog",
+    durationMinutes: settings.defaultDurationMinutes,
+    text: "New clock",
+    startTime: startTime.clone(),
+    symbol: "-",
   };
 }
 
@@ -269,44 +279,52 @@ export function getOneLineSummary(timeBlock: TimeBlock) {
   return pipe(timeBlock.text, getFirstLine, removeTimeRangeFromStartOfLine);
 }
 
-/**
- * Clips a block to the whole days covered by `range` and records which
- * horizontal edges got cut, so the multi-day view can render the block as
- * continuing outside the range. For plain time clamping without the render
- * flags use {@link clampToTimeRange}.
- */
+function clipToRange<T extends WithDuration<TimeBlock>>(
+  timeBlock: T,
+  range: m.Range,
+  edges: { start: Side; end: Side },
+): T {
+  const clipped = { ...timeBlock };
+
+  if (timeBlock.startTime.isBefore(range.start)) {
+    clipped.startTime = range.start;
+    clipped.durationMinutes = getEndTime(timeBlock).diff(
+      range.start,
+      "minutes",
+    );
+    clipped.truncated = [...(clipped.truncated ?? []), edges.start];
+  }
+
+  if (getEndTime(clipped).isAfter(range.end)) {
+    clipped.durationMinutes = m.getDiffInMinutes(clipped.startTime, range.end);
+    clipped.truncated = [...(clipped.truncated ?? []), edges.end];
+  }
+
+  return clipped;
+}
+
+export function clipToColumnRange<T extends WithDuration<TimeBlock>>(
+  timeBlock: T,
+  range: m.Range,
+): T {
+  return clipToRange(timeBlock, range, { start: "top", end: "bottom" });
+}
+
+export function clipToRowRange<T extends WithDuration<TimeBlock>>(
+  timeBlock: T,
+  range: m.Range,
+): T {
+  return clipToRange(timeBlock, range, { start: "left", end: "right" });
+}
+
 export function truncateToDayRange<T extends WithDuration<TimeBlock>>(
   timeBlock: T,
   range: m.Range,
 ): T {
-  const start = timeBlock.startTime.clone().startOf("day");
-  const end = getEndTime(timeBlock).clone().endOf("day");
-
-  const startOfRange = range.start.clone().startOf("day");
-  const endOfRange = range.end.clone().add(1, "day").startOf("day");
-
-  const truncatedBase = { ...timeBlock };
-
-  if (start.isBefore(startOfRange)) {
-    truncatedBase.durationMinutes = getEndTime(timeBlock).diff(
-      startOfRange,
-      "minutes",
-    );
-
-    truncatedBase.startTime = startOfRange;
-    truncatedBase.truncated = [...(truncatedBase.truncated ?? []), "left"];
-  }
-
-  if (end.isAfter(endOfRange)) {
-    truncatedBase.durationMinutes = m.getDiffInMinutes(
-      truncatedBase.startTime,
-      endOfRange,
-    );
-
-    truncatedBase.truncated = [...(truncatedBase.truncated ?? []), "right"];
-  }
-
-  return truncatedBase;
+  return clipToRowRange(timeBlock, {
+    start: range.start.clone().startOf("day"),
+    end: range.end.clone().add(1, "day").startOf("day"),
+  });
 }
 
 export function removeTimeRangeFromStartOfLine(text: string) {
@@ -325,32 +343,14 @@ export function isTimeEqual(a: EditableTimeBlock, b: EditableTimeBlock) {
   );
 }
 
-/**
- * Pulls a block's start and end inside `range` at exact time precision. Unlike
- * {@link truncateToDayRange} it does not snap to day boundaries and does not
- * mark the block as truncated.
- */
-export function clampToTimeRange<T extends WithDuration<TimeBlock>>(
-  timeBlock: T,
-  range: m.Range,
-): T {
-  const { start, end } = range;
+export function getCutEdges(timeBlock: TimeBlock): Side[] {
+  const cutEdges = timeBlock.truncated ?? [];
 
-  const clampedStartTime = timeBlock.startTime.isBefore(start)
-    ? start
-    : timeBlock.startTime;
-  const endTime = getEndTime(timeBlock);
-  const clampedEndTime = endTime.isAfter(end) ? end : endTime;
-  const clampedDurationMinutes = clampedEndTime.diff(
-    clampedStartTime,
-    "minutes",
-  );
+  if (!isLocal(timeBlock) || !isLog(timeBlock) || !timeBlock.isRunning) {
+    return cutEdges;
+  }
 
-  return {
-    ...timeBlock,
-    startTime: clampedStartTime,
-    durationMinutes: clampedDurationMinutes,
-  };
+  return cutEdges.includes("bottom") ? cutEdges : [...cutEdges, "bottom"];
 }
 
 export function getBlockProps(

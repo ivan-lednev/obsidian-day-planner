@@ -22,9 +22,14 @@ import type { createRenderMarkdown } from "./util/create-render-markdown";
 import { type ShowPreview } from "./util/create-show-preview";
 import type { Scheduler } from "./util/scheduler";
 
-export type OnUpdateFn = (
-  base: Array<EditableTimeBlock>,
-  next: Array<EditableTimeBlock>,
+/**
+ * Writes an edit back to the vault, resolving to whether it went through.
+ * Planner blocks go through the transaction writer, log blocks get patched in
+ * place by the log entry editor, so the two differ in the block they take.
+ */
+export type OnUpdateFn<Block = EditableTimeBlock> = (
+  base: Array<Block>,
+  next: Array<Block>,
   mode: EditMode,
 ) => Promise<boolean>;
 
@@ -62,6 +67,7 @@ export interface ObsidianContext {
   renderMarkdown: RenderMarkdown;
   toggleCheckboxInFile: VaultFacade["toggleCheckboxInFile"];
   editContext: ReturnType<typeof useEditContext>;
+  isEditing: Readable<boolean>;
   showPreview: ShowPreview;
   isModPressed: Readable<boolean>;
   reSync: () => void;
@@ -73,7 +79,7 @@ export interface ObsidianContext {
   logEntryEditor: LogEntryEditor;
   openLogEntryEditModal: OpenLogEntryEditModal;
   openTimelineSettingsModal: OpenTimelineSettingsModal;
-  openClockInOnAnythingModal: () => void;
+  openClockInOnAnythingModal: () => Promise<void>;
   // todo: rename to promptUserToEditText
   editText: (props: {
     initialText?: string;

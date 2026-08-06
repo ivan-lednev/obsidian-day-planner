@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
+  import type { Attachment } from "svelte/attachments";
   import { on } from "svelte/events";
 
   import { getObsidianContext } from "../../context/obsidian-context";
@@ -20,23 +21,14 @@
 
   const { startScroll, stopScroll } = createAutoScroll();
 
-  const {
-    editContext: { editOperation },
-  } = getObsidianContext();
+  const { isEditing } = getObsidianContext();
 
-  function blockPanOnEdit(el: HTMLElement) {
-    const off = on(el, "touchmove", (event) => {
-      if ($editOperation) {
+  const blockPanOnEdit: Attachment<HTMLElement> = (el) =>
+    on(el, "touchmove", (event) => {
+      if ($isEditing) {
         event.preventDefault();
       }
     });
-
-    return {
-      destroy() {
-        off();
-      },
-    };
-  }
 </script>
 
 <div
@@ -50,7 +42,7 @@
   }}
   onpointerleave={stopScroll}
   onpointermove={(event) => {
-    if (!$editOperation || !el) {
+    if (!$isEditing || !el) {
       return;
     }
 
@@ -65,7 +57,7 @@
     }
   }}
   {onscroll}
-  use:blockPanOnEdit
+  {@attach blockPanOnEdit}
 >
   {@render children(isUnderCursor)}
 </div>

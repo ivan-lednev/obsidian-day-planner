@@ -1,18 +1,16 @@
-import { Array, pipe } from "effect";
-import type { Moment } from "moment";
-import { derived, type Readable, writable } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
-import { addHorizontalPlacing } from "../../../overlap/overlap";
-import type { PeriodicNotes } from "../../../service/periodic-notes";
-import { WorkspaceFacade } from "../../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../../settings";
 import type {
+  EditableLogTimeBlock,
   EditableTimeBlock,
+  LogTimeBlock,
   RemoteTimeBlock,
-  TimelineTimeBlock,
-  WithPlacing,
-  WithDuration,
 } from "../../../time-block-types";
+import {
+  getAllDayTimeBlocksInRange,
+  getVisibleTimeBlocks,
+} from "../../../timeline-layout";
 import type {
   OnEditAbortedFn,
   OnUpdateFn,
@@ -21,236 +19,94 @@ import type {
 import * as m from "../../../util/moment";
 import * as t from "../../../util/time-block-utils";
 
-import { createEditHandlers } from "./create-edit-handlers";
 import { useCursor } from "./cursor";
-import { transform } from "./transform/transform";
-import type { EditOperation } from "./types";
-import { useEditActions } from "./use-edit-actions";
-
-function groupByDay(timeBlocks: TimelineTimeBlock[]) {
-  return timeBlocks.reduce<
-    Record<
-      string,
-      { withTime: TimelineTimeBlock[]; noTime: TimelineTimeBlock[] }
-    >
-  >((result, timeBlock) => {
-    const key = t.getDayKey(timeBlock.startTime);
-
-    if (!result[key]) {
-      result[key] = { withTime: [], noTime: [] };
-    }
-
-    if (timeBlock.isAllDayEvent) {
-      result[key].noTime.push(timeBlock);
-    } else {
-      result[key].withTime.push(timeBlock);
-    }
-
-    return result;
-  }, {});
-}
+import { createLane } from "./lane";
 
 export function useEditContext(props: {
-  workspaceFacade: WorkspaceFacade;
-  periodicNotes: PeriodicNotes;
   onUpdate: OnUpdateFn;
+  onLogUpdate: OnUpdateFn<EditableLogTimeBlock>;
   settingsStore: Readable<DayPlannerSettings>;
   localTimeBlocks: Readable<EditableTimeBlock[]>;
+  logTimeBlocks: Readable<LogTimeBlock[]>;
   remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
   pointerDateTime: Readable<PointerDateTime>;
   abortEditTrigger: Readable<unknown>;
   onEditAborted: OnEditAbortedFn;
 }) {
   const {
-    workspaceFacade,
-    periodicNotes,
     onEditAborted,
     onUpdate,
+    onLogUpdate,
     settingsStore,
     localTimeBlocks,
+    logTimeBlocks,
     remoteTimeBlocks,
     pointerDateTime,
     abortEditTrigger,
   } = props;
 
-  const editOperation = writable<EditOperation | undefined>(
-    undefined,
-    (set, updateEditOperation) => {
-      const unsubscribe = abortEditTrigger.subscribe(() => {
-        updateEditOperation((currentEditOperation) => {
-          if (currentEditOperation !== undefined) {
-            onEditAborted();
-          }
-
-          return undefined;
-        });
-      });
-
-      return unsubscribe;
-    },
-  );
-  const cursor = useCursor(editOperation);
-
   const localFilteredTimeBlocks = derived(
     [localTimeBlocks, settingsStore],
     ([$localTimeBlocks, $settingsStore]) =>
-      $settingsStore.showCompletedTasks
-        ? $localTimeBlocks
-        : $localTimeBlocks.filter(
-            (it) => !it.task || it.task.toLowerCase() !== "x",
-          ),
+      getVisibleTimeBlocks($localTimeBlocks, $settingsStore),
   );
 
-  const baselineTimeBlocks = writable<EditableTimeBlock[]>([], (set) => {
-    return localFilteredTimeBlocks.subscribe(set);
-  });
-
-  const timeBlocksWithPendingUpdate = derived(
-    [editOperation, baselineTimeBlocks, settingsStore, pointerDateTime],
-    ([
-      $editOperation,
-      $baselineTimeBlocks,
-      $settingsStore,
-      $pointerDateTime,
-    ]) => {
-      return $editOperation
-        ? transform(
-            $baselineTimeBlocks,
-            $editOperation,
-            $settingsStore,
-            $pointerDateTime,
-          )
-        : $baselineTimeBlocks;
-    },
-  );
-
-  const { startEdit, confirmEdit, cancelEdit } = useEditActions({
-    editOperation,
-    baselineTimeBlocks,
-    timeBlocksWithPendingUpdate,
+  const plan = createLane<EditableTimeBlock, RemoteTimeBlock>({
+    timeBlocks: localFilteredTimeBlocks,
+    readonlyTimeBlocks: remoteTimeBlocks,
+    createBlock: t.create,
+    copyBlock: t.copy,
     onUpdate,
-  });
-
-  const handlers = createEditHandlers({
-    periodicNotes,
-    pointerDateTime,
-    workspaceFacade,
-    startEdit,
-    editOperation,
     settingsStore,
+    pointerDateTime,
+    abortEditTrigger,
+    onEditAborted,
   });
 
-  const combinedTimeBlocks = derived(
-    [remoteTimeBlocks, timeBlocksWithPendingUpdate],
-    ([
-      $remoteTimeBlocks,
-      $timeBlocksWithPendingUpdate,
-    ]): TimelineTimeBlock[] => [
-      ...$remoteTimeBlocks,
-      ...$timeBlocksWithPendingUpdate,
-    ],
-  );
-
-  const dayToDisplayedTimeBlocks = derived(
-    combinedTimeBlocks,
-    ($combinedTimeBlocks) => {
-      const split: TimelineTimeBlock[] = $combinedTimeBlocks.flatMap(
-        (timeBlock): TimelineTimeBlock[] | TimelineTimeBlock => {
-          if (!t.isWithDuration(timeBlock) || timeBlock.isAllDayEvent) {
-            return timeBlock;
-          }
-
-          const daySpan = t
-            .getEndTime(timeBlock)
-            .diff(timeBlock.startTime, "days");
-          const shouldGoToMultiDayRow = daySpan > 1;
-
-          if (shouldGoToMultiDayRow) {
-            return timeBlock;
-          }
-
-          const chunks = m.splitMultiday(
-            timeBlock.startTime,
-            t.getEndTime(timeBlock),
-          );
-
-          return chunks.map(([startTime, endTime]) => ({
-            ...timeBlock,
-            startTime,
-            durationMinutes: m.getDiffInMinutes(startTime, endTime),
-          }));
-        },
-      );
-
-      return groupByDay(split);
+  // Log blocks skip `getVisibleTimeBlocks`: hiding a clock because the task it
+  // belongs to is done would hide time that was actually spent.
+  const log = createLane<EditableLogTimeBlock>({
+    timeBlocks: logTimeBlocks,
+    createBlock: t.createLog,
+    copyBlock: () => {
+      throw new Error("Copying clocks is not implemented yet");
     },
-  );
+    onUpdate: onLogUpdate,
+    settingsStore,
+    pointerDateTime,
+    abortEditTrigger,
+    onEditAborted,
+  });
 
-  const getDisplayedAllDayTimeBlocksForMultiDayRow = derived(
-    [combinedTimeBlocks],
-    ([$combinedTimeBlocks]) =>
-      (range: m.Range) => {
-        const startOfRange = range.start.clone().startOf("day");
-        const endOfRange = range.end.clone().add(1, "day").startOf("day");
-
-        return $combinedTimeBlocks
-          .filter((timeBlock) => {
-            // TODO: a limitation to be removed later
-            if (!timeBlock.isAllDayEvent) {
-              return false;
-            }
-
-            if (t.isWithDuration(timeBlock)) {
-              return m.doesOverlapWithRange(
-                {
-                  start: timeBlock.startTime,
-                  end: t.getEndTime(timeBlock),
-                },
-                { start: startOfRange, end: endOfRange },
-              );
-            }
-
-            return m.isWithinRange(timeBlock.startTime, range);
-          })
-          .map(
-            (timeBlock): TimelineTimeBlock =>
-              t.isWithDuration(timeBlock)
-                ? t.truncateToDayRange(timeBlock, range)
-                : timeBlock,
-          );
-      },
-  );
-
-  function getDisplayedTimeBlocksForTimeline(day: Moment) {
-    return derived(dayToDisplayedTimeBlocks, ($dayToDisplayedTimeBlocks) => {
-      const timeBlocksForDay =
-        $dayToDisplayedTimeBlocks[t.getDayKey(day)] ||
-        t.getEmptyTimeBlocksForDay();
-
-      const withTime: Array<WithPlacing<WithDuration<TimelineTimeBlock>>> =
-        // todo: fix `as`
-        pipe(
-          timeBlocksForDay.withTime as Array<WithDuration<TimelineTimeBlock>>,
-          Array.dedupeWith((a, b) => t.getRenderKey(a) === t.getRenderKey(b)),
-          addHorizontalPlacing,
-        );
-
-      return {
-        ...timeBlocksForDay,
-        withTime,
-      };
-    });
+  async function confirmEdit() {
+    await Promise.all([plan.confirmEdit(), log.confirmEdit()]);
   }
 
+  function cancelEdit() {
+    plan.cancelEdit();
+    log.cancelEdit();
+  }
+
+  const editOperation = derived(
+    [plan.editOperation, log.editOperation],
+    ([$planEditOperation, $logEditOperation]) =>
+      $planEditOperation ?? $logEditOperation,
+  );
+
+  const cursor = useCursor(editOperation);
+
+  const getDisplayedAllDayTimeBlocksForMultiDayRow = derived(
+    plan.displayedTimeBlocks,
+    ($displayedTimeBlocks) => (range: m.Range) =>
+      getAllDayTimeBlocksInRange($displayedTimeBlocks, range),
+  );
+
   return {
-    handlers,
+    lanes: { plan, log },
     cursor,
-    dayToDisplayedTimeBlocks,
+    editOperation,
     confirmEdit,
     cancelEdit,
-    editOperation,
-    getDisplayedTimeBlocksForTimeline,
-    getDisplayedAllDayTimeBlocksForMultiDayRow:
-      getDisplayedAllDayTimeBlocksForMultiDayRow,
+    getDisplayedAllDayTimeBlocksForMultiDayRow,
   };
 }

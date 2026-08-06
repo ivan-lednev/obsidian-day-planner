@@ -7,7 +7,7 @@
     WithPlacing,
     WithDuration,
   } from "../../time-block-types";
-  import type { ActionArray } from "../actions/use-actions";
+  import { getCutEdges } from "../../util/time-block-utils";
   import {
     useColoredTimeline,
     useColorsForRelationToNow,
@@ -20,7 +20,6 @@
   }: {
     children: Snippet;
     timeBlock: WithPlacing<WithDuration<TimeBlock>>;
-    use?: ActionArray;
   } = $props();
 
   const { height, offset, width, left } = $derived(
@@ -30,7 +29,7 @@
   const relationToNow = $derived(useColorsForRelationToNow(timeBlock));
 
   const padding = $derived(
-    timeBlock.truncated?.includes("bottom") ? "0 1px 0" : undefined,
+    getCutEdges(timeBlock).includes("bottom") ? "0 1px 0" : undefined,
   );
 
   const coloredTimeline = $derived(useColoredTimeline(timeBlock));

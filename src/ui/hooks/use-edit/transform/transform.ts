@@ -1,10 +1,9 @@
 import { isNotVoid } from "typed-assert";
 
 import type { DayPlannerSettings } from "../../../../settings";
-import { type EditableTimeBlock } from "../../../../time-block-types";
 import type { PointerDateTime } from "../../../../types";
 import * as t from "../../../../util/time-block-utils";
-import { EditMode, type EditOperation } from "../types";
+import { EditMode, type EditableInterval } from "../types";
 
 import { editBlocks } from "./edit-blocks";
 
@@ -49,12 +48,12 @@ function getEditInteraction(mode: EditMode) {
   return "none";
 }
 
-export function transform(
-  baseline: EditableTimeBlock[],
-  operation: EditOperation,
+export function transform<Block extends EditableInterval>(
+  baseline: Block[],
+  operation: { timeBlock: Block; mode: EditMode },
   settings: DayPlannerSettings,
   pointerDateTime: PointerDateTime,
-) {
+): Block[] {
   const result = baseline.slice();
 
   const isInBaseline = baseline.find(

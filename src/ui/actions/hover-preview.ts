@@ -1,11 +1,23 @@
+import type { Attachment } from "svelte/attachments";
 import { derived, writable } from "svelte/store";
 
 import { getObsidianContext } from "../../context/obsidian-context";
-import { isListItemSourced, type LocalTimeBlock } from "../../time-block-types";
+import {
+  isListItemSourced,
+  isUnwritten,
+  type LocalTimeBlock,
+} from "../../time-block-types";
 
-export function hoverPreview(timeBlock: LocalTimeBlock) {
-  return (el: HTMLElement) => {
-    const { isModPressed, showPreview } = getObsidianContext();
+export function hoverPreview(
+  timeBlock: LocalTimeBlock,
+): Attachment<HTMLElement> {
+  return (el) => {
+    const {
+      isModPressed,
+      showPreview,
+      editContext: { editOperation },
+    } = getObsidianContext();
+
     let currentEvent: MouseEvent | undefined;
 
     const hovering = writable(false);
@@ -15,7 +27,7 @@ export function hoverPreview(timeBlock: LocalTimeBlock) {
       hovering.set(true);
     }
 
-    function handleMouseLeave(event: MouseEvent) {
+    function handleMouseLeave() {
       currentEvent = undefined;
       hovering.set(false);
     }
@@ -24,10 +36,9 @@ export function hoverPreview(timeBlock: LocalTimeBlock) {
     el.addEventListener("mouseleave", handleMouseLeave);
 
     const shouldShowPreview = derived(
-      [isModPressed, hovering],
-      ([$isModPressed, $hovering]) => {
-        return $isModPressed && $hovering;
-      },
+      [isModPressed, hovering, editOperation],
+      ([$isModPressed, $hovering, $editOperation]) =>
+        $isModPressed && $hovering && !$editOperation,
     );
 
     const unsubscribe = shouldShowPreview.subscribe((newValue) => {
@@ -35,7 +46,7 @@ export function hoverPreview(timeBlock: LocalTimeBlock) {
         return;
       }
 
-      if (timeBlock.source === "unwritten") {
+      if (isUnwritten(timeBlock)) {
         return;
       }
 
@@ -49,12 +60,10 @@ export function hoverPreview(timeBlock: LocalTimeBlock) {
       );
     });
 
-    return {
-      destroy() {
-        el.removeEventListener("mouseenter", handleMouseEnter);
-        el.removeEventListener("mouseleave", handleMouseLeave);
-        unsubscribe();
-      },
+    return () => {
+      el.removeEventListener("mouseenter", handleMouseEnter);
+      el.removeEventListener("mouseleave", handleMouseLeave);
+      unsubscribe();
     };
   };
 }

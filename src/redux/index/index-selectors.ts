@@ -1,10 +1,8 @@
 import type { Moment } from "moment";
 import { isNotVoid } from "typed-assert";
 
-import { addHorizontalPlacing } from "../../overlap/overlap";
 import type { LogTimeBlock } from "../../time-block-types";
-import { strictParse, toMinutePrecision } from "../../util/moment";
-import { clampToTimeRange } from "../../util/time-block-utils";
+import { toMinutePrecision } from "../../util/moment";
 import { createAppSelector } from "../create-app-selector";
 import { selectVisibleDays } from "../date-ranges-slice";
 
@@ -25,59 +23,57 @@ import {
   type ClosedLogEntry,
 } from "./index-slice";
 
-export const selectLogTimeBlocksForDay = createAppSelector(
+/**
+ * Blocks are returned with their full time span. Clipping them to a day and
+ * laying them out is a view concern, so it happens after the edit transform,
+ * next to where planner blocks get laid out.
+ */
+export const selectLogTimeBlocksForVisibleDays = createAppSelector(
   [
     selectLogEntriesByDay,
     selectLogEntriesById,
     selectListItemEntriesById,
     selectFileEntriesById,
-    (state, dayKey: string) => dayKey,
-    (state, dayKey, currentTime: Moment) => currentTime,
+    selectVisibleDays,
+    (state, currentTime: Moment) => toMinutePrecision(currentTime).valueOf(),
   ],
-  (byDay, byId, listItemEntriesById, fileEntriesById, dayKey, currentTime) => {
-    const parsedDay = strictParse(dayKey);
-    const startOfDay = parsedDay.clone().startOf("day");
-    const endOfDay = toMinutePrecision(parsedDay.clone().endOf("day"));
-    const isDayKeyForToday = parsedDay.isSame(currentTime, "day");
+  (
+    byDay,
+    byId,
+    listItemEntriesById,
+    fileEntriesById,
+    dayKeys,
+    minuteTimestamp,
+  ) => {
+    const currentTime = window.moment(minuteTimestamp);
 
-    const uniqueLogEntryIds = Object.keys(byDay[dayKey] || {});
-
-    const inflatedTimeBlocksWithoutActiveClocks = uniqueLogEntryIds.map(
-      (logEntryId) => {
-        const logEntry = byId[logEntryId];
-
-        isNotVoid(
-          logEntry,
-          `Inconsistent store state: expected to find log entry by id ${logEntryId}`,
-        );
-
-        const entry =
-          listItemEntriesById[logEntry.parentId] ??
-          fileEntriesById[logEntry.parentId];
-
-        isNotVoid(
-          entry,
-          `Inconsistent store state: parent entry not found for log entry ${logEntryId}`,
-        );
-
-        const timeBlock = logEntryToTimeBlock({
-          logEntry,
-          parentEntry: entry,
-          currentTime,
-        });
-
-        const clamped = clampToTimeRange(timeBlock, {
-          start: startOfDay,
-          end: endOfDay,
-        });
-
-        return timeBlock.isRunning && isDayKeyForToday
-          ? { ...clamped, truncated: ["bottom" as const] }
-          : clamped;
-      },
+    const uniqueLogEntryIds = new Set(
+      dayKeys.flatMap((dayKey) => Object.keys(byDay[dayKey] || {})),
     );
 
-    return addHorizontalPlacing(inflatedTimeBlocksWithoutActiveClocks);
+    return [...uniqueLogEntryIds].map((logEntryId) => {
+      const logEntry = byId[logEntryId];
+
+      isNotVoid(
+        logEntry,
+        `Inconsistent store state: expected to find log entry by id ${logEntryId}`,
+      );
+
+      const entry =
+        listItemEntriesById[logEntry.parentId] ??
+        fileEntriesById[logEntry.parentId];
+
+      isNotVoid(
+        entry,
+        `Inconsistent store state: parent entry not found for log entry ${logEntryId}`,
+      );
+
+      return logEntryToTimeBlock({
+        logEntry,
+        parentEntry: entry,
+        currentTime,
+      });
+    });
   },
 );
 
@@ -179,44 +175,6 @@ export const selectPlanTimeBlocksForVisibleDays = createAppSelector(
     selectPlanEntriesById,
     selectListItemEntriesById,
     selectVisibleDays,
-  ],
-  // todo: copy-pasta. Can we re-use it without breaking caching?
-  (planEntriesByDay, planEntriesById, listItemEntriesById, dayKeys) => {
-    const uniquePlanEntryIds = new Set(
-      dayKeys.flatMap((dayKey) => Object.keys(planEntriesByDay[dayKey] || {})),
-    );
-
-    return (
-      [...uniquePlanEntryIds]?.map((id) => {
-        const planEntry = planEntriesById[id];
-
-        isNotVoid(planEntry, "Inconsistent index state");
-
-        const listItemEntry = listItemEntriesById[planEntry.parentId];
-
-        isNotVoid(listItemEntry, "Inconsistent index state");
-
-        const withChildren = inflateChildren(
-          listItemEntry,
-          listItemEntriesById,
-        );
-
-        return planEntryToTimeBlock({
-          planEntry,
-          parentEntry: listItemEntry,
-          listItemEntryWithChildren: withChildren,
-        });
-      }) || []
-    );
-  },
-);
-
-export const selectPlanTimeBlocksForDays = createAppSelector(
-  [
-    selectPlanEntriesByDay,
-    selectPlanEntriesById,
-    selectListItemEntriesById,
-    (state, dayKeys: string[]) => dayKeys,
   ],
   (planEntriesByDay, planEntriesById, listItemEntriesById, dayKeys) => {
     const uniquePlanEntryIds = new Set(

@@ -8,7 +8,6 @@
 
   import { getObsidianContext } from "../../context/obsidian-context";
   import type { EditableTimeBlock } from "../../time-block-types";
-  import * as t from "../../util/time-block-utils";
   import { createGestures } from "../actions/gestures";
   import { EditMode } from "../hooks/use-edit/types";
 
@@ -20,9 +19,7 @@
   export let timeBlock: EditableTimeBlock;
 
   const {
-    editContext: {
-      handlers: { handleGripMouseDown },
-    },
+    editContext: { lanes },
   } = getObsidianContext();
 </script>
 
@@ -31,11 +28,10 @@
     <BlockControlButton
       cursor="grab"
       label="Move block"
-      use={[
-        createGestures({
-          onpanmove: () => handleGripMouseDown(timeBlock, EditMode.DRAG),
-        }),
-      ]}
+      {@attach createGestures({
+        onpanmove: () =>
+          lanes.plan.startEdit({ timeBlock, mode: EditMode.DRAG }),
+      })}
     >
       <GripVertical class="svg-icon" />
     </BlockControlButton>
@@ -44,12 +40,9 @@
     <BlockControlButton
       cursor="grab"
       label="Copy block"
-      use={[
-        createGestures({
-          onpanmove: () =>
-            handleGripMouseDown(t.copy(timeBlock), EditMode.DRAG),
-        }),
-      ]}
+      {@attach createGestures({
+        onpanmove: () => lanes.plan.startCopy(timeBlock),
+      })}
     >
       <Copy class="svg-icon" />
     </BlockControlButton>
@@ -58,24 +51,26 @@
       <BlockControlButton
         cursor="grab"
         label="Move block and push neighboring blocks"
-        use={[
-          createGestures({
-            onpanmove: () =>
-              handleGripMouseDown(timeBlock, EditMode.DRAG_AND_SHIFT_OTHERS),
-          }),
-        ]}
+        {@attach createGestures({
+          onpanmove: () =>
+            lanes.plan.startEdit({
+              timeBlock,
+              mode: EditMode.DRAG_AND_SHIFT_OTHERS,
+            }),
+        })}
       >
         <ArrowDownToLine class="svg-icon" />
       </BlockControlButton>
       <BlockControlButton
         cursor="grab"
         label="Move block and shrink neighboring blocks"
-        use={[
-          createGestures({
-            onpanmove: () =>
-              handleGripMouseDown(timeBlock, EditMode.DRAG_AND_SHRINK_OTHERS),
-          }),
-        ]}
+        {@attach createGestures({
+          onpanmove: () =>
+            lanes.plan.startEdit({
+              timeBlock,
+              mode: EditMode.DRAG_AND_SHRINK_OTHERS,
+            }),
+        })}
       >
         <FoldVertical class="svg-icon" />
       </BlockControlButton>

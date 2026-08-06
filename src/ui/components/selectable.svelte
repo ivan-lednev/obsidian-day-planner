@@ -1,16 +1,17 @@
 <script lang="ts">
   import { type Snippet } from "svelte";
+  import type { Attachment } from "svelte/attachments";
 
   import { MouseButton, vibrationDurationMillis } from "../../constants";
   import { isTouchEvent } from "../../util/dom";
   import { createGestures } from "../actions/gestures";
   import { pointerUpOutside } from "../actions/pointer-up-outside";
-  import type { HTMLActionArray } from "../actions/use-actions";
 
   type SelectionState = "primary" | "secondary" | "none";
 
   interface ChildrenProps {
-    use: HTMLActionArray;
+    gestures: Attachment<HTMLElement>;
+    clearOnPointerUpOutside: Attachment<HTMLElement>;
     state: SelectionState;
     onpointerup: (event: PointerEvent) => void;
   }
@@ -66,18 +67,17 @@
     onSecondarySelect?.(event);
   }
 
-  const use = [
-    createGestures({
-      ontap: () => {
-        setPrimary();
-      },
-      onlongpress: (event) => {
-        setSecondary(event);
-      },
-      options: { mouseSupport: false },
-    }),
-    pointerUpOutside(clear),
-  ];
+  const gestures = createGestures({
+    ontap: () => {
+      setPrimary();
+    },
+    onlongpress: (event) => {
+      setSecondary(event);
+    },
+    options: { mouseSupport: false },
+  });
+
+  const clearOnPointerUpOutside = pointerUpOutside(clear);
 
   function handlePointerUp(event: PointerEvent) {
     if (isTouchEvent(event)) {
@@ -100,4 +100,9 @@
   }}
 />
 
-{@render children({ use, state, onpointerup: handlePointerUp })}
+{@render children({
+  gestures,
+  clearOnPointerUpOutside,
+  state,
+  onpointerup: handlePointerUp,
+})}
