@@ -98,9 +98,7 @@ describe("Task views", () => {
     });
 
     const displayedTimeBlocks = get(
-      editContext.getDisplayedTimeBlocksForTimeline(
-        window.moment("2025-07-19"),
-      ),
+      editContext.lanes.plan.getTimeBlocksForDay(window.moment("2025-07-19")),
     );
 
     expect(displayedTimeBlocks).toContainEqual(

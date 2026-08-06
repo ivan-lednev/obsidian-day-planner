@@ -50,14 +50,10 @@ export function setUp({
   settings?: DayPlannerSettings;
 } = {}) {
   const props = createProps({ timeBlocks, settings });
-  const {
-    lanes,
-    getDisplayedTimeBlocksForTimeline,
-    getDisplayedAllDayTimeBlocksForMultiDayRow,
-    confirmEdit,
-  } = useEditContext(props);
+  const { lanes, getDisplayedAllDayTimeBlocksForMultiDayRow, confirmEdit } =
+    useEditContext(props);
 
-  const blocksForDay = getDisplayedTimeBlocksForTimeline(day);
+  const blocksForDay = lanes.plan.getTimeBlocksForDay(day);
 
   // this prevents the store from resetting;
   blocksForDay.subscribe(Function.constVoid);
@@ -74,7 +70,7 @@ export function setUp({
   }
 
   function getBlocksForDay(dayKey: string) {
-    return get(getDisplayedTimeBlocksForTimeline(moment(dayKey)));
+    return get(lanes.plan.getTimeBlocksForDay(moment(dayKey)));
   }
 
   return {

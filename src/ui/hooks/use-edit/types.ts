@@ -19,8 +19,6 @@ export type EditableInterval = TimeInterval & {
 
 /**
  * Planner and tracker blocks keep separate baselines and separate write paths.
- * An operation lives in the store of the lane it belongs to, so the kind of
- * block it edits is known statically and never has to be tested for.
  */
 export interface EditOperation<Block extends EditableInterval> {
   timeBlock: Block;

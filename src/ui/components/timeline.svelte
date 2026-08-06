@@ -30,13 +30,7 @@
 
   const {
     settingsStore,
-    editContext: {
-      confirmEdit,
-      lanes,
-      getDisplayedTimeBlocksForTimeline,
-      getDisplayedLogTimeBlocksForTimeline,
-      editOperation,
-    },
+    editContext: { confirmEdit, lanes, editOperation },
     pointerDateTime,
     settingsSignal,
     useSelector,
@@ -46,10 +40,10 @@
   } = getObsidianContext();
 
   const displayedTimeBlocksForTimeline = $derived(
-    getDisplayedTimeBlocksForTimeline(day),
+    lanes.plan.getTimeBlocksForDay(day),
   );
   const displayedLogTimeBlocksForTimeline = $derived(
-    getDisplayedLogTimeBlocksForTimeline(day),
+    lanes.log.getTimeBlocksForDay(day),
   );
 
   const logEntriesById = useSelector(selectLogEntriesById);

@@ -1,7 +1,10 @@
-import { derived, get, type Readable, writable } from "svelte/store";
+import type { Moment } from "moment";
+import { derived, get, readable, type Readable, writable } from "svelte/store";
 
 import { vibrationDurationMillis } from "../../../constants";
 import type { DayPlannerSettings } from "../../../settings";
+import type { TimeBlock } from "../../../time-block-types";
+import { layOutDayColumn } from "../../../timeline-layout";
 import type {
   OnEditAbortedFn,
   OnUpdateFn,
@@ -9,24 +12,31 @@ import type {
 } from "../../../types";
 
 import { transform } from "./transform/transform";
-import type { EditableInterval, EditOperation } from "./types";
+import { EditMode, type EditableInterval, type EditOperation } from "./types";
 
-/**
- * A lane is one editable column: its own baseline, its own edit operation and
- * its own way of writing changes back. Since an operation cannot leave the lane
- * it started in, nothing downstream has to ask which kind of block it holds.
- */
-export function createLane<Block extends EditableInterval>(props: {
-  source: Readable<Block[]>;
-  write: OnUpdateFn<Block>;
+export function createLane<
+  Block extends TimeBlock & EditableInterval,
+  ReadonlyBlock extends TimeBlock = never,
+>(props: {
+  timeBlocks: Readable<Block[]>;
+  readonlyTimeBlocks?: Readable<ReadonlyBlock[]>;
+  createBlock: (props: {
+    startTime: Moment;
+    settings: DayPlannerSettings;
+  }) => Block;
+  copyBlock: (timeBlock: Block) => Block;
+  onUpdate: OnUpdateFn<Block>;
   settingsStore: Readable<DayPlannerSettings>;
   pointerDateTime: Readable<PointerDateTime>;
   abortEditTrigger: Readable<unknown>;
   onEditAborted: OnEditAbortedFn;
 }) {
   const {
-    source,
-    write,
+    timeBlocks,
+    readonlyTimeBlocks = readable<ReadonlyBlock[]>([]),
+    createBlock,
+    copyBlock,
+    onUpdate,
     settingsStore,
     pointerDateTime,
     abortEditTrigger,
@@ -50,7 +60,7 @@ export function createLane<Block extends EditableInterval>(props: {
     },
   );
 
-  const baseline = writable<Block[]>([], (set) => source.subscribe(set));
+  const baseline = writable<Block[]>([], (set) => timeBlocks.subscribe(set));
 
   const pendingUpdate = derived(
     [editOperation, baseline, settingsStore, pointerDateTime],
@@ -59,6 +69,20 @@ export function createLane<Block extends EditableInterval>(props: {
         ? transform($baseline, $editOperation, $settingsStore, $pointerDateTime)
         : $baseline,
   );
+
+  const displayedTimeBlocks = derived(
+    [readonlyTimeBlocks, pendingUpdate],
+    ([$readonlyTimeBlocks, $pendingUpdate]): Array<Block | ReadonlyBlock> => [
+      ...$readonlyTimeBlocks,
+      ...$pendingUpdate,
+    ],
+  );
+
+  function getTimeBlocksForDay(day: Moment) {
+    return derived(displayedTimeBlocks, ($displayedTimeBlocks) =>
+      layOutDayColumn({ timeBlocks: $displayedTimeBlocks, day }),
+    );
+  }
 
   function getUnderlyingTimeBlockWithoutSplitting(viewTimeBlock: Block) {
     return (
@@ -75,6 +99,23 @@ export function createLane<Block extends EditableInterval>(props: {
     editOperation.set({
       ...operation,
       timeBlock: getUnderlyingTimeBlockWithoutSplitting(operation.timeBlock),
+    });
+  }
+
+  function startCreate() {
+    startEdit({
+      timeBlock: createBlock({
+        startTime: get(pointerDateTime).dateTime,
+        settings: get(settingsStore),
+      }),
+      mode: EditMode.CREATE,
+    });
+  }
+
+  function startCopy(timeBlock: Block) {
+    startEdit({
+      timeBlock: copyBlock(getUnderlyingTimeBlockWithoutSplitting(timeBlock)),
+      mode: EditMode.DRAG,
     });
   }
 
@@ -95,7 +136,7 @@ export function createLane<Block extends EditableInterval>(props: {
     baseline.set(currentTimeBlocks);
     editOperation.set(undefined);
 
-    const succeeded = await write(
+    const succeeded = await onUpdate(
       oldBase,
       currentTimeBlocks,
       currentOperation.mode,
@@ -108,9 +149,11 @@ export function createLane<Block extends EditableInterval>(props: {
 
   return {
     editOperation,
-    pendingUpdate,
-    getUnderlyingTimeBlockWithoutSplitting,
+    displayedTimeBlocks,
+    getTimeBlocksForDay,
     startEdit,
+    startCreate,
+    startCopy,
     cancelEdit,
     confirmEdit,
   };

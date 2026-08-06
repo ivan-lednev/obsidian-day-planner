@@ -144,7 +144,7 @@ describe("Indexing", () => {
     const { editContext } = await setUp({ visibleDays: [getDayKey(now)] });
 
     const activeClock = get(
-      editContext.getDisplayedLogTimeBlocksForTimeline(now),
+      editContext.lanes.log.getTimeBlocksForDay(now),
     ).find((it) => it.text.includes("Task"));
 
     isNotVoid(activeClock);
@@ -163,7 +163,7 @@ describe("Indexing", () => {
     });
 
     const logTimeBlocksForYesterday = get(
-      editContext.getDisplayedLogTimeBlocksForTimeline(yesterday),
+      editContext.lanes.log.getTimeBlocksForDay(yesterday),
     );
 
     const activeClock = logTimeBlocksForYesterday.find((it) =>
