@@ -3,6 +3,7 @@ import { derived, type Readable, type Writable } from "svelte/store";
 
 import type { DayPlannerSettings } from "../../settings";
 import type {
+  EditableLogTimeBlock,
   EditableTimeBlock,
   LogTimeBlock,
   RemoteTimeBlock,
@@ -19,7 +20,7 @@ export function useTimeBlocks(props: {
   isOnline: Readable<boolean>;
   currentTime: Readable<Moment>;
   onUpdate: OnUpdateFn;
-  onLogUpdate: OnUpdateFn<LogTimeBlock>;
+  onLogUpdate: OnUpdateFn<EditableLogTimeBlock>;
   onEditAborted: OnEditAbortedFn;
   pointerDateTime: Readable<PointerDateTime>;
   remoteTimeBlocks: Readable<RemoteTimeBlock[]>;

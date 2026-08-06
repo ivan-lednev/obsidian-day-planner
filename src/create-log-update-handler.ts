@@ -4,8 +4,10 @@ import { clockFormat } from "./constants";
 import { selectLogEntriesById } from "./redux/index/index-slice";
 import type { RootState } from "./redux/store";
 import type { ClockLocation, LogEntryEditor } from "./service/log-entry-editor";
-import type { LogTimeBlock } from "./time-block-types";
+import type { EditableLogTimeBlock, LogTimeBlock } from "./time-block-types";
 import type { OnUpdateFn } from "./types";
+import type { PickClockTarget } from "./ui/clock-target-picker";
+import { EditMode } from "./ui/hooks/use-edit/types";
 import { runWithNoticeOnError } from "./util/effect";
 import { getEndTime } from "./util/time-block-utils";
 
@@ -15,7 +17,7 @@ function toClockLocation(timeBlock: LogTimeBlock): ClockLocation {
     : { path: timeBlock.path };
 }
 
-function hasMovedInTime(a: LogTimeBlock, b: LogTimeBlock) {
+function hasMovedInTime(a: EditableLogTimeBlock, b: EditableLogTimeBlock) {
   return (
     !a.startTime.isSame(b.startTime) || a.durationMinutes !== b.durationMinutes
   );
@@ -24,17 +26,45 @@ function hasMovedInTime(a: LogTimeBlock, b: LogTimeBlock) {
 export const createLogUpdateHandler = (props: {
   logEntryEditor: LogEntryEditor;
   getState: () => RootState;
-}): OnUpdateFn<LogTimeBlock> => {
-  const { logEntryEditor, getState } = props;
+  pickClockTarget: PickClockTarget;
+  onEditCanceled: () => void;
+}): OnUpdateFn<EditableLogTimeBlock> => {
+  const { logEntryEditor, getState, pickClockTarget, onEditCanceled } = props;
 
-  return async (base, next) => {
+  return async (base, next, mode) => {
+    if (mode === EditMode.CREATE) {
+      const created = next.find(
+        (timeBlock) => !base.some((it) => it.id === timeBlock.id),
+      );
+
+      isNotVoid(created);
+
+      const location = await pickClockTarget({
+        placeholder: "Log time on a task or a file...",
+        actionPurpose: "to log time",
+      });
+
+      if (!location) {
+        onEditCanceled();
+
+        return false;
+      }
+
+      return runWithNoticeOnError(
+        logEntryEditor.addClock(location, {
+          start: created.startTime.format(clockFormat),
+          end: getEndTime(created).format(clockFormat),
+        }),
+      );
+    }
+
     const editedTimeBlock = next.find((timeBlock) => {
       const timeBlockInBase = base.find((it) => it.id === timeBlock.id);
 
       return timeBlockInBase && hasMovedInTime(timeBlockInBase, timeBlock);
     });
 
-    if (!editedTimeBlock) {
+    if (!editedTimeBlock || editedTimeBlock.source === "unwrittenLog") {
       return true;
     }
 

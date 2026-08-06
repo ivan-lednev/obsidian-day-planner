@@ -68,7 +68,10 @@ import type {
   RemoteTimeBlock,
 } from "./time-block-types";
 import type { ObsidianContext, OnUpdateFn, PointerDateTime } from "./types";
-import { ClockInOnAnythingModal } from "./ui/clock-in-on-anything-modal";
+import {
+  ClockTargetModal,
+  type PickClockTarget,
+} from "./ui/clock-target-picker";
 import { askForConfirmation } from "./ui/confirmation-modal";
 import { createEditorMenuCallback } from "./ui/editor-menu";
 import { useTimeBlocks } from "./ui/hooks/use-time-blocks";
@@ -101,14 +104,26 @@ export default class DayPlanner extends Plugin {
   private metadataCacheFacade!: MetadataCacheFacade;
   private undoNotice!: UndoNotice;
 
-  private openClockInOnAnythingModal = () => {
-    new ClockInOnAnythingModal(
-      this.app,
-      this.searchService,
-      this.searchOrderingService,
-      this.vaultFacade,
-      this.logEntryEditor,
-    ).open();
+  private pickClockTarget: PickClockTarget = (labels) =>
+    new Promise((resolve) => {
+      new ClockTargetModal(
+        this.app,
+        this.searchService,
+        this.searchOrderingService,
+        this.vaultFacade,
+        resolve,
+        labels,
+      ).open();
+    });
+
+  private openClockInOnAnythingModal = async () => {
+    const location = await this.pickClockTarget();
+
+    if (!location) {
+      return;
+    }
+
+    await runWithNoticeOnError(this.logEntryEditor.clockIn(location));
   };
 
   async onload() {
@@ -516,6 +531,10 @@ export default class DayPlanner extends Plugin {
     const onLogUpdate = createLogUpdateHandler({
       logEntryEditor: this.logEntryEditor,
       getState: store.getState,
+      pickClockTarget: this.pickClockTarget,
+      onEditCanceled: () => {
+        new Notice("Edit canceled");
+      },
     });
 
     const onEditAborted = () => {

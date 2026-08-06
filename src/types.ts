@@ -79,7 +79,7 @@ export interface ObsidianContext {
   logEntryEditor: LogEntryEditor;
   openLogEntryEditModal: OpenLogEntryEditModal;
   openTimelineSettingsModal: OpenTimelineSettingsModal;
-  openClockInOnAnythingModal: () => void;
+  openClockInOnAnythingModal: () => Promise<void>;
   // todo: rename to promptUserToEditText
   editText: (props: {
     initialText?: string;

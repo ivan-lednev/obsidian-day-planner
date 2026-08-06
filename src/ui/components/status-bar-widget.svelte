@@ -35,7 +35,7 @@
     logEntryEditor: LogEntryEditor;
     workspaceFacade: WorkspaceFacade;
     openLogEntryEditModal: OpenLogEntryEditModal;
-    openClockInOnAnythingModal: () => void;
+    openClockInOnAnythingModal: () => Promise<void>;
   } = $props();
 
   const { current, next } = $derived(
@@ -58,9 +58,9 @@
 
   const newestActiveClock = $derived(newestActiveClockSignal.current);
 
-  function handleClockClick(event: MouseEvent) {
+  async function handleClockClick(event: MouseEvent) {
     if (!newestActiveClock) {
-      openClockInOnAnythingModal();
+      await openClockInOnAnythingModal();
 
       return;
     }

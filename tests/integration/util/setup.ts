@@ -30,6 +30,7 @@ import {
   defaultSettingsForTests,
 } from "../../../src/settings";
 import { type EditableTimeBlock } from "../../../src/time-block-types";
+import type { PickClockTarget } from "../../../src/ui/clock-target-picker";
 import { useTimeBlocks } from "../../../src/ui/hooks/use-time-blocks";
 import { createBackgroundBatchScheduler } from "../../../src/util/scheduler";
 import { getOneLineSummary } from "../../../src/util/time-block-utils";
@@ -135,6 +136,7 @@ export async function setUp(props?: {
 
   const onEditCanceled = vi.fn();
   const onEditConfirmed = vi.fn();
+  const pickClockTarget = vi.fn<PickClockTarget>().mockResolvedValue(undefined);
   const defaultPreloadedStateForTests: Partial<RootState> = {
     dateRanges: {
       ...initialState,
@@ -204,6 +206,8 @@ export async function setUp(props?: {
   const onLogUpdate = createLogUpdateHandler({
     logEntryEditor,
     getState,
+    pickClockTarget,
+    onEditCanceled,
   });
 
   const { timeBlocksWithTimeForToday, editContext, newlyStartedTimeBlocks } =
@@ -278,5 +282,6 @@ export async function setUp(props?: {
     metadataCache,
     yamlEditTargets,
     logEntryEditor,
+    pickClockTarget,
   };
 }

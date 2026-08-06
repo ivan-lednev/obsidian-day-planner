@@ -3,6 +3,7 @@ import moment from "moment";
 
 import type {
   EditableTimeBlock,
+  LogTimeBlock,
   WithPlacing,
   WithDuration,
 } from "../../../src/time-block-types";
@@ -91,3 +92,23 @@ export const baseTimeBlocks: [WithPlacing<WithDuration<EditableTimeBlock>>] = [
 export const timeBlocksWithUnscheduledTimeBlock: [EditableTimeBlock] = [
   unscheduledTimeBlock,
 ];
+
+export const emptyLogTimeBlocks: LogTimeBlock[] = [];
+
+export function createLogTimeBlock(
+  id: string,
+  overrides: Partial<{
+    startTime: Moment;
+    durationMinutes: number;
+    isRunning: boolean;
+  }> = {},
+): WithDuration<LogTimeBlock> {
+  return {
+    ...timeBlockDefaults,
+    source: "listItemLog",
+    id,
+    text: `text ${id}`,
+    isRunning: false,
+    ...overrides,
+  };
+}
