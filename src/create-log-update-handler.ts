@@ -21,11 +21,6 @@ function hasMovedInTime(a: LogTimeBlock, b: LogTimeBlock) {
   );
 }
 
-/**
- * Writes an edited clock straight through the log entry editor, unlike planner
- * blocks, which go through the transaction writer. This means log edits do not
- * join the undo history yet.
- */
 export const createLogUpdateHandler = (props: {
   logEntryEditor: LogEntryEditor;
   getState: () => RootState;
@@ -33,8 +28,6 @@ export const createLogUpdateHandler = (props: {
   const { logEntryEditor, getState } = props;
 
   return async (base, next) => {
-    // The tracker has no modes that move neighboring blocks, so an edit
-    // changes exactly one clock.
     const editedTimeBlock = next.find((timeBlock) => {
       const timeBlockInBase = base.find((it) => it.id === timeBlock.id);
 
