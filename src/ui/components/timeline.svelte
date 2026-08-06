@@ -7,7 +7,7 @@
   import { isToday } from "../../global-store/current-time";
   import { getVisibleHours } from "../../global-store/derived-settings";
   import { selectLogEntriesById } from "../../redux/index/index-slice";
-  import { isLog, type LogTimeBlock } from "../../time-block-types";
+  import type { LogTimeBlock } from "../../time-block-types";
   import { isTouchEvent } from "../../util/dom";
   import { getBlockProps } from "../../util/time-block-utils";
   import { createGestures } from "../actions/gestures";
@@ -87,62 +87,46 @@
     }
   }
 
-  const plannerPointer = trackPointerDateTime({
+  const pointer = trackPointerDateTime({
     getDay: () => day,
     pointerDateTime,
     settingsSignal,
   });
 
-  const trackerPointer = trackPointerDateTime({
-    getDay: () => day,
-    pointerDateTime,
-    settingsSignal,
-  });
+  let plannerBackgroundEl: HTMLDivElement | undefined = $state();
 
   function handleContainerPointerDown(event: MouseEvent | TouchEvent) {
-    plannerPointer.sync(event);
+    pointer.sync(event);
     startCreate();
   }
 
-  // Deliberately the block being edited and not `isEditing`: both columns share
-  // one pointer, so only the column that owns the edit may move it.
-  function handleContainerPointerMove(event: MouseEvent | TouchEvent) {
-    const operation = get(editOperation);
-
-    if (operation && !isLog(operation.timeBlock)) {
-      plannerPointer.sync(event);
-    }
-  }
-
-  function handleTrackerPointerMove(event: MouseEvent | TouchEvent) {
-    const operation = get(editOperation);
-
-    if (operation && isLog(operation.timeBlock)) {
-      trackerPointer.sync(event);
+  function syncPointerDuringEdit(event: MouseEvent | TouchEvent) {
+    if (get(editOperation)) {
+      pointer.sync(event);
     }
   }
 
   const timelineGestures = createGestures({
     onlongpress: (event) => {
-      if (!plannerPointer.isOnBackground(event)) {
+      if (event.target !== plannerBackgroundEl) {
         return;
       }
 
       handleContainerPointerDown(event);
     },
-    onpanmove: handleContainerPointerMove,
+    onpanmove: syncPointerDuringEdit,
     onpanend: confirmEdit,
     options: { mouseSupport: false },
   });
 
   const trackerGestures = createGestures({
-    onpanmove: handleTrackerPointerMove,
+    onpanmove: syncPointerDuringEdit,
     onpanend: confirmEdit,
     options: { mouseSupport: false },
   });
 </script>
 
-<div class="timeline">
+<div class="timeline" {@attach pointer.attachment}>
   {#if $settingsStore.timelineColumns.planner}
     <Column visibleHours={getVisibleHours($settingsStore)}>
       {#if $isToday(day)}
@@ -150,17 +134,17 @@
       {/if}
 
       <div
+        bind:this={plannerBackgroundEl}
         class="tasks absolute-stretch-x"
         onpointerdown={(event) => {
-          if (isTouchEvent(event) || !plannerPointer.isOnBackground(event)) {
+          if (isTouchEvent(event) || event.target !== plannerBackgroundEl) {
             return;
           }
 
           handleContainerPointerDown(event);
         }}
-        onpointermove={handleContainerPointerMove}
+        onpointermove={syncPointerDuringEdit}
         onpointerup={confirmEdit}
-        {@attach plannerPointer.attachment}
         {@attach timelineGestures}
       >
         {#each $displayedTimeBlocksForTimeline as timeBlock (timeBlock.id)}
@@ -188,9 +172,8 @@
 
       <div
         class="tasks absolute-stretch-x"
-        onpointermove={handleTrackerPointerMove}
+        onpointermove={syncPointerDuringEdit}
         onpointerup={confirmEdit}
-        {@attach trackerPointer.attachment}
         {@attach trackerGestures}
       >
         {#each $displayedLogTimeBlocksForTimeline as timeBlock (timeBlock.id)}

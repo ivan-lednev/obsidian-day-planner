@@ -29,10 +29,6 @@ export function trackPointerDateTime(props: {
   return {
     attachment,
 
-    isOnBackground(event: Event) {
-      return event.target === el;
-    },
-
     sync(event: MouseEvent | TouchEvent) {
       isNotVoid(el);
 
