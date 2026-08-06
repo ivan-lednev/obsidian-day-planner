@@ -18,11 +18,11 @@
     selectNewestActiveLogTimeBlock(state, currentTimeSignal.current),
   );
 
-  function handleClick(event: MouseEvent) {
+  async function handleClick(event: MouseEvent) {
     const timeBlock = newestActiveClock.current;
 
     if (!timeBlock) {
-      openClockInOnAnythingModal();
+      await openClockInOnAnythingModal();
 
       return;
     }

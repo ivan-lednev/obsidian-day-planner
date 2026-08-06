@@ -21,6 +21,7 @@ import {
   type RemoteTimeBlock,
   type Side,
   type TimeBlock,
+  type UnwrittenLogTimeBlock,
   type UnwrittenTimeBlock,
   type WithDuration,
   type WriteDestination,
@@ -251,6 +252,22 @@ export function create(props: {
       settings.eventFormatOnCreation === "task"
         ? settings.taskStatusOnCreation
         : undefined,
+  };
+}
+
+export function createLog(props: {
+  startTime: Moment;
+  settings: DayPlannerSettings;
+}): WithDuration<UnwrittenLogTimeBlock> {
+  const { startTime, settings } = props;
+
+  return {
+    id: getId(),
+    source: "unwrittenLog",
+    durationMinutes: settings.defaultDurationMinutes,
+    text: "New clock",
+    startTime: startTime.clone(),
+    symbol: "-",
   };
 }
 

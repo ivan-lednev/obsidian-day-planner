@@ -111,6 +111,15 @@ export interface UnwrittenTimeBlock extends LocalTimeBlockBase {
   destination: WriteDestination;
 }
 
+/**
+ * A clock that has been dragged out in the tracker but not written to a file
+ * yet. It has no path: the task or file it belongs to gets picked when the edit
+ * is confirmed.
+ */
+export interface UnwrittenLogTimeBlock extends LocalTimeBlockBase {
+  source: "unwrittenLog";
+}
+
 export type PlanTimeBlock = DailyNoteDateTimeBlock | TasksPluginPropTimeBlock;
 
 export type LogTimeBlock = ListItemLogTimeBlock | FrontmatterLogTimeBlock;
@@ -121,7 +130,12 @@ export type IndexedTimeBlock = PlanTimeBlock | LogTimeBlock;
 
 export type EditableTimeBlock = PlanTimeBlock | UnwrittenTimeBlock;
 
-export type LocalTimeBlock = IndexedTimeBlock | UnwrittenTimeBlock;
+export type EditableLogTimeBlock = LogTimeBlock | UnwrittenLogTimeBlock;
+
+export type LocalTimeBlock =
+  | IndexedTimeBlock
+  | UnwrittenTimeBlock
+  | UnwrittenLogTimeBlock;
 
 export type TimeBlock = LocalTimeBlock | RemoteTimeBlock;
 
@@ -140,7 +154,20 @@ export function isListItemSourced(
   timeBlock: LocalTimeBlock,
 ): timeBlock is ListItemSourcedTimeBlock {
   return (
-    timeBlock.source !== "unwritten" && timeBlock.source !== "frontmatterLog"
+    timeBlock.source === "dailyNoteDate" ||
+    timeBlock.source === "tasksPluginProp" ||
+    timeBlock.source === "listItemLog"
+  );
+}
+
+/**
+ * A block that has not been written to a file yet has no path to point at.
+ */
+export function isUnwritten(
+  timeBlock: LocalTimeBlock,
+): timeBlock is UnwrittenTimeBlock | UnwrittenLogTimeBlock {
+  return (
+    timeBlock.source === "unwritten" || timeBlock.source === "unwrittenLog"
   );
 }
 

@@ -2,6 +2,7 @@ import { derived, type Readable } from "svelte/store";
 
 import type { DayPlannerSettings } from "../../../settings";
 import type {
+  EditableLogTimeBlock,
   EditableTimeBlock,
   LogTimeBlock,
   RemoteTimeBlock,
@@ -23,7 +24,7 @@ import { createLane } from "./lane";
 
 export function useEditContext(props: {
   onUpdate: OnUpdateFn;
-  onLogUpdate: OnUpdateFn<LogTimeBlock>;
+  onLogUpdate: OnUpdateFn<EditableLogTimeBlock>;
   settingsStore: Readable<DayPlannerSettings>;
   localTimeBlocks: Readable<EditableTimeBlock[]>;
   logTimeBlocks: Readable<LogTimeBlock[]>;
@@ -64,11 +65,9 @@ export function useEditContext(props: {
 
   // Log blocks skip `getVisibleTimeBlocks`: hiding a clock because the task it
   // belongs to is done would hide time that was actually spent.
-  const log = createLane<LogTimeBlock>({
+  const log = createLane<EditableLogTimeBlock>({
     timeBlocks: logTimeBlocks,
-    createBlock: () => {
-      throw new Error("Creating clocks in the tracker is not implemented yet");
-    },
+    createBlock: t.createLog,
     copyBlock: () => {
       throw new Error("Copying clocks is not implemented yet");
     },

@@ -11,7 +11,7 @@ const moment = window.moment;
 const defaultTimestampFormat = "hh:mm";
 
 export function getMinutesSinceMidnight(moment: Moment) {
-  return moment.diff(moment.clone().startOf("day"), "minutes");
+  return moment.hours() * 60 + moment.minutes();
 }
 
 export function toMinutePrecision(moment: Moment) {
