@@ -32,7 +32,7 @@
     settingsStore,
     editContext: {
       confirmEdit,
-      startCreate,
+      lanes,
       getDisplayedTimeBlocksForTimeline,
       getDisplayedLogTimeBlocksForTimeline,
       editOperation,
@@ -97,7 +97,7 @@
 
   function handleContainerPointerDown(event: MouseEvent | TouchEvent) {
     pointer.sync(event);
-    startCreate();
+    lanes.plan.startCreate();
   }
 
   function syncPointerDuringEdit(event: MouseEvent | TouchEvent) {

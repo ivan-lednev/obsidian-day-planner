@@ -51,8 +51,7 @@ export function setUp({
 } = {}) {
   const props = createProps({ timeBlocks, settings });
   const {
-    startEdit,
-    startCreate,
+    lanes,
     getDisplayedTimeBlocksForTimeline,
     getDisplayedAllDayTimeBlocksForMultiDayRow,
     confirmEdit,
@@ -79,8 +78,8 @@ export function setUp({
   }
 
   return {
-    startEdit,
-    startCreate,
+    startEdit: lanes.plan.startEdit,
+    startCreate: lanes.plan.startCreate,
     moveCursorTo,
     getBlocksForDay,
     getDisplayedAllDayTimeBlocksForMultiDayRow,

@@ -33,7 +33,7 @@
 
   const {
     isEditing,
-    editContext: { startEdit },
+    editContext: { lanes },
   } = getObsidianContext();
 </script>
 
@@ -63,7 +63,7 @@
                 label="Move clock"
                 {@attach createGestures({
                   onpanmove: () =>
-                    startEdit({ timeBlock, mode: EditMode.DRAG }),
+                    lanes.log.startEdit({ timeBlock, mode: EditMode.DRAG }),
                 })}
               >
                 <GripVertical class="svg-icon" />
@@ -82,7 +82,7 @@
                 label="Move the end of the clock"
                 {@attach createGestures({
                   onpanmove: () =>
-                    startEdit({ timeBlock, mode: EditMode.RESIZE }),
+                    lanes.log.startEdit({ timeBlock, mode: EditMode.RESIZE }),
                 })}
               >
                 <MoveVertical class="svg-icon" />
@@ -100,7 +100,10 @@
               label="Move the start of the clock"
               {@attach createGestures({
                 onpanmove: () =>
-                  startEdit({ timeBlock, mode: EditMode.RESIZE_FROM_TOP }),
+                  lanes.log.startEdit({
+                    timeBlock,
+                    mode: EditMode.RESIZE_FROM_TOP,
+                  }),
               })}
             >
               <MoveVertical class="svg-icon" />

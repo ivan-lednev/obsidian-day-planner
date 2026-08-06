@@ -19,7 +19,7 @@
   export let timeBlock: EditableTimeBlock;
 
   const {
-    editContext: { startEdit, startCopy },
+    editContext: { lanes },
   } = getObsidianContext();
 </script>
 
@@ -29,7 +29,8 @@
       cursor="grab"
       label="Move block"
       {@attach createGestures({
-        onpanmove: () => startEdit({ timeBlock, mode: EditMode.DRAG }),
+        onpanmove: () =>
+          lanes.plan.startEdit({ timeBlock, mode: EditMode.DRAG }),
       })}
     >
       <GripVertical class="svg-icon" />
@@ -40,7 +41,7 @@
       cursor="grab"
       label="Copy block"
       {@attach createGestures({
-        onpanmove: () => startCopy(timeBlock),
+        onpanmove: () => lanes.plan.startCopy(timeBlock),
       })}
     >
       <Copy class="svg-icon" />
@@ -52,7 +53,10 @@
         label="Move block and push neighboring blocks"
         {@attach createGestures({
           onpanmove: () =>
-            startEdit({ timeBlock, mode: EditMode.DRAG_AND_SHIFT_OTHERS }),
+            lanes.plan.startEdit({
+              timeBlock,
+              mode: EditMode.DRAG_AND_SHIFT_OTHERS,
+            }),
         })}
       >
         <ArrowDownToLine class="svg-icon" />
@@ -62,7 +66,10 @@
         label="Move block and shrink neighboring blocks"
         {@attach createGestures({
           onpanmove: () =>
-            startEdit({ timeBlock, mode: EditMode.DRAG_AND_SHRINK_OTHERS }),
+            lanes.plan.startEdit({
+              timeBlock,
+              mode: EditMode.DRAG_AND_SHRINK_OTHERS,
+            }),
         })}
       >
         <FoldVertical class="svg-icon" />

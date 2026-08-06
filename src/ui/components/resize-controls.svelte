@@ -16,7 +16,7 @@
   export let fromTop: boolean | undefined = false;
 
   const {
-    editContext: { startEdit },
+    editContext: { lanes },
   } = getObsidianContext();
 </script>
 
@@ -27,7 +27,7 @@
       label="Resize block"
       {@attach createGestures({
         onpanmove: () =>
-          startEdit({
+          lanes.plan.startEdit({
             timeBlock,
             mode: fromTop ? EditMode.RESIZE_FROM_TOP : EditMode.RESIZE,
           }),
@@ -42,7 +42,7 @@
       label="Resize block and push neighboring blocks"
       {@attach createGestures({
         onpanmove: () =>
-          startEdit({
+          lanes.plan.startEdit({
             timeBlock,
             mode: fromTop
               ? EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS
@@ -57,7 +57,7 @@
       label="Resize block and shrink neighboring blocks"
       {@attach createGestures({
         onpanmove: () =>
-          startEdit({
+          lanes.plan.startEdit({
             timeBlock,
             mode: fromTop
               ? EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS

@@ -1,9 +1,4 @@
-import type {
-  EditableTimeBlock,
-  LogTimeBlock,
-  TimeInterval,
-  WithDuration,
-} from "../../../time-block-types";
+import type { TimeInterval } from "../../../time-block-types";
 
 export enum EditMode {
   DRAG = "DRAG",
@@ -24,10 +19,10 @@ export type EditableInterval = TimeInterval & {
 
 /**
  * Planner and tracker blocks keep separate baselines and separate write paths.
- * Which one an operation belongs to is told apart by its block, through the
- * `isLog` guard.
+ * An operation lives in the store of the lane it belongs to, so the kind of
+ * block it edits is known statically and never has to be tested for.
  */
-export interface EditOperation {
-  timeBlock: WithDuration<EditableTimeBlock> | WithDuration<LogTimeBlock>;
+export interface EditOperation<Block extends EditableInterval> {
+  timeBlock: Block;
   mode: EditMode;
 }

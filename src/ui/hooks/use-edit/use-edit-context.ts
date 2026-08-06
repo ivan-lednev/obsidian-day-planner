@@ -1,13 +1,13 @@
 import type { Moment } from "moment";
-import { derived, type Readable, writable } from "svelte/store";
+import { derived, get, type Readable } from "svelte/store";
 
 import type { DayPlannerSettings } from "../../../settings";
-import {
-  isLog,
-  type EditableTimeBlock,
-  type LogTimeBlock,
-  type RemoteTimeBlock,
-  type TimelineTimeBlock,
+import type {
+  EditableTimeBlock,
+  LogTimeBlock,
+  RemoteTimeBlock,
+  TimelineTimeBlock,
+  WithDuration,
 } from "../../../time-block-types";
 import {
   getAllDayTimeBlocksInRange,
@@ -20,11 +20,11 @@ import type {
   PointerDateTime,
 } from "../../../types";
 import * as m from "../../../util/moment";
+import * as t from "../../../util/time-block-utils";
 
 import { useCursor } from "./cursor";
-import { transform } from "./transform/transform";
-import { type EditOperation } from "./types";
-import { useEditActions } from "./use-edit-actions";
+import { createLane } from "./lane";
+import { EditMode } from "./types";
 
 export function useEditContext(props: {
   onUpdate: OnUpdateFn;
@@ -49,107 +49,75 @@ export function useEditContext(props: {
     abortEditTrigger,
   } = props;
 
-  const editOperation = writable<EditOperation | undefined>(
-    undefined,
-    (set, updateEditOperation) => {
-      const unsubscribe = abortEditTrigger.subscribe(() => {
-        updateEditOperation((currentEditOperation) => {
-          if (currentEditOperation !== undefined) {
-            onEditAborted();
-          }
-
-          return undefined;
-        });
-      });
-
-      return unsubscribe;
-    },
-  );
-  const cursor = useCursor(editOperation);
-
   const localFilteredTimeBlocks = derived(
     [localTimeBlocks, settingsStore],
     ([$localTimeBlocks, $settingsStore]) =>
       getVisibleTimeBlocks($localTimeBlocks, $settingsStore),
   );
 
-  const baselineTimeBlocks = writable<EditableTimeBlock[]>([], (set) => {
-    return localFilteredTimeBlocks.subscribe(set);
+  const planLane = createLane<EditableTimeBlock>({
+    source: localFilteredTimeBlocks,
+    write: onUpdate,
+    settingsStore,
+    pointerDateTime,
+    abortEditTrigger,
+    onEditAborted,
   });
 
-  // Log blocks skip `getVisibleTimeBlocks`: hiding a clock because the task it
-  // belongs to is done would hide time that was actually spent.
-  const logBaselineTimeBlocks = writable<LogTimeBlock[]>([], (set) => {
-    return logTimeBlocks.subscribe(set);
+  const logLane = createLane<LogTimeBlock>({
+    source: logTimeBlocks,
+    write: onLogUpdate,
+    settingsStore,
+    pointerDateTime,
+    abortEditTrigger,
+    onEditAborted,
   });
 
-  const timeBlocksWithPendingUpdate = derived(
-    [editOperation, baselineTimeBlocks, settingsStore, pointerDateTime],
-    ([
-      $editOperation,
-      $baselineTimeBlocks,
-      $settingsStore,
-      $pointerDateTime,
-    ]) => {
-      const timeBlock = $editOperation?.timeBlock;
+  const plan = {
+    ...planLane,
 
-      if (!$editOperation || !timeBlock || isLog(timeBlock)) {
-        return $baselineTimeBlocks;
-      }
-
-      return transform(
-        $baselineTimeBlocks,
-        { timeBlock, mode: $editOperation.mode },
-        $settingsStore,
-        $pointerDateTime,
-      );
+    startCreate() {
+      planLane.startEdit({
+        timeBlock: t.create({
+          startTime: get(pointerDateTime).dateTime,
+          settings: get(settingsStore),
+        }),
+        mode: EditMode.CREATE,
+      });
     },
+
+    startCopy(timeBlock: WithDuration<EditableTimeBlock>) {
+      planLane.startEdit({
+        timeBlock: t.copy(
+          planLane.getUnderlyingTimeBlockWithoutSplitting(timeBlock),
+        ),
+        mode: EditMode.DRAG,
+      });
+    },
+  };
+
+  async function confirmEdit() {
+    await Promise.all([plan.confirmEdit(), logLane.confirmEdit()]);
+  }
+
+  function cancelEdit() {
+    plan.cancelEdit();
+    logLane.cancelEdit();
+  }
+
+  const editOperation = derived(
+    [plan.editOperation, logLane.editOperation],
+    ([$planEditOperation, $logEditOperation]) =>
+      $planEditOperation ?? $logEditOperation,
   );
 
-  const logTimeBlocksWithPendingUpdate = derived(
-    [editOperation, logBaselineTimeBlocks, settingsStore, pointerDateTime],
-    ([
-      $editOperation,
-      $logBaselineTimeBlocks,
-      $settingsStore,
-      $pointerDateTime,
-    ]) => {
-      const timeBlock = $editOperation?.timeBlock;
-
-      if (!$editOperation || !timeBlock || !isLog(timeBlock)) {
-        return $logBaselineTimeBlocks;
-      }
-
-      return transform(
-        $logBaselineTimeBlocks,
-        { timeBlock, mode: $editOperation.mode },
-        $settingsStore,
-        $pointerDateTime,
-      );
-    },
-  );
-
-  const { startEdit, startCopy, confirmEdit, cancelEdit, startCreate } =
-    useEditActions({
-      editOperation,
-      baselineTimeBlocks,
-      logBaselineTimeBlocks,
-      timeBlocksWithPendingUpdate,
-      logTimeBlocksWithPendingUpdate,
-      onUpdate,
-      onLogUpdate,
-      pointerDateTime,
-      settingsStore,
-    });
+  const cursor = useCursor(editOperation);
 
   const combinedTimeBlocks = derived(
-    [remoteTimeBlocks, timeBlocksWithPendingUpdate],
-    ([
-      $remoteTimeBlocks,
-      $timeBlocksWithPendingUpdate,
-    ]): TimelineTimeBlock[] => [
+    [remoteTimeBlocks, plan.pendingUpdate],
+    ([$remoteTimeBlocks, $planPendingUpdate]): TimelineTimeBlock[] => [
       ...$remoteTimeBlocks,
-      ...$timeBlocksWithPendingUpdate,
+      ...$planPendingUpdate,
     ],
   );
 
@@ -166,24 +134,17 @@ export function useEditContext(props: {
   }
 
   function getDisplayedLogTimeBlocksForTimeline(day: Moment) {
-    return derived(
-      logTimeBlocksWithPendingUpdate,
-      ($logTimeBlocksWithPendingUpdate) =>
-        layOutDayColumn({
-          timeBlocks: $logTimeBlocksWithPendingUpdate,
-          day,
-        }),
+    return derived(logLane.pendingUpdate, ($logPendingUpdate) =>
+      layOutDayColumn({ timeBlocks: $logPendingUpdate, day }),
     );
   }
 
   return {
+    lanes: { plan, log: logLane },
     cursor,
-    startEdit,
-    startCopy,
-    startCreate,
+    editOperation,
     confirmEdit,
     cancelEdit,
-    editOperation,
     getDisplayedTimeBlocksForTimeline,
     getDisplayedLogTimeBlocksForTimeline,
     getDisplayedAllDayTimeBlocksForMultiDayRow,
