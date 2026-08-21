@@ -15,7 +15,7 @@ const time12h = `(${hours12h})(?:${hourMinuteSeparator}?(${minutes}))(${ampm})`;
 const time24h = `(${hours24h})(?:${hourMinuteSeparator}(${minutes}))`;
 const time = `(?:${time12h}|${time24h})`;
 
-const timeRangeSeparator = `\\s?-\\s?`;
+const timeRangeSeparator = `\\s?[-–]\\s?`;
 const timeRange = `(?<start>${time})(?:${timeRangeSeparator}(?<end>${time}))?`;
 
 export const timeRegExp = new RegExp(time);
