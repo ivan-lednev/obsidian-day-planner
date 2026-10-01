@@ -1,25 +1,49 @@
 import type { Moment } from "moment";
-import { normalizePath, type TFile } from "obsidian";
+import { normalizePath, type TFile, type Vault } from "obsidian";
 import {
-  getAllDailyNotes,
   getDailyNote,
-  getDateFromPath,
+  getDateFromPath as getDateFromPathViaLibrary,
+  getDateUID,
   createDailyNote,
-  getDateFromFile,
   DEFAULT_DAILY_NOTE_FORMAT,
   getDailyNoteSettings,
 } from "obsidian-daily-notes-interface";
 import { isNotVoid } from "typed-assert";
 
+import { getDateFromDailyNotePath, getFolderPrefix } from "./daily-note-date";
+
 export class PeriodicNotes {
   readonly DEFAULT_DAILY_NOTE_FORMAT = DEFAULT_DAILY_NOTE_FORMAT;
+
+  constructor(private readonly vault: Vault) {}
 
   getDailyNote(day: Moment, dailyNotes: Record<string, TFile>): TFile | null {
     return getDailyNote(day, dailyNotes);
   }
 
   getAllDailyNotes() {
-    return getAllDailyNotes();
+    const { folder = "" } = this.getDailyNoteSettings();
+
+    const prefix = getFolderPrefix(folder);
+    const dailyNotes: Record<string, TFile> = {};
+
+    for (const file of this.vault.getFiles()) {
+      if (!file.path.endsWith(".md")) {
+        continue;
+      }
+
+      if (prefix && !file.path.startsWith(prefix)) {
+        continue;
+      }
+
+      const date = this.getDateFromPath(file.path, "day");
+
+      if (date) {
+        dailyNotes[getDateUID(date, "day")] = file;
+      }
+    }
+
+    return dailyNotes;
   }
 
   createDailyNote(day: Moment) {
@@ -27,11 +51,22 @@ export class PeriodicNotes {
   }
 
   getDateFromPath(path: string, type: "day" | "month" | "year") {
-    return getDateFromPath(path, type);
+    if (type === "day") {
+      const { format = this.DEFAULT_DAILY_NOTE_FORMAT, folder = "" } =
+        this.getDailyNoteSettings();
+
+      const date = getDateFromDailyNotePath({ path, format, folder });
+
+      if (date) {
+        return date;
+      }
+    }
+
+    return getDateFromPathViaLibrary(path, type);
   }
 
   getDateFromFile(file: TFile, type: "day" | "month" | "year") {
-    return getDateFromFile(file, type);
+    return this.getDateFromPath(file.path, type);
   }
 
   getDailyNoteSettings() {
