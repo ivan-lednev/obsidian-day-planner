@@ -10,7 +10,10 @@ import {
 } from "obsidian-daily-notes-interface";
 import { isNotVoid } from "typed-assert";
 
-import { getDateFromDailyNotePath, getFolderPrefix } from "./daily-note-date";
+import {
+  getFolderPrefix,
+  getDateFromDailyNotePathWorkaround,
+} from "./daily-note-path-workaround";
 
 export class PeriodicNotes {
   readonly DEFAULT_DAILY_NOTE_FORMAT = DEFAULT_DAILY_NOTE_FORMAT;
@@ -51,15 +54,14 @@ export class PeriodicNotes {
   }
 
   getDateFromPath(path: string, type: "day" | "month" | "year") {
+    // WORKAROUND: see `getDateFromDailyNotePathWorkaround` for why `"day"` does
+    // not go through the dependency. Other granularities are unused by the
+    // plugin and keep delegating to the library.
     if (type === "day") {
       const { format = this.DEFAULT_DAILY_NOTE_FORMAT, folder = "" } =
         this.getDailyNoteSettings();
 
-      const date = getDateFromDailyNotePath({ path, format, folder });
-
-      if (date) {
-        return date;
-      }
+      return getDateFromDailyNotePathWorkaround({ path, format, folder });
     }
 
     return getDateFromPathViaLibrary(path, type);

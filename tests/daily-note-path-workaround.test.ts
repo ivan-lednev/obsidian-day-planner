@@ -1,20 +1,20 @@
 import { describe, expect, test } from "vitest";
 
-import { getDateFromDailyNotePath } from "../src/service/daily-note-date";
+import { getDateFromDailyNotePathWorkaround } from "../src/service/daily-note-path-workaround";
 
-describe("getDateFromDailyNotePath", () => {
+describe("getDateFromDailyNotePathWorkaround", () => {
   test("parses dates that live in folder segments of the format", () => {
     const format = "YYYY/[Daily]/MM-MMM/DD-ddd";
 
     expect(
-      getDateFromDailyNotePath({
+      getDateFromDailyNotePathWorkaround({
         path: "2023/Daily/11-Nov/22-Wed.md",
         format,
       })?.format("YYYY-MM-DD"),
     ).toBe("2023-11-22");
 
     expect(
-      getDateFromDailyNotePath({
+      getDateFromDailyNotePathWorkaround({
         path: "2023/Daily/02-Feb/22-Wed.md",
         format,
       })?.format("YYYY-MM-DD"),
@@ -24,11 +24,11 @@ describe("getDateFromDailyNotePath", () => {
   test("distinguishes notes with the same basename in different folders", () => {
     const format = "YYYY/[Daily]/MM-MMM/DD-ddd";
 
-    const first = getDateFromDailyNotePath({
+    const first = getDateFromDailyNotePathWorkaround({
       path: "2023/Daily/11-Nov/22-Wed.md",
       format,
     });
-    const second = getDateFromDailyNotePath({
+    const second = getDateFromDailyNotePathWorkaround({
       path: "2023/Daily/02-Feb/22-Wed.md",
       format,
     });
@@ -40,7 +40,7 @@ describe("getDateFromDailyNotePath", () => {
     const format = "YYYY/MM/DD";
 
     expect(
-      getDateFromDailyNotePath({
+      getDateFromDailyNotePathWorkaround({
         path: "journal/2023/11/22.md",
         format,
         folder: "journal",
@@ -50,7 +50,7 @@ describe("getDateFromDailyNotePath", () => {
 
   test("returns null when the path is outside the daily notes folder", () => {
     expect(
-      getDateFromDailyNotePath({
+      getDateFromDailyNotePathWorkaround({
         path: "notes/2023-11-22.md",
         format: "YYYY-MM-DD",
         folder: "journal",
@@ -60,7 +60,7 @@ describe("getDateFromDailyNotePath", () => {
 
   test("parses basename-only formats", () => {
     expect(
-      getDateFromDailyNotePath({
+      getDateFromDailyNotePathWorkaround({
         path: "2023-11-22.md",
         format: "YYYY-MM-DD",
       })?.format("YYYY-MM-DD"),

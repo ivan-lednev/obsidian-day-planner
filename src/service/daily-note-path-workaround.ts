@@ -1,6 +1,24 @@
 import type { Moment } from "moment";
 import { normalizePath } from "obsidian";
 
+/**
+ * WORKAROUND: temporary, remove when the dependency supports subdirectories.
+ *
+ * `obsidian-daily-notes-interface` parses a note's date from its *basename*,
+ * against only the last segment of the daily note format (see its
+ * `getDateFromFilename`). When the format encodes date parts in folders, e.g.
+ * `YYYY/[Daily]/MM-MMM/DD-ddd`, the folder parts are dropped. Notes with the
+ * same basename in different folders (`2023/Daily/11-Nov/22-Wed.md` and
+ * `2023/Daily/02-Feb/22-Wed.md`) then collapse onto the same date, so the
+ * plugin reads/opens the wrong file.
+ *
+ * Upstream issue: https://github.com/liamcain/obsidian-daily-notes-interface/issues/21
+ * Upstream fix (unmerged): https://github.com/liamcain/obsidian-daily-notes-interface/pull/34
+ *
+ * TODO: delete this module and revert `PeriodicNotes` to pass through to the
+ * dependency once a release includes subdirectory support.
+ */
+
 export function getFolderPrefix(folder?: string) {
   const normalized = normalizePath(folder ?? "");
 
@@ -11,17 +29,7 @@ export function getFolderPrefix(folder?: string) {
   return `${normalized}/`;
 }
 
-/**
- * Parses the date out of a daily note path.
- *
- * Unlike `obsidian-daily-notes-interface`, it parses the whole path relative to
- * the daily notes folder against the whole format. This matters when the format
- * encodes parts of the date in folders, e.g.
- * `YYYY/[Daily]/MM-MMM/DD-ddd` for `2023/Daily/11-Nov/22-Wed.md`. Parsing only
- * the basename (`22-Wed` with `DD-ddd`) drops the year and month, so distinct
- * notes collapse onto the same date.
- */
-export function getDateFromDailyNotePath(props: {
+export function getDateFromDailyNotePathWorkaround(props: {
   path: string;
   format: string;
   folder?: string;
