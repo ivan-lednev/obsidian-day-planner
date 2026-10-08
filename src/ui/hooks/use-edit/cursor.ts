@@ -1,8 +1,10 @@
 import { derived, type Readable } from "svelte/store";
 
-import { EditMode, type EditOperation } from "./types";
+import { EditMode } from "./types";
 
-export function useCursor(editOperation: Readable<EditOperation | undefined>) {
+export function useCursor(
+  editOperation: Readable<{ mode: EditMode } | undefined>,
+) {
   return derived(editOperation, ($editOperation) => {
     if (
       $editOperation?.mode === EditMode.CREATE ||

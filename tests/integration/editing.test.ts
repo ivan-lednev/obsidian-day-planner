@@ -13,10 +13,10 @@ describe("Editing", () => {
         visibleDays: ["2025-07-19"],
       });
 
-      editContext.handlers.handleGripMouseDown(
-        findByText("List item under planner heading"),
-        EditMode.DRAG,
-      );
+      editContext.lanes.plan.startEdit({
+        timeBlock: findByText("List item under planner heading"),
+        mode: EditMode.DRAG,
+      });
 
       moveCursorTo(window.moment("2025-07-19 17:00"));
 
@@ -30,10 +30,10 @@ describe("Editing", () => {
         visibleDays: ["2025-07-19"],
       });
 
-      editContext.handlers.handleGripMouseDown(
-        findByText("List item under planner heading"),
-        EditMode.DRAG,
-      );
+      editContext.lanes.plan.startEdit({
+        timeBlock: findByText("List item under planner heading"),
+        mode: EditMode.DRAG,
+      });
 
       moveCursorTo(window.moment("2025-07-19"), "date");
 
@@ -48,7 +48,7 @@ describe("Editing", () => {
       });
 
       moveCursorTo(window.moment("2025-07-20 13:00"));
-      editContext.handlers.handleContainerMouseDown();
+      editContext.lanes.plan.startCreate();
       moveCursorTo(window.moment("2025-07-20 14:00"));
 
       await editContext.confirmEdit();
@@ -66,10 +66,10 @@ describe("Editing", () => {
         },
       });
 
-      editContext.handlers.handleGripMouseDown(
-        findByText("Parent"),
-        EditMode.DRAG,
-      );
+      editContext.lanes.plan.startEdit({
+        timeBlock: findByText("Parent"),
+        mode: EditMode.DRAG,
+      });
 
       moveCursorTo(window.moment("2025-07-19 10:00"));
 
@@ -95,10 +95,10 @@ describe("Editing", () => {
         },
       });
 
-      editContext.handlers.handleGripMouseDown(
-        findByText("Child"),
-        EditMode.DRAG,
-      );
+      editContext.lanes.plan.startEdit({
+        timeBlock: findByText("Child"),
+        mode: EditMode.DRAG,
+      });
 
       moveCursorTo(window.moment("2025-07-20 17:00"));
 
@@ -120,10 +120,10 @@ describe("Editing", () => {
         visibleDays: ["2025-07-19"],
       });
 
-      editContext.handlers.handleGripMouseDown(
-        findByText("Task without time"),
-        EditMode.DRAG,
-      );
+      editContext.lanes.plan.startEdit({
+        timeBlock: findByText("Task without time"),
+        mode: EditMode.DRAG,
+      });
 
       moveCursorTo(window.moment("2025-07-19 13:00"));
 
@@ -137,10 +137,10 @@ describe("Editing", () => {
         visibleDays: ["2025-07-19"],
       });
 
-      editContext.handlers.handleGripMouseDown(
-        findByText("Task with time"),
-        EditMode.DRAG,
-      );
+      editContext.lanes.plan.startEdit({
+        timeBlock: findByText("Task with time"),
+        mode: EditMode.DRAG,
+      });
 
       moveCursorTo(window.moment("2025-07-19"), "date");
 
@@ -155,10 +155,10 @@ describe("Editing", () => {
         loadedFixtures: ["tasks.md"],
       });
 
-      editContext.handlers.handleGripMouseDown(
-        findByText("Task with time"),
-        EditMode.DRAG,
-      );
+      editContext.lanes.plan.startEdit({
+        timeBlock: findByText("Task with time"),
+        mode: EditMode.DRAG,
+      });
 
       moveCursorTo(window.moment("2025-07-28 10:00"));
 
@@ -183,10 +183,10 @@ describe("Editing", () => {
         visibleDays: ["2025-07-19"],
       });
 
-      editContext.handlers.handleGripMouseDown(
-        findByText(label),
-        EditMode.DRAG,
-      );
+      editContext.lanes.plan.startEdit({
+        timeBlock: findByText(label),
+        mode: EditMode.DRAG,
+      });
 
       moveCursorTo(window.moment("2025-07-19 13:00"));
 
@@ -209,10 +209,10 @@ describe("Editing", () => {
         visibleDays: ["2025-07-19"],
       });
 
-      editContext.handlers.handleGripMouseDown(
-        findByText(label),
-        EditMode.DRAG,
-      );
+      editContext.lanes.plan.startEdit({
+        timeBlock: findByText(label),
+        mode: EditMode.DRAG,
+      });
 
       moveCursorTo(window.moment("2025-07-19"), "date");
 

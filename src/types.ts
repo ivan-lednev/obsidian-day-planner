@@ -14,17 +14,22 @@ import type { VaultFacade } from "./service/vault-facade";
 import type { WorkspaceFacade } from "./service/workspace-facade";
 import type { DayPlannerSettings, IcalConfig } from "./settings";
 import type { EditableTimeBlock, PlanTimeBlock } from "./time-block-types";
+import type { createRenderMarkdownAttachmentFactory } from "./ui/actions/render-markdown.svelte";
 import { EditMode } from "./ui/hooks/use-edit/types";
 import { useEditContext } from "./ui/hooks/use-edit/use-edit-context";
 import type { OpenLogEntryEditModal } from "./ui/log-entry-edit-modal";
 import type { OpenTimelineSettingsModal } from "./ui/timeline-settings-modal";
-import type { createRenderMarkdown } from "./util/create-render-markdown";
 import { type ShowPreview } from "./util/create-show-preview";
 import type { Scheduler } from "./util/scheduler";
 
-export type OnUpdateFn = (
-  base: Array<EditableTimeBlock>,
-  next: Array<EditableTimeBlock>,
+/**
+ * Writes an edit back to the vault, resolving to whether it went through.
+ * Planner blocks go through the transaction writer, log blocks get patched in
+ * place by the log entry editor, so the two differ in the block they take.
+ */
+export type OnUpdateFn<Block = EditableTimeBlock> = (
+  base: Array<Block>,
+  next: Array<Block>,
   mode: EditMode,
 ) => Promise<boolean>;
 
@@ -39,7 +44,9 @@ export interface Overlap {
   fraction?: Fraction;
 }
 
-export type RenderMarkdown = ReturnType<typeof createRenderMarkdown>;
+export type RenderMarkdownAttachmentFactory = ReturnType<
+  typeof createRenderMarkdownAttachmentFactory
+>;
 
 export type PointerDateTime = {
   dateTime: Moment;
@@ -59,9 +66,10 @@ export interface ObsidianContext {
   workspaceFacade: WorkspaceFacade;
   periodicNotes: PeriodicNotes;
   initWeeklyView: () => Promise<void>;
-  renderMarkdown: RenderMarkdown;
+  createRenderMarkdownAttachment: RenderMarkdownAttachmentFactory;
   toggleCheckboxInFile: VaultFacade["toggleCheckboxInFile"];
   editContext: ReturnType<typeof useEditContext>;
+  isEditing: Readable<boolean>;
   showPreview: ShowPreview;
   isModPressed: Readable<boolean>;
   reSync: () => void;
@@ -73,7 +81,7 @@ export interface ObsidianContext {
   logEntryEditor: LogEntryEditor;
   openLogEntryEditModal: OpenLogEntryEditModal;
   openTimelineSettingsModal: OpenTimelineSettingsModal;
-  openClockInOnAnythingModal: () => void;
+  openClockInOnAnythingModal: () => Promise<void>;
   // todo: rename to promptUserToEditText
   editText: (props: {
     initialText?: string;

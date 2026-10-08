@@ -1,17 +1,16 @@
 import type { Moment } from "moment";
 import { derived, type Readable, type Writable } from "svelte/store";
 
-import type { PeriodicNotes } from "../../service/periodic-notes";
-import { WorkspaceFacade } from "../../service/workspace-facade";
 import type { DayPlannerSettings } from "../../settings";
 import type {
+  EditableLogTimeBlock,
   EditableTimeBlock,
+  LogTimeBlock,
   RemoteTimeBlock,
   TimeBlock,
   WithDuration,
 } from "../../time-block-types";
 import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../../types";
-import { getUpdateTrigger } from "../../util/store";
 
 import { useEditContext } from "./use-edit/use-edit-context";
 import { useNewlyStartedTimeBlocks } from "./use-newly-started-time-blocks";
@@ -20,24 +19,26 @@ export function useTimeBlocks(props: {
   settingsStore: Writable<DayPlannerSettings>;
   isOnline: Readable<boolean>;
   currentTime: Readable<Moment>;
-  workspaceFacade: WorkspaceFacade;
   onUpdate: OnUpdateFn;
+  onLogUpdate: OnUpdateFn<EditableLogTimeBlock>;
   onEditAborted: OnEditAbortedFn;
   pointerDateTime: Readable<PointerDateTime>;
   remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
-  periodicNotes: PeriodicNotes;
   localTimeBlocks: Readable<EditableTimeBlock[]>;
+  logTimeBlocks: Readable<LogTimeBlock[]>;
+  abortEditTrigger: Readable<unknown>;
 }) {
   const {
     settingsStore,
-    periodicNotes,
     currentTime,
-    workspaceFacade,
     pointerDateTime,
     onUpdate,
+    onLogUpdate,
     onEditAborted,
     remoteTimeBlocks,
     localTimeBlocks,
+    logTimeBlocks,
+    abortEditTrigger,
   } = props;
 
   const timeBlocksWithTimeForToday = derived(
@@ -57,15 +58,13 @@ export function useTimeBlocks(props: {
     },
   );
 
-  const abortEditTrigger = derived(localTimeBlocks, getUpdateTrigger);
-
   const editContext = useEditContext({
-    periodicNotes,
-    workspaceFacade,
     onUpdate,
+    onLogUpdate,
     onEditAborted,
     settingsStore,
     localTimeBlocks,
+    logTimeBlocks,
     remoteTimeBlocks,
     pointerDateTime,
     abortEditTrigger,

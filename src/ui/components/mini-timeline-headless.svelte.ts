@@ -50,7 +50,7 @@ export class MiniTimeline {
         ),
       ),
       Array.map((it) => ({
-        ...t.clampToTimeRange(it, {
+        ...t.clipToRowRange(it, {
           start: this.rangeStart,
           end: this.rangeEnd,
         }),

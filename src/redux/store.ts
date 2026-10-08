@@ -7,8 +7,15 @@ import {
   type TypedStartListening,
 } from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
+import type { Moment } from "moment";
 import type { MetadataCache, Vault } from "obsidian";
-import { toStore, writable } from "svelte/store";
+import {
+  derived,
+  fromStore,
+  type Readable,
+  toStore,
+  writable,
+} from "svelte/store";
 
 import type { IndexService } from "../service/index/index-service";
 import type { ListPropsParser } from "../service/list-props-parser";
@@ -16,13 +23,17 @@ import type { PeriodicNotes } from "../service/periodic-notes";
 import type { DayPlannerSettings } from "../settings";
 import type { PointerDateTime, ReduxExtraArgument } from "../types";
 import type { Scheduler } from "../util/scheduler";
+import { getUpdateTrigger } from "../util/store";
 
 import { createDateRanges } from "./date-ranges";
 import { dateRangesSlice } from "./date-ranges-slice";
 import { icalSlice, selectRemoteTimeBlocks } from "./ical/ical-slice";
 import type { IcalParseTaskResult } from "./ical/init-ical-listeners";
-import { selectPlanTimeBlocksForVisibleDays } from "./index/index-selectors";
-import { indexSlice } from "./index/index-slice";
+import {
+  selectLogTimeBlocksForVisibleDays,
+  selectPlanTimeBlocksForVisibleDays,
+} from "./index/index-selectors";
+import { indexSlice, selectIndexState } from "./index/index-slice";
 import { initListenerMiddleware } from "./listener-middleware";
 import { settingsSlice } from "./settings-slice";
 import { createUseSelector } from "./use-selector";
@@ -62,6 +73,7 @@ export function createReactor(props: {
   periodicNotes: PeriodicNotes;
   settings: DayPlannerSettings;
   icalParseScheduler: Scheduler<IcalParseTaskResult>;
+  currentTime: Readable<Moment>;
 }) {
   const {
     preloadedState = {},
@@ -72,6 +84,7 @@ export function createReactor(props: {
     periodicNotes,
     settings,
     icalParseScheduler,
+    currentTime,
   } = props;
 
   const listenerMiddleware = initListenerMiddleware({
@@ -101,6 +114,21 @@ export function createReactor(props: {
   );
   const localTimeBlocks = toStore(() => localTimeBlocksSignal.current);
 
+  const currentTimeSignal = fromStore(currentTime);
+  const logTimeBlocksSignal = useSelector((state) =>
+    selectLogTimeBlocksForVisibleDays(state, currentTimeSignal.current),
+  );
+  const logTimeBlocks = toStore(() => logTimeBlocksSignal.current);
+
+  const indexStateSignal = useSelector(selectIndexState);
+  const indexState = toStore(() => indexStateSignal.current);
+
+  /**
+   * Edits are written back at line positions taken from the index, so any
+   * indexing pass can invalidate an edit in progress.
+   */
+  const abortEditTrigger = derived(indexState, getUpdateTrigger);
+
   const remoteTimeBlocksSignal = useSelector((state) =>
     selectRemoteTimeBlocks(state),
   );
@@ -116,6 +144,8 @@ export function createReactor(props: {
     listenerMiddleware,
     remoteTimeBlocks,
     localTimeBlocks,
+    logTimeBlocks,
+    abortEditTrigger,
     pointerDateTime,
     useSelector,
     dateRanges,

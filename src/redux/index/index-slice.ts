@@ -306,6 +306,12 @@ export const indexSlice = createAppSlice({
     ),
   }),
   selectors: {
+    /**
+     * Changes on every indexing pass. Edits are written back at line
+     * positions taken from the index, so anything that reindexes a file can
+     * invalidate an edit in progress, no matter which entries it touched.
+     */
+    selectIndexState: (state) => state,
     selectEntriesForPath: (state, path) => {
       return state.listItemEntries.byPath[path]?.map(
         (it) => state.listItemEntries.byId[it],
@@ -343,6 +349,7 @@ export type ListItemEntryWithChildren = Omit<
 export const { filesIndexed, indexRequested, fileDeleted } = indexSlice.actions;
 
 export const {
+  selectIndexState,
   selectEntriesForPath,
   selectLogEntriesByDay,
   selectLogEntriesById,

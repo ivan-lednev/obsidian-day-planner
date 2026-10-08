@@ -16,9 +16,7 @@
   export let fromTop: boolean | undefined = false;
 
   const {
-    editContext: {
-      handlers: { handleResizerMouseDown },
-    },
+    editContext: { lanes },
   } = getObsidianContext();
 </script>
 
@@ -27,15 +25,13 @@
     <BlockControlButton
       cursor="grab"
       label="Resize block"
-      use={[
-        createGestures({
-          onpanmove: () =>
-            handleResizerMouseDown(
-              timeBlock,
-              fromTop ? EditMode.RESIZE_FROM_TOP : EditMode.RESIZE,
-            ),
-        }),
-      ]}
+      {@attach createGestures({
+        onpanmove: () =>
+          lanes.plan.startEdit({
+            timeBlock,
+            mode: fromTop ? EditMode.RESIZE_FROM_TOP : EditMode.RESIZE,
+          }),
+      })}
     >
       <MoveVertical class="svg-icon" />
     </BlockControlButton>
@@ -44,36 +40,30 @@
     <BlockControlButton
       cursor="grab"
       label="Resize block and push neighboring blocks"
-      use={[
-        createGestures({
-          onpanmove: () => {
-            handleResizerMouseDown(
-              timeBlock,
-              fromTop
-                ? EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS
-                : EditMode.RESIZE_AND_SHIFT_OTHERS,
-            );
-          },
-        }),
-      ]}
+      {@attach createGestures({
+        onpanmove: () =>
+          lanes.plan.startEdit({
+            timeBlock,
+            mode: fromTop
+              ? EditMode.RESIZE_FROM_TOP_AND_SHIFT_OTHERS
+              : EditMode.RESIZE_AND_SHIFT_OTHERS,
+          }),
+      })}
     >
       <ArrowDownToLine class="svg-icon" />
     </BlockControlButton>
     <BlockControlButton
       cursor="grab"
       label="Resize block and shrink neighboring blocks"
-      use={[
-        createGestures({
-          onpanmove: () => {
-            handleResizerMouseDown(
-              timeBlock,
-              fromTop
-                ? EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS
-                : EditMode.RESIZE_AND_SHRINK_OTHERS,
-            );
-          },
-        }),
-      ]}
+      {@attach createGestures({
+        onpanmove: () =>
+          lanes.plan.startEdit({
+            timeBlock,
+            mode: fromTop
+              ? EditMode.RESIZE_FROM_TOP_AND_SHRINK_OTHERS
+              : EditMode.RESIZE_AND_SHRINK_OTHERS,
+          }),
+      })}
     >
       <FoldVertical class="svg-icon" />
     </BlockControlButton>

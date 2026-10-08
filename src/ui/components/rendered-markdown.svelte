@@ -5,9 +5,9 @@
   import { getObsidianContext } from "../../context/obsidian-context";
   import {
     isListItemSourced,
+    isUnwritten,
     type LocalTimeBlock,
   } from "../../time-block-types";
-  import { createRenderMarkdownAttachment } from "../../util/dom";
   import {
     isCompleted,
     toRenderableMarkdown,
@@ -20,15 +20,11 @@
     bottomDecoration,
   }: { timeBlock: LocalTimeBlock; bottomDecoration?: Snippet } = $props();
 
-  const { renderMarkdown, toggleCheckboxInFile, settingsStore } =
-    getObsidianContext();
-
-  const onCheckboxLineClick = $derived(
-    isListItemSourced(timeBlock)
-      ? (line: number) => toggleCheckboxInFile(timeBlock.path, line)
-      : // todo: should throw an error
-        undefined,
-  );
+  const {
+    createRenderMarkdownAttachment,
+    toggleCheckboxInFile,
+    settingsStore,
+  } = getObsidianContext();
 
   const { listItem, nestedListItems } = $derived(
     toRenderableMarkdown(timeBlock),
@@ -46,11 +42,20 @@
   const listItemLine = $derived(
     isListItemSourced(timeBlock) ? timeBlock.position.start.line : undefined,
   );
+
   const nestedListItemLines = $derived(
     flatten(timeBlock.children ?? [])
       .filter((child) => child.task !== undefined)
       .map((item) => item.position.start.line),
   );
+
+  async function onCheckboxLineClick(line: number) {
+    if (isUnwritten(timeBlock)) {
+      throw new Error("Cannot complete tasks in in-memory time blocks");
+    }
+
+    await toggleCheckboxInFile(timeBlock.path, line);
+  }
 </script>
 
 <TimeBlockContentLayout
@@ -62,9 +67,8 @@
     <div
       class="markdown-wrapper first-line-wrapper"
       {@attach createRenderMarkdownAttachment({
-        renderMarkdown,
-        markdown: listItem,
-        taskLines: [listItemLine],
+        getMarkdown: () => listItem,
+        getTaskLines: () => [listItemLine],
         onCheckboxLineClick,
       })}
     ></div>
@@ -75,9 +79,8 @@
       <div
         class="markdown-wrapper lines-after-first-wrapper"
         {@attach createRenderMarkdownAttachment({
-          renderMarkdown,
-          markdown: nestedListItems,
-          taskLines: nestedListItemLines,
+          getMarkdown: () => nestedListItems,
+          getTaskLines: () => nestedListItemLines,
           onCheckboxLineClick,
         })}
       ></div>

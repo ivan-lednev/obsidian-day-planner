@@ -3,27 +3,27 @@
 
   import type { LocalTimeBlock } from "../../time-block-types";
   import { hoverPreview } from "../actions/hover-preview";
-  import type { HTMLActionArray } from "../actions/use-actions";
 
   import FrontmatterLogContent from "./frontmatter-log-content.svelte";
   import RenderedMarkdown from "./rendered-markdown.svelte";
   import TimeBlockBase from "./time-block-base.svelte";
+
+  interface Props {
+    isActive?: boolean;
+    timeBlock: LocalTimeBlock;
+    bottomDecoration?: Snippet;
+    blockEndDecoration?: Snippet;
+    onpointerup?: (event: PointerEvent) => void;
+  }
 
   const {
     timeBlock,
     bottomDecoration,
     blockEndDecoration,
     isActive = false,
-    use = [],
     onpointerup,
-  }: {
-    isActive?: boolean;
-    timeBlock: LocalTimeBlock;
-    bottomDecoration?: Snippet;
-    blockEndDecoration?: Snippet;
-    use?: HTMLActionArray;
-    onpointerup?: (event: PointerEvent) => void;
-  } = $props();
+    ...rest
+  }: Props = $props();
 </script>
 
 <TimeBlockBase
@@ -34,7 +34,8 @@
   {blockEndDecoration}
   {onpointerup}
   {timeBlock}
-  use={[...use, hoverPreview(timeBlock)]}
+  {...rest}
+  {@attach hoverPreview(timeBlock)}
 >
   {#if timeBlock.source === "frontmatterLog"}
     <FrontmatterLogContent {bottomDecoration} {timeBlock} />

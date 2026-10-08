@@ -1,14 +1,14 @@
+import type { Attachment } from "svelte/attachments";
 import { on } from "svelte/events";
 import { isNotVoid } from "typed-assert";
 
 import { getPointerOffsetY } from "../../util/dom";
 
 /**
- * This action is useful for cases when we need a resize grip that is outside
- * the resize container.
+ * Pairs a grip with the container it resizes. Useful when the grip lives
+ * outside of that container, so the two cannot share a single element.
  */
 export function createResizeState() {
-  const onDestroyCallbacks: Array<() => void> = [];
   let resizeContainerEl: HTMLElement | undefined;
   let editingHeight = false;
 
@@ -36,7 +36,7 @@ export function createResizeState() {
 
     isNotVoid(
       resizeContainerEl,
-      `Failed to resize a container. Either an action function hasn't been passed to a container, or the container got destroyed.`,
+      `Failed to resize a container. Either the attachment hasn't been passed to a container, or the container got destroyed.`,
     );
 
     const newHeight = getPointerOffsetY(resizeContainerEl, event);
@@ -44,28 +44,26 @@ export function createResizeState() {
     resizeContainerEl.style.height = `${newHeight}px`;
   }
 
-  function resizeAction(el: HTMLElement) {
+  const resizeContainer: Attachment<HTMLElement> = (el) => {
     resizeContainerEl = el;
 
-    onDestroyCallbacks.push(
+    const cleanUpCallbacks = [
       on(document, "mousemove", handleMove),
       on(document, "touchmove", handleMove),
       on(document, "mouseup", stopResizing, { capture: true }),
       on(document, "touchend", stopResizing, { capture: true }),
       on(document, "touchcancel", stopResizing, { capture: true }),
       on(window, "blur", handleBlur),
-    );
+    ];
 
-    return {
-      destroy() {
-        resizeContainerEl = undefined;
-        onDestroyCallbacks.forEach((callback) => callback());
-      },
+    return () => {
+      resizeContainerEl = undefined;
+      cleanUpCallbacks.forEach((cleanUp) => cleanUp());
     };
-  }
+  };
 
   return {
     startResizing,
-    resizeAction,
+    resizeContainer,
   };
 }

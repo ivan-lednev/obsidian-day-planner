@@ -24,13 +24,21 @@
   </TimeBlockBase>
 {:else}
   <TimeBlockControls {timeBlock}>
-    {#snippet content({ isActive, onPointerUp, use })}
+    {#snippet content({
+      isActive,
+      onPointerUp,
+      gestures,
+      clearOnPointerUpOutside,
+      anchor,
+    })}
       <LocalTimeBlock
         {bottomDecoration}
         {isActive}
         onpointerup={onPointerUp}
         {timeBlock}
-        {use}
+        {@attach gestures}
+        {@attach clearOnPointerUpOutside}
+        {@attach anchor}
       />
     {/snippet}
   </TimeBlockControls>

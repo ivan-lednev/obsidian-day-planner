@@ -1,8 +1,20 @@
 node_modules/
 
 main.js
-src/ui/actions/use-actions.ts
 # Needed until we update to eslint v9
-src/ui/components/rendered-markdown.svelte
 src/ui/components/settings-controls.svelte
 src/ui/components/error-boundary.svelte
+# svelte-eslint-parser 0.41 cannot parse `{@attach}`. Lifted by the same eslint
+# v9 update: it unblocks eslint-plugin-svelte v3, which parses attachments.
+src/ui/components/active-clocks.svelte
+src/ui/components/drag-controls.svelte
+src/ui/components/floating-controls.svelte
+src/ui/components/local-time-block.svelte
+src/ui/components/log-time-block-controls.svelte
+src/ui/components/multi-day/multi-day-grid.svelte
+src/ui/components/recent-clocks.svelte
+src/ui/components/rendered-markdown.svelte
+src/ui/components/resize-controls.svelte
+src/ui/components/scroller.svelte
+src/ui/components/timeline.svelte
+src/ui/components/unscheduled-time-block.svelte

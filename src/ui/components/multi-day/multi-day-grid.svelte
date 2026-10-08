@@ -110,7 +110,7 @@
     });
   }
 
-  const { startResizing, resizeAction } = createResizeState();
+  const { startResizing, resizeContainer } = createResizeState();
 </script>
 
 <ErrorBoundary>
@@ -157,7 +157,7 @@
   <div
     style:--timeline-internal-column-count={timelineInternalColumnCount}
     class={["planner-header-row", "horizontal-resize-box-wrapper"]}
-    use:resizeAction
+    {@attach resizeContainer}
   >
     <!--Note: we need this wrapper to listen to pointer events on the whole height of the row-->
     <div

@@ -1,3 +1,4 @@
+import type { Attachment } from "svelte/attachments";
 import TinyGesture, { type Options } from "tinygesture";
 
 export function createGestures(props: {
@@ -7,13 +8,13 @@ export function createGestures(props: {
   onpanend?: (event: MouseEvent | TouchEvent) => void;
   onpanmove?: (event: MouseEvent | TouchEvent) => void;
   options?: Partial<Options>;
-}) {
+}): Attachment<HTMLElement> {
   const { ontap, onlongpress, onpanstart, onpanend, onpanmove, options } =
     props;
 
   let pressed = false;
 
-  return (el: HTMLElement) => {
+  return (el) => {
     const gesture = new TinyGesture(el, options);
 
     gesture.on("tap", (event) => {
@@ -48,10 +49,8 @@ export function createGestures(props: {
       onpanmove?.(event);
     });
 
-    return {
-      destroy() {
-        gesture.destroy();
-      },
+    return () => {
+      gesture.destroy();
     };
   };
 }

@@ -2,20 +2,32 @@ import { get } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 import { describe, expect, test } from "vitest";
 
-import { selectPlanTimeBlocksForDays } from "../../src/redux";
+import { selectPlanTimeBlocksForVisibleDays } from "../../src/redux";
 import { defaultSettingsForTests } from "../../src/settings";
 import { isLocal } from "../../src/time-block-types";
 import { toRenderableMarkdown } from "../../src/util/time-block-utils";
 
 import { setUp } from "./util/setup";
 
+type EditContext = Awaited<ReturnType<typeof setUp>>["editContext"];
+
+function getAllDayTimeBlocks(editContext: EditContext, dayKey: string) {
+  const day = window.moment(dayKey);
+
+  return get(editContext.getDisplayedAllDayTimeBlocksForMultiDayRow)({
+    start: day,
+    end: day,
+  });
+}
+
 describe("Task views", () => {
   test("Shows list item with checkbox, nested list items (tasks & plain list items) with their paragraphs and checkboxes", async () => {
     const { getState } = await setUp({
       loadedFixtures: ["2025-07-28.md"],
+      visibleDays: ["2025-07-28"],
     });
 
-    const planEntries = selectPlanTimeBlocksForDays(getState(), ["2025-07-28"]);
+    const planEntries = selectPlanTimeBlocksForVisibleDays(getState());
     const taskWithNestedListItems = planEntries.find((entry) =>
       entry.text.includes("Parent"),
     );
@@ -35,9 +47,10 @@ describe("Task views", () => {
   test("Removes list tokens for plain list items", async () => {
     const { getState } = await setUp({
       loadedFixtures: ["2025-07-19.md"],
+      visibleDays: ["2025-07-19"],
     });
 
-    const planEntries = selectPlanTimeBlocksForDays(getState(), ["2025-07-19"]);
+    const planEntries = selectPlanTimeBlocksForVisibleDays(getState());
     const taskWithNestedListItems = planEntries.find((entry) =>
       entry.text.includes("List item under planner heading"),
     );
@@ -60,9 +73,7 @@ describe("Task views", () => {
       },
     });
 
-    expect(
-      selectPlanTimeBlocksForDays(getState(), ["2025-07-19"]),
-    ).toContainEqual(
+    expect(selectPlanTimeBlocksForVisibleDays(getState())).toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Task outside of planner heading"),
       }),
@@ -74,11 +85,7 @@ describe("Task views", () => {
       visibleDays: ["2025-07-19"],
     });
 
-    const displayedTimeBlocks = editContext.getDisplayedTimeBlocksForTimeline(
-      window.moment("2025-07-19"),
-    );
-
-    expect(get(displayedTimeBlocks)?.noTime).not.toContainEqual(
+    expect(getAllDayTimeBlocks(editContext, "2025-07-19")).not.toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Task outside of planner heading"),
       }),
@@ -90,24 +97,22 @@ describe("Task views", () => {
       visibleDays: ["2025-07-19"],
     });
 
-    const displayedTimeBlocks = editContext.getDisplayedTimeBlocksForTimeline(
-      window.moment("2025-07-19"),
+    const displayedTimeBlocks = get(
+      editContext.lanes.plan.getTimeBlocksForDay(window.moment("2025-07-19")),
     );
 
-    const { withTime, noTime } = get(displayedTimeBlocks);
-
-    expect(withTime).toContainEqual(
+    expect(displayedTimeBlocks).toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("List item under planner heading"),
       }),
     );
-    expect(withTime).toContainEqual(
+    expect(displayedTimeBlocks).toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Task with time"),
       }),
     );
 
-    expect(noTime).toContainEqual(
+    expect(getAllDayTimeBlocks(editContext, "2025-07-19")).toContainEqual(
       expect.objectContaining({
         text: expect.stringContaining("Task without time"),
       }),
@@ -139,14 +144,8 @@ describe("Task views", () => {
       },
     });
 
-    const displayedTimeBlocks = editContext.getDisplayedTimeBlocksForTimeline(
-      window.moment("2025-07-19"),
-    );
-
-    const { noTime } = get(displayedTimeBlocks);
-
     expect(
-      noTime.filter(
+      getAllDayTimeBlocks(editContext, "2025-07-19").filter(
         (it) => isLocal(it) && it.text.includes("Task without time"),
       ),
     ).toHaveLength(expectedLength);

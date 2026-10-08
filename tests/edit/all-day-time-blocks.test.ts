@@ -21,7 +21,7 @@ describe("all-day tasks", () => {
 
   test("an unscheduled task gets moved to another day", () => {
     const {
-      handlers,
+      startEdit,
       moveCursorTo,
       getDisplayedAllDayTimeBlocksForMultiDayRow,
     } = setUp({
@@ -30,7 +30,7 @@ describe("all-day tasks", () => {
 
     const timeBlock = timeBlocksWithUnscheduledTimeBlock[0];
 
-    handlers.handleGripMouseDown(timeBlock, EditMode.DRAG);
+    startEdit({ timeBlock: timeBlock, mode: EditMode.DRAG });
     moveCursorTo(moment("2023-01-02 01:00"), "date");
 
     expect(
@@ -45,14 +45,14 @@ describe("all-day tasks", () => {
 
   test("a scheduled task changes its type to all-day", () => {
     const {
-      handlers,
+      startEdit,
       moveCursorTo,
       getDisplayedAllDayTimeBlocksForMultiDayRow,
     } = setUp({ timeBlocks: baseTimeBlocks });
 
     const timeBlock = baseTimeBlocks[0];
 
-    handlers.handleGripMouseDown(timeBlock, EditMode.DRAG);
+    startEdit({ timeBlock: timeBlock, mode: EditMode.DRAG });
     moveCursorTo(timeBlock.startTime, "date");
 
     expect(
@@ -67,7 +67,7 @@ describe("all-day tasks", () => {
 
   test("can copy a scheduled task to all-day", () => {
     const {
-      handlers,
+      startEdit,
       moveCursorTo,
       getDisplayedAllDayTimeBlocksForMultiDayRow,
     } = setUp({ timeBlocks: baseTimeBlocks });
@@ -81,7 +81,7 @@ describe("all-day tasks", () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { path, position, placing, ...taskWithoutFileLocation } = timeBlock;
 
-    handlers.handleGripMouseDown(t.copy(timeBlock), EditMode.DRAG);
+    startEdit({ timeBlock: t.copy(timeBlock), mode: EditMode.DRAG });
     moveCursorTo(timeBlock.startTime, "date");
 
     expect(

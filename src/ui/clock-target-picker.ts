@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { App, type IconName, setIcon, SuggestModal } from "obsidian";
 
-import type { LogEntryEditor } from "../service/log-entry-editor";
+import type { ClockLocation } from "../service/log-entry-editor";
 import type { SearchOrderingService } from "../service/search-ordering-service";
 import type { Match, SearchService } from "../service/search-service";
 import type { VaultFacade } from "../service/vault-facade";
@@ -27,20 +27,33 @@ function getSuggestionIcon(item: Suggestion): IconName {
   return "plus";
 }
 
-export class ClockInOnAnythingModal extends SuggestModal<Suggestion> {
+export interface ClockTargetLabels {
+  placeholder: string;
+  actionPurpose: string;
+}
+
+const clockInLabels: ClockTargetLabels = {
+  placeholder: "Clock in on a task or a file...",
+  actionPurpose: "to clock in",
+};
+
+export class ClockTargetModal extends SuggestModal<Suggestion> {
+  private picked = false;
+
   constructor(
     app: App,
     private readonly searchService: SearchService,
     private readonly searchOrderingService: SearchOrderingService,
     private readonly vaultFacade: VaultFacade,
-    private readonly logEntryEditor: LogEntryEditor,
+    private readonly onPicked: (location: ClockLocation | undefined) => void,
+    labels: ClockTargetLabels = clockInLabels,
   ) {
     super(app);
 
-    this.setPlaceholder("Clock in on a task or a file...");
+    this.setPlaceholder(labels.placeholder);
     this.setInstructions([
       { command: "↑↓", purpose: "to navigate" },
-      { command: "↵", purpose: "to clock in" },
+      { command: "↵", purpose: labels.actionPurpose },
       { command: "esc", purpose: "to dismiss" },
     ]);
   }
@@ -87,24 +100,44 @@ export class ClockInOnAnythingModal extends SuggestModal<Suggestion> {
   }
 
   async onChooseSuggestion(item: Suggestion) {
-    const { logEntryEditor, vaultFacade } = this;
+    this.picked = true;
 
-    if (item.type === "create") {
-      const path = item.name.endsWith(".md") ? item.name : `${item.name}.md`;
+    if (item.type !== "create") {
+      this.onPicked(item);
 
-      return runWithNoticeOnError(
-        Effect.gen(function* () {
-          yield* Effect.tryPromise({
-            try: () => vaultFacade.createFile(path, ""),
-            catch: (error) =>
-              new Error(`Could not create file ${path}`, { cause: error }),
-          });
-
-          yield* logEntryEditor.clockIn({ path });
-        }),
-      );
+      return;
     }
 
-    return runWithNoticeOnError(logEntryEditor.clockIn(item));
+    const { vaultFacade } = this;
+    const path = item.name.endsWith(".md") ? item.name : `${item.name}.md`;
+
+    const created = await runWithNoticeOnError(
+      Effect.tryPromise({
+        try: () => vaultFacade.createFile(path, ""),
+        catch: (error) =>
+          new Error(`Could not create file ${path}`, { cause: error }),
+      }),
+    );
+
+    this.onPicked(created ? { path } : undefined);
+  }
+
+  close() {
+    // Note: we need to be able to run onChooseSuggestion before onClose
+    window.setTimeout(() => {
+      if (!this.picked) {
+        this.onPicked(undefined);
+      }
+
+      super.close();
+    });
   }
 }
+
+/**
+ * Asks the user what to attach a clock to. Resolves to `undefined` when the
+ * modal gets dismissed, so callers can cancel whatever they were about to write.
+ */
+export type PickClockTarget = (
+  labels?: ClockTargetLabels,
+) => Promise<ClockLocation | undefined>;

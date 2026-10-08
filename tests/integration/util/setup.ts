@@ -1,11 +1,12 @@
 import { Function } from "effect";
 import type { Moment } from "moment";
 import { type CachedMetadata, MetadataCache, type Vault } from "obsidian";
-import { derived, get, writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 import { isNotVoid } from "typed-assert";
 import { expect, onTestFinished, vi } from "vitest";
 
 import { icalParseLowerLimit } from "../../../src/constants";
+import { createLogUpdateHandler } from "../../../src/create-log-update-handler";
 import { createUpdateHandler } from "../../../src/create-update-handler";
 import { initialState } from "../../../src/redux/date-ranges-slice";
 import { type IcalParseTaskResult } from "../../../src/redux/ical/init-ical-listeners";
@@ -28,11 +29,8 @@ import {
   type DayPlannerSettings,
   defaultSettingsForTests,
 } from "../../../src/settings";
-import {
-  isLocal,
-  type EditableTimeBlock,
-  type TimeBlock,
-} from "../../../src/time-block-types";
+import { type EditableTimeBlock } from "../../../src/time-block-types";
+import type { PickClockTarget } from "../../../src/ui/clock-target-picker";
 import { useTimeBlocks } from "../../../src/ui/hooks/use-time-blocks";
 import { createBackgroundBatchScheduler } from "../../../src/util/scheduler";
 import { getOneLineSummary } from "../../../src/util/time-block-utils";
@@ -138,6 +136,7 @@ export async function setUp(props?: {
 
   const onEditCanceled = vi.fn();
   const onEditConfirmed = vi.fn();
+  const pickClockTarget = vi.fn<PickClockTarget>().mockResolvedValue(undefined);
   const defaultPreloadedStateForTests: Partial<RootState> = {
     dateRanges: {
       ...initialState,
@@ -158,6 +157,8 @@ export async function setUp(props?: {
     store,
     remoteTimeBlocks,
     localTimeBlocks,
+    logTimeBlocks,
+    abortEditTrigger,
     pointerDateTime,
   } = createReactor({
     preloadedState: defaultPreloadedStateForTests,
@@ -168,6 +169,7 @@ export async function setUp(props?: {
     periodicNotes,
     settings,
     icalParseScheduler,
+    currentTime,
   });
 
   const { getState, dispatch } = store;
@@ -201,31 +203,32 @@ export async function setUp(props?: {
     getConfirmationInput: () => Promise.resolve(true),
   });
 
+  const onLogUpdate = createLogUpdateHandler({
+    logEntryEditor,
+    getState,
+    pickClockTarget,
+    onEditCanceled,
+  });
+
   const { timeBlocksWithTimeForToday, editContext, newlyStartedTimeBlocks } =
     useTimeBlocks({
       onUpdate,
+      onLogUpdate,
       onEditAborted: () => {},
-      periodicNotes,
-      workspaceFacade,
       isOnline,
       settingsStore,
       currentTime,
       pointerDateTime,
       remoteTimeBlocks,
       localTimeBlocks,
+      logTimeBlocks,
+      abortEditTrigger,
     });
 
-  const allTimeBlocks = derived(
-    editContext.dayToDisplayedTimeBlocks,
-    ($dayToDisplayedTimeBlocks) => {
-      return Object.values($dayToDisplayedTimeBlocks).flatMap(
-        ({ withTime, noTime }) => withTime.concat(noTime),
-      );
-    },
-  );
-
   // this prevents the store from resetting;
-  allTimeBlocks.subscribe(Function.constVoid);
+  editContext.getDisplayedAllDayTimeBlocksForMultiDayRow.subscribe(
+    Function.constVoid,
+  );
   localTimeBlocks.subscribe(Function.constVoid);
 
   function moveCursorTo(
@@ -238,10 +241,8 @@ export async function setUp(props?: {
     });
   }
 
-  function findTimeBlock(predicate: (timeBlock: TimeBlock) => boolean) {
-    const found = get(allTimeBlocks).filter(isLocal).find(predicate) as
-      | EditableTimeBlock
-      | undefined;
+  function findTimeBlock(predicate: (timeBlock: EditableTimeBlock) => boolean) {
+    const found = get(localTimeBlocks).find(predicate);
 
     isNotVoid(found, `TimeBlock not found`);
 
@@ -276,11 +277,11 @@ export async function setUp(props?: {
     vault,
     findTimeBlock,
     findByText,
-    allTimeBlocks,
     transactionWriter,
     currentTime,
     metadataCache,
     yamlEditTargets,
     logEntryEditor,
+    pickClockTarget,
   };
 }
