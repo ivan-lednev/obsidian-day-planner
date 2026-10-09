@@ -121,7 +121,7 @@ export default class DayPlanner extends Plugin {
     const getTasksApi = createGetTasksApi(this.app);
     const listPropsParser = new ListPropsParser(vault, metadataCache);
 
-    this.periodicNotes = new PeriodicNotes();
+    this.periodicNotes = new PeriodicNotes(vault);
 
     const indexServices = createIndexServices({
       listPropsParser,
