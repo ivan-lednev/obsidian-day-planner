@@ -14,7 +14,7 @@ import {
   selectEntriesForPath,
 } from "../../src/redux/index/index-slice";
 import { strictParse } from "../../src/util/moment";
-import { getDayKey } from "../../src/util/time-block-utils";
+import { getCutEdges, getDayKey } from "../../src/util/time-block-utils";
 
 import { setUp } from "./util/setup";
 
@@ -139,21 +139,23 @@ describe("Indexing", () => {
     });
   });
 
-  test("Returns truncated active log entries for today's range", async () => {
+  test("Marks an active clock as continuing past the bottom of today's column", async () => {
     const now = window.moment();
     const { editContext } = await setUp({ visibleDays: [getDayKey(now)] });
 
-    expect(
-      get(editContext.getDisplayedLogTimeBlocksForTimeline(now)),
-    ).toContainEqual(
-      expect.objectContaining({
-        text: expect.stringContaining("Task"),
-        truncated: ["bottom"],
-      }),
-    );
+    const activeClock = get(
+      editContext.lanes.log.getTimeBlocksForDay(now),
+    ).find((it) => it.text.includes("Task"));
+
+    isNotVoid(activeClock);
+
+    // Today's column does not clip a running clock: its end is the current
+    // moment, which is inside the day.
+    expect(activeClock.truncated).not.toContain("bottom");
+    expect(getCutEdges(activeClock)).toContain("bottom");
   });
 
-  test("Does not truncate active log entries in yesterday's view", async () => {
+  test("Clips an active clock crossing midnight to yesterday's column", async () => {
     const now = window.moment();
     const yesterday = now.clone().subtract(1, "day");
     const { editContext } = await setUp({
@@ -161,14 +163,17 @@ describe("Indexing", () => {
     });
 
     const logTimeBlocksForYesterday = get(
-      editContext.getDisplayedLogTimeBlocksForTimeline(yesterday),
+      editContext.lanes.log.getTimeBlocksForDay(yesterday),
     );
 
     const activeClock = logTimeBlocksForYesterday.find((it) =>
       it.text.includes("Task"),
     );
 
-    expect(activeClock).not.toHaveProperty("truncated");
+    expect(activeClock).toMatchObject({
+      startTime: yesterday.clone().startOf("day"),
+      truncated: ["top", "bottom"],
+    });
   });
 
   test("Returns time block views in range; nested blocks get parsed", async () => {

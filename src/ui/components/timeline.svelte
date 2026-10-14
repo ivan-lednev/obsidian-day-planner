@@ -17,10 +17,10 @@
 
   import Column from "./column.svelte";
   import LocalTimeBlock from "./local-time-block.svelte";
+  import LogTimeBlockControls from "./log-time-block-controls.svelte";
   import NeedleClockControl from "./needle-clock-control.svelte";
   import Needle from "./needle.svelte";
   import PositionedTimeBlock from "./positioned-time-block.svelte";
-  import Selectable from "./selectable.svelte";
   import UnscheduledTimeBlock from "./unscheduled-time-block.svelte";
 
   const {
@@ -30,13 +30,7 @@
 
   const {
     settingsStore,
-    editContext: {
-      confirmEdit,
-      startCreate,
-      getDisplayedTimeBlocksForTimeline,
-      getDisplayedLogTimeBlocksForTimeline,
-      editOperation,
-    },
+    editContext: { confirmEdit, lanes, editOperation },
     pointerDateTime,
     settingsSignal,
     useSelector,
@@ -46,10 +40,10 @@
   } = getObsidianContext();
 
   const displayedTimeBlocksForTimeline = $derived(
-    getDisplayedTimeBlocksForTimeline(day),
+    lanes.plan.getTimeBlocksForDay(day),
   );
   const displayedLogTimeBlocksForTimeline = $derived(
-    getDisplayedLogTimeBlocksForTimeline(day),
+    lanes.log.getTimeBlocksForDay(day),
   );
 
   const logEntriesById = useSelector(selectLogEntriesById);
@@ -87,40 +81,67 @@
     }
   }
 
-  const plannerPointer = trackPointerDateTime({
+  const pointer = trackPointerDateTime({
     getDay: () => day,
     pointerDateTime,
     settingsSignal,
   });
 
-  function handleContainerPointerDown(event: MouseEvent | TouchEvent) {
-    plannerPointer.sync(event);
-    startCreate();
-  }
+  let plannerBackgroundEl: HTMLDivElement | undefined = $state();
+  let trackerBackgroundEl: HTMLDivElement | undefined = $state();
 
-  function handleContainerPointerMove(event: MouseEvent | TouchEvent) {
-    // Deliberately the planner's own operation and not `isEditing`: the pointer
-    // should only follow the column that is actually being edited.
+  function syncPointerDuringEdit(event: MouseEvent | TouchEvent) {
     if (get(editOperation)) {
-      plannerPointer.sync(event);
+      pointer.sync(event);
     }
   }
 
-  const timelineGestures = createGestures({
-    onlongpress: (event) => {
-      if (!plannerPointer.isOnBackground(event)) {
-        return;
-      }
+  function createColumnHandlers(props: {
+    getBackgroundEl: () => HTMLDivElement | undefined;
+    startCreate: () => void;
+  }) {
+    const { getBackgroundEl, startCreate } = props;
 
-      handleContainerPointerDown(event);
-    },
-    onpanmove: handleContainerPointerMove,
-    onpanend: confirmEdit,
-    options: { mouseSupport: false },
+    function startCreateAt(event: MouseEvent | TouchEvent) {
+      pointer.sync(event);
+      startCreate();
+    }
+
+    return {
+      onpointerdown: (event: PointerEvent) => {
+        if (isTouchEvent(event) || event.target !== getBackgroundEl()) {
+          return;
+        }
+
+        startCreateAt(event);
+      },
+      gestures: createGestures({
+        onlongpress: (event) => {
+          if (event.target !== getBackgroundEl()) {
+            return;
+          }
+
+          startCreateAt(event);
+        },
+        onpanmove: syncPointerDuringEdit,
+        onpanend: confirmEdit,
+        options: { mouseSupport: false },
+      }),
+    };
+  }
+
+  const plannerColumn = createColumnHandlers({
+    getBackgroundEl: () => plannerBackgroundEl,
+    startCreate: lanes.plan.startCreate,
+  });
+
+  const trackerColumn = createColumnHandlers({
+    getBackgroundEl: () => trackerBackgroundEl,
+    startCreate: lanes.log.startCreate,
   });
 </script>
 
-<div class="timeline">
+<div class="timeline" {@attach pointer.attachment}>
   {#if $settingsStore.timelineColumns.planner}
     <Column visibleHours={getVisibleHours($settingsStore)}>
       {#if $isToday(day)}
@@ -128,18 +149,12 @@
       {/if}
 
       <div
+        bind:this={plannerBackgroundEl}
         class="tasks absolute-stretch-x"
-        onpointerdown={(event) => {
-          if (isTouchEvent(event) || !plannerPointer.isOnBackground(event)) {
-            return;
-          }
-
-          handleContainerPointerDown(event);
-        }}
-        onpointermove={handleContainerPointerMove}
+        onpointerdown={plannerColumn.onpointerdown}
+        onpointermove={syncPointerDuringEdit}
         onpointerup={confirmEdit}
-        {@attach plannerPointer.attachment}
-        {@attach timelineGestures}
+        {@attach plannerColumn.gestures}
       >
         {#each $displayedTimeBlocksForTimeline as timeBlock (timeBlock.id)}
           <PositionedTimeBlock {timeBlock}>
@@ -164,31 +179,47 @@
         </Needle>
       {/if}
 
-      <div class="tasks absolute-stretch-x">
+      <div
+        bind:this={trackerBackgroundEl}
+        class="tasks absolute-stretch-x"
+        onpointerdown={trackerColumn.onpointerdown}
+        onpointermove={syncPointerDuringEdit}
+        onpointerup={confirmEdit}
+        {@attach trackerColumn.gestures}
+      >
         {#each $displayedLogTimeBlocksForTimeline as timeBlock (timeBlock.id)}
+          {#snippet blockProps()}
+            {getBlockProps(timeBlock, settingsSignal.current)}
+          {/snippet}
+
           <PositionedTimeBlock {timeBlock}>
-            <Selectable
-              onSecondarySelect={(event) => showLogBlockMenu(event, timeBlock)}
-            >
-              {#snippet children({
-                gestures,
-                clearOnPointerUpOutside,
-                onpointerup,
-                state,
-              })}
-                <LocalTimeBlock
-                  isActive={state === "secondary"}
-                  {onpointerup}
-                  {timeBlock}
-                  {@attach gestures}
-                  {@attach clearOnPointerUpOutside}
-                >
-                  {#snippet bottomDecoration()}
-                    {getBlockProps(timeBlock, settingsSignal.current)}
-                  {/snippet}
-                </LocalTimeBlock>
-              {/snippet}
-            </Selectable>
+            {#if timeBlock.source === "unwrittenLog"}
+              <LocalTimeBlock bottomDecoration={blockProps} {timeBlock} />
+            {:else}
+              <LogTimeBlockControls
+                onSecondarySelect={(event) =>
+                  showLogBlockMenu(event, timeBlock)}
+                {timeBlock}
+              >
+                {#snippet content({
+                  isActive,
+                  onPointerUp,
+                  gestures,
+                  clearOnPointerUpOutside,
+                  anchor,
+                })}
+                  <LocalTimeBlock
+                    bottomDecoration={blockProps}
+                    {isActive}
+                    onpointerup={onPointerUp}
+                    {timeBlock}
+                    {@attach gestures}
+                    {@attach clearOnPointerUpOutside}
+                    {@attach anchor}
+                  />
+                {/snippet}
+              </LogTimeBlockControls>
+            {/if}
           </PositionedTimeBlock>
         {/each}
       </div>

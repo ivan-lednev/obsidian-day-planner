@@ -1,8 +1,4 @@
-import type {
-  EditableTimeBlock,
-  TimeInterval,
-  WithDuration,
-} from "../../../time-block-types";
+import type { TimeInterval } from "../../../time-block-types";
 
 export enum EditMode {
   DRAG = "DRAG",
@@ -21,9 +17,10 @@ export type EditableInterval = TimeInterval & {
   isAllDayEvent?: boolean;
 };
 
-export interface EditOperation<
-  Block extends EditableInterval = WithDuration<EditableTimeBlock>,
-> {
+/**
+ * Planner and tracker blocks keep separate baselines and separate write paths.
+ */
+export interface EditOperation<Block extends EditableInterval> {
   timeBlock: Block;
   mode: EditMode;
 }

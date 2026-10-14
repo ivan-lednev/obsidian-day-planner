@@ -11,6 +11,7 @@ import {
   icalRefreshIntervalMillis,
   icalParseLowerLimit,
 } from "./constants";
+import { createLogUpdateHandler } from "./create-log-update-handler";
 import {
   createDeleteTimeBlockHandler,
   createEditLineHandler,
@@ -67,7 +68,11 @@ import type {
   RemoteTimeBlock,
 } from "./time-block-types";
 import type { ObsidianContext, OnUpdateFn, PointerDateTime } from "./types";
-import { ClockInOnAnythingModal } from "./ui/clock-in-on-anything-modal";
+import { createRenderMarkdownAttachmentFactory } from "./ui/actions/render-markdown.svelte";
+import {
+  ClockTargetModal,
+  type PickClockTarget,
+} from "./ui/clock-target-picker";
 import { askForConfirmation } from "./ui/confirmation-modal";
 import { createEditorMenuCallback } from "./ui/editor-menu";
 import { useTimeBlocks } from "./ui/hooks/use-time-blocks";
@@ -100,14 +105,26 @@ export default class DayPlanner extends Plugin {
   private metadataCacheFacade!: MetadataCacheFacade;
   private undoNotice!: UndoNotice;
 
-  private openClockInOnAnythingModal = () => {
-    new ClockInOnAnythingModal(
-      this.app,
-      this.searchService,
-      this.searchOrderingService,
-      this.vaultFacade,
-      this.logEntryEditor,
-    ).open();
+  private pickClockTarget: PickClockTarget = (labels) =>
+    new Promise((resolve) => {
+      new ClockTargetModal(
+        this.app,
+        this.searchService,
+        this.searchOrderingService,
+        this.vaultFacade,
+        resolve,
+        labels,
+      ).open();
+    });
+
+  private openClockInOnAnythingModal = async () => {
+    const location = await this.pickClockTarget();
+
+    if (!location) {
+      return;
+    }
+
+    await runWithNoticeOnError(this.logEntryEditor.clockIn(location));
   };
 
   async onload() {
@@ -151,6 +168,7 @@ export default class DayPlanner extends Plugin {
       remoteTimeBlocks,
       localTimeBlocks,
       logTimeBlocks,
+      abortEditTrigger,
       pointerDateTime,
       dateRanges,
     } = createReactor({
@@ -193,6 +211,7 @@ export default class DayPlanner extends Plugin {
       useSelector,
       localTimeBlocks,
       logTimeBlocks,
+      abortEditTrigger,
       dateRanges,
     });
 
@@ -470,6 +489,7 @@ export default class DayPlanner extends Plugin {
     remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
     localTimeBlocks: Readable<EditableTimeBlock[]>;
     logTimeBlocks: Readable<LogTimeBlock[]>;
+    abortEditTrigger: Readable<unknown>;
     pointerDateTime: Writable<PointerDateTime>;
     dateRanges: DateRanges;
   }) {
@@ -480,6 +500,7 @@ export default class DayPlanner extends Plugin {
       remoteTimeBlocks,
       localTimeBlocks,
       logTimeBlocks,
+      abortEditTrigger,
       pointerDateTime,
       dateRanges,
     } = props;
@@ -508,6 +529,15 @@ export default class DayPlanner extends Plugin {
         }),
     });
 
+    const onLogUpdate = createLogUpdateHandler({
+      logEntryEditor: this.logEntryEditor,
+      getState: store.getState,
+      pickClockTarget: this.pickClockTarget,
+      onEditCanceled: () => {
+        new Notice("Edit canceled");
+      },
+    });
+
     const onEditAborted = () => {
       new Notice("Tasks changed externally; edit canceled");
     };
@@ -519,6 +549,7 @@ export default class DayPlanner extends Plugin {
     const { timeBlocksWithTimeForToday, editContext, newlyStartedTimeBlocks } =
       useTimeBlocks({
         onUpdate,
+        onLogUpdate,
         onEditAborted,
         isOnline,
         settingsStore: this.settingsStore,
@@ -527,10 +558,10 @@ export default class DayPlanner extends Plugin {
         remoteTimeBlocks,
         localTimeBlocks,
         logTimeBlocks,
+        abortEditTrigger,
       });
 
-    // Once the time tracker column becomes editable, its operation joins this
-    // one instead of every consumer growing a second subscription.
+    // Both columns share one operation, so this covers editing in either.
     const isEditing = derived(editContext.editOperation, ($editOperation) =>
       Boolean($editOperation),
     );
@@ -655,7 +686,9 @@ export default class DayPlanner extends Plugin {
       deleteTimeBlock,
       workspaceFacade: this.workspaceFacade,
       initWeeklyView: this.initWeeklyLeaf,
-      renderMarkdown: createRenderMarkdown(this.app),
+      createRenderMarkdownAttachment: createRenderMarkdownAttachmentFactory({
+        renderMarkdown: createRenderMarkdown(this.app),
+      }),
       toggleCheckboxInFile: this.vaultFacade.toggleCheckboxInFile,
       editContext,
       isEditing,

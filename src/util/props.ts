@@ -43,16 +43,18 @@ export function isWithOpenClock(props?: Props) {
   return Boolean(props?.planner?.log?.find((it) => !it.end));
 }
 
-export function createPropsWithOpenClock(): Props {
+export function addLogEntry(props: Props | undefined, entry: LogEntry): Props {
   return {
+    ...props,
     planner: {
-      log: [
-        {
-          start: window.moment().format(clockFormat),
-        },
-      ],
+      ...props?.planner,
+      log: [...(props?.planner?.log || []), entry],
     },
   };
+}
+
+function createOpenClock(): LogEntry {
+  return { start: window.moment().format(clockFormat) };
 }
 
 export function addOpenClock(props: Props): Props {
@@ -60,22 +62,11 @@ export function addOpenClock(props: Props): Props {
     throw new Error("There is already an open clock");
   }
 
-  return {
-    ...props,
-    planner: {
-      ...props.planner,
-      log: [
-        ...(props.planner?.log || []),
-        {
-          start: window.moment().format(clockFormat),
-        },
-      ],
-    },
-  };
+  return addLogEntry(props, createOpenClock());
 }
 
 export function addOpenClockOrCreateProps(props?: Props): Props {
-  return props ? addOpenClock(props) : createPropsWithOpenClock();
+  return props ? addOpenClock(props) : addLogEntry(props, createOpenClock());
 }
 
 export function cancelOpenClock(props: Props): Props {

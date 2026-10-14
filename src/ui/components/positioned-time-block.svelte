@@ -7,6 +7,7 @@
     WithPlacing,
     WithDuration,
   } from "../../time-block-types";
+  import { getCutEdges } from "../../util/time-block-utils";
   import {
     useColoredTimeline,
     useColorsForRelationToNow,
@@ -28,7 +29,7 @@
   const relationToNow = $derived(useColorsForRelationToNow(timeBlock));
 
   const padding = $derived(
-    timeBlock.truncated?.includes("bottom") ? "0 1px 0" : undefined,
+    getCutEdges(timeBlock).includes("bottom") ? "0 1px 0" : undefined,
   );
 
   const coloredTimeline = $derived(useColoredTimeline(timeBlock));

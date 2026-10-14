@@ -27,7 +27,7 @@
       <ControlButton
         --border-radius="0"
         label="Clock in on anything"
-        onclick={() => openClockInOnAnythingModal()}
+        onclick={openClockInOnAnythingModal}
       >
         {#snippet icon()}
           <Plus class="svg-icon" />

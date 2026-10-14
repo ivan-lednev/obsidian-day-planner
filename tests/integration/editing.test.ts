@@ -13,7 +13,7 @@ describe("Editing", () => {
         visibleDays: ["2025-07-19"],
       });
 
-      editContext.startEdit({
+      editContext.lanes.plan.startEdit({
         timeBlock: findByText("List item under planner heading"),
         mode: EditMode.DRAG,
       });
@@ -30,7 +30,7 @@ describe("Editing", () => {
         visibleDays: ["2025-07-19"],
       });
 
-      editContext.startEdit({
+      editContext.lanes.plan.startEdit({
         timeBlock: findByText("List item under planner heading"),
         mode: EditMode.DRAG,
       });
@@ -48,7 +48,7 @@ describe("Editing", () => {
       });
 
       moveCursorTo(window.moment("2025-07-20 13:00"));
-      editContext.startCreate();
+      editContext.lanes.plan.startCreate();
       moveCursorTo(window.moment("2025-07-20 14:00"));
 
       await editContext.confirmEdit();
@@ -66,7 +66,7 @@ describe("Editing", () => {
         },
       });
 
-      editContext.startEdit({
+      editContext.lanes.plan.startEdit({
         timeBlock: findByText("Parent"),
         mode: EditMode.DRAG,
       });
@@ -95,7 +95,7 @@ describe("Editing", () => {
         },
       });
 
-      editContext.startEdit({
+      editContext.lanes.plan.startEdit({
         timeBlock: findByText("Child"),
         mode: EditMode.DRAG,
       });
@@ -120,7 +120,7 @@ describe("Editing", () => {
         visibleDays: ["2025-07-19"],
       });
 
-      editContext.startEdit({
+      editContext.lanes.plan.startEdit({
         timeBlock: findByText("Task without time"),
         mode: EditMode.DRAG,
       });
@@ -137,7 +137,7 @@ describe("Editing", () => {
         visibleDays: ["2025-07-19"],
       });
 
-      editContext.startEdit({
+      editContext.lanes.plan.startEdit({
         timeBlock: findByText("Task with time"),
         mode: EditMode.DRAG,
       });
@@ -155,7 +155,7 @@ describe("Editing", () => {
         loadedFixtures: ["tasks.md"],
       });
 
-      editContext.startEdit({
+      editContext.lanes.plan.startEdit({
         timeBlock: findByText("Task with time"),
         mode: EditMode.DRAG,
       });
@@ -183,7 +183,7 @@ describe("Editing", () => {
         visibleDays: ["2025-07-19"],
       });
 
-      editContext.startEdit({
+      editContext.lanes.plan.startEdit({
         timeBlock: findByText(label),
         mode: EditMode.DRAG,
       });
@@ -209,7 +209,7 @@ describe("Editing", () => {
         visibleDays: ["2025-07-19"],
       });
 
-      editContext.startEdit({
+      editContext.lanes.plan.startEdit({
         timeBlock: findByText(label),
         mode: EditMode.DRAG,
       });

@@ -6,6 +6,7 @@ import { isNotVoid } from "typed-assert";
 import { expect, onTestFinished, vi } from "vitest";
 
 import { icalParseLowerLimit } from "../../../src/constants";
+import { createLogUpdateHandler } from "../../../src/create-log-update-handler";
 import { createUpdateHandler } from "../../../src/create-update-handler";
 import { initialState } from "../../../src/redux/date-ranges-slice";
 import { type IcalParseTaskResult } from "../../../src/redux/ical/init-ical-listeners";
@@ -29,6 +30,7 @@ import {
   defaultSettingsForTests,
 } from "../../../src/settings";
 import { type EditableTimeBlock } from "../../../src/time-block-types";
+import type { PickClockTarget } from "../../../src/ui/clock-target-picker";
 import { useTimeBlocks } from "../../../src/ui/hooks/use-time-blocks";
 import { createBackgroundBatchScheduler } from "../../../src/util/scheduler";
 import { getOneLineSummary } from "../../../src/util/time-block-utils";
@@ -134,6 +136,7 @@ export async function setUp(props?: {
 
   const onEditCanceled = vi.fn();
   const onEditConfirmed = vi.fn();
+  const pickClockTarget = vi.fn<PickClockTarget>().mockResolvedValue(undefined);
   const defaultPreloadedStateForTests: Partial<RootState> = {
     dateRanges: {
       ...initialState,
@@ -155,6 +158,7 @@ export async function setUp(props?: {
     remoteTimeBlocks,
     localTimeBlocks,
     logTimeBlocks,
+    abortEditTrigger,
     pointerDateTime,
   } = createReactor({
     preloadedState: defaultPreloadedStateForTests,
@@ -199,9 +203,17 @@ export async function setUp(props?: {
     getConfirmationInput: () => Promise.resolve(true),
   });
 
+  const onLogUpdate = createLogUpdateHandler({
+    logEntryEditor,
+    getState,
+    pickClockTarget,
+    onEditCanceled,
+  });
+
   const { timeBlocksWithTimeForToday, editContext, newlyStartedTimeBlocks } =
     useTimeBlocks({
       onUpdate,
+      onLogUpdate,
       onEditAborted: () => {},
       isOnline,
       settingsStore,
@@ -210,6 +222,7 @@ export async function setUp(props?: {
       remoteTimeBlocks,
       localTimeBlocks,
       logTimeBlocks,
+      abortEditTrigger,
     });
 
   // this prevents the store from resetting;
@@ -269,5 +282,6 @@ export async function setUp(props?: {
     metadataCache,
     yamlEditTargets,
     logEntryEditor,
+    pickClockTarget,
   };
 }

@@ -21,7 +21,7 @@ export function mountStatusBarWidget(props: {
   logEntryEditor: LogEntryEditor;
   workspaceFacade: WorkspaceFacade;
   openLogEntryEditModal: OpenLogEntryEditModal;
-  openClockInOnAnythingModal: () => void;
+  openClockInOnAnythingModal: () => Promise<void>;
 }) {
   const {
     plugin,

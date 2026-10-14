@@ -3,6 +3,7 @@ import { derived, type Readable, type Writable } from "svelte/store";
 
 import type { DayPlannerSettings } from "../../settings";
 import type {
+  EditableLogTimeBlock,
   EditableTimeBlock,
   LogTimeBlock,
   RemoteTimeBlock,
@@ -10,7 +11,6 @@ import type {
   WithDuration,
 } from "../../time-block-types";
 import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../../types";
-import { getUpdateTrigger } from "../../util/store";
 
 import { useEditContext } from "./use-edit/use-edit-context";
 import { useNewlyStartedTimeBlocks } from "./use-newly-started-time-blocks";
@@ -20,21 +20,25 @@ export function useTimeBlocks(props: {
   isOnline: Readable<boolean>;
   currentTime: Readable<Moment>;
   onUpdate: OnUpdateFn;
+  onLogUpdate: OnUpdateFn<EditableLogTimeBlock>;
   onEditAborted: OnEditAbortedFn;
   pointerDateTime: Readable<PointerDateTime>;
   remoteTimeBlocks: Readable<RemoteTimeBlock[]>;
   localTimeBlocks: Readable<EditableTimeBlock[]>;
   logTimeBlocks: Readable<LogTimeBlock[]>;
+  abortEditTrigger: Readable<unknown>;
 }) {
   const {
     settingsStore,
     currentTime,
     pointerDateTime,
     onUpdate,
+    onLogUpdate,
     onEditAborted,
     remoteTimeBlocks,
     localTimeBlocks,
     logTimeBlocks,
+    abortEditTrigger,
   } = props;
 
   const timeBlocksWithTimeForToday = derived(
@@ -54,16 +58,14 @@ export function useTimeBlocks(props: {
     },
   );
 
-  const abortEditTrigger = derived(localTimeBlocks, getUpdateTrigger);
-
   const editContext = useEditContext({
     onUpdate,
+    onLogUpdate,
     onEditAborted,
     settingsStore,
     localTimeBlocks,
     logTimeBlocks,
     remoteTimeBlocks,
-    currentTime,
     pointerDateTime,
     abortEditTrigger,
   });

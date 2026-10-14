@@ -2,7 +2,11 @@ import type { Attachment } from "svelte/attachments";
 import { derived, writable } from "svelte/store";
 
 import { getObsidianContext } from "../../context/obsidian-context";
-import { isListItemSourced, type LocalTimeBlock } from "../../time-block-types";
+import {
+  isListItemSourced,
+  isUnwritten,
+  type LocalTimeBlock,
+} from "../../time-block-types";
 
 export function hoverPreview(
   timeBlock: LocalTimeBlock,
@@ -42,7 +46,7 @@ export function hoverPreview(
         return;
       }
 
-      if (timeBlock.source === "unwritten") {
+      if (isUnwritten(timeBlock)) {
         return;
       }
 
