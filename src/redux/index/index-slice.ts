@@ -412,7 +412,7 @@ export function createIndexListener(props: {
         const metadata = metadataCache.getCache(path);
 
         // todo: this is a leak: the orchestrator knows about indexer specifics
-        if (!metadata?.listItems && !metadata?.frontmatter) {
+        if (!metadata) {
           return undefined;
         }
 
