@@ -16,13 +16,13 @@ import {
   getActivityLogEntries,
 } from "../util/activity-log-location";
 import {
-  buildActivityFinishUpdate,
+  finishActivityRecord,
+  getOpenActivityLog,
   getActivityFinishFields,
 } from "../util/activity-workflow";
 import {
   appendNoteToActivity,
   cancelActivityLogEntry,
-  closeActivityLogEntry,
   propsSchema,
   updateActivityDetails,
   updateActivityLogEntry,
@@ -82,16 +82,15 @@ export class ActivityEditor {
       fields: getActivityFinishFields(activityName),
     });
     if (!values) return;
-    const attributes = buildActivityFinishUpdate(activityName, values);
     await this.updateSelectedActivity(block, (props, index, logIndex) => ({
       ...props,
       activities: props.activities!.with(
         index,
-        closeActivityLogEntry(
+        finishActivityRecord(
           props.activities![index],
-          logIndex,
-          attributes,
+          values,
           window.moment().format(clockFormat),
+          props.activities![index].log![logIndex].start,
         ),
       ),
     }));
@@ -183,7 +182,7 @@ export class ActivityEditor {
       .getActivitiesWithLocations()
       .flatMap(({ path, activity, activityIndex }) =>
         getActivityLogEntries(path, [activity])
-          .filter(({ log }) => !log.end)
+          .filter(({ activity, log }) => getOpenActivityLog(activity) === log)
           .map(({ log, activityLocation }) => {
             const text = `${getActivityDisplayLabel(activity.activity, activity)} — ${log.start} (${path}, activity ${activityIndex + 1}, log ${activityLocation.logEntryIndex + 1})`;
             return {

@@ -3,6 +3,7 @@ import type { Moment } from "moment";
 import type { ActivityResourceMetadata } from "./activity-field-options";
 import {
   normalizeActivities,
+  activitySchema,
   propsSchema,
   type Activity,
 } from "./activity-schema";
@@ -60,7 +61,7 @@ export function writeActivityFile(
   codec: ActivityYamlCodec,
 ) {
   return codec.stringify({
-    activities,
+    activities: activities.map((activity) => activitySchema.parse(activity)),
   });
 }
 

@@ -78,14 +78,11 @@ final class WidgetTimelineRenderer {
             int qualityWidth = quality.isEmpty() ? 0 : Math.max(1, Math.min(contentWidth / 2,
                 (int) Math.ceil(qualityPaint.measureText(quality))));
             int titleWidth = Math.max(1, contentWidth - (qualityWidth > 0 ? qualityWidth + 5 : 0));
-            int titleHeight = paragraph(canvas, block.getString("title"), title, left + 5, y, titleWidth, 2);
+            String titleText = (block.getBoolean("active") ? "● " : "") + block.getString("title");
+            int titleHeight = paragraph(canvas, titleText, title, left + 5, y, titleWidth, 2);
             int qualityHeight = qualityWidth == 0 ? 0 : paragraph(canvas, quality, qualityPaint,
                 right - 5 - qualityWidth, y, qualityWidth, 1, Layout.Alignment.ALIGN_OPPOSITE);
             y += Math.max(titleHeight, qualityHeight);
-            if (y + 13 * fontScale < bottom) {
-                String time = (block.getBoolean("active") ? "● " : "") + block.getString("timeLabel");
-                y += paragraph(canvas, time, textPaint(muted, 10 * fontScale, false), left + 5, y + 2, contentWidth, 1) + 2;
-            }
             String notes = block.optString("notes", "");
             int lines = Math.min(3, (int) ((bottom - y - 18 * fontScale) / (14 * fontScale)));
             if (!notes.isEmpty() && lines > 0)

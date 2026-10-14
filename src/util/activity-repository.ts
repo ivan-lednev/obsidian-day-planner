@@ -1,3 +1,4 @@
+import { getOpenActivityLog } from "./activity-open-clock";
 import { activitySchema, type Activity } from "./activity-schema";
 import {
   activitiesFolder,
@@ -7,6 +8,11 @@ import {
   writeActivityFile,
   type ActivityYamlCodec,
 } from "./activity-storage";
+import {
+  finishActivityRecord,
+  mergeActivityDetails,
+  type ActivityValues,
+} from "./activity-workflow";
 
 /** Paths are relative to the vault root. Records live exclusively in vault files. */
 export interface ActivityFileStore {
@@ -116,6 +122,27 @@ export class ActivityRepository {
       return records.with(matches[0], updated);
     });
     return updated!;
+  }
+
+  async finishActivity(
+    id: string,
+    values: ActivityValues,
+    expectedStart?: string,
+    endedAt: number | string = Date.now(),
+  ) {
+    return this.updateActivity(id, (record) =>
+      finishActivityRecord(record, values, endedAt, expectedStart),
+    );
+  }
+
+  async appendActivityNote(id: string, note: string) {
+    const text = note.trim();
+    if (!text) throw new Error("Note is empty");
+    return this.updateActivity(id, (record) => {
+      if (!getOpenActivityLog(record))
+        throw new Error("There is no open clock");
+      return mergeActivityDetails(record, { notes: text });
+    });
   }
 
   async updateActivities(

@@ -107,16 +107,13 @@ describe("toMarkdown", () => {
 });
 
 describe("cancelOpenClockByActivityIndex", () => {
-  test("removes the activity if only unfinished clocks remain", () => {
+  test("removes the activity when its sole log is unfinished", () => {
     const result = cancelOpenClockByActivityIndex(
       {
         activities: [
           {
             activity: "work",
-            log: [
-              { start: "2026-01-01T10:00:00Z" },
-              { start: "2026-01-01T12:00:00Z" },
-            ],
+            log: [{ start: "2026-01-01T10:00:00Z" }],
           },
         ],
       },

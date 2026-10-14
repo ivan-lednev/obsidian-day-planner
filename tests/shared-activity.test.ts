@@ -65,14 +65,13 @@ describe("shared activity API without a UI or platform runtime", () => {
     expect(hasOpenActivityClock(finished.activities![0])).toBe(false);
   });
 
-  it("only completes the first open log and preserves completed sessions when cancelling", () => {
+  it("completes the sole open log and preserves completed sessions when cancelling", () => {
     const record: Activity = {
       activity: "walk",
       taskIds: [],
       log: [
         { start: "2026-10-06 09:00:00", end: "2026-10-06 09:30:00" },
         { start: "2026-10-06 10:00:00" },
-        { start: "2026-10-06 11:00:00" },
       ],
     };
     const finished = clockOut(
@@ -84,11 +83,13 @@ describe("shared activity API without a UI or platform runtime", () => {
     expect(finished.activities![0].log).toEqual([
       record.log![0],
       { start: "2026-10-06 10:00:00", end: "2026-10-06 10:30:00" },
-      record.log![2],
     ]);
-    const cancelled = cancelOpenClockByActivityIndex(finished, 0);
-    expect(cancelled.activities![0].log).toHaveLength(2);
-    expect(record.log).toHaveLength(3);
+    const cancelled = cancelOpenClockByActivityIndex(
+      { activities: [record] },
+      0,
+    );
+    expect(cancelled.activities![0].log).toEqual([record.log![0]]);
+    expect(record.log).toHaveLength(2);
   });
 
   it("writes complete weekly files with the same year folders and optional task links", () => {

@@ -2,6 +2,7 @@ import type { Activity, Props, LogEntry } from "./activity-schema";
 import {
   closeActivityRecord,
   createActivityRecordWithAttributes,
+  getOpenActivityLog,
   hasOpenActivityClock,
   mergeActivityDetails,
 } from "./activity-workflow";
@@ -99,6 +100,8 @@ export function updateActivityLogEntry(
     }),
   });
 
+  getOpenActivityLog(updatedActivities[activityIndex]);
+
   return {
     ...props,
     activities: updatedActivities,
@@ -142,7 +145,8 @@ export function cancelOpenClockByActivityIndex(
     throw new Error("There is no log");
   }
 
-  const openClockIndex = log.findIndex((it) => !it.end);
+  const openLog = getOpenActivityLog(activityWithOpenClock);
+  const openClockIndex = openLog ? log.indexOf(openLog) : -1;
 
   if (openClockIndex === -1) {
     throw new Error("There is no open clock");
@@ -172,6 +176,7 @@ export function cancelActivityLogEntry(
 ): Props {
   const activities = getActivitiesCopy(props);
   const activity = activities[activityIndex];
+  if (activity) getOpenActivityLog(activity);
   const entry = activity?.log?.[logEntryIndex];
   if (!entry || entry.end) throw new Error("There is no open clock");
   const log = activity.log!.toSpliced(logEntryIndex, 1);

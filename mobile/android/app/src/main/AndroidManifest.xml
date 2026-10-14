@@ -43,6 +43,14 @@
             android:permission="android.permission.BIND_REMOTEVIEWS"
             android:exported="false" />
 
+        <receiver android:name=".notifications.ActivityClocksWidget"
+            android:label="@string/clocks_widget_name" android:exported="false">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/activity_clocks_widget" />
+        </receiver>
+        <service android:name=".notifications.ActivityClocksService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

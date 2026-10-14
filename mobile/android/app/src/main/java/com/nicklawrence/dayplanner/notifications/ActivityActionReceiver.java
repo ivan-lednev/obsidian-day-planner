@@ -21,14 +21,13 @@ public class ActivityActionReceiver extends BroadcastReceiver {
         PendingResult pending = goAsync();
         executor.execute(() -> {
             try {
-                synchronized (VaultFiles.LOCK) {
-                    ActiveActivityStore store = new ActiveActivityStore(context);
-                    if (!store.isActive() || !store.id().equals(intent.getStringExtra("activity_id")) ||
-                        !store.connectionId().equals(intent.getStringExtra("vault_uri"))) return;
-                    store.appendNote(note.toString());
-                    ActivityTimelineWidget.refreshAll(context);
-                    ActivityNotificationManager.show(context, store, "Note added");
-                }
+                ActiveActivityStore store = new ActiveActivityStore(context);
+                if (!store.isActive() || !store.id().equals(intent.getStringExtra("activity_id")) ||
+                    !store.connectionId().equals(intent.getStringExtra("vault_uri"))) return;
+                store.appendNote(note.toString());
+                ActivityTimelineWidget.refreshAll(context);
+                ActivityClocksWidget.refreshAll(context);
+                ActivityNotificationManager.show(context, store, "Note added");
             } catch (Exception error) {
                 android.util.Log.e("DayPlanner", "Unable to save activity note", error);
                 // Show failure without silently retaining an unsaved note in private storage.

@@ -22,6 +22,17 @@ validates the selected row against the current file before applying a change.
 
 ## Adapters
 
+An activity may retain any number of completed logs and at most one open log.
+Separate activity rows may run simultaneously, including rows sharing task IDs.
+The shared schema enforces this on file reads and writes; shared clock mutations
+also reject an invalid multi-open record or an edit that creates a second open
+log. No adapter should silently close or discard a log to repair invalid input.
+
+`getOpenActivityLog` is the common clock resolver. `resolveActivitySelection`
+interprets notification pointers against validated repository records.
+`finishActivityRecord` and `ActivityRepository.finishActivity` close the sole open
+log, optionally checking its expected start to reject stale widget requests.
+
 - `util/props.ts` preserves the plugin's existing clock API and supplies its
   Obsidian-configured timestamp to the shared mutations. Its task Markdown helpers
   remain plugin-specific.
@@ -34,8 +45,13 @@ validates the selected row against the current file before applying a change.
 - The modal and Svelte form render inputs and show platform-specific confirmation
   UI, using shared form defaults, validation, and change detection.
 - Capacitor/Android handle file access, notifications, inline replies, and the
-  system folder picker. Preferences contain only connection and selection metadata. Notification replies must work while the TypeScript web
-  view is stopped, so those background actions still require native code.
+  system folder picker. Preferences contain only connection and selection metadata.
+  Background notification replies run the same bundled TypeScript repository in
+  an offline WebView, even when the app UI is stopped. `prepareActivityCommand`
+  executes against a file snapshot and returns repository writes plus the resulting
+  activity reference. Native code supplies files, checks expected contents, applies
+  the writes, and retains only the notification pointer. It does not parse activity
+  YAML, select open log entries, or implement activity mutations.
 
 Keep `window`, DOM, Obsidian, Capacitor, and native APIs out of the shared modules.
 Storage functions accept an `ActivityYamlCodec` instead of importing a particular

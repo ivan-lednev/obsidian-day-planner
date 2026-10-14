@@ -20,7 +20,7 @@ See [the shared API notes](../src/shared/README.md) for the boundary and tests.
   limits. Activities without start fields begin immediately. The generic Details
   field has been removed.
 - Ending asks for the activity's end fields, optional **Quality (1-10)**, and
-  optional **Notes**. Saving closes the first open log, preserves start attributes
+  optional **Notes**. Saving closes the activity's sole open log, preserves start attributes
   and optional YAML metadata, and appends finish notes to existing notes. Cancelling leaves
   tracking active, with confirmation before edited form values are discarded.
 - Multiple open activities are retained. Select one under **Open activities** to
@@ -30,6 +30,11 @@ See [the shared API notes](../src/shared/README.md) for the boundary and tests.
   start suggestions directly from the vault.
 - The notification's **End** action opens the finish form, including after the app
   was closed. **Add note** uses inline reply without a running web view.
+- The current activity label, elapsed timer, and actions are available on the lock
+  screen. The default notification channel uses normal importance with no sound
+  or vibration. Existing customized channel settings are retained; Android's
+  notification permission and lock-screen settings still apply. **End** opens the
+  app and may require unlocking, and Android can require unlocking for inline replies.
 
 ## Home-screen daily timeline
 
@@ -43,6 +48,10 @@ share columns; overnight logs are clipped to the displayed day. Repeated logs
 and duplicate task IDs remain separate. **Now** refreshes and scrolls to the
 current hour; **↻** refreshes without changing the scroll position. Tapping the
 heading or an hour opens the app.
+While loading, the refresh button becomes a spinner and the heading shows
+**Refreshing…**. Both refresh controls are unavailable until the load finishes.
+The spinner clears on success or failure; a failed load shows a retry message in
+the heading as well as the timeline's status row.
 
 The widget runs the shared TypeScript YAML parser, validation, labels, colors,
 duration/quality formatting, and overlap layout in a short-lived offline WebView.
@@ -66,6 +75,31 @@ The widget engine is built automatically by `npm run android:sync`. The shared
 rendering entry is [`../src/shared/activity-timeline.ts`](../src/shared/activity-timeline.ts).
 The Android instrumentation tests exercise the bundled JavaScript in a real
 WebView and apply the bitmap row through `RemoteViews`.
+
+## Home-screen active clocks
+
+Add **Day Planner — Active clocks** from Android's widget picker. The cards use
+the plugin's default activity colors and shared labels, notes, quality, and start
+times. Open clocks from all weekly files appear side by side. Resize horizontally
+to fit more cards; the arrow controls page through any additional clocks in a
+single horizontal row. Paging uses the current in-memory snapshot without another
+vault scan. Elapsed timers tick in the launcher even while the app is closed.
+
+Each card has an image-only clock-out button on its right. Tapping it opens the
+app's shared finish form for that exact activity, including its end fields,
+quality, and notes. Each activity has at most one open clock and can retain many
+completed sessions. Several independent activities can run simultaneously.
+Saving reads the latest YAML and closes the sole open log that
+was tapped; cancelling leaves it open. A changed, ambiguous, already finished, or
+different-vault reference cannot close another activity. Requests also survive a
+cold app launch and arriving during an existing refresh.
+
+Starts, finishes, inline notes, and app refreshes update both widgets. The active
+clocks widget also has manual refresh with a spinner and the launcher's periodic
+refresh. A failed read keeps the last good view with a retry message. Its data
+comes from the same vault snapshot reader and offline TypeScript bundle as the
+timeline widget; only the pending finish reference and launcher UI state are
+remembered, never a separate activity database.
 
 ## Connect the vault
 
@@ -251,10 +285,16 @@ the platform boundary small enough to add an iOS implementation later.
 
 The shared TypeScript `ActivityRepository` performs activity reads, validation,
 start/end updates, and weekly placement for both apps. `VaultFiles` is the Android
-file adapter. `VaultActivityDocument` is the minimal native YAML note adapter
-needed for notification replies with no running WebView; its tests cover identity
-matching, legacy normalization, string preservation, and closed/stale references.
-No native start/end implementation or separate native history store is needed.
+file adapter. Notification replies run the bundled shared TypeScript in a
+short-lived offline WebView, using `prepareActivityCommand` and the same repository
+to produce expected-content file writes. Android applies those writes through
+the vault adapter. There is no native YAML parser, native activity mutation
+implementation, or separate native history store.
+
+The shared schema rejects more than one open log in an activity, on both read and
+write. The same clock helpers handle selection, completion, cancellation, and
+stale start references in both clients. Invalid records are reported without
+silently closing a clock or changing the vault file.
 
 Start forms open from the loaded activity history. Resource choices load in the
 background without disabling the form. History scans visit only

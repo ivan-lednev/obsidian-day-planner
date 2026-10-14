@@ -5,8 +5,14 @@ import {
   qualityRatingField,
   type ActivityAttributeField,
 } from "./activity-definitions";
+import { getOpenActivityLog } from "./activity-open-clock";
 import type { Activity } from "./activity-schema";
 import { formatActivityTimestamp } from "./activity-time";
+
+export {
+  getOpenActivityLog,
+  hasOpenActivityClock,
+} from "./activity-open-clock";
 
 export type ActivityValues = Record<string, string | number | undefined>;
 
@@ -77,14 +83,6 @@ export function hasActivityFormChanges(
   );
 }
 
-export function getOpenActivityLog(activity: Pick<Activity, "log">) {
-  return activity.log?.find((entry) => !entry.end);
-}
-
-export function hasOpenActivityClock(activity: Pick<Activity, "log">) {
-  return Boolean(getOpenActivityLog(activity));
-}
-
 export function createActivityRecordWithAttributes(
   activityName: string,
   attributes?: Record<string, unknown>,
@@ -116,6 +114,7 @@ export function closeActivityRecord(
   attributes?: Record<string, unknown>,
   endedAt: number | string = Date.now(),
 ): Activity {
+  getOpenActivityLog(activity);
   const log = activity.log;
   if (!log) throw new Error("There is no log");
   const index = log.findIndex((entry) => !entry.end);
@@ -128,6 +127,7 @@ export function closeActivityLogEntry(
   attributes?: Record<string, unknown>,
   endedAt: number | string = Date.now(),
 ): Activity {
+  getOpenActivityLog(activity);
   const log = activity.log;
   if (!log?.[logEntryIndex] || log[logEntryIndex].end)
     throw new Error("There is no open clock");
@@ -148,7 +148,9 @@ export function finishActivityRecord(
   activity: Activity,
   values: ActivityValues,
   endedAt: number | string = Date.now(),
+  expectedStart?: string,
 ): Activity {
+  getOpenActivityLog(activity, expectedStart);
   return closeActivityRecord(
     activity,
     buildActivityFinishUpdate(activity.activity, values),
@@ -160,48 +162,54 @@ export function mergeActivityDetails(
   activity: Activity,
   updates?: Record<string, unknown>,
 ): Activity {
+  getOpenActivityLog(activity);
   if (!updates) {
     return activity;
   }
 
-  return Object.entries(updates).reduce<Activity>((result, [key, value]) => {
-    if (key === "notes" && typeof value === "string") {
-      const trimmedValue = value.trim();
+  const updated = Object.entries(updates).reduce<Activity>(
+    (result, [key, value]) => {
+      if (key === "notes" && typeof value === "string") {
+        const trimmedValue = value.trim();
 
-      if (!trimmedValue) {
-        return result;
+        if (!trimmedValue) {
+          return result;
+        }
+
+        return {
+          ...result,
+          notes:
+            typeof result.notes === "string" && result.notes.length > 0
+              ? `${result.notes}
+${trimmedValue}`
+              : trimmedValue,
+        };
+      }
+
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        const existing = (result as Record<string, unknown>)[key];
+        if (
+          existing &&
+          typeof existing === "object" &&
+          !Array.isArray(existing)
+        ) {
+          return {
+            ...result,
+            [key]: {
+              ...(existing as Record<string, unknown>),
+              ...(value as Record<string, unknown>),
+            },
+          };
+        }
       }
 
       return {
         ...result,
-        notes:
-          typeof result.notes === "string" && result.notes.length > 0
-            ? `${result.notes}
-${trimmedValue}`
-            : trimmedValue,
+        [key]: value,
       };
-    }
-
-    if (value && typeof value === "object" && !Array.isArray(value)) {
-      const existing = (result as Record<string, unknown>)[key];
-      if (
-        existing &&
-        typeof existing === "object" &&
-        !Array.isArray(existing)
-      ) {
-        return {
-          ...result,
-          [key]: {
-            ...(existing as Record<string, unknown>),
-            ...(value as Record<string, unknown>),
-          },
-        };
-      }
-    }
-
-    return {
-      ...result,
-      [key]: value,
-    };
-  }, activity);
+    },
+    activity,
+  );
+  getOpenActivityLog(updated);
+  return updated;
 }

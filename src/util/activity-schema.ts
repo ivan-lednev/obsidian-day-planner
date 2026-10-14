@@ -5,6 +5,7 @@ import {
   type ActivityAttributesDefinition,
   getActivityDefinitions,
 } from "./activity-definitions";
+import { multipleOpenClocksMessage } from "./activity-open-clock";
 import { parseActivityTimestamp } from "./activity-time";
 
 const dateTimeSchema = z
@@ -57,7 +58,13 @@ const activityAttributeSchemas = getActivityDefinitions().reduce<
 export const activitySchema = z
   .object({
     activity: z.string(),
-    log: z.array(logEntrySchema).optional(),
+    log: z
+      .array(logEntrySchema)
+      .refine(
+        (logs) => logs.filter((log) => log.end === undefined).length <= 1,
+        { message: multipleOpenClocksMessage },
+      )
+      .optional(),
     taskIds: z.array(z.string()).optional(),
     notes: z.string().optional(),
     quality: z.number().optional(),

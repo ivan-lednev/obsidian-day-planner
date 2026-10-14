@@ -48,7 +48,17 @@ public class ActivityNotificationsPlugin extends Plugin {
     protected void handleOnNewIntent(Intent intent) { handleFinishIntent(intent); }
 
     private void handleFinishIntent(Intent intent) {
-        if (intent == null || !ActivityNotificationManager.ACTION_END.equals(intent.getAction())) return;
+        if (intent == null) return;
+        if (ActivityClocksWidget.CLOCK_OUT.equals(intent.getAction())) {
+            try {
+                new ActiveActivityStore(getContext()).requestFinishFor(
+                    intent.getStringExtra("activity_id"), intent.getStringExtra("vault_uri"), intent.getStringExtra("log_start"));
+                notifyListeners("finishRequested", new JSObject());
+            } catch (Exception error) { android.util.Log.w("DayPlanner", "Invalid clock-out request", error); }
+            intent.setAction(null);
+            return;
+        }
+        if (!ActivityNotificationManager.ACTION_END.equals(intent.getAction())) return;
         ActiveActivityStore store = new ActiveActivityStore(getContext());
         if (store.isActive() && store.id().equals(intent.getStringExtra("activity_id")) &&
             store.connectionId().equals(intent.getStringExtra("vault_uri"))) {
@@ -62,6 +72,7 @@ public class ActivityNotificationsPlugin extends Plugin {
     public void getConnection(PluginCall call) {
         resolveConnection(call);
         ActivityTimelineWidget.refreshAll(getContext());
+        ActivityClocksWidget.refreshAll(getContext());
     }
 
     @PluginMethod
@@ -84,13 +95,17 @@ public class ActivityNotificationsPlugin extends Plugin {
             Uri tree = data.getData();
             int grants = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             if ((grants & Intent.FLAG_GRANT_WRITE_URI_PERMISSION) == 0) throw new java.io.IOException("Choose a writable vault folder");
-            getContext().getContentResolver().takePersistableUriPermission(tree, grants);
+            getContext().getContentResolver().takePersistableUriPermission(tree,
+                (grants & Intent.FLAG_GRANT_READ_URI_PERMISSION) != 0
+                    ? Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    : Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             synchronized (VaultFiles.LOCK) {
                 new VaultFiles(getContext()).connect(tree);
                 new ActiveActivityStore(getContext()).clear();
                 ActivityNotificationManager.cancel(getContext());
             }
             ActivityTimelineWidget.refreshAll(getContext());
+            ActivityClocksWidget.refreshAll(getContext());
             resolveConnection(call);
         } catch (Exception error) { call.reject(error.getMessage(), error); }
     }
@@ -129,6 +144,7 @@ public class ActivityNotificationsPlugin extends Plugin {
             if (!call.getData().has("expected")) { call.reject("Expected file contents are required"); return; }
             new VaultFiles(getContext()).writeFile(call.getString("path", ""), call.getString("contents", ""), call.getString("expected", null));
             ActivityTimelineWidget.refreshAll(getContext());
+            ActivityClocksWidget.refreshAll(getContext());
             call.resolve();
         } catch (Exception error) { call.reject(error.getMessage(), error); }
     }
@@ -152,14 +168,14 @@ public class ActivityNotificationsPlugin extends Plugin {
 
     @PluginMethod
     public void clearSelection(PluginCall call) {
-        new ActiveActivityStore(getContext()).clear();
+        new ActiveActivityStore(getContext()).clearSelection();
         ActivityNotificationManager.cancel(getContext());
         call.resolve();
     }
 
     @PluginMethod
     public void cancelFinish(PluginCall call) {
-        new ActiveActivityStore(getContext()).requestFinish(false);
+        new ActiveActivityStore(getContext()).cancelFinish(call.getString("id", null), call.getString("logStart", null));
         call.resolve();
     }
 

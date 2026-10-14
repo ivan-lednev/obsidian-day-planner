@@ -14,6 +14,7 @@ import type { LocalTask, RemoteTask, Task, WithTime } from "../../task-types";
 import type { OnEditAbortedFn, OnUpdateFn, PointerDateTime } from "../../types";
 import { getActivityDisplayLabel } from "../../util/activity-definitions";
 import { getActivityLogEntries } from "../../util/activity-log-location";
+import { getOpenActivityLog } from "../../util/activity-open-clock";
 import { getActivityResourcePath } from "../../util/activity-resources";
 import { createClockTaskFromActivity } from "../../util/clock";
 import { doesOverlapWithRange, splitMultiday } from "../../util/moment";
@@ -136,7 +137,7 @@ export function useTasks(props: {
     [activityEntries, currentTime],
     ([$entries, $currentTime]) =>
       $entries
-        .filter(({ log }) => typeof log.end === "undefined")
+        .filter(({ activity, log }) => getOpenActivityLog(activity) === log)
         .map(({ activity, log, activityLocation }) => ({
           activity,
           log,

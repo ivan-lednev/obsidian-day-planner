@@ -49,6 +49,8 @@ export interface ActivityNotificationsPlugin {
     active: boolean;
     id?: string;
     finishRequested?: boolean;
+    finishId?: string;
+    finishLogStart?: string;
   }>;
   selectActivity(options: {
     id: string;
@@ -56,7 +58,7 @@ export interface ActivityNotificationsPlugin {
     startedAt: number;
   }): Promise<void>;
   clearSelection(): Promise<void>;
-  cancelFinish(): Promise<void>;
+  cancelFinish(options?: { id: string; logStart?: string }): Promise<void>;
 }
 
 // Only the directory handle and selection are held here, never activity records.

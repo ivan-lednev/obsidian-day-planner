@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="96dp">
+    <ImageView android:id="@+id/clock_background" android:layout_width="match_parent"
+        android:layout_height="match_parent" android:scaleType="fitXY" android:importantForAccessibility="no" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:minHeight="96dp" android:padding="6dp" android:orientation="vertical" android:gravity="center_vertical">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                <TextView android:id="@+id/clock_title" android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:textColor="@color/widget_text" android:textSize="12sp"
+                    android:textStyle="bold" android:maxLines="2" android:ellipsize="end" />
+                <TextView android:id="@+id/clock_quality" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp" android:textColor="@color/widget_muted" android:textSize="10sp" />
+            </LinearLayout>
+            <TextView android:id="@+id/clock_notes" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="2dp" android:textColor="@color/widget_muted" android:textSize="10sp"
+                android:maxLines="1" android:ellipsize="end" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="2dp" android:orientation="horizontal" android:gravity="center_vertical">
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:id="@+id/clock_start" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:textColor="@color/widget_muted" android:textSize="10sp" />
+                    <Chronometer android:id="@+id/clock_elapsed" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:textColor="@color/widget_text" android:textSize="12sp" android:fontFamily="monospace" />
+                </LinearLayout>
+                <ImageView android:id="@+id/clock_out" android:layout_width="44dp" android:layout_height="44dp"
+                    android:layout_marginStart="4dp" android:padding="10dp" android:background="@drawable/widget_control"
+                    android:src="@drawable/ic_clock_out" android:contentDescription="@string/clock_out_default_description" />
+            </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

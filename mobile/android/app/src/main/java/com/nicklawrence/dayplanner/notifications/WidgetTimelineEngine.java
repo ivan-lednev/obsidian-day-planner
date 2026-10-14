@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.JavascriptInterface;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
@@ -16,14 +17,44 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
-/** Executes the bundled shared TypeScript without requiring an open Capacitor app. */
+/** Executes bundled shared activity TypeScript for widgets and background replies. */
 final class WidgetTimelineEngine {
     private static final Handler main = new Handler(Looper.getMainLooper());
 
-    @SuppressLint("SetJavaScriptEnabled")
     static JSONObject build(Context context, JSONArray files, String day, long now, boolean dark) throws Exception {
+        return evaluate(context, "build", files + "," + JSONObject.quote(day) + "," + now + "," + dark);
+    }
+
+    static JSONObject activeClocks(Context context, JSONArray files, boolean dark) throws Exception {
+        return evaluate(context, "activeClocks", files + ",\"\"," + System.currentTimeMillis() + "," + dark);
+    }
+
+    static JSONObject activityCommand(Context context, JSONArray files, JSONObject command) throws Exception {
+        return evaluate(context, "activityCommand", files + "," + command);
+    }
+
+    public static final class ResultCallback {
+        private final AtomicReference<JSONObject> result;
+        private final AtomicReference<Exception> failure;
+        private final CountDownLatch complete;
+        private final AtomicBoolean received = new AtomicBoolean();
+        ResultCallback(AtomicReference<JSONObject> result, AtomicReference<Exception> failure, CountDownLatch complete) {
+            this.result = result; this.failure = failure; this.complete = complete;
+        }
+        @JavascriptInterface public void finish(String value) {
+            if (!received.compareAndSet(false, true)) return;
+            try {
+                JSONObject response = new JSONObject(value);
+                if (response.has("error")) throw new IOException(response.getString("error"));
+                result.set(response.getJSONObject("model"));
+            } catch (Exception error) { failure.set(error); }
+            finally { complete.countDown(); }
+        }
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private static JSONObject evaluate(Context context, String method, String arguments) throws Exception {
         if (Looper.myLooper() == Looper.getMainLooper()) throw new IllegalStateException("Widget data must load off the UI thread");
         String engine;
         try (InputStream input = context.getAssets().open("public/widget-engine.js")) {
@@ -33,8 +64,9 @@ final class WidgetTimelineEngine {
             while ((count = input.read(buffer)) != -1) bytes.write(buffer, 0, count);
             engine = bytes.toString(StandardCharsets.UTF_8.name());
         }
-        String expression = engine + "\nJSON.stringify(window.DayPlannerWidget.build(" + files + ","
-            + JSONObject.quote(day) + "," + now + "," + dark + "))";
+        String expression = engine + "\nPromise.resolve().then(() => window.DayPlannerWidget." + method + "(" + arguments
+            + ")).then(value => DayPlannerResult.finish(JSON.stringify(value)))"
+            + ".catch(error => DayPlannerResult.finish(JSON.stringify({error: String(error.message || error)})))";
         CountDownLatch complete = new CountDownLatch(1);
         AtomicReference<JSONObject> result = new AtomicReference<>();
         AtomicReference<Exception> failure = new AtomicReference<>();
@@ -49,20 +81,13 @@ final class WidgetTimelineEngine {
                 view.getSettings().setBlockNetworkLoads(true);
                 view.getSettings().setAllowFileAccess(false);
                 view.getSettings().setAllowContentAccess(false);
+                // This result-only callback exposes no vault, file, or notification APIs.
+                view.addJavascriptInterface(new ResultCallback(result, failure, complete), "DayPlannerResult");
                 AtomicBoolean evaluated = new AtomicBoolean();
                 view.setWebViewClient(new WebViewClient() {
                     @Override public void onPageFinished(WebView ignored, String url) {
                         if (cancelled.get() || !evaluated.compareAndSet(false, true)) return;
-                        view.evaluateJavascript(expression, value -> {
-                            try {
-                                Object decoded = new JSONTokener(value).nextValue();
-                                if (!(decoded instanceof String)) throw new IOException("Unable to run the shared timeline engine");
-                                JSONObject response = new JSONObject((String) decoded);
-                                if (response.has("error")) throw new IOException(response.getString("error"));
-                                result.set(response.getJSONObject("model"));
-                            } catch (Exception error) { failure.set(error); }
-                            finally { complete.countDown(); }
-                        });
+                        view.evaluateJavascript(expression, null);
                     }
                 });
                 // Only trusted, bundled JavaScript is evaluated; YAML remains a JSON argument.

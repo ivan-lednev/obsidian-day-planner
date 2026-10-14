@@ -8,6 +8,7 @@ import android.widget.FrameLayout;
 import android.widget.RemoteViews;
 import android.widget.ListView;
 import android.widget.BaseAdapter;
+import android.widget.TextView;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -70,6 +71,25 @@ public class WidgetTimelineEngineTest {
             assertEquals(0, list.getFirstVisiblePosition());
             list.setSelection(23); list.forceLayout(); list.measure(width, height); list.layout(0, 0, 600, 400);
             assertEquals(23, list.getLastVisiblePosition());
+            RemoteViews progress = new RemoteViews(context.getPackageName(), R.layout.activity_timeline_widget);
+            ActivityTimelineWidget.applyRefreshState(context, progress, true, null);
+            progress.reapply(context, root);
+            assertSame(list, root.findViewById(R.id.widget_hours));
+            assertEquals(23, list.getLastVisiblePosition());
+            assertEquals(View.VISIBLE, root.findViewById(R.id.widget_refresh_progress).getVisibility());
+            assertFalse(root.findViewById(R.id.widget_now).isEnabled());
+            ActivityTimelineWidget.applyRefreshState(context, progress, false, context.getString(R.string.widget_refresh_failed));
+            progress.reapply(context, root);
+            assertEquals(View.GONE, root.findViewById(R.id.widget_refresh_progress).getVisibility());
+            assertEquals(View.VISIBLE, root.findViewById(R.id.widget_refresh).getVisibility());
+            assertTrue(root.findViewById(R.id.widget_now).isEnabled());
+            assertEquals(context.getString(R.string.widget_refresh_failed),
+                ((TextView) root.findViewById(R.id.widget_date)).getText().toString());
+            assertEquals(23, list.getLastVisiblePosition());
+            ActivityTimelineWidget.applyRefreshState(context, progress, false, null);
+            progress.reapply(context, root);
+            assertNotEquals(context.getString(R.string.widget_refresh_failed),
+                ((TextView) root.findViewById(R.id.widget_date)).getText().toString());
             list.setSelection(0); list.forceLayout(); list.measure(width, height); list.layout(0, 0, 600, 400);
             assertEquals(0, list.getFirstVisiblePosition());
         });

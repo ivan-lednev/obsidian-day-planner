@@ -451,20 +451,23 @@ describe("one vault backend for the plugin and companion", () => {
     const older = {
       ...createActivityRecord("walk", {}, "2026-09-29 10:00:00"),
       taskIds: ["shared"],
-      log: [{ start: "2026-09-29 10:00:00" }, { start: "2026-09-29 11:00:00" }],
+      log: [
+        { start: "2026-09-29 10:00:00", end: "2026-09-29 10:30:00" },
+        { start: "2026-09-29 11:00:00" },
+      ],
     };
     await companion.addActivity(older);
     const editor = new ActivityEditor({} as App, plugin);
-    // Weekly files load chronologically, so the older file's second log is choice 1.
-    dialogs.choice = 1;
+    // Only the older activity's second log is open; it is the first suggestion.
+    dialogs.choice = 0;
     dialogs.values.mockResolvedValue({ notes: "Finish second log" });
     await editor.finishSelectedOpenActivity();
-    expect(dialogs.shown).toHaveLength(3);
+    expect(dialogs.shown).toHaveLength(2);
     const olderPath = "_Planner/activities/2026/2026-W40.yaml";
     const completed = plugin
       .getAllActivities()
       .find((item) => item.log![0].start === older.log[0].start)!;
-    expect(completed.log![0].end).toBeUndefined();
+    expect(completed.log![0].end).toBe("2026-09-29 10:30:00");
     expect(completed.log![1].end).toBeDefined();
     const block = {
       id: "older",
@@ -483,10 +486,22 @@ describe("one vault backend for the plugin and companion", () => {
       .getAllActivities()
       .find((item) => item.log![0].start === "2026-09-29 10:15:00")!;
     expect(afterEdit.notes).toBe("Finish second log\nAnother note");
+    // Reopen one earlier session before cancelling it, preserving the finished session.
+    await plugin.updateActivities(olderPath, (records) =>
+      records.map((record) => ({
+        ...record,
+        log: record.log!.map((log, index) =>
+          index === 0 ? { start: log.start } : log,
+        ),
+      })),
+    );
+    const reopened = plugin
+      .getAllActivities()
+      .find((item) => item.notes === afterEdit.notes)!;
     dialogs.confirm.mockResolvedValue(true);
     await editor.cancelActivity({
       ...block,
-      clockActivity: { ...afterEdit, log: [afterEdit.log![0]] },
+      clockActivity: { ...reopened, log: [reopened.log![0]] },
     });
     expect(
       plugin.getAllActivities().find((item) => item.notes === afterEdit.notes)

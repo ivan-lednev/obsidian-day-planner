@@ -18,13 +18,14 @@ final class ActivityNotificationManager {
     static final String ACTION_ADD_NOTE = "com.nicklawrence.dayplanner.action.ADD_NOTE";
     static final String KEY_NOTE = "activity_note";
 
-    private static final String CHANNEL_ID = "active_activity";
+    private static final String LEGACY_CHANNEL_ID = "active_activity";
+    private static final String CHANNEL_ID = "active_activity_lock_screen";
     private static final int NOTIFICATION_ID = 1001;
 
     private ActivityNotificationManager() {}
 
     static void show(Context context, ActiveActivityStore activity, String confirmation) {
-        createChannel(context);
+        String channelId = createChannel(context);
 
         Intent openIntent = new Intent(context, MainActivity.class)
             .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -67,7 +68,7 @@ final class ActivityNotificationManager {
             ? confirmation
             : "Activity in progress";
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_stat_activity)
             .setContentTitle(activity.label())
             .setContentText(content)
@@ -77,7 +78,9 @@ final class ActivityNotificationManager {
             .setShowWhen(true)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setSound(null)
             .setCategory(NotificationCompat.CATEGORY_STOPWATCH)
             .addAction(R.drawable.ic_stat_activity, "End", endPendingIntent)
             .addAction(noteAction);
@@ -90,15 +93,32 @@ final class ActivityNotificationManager {
         context.getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
     }
 
-    private static void createChannel(Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+    private static String createChannel(Context context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return CHANNEL_ID;
 
+        NotificationManager manager = context.getSystemService(NotificationManager.class);
+        if (manager.getNotificationChannel(CHANNEL_ID) != null) return CHANNEL_ID;
         NotificationChannel channel = new NotificationChannel(
             CHANNEL_ID,
             "Current activity",
-            NotificationManager.IMPORTANCE_LOW
+            NotificationManager.IMPORTANCE_DEFAULT
         );
+        NotificationChannel legacy = manager.getNotificationChannel(LEGACY_CHANNEL_ID);
+        // Channel importance cannot be raised after registration. Migrate the old
+        // default, but keep any explicit user choice (including blocking or hiding it).
+        if (legacy != null && (legacy.getImportance() != NotificationManager.IMPORTANCE_LOW
+            || legacy.getLockscreenVisibility() != channel.getLockscreenVisibility()
+            || legacy.shouldVibrate() || legacy.shouldShowLights()
+            || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && legacy.hasUserSetImportance())
+            || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && legacy.hasUserSetSound())))
+            return LEGACY_CHANNEL_ID;
+
         channel.setDescription("Shows the activity currently being tracked");
-        context.getSystemService(NotificationManager.class).createNotificationChannel(channel);
+        // Normal importance keeps the timer eligible for the lock screen even
+        // when Android hides low-priority notifications. Tracking stays quiet.
+        channel.setSound(null, null);
+        channel.enableVibration(false);
+        manager.createNotificationChannel(channel);
+        return CHANNEL_ID;
     }
 }

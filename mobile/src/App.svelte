@@ -10,7 +10,7 @@
     type ActivityNameSuggestion,
     mergeActivityFieldOptions,
     createActivityRecord,
-    finishActivityRecord,
+    resolveActivitySelection,
     getActivityFinishFields,
     type ActivityValues,
     getOpenActivityLog,
@@ -40,11 +40,13 @@
   let resources = $state<ResourceFile[]>([]);
   let selection = $state<ActivitySelection | null>(null);
   let finishingId = $state<string | null>(null);
+  let finishingLogStart = $state<string | null>(null);
   let query = $state("");
   let highlighted = $state(0);
   let error = $state("");
   let notice = $state("");
   let busy = $state(false);
+  let refreshRequested = false;
   let resourcesLoading = $state(false);
   let resourceLoad: Promise<void> | undefined;
   let resourceGeneration = 0;
@@ -81,9 +83,7 @@
     void run(refresh);
     const listener = ActivityNotifications.addListener(
       "finishRequested",
-      () => {
-        void run(refresh);
-      },
+      requestRefresh,
     );
     const timer = window.setInterval(() => {
       now = Date.now();
@@ -113,14 +113,21 @@
     }
     entries = await repository.getActivities();
     const selected = await ActivityNotifications.getActiveActivity();
-    const entry = entries.find(
-      ({ id, record }) => id === selected.id && hasOpenActivityClock(record),
-    );
-    const current =
-      entry ?? entries.find(({ record }) => hasOpenActivityClock(record));
+    const { requestedId, requestedLog, validRequest, current } =
+      resolveActivitySelection(entries, selected);
+    if (requestedId && !validRequest) {
+      await ActivityNotifications.cancelFinish({
+        id: requestedId,
+        logStart: selected.finishLogStart,
+      });
+      finishingId = null;
+      notice =
+        "That clock is no longer open or its activity changed. Refresh and select it again.";
+    }
     if (current) {
       const startedAt = parseActivityTimestamp(
-        getOpenActivityLog(current.record)!.start,
+        (validRequest ? requestedLog! : getOpenActivityLog(current.record)!)
+          .start,
       ).valueOf();
       const label = getActivityDisplayLabel(
         current.record.activity,
@@ -131,7 +138,7 @@
         active: true,
         label,
         startedAt,
-        finishRequested: !!entry && !!selected.finishRequested,
+        finishRequested: validRequest,
       };
       await ActivityNotifications.selectActivity({
         id: current.id,
@@ -147,10 +154,11 @@
     if (
       activity.active &&
       activity.finishRequested &&
-      finishingId !== activity.id
+      (finishingId !== activity.id || finishingLogStart !== requestedLog?.start)
     ) {
       selection = null;
       finishingId = activity.id;
+      finishingLogStart = requestedLog!.start;
     }
   }
 
@@ -254,6 +262,7 @@
       if (!activity.active) return;
       selection = null;
       finishingId = activity.id;
+      finishingLogStart = getOpenActivityLog(activity.record)!.start;
     });
   }
 
@@ -263,10 +272,15 @@
       if (!current.active || current.id !== finishingId)
         throw new Error("The active activity changed. Reopen the finish form.");
       // Apply to the latest vault record, including external edits and inline notes.
-      await repository.updateActivity(current.id!, (record) =>
-        finishActivityRecord(record, values),
+      await repository.finishActivity(
+        current.id!,
+        values,
+        finishingLogStart ?? undefined,
       );
-      await ActivityNotifications.cancelFinish();
+      await ActivityNotifications.cancelFinish({
+        id: current.id!,
+        logStart: finishingLogStart ?? undefined,
+      });
       finishingId = null;
       await refresh();
     });
@@ -275,7 +289,10 @@
   function cancelForm() {
     if (finishingId) {
       void run(async () => {
-        await ActivityNotifications.cancelFinish();
+        await ActivityNotifications.cancelFinish({
+          id: finishingId!,
+          logStart: finishingLogStart ?? undefined,
+        });
         finishingId = null;
         await refresh();
       });
@@ -304,7 +321,16 @@
       error = caught instanceof Error ? caught.message : "Something went wrong";
     } finally {
       busy = false;
+      if (refreshRequested) {
+        refreshRequested = false;
+        void run(refresh);
+      }
     }
+  }
+
+  function requestRefresh() {
+    if (busy) refreshRequested = true;
+    else void run(refresh);
   }
 
   function pickerKey(event: KeyboardEvent) {
@@ -385,9 +411,9 @@
       </p>
     </section>
   {:else if finishingId && activity.active}
-    {#key finishingId}
+    {#key `${finishingId}:${finishingLogStart}`}
       <ActivityFields
-        title={`Finish ${getActivityLabel(activity.record.activity)}`}
+        title={`Finish ${getActivityDisplayLabel(activity.record.activity, activity.record)}`}
         fields={getActivityFinishFields(activity.record.activity)}
         {busy}
         onSave={finish}

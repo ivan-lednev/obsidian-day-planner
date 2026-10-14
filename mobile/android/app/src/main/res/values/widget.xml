@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="clocks_widget_name">Day Planner — Active clocks</string>
+    <string name="clocks_widget_description">Live active clocks with a clock-out button for each activity.</string>
+    <string name="clocks_title">Active clocks</string>
+    <string name="clocks_none">No open clocks</string>
+    <string name="clocks_connect">Open Day Planner and choose your vault folder.</string>
+    <string name="clocks_previous">Previous clocks</string>
+    <string name="clocks_next">Next clocks</string>
+    <string name="clock_out_default_description">Clock out</string>
+    <string name="clock_out_description">Clock out %1$s</string>
+    <plurals name="clocks_count">
+        <item quantity="one">%1$d open clock</item>
+        <item quantity="other">%1$d open clocks</item>
+    </plurals>
     <color name="widget_background">#ffffff</color>
     <color name="widget_text">#222222</color>
     <color name="widget_muted">#666666</color>
@@ -10,6 +23,8 @@
     <string name="widget_now">Now</string>
     <string name="widget_now_description">Refresh and jump to the current hour</string>
     <string name="widget_refresh_description">Refresh activity timeline</string>
+    <string name="widget_refreshing">Refreshing…</string>
+    <string name="widget_refresh_failed">Refresh failed · Tap ↻ to retry</string>
     <string name="widget_open_description">Open Day Planner</string>
     <string name="widget_loading">Loading today’s activities…</string>
 </resources>

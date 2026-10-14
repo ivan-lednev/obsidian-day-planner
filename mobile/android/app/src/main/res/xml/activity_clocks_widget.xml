@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="300dp" android:minHeight="160dp"
+    android:targetCellWidth="4" android:targetCellHeight="2"
+    android:minResizeWidth="180dp" android:minResizeHeight="140dp"
+    android:initialLayout="@layout/activity_clocks_widget" android:previewLayout="@layout/activity_clocks_widget"
+    android:resizeMode="horizontal|vertical" android:updatePeriodMillis="1800000"
+    android:widgetCategory="home_screen" android:description="@string/clocks_widget_description" />

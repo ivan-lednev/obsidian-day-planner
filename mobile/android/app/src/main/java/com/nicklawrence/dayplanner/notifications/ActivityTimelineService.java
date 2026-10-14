@@ -8,13 +8,10 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 import com.nicklawrence.dayplanner.R;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class ActivityTimelineService extends RemoteViewsService {
@@ -60,34 +57,32 @@ public class ActivityTimelineService extends RemoteViewsService {
         private void reload() {
             synchronized (loading) {
                 if (destroyed) return;
+                long refresh = ActivityTimelineWidget.beginRefresh(context, widgetId);
+                String refreshError = null;
                 try {
                     VaultFiles vault = new VaultFiles(context);
                     String connection = vault.connectionId();
                     if (!connection.equals(modelConnection)) model = null;
-                    if (!vault.connected()) throw new java.io.IOException("Open Day Planner and choose your vault folder.");
-                    JSONArray files = new JSONArray();
-                    List<String> paths = vault.listFiles("_Planner/activities", ".yaml");
-                    Collections.sort(paths);
-                    for (String path : paths) {
-                        if (destroyed) return;
-                        String contents = vault.readFile(path);
-                        if (contents != null) files.put(new JSONArray().put(path).put(contents));
-                    }
+                    WidgetActivitySnapshot snapshot = WidgetActivitySnapshot.read(context);
+                    if (destroyed) return;
                     long now = System.currentTimeMillis();
                     String day = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(new Date(now));
-                    JSONObject next = WidgetTimelineEngine.build(context, files, day, now, dark);
+                    JSONObject next = WidgetTimelineEngine.build(context, snapshot.files, day, now, dark);
                     if (destroyed) return;
-                    if (!connection.equals(vault.connectionId())) throw new java.io.IOException("Vault changed during refresh");
+                    snapshot.assertCurrent(context);
                     model = next;
-                    modelConnection = connection;
+                    modelConnection = snapshot.connection;
                     int count = next.getJSONArray("blocks").length();
                     status = (count == 0 ? "No activities recorded today" : count + " activity logs")
                         + " · Updated " + new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date(now));
                 } catch (Exception error) {
+                    refreshError = context.getString(R.string.widget_refresh_failed);
                     android.util.Log.e("DayPlannerWidget", "Unable to load activity timeline", error);
                     status = !new VaultFiles(context).connected() ? "Open Day Planner and choose your vault folder."
                         : (model == null ? "" : "Showing " + model.optString("title") + " from the last refresh. ")
                             + "Refresh failed. Tap ↻ to retry or open Day Planner.";
+                } finally {
+                    ActivityTimelineWidget.finishRefresh(context, widgetId, refresh, refreshError);
                 }
             }
         }
