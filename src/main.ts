@@ -135,6 +135,7 @@ export default class DayPlanner extends Plugin {
       this.app.workspace,
       this.vaultFacade,
       this.periodicNotes,
+      () => this.getSettings(),
     );
     this.metadataCacheFacade = new MetadataCacheFacade(metadataCache);
     this.searchService = new VaultSearchService(vault, metadataCache);
@@ -357,11 +358,7 @@ export default class DayPlanner extends Plugin {
       id: "show-day-planner-today-note",
       name: "Open today's Day Planner",
       callback: async () => {
-        const dailyNote = await this.periodicNotes.createDailyNoteIfNeeded(
-          window.moment(),
-        );
-
-        await this.app.workspace.getLeaf(false).openFile(dailyNote);
+        await this.workspaceFacade.openFileForDay(window.moment());
       },
     });
 

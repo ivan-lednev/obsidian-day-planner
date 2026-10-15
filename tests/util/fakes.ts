@@ -34,6 +34,12 @@ export class InMemoryVault {
     found.contents = contents;
   }
 
+  async process(file: TFile, editFn: (contents: string) => string) {
+    const found = this.getAbstractFileByPath(file.path);
+    found.contents = editFn(found.contents);
+    return found.contents;
+  }
+
   getFileByPath(path: string) {
     return this.getAbstractFileByPath(path);
   }

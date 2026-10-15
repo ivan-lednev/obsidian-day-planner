@@ -35,6 +35,7 @@ export interface DayPlannerSettings {
   startHour: number;
   timelineDateFormat: string;
   centerNeedle: boolean;
+  plannerNotePath: string;
   plannerHeading: string;
   plannerHeadingLevel: number;
   timelineColored: boolean;
@@ -75,6 +76,7 @@ export const defaultSettings: DayPlannerSettings = {
   startHour: 6,
   timelineDateFormat: defaultDayFormat,
   centerNeedle: false,
+  plannerNotePath: "",
   plannerHeading: "Day planner",
   plannerHeadingLevel: 1,
   timelineColored: false,

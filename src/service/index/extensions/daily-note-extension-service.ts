@@ -3,6 +3,7 @@ import type { Pos } from "obsidian";
 import { clockFormat } from "../../../constants";
 import { getTimeFromLine } from "../../../parser/parser";
 import { createId } from "../../../redux/index/index-slice";
+import { scheduledPropRegExps } from "../../../regexp";
 import type { DayPlannerSettings } from "../../../settings";
 import {
   getHeadingSectionPosition,
@@ -12,6 +13,7 @@ import {
 } from "../../../util/metadata";
 import { getDayKey, getEndTime } from "../../../util/time-block-utils";
 import type { PeriodicNotes } from "../../periodic-notes";
+import { getSharedPlannerNotePath } from "../../planner-note";
 import type { FileWithMetadata } from "../index-service";
 import type {
   ListItemIndexExtensionService,
@@ -40,6 +42,10 @@ export class DailyNoteExtensionService
       rawListItemEntry,
     }: RawListItemEntryWithContext) => {
       if (
+        (path === getSharedPlannerNotePath(this.settings.plannerNotePath) &&
+          scheduledPropRegExps.some((regexp) =>
+            regexp.test(rawListItemEntry.text),
+          )) ||
         !dateFromPath ||
         !this.isInsideDailyNoteParseScope(
           listItemCache.position,

@@ -12,6 +12,7 @@ Day Planner is a community plugin for [Obsidian](https://obsidian.md/). It adds 
 - [Table of contents](#table-of-contents)
 - [How to use it](#how-to-use-it)
   - [1. Showing events from your daily notes](#1-showing-events-from-your-daily-notes)
+    - [Keeping all plans in one note](#keeping-all-plans-in-one-note)
   - [2. tasks community plugin integration, showing events from other files in your vault](#2-tasks-community-plugin-integration-showing-events-from-other-files-in-your-vault)
   - [3. Showing internet calendars](#3-showing-internet-calendars)
     - [Where to get a Google Calendar link](#where-to-get-a-google-calendar-link)
@@ -68,6 +69,21 @@ Write your tasks in a daily note, and they show up on the timeline:
 - [ ] 10:00 - 10:30 Wake up
 - [ ] 11:00 - 12:30 Grab a brush and put a little make-up
 ```
+
+#### Keeping all plans in one note
+
+Set **Settings → Day Planner → Planner Heading → Single planner note** to a vault-relative Markdown path, such as `Plans/Day plans.md`, then restart Obsidian. New timeline plans for every day will be appended under the planner heading in that note, with an explicit scheduled date:
+
+```md
+# Day planner
+
+- [ ] 09:00 - 10:00 Write a report ⏳ 2025-07-19
+- [ ] 14:00 - 15:00 Review the report ⏳ 2025-07-20
+```
+
+The note and its folders are created when needed. Clicking the selected day or running **Open today's Day Planner** opens the same note. Moving a plan between days updates its scheduled date in place, and undo restores the previous contents. Both task and bullet event formats are supported. Existing plans stay in their files; they are not automatically migrated.
+
+Leave **Single planner note** empty to keep using daily notes. The Daily Notes or Periodic Notes plugin should still be enabled.
 
 ### 2. [tasks community plugin](obsidian://show-plugin?id=obsidian-tasks-plugin) integration, showing events from other files in your vault
 

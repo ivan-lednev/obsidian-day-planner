@@ -13,13 +13,20 @@ export class VaultFacade {
   async editFile(path: string, editFn: (contents: string) => string) {
     const file = this.getFileByPath(path);
 
-    const contents = await this.vault.read(file);
-    const newContents = editFn(contents);
-
-    await this.vault.modify(file, newContents);
+    await this.vault.process(file, editFn);
   }
 
   async createFile(path: string, contents: string) {
+    const folders = path.split("/").slice(0, -1);
+
+    for (let index = 1; index <= folders.length; index++) {
+      const folderPath = folders.slice(0, index).join("/");
+
+      if (!this.checkFileExists(folderPath)) {
+        await this.vault.createFolder(folderPath);
+      }
+    }
+
     await this.vault.create(path, contents);
   }
 

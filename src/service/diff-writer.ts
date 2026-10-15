@@ -1,5 +1,5 @@
 import { Array } from "effect";
-import type { Root } from "mdast";
+import type { Node, Root } from "mdast";
 import { isNotVoid } from "typed-assert";
 
 import {
@@ -7,9 +7,15 @@ import {
   findFirst,
   fromMarkdown,
   insertListItemUnderHeading,
+  isParentNode,
   isListItem,
   toMarkdown,
 } from "../mdast/mdast";
+import {
+  listItemRegExp,
+  scheduledPropRegExps,
+  timeRangeRegExp,
+} from "../regexp";
 import type { DayPlannerSettings } from "../settings";
 import type {
   EditableTimeBlock,
@@ -20,6 +26,7 @@ import { applyScopedUpdates, getFirstLine } from "../util/markdown";
 import * as t from "../util/time-block-utils";
 
 import type { PeriodicNotes } from "./periodic-notes";
+import { getPlannerNotePath, getSharedPlannerNotePath } from "./planner-note";
 import type { VaultFacade } from "./vault-facade";
 
 interface Range {
@@ -142,7 +149,6 @@ export function createTransaction(props: {
         .reduce(applyRangeUpdate, lines)
         .join("\n");
 
-      // TODO: the knowledge is implicit here: mdast updates are only applied to daily notes
       if (mdastUpdates.length > 0) {
         result = applyScopedUpdates(
           result,
@@ -255,6 +261,33 @@ export function getTimeBlockDiffFromEditState(
   );
 }
 
+function addScheduledDates(contents: string, dayKey: string) {
+  const lines = contents.split("\n");
+
+  function visit(node: Node) {
+    if (checkListItem(node) && node.position) {
+      const index = node.position.start.line - 1;
+      const line = lines[index];
+      isNotVoid(line);
+      const isPlan =
+        index === 0 ||
+        line.match(listItemRegExp)?.groups?.task !== undefined ||
+        timeRangeRegExp.test(line);
+
+      if (isPlan && !scheduledPropRegExps.some((regexp) => regexp.test(line))) {
+        lines[index] = t.appendText(line, ` ⏳ ${dayKey}`);
+      }
+    }
+
+    if (isParentNode(node)) {
+      node.children.forEach(visit);
+    }
+  }
+
+  visit(fromMarkdown(contents));
+  return lines.join("\n");
+}
+
 function createInsertUnderHeadingUpdate(props: {
   timeBlock: EditableTimeBlock;
   contents: string;
@@ -262,12 +295,16 @@ function createInsertUnderHeadingUpdate(props: {
   periodicNotes: PeriodicNotes;
 }): Update {
   const { timeBlock, contents, settings, periodicNotes } = props;
+  const sharedPath = getSharedPlannerNotePath(settings.plannerNotePath);
+  const contentsWithDates = sharedPath
+    ? addScheduledDates(contents, t.getDayKey(timeBlock.startTime))
+    : contents;
 
   return {
     type: "mdast",
-    path: periodicNotes.createDailyNotePath(timeBlock.startTime),
+    path: getPlannerNotePath(timeBlock.startTime, settings, periodicNotes),
     updateFn: (root: Root) => {
-      const taskRoot = fromMarkdown(contents);
+      const taskRoot = fromMarkdown(contentsWithDates);
       const listItemToInsert = findFirst(taskRoot, checkListItem);
 
       isNotVoid(listItemToInsert);
@@ -337,6 +374,7 @@ function mapPersistedToUpdates(props: {
 
   const originalLocationDay = periodicNotes.getDateFromPath(path, "day");
   const needToMoveBetweenNotes =
+    path !== getSharedPlannerNotePath(settings.plannerNotePath) &&
     originalLocationDay &&
     !timeBlock.startTime.isSame(originalLocationDay, "day");
 

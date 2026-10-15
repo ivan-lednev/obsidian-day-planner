@@ -6,6 +6,8 @@ import type { DayPlannerSettings } from "../../../settings";
 import { isTaskCache } from "../../../util/metadata";
 import { strictParse } from "../../../util/moment";
 import { getDayKey, getEndTime } from "../../../util/time-block-utils";
+import { getSharedPlannerNotePath } from "../../planner-note";
+import type { FileWithMetadata } from "../index-service";
 import type {
   ListItemIndexExtensionService,
   RawListItemEntryWithContext,
@@ -16,12 +18,15 @@ export class ObsidianTasksExtensionService
 {
   constructor(private readonly settings: DayPlannerSettings) {}
 
-  forFile() {
+  forFile({ path }: FileWithMetadata) {
     return ({
       listItemCache,
       rawListItemEntry,
     }: RawListItemEntryWithContext) => {
-      if (!isTaskCache(listItemCache)) {
+      if (
+        !isTaskCache(listItemCache) &&
+        path !== getSharedPlannerNotePath(this.settings.plannerNotePath)
+      ) {
         return {};
       }
 

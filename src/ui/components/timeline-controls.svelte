@@ -14,13 +14,8 @@
   import DayOfWeekPicker from "./day-of-week-picker.svelte";
   import { ChevronLeft, ChevronRight } from "./lucide";
 
-  const {
-    workspaceFacade,
-    periodicNotes,
-    reSync,
-    initWeeklyView,
-    openTimelineSettingsModal,
-  } = getObsidianContext();
+  const { workspaceFacade, reSync, initWeeklyView, openTimelineSettingsModal } =
+    getObsidianContext();
   const dateRange = getDateRangeContext();
   const isInSidebar = getIsInSidebarContext();
 
@@ -42,9 +37,7 @@
   }
 
   async function goToNoteForDay(day: Moment) {
-    const note = await periodicNotes.createDailyNoteIfNeeded(day);
-
-    await workspaceFacade.openFileInEditor(note);
+    await workspaceFacade.openFileForDay(day);
   }
 
   async function handleDayClick(day: Moment) {

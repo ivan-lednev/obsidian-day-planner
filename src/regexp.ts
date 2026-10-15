@@ -29,7 +29,7 @@ export const listTokenWithSpacesRegExp = new RegExp(listTokenWithSpaces);
 export const checkboxRegExp = new RegExp(checkbox);
 
 export const headingRegExp = /^(#+)\s/;
-export const obsidianBlockIdRegExp = /\s\^[a-z1-9-]+$/i;
+export const obsidianBlockIdRegExp = /\s\^[a-z0-9-]+$/i;
 export const listItemRegExp = new RegExp(
   "^[\\s>]*(?<symbol>\\d+\\.|\\d+\\)|\\*|-|\\+)\\s*(?:\\[(?<task>.)\\])?\\s*(?<text>.*)$",
   "mu",

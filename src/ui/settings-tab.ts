@@ -1,11 +1,12 @@
 import { produce } from "immer";
-import { PluginSettingTab, SettingGroup } from "obsidian";
+import { Notice, PluginSettingTab, SettingGroup } from "obsidian";
 import { type Component, mount, unmount } from "svelte";
 import type { Writable } from "svelte/store";
 import { isNotVoid, isOneOf } from "typed-assert";
 
 import { icons } from "../constants";
 import type DayPlanner from "../main";
+import { getSharedPlannerNotePath } from "../service/planner-note";
 import {
   type DayPlannerSettings,
   eventFormats,
@@ -437,6 +438,29 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
 
     new SettingGroup(containerEl)
       .setHeading("Planner Heading")
+      .addSetting((setting) =>
+        setting
+          .setName("Single planner note")
+          .setDesc(
+            "Append new plans for all days to this Markdown file. Use a path relative to the vault; leave empty to use daily notes. Plans receive an explicit scheduled date. Existing plans stay in their files.",
+          )
+          .addText((component) => {
+            component
+              .setPlaceholder("Plans.md")
+              .setValue(this.plugin.getSettings().plannerNotePath);
+            component.inputEl.addEventListener("change", () => {
+              try {
+                const plannerNotePath =
+                  getSharedPlannerNotePath(component.getValue()) ?? "";
+                this.update({ plannerNotePath });
+                component.setValue(plannerNotePath);
+              } catch (error) {
+                new Notice(String(error));
+                component.setValue(this.plugin.getSettings().plannerNotePath);
+              }
+            });
+          }),
+      )
       .addSetting((setting) =>
         setting
           .setName("Planner Heading Text")

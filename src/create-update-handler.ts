@@ -10,6 +10,7 @@ import {
   type Update,
 } from "./service/diff-writer";
 import type { PeriodicNotes } from "./service/periodic-notes";
+import { createPlannerNote } from "./service/planner-note";
 import type { VaultFacade } from "./service/vault-facade";
 import type { DayPlannerSettings } from "./settings";
 import type { PlanTimeBlock } from "./time-block-types";
@@ -181,11 +182,12 @@ export const createUpdateHandler = (props: {
 
       await Promise.all(
         needToCreate.map(async (path) => {
-          const date = periodicNotes.getDateFromPath(path, "day");
-
-          isNotVoid(date);
-
-          await periodicNotes.createDailyNote(date);
+          await createPlannerNote(
+            path,
+            getSettings(),
+            periodicNotes,
+            vaultFacade,
+          );
         }),
       );
     }

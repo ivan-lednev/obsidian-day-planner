@@ -9,7 +9,10 @@ import {
 } from "obsidian";
 import { isInstanceOf, isNotVoid } from "typed-assert";
 
+import type { DayPlannerSettings } from "../settings";
+
 import type { PeriodicNotes } from "./periodic-notes";
+import { getOrCreatePlannerNote } from "./planner-note";
 import type { VaultFacade } from "./vault-facade";
 
 function doesLeafContainFile(leaf: WorkspaceLeaf, file: TFile) {
@@ -23,6 +26,7 @@ export class WorkspaceFacade {
     private readonly workspace: Workspace,
     private readonly vaultFacade: VaultFacade,
     private readonly periodicNotes: PeriodicNotes,
+    private readonly getSettings: () => DayPlannerSettings,
   ) {}
 
   onLayoutChange(handler: () => void) {
@@ -79,13 +83,14 @@ export class WorkspaceFacade {
   };
 
   async openFileForDay(moment: Moment) {
-    const dailyNote =
-      this.periodicNotes.getDailyNote(
-        moment,
-        this.periodicNotes.getAllDailyNotes(),
-      ) || (await this.periodicNotes.createDailyNote(moment));
+    const note = await getOrCreatePlannerNote(
+      moment,
+      this.getSettings(),
+      this.periodicNotes,
+      this.vaultFacade,
+    );
 
-    return this.openFileInEditor(dailyNote);
+    return this.openFileInEditor(note);
   }
 
   getActiveMarkdownView = () => {
