@@ -61,6 +61,8 @@
   }
 
   .content {
+    cursor: var(--time-block-cursor, inherit);
+
     position: relative;
 
     overflow: hidden;

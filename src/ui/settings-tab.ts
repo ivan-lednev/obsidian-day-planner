@@ -12,6 +12,7 @@ import {
   firstDaysOfWeek,
 } from "../settings";
 import Callout from "../ui/components/callout.svelte";
+import { TemplateFileSuggest } from "../ui/template-file-suggest";
 
 export class DayPlannerSettingsTab extends PluginSettingTab {
   private warningComponent?: Component;
@@ -479,6 +480,90 @@ export class DayPlannerSettingsTab extends PluginSettingTab {
               }),
           ),
       );
+
+    const meetingNotesGroup = new SettingGroup(containerEl)
+      .setHeading("Meeting notes")
+      .addSetting((setting) =>
+        setting
+          .setName("Open meeting notes when clicking calendar events")
+          .setDesc(
+            "Off by default. When on, clicking an event from a remote calendar opens a note for it, creating one if needed",
+          )
+          .addToggle((toggle) =>
+            toggle
+              .setValue(this.plugin.getSettings().meetingNotesEnabled)
+              .onChange((value: boolean) => {
+                this.update({ meetingNotesEnabled: value });
+                this.display();
+              }),
+          ),
+      );
+
+    if (this.plugin.getSettings().meetingNotesEnabled) {
+      meetingNotesGroup
+        .addSetting((setting) =>
+          setting
+            .setName("Meeting notes folder")
+            .setDesc("New meeting notes are created in this folder")
+            .addText((component) =>
+              component
+                .setPlaceholder("Meetings")
+                .setValue(this.plugin.getSettings().meetingNotesFolder)
+                .onChange((value) => {
+                  this.update({ meetingNotesFolder: value.trim() });
+                }),
+            ),
+        )
+        .addSetting((setting) =>
+          setting
+            .setName("Link meeting notes from daily notes")
+            .setDesc(
+              "Add a link to the new meeting note in the daily note of the event's day, and a link back to the daily note in the meeting note",
+            )
+            .addToggle((toggle) =>
+              toggle
+                .setValue(this.plugin.getSettings().meetingNotesLinkInDailyNote)
+                .onChange((value: boolean) => {
+                  this.update({ meetingNotesLinkInDailyNote: value });
+                }),
+            ),
+        )
+        .addSetting((setting) =>
+          setting
+            .setName("Meeting note template")
+            .setDesc(
+              "A note to use as the template for new meeting notes. Leave empty to use the default layout. See the README for the supported variables",
+            )
+            .addText((component) => {
+              component
+                .setPlaceholder("Templates/Meeting.md")
+                .setValue(this.plugin.getSettings().meetingNoteTemplate)
+                .onChange((value) => {
+                  this.update({ meetingNoteTemplate: value.trim() });
+                });
+
+              new TemplateFileSuggest(this.app, component.inputEl, (path) => {
+                component.setValue(path);
+                this.update({ meetingNoteTemplate: path });
+              });
+            }),
+        )
+        .addSetting((setting) =>
+          setting
+            .setName("Meeting notes heading")
+            .setDesc(
+              "Links to meeting notes are added under this heading in the daily note. It gets created if it's missing",
+            )
+            .addText((component) =>
+              component
+                .setPlaceholder("Meetings")
+                .setValue(this.plugin.getSettings().meetingNotesHeading)
+                .onChange((value) => {
+                  this.update({ meetingNotesHeading: value });
+                }),
+            ),
+        );
+    }
 
     new SettingGroup(containerEl)
       .setHeading("Status bar widget")

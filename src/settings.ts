@@ -63,6 +63,16 @@ export interface DayPlannerSettings {
   firstDayOfWeek: (typeof firstDaysOfWeek)[number];
   multiDayRange: "full-week" | "work-week" | "3-days";
   timelineColumns: TimelineColumns;
+  meetingNotesEnabled: boolean;
+  meetingNotesFolder: string;
+  meetingNotesHeading: string;
+  meetingNotesLinkInDailyNote: boolean;
+  meetingNoteTemplate: string;
+  /**
+   * Meeting ID -> path of its note. Lets us find a note again without storing
+   * the ID in the note itself.
+   */
+  meetingNoteIndex: Record<string, string>;
 }
 
 export const defaultSettings: DayPlannerSettings = {
@@ -102,6 +112,12 @@ export const defaultSettings: DayPlannerSettings = {
   multiDayRange: "3-days",
   showActiveClockInStatusBar: true,
   timelineColumns: { planner: true, timeTracker: false },
+  meetingNotesEnabled: false,
+  meetingNotesFolder: "Meetings",
+  meetingNotesHeading: "Meetings",
+  meetingNotesLinkInDailyNote: true,
+  meetingNoteTemplate: "",
+  meetingNoteIndex: {},
 };
 
 export const defaultSettingsForTests = {

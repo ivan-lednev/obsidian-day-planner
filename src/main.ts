@@ -34,7 +34,12 @@ import type { DateRanges } from "./redux/date-ranges";
 import { icalRefreshRequested } from "./redux/ical/ical-slice";
 import { type IcalParseTaskResult } from "./redux/ical/init-ical-listeners";
 import { selectActiveLogTimeBlocks } from "./redux/index/index-selectors";
-import { settingsUpdated } from "./redux/settings-slice";
+import {
+  startMeetingNoteListeners,
+  vaultFileDeleted,
+  vaultFileRenamed,
+} from "./redux/meeting-notes/meeting-notes-listeners";
+import { selectSettings, settingsUpdated } from "./redux/settings-slice";
 import {
   type AppDispatch,
   type AppStore,
@@ -47,6 +52,7 @@ import { createYamlEditTargets } from "./service/edit-yaml";
 import { createIndexServices } from "./service/index/create-index-services";
 import { ListPropsParser } from "./service/list-props-parser";
 import { LogEntryEditor } from "./service/log-entry-editor";
+import { createMeetingNotes } from "./service/meeting-notes";
 import { MetadataCacheFacade } from "./service/metadata-cache-facade";
 import { PeriodicNotes } from "./service/periodic-notes";
 import {
@@ -165,6 +171,30 @@ export default class DayPlanner extends Plugin {
     });
 
     const { dispatch } = store;
+
+    startMeetingNoteListeners({
+      listenerMiddleware,
+      meetingNotes: createMeetingNotes({
+        vault,
+        metadataCache,
+        fileManager: this.app.fileManager,
+        periodicNotes: this.periodicNotes,
+        workspaceFacade: this.workspaceFacade,
+        getSettings: () => selectSettings(store.getState()),
+        updateSettings: (patch) =>
+          this.settingsStore.update((previous) => ({ ...previous, ...patch })),
+      }),
+    });
+    this.registerEvent(
+      vault.on("rename", (file, oldPath) =>
+        dispatch(vaultFileRenamed({ oldPath, newPath: file.path })),
+      ),
+    );
+    this.registerEvent(
+      vault.on("delete", (file) =>
+        dispatch(vaultFileDeleted({ path: file.path })),
+      ),
+    );
 
     this.searchOrderingService = new DefaultSearchOrderingService(
       vault,
