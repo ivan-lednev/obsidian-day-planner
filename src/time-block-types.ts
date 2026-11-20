@@ -29,9 +29,19 @@ export interface RemoteTimeBlock extends BaseTimeBlock {
   source: "ical";
   calendar: IcalConfig;
   summary: string;
+  /**
+   * The UID of the iCal event. Unlike `id`, it is stable between re-syncs, so
+   * it can be used to link vault content (like meeting notes) to an event.
+   * Recurring events share a UID, so it should be combined with the date.
+   */
+  uid?: string;
   rsvpStatus: AttendeePartStat;
   description?: string;
   location?: string;
+  /** Emails of the organizer and attendees, without rooms */
+  attendees?: string[];
+  /** A link for joining online: Google Meet, Zoom, Teams, etc. */
+  onlineMeetingUrl?: string;
 }
 
 type Side = "top" | "bottom" | "left" | "right";

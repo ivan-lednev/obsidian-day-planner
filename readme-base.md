@@ -23,6 +23,10 @@ Day Planner is a community plugin for [Obsidian](https://obsidian.md/). It adds 
     - [Clocks in timelines](#clocks-in-timelines)
     - [Active clocks](#active-clocks)
     - [Limitations](#limitations)
+  - [5. Meeting notes](#5-meeting-notes)
+    - [Turning it on](#turning-it-on)
+    - [What you get](#what-you-get)
+    - [Templates](#templates)
 - [Note on the old plugin version](#note-on-the-old-plugin-version)
 - [Acknowledgements](#acknowledgements)
 
@@ -162,6 +166,82 @@ A right click on an active clock will bring the control menu:
 #### Limitations
 
 - Clock time blocks cannot be edited by dragging yet. Use the context menu to edit clock times.
+
+### 5. Meeting notes
+
+Click an event from an internet calendar to take notes for this meeting. Day Planner creates a note for the meeting from your template and links it to your daily note. Click the event again, and the same note opens.
+
+![](./assets/meeting-notes-demo.png)
+
+#### Turning it on
+
+Meeting notes are off by default. Turn them on in the plugin settings under **Meeting notes**:
+
+| Setting                                          | Default    | What it does                                                                    |
+| ------------------------------------------------ | ---------- | ------------------------------------------------------------------------------- |
+| Open meeting notes when clicking calendar events | Off        | Clicking or tapping an event from an internet calendar opens its note           |
+| Meeting notes folder                             | `Meetings` | Where new meeting notes are created                                             |
+| Meeting note template                            | None       | A note to use as the template (see [Templates](#templates))                     |
+| Link meeting notes from daily notes              | On         | Adds a link to the meeting note in the daily note of that day, and a link back  |
+| Meeting notes heading                            | `Meetings` | The heading in the daily note that links go under. It's created if it's missing |
+
+The other settings show up once you turn the feature on.
+
+![](./assets/meeting-notes-settings.png)
+
+#### What you get
+
+- **A note per meeting:** `Meetings/2026-11-19 Weekly sync.md`. Recurring events get a note per day
+- **Properties:** `title`, `meeting-id`, `location` (a physical place), `meeting-link` (Google Meet, Zoom, Teams, Webex and others) and `daily-note`. A property is left out if the event doesn't have it
+- **A link in your daily note:** `- [[2026-11-19 Weekly sync|10:00 - 10:30 Weekly sync]]` under the "Meetings" heading. It's never added twice
+
+  ![](./assets/meeting-notes-daily-note.png)
+
+- **The same note every time:** clicking the event again opens the note you already have, even if you renamed or moved it
+
+> [!Note]
+> Meeting links are found in the conference details of the event (Google Meet, Microsoft Teams) or in its location and description.
+
+#### Templates
+
+Pick a template in the settings to control how meeting notes look. The properties above are always added to the note, and these variables are replaced:
+
+| Variable                               | Value                                         |
+| -------------------------------------- | --------------------------------------------- |
+| `{{summary}}`                          | Event title                                   |
+| `{{title}}`                            | Note name                                     |
+| `{{meeting-id}}`                       | Event ID, stable between syncs                |
+| `{{date}}`, `{{date:DD.MM.YYYY}}`      | Event date, with an optional format           |
+| `{{time}}`, `{{start}}`, `{{end}}`     | Start and end times, with an optional format  |
+| `{{time-range}}`                       | E.g. `10:00 - 10:30`                          |
+| `{{duration}}`, `{{duration-minutes}}` | E.g. `1h 30m` and `90`                        |
+| `{{location}}`, `{{meeting-link}}`     | Physical location and online meeting link     |
+| `{{attendees}}`, `{{attendee-list}}`   | Attendee emails, comma-separated or as a list |
+| `{{description}}`                      | Event description, as Markdown                |
+| `{{daily-note}}`                       | A link to the daily note                      |
+| `{{calendar}}`                         | Calendar name                                 |
+
+Other text, like [Templater](https://github.com/SilentVoid13/Templater) commands, is left as is. Here is a template that adds more properties, so that you can find all meetings with someone using search or Bases:
+
+```md
+---
+tags:
+  - meeting
+date: { { date:YYYY-MM-DDTHH:mm } }
+duration: { { duration-minutes } }
+attendees: [{ { attendees } }]
+---
+
+## Agenda
+
+{{description}}
+
+## Notes
+
+## Action items
+
+- [ ]
+```
 
 ## Note on the old plugin version
 

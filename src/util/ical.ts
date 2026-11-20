@@ -7,6 +7,7 @@ import type { RemoteTimeBlock, WithDuration } from "../time-block-types";
 import type { WithIcalConfig } from "../types";
 
 import { liftToArray } from "./array";
+import { getAttendeeEmails, getOnlineMeetingUrl } from "./ical-meeting-details";
 import { getId } from "./id";
 import * as m from "./moment";
 
@@ -134,8 +135,11 @@ export function icalEventToTimeBlock(
     source: "ical",
     calendar: icalEvent.calendar,
     summary: icalEvent.summary || "(No title)",
+    uid: icalEvent.uid,
     description: icalEvent.description,
     location: icalEvent.location,
+    attendees: getAttendeeEmails(icalEvent),
+    onlineMeetingUrl: getOnlineMeetingUrl(icalEvent),
     startTime: startTimeAdjusted,
     rsvpStatus,
     isAllDayEvent,
